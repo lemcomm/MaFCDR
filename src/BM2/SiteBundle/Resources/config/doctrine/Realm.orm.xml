@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Realm">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="active" type="boolean"/>
+		<field name="name" type="string"/>
+		<field name="formal_name" type="string"/>
+		<field name="type" type="smallint"/>
+		<field name="colour_hex" type="string"/>
+		<field name="colour_rgb" type="string"/>
+		<field name="language" type="string" nullable="true"/>
+		<field name="description" type="text" nullable="true"/>
+
+		<many-to-one field="superior" target-entity="Realm" inversed-by="inferiors"/>
+		<one-to-many field="inferiors" target-entity="Realm" mapped-by="superior"/>
+		<one-to-many field="estates" target-entity="Settlement" mapped-by="realm"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="realm" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="laws" target-entity="RealmLaw" mapped-by="realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="positions" target-entity="RealmPosition" mapped-by="realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="elections" target-entity="Election" mapped-by="realm"/>
+
+		<one-to-many field="my_relations" target-entity="RealmRelation" mapped-by="source_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="foreign_relations" target-entity="RealmRelation" mapped-by="target_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="wars" target-entity="War" mapped-by="realm" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="conversations" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
+
+	</entity>
+</doctrine-mapping>

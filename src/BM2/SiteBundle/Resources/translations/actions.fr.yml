@@ -1,0 +1,275 @@
+backlink:       Retour à la <a href="%url%">Page Actions</a>.
+queued:         Cette action a été ajoutée à votre liste d'ordres.
+unavailable:
+ intro:          Désolé, mais cette action n'est pas disponible car:
+ nosettlement:   Vous n'êtes pas près d'un hameau. 
+ notyours:       Vous ne contrôlez pas cet établissement.
+ nobody:         Il n'y a pas d'autres nobles dans votre champ d'action.
+ nosoldiers:     Vous ne commandez pas de troupes.
+
+queue:
+ title:         liste d'actions
+ settlement:
+  rename:       renommer l'établissement
+  attack:       attaquer l'établissement
+  defend:       défendre l'établissement
+
+control:
+ name:          actions de contrôle local
+ all:           toutes les actions de contrôle
+ take:
+  name:         prendre le contrôle
+  description:  Vous déclare le Seigneur de cet établissement et l'ajoute à vos possessions.
+  unavailable:
+   yours:       Vous contrôlez déjà cet établissement.
+  intro:        Pour utiliser les ressources de ce %type% et en commander la population, vous devez en prendre le contrôle. 
+  owned:        Cet établissement est présentement contrôlé par %owner%.
+  defended: >
+    Des soldats défendent cet endroit, vous ne pouvez pas simplement y monter votre 
+    bannière. Vous devrez les vaincre d'abord.
+  undefended: >
+    Puisqu'il n'y a personne pour défendre cet endroit, vous pouvez simplement remplacer 
+    la bannière de %his% par la vôtre.
+  free: >
+    Puisque personne ne contrôle cet établissement, vous n'avez qu'à convaincre les paysans.
+    Il suffit de planter votre bannière, puis de corriger le premier impudent qui s'y 
+    objecterait.    
+  submit:       prendre le contrôle
+  success: >
+    Votre bannière flotte sur cet établissement, et les gens qui s'y trouvent vous obéiront.<br />
+    Rappelez-vous qu'à moins d'y installer une milice de défense, vous pouvez en perdre le contrôle 
+    aussi facilement que vous l'avez pris.    
+ grant:
+  name:         Transférer le contrôle
+  description:  Transfère le contrôle de cet établissement à un autre noble.
+  unavailable:
+   owned:       Un autre que vous contrôle cet établissement.
+   free:        Vous ne contrôlez pas cet établissement, vous devez d'abord en prendre le contrôle.
+  intro: >
+    Les établissements sous votre contrôle peuvent être transférés à quelqu'un d'autre.<br />
+    Notez qu'un transfert <em>ne fait pas</em> automatiquement du récipient votre vassal. Les questions 
+    de légitimité et de féodalité doivent être réglées indépendamment.
+  to:           transférer le contrôle à
+  submit:       transférer
+  success:      Vous avez maintenant transféré le contrôle de get établissement à %newowner%.
+ rename:
+  name:         renommer l'établissement
+  description:  Change le nom de cet établissement.
+  intro: >        
+    En tant que Seigneur de ce %type%, vous pouvez en changer le nom pour le rendre plus 
+    distinctif, ou pour flatter votre ego.
+  newname:      nouveau nom
+  submit:       changer le nom
+  success: >
+    Vous avez décrété que cet endroit s'appellerait dorénavant "%newname%".<br />
+    Les cartes et la signalisation sont immédiatement mis à jour.
+  queued: >
+    Les meneurs de cet établissement ont reçu l'instruction de le renommer "%newname%".<br />
+    Les cartes et la signalisation seront mis à jour dans les prochaines heures. Vous verrez les changements bientôt complétés.
+
+military:
+ name:          actions militaires
+ all:           toutes les actions militaires
+ settlement:
+  all:          toutes les actions militaires dans des établissements
+  defend:
+   name:        défendre l'établissement
+   description: place votre troupe en position pour défendre l'établissement s'il était attaqué.
+   intro: >
+     Ordonnez à vos soldats de défendre %settelement%.<br />
+     Ils installeront des défenses, utilisant toutes les fortifications disponibles, et défendront 
+     l'établissement contre quiconque l'attaquerait.
+   submit:      installer les défenses
+   queued: >
+     Vos soldats se préparent à une attaque et sont prêts à se défendre.
+   unavailable:
+    already:    Vous avez déjà ordonné à votre troupe de défendre.
+    attacking:  Vous ne pouvez pas attaquer et défendre en même temps.
+
+  attack:
+   name:        attaquer l'établissement
+   description: envahir l'établissement pour tuer ou faire fuir ses défendeurs.
+   intro: >
+     Ordonne à vos soldats d'attaquer %settlement%.<br />
+     Il y aura une bataille entre vos forces et celle de vos alliés contre le milice locale 
+     ainsi que les autres forces présentes pour défendre l'établissement. Si vous vainquez 
+     tous vos opposants, vous pourrez prendre le contrôle de l'établissement.    
+   submit:      attaquez!  
+   queued: >
+     Vos soldats se préparent à l'attaque et la bataille commencera bientôt.
+   unavailable:
+    yours:      Vous contrôlez déjà cet établissement.
+    nodefenders: Personne ne défend cet établissement, prenez-en simplement le contrôle.
+    already:    Vous avez déjà donné l'ordre d'attaquer.
+    defending:  Vous ne pouvez pas attaquer et défendre en même temps.
+  loot:
+   name:        piller cet établissement
+   description: piller les ressources et les valeurs dans cet établissement
+ others:
+  all:          toutes les actions militaires visant d'autres nobles
+  attack:
+   name:        attaquer d'autre nobles
+   description: prépare une bataille avec d'autres nobles
+   submit:      préparer l'attaque
+
+
+economy:
+ name:          actions sur l'économie d'un établissement
+ all:           toutes les actions économiques
+ others:        autres actions économiques
+ workhours:     heures de travail
+ roads:
+  name:         construction de route
+  description:  Ordonne la construction ou la destruction de routes et de ponts.
+  intro: >
+    Pour améliorer le transport et le commerce, vous pouvez construire des routes de votre 
+    établissement à celui de votre voisin, du moins la partie située sur vos terres.<br />
+    Si une rivière se dresse sur le chemin, un pont sera automatiquement consruit si et
+    seulement si à la fois vous et votre voisin dédiez des ressources à la construction de 
+    la route.<br />
+    Comme pour les autres projets de construction, vous pouvez assigner un pourcentage de
+    la production locale à la construction de routes.
+  dest:         destination
+  destlord:     seigneur de la destination
+  status:
+   us:          statut de notre côté
+   them:        statut de leur côté
+  river:        traverse de rivière
+  workers:      travailleurs assignés
+  buildworkers: travailleurs assignés à la construction d'infrastructures
+  submit:       assigner des travailleurs
+ build:
+  name:         construction d'immeuble
+  description:  Organise la construction des infrastructures importantes.
+  intro: >
+    Bien que les paysans construisent eux mêmes les immeubles dont ils ont besoin, vous pouvez
+    ordonner que l'on construise des infrastructures avant qu'ils le fassent eux-mêmes.<br />
+    La construction nécessitera d'y dédier une partie de vos ressources. Plusieurs infrastructures
+    requièrent un minimum de population ou la présence d'infrastructures précédentes.
+  active:       actif
+  progress:     avancement de la construction
+  workers:      travailleurs assignés
+  completion:   restant estimé
+  never:        jamais
+  roadworkers:  travailleurs assignés à la construction de routes
+  effort:       effort de construction
+  existing:     infrastructures existantes
+  canbuild:     peut être construit
+  cannotbuild:  inconstruisible
+  submit:       assigne des travailleurs
+  unavailable:
+   population:  Cet établissement requière une population d'au moins %content%.
+   prerequisite: %content% requis avant de pouvoir construire cet infrastructure.
+   already:     Cette infrastructure est déjà construite ou en cours de construction.
+   over100percent: Vous avez assigné plus de travailleurs que vous n'en avez. Cette allocation ne sera pas acceptée.
+  warning:
+   over20percent: Vous avez assigné une part considérable de vos paysans à du travail de construction. Êtes-vous certain que cela ne résultera pas en un manque de nourriture?
+   over50percent: Vous assignez la majorité de votre population à des travaux de construction. Faites attention à une possible famine résultante.
+
+ trade:
+  name:        Accords d'Echange/de Tributs
+  owner:       Voir et proposer des accords commerciaux pour cet établissement
+  foreign:     Offrir un accord à cet établissement
+  unavailable:
+   noestate:   Vous n'avez pas d'établissement pour faire du commerce.
+  intro:
+   owned: >
+     En tant que Seigneur de cet établissement, vous pouvez revoir et modifier ou annuler les ventes prévues. Vous 
+     pouvez aussi répondre aux offres d'achat que l'on vous fait.<br /> 
+     Tous les accords de commerce ou de tribut sont à long terme - ils durent jusqu'à ce que vous les modifiez ou les
+     annuliez. Vous êtes le Seigneur, vous n'avez pas gérer chaque envoi.
+   foreign: >
+     Vous pouvez offrir de vendre ou de donner du matérial à cet établissement depuis un des votres. Les envois pourront 
+     commencer immédiatement.<br />
+     A moins que vous n'offriez un tribut, vous devriez insister pour recevoir des biens en échange, mais quelqu'un
+     doit bouger le premier. La confiance est la véritable monnaie du commerce.<br />
+     Tous les accords de commerce ou de tribut sont à long terme - ils durent jusqu'à ce que vous les modifiez ou les
+     annuliez. Vous êtes le Seigneur, vous n'avez pas gérer chaque envoi.
+  submit:       initier un échange ou un tribut
+  cancel:       annuler un accord
+  inbound:      réception
+  outbound:     envoi
+  towards:      envois de votre établissement vers celui-ci
+  resources:    ressources de vos établissements
+  amount:       montant
+  res:          ressource
+  to:           vers
+  from:         de
+  localres:     ressources locales
+  production:   production
+  demand:       demande
+  trade:        échange
+  sum:          somme
+  transcost:    coût de l'échange
+  new:          nouvel accord
+
+recruit:
+ name:          actions de recrutements
+ all:           toutes les actions de recrutements
+ entourage:
+  name:         recruter un entourage
+  description:  Ajoute des spécialistes à votre entourage personnel.
+  intro: >
+    En tant que Seigneur de %settlement%, vous pouvez engager des paysans de ce %type% pour servir
+    dans votre entourage. <br />
+    Les centres de recrutements permettent l'accès à des spécialistes expérimentés, y compris ceux 
+    qui nécessitent une véritable éducation.
+  provided:     fourni par
+  submit:       recruter
+ troops:
+  name:         entrainer des soldats
+  description:  Entraine des soldats pour servir dans la milice ou dans votre troupe.
+  intro: >
+    En tant que Seigneur de %settlement%, vous pouvez engager des paysans de ce %type% pour servir
+    comme soldats.<br />
+    Une fois entrainés, ils seront automatiquement ajoutés aux forces de défense locales, mais peuvent
+    vous suivre en campagne lorsque vous le désirez.<br />
+    Les centres de recrutements militaires permettent l'accès à des soldats expérimentés et mieux équipés.
+  traintime:    temps d'entraiement
+  provided:     fourni par
+  current: >
+    %number% soldats s'entrainent présentement dans cet établissement.<br />
+    Le temps d'entrainement augmente lorsque plusieurs soldats s'entrainent en même temps. Pour éviter les queues
+    à l'entrée du camp, attendez que cette cohorte-ci aie terminé son entrainement.<br />
+    Les détails des recrues présentement au camp sont visible sur la page <a href="%url%">%page%</a>.
+  time:         Temps estimé pour l'entrainement des nouvelles recrues: <span id="total">%est%</span> jours.
+  submit:       recruter
+ militia:
+  name:         gérer la milice
+  description:  Equipe ou enrôle la milice de cet établissement
+  recruit:      recruter
+  unavailable:
+   none:        Il n'y a pas de soldats ici.
+ manage:
+  choose:       -- select --
+  disband:      dissoudre
+  makesoldier:  mobiliser
+  makemilitia:  placer comme milice
+  submit:       soumettre
+
+meta:
+ name:          méta-actions du personnage
+ rename:
+  name:         renommer
+  description:  changer le nom du personnage
+  intro: >
+    Vous pouvez changer le nom de votre personnage à n'importe quel moment, mais il est <em>fortement</em> conseillé
+    de ne le faire que dans les cas raisonnables, par exemple un mariage ou une ascension à un trône.<br />
+    Tous les changements sont enregistrés dans l'historique public du personnage.
+  newname:      Nouveau Nom
+  submit:       renomme le personnage
+  success:      Votre personnage a été renommé.
+ kill:
+  name:         tuer
+  description:  tue le personnage
+  intro: >
+    Vous pouvez tuer votre personnage à n'importe quel moment.<br />
+    Cette action ne donnera pas en elle-même une raison pour la mort du personnage. Vous devriez tout d'abord jouer une
+    scène de mort afin que les autres joueurs connaissent la raison de la mort de %he%.<br />   
+    <div class="warning">Cette action ne peut pas être annulée.</div>
+  sure:         vous êtes vraiment, vraiment certain?
+  submit:       embrassez le vide cosmique de la mort
+
+
+
+

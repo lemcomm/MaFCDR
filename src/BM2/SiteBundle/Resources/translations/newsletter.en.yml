@@ -1,0 +1,189 @@
+# Might & Fealty
+# text strings for the daily newsletter
+# Author: Tom Vogt <tom@mightandfealty.com>
+
+footer: >
+  <small>
+  You are receiving this message because you registered with the online game <a href="http://mightandfealty.com">Might & Fealty</a>.<br />
+  If you don't want to receive these messages anymore, log on to your account, go to <a href="http://mightandfealty.com/account/settings">Settings</a> 
+  and disable "Newsletter".
+  </small>
+
+newplayer:
+ subject: "[Might & Fealty] New Player Guide"
+ 0: >
+   <p>Welcome to the Might & Fealty New Player Guide. As the game is a fair bit deep, you as a new player will get exclusive,
+   daily hints and tricks to get into the game in what I hope to be the best way. Of course, as always in this game, you are
+   very welcome to experiment on your own as well.</p>
+   <p>Today, in case you have missed it, allow me to remind you that the game has a nice <a href="http://mightandfealty.com/manual">manual,
+   which includes a tutorial video</a>. This will help you to get started after creating your first character.</p>
+   <p>But you should not stop there. Being a sandbox, the different areas and realms in the game world are at different levels of activity
+   and interest at any given time. You really should create several characters and put them into different places around the map,
+   so you can experience various environments and figure out quickly which you like best.</p>
+ 1: >
+   <p>Welcome to the second part of the Might & Fealty New Player Guide. Remember, these are exclusive hints for new players, to
+   help you get into the game in the best possible way.</p>
+   <p>By now, you have certainly started a few characters and jumped into the game world. It may appear very calm and quiet at first,
+   but looks can be deceiving.<br />
+   In addition to communicating with your liege (if you accepted a knight offer), there are also <i>Realm Conversations</i> going on
+   that let you talk to everyone within your realm - or realms if you joined a sub-realm that is part of a larger one.<br />
+   In addition to letting you know what is going on around the realm, these conversations are also your best and most direct route to
+   other players who are, by shared bonds, your allies more often than not. In addition to talking to your liege, this is where you can
+   ask questions or get some help from fellow players. Do not hesitate to ask, or simply to introduce your characters with a short roleplay.</p>
+ 2: >
+   <p>More exclusive hints and tricks for you and your Might & Fealty gameplay experience. Today, we will focus on unit management.</p>
+   <p>Either through a knight offer, or due to some lord generously (read: expecting your service in return) granting you some troops,
+   at least one of your characters should have some soldiers by now. Check them out - in the menu bar, find "Status" and in the pop-up
+   menu you can see "Your Soldiers". When you click on it, a list of all your soldiers shows up, with detailed information about every
+   single one of them. Take some time to explore this page, as it tells you everything you could ever want to know about your soldiers.</p>
+   <p>You will see an empty select box next to each one. This is where you can issue orders to your soldiers. Which orders are available
+   depends on your location and other factors. For example, the option to resupply will only appear if you are in a settlement that allows
+   you to use its facilities and your soldier is in need of resupply.</p>
+   <p>There is also a similar screen for your entourage, also available through the menu. Check it out as well!</p>
+ 3: >
+   <p>Today, our exclusive Might & Fealty hint will tell you how to go deeper, much deeper, into the gameplay.</p>
+   <p>As a new knight, so far you have managed a small unit of soldiers and maybe walked around and discovered the game world a little.
+   But that is only the surface.</p>
+   <p>The core of Might & Fealty is that you can reach your goals in many different ways. There are three main channels for your power:
+   Military, Political and Economical. To have the deepest and most satisfying gameplay, you should explore all of them, possibly with
+   different characters.</p>
+   <p><b>Military</b> power is soldiers under your command. Train them, maintain them well and always strive to get more and better equipped
+   ones. 10 heavily armoured knights will wipe the floor with 10 light infantry. If you command a powerful army, you can go anywhere and
+   simply take what you desire.</p>
+   <p>That is, until you meet someone with <b>Political</b> power. As a politician, you may not command a strong army yourself, but you
+   can call upon vassals, allies and others to do your fighting for you. By making alliances, brokering deals and managing fealty properly,
+   you are never alone and your power can far exceed that which you could hold on your own.</p>
+   <p>But the foundation of all is <b>Economic</b> power. He who controls the kings gold, controls the king. Economic power exists in
+   your estates, settlements under your command, and their population, production and facilities. Those 10 heavy knights need to have
+   their plate armor and swords manufactured somewhere, and their war horses raised and trained. Those who control the means to <i>create</i>
+   an army hold considerable power. But no city exists on its own. Trade is the weapon of economy, and to set up good trade, or bring in
+   tribute, military and political power are always useful and sometimes necessary.</p>
+   <p>To get started into the depths of Might & Fealty gameplay, you should strive to have at least one of your characters become a
+   <i>lord or lady</i>, someone who holds his own estate. Will you take your first settlement by force, or have it granted to you in
+   exchange for your loyalty?</p>
+ 4: >
+   <p>Yesterday, I told you how the game is more like Game of Thrones than Total War, by showing you different paths to power. Today,
+   some hints on estate management. If you do not yet have your own estate, keep them in mind for the future, because sooner or later,
+   you will.</p>
+   <p>The most important thing to keep in mind is to have a <i>purpose</i>. When it comes to trade, troops and construction, contrary to 
+   many build-up games, you should not construct every building possible just because you can. Nor should you recruit the maximum
+   possible amount of militia. Read on.</p>
+   <p>For each of your estates, determine what it is for. Both for yourself and in the greater picture. Once you have determined that
+   purpose, see which steps bring you closer, and which ones don't.</p>
+   <p>For example, many villages primarily serve to provide food and other resources to a larger town or city. Building blacksmiths and
+   training facilities in these villages is a waste, because these buildings will tie up workforce and thus reduce the production of
+   resources - your primary purpose. However, some buildings such as a palisade help to ensure not every bandit walking by can take 
+   control, and it also raises <a href="http://mightandfealty.com/manual/settlements">economic security</a>, which in turn improves
+   resource production. For the same reason, you want to have a small militia stationed, even if the village is under no threat. And,
+   of course, you want to construct buildings that provide useful resource production bonuses, such as the mill or the market.</p>
+   <p>In larger settlements, focus is still useful. Do you really have to have production and training facilities for every imaginable
+   type of soldiers and entourage, or do you want to focus? More focus means less wasted workforce and faster construction.</p>
+   <p>In both cases, look through the <a href="http://mightandfealty.com/info/buildingtypes">building types</a> to see which buildings
+   depend on what others and figure out in which order to build them. You can also check out the 
+   <a href="http://mightandfealty.com/en/info/equipmenttypes">equipment types</a> to see which buildings you need to produce and train
+   particular types of soldiers.</p>
+   <p>One last thing to keep in mind is that <i>plans change</i>. When your major trading partner fails, or your realm changes shape,
+   or just when you make other plans. Always be ready to change course and re-plan your estates and their purpose.</p>
+ 5: >
+   <p>For your fifth day in the game, I will give you some hints on how the game differs from almost every other game out there. This
+   matters a great deal because only by understanding these differences can you enjoy it to the max.</p>
+   <p>The first thing is that Might & Fealty is a <b>sandbox game</b>. Fortunately, there are others out there that you can compare it
+   to, like EVE Online or Dwarf Fortress or The Sims. By "sandbox" I mean that there are no quests or campaigns. You make your own goals
+   and carve your own path, and so does every other player. On the one hand, everything is possible. On the other hand, you are
+   responsible for making it happen. Like nature in the real world, the game world of Might & Fealty is cruel and doesn't care if your
+   character lives or dies. The background world just happens, it doesn't wait for you nor does it have a specific path or storyline
+   prepared. You can do whatever you want.</p>
+   <p>Secondly, Might & Fealty is not a <a href="http://en.wikipedia.org/wiki/4X">4X</a> game. "4X" stands for <i>"eXplore, eXpand, eXploit, and eXterminate"</i>
+   and sums up the gameplay of most strategy and wargames, where you begin small, build up your base/castle/empire/starship in order to
+   expand and grow so you can defeat the enemy and win. While in Might & Fealty you will experience periods of growth and expansion,
+   the game world itself is static and self-balancing - your growth only happens because you take land away from other players. This
+   also means that at times, you will be the one who gets beaten up and loses lands, troops or even an entire realm. Unlike 4X games
+   with their exponential growth towards domination, in Might & Fealty this is not the end of the game. Empires rise and fall throughout
+   history, and while the empire might end, history does not.<br />
+   In consequence, don't expect the constant growth you know from other games. When you get your first estate, it is most likely already
+   built-up to what it can sustain. It might be damaged from war, but it is unlikely that your village will grow into a large city.
+   Remember yesterdays hints? Keep the <i>purpose</i> of each settlement in mind. If your estate is stable, you are doing nothing wrong,
+   on the contrary, you are doing everything right.</p>
+   <p>And finally, Might & Fealty is many games in one. If you don't like your current realm, or are losing a war, you can always
+   start a new character and play somewhere else. No one can see which characters are yours if you don't link them up through family
+   or other relationships, so there is nothing stopping you from switching sides and playing alongside of your former enemies. And
+   since every character can die, your focus in the game should be your experience and fun, not the success or progress of individual
+   characters. That is part of the fun, but the game itself is all about you, the player.</p>
+   <hr />
+   <p>These hints should help you get into the game properly. Today was the last daily hint, we do not want to bother you with too
+   many messages. You will receive a few more in longer intervals, to point out things you may have missed. And as always, feel
+   free to explore the game in any way you wish.</p>
+ a: >
+   <p>Here is another hint about smaller features that are less obvious but can deepen the gameplay of Might & Fealty considerably.
+   If you want to get even more out of the game or are looking for something else to do while your political schemes unfold, here
+   are some ideas:</p>
+   <dl>
+   <dt>Marriage</dt>
+   <dd>Characters in the game can be engaged, marry, divorce, be unfaithful, take a lover and many more things. You can use these
+   options for roleplaying, as political tools or just for fun.</dd>
+   <dt>Historic Research</dt>
+   <dd>For some historic events, only a limited amount of information is immediately available and scholars are needed to research
+   more. Uncovering the long-lost history of a settlement and settling the question of its heritage can be both a challenge and an
+   interesting side-quest.</dd>
+   <dt>Dungeons</dt>
+   <dd>And speaking of side-quests, you can also take your character into unexplored caves, ancient ruins and other places of danger
+   and adventure, where you face progressively more dangerous enemies together. Finding a dungeon is a small quest all by itself and
+   you may need the help of others who have heard of their location.</dd>
+   </dl>
+ b: >
+   <p>Here is one more - almost the last - gameplay hint that I want to share with you. It is about motivation.</p>
+   <p>The summary is simple: <b>Never give up</b>. In Might & Fealty, you can never really lose. Sure, you might lose a battle,
+   or control of a settlement. You can see your kingdom shattered and your family of characters hunted and hanged. But there is
+   never a "game over" screen. You can always make a new character, retake your estates, found a new kingdom - revenge is always
+   possible.</p>
+   <p>Tides turn and fortunes change, but alliances also shift. Your enemy today may be your friend tomorrow - or vice versa. In
+   addition to continuing your family or clan, you can also start a new character with no obvious relations to your family or
+   kingdom. Might & Fealty never reveals which character is played by what player, so you always have the opportunity to simply
+   start again with a blank slate.<br />
+   Since you can also rename characters, it is quite possible to roleplay infiltration this way, and then reveal your true colors
+   once you have stuck your knife into the back of that hated enemy.</p>
+   <p>As so often in this game, the possibilities are endless.</p>
+ c: >
+   <p>For the last time today, a few bits of help and then you are no longer a new player and you are on your own. Of course,
+   if you have followed the previous letters, you now have in-game allies and friends who will continue to support you, right?</p>
+   <p>This last newsletter expands into ways to worry and damage enemies, or just keep yourself entertained: Looting and bandits.</p>
+   <p>When you wage war, you can not or do not want to always conquer. Looting your opponent can be funny and profitable. It has
+   two main purposes. The first is to damage your enemy, by disrupting his infrastructure and trade. When doing damage, think
+   beyond the estate you are attacking itself. If it supplies some resource to other settlements, with enough damage you can
+   impact that trade, causing harm to other settlements without having to visit them. For example, if you just can't breach the
+   fortifications of a big city, make a guess which nearby villages are supplying it with food and burn them. No food means
+   starvation, which can wound or kill the militia defending the walls.<br />
+   The second purpose of looting is personal gain. You can plunder and give resources to your own settlements. Sometimes, that
+   is the best way to gain access to necessary things very quickly, without all this trade and diplomacy bother.</p>
+   <p>And finally, we have bandits. These are half-NPC characters. Their number is limited, but whenever one frees up, you can
+   go and take control of him or her. These bandits are detached from the normal character gameplay, they can not join realms
+   or marry or any such things. They do, however, get a small army and can cause havoc. They are for fun. Their armies are not
+   big enough to swing a war, but they can cause trouble in those areas of the map currently too peaceful.<br />
+   When playing a bandit, don't forget to interact. Talk to your victims, give him or her some personality, invent a reason
+   why this band of outlaws is rampaging around the countryside.</p>
+   <p>And that is it so far, we have told you many different ways in which you can enjoy the game, and there are many more.
+   If you have questions, ideas or just want to talk to other players, don't forget that we have a forum at http://forum.mightandfealty.com.<br />
+   Always remember that in this game, history is being made by you.</p>
+
+retention:
+ subject: "[Might & Fealty] We Miss You"
+ 1: >
+   <p>Hey there,<br />
+   We noticed you haven't logged in for a while and no doubt your enemies are plotting your demise.</p>
+   <p>This reminder is just to check if everything is fine, and to remind you that if you have any questions, problems or
+   suggestions, you can always come to the forum at http://forum.mightandfealty.com and let us know.</p>
+ 2: >
+   <p>Hey there,<br />
+   It's been two weeks since we last saw you in Might & Fealty. Maybe you're just on holiday or very busy, but in
+   any case we're following up on other players requests to send reminders for those whose life simply threw them
+   into a loop and they forgot.</p>
+   <p>It would be really cool to have you back, and if there's anything wrong that makes you unhappy with the game,
+   please please come to the forum or send us an email and let us know what. If we don't know it, we can't fix it.</p>
+ 3: >
+   <p>Hey there,<br />
+   So long that we didn't see you in Might & Fealty, and we miss you. If you're just very busy, then excuse me for
+   interrupting. If you just forgot about the game, or didn't like it, please let me know what you expected to be
+   different or what you didn't like at tom@mightandfealty.com -- I want to make a really, really good game, and letting
+   me know what's not great helps me a lot in making it better.</p>
+   <p>Even if you choose to not come back, it was good having you and I appreciate your time and the chance you've
+   given the game.</p>

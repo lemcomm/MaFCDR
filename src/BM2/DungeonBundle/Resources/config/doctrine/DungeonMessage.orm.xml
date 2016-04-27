@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonMessage">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="ts" type="datetime"/>
+		<field name="content" type="text"/>
+		<many-to-one field="party" target-entity="DungeonParty" inversed-by="messages"/>
+		<many-to-one field="sender" target-entity="Dungeoneer" inversed-by="messages"/>
+	</entity>
+</doctrine-mapping>

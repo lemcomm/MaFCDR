@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\Dungeon">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="area" type="string"/>
+		<field name="location" type="point" nullable="true"/>
+		<field name="tick" type="smallint"/>
+		<field name="exploration_count" type="smallint"/>
+
+		<one-to-many field="levels" target-entity="DungeonLevel" mapped-by="dungeon"/>
+		<one-to-one field="party" target-entity="DungeonParty" mapped-by="dungeon"/>
+		<many-to-one field="geo_data" target-entity="BM2\SiteBundle\Entity\GeoData"/>
+
+	</entity>
+</doctrine-mapping>

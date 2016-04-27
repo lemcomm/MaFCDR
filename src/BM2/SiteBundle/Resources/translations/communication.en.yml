@@ -1,0 +1,452 @@
+# Might & Fealty
+# text strings for events
+# Author: Tom Vogt <tom@mightandfealty.com>
+rss:
+ desc:        Might & Fealty Event Log Summary
+ feed:        get event updates via RSS
+
+event:
+ artifact:
+  created:      created
+  assigned:     Assigned to %character%.
+  spawned:      Spawned in the area of %area%.
+  given:        %character-1% gave it to %character-2%.
+  killer:       Taken by %character-1% through the killing of %character-2%.
+  lost:         Lost upon the death of %character%.
+ feature:
+  damaged:      %character% has damaged the %featuretype% %name%. It will deteriorate further if no workers are assigned for repair.
+  disabled:     %character% has damaged the %featuretype% %name% so badly, it has become inoperative. It will deteriorate further if no workers are assigned for repair.
+  destroyed:    %character% has destroyed the %featuretype% %name% to rubble.
+ spot:
+  scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
+  tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
+  estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
+
+ feature2:
+  damaged:      The %featuretype% %name% is deteriorating. Workers should be assigned for repair.
+  disabled:     The %featuretype% %name% has become inoperative due to deterioration. Workers should be assigned for repair.
+  destroyed:    The %featuretype% %name% has broken down completely and must be considered lost.
+ settlement:
+  ownership:
+   gained:			Has taken control of %settlement%.
+   lost:				Has lost control of %settlement%, because it has been taken by %character%.
+  inherited:    Was inherited by %character%.
+  inherifail:   Fell to independence on the death of %character%, who left no heir.
+  take:
+   started:     %character% has initiated actions to take control.
+   stopped:     %character% has abandoned attempts to take control.
+  taken:				Control established by %character%.
+  taken2:       Control established by %character% of %realm%.
+  loot:         The settlement is being looted by %character%.
+  loot2:        Outlying farms and homesteads are being looted by %character%.
+  lootgain:
+   resource:    Stolen resources from %settlement%, looted by %character%, have arrived.
+   thralls:     %amount% thralls taken from %settlement% by %character%, have arrived.
+  renamed:			Old name "%oldname%" changed to "%newname%".
+  granted:      Granted to %character%.
+  granted2:     Granted in fief to %character%.
+  changed:      Allegiance changed to %realm%.
+  realm:        Became a founding estate of %realm%.
+  subrealm:     Split of to be a part of %realm%.
+  realmfail:    Returned to independence with the failing of %realm%.
+  realmfail2:   Became part of %realm-1% with the failing of %realm-2%.
+  autoconstruction: >
+    Due to popular demand, the peasants have initiated construction of the %buildingtype% of their own accord.
+    %workers% workers have volunteered for the project.
+  addconstruction: >
+    Demand for %buildingtype% has caused the peasants to volunteer to speed up the construction work.
+    The worker amount on the project has been raised to %workers%.
+  tradefail:    Outgoing trade of %amount% %resource% for %settlement% had to be stopped due to insufficient amounts available.
+  tradereduce:  Insufficient resources for outgoing trade of %amount% %resource% for %settlement%. Trade volume has been reduced to %newamount%.
+  tradestop:    The trade of %amount% %resource% from %settlement% has ceased.
+  tradereduced: The trade of %resource% from %settlement% has dropped in volume. Instead of the previous %amount% units, it is now %newamount% units.
+  setback:      Due to ongoing food shortages, workers are leaving construction projects to take care of their families instead.
+  hunger:       Food shortages and hunger are becoming a problem.
+  starvation:   Starvation has reached serious levels.
+  crash:        Production and construction has come to a stop due to insufficient workforce. Buildings are closing down and falling into disrepair.
+  disrepair:    The %buildingtype% has broken down beyond repair and must be considered lost.
+  burned:       The %buildingtype% has been damaged by enemy forces.
+  burned2:      The %buildingtype% has been burned down by enemy forces.
+  thrallstaken: %amount% peasants have been abducted and sold into slavery.
+  thrallstaken2: %amount% peasants have been taken and sold as slaves. According to rumours, they have been sent to %settlement%.
+  resourcestaken2: Resources have been plundered from warehouses. According to rumours, they were sent to %settlement%.
+  attacked:     The settlement is being attacked by troops of %character%.
+  battle:       %battle% was fought.
+  entered:      %character% has entered the settlement.
+  entered2:     %character% has entered the settlement with %soldiers% soldiers.
+  forceentered: %character% has forced his way into the settlement.
+  forceentered2: %character% has forced his way into the settlement with %soldiers% soldiers.
+  left:         %character% has been seen leaving.
+  forceleft:    %character% has been forced outside the walls during the battle.
+  spot:         The watchtower "%tower%" spotted %character% in the vicinity.
+  spot2:        The watchtower "%tower%" spotted a ship nearby.
+  spot3:        The watchtower "%tower%" spotted %character% in the vicinity, with %count% soldiers.
+  claim:
+   added:       %character% has announced a claim to this settlement.
+   cancelled:   %character% has withdrawn the claim to this settlement.
+  charstart:    A new First One named %character% has appeared here.
+  newyear:      New Year celebrations, festive atmosphere and alcoholic drinks resulted in a predictable additional %babies% babies being born.
+ travel:
+  disembark:    Your ships have arrived at their destination and you have disembarked.
+  cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
+  wreck:        You have been shipwrecked at sea! With last efforts, you and your men landed near %settlement%. Your ships, however, have been lost.
+ character:
+  created:      First mention in family chronicle.
+  start:        Has appeared at %settlement%.
+  renamed:      Has changed name from "%oldname%" to "%newname%".
+  knownas1:     Now known as "%newname%".
+  knownas2:     No longer known as "%oldname%".
+  death:        Died.
+  death2:       Died in battle.
+  npcdeath:     Without troops, disappeared and died.
+  desertions:   %complaining% soldiers are complaining about being too far away from home. %gone% of them deserted.
+  deathreclaim: %amount% soldiers returned to you upon the death of %character%, whom you had them assigned to.
+  killgold:     You took %gold% gold from the body of %character%.
+  killartifact: You took the %artifact% from the body of %character%.
+  child:        Had a child, %character%.
+  inherit:
+   estate:      Inherited the settlement %settlement% from %character%.
+   realm:       Inherited the realm %realm% from %character%.
+  inheritvia:
+   estate:      Inherited the settlement %settlement% from %character-1% (via %character-2%).
+   realm:       Inherited the realm %realm% from %character-1% (via %character-2%).
+  wasgranted:   Was granted ownership of %settlement% by %character%.
+  wasgranted2:  Was granted the fief of %settlement% by %character%.
+  realmfounded: Founded the realm %realm%.
+  realmgranted: Granted rulership of %realm% by %character%.
+  abdicated:    Has abdicated rulership of %realm% and given it to %character%.
+  abdicated2:   Has abdicated rulership of %realm% with no successor.
+  succeeds:     Has gained rulership of %realm% through the abdication of %character%.
+  appointed:    Was appointed ruler of %realm% by %character%.
+  position:
+   appointed:    Appointed %realmposition% in %realm%.
+   demoted:      Demoted from %realmposition% in %realm%.
+   elected:      Elected %realmposition% in %realm%.
+  liegedied:    Your liege %character% has died. This dissolves your oath of fealty.
+  liegedied2:   Your liege %character% has died. This dissolves your oath of fealty and has turned you into a wandering noble with no realm affiliation.
+  spot:         Your scouts spotted %character% in the vicinity.
+  spot2:        Your scouts spotted %character% in the vicinity, with %count% soldiers.
+  gotship:      You were given a ship by %character%. The ship made landfall nearby %remain% days ago.
+  gotgold:      A messenger brought you a bag with %amount% gold from %character%.
+  gotartifact:  You have received the %artifact% from %character%.
+  surrender:    %character% has thrown down the sword, bent the knee, and surrendered to your mercy.
+  surrenderto:  Has surrendered to %character% and become a prisoner.
+  proposed:
+   marriage:    You have received a marriage proposal from %character%. Accept or decline it on the relations page.
+   engagement:  You have received a proposal to become engaged to %character%. Accept or decline it on the relations page.
+   liason:      %character% is making advancements on you and is obviously moving towards a liason. Allow or refute it on the relations page.
+  rejected:
+   marriage:    %character% has rejected your marriage proposal.
+   engagement:  %character% has refused to become engaged to you.
+   liason:      %character% has rejected your advances towards a liason.
+  public:
+   marriage:    Married %character%.
+   engagement:  Became engaged to %character%.
+  secret:
+   marriage:    You secrectly married %character%.
+   engagement:  You became secretly engaged to %character%.
+   liason:      You have begun a liason with %character%.
+  mercs:
+   paid:        You paid %cost% gold to your mercenary unit "%mercenaries%".
+   cantpay:     You could not pay the mercenary unit "%mercenaries%" the %cost% gold they asked for, so they left you.
+  capture:      Surrendered in battle to %character% and was taken prisoner.
+  prison:
+   free:        Set free from imprisonment.
+   free2:       Freed from imprisonment through the death of %character%.
+   kill:
+    behead:     Beheaded by %character% as a prisoner.
+    hang:       While imprisoned by %character%, executed by hanging.
+    burn:       Burned alive by %character% as a prisoner.
+    quarter:    Brutally killed by quartering while a prisoner of %character%.
+    impale:     Slaughtered by impaling while a prisoner of %character%.
+   killer:
+    behead:     Beheaded %character%.
+    hang:       Executed %character% by hanging.
+    burn:       Burned %character% alive.
+    quarter:    Brutally killed %character% by quartering.
+    impale:     Slaughtered %character% by impaling.
+   assign:      You were transferred and are now a prisoner of %character%.
+   assign2:     Transferred to %character-1% through the killing of %character-2%.
+   received:    %character-1% has given you %character-2% as a prisoner.
+   received2:   The slaying of %character-1% has given you %character-2% as a prisoner.
+  dungeon:
+   progress:    Your <a href="%url%">dungeon expedition</a> has made progress.
+   newcard1:    You improved the action %card% in the dungeon and can now do it more often.
+   newcard2:    You learned a new action while in the dungeon: %card%
+   gold:        Your plunder from the dungeon came to a total of %gold% gold.
+   closed:      Rumours have it that a nearby dungeon has been completely explored and is no longer interesting.
+  inactive:
+   prisoner:    Your captor %character% has not been seen for a long time. Maybe slumberblight got him? In any case, escaping should now be much easier.
+   vassal:      Your vassal %character% has not been seen for a long time and rumors have it that he has contracted slumberblight.
+   liege:       Your liege, %character%, has not been heard of for some time. Some say, he has been affected by slumberblight.
+   partner:     Your partner %character% seems to have vanished, or maybe it is slumberblight?
+   position:    The %realmposition% %character% has not been seen for a long time and must be assumed a victim of slumberblight.
+ military:
+  assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
+  assigned2:    You were assigned %count% entourage by %character%.
+  reclaimed:    %character% has reclaimed %count% soldiers assigned to you. %stay% of them decided to remain under your command.
+  battlejoin:   %character% has joined the battle with %soldiers% soldiers.
+
+ quest:
+  created:      Quest created.
+  started:      %character% has begun the quest.
+  abandoned:    %character% has abandoned the quest.
+  completed:    %character% claims to have completed the quest.
+  confirmed:    %character% has been confirmed to have completed the quest.
+  rejected:     The claim of %character% to have completed the quest has been rejected.
+
+ war:
+  started:      The war has been declared.
+  settlement:   Attack on %settlement% started.
+
+ realm:
+  founded:      Founded by %character%.
+  inherited:    Rulership passed to %character-2% upon the death of %character-1%.
+  inherifail:   Rulership disputed after the death of %character%, who left no heir.
+  elected:      %character% was elected as ruler.
+  joined:       Became a part of %realm%.
+  wasjoined:    Acquired control of %realm%.
+  left:         Left %realm% and became independent.
+  wasleft:      Lost control of %realm%, which declared itself independent.
+  gained:       Gained ownership of %settlement%.
+  gained2:      Gained ownership of %settlement% from %realm%.
+  lost:         Lost ownership of %settlement%.
+  lost2:        Lost ownership of %settlement% to %realm%.
+  abdicated:    %character-1% has abdicated and handed control of the realm to %character-2%.
+  abdicated2:   %character% has abdicated without a successor.
+  deserted:     Vanished into history with no members remaining.
+  war:
+   declared:    Declared war "%war%".
+   received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
+
+ subrealm:
+  founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
+ position:
+  death:        %character% has died and thus left the office of %realmposition%.
+  inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
+
+report:
+ building:
+  abandon:      The %buildingtype% cannot be sustained anymore due to low population, and has been abandoned.
+  complete:			Construction of %buildingtype% has been completed.
+ feature:
+  complete:     A %featuretype% has been completed.
+ road:
+  complete:			Road construction has finished.
+
+soldier:
+ recruited:     Recruited by %character% in %settlement% with %item-1%/%item-2%/%item-3%.
+ hired:         Hired by %character%.
+ traincancel:   Training cancelled, reverted to old equipment.
+ traincomplete: Training completed.
+ retrain:       Retrained in %settlement% to use %item-1%/%item-2%/%item-3%.
+ militia:       Set up as militia in %settlement%.
+ mobilize:      Mobilized by %character%.
+ assign:        Assigned to %character%.
+ battle:        Participated in %battle%.
+ routed:
+  ranged:       Routed due to archery fire.
+  melee:        Routed in melee combat.
+ dropped:
+  shield:       Dropped shield while running away.
+  weapon:       Dropped weapon while running away.
+ killed:        Killed in battle.
+ wounded:
+  ranged:       Wounded by archery fire.
+  melee:        Wounded in melee.
+  escape:       Wounded during retreat.
+ casualties:    Caused %nr% casualties to the enemy.
+ starved:       Starved to death.
+
+politics:
+ oath:
+  offer:      %character% has accepted one of your knight offers and become your knight.
+  offer2:     %character% has accepted your knight offer in %settlement% and become your knight.
+  taken:      Has appeared as a knight of %character% at %settlement%.
+  taken2:     Has appeared as a vassal of %character% and received lordship of %settlement%.
+  broken:     %character% has broken the oath of fealty to you and become a rogue.
+  disowned:   Oath of fealty dissolved by your liege, %character%.
+  nowruler:   %character% has become ruler of %realm% and is thus no longer a vassal.
+  changed:    %character-1% has broken the oath of fealty to you and sworn an oath to %character-2% instead.
+  new:        %character-1% has visited you and sworn an oath of fealty, becoming your vassal.
+  new2:       %character-1% has visited you and sworn an oath of fealty, breaking his old oath to %character-3% and becoming your vassal.
+  mynew:      Has sworn an oath of fealty to %character-2%.
+  mynew2:     Has broken the oath of fealty to %character-3% and sworn an oath to %character-2% instead.
+ successor:
+  set:        Has set %character% as successor.
+  changed:    Has changed the successor, instead of %character-1% it will now be %character-2%.
+  new:				You have been declared as the successor of %character%.
+  removed:    %character% has removed you as successor.
+
+
+resolution:
+ take:
+  failed:       Your attempt to take control of %settlement% has failed.
+  success:      Your banner now flies over %settlement% and its people will follow your commands.
+ rename:
+  failed:       Your attempt to rename %settlement% has failed.
+  success:      You have successfully renamed the settlement to "%new%".
+ grant:
+  failed:       Your attempt to grant %settlement% to %character% has failed.
+  success:      Granted %settlement% to %character%.
+  success2:     Granted %settlement% in fief to %character%.
+ unavailable:
+  nosettlement: You can only complete actions on settlements while you are there.
+  notyours:     You do not control this settlement anymore.
+  notinside:    You are not inside the settlement (anymore).
+  location:
+   fortified:   You cannot take control of a fortified settlement from outside.
+ attack:
+  success:      You have successfully engaged the enemy. Battle preparations are underway.
+  targeted:     Enemy troops are engaging you. Battle preparations are being made by both sides. You have an estimated %time% for any actions or requests of support you might want to make.
+  evading:      Enemy troops are engaging you. As instructed, your troops will try to evade the battle, but if they fail to do so, the fight will occur in an estimated %time%.
+ defend:
+  success:      %settlement% is being attacked. As ordered, your troops are rallying to defend it. The battle is expected to occur in %time%.
+  removed:      You are no longer defending %settlement%, because you have moved too far away from it.
+ disengage:
+  success:      You have successfully evaded a battle.
+  failed:       Your attempt to evade a battle has failed.
+ regroup:
+  success:      Your troops have regrouped and are ready for more battles.
+ research:
+  complete:     The journal of %log% has been completely researched.
+ enter:
+  success:      You have entered %settlement%.
+  failed:       Guards at %settlement% have denied you entrance.
+ escape:
+  success:      You have successfully escaped from captivity.
+  failed:       Your attempt to escape captivity has failed. Your captor has been informed.
+  by:           %character% has escaped from your captivity, breaking the ancient oath sworn.
+  try:          %character% has attempted to escape from your captivity, but your guards have thwarted the attempt.
+ aid:
+  removed:      Military aid for %character% has ended, and you will no longer automatically join battles on their side. Refresh the support if you wish to continue it.
+  success:      You have entered battle in aid of %character%.
+
+battle:
+ participated:  Participated in %battle%.
+ failed:        The battle failed to happen, most likely because all enemies evaded successfully.
+
+mail:
+ sender:        Notification Service
+ subject:       Might & Fealty Important Event Notice
+ intro:         Important event for your character %name%:
+ intro2:        Important event at the settlement %settlement%, owned by your character %character%:
+ intro3:        Important event for the realm %realm%, ruled by your character %character%:
+ footer:        <small>(if you do not want to receive these messages anymore, disable notifications in your settings)</small>
+
+
+news:
+ title:     publication|publications
+ edition:   edition|editions
+ number:    Edition %number%
+ readers:   %count% subscriber|%count% subscribers
+ collection:  articles collection
+ create:
+  title:    create publication
+  intro:    Here you can create a new publication, which can serve as a newspaper, a realm announcement service, strategy manual, law book or anything else you might want to put it to use for.<br />You will automatically become the first owner, editor, author and publisher, but you can add others later.
+  newname:  pick a unique name
+  submit:   create publication
+  unpublished:  unpublished
+ member:    you are a member of:
+ members:   members of this publication:
+ reader:    publications you are reading:
+ local:     locally published:
+ local2:    local publications
+ owner:     owner
+ editor:    editor
+ author:    author
+ publisher: publisher
+ layout:
+  edit:     edit
+  delete:   del
+  update:   update layout
+  updating: updating...
+  done:     layout updated
+ publish:
+  do:       publish this edition
+  updating: publishing...
+  done:     edition published
+ article:
+  title:    title
+  author:   by %name%
+  content:  content
+  new:      new article
+  create:   create article
+  edit:     update article
+ change:    change
+ delmember: If you remove all privileges from a member, it will be removed as a member. The entry will remain on this page so you can undo mistakes, but it will be gone at the next reload.
+ save:      save changes
+ addmember: add a new member
+ addintro:  New members will be added as publishers automatically, you can then grant them more access afterwards.
+ moved:     Article moved into articles collection.
+ del:       Article deleted.
+ rest:      move
+ restore:   ed. %num%
+ restored:  Article moved into current edition.
+ help:
+  owner:      Owners can add, remove or change the status of other members.
+  editor:     Editors can layout and publish editions.
+  author:     Authors can write articles for the publication.
+  publisher:  Publishers distribute the publication, but do not add content.
+ examples:
+  title0:     Lorem Ipsum
+  content0:   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima.
+  title1:     Welcome to your publication
+  content1:   Your first edition has been created and filled with a few example articles so you can experiment with the layout functionality and see how everything works. The buttons on the top-right of every article allow you to change them.
+  title2:     Drag Me
+  content2:   You can rearrange articles by dragging and dropping, simply click anywhere on the article, hold and drag it around. It will slide in place wherever there is space.
+  title3:     Resize Me
+  content3:   You can change the size of an article by clicking on the "1x1" (or whatever the current size is) button and choosing a new size.
+ subscribe:
+  title:      subscribe
+  intro: >
+    If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the 
+    edition to your readers list and you will be able to access it in the future. If the publication is set up as a periodical, you will also
+    receive a notification and a copy of future editions.
+  submit:     subscribe now
+  done:       You have now subscribed to the "%paper%".
+
+trans:
+ _friend:         friendly
+ _neutral:        neutral
+ _hostile:        hostile
+ _settlement:     settlement to insert
+ _realm:          realm to insert
+ dontunderstand:  I am sorry, but I do not understand your message. Please use a %translator% to communicate with me.
+ _dontunderstand: what?
+ mylang:          My primary language is %language%.
+ _mylang:         language
+ _hello:          hello
+ hello:
+  friend:         Greetings, my friend. My name is %name% and I come with peaceful intentions.
+  neutral:        Salutations to a fellow noble. My name is %name%, pleased to meet you.
+  hostile:        You are in the presence of %name%, worm. Tremble before me.
+ _demand:         demand
+ demand:
+  _vassal:        become my vassal
+  _settlement:    give me a settlement
+  _realmjoin:     join my realm
+  vassal:
+   friend:        I would like to offer you my protection in exchange for your fealty. Are you interested?
+   neutral:       There is always room for more vassals at my court, and I would like to welcome you as one.
+   hostile:       Bow before me and swear fealty, or I will consider you an enemy and crush you.
+  settlement:
+   friend:        I would like to take care of %settlement% for you, if you would grant it to me.
+   neutral:       Allow me to propose that you grant %settlement% to me.
+   hostile:       I demand that you grant %settlement% to me, or I shall take it by force.
+  realmjoin:
+   friend:        I would be quite pleased if you were to join my realm of %realm%.
+   neutral:       A mutually beneficial cooperation could be in both our future, if you were to join my realm of %realm%.
+   hostile:       You and everything that belongs to you shall become a part of %realm%. This is your one chance to submit peacefully.
+ _answer:         answer
+ answer:
+  _yes:           yes
+  _no:            no
+  yes:
+   friend:        I will gladly accept your offer.
+   neutral:       Your request sounds good and I accept.
+   hostile:       You leave me no other choice but to submit to your demand.
+  no:
+   friend:        I am quite sorry, but I cannot accept your offer at this time.
+   neutral:       I have to refuse your request.
+   hostile:       You can have what is rightfully mine if you take it from my cold, dead hands.

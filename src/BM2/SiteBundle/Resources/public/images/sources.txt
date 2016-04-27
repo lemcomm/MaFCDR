@@ -1,0 +1,14 @@
+
+rpg_map/*:							http://clipart.nicubunu.ro/?gallery=rpg_map
+
+from openclipart.org:			blood_clipart.svg
+										cybergedeon_skull.svg
+										cutlery.svg - http://openclipart.org/detail/148195/cutlery-by-voyeg3r 
+										run.svg - http://openclipart.org/detail/170304/running-by-azansarkar
+										lock.svg - http://openclipart.org/detail/188461/closed-lock-by-iyo-188461
+										http://openclipart.org/detail/16832/pirate-ship-by-mystica-16832
+									
+
+"new" star:							http://www.iconfinder.com/icondetails/17999/24/bookmark_favorite_star_icon
+
+badges:								http://www.freepik.com/free-vector/stylish-banner-set-logo-vector_682956.htm

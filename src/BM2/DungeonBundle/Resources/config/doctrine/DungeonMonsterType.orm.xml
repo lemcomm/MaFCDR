@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonMonsterType">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="class" type="simple_array"/>
+		<field name="areas" type="simple_array"/>
+		<field name="min_depth" type="smallint"/>
+
+		<field name="power" type="smallint"/>
+		<field name="attacks" type="smallint"/>
+		<field name="defense" type="smallint"/>
+		<field name="wounds" type="smallint"/>
+	</entity>
+</doctrine-mapping>

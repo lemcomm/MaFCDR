@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ListMember">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="priority" type="integer"/>
+		<field name="allowed" type="boolean"/>
+		<field name="include_subs" type="boolean"/>
+
+		<many-to-one field="listing" target-entity="Listing" inversed-by="members"/>
+
+		<many-to-one field="target_realm" target-entity="Realm"/>
+		<many-to-one field="target_character" target-entity="Character"/>
+	</entity>
+</doctrine-mapping>

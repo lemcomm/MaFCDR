@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonLevel">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="depth" type="smallint"/>
+		<field name="scout_level" type="smallint"/>
+		<many-to-one field="dungeon" target-entity="Dungeon" inversed-by="levels"/>
+		<one-to-many field="monsters" target-entity="DungeonMonster" mapped-by="level"/>
+		<one-to-many field="treasures" target-entity="DungeonTreasure" mapped-by="level"/>
+	</entity>
+</doctrine-mapping>

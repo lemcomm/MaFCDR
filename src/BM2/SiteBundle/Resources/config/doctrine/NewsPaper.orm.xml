@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\NewsPaper">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="created_at" type="datetime"/>
+		<field name="subscription" type="boolean"/>
+
+		<one-to-many field="editors" target-entity="NewsEditor" mapped-by="paper"/>
+		<one-to-many field="editions" target-entity="NewsEdition" mapped-by="paper"/>
+
+	</entity>
+</doctrine-mapping>

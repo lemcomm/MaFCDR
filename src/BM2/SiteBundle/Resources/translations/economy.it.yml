@@ -1,0 +1,142 @@
+req:        necessita di
+reqfor:     necessario per
+provides:   fornisce
+
+building:
+ Academy: Accademia
+ Alchemist: Alchimista
+ Archery Range: Poligono di tiro con l'arco
+ Archery School: Scuola di tiro con l'arco
+ Armourer: Corazzaio
+ Armoury: Armeria
+ Bank: Banca
+ Barracks: Caserma
+ Blacksmith: Fabbro
+ Bowyer: Fabbricante d'archi
+ Carpenter: Carpentiere
+ Citadel: Cittadella
+ City Hall: Corte Cittadina
+ Dirt Streets: Strade sterrata
+ Fairground: Fiera
+ Fortress: Fortezza
+ Garrison: Guarnigione
+ Great Temple: Tempio Grandioso
+ Guardhouse: Corpo di Guardia
+ Heavy Armourer: Mastro Corazzaio
+ Leather Tanner: Conciatore
+ Library: Libreria
+ Market: Mercato
+ Mason: Muratore
+ Master Mason: Mastro Muratore
+ Merchant's Quarter: Quartiere Mercantile
+ Mine: Miniera
+ Palisade: Palizzata
+ Paved Streets: Strade Lastricate
+ Saddler: Sellaio
+ School: Scuola
+ Shrine: Santuario
+ Stables: Stalle
+ Stone Castle: Castello di Pietra
+ Stone Towers: Torri di Pietra
+ Stone Wall: Mura di Pietra
+ Tailor: Sarto
+ Temple: Tempio
+ Town Hall: Municipio
+ Training Ground: Piazza d'armi
+ University: Università
+ Weaponsmith: Armaiolo
+ Wood Castle: Castello di Legno
+ Wood Towers: Torri di Legno
+ Wood Wall: Mura di Legno
+
+description:
+ Academy: >
+   Unendo la conoscenza proveniente dall'università con l'esperienza pratica delle più brillanti menti militari si genera l'accademia, dove vengono create nuove tattiche e strategie.
+ Alchemist: >
+   Dislocato normalmente ai limiti dell'insediamento, l'alchimista à l'edificio che tutti si aspettano sempre salti in aria in maniera pirotecnica, anche se in realtà gli esperimenti compiuti sono decisamente poco pericolosi o spettacolari. Nonostante la maggior parte della ricerca effettuata qui sia di dubbia qualità, talvolta vengono scoperti interessanti sostanze o veleni.
+ Archery Range: >
+   Una zona riservata con bersagli e qualche copertura per proteggere dai colpi a vuoto. Un posto dove gli arcieri si allenano e imparano a incoccare, mirare e tirare. Necessario affinché si possano addestrare arcieri di qualunque tipo. 
+ Archery School: >
+   Il famoso arco lungo richiede più addestramento delle altre armi da tiro; questo è ciò che offre la scuola di tiro con l'arco, aggiungendo maggiore versatilità e gittata al poligono di tiro con l'arco. 
+ Armourer: >
+   Uno specialista nel creare ogni genere di armatura per i vostri soldati, il corazziere combina tessuto, pelli e metallo per creare buone protezioni.
+ Armoury: >
+   Note anche come arsenale, l'armeria è un magazzino per armi e armature dove vengono inoltre tenute in buono stato, organizzate e distribuite rapidamente ed efficientemente. E' necessaria per le fortificazioni più avanzate. 
+ Bank: >
+   Un edificio fortificato dove si possono depositare preziosi e tesori, ma che fornisce anche prestiti di danaro e persino rilascia particolari obbligazioni che possono essere scambiate in oro presso altre banche. 
+ Barracks: >
+   Alloggio e residenza per soldati, permette di avere soldati professionisti a tempo pieno.
+ Blacksmith: >
+   Forgia, incudine e rumore assordante - il fabbro trasforma il metallo in utensili da vendere e semplici armi per equipaggiare soldati.
+ Bowyer: >
+   Un artigiano specializzato che manifattura archi, balestre e altre armi da tiro personali.
+ Carpenter: >
+   Ogni genere di lavoro complesso fatto in legno richiede un carpentiere, questo vale in particolare per gli edifici più grandi, le cui ossature sono composte da intricate costruzioni di legno. 
+ Citadel: >
+   La costruzione difensiva definitiva, la cittadella è invidiata persino dai re. Questa incredibilmente massiccia costruzione è praticamente impenetrabile ed è in grado di respingere persino i più determinati e ben equipaggiati invasori.
+ City Hall: >
+   Un grande edificio pubblico contenente l'amministrazione ma con anche ampio spazio per tribunali, archivi e tutto il resto necessario ad una città organizzata.
+ Dirt Streets: >
+   Strade più solide ed affidabili all'interno dell'insediamento permettono di spostarsi più velocemente e sono necessarie per certi trasporti pesanti e di conseguenza per gli edifici che ne necessitano.
+ Fairground: >
+   Una più grande e permanente zona commerciale, la fiera permette ampi scambi e baratti, oltre che rendere possibili particolari avvenimenti che attirano mercanti provenienti da lontano e che arricchiscono la città grazie ai vari commerci.
+ Fortress: >
+   Non sono in molti i Signori che possono permettersi la costruzione di una di queste massicce fortificazioni. Una fortezza è un castello di pietra rinforzato e con delle aggiuntive costruzioni offensive e difensive. Può essere difesa contro praticamente tutti gli attacchi tranne i più terribili con una quantità modesta di forze.
+ Garrison:
+   Un permanente edificio poderoso per venire incontro ai bisogni di soldati professionisti: è sia alloggio che magazzino per armi e armature ed è inoltre in grado di ospitare una permanente riserva da poter richiamare in caso di emergenza.
+ Great Temple: >
+   Il più grande e maestoso edificio religioso, spesso meta di pellegrinaggio. Offre alloggio agli innumerevoli sacerdoti e personale di servizio. 
+ Guardhouse: >
+   Un piccolo edificio che funge da punto di riferimento per le guardie e i soldati dell'insediamento, permettendogli anche di depositare il proprio equipaggiamento. Permette l'addestramento e il reclutamento di alcuni semplici tipi di soldati.
+ Heavy Armourer: >
+   Un raro specialista di armature pesanti, in grado di fare miracoli con il metallo e creare la preziosa e ricercata armatura di piastre, la migliore armatura in circolazione.
+ Leather Tanner: >
+   Un semplice artigiano che trasforma pelli di animali in cuoio con cui può poi produrre oggetti vari.
+ Library: >
+   Luogo di raccolta e protezione di libri e manoscritti di importanza religiosa e secolare.
+ Market: >
+   Un luogo dove mercanti e contadini locali possono comprare e vendere i loro prodotti. Un mercato incrementa i commerci e l'economia locale, aumentando leggermente la ricchezza dell'insediamento.
+ Mason: >
+   Un semplice artigiano, il muratore è necessario per lavori in muratura e edifici in pietra.
+ Master Mason: >
+   Le più avanzate tecniche edili di quest'epoca sono note solo a pochi artigiani specialisti.
+ Merchant's Quarter: >
+   Un intera sezione dell'insediamento dedicata ad affari e commerci, contenente magazzini, cambiavalute, mercati e corporazioni.
+ Mine: >
+   Minerali e pietre preziose devono essere estratte e questo è ciò che viene fatto dai minatori in miniera. Incrementando significativamente la produzione metallurgica, la miniera è necessaria per beni, armi e armature a base di metalli.
+ Palisade: >
+   Il tipo più primitivo di fortificazione, la palizzata è utile specialmente contro animali selvaggi e banditi, dando agli abitanti un certo senso di sicurezza.
+ Paved Streets: >
+   Lastricare le strade dell'insediamento facilita il trasporto specialmente con veicoli a ruota. Rende inoltre muoversi indipendente dal tempo atmosferico, necessario per alcune grandi costruzioni.
+ Saddler: >
+   Un artigiano specializzato che crea selle, staffe, briglie, freni e altri accessori per cavalli e carri.
+ School: >
+   Un luogo gestito dal governo dove pochi selezionati studenti possono essere educati, portando ad una popolazione più educata. Distribuisce sapere, permettendo lavori ed edifici più raffinati.
+ Shrine: >
+   Un piccolo posto sacro, spesso gestito dai locali e senza un vero sacerdote
+ Stables: >
+   Le stalle allevano e mantengono cavalli sia da guerra che da lavoro.
+ Stone Castle: >
+   Più massiccio e resistente di una fortificazione in legno, il castello è una possente struttura difensiva che un nemico non può pensare di conquistare o distruggere senza armi d'assedio.
+ Stone Towers: >
+   Queste torri di pietra possono essere costruite più alte di quelle in legno e sono praticamente indistruttibili se non con avanzate tecniche d'assedio.
+ Stone Wall: >
+   Mura di solida pietra sono il simbolo di un insediamento ben difeso. Non bruciano e possono essere sfondate solo con grandi armi d'assedio.
+ Tailor: >
+   Un semplice artigiano che rifornisce i paesani di vestiti di qualità migliore di quelli da loro fatti in casa, è anche in grado di produrre partite di tuniche o anche semplici armature imbottite.
+ Temple: >
+   Un luogo di culto di grandi dimensioni, solitamente vi risiedono uno o più sacerdoti e svariati aiutanti.
+ Town Hall: >
+   Un edificio pubblico che ospita uffici, un tribunale pubblico e per le altre necessità burocratiche di una città in crescita.
+ Training Ground: >
+   Un ampio spazio all'aperto con il necessario per far addestrare i soldati, permette di reclutare tipi più avanzati di soldati.
+ University: >
+   Il miglior luogo di insegnamento a disposizione della vostra gente, l'università è un centro di conoscenza e sede di numerosi rari e preziosi esperti.
+ Weaponsmith: >
+   Un artigiano specializzato nel forgiare armi. Nonostante la maggior parte del suo lavoro sia abbastanza simile a quello del fabbro, è anche in grado di lavorare il legno quando necessario per le impugnature. Utilizza inoltre tecniche più avanzate di forgiatura e fusione per produrre armi in grado di tollerare sforzi maggiori rispetto al tipico attrezzo da contadino.
+ Wood Castle: >
+   Il centro militare dell'accampamento è cintato con mura, torri, un corpo di guardia e difese fortificate. Il castello in legno possiede eccellenti difese e resisterà persino contro attaccanti in notevole vantaggio numerico.
+ Wood Towers: >
+   Aggiungere torri alle fortificazioni di un insediamento permette ai difensori di rispondere al fuoco e permette di avvistare nemici a maggiore distanza dando così maggiore preavviso.
+ Wood Wall: >
+   Una palizzata più resistente, le mura in legno circondano l'insediamento e ne forniscono una difesa di base contro animali selvaggi, banditi e attaccanti disorganizzati.

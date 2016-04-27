@@ -1,0 +1,38 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	{% if app.environment != 'prod' %}
+		<script src="{{ asset('bundles/bm2site/map/map.js?env='~app.environment) }}"></script>
+	{% else %}
+		<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+
+Network map is still very much TODO and will not be available soon.
+
+
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+
+	<div id="mapviewer">
+	<div id="sd_anchor" style="width:20em;float:right;margin-right:0;min-height:50em">
+		<h1>{{ 'map.layers'|trans|title }}</h1>
+		<div id="switcher" class="olControlLayerSwitcher">
+		</div>
+	</div>
+
+	<div style="margin-right:22em">
+		<div id="map" style="min-width:40em;min-height:50em;"></div>
+	</div>
+	<div id="sd" class="hidden" title="dummy"></div>
+	</div>
+
+{% endblock %}
+
+{% block jquery %}
+{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+mapinit('map', true, 'network');
+{% endblock %}

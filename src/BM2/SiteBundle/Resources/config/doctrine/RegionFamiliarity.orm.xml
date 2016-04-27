@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\RegionFamiliarity">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="amount" type="smallint"/>
+
+		<many-to-one field="character" target-entity="Character"/>
+		<many-to-one field="geo_data" target-entity="GeoData"/>
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,40 @@
+<tr>
+	<td>{{ link(build.type) }}</a></td>
+		{% if build.type.canfocus %}
+		<td align="right">{{ (build.currentspeed*100)|number_format }} %</td>
+		<td align="right">
+			{% if build.focus > 0 %}
+				{{ (build.currentspeed * (1.5**build.focus) * 100)|number_format }} %
+			{% endif %}
+		</td>
+		<td align="center">
+		{% for i in 1..3 %}
+			{% if i <= build.focus %}
+				<img class="editable setfocus" src="{{ asset('bundles/bm2site/images/sivvus_tools.svg') }}" height="16px" data-id="{{ build.id }}" data-set="{{ i - 1 }}"/>
+			{% else %}
+				<img class="editable setfocus" src="{{ asset('bundles/bm2site/images/sivvus_tools2.svg') }}" height="16px" data-id="{{ build.id }}" data-set="{{ i }}"/>
+			{% endif %}
+		{% endfor %}
+		</td>
+		{% else %}
+		<td></td><td></td><td></td>
+		{% endif %}
+	<td align="right">{{ build.employees }} {{ 'build.employees'|trans }}</td>
+
+	<td class="production">
+		{% if build.type.providesequipment %}
+			<ul class="shortlist">
+				{% set work = build.employees * 5 %}
+				{% set focus = 1.5 ** build.focus %}
+				{% set gain = work * build.currentspeed %}
+				{% for item in build.type.providesequipment %}
+					{% set get = gain * 5 / item.resupplycost %}{# * 5 because we show production per WEEK #}
+					<li>{{ get|number_format(1) }} {{ link(item) }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</td>
+
+	<td><form method="post" action="{{ path('bm2_site_construction_abandonbuilding', {'building':build.id}) }}"><button>{{ 'economy.build.abandon'|trans({},"actions") }}</button></form></td>
+
+</tr>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonEvent">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="ts" type="datetime"/>
+		<field name="content" type="text"/>
+		<field name="data" type="array" nullable="true"/>
+		<many-to-one field="party" target-entity="DungeonParty" inversed-by="events"/>
+	</entity>
+</doctrine-mapping>

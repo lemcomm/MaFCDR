@@ -1,0 +1,177 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "economy.trade.name"|trans({},"actions")|title }}</h2>
+
+{% if owned == true %}
+	{{ "economy.trade.intro.owned"|trans({},"actions")|raw }}
+	<h3>{{ "economy.trade.outbound"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th></th>
+		<th>{{ "economy.trade.amount"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.to"|trans({},"actions") }}</th>
+		<th data-sorter="false"></th><th data-sorter="false"></th>
+	</tr></thead><tbody>
+	{% for trade in settlement.tradesOutbound %}
+		<tr>
+			<td>{{ trade.name }}</td>
+			<td align="right">{{ trade.amount }}</td>
+			<td>{{ trade.resourcetype.name|trans }}</td>
+			<td>{{ link(trade.destination) }}</td>
+			<!-- <td>TODO: ? edit</td>-->
+			<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
+		</tr>
+	{% endfor %}
+	</tbody></table>
+
+	<h3>{{ "economy.trade.inbound"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th></th>
+		<th>{{ "economy.trade.amount"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.from"|trans({},"actions") }}</th>
+		<th data-sorter="false"></th><th data-sorter="false"></th>
+	</tr></thead><tbody>
+	{% for trade in settlement.tradesInbound %}
+		<tr>
+			<td>{{ trade.name }}</td>
+			<td align="right">{{ trade.amount }}</td>
+			<td>{{ trade.resourcetype.name|trans }}</td>
+			<td>{{ link(trade.source) }}</td>
+			{% if trade.source.owner == character %}
+				<!-- <td>TODO: ? edit</td>-->
+				<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</tbody></table>
+
+	<h3>{{ "economy.trade.resources"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th>{{ "estate"|transchoice(1) }}</th>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.production"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.demand"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.trade"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.sum"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.transcost"|trans({},"actions") }}</th>
+	</tr></thead><tbody>
+	{% for estate in estates %}
+		{% for resource in estate.resources %}
+			<tr>
+				<td>{{ link(estate.settlement) }}</td>
+				<td>{{ resource.type.name|trans }}</td>
+				<td align="right">{{ resource.production }}</td>
+				<td align="right">{{ resource.demand }}</td>
+				<td align="right">{{ resource.trade }}</td>
+				<td align="right">{{ resource.production + resource.trade - resource.demand }}</td>
+				<td align="right">{{ (resource.cost*100)|number_format(1) }} %</td>
+			</tr>
+		{% endfor %}
+	{% endfor %}
+	</tbody></table>
+
+{% else %}
+	{{ "economy.trade.intro.foreign"|trans({},"actions")|raw }}
+
+	<h3>{{ "economy.trade.towards"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th>{{ "economy.trade.amount"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.from"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.to"|trans({},"actions") }}</th>
+		<th data-sorter="false"></th><th data-sorter="false"></th>
+	</tr></thead><tbody>
+	{% for trade in trades %}
+		<tr>
+			<td align="right">{{ trade.amount }}</td>
+			<td>{{ trade.resourcetype.name|trans }}</td>
+			<td>{{ link(trade.source) }}</td>
+			<td>{{ link(trade.destination) }}</td>
+			<!-- <td>TODO: ? edit</td>-->
+			<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
+		</tr>
+	{% endfor %}
+	</tbody></table>
+
+	<h3>{{ "economy.trade.localres"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.production"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.demand"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.trade"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.sum"|trans({},"actions") }}</th>
+	</tr></thead><tbody>
+	{% for resource in local %}
+		<tr>
+			<td>{{ resource.type.name|trans }}</td>
+			<td align="right">{{ resource.production }}</td>
+			<td align="right">{{ resource.demand }}</td>
+			<td align="right">{{ resource.trade }}</td>
+			<td align="right">{{ resource.production + resource.trade - resource.demand }}</td>
+		</tr>
+	{% endfor %}
+	</tbody></table>
+
+	<h3>{{ "economy.trade.resources"|trans({},"actions")|title }}</h3>
+	<table class="tsort"><thead><tr>
+		<th>{{ "estate"|transchoice(1) }}</th>
+		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.production"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.demand"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.trade"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.sum"|trans({},"actions") }}</th>
+		<th>{{ "economy.trade.transcost"|trans({},"actions") }}</th>
+	</tr></thead><tbody>
+	{% for estate in estates %}
+		{% for resource in estate.resources %}
+			<tr>
+				<td>{{ link(estate.settlement) }}</td>
+				<td>{{ resource.type.name|trans }}</td>
+				<td align="right">{{ resource.production }}</td>
+				<td align="right">{{ resource.demand }}</td>
+				<td align="right">{{ resource.trade }}</td>
+				<td align="right">{{ resource.production + resource.trade - resource.demand }}</td>
+				<td align="right">{{ (resource.cost*100)|number_format(1) }} %</td>
+			</tr>
+		{% endfor %}
+	{% endfor %}
+	</tbody></table>
+{% endif %}
+
+
+<h3>{{ "economy.trade.new"|trans({},"actions")|title }}</h3>
+{# TODO: add own merchants if any to make it a better deal #}
+{% if (form) %}
+	<form class="wide" action="{{ path('bm2_site_actions_trade') }}" method="post">
+		{{ form_widget(form) }}
+		<button type="submit">{{ "economy.trade.submit"|trans({},"actions") }}</button>
+	</form>
+
+	<div class="hidden">
+	<form id="canceldeal" action="{{ path('bm2_site_actions_trade') }}" method="post">
+		{{ form_widget(cancelform) }}
+	</form>
+	</div>
+{% else %}
+	<p>{{ "unavailable.trade.nooptions"|trans }}</h3>
+{% endif %}
+
+{% endblock %}
+
+
+{% block jquery %}
+$(".cancel").click(function(){
+	var id = $(this).attr('data-value');
+	$('#{{cancelform.trade.vars.id}}').val(id);
+	$('#canceldeal').submit();
+});
+
+$(".tsort").tablesorter();
+{% endblock %}

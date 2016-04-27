@@ -1,0 +1,68 @@
+{% spaceless %}
+
+{% set gender_he = character.gender("he")|trans|title %}
+
+{% macro realm_hierarchy(realm, gender_he) %}
+{% spaceless %}
+	{% if realm.superior %}
+		{{ ("status.realm.partof")|trans({"%He%":gender_he, "%superior%":link(realm.superior)},"politics")|raw }}
+		{{ _self.realm_hierarchy(realm.superior) }}
+	{% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% if character.liege %}
+	<p>{{ ("status."~who~".vassal")|trans({"%He%":gender_he, "%liege%":link(character.liege)},"politics")|raw }}</p>
+{% elseif character.vassals is empty %}
+	{% if character.estates is empty %}
+		{% if character.positions is empty %}
+			<p>{{ ("status."~who~".landless")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% else %}
+			<p>{{ ("status."~who~".landless2")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% endif %}
+	{% else %}
+		{% if character.findrealms is empty %}
+			<p>{{ ("status."~who~".independent")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% endif %}
+	{% endif %}
+{% else %}
+	{% if character.findrealms is empty %}
+		<p>{{ ("status."~who~".ultimate")|trans({"%He%":gender_he, },"politics") }}</p>
+	{% endif %}
+{% endif %}
+
+<ul>
+{% for position in character.positions %}
+	<li>
+		{% if position.ruler %}
+			{% if character.male %}
+				{% set posname = 'realm.title.male.'~position.realm.type %}
+			{% else %}
+				{% set posname = 'realm.title.female.'~position.realm.type %}
+			{% endif %}
+			{{ ("status.self.position")|trans({"%position%":posname|trans({},"politics")|title, "%realm%":link(position.realm)},"politics")|raw }}
+		{% else %}
+			{{ ("status.self.position")|trans({"%position%":link(position), "%realm%":link(position.realm)},"politics")|raw }}
+		{% endif %}
+	</li>
+{% endfor %}
+
+{% for realm in character.findrealms %}
+	<li>
+	{{ ("status."~who~".realm")|trans({"%He%":gender_he, "%realm%":link(realm)},"politics")|raw }}
+	{{ macros.realm_hierarchy(realm, gender_he) }}.
+	</li>
+{% endfor %}
+
+{% if character.vassals is not empty %}
+	<li>{{ ("status."~who~".liege")|trans({},"politics") }}<ul class="shortlist">
+	{% for vassal in character.vassals  %}
+		<li>{{ link(vassal) }}</li>
+	{% endfor %}
+	</ul></li>
+{% endif %}
+
+</ul>
+{% endspaceless %}

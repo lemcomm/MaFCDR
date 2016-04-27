@@ -1,0 +1,25 @@
+event:
+ settlement:
+  ownership:
+   gained:			Ha ottenuto il controllo di %settlement%.
+   lost:				Ha perso il controllo di %settlement%, che è stato preso da %character%.
+  taken:				Controllo ottenuto da %character%.
+  renamed:			Precedente nome "%oldname%" è stato cambiato in "%newname%".
+  autoconstruction: >
+    Per domanda popolare, i paesani hanno iniziato la costruzioe di %building% spontaneamente. %workers% lavoratori si sono offerti volontari per il progetto.
+ character:
+  start:        E' apparso in %settlement%.
+  renamed:      Ha cambiato il nome da "%oldname%" in "%newname%".
+
+report:
+ building:
+  complete:			La costruzione del %buildingtype% è stata completata.
+ road:
+  complete:			La costruzione delle strade è stata completata.
+
+politics:
+ oath:
+  new:				%character% vi ha dichiarato un giuramento di sudditanza, divenendo vostro vassallo.
+  broken:			%character-1% ha tradito il suo giuramento di sudditanza a voi, dichiarandola a %character-2%.
+ successor:
+  new:				Siete stato dichiarato successore di %character%.

@@ -1,0 +1,42 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: config.yml }
+
+framework:
+    router:   { resource: "%kernel.root_dir%/config/routing_dev.yml" }
+    profiler: { only_exceptions: false }
+
+web_profiler:
+    toolbar: true
+    intercept_redirects: true
+
+monolog:
+    handlers:
+        main:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+        firephp:
+            type:  firephp
+            level: info
+        console:
+            type:   console
+        dungeons:
+            channels: dungeons
+            type:  stream
+            path:  %kernel.logs_dir%/dungeons.log
+            level: info
+        output:
+            type:   stream
+            path:   php://stdout
+            level:  info
+#            formatter:  fancy_formatter -- doesn't work because on prod console seems to run in dev ???
+            formatter:  simple_formatter
+
+assetic:
+    use_controller: true
+
+swiftmailer:
+    disable_delivery: true
+    delivery_address: tom@lemuria.org
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Culture" table="types.culture">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="colour_hex" type="string"/>
+		<field name="free" type="boolean"/>
+		<field name="cost" type="integer"/>
+		<field name="contains" type="array"/>
+		<many-to-many field="users" target-entity="User" mapped-by="cultures"/>
+
+	</entity>
+</doctrine-mapping>

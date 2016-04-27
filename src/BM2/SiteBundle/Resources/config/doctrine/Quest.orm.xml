@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Quest">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="summary" type="string"/>
+		<field name="description" type="text"/>
+		<field name="reward" type="text"/>
+		<field name="notes" type="text"/>
+		<field name="completed" type="boolean"/>
+
+		<many-to-one field="owner" target-entity="Character" inversed-by="quests_owned"/>
+		<many-to-one field="home" target-entity="Settlement" inversed-by="quests"/>
+		<one-to-many field="questers" target-entity="Quester" mapped-by="quest"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="quest"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,80 @@
+{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/jquery.sha1.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+{% if announcements is defined %}
+<div class="symfony-content" style="color:#460702">
+	{{ announcements|markdown }}
+</div>
+{% endif %}
+
+<h2>{{ 'layout.login'|trans({}, 'FOSUserBundle')|title }}</h2>
+
+{% if error %}
+<div class="error">{{ error|trans({}, 'FOSUserBundle') }}</div>
+{% endif %}
+
+<div id="direct_login">
+	<p>{{ 'login.intro'|trans|raw }}</p>
+	<form class="wide" action="{{ path("fos_user_security_check") }}" method="post">
+	<div>
+		<input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+		<div>
+			<label for="username">{{ 'security.login.username'|trans({}, 'FOSUserBundle') }}</label>
+			<input type="text" id="username" name="_username" value="{{ last_username }}" required="required" />
+		</div>
+		<div>
+			<label for="password">{{ 'security.login.password'|trans({}, 'FOSUserBundle') }}</label>
+			<input type="password" id="password" name="_password" required="required" />
+		</div>
+		<div>
+			<input type="checkbox" id="remember_me" name="_remember_me" value="on" />
+			<label for="remember_me">{{ 'security.login.remember_me'|trans({}, 'FOSUserBundle') }}</label>
+		</div>
+		<br />
+		<div>
+			<input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans({}, 'FOSUserBundle') }}" />
+		</div>
+	</div>
+	</form>
+	<br />
+	<a href="{{ path('fos_user_resetting_request') }}">{{ 'security.login.reset'|trans({}, 'FOSUserBundle') }}</a>
+	<br /><br />
+</div>
+
+<br class="clear" />
+
+{% endblock %}
+
+{% block javascript %}
+function supports_html5_storage() {
+  try {
+    return 'localStorage' in window && window['localStorage'] !== null;
+  } catch (e) {
+    return false;
+  }
+}
+{% endblock %}
+
+{% block jquery %}
+if (supports_html5_storage()) {
+	$.post("{{ path('bm2_challenge') }}", function(challenge) {
+		var user = localStorage['maf.userid'];
+		var secret = localStorage['maf.secret'];
+
+		if (user != undefined && secret != undefined ) {
+			var input = challenge + secret + challenge;
+			var response = $.sha1(input);
+
+			$.post("{{ path('bm2_autologin')}}", {'id':user, 'response':response}, function(result) {
+				console.log(result);
+			});
+
+		}
+	});
+}
+{% endblock %}

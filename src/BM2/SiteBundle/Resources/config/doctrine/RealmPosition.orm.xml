@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\RealmPosition">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="description" type="text"/>
+		<field name="ruler" type="boolean"/>
+		<field name="elected" type="boolean"/>
+		<field name="inherit" type="boolean"/>
+		<field name="term" type="smallint"/>
+		<field name="current_term_ends" type="datetime" nullable="true"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="positions"/>
+		<many-to-many field="permissions" target-entity="Permission"/>
+		<one-to-many field="elections" target-entity="Election" mapped-by="position"/>
+
+		<many-to-many field="holders" target-entity="Character" inversed-by="positions">
+			<join-table name="realmpositions_characters">
+				<join-columns>
+					<join-column name="realmposition_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="character_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,67 @@
+# Might & Fealty
+# validation text strings
+# Author: Tom Vogt <tom@mightandfealty.com>
+password:
+ old:			incorrect current password
+ minlength:	'[0,Inf]your password must be at least 6 characters long'
+ match:		new password and confirm password fields do not match
+
+realm:
+ new:
+  toosimilar:
+   name:				Your realm name is too similar to another realm, %other%.
+   formalname:		Your formal realm name is too similar to another realm, %other%.
+
+settlement:
+ grant:
+  free2:        Free accounts can only have 3 estates per character, and this character belongs to a free account.
+  npc:          You cannot grant settlements to bandit characters.
+
+character:
+ burst:				You already created a character within the last minute. We're slowing you down to make sure you are not a bot.
+ spawnlimit:		You already have 2 unspawned characters. Start playing those before you create more characters.
+ homosexual:		Sorry, but we are simulating a medieval fantasy world that is pre-enlightenment. No homosexual marriages, yet.
+ foreignparent:	At least one parent must be one of your own characters.
+ nosex:				Your characters' parents need to have a sexual relationship.
+
+trade:
+ toomuch:    You do not have that much available.
+ allremote:  Either source or destination of a trade must be your current location.
+ same:		 Repackaging the same product and selling it as somehow better in the same place has not yet been invented. Please wait for the invention of Wall St. and rating agencies first. Thank you.
+
+economy:
+ toomany:    You can obviously not assign more peasants to work projects than there are.
+
+feature:
+ location:     Please select a location for the new feature by clicking on the map.
+ outside:      The location you have chosen is not part of the area this settlement controls.
+ noriver:		There is no river adjacent to this area.
+ nocoast:		This is not a coastal area.
+ needworkers:  Please assign some workers to this project.
+
+recruit:
+ entourage:
+  toomany:      You can obviously not recruit more specialists than your settlement has population.
+  toomany2:		 This settlement can only train %max% peasants per day.
+ troops:
+  toomany:      You can obviously not recruit more soldiers than your settlement has population.
+  toomany2:		 This settlement can only begin the training of %max% peasants per day.
+  noweapon:		 You cannot recruit troops without weapons, they would not be soldiers, would they?
+ offer:
+  empty:        knight offers must include something, else you would offer nothing in exchange for something (fealty).
+  givealready:  You already have a knight offer including lordship of this settlement. You cannot have two.
+ mercs:
+  fail:			You do not have enough gold to pay for these men. Try fewer men or a different mercenary group.
+
+road:
+ same:		That is an interesting idea, but seriously, start and destination of a road should be different.
+ exists:		That road already exists.
+ invalid:   The workers are very sorry and await your judgement, but they were unable to find a connection between those two points that would not cross through water or other impassable terrain.
+
+
+attack:
+ nobody:		You need to select at least one target to attack.
+
+loot:
+ target:		If you take resources or thralls, you must name a target settlement to send your plunder to.
+ noslaves:	The target settlement does not allow slavery, so you cannot send thralls there.

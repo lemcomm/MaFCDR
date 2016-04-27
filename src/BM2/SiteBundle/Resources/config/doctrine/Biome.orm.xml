@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Biome" table="types.biome">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="spot" type="float"/>
+		<field name="travel" type="float"/>
+		<field name="road_construction" type="float"/>
+		<field name="feature_construction" type="float"/>	
+
+		<one-to-many field="geo_data" target-entity="GeoData" mapped-by="biome"/>
+
+	</entity>
+</doctrine-mapping>

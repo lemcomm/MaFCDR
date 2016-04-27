@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\EntourageType" table="types.entouragetype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="training" type="smallint"/>
+		<field name="icon" type="string" nullable="true"/>
+
+		<many-to-one field="provider" target-entity="BuildingType" inversed-by="provides_entourage" />
+
+	</entity>
+</doctrine-mapping>

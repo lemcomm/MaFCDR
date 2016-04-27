@@ -1,0 +1,24 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'dungeon.events.title'|trans({}, "dungeons")|title }}</h2>
+<p>{{ 'dungeon.events.intro'|trans({"%party%":dungeon.party.countactivemembers, "%area%":('area.'~dungeon.area)|trans({},"dungeons")}, "dungeons") }}</p>
+
+<dl class="events">
+	{% set last = null %}
+	{% for event in events %}
+	{% if event.content == '---' %}
+		<hr />
+	{% else %}
+		<dt>
+			{% if event.ts != last %}
+				{{ event.ts|date }}
+				{% set last = event.ts %}
+			{% endif %}
+		</dt>
+		<dd>{{ event|dungeoneventfilter }}</dd>
+	{% endif %}
+	{% endfor %}
+</dl>
+
+{% endblock %}

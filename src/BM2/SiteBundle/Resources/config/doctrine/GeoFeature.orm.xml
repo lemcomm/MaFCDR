@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\GeoFeature">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="location" type="point"/>
+		<field name="workers" type="float"/>
+		<field name="active" type="boolean"/>
+		<field name="condition" type="integer"/>
+
+		<many-to-one field="type" target-entity="FeatureType"/>
+		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="features"/>
+
+	</entity>
+</doctrine-mapping>

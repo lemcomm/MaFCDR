@@ -1,0 +1,170 @@
+# Might & Fealty
+# text strings for the heraldry designer
+# Authors:  Peter Horner <peter@horner.co.at>
+#				Tom Vogt <tom@lemuria.org>
+title:		Heraldik
+intro: >
+  Für ein paar Kredite kannst Du ein individuelles Wappen entwerfen das jeder Deiner Charaktere führen kann. Einmal kreiert 'gehört' Dir das Wappen für immer
+  und es kann von so vielen Deiner Charaktere geführt werden wie Du willst.<br />
+  Einmal kreiert wird das Wappen gesperrt und kann von niemandem anderen ein zweites Mal kreiert werden - Dein Wappen ist also einzigartig und kann nur von Deinen Charakteren geführt werden. Wie ein wirkliches Wappen dient es dazu 
+  Deine Familie oder Dynastie zu identifizieren.
+  
+list:
+ title:		Deine bereits bestehenden Wappen
+
+form:
+ choose:		-- wähle --
+design:
+ title:		Heraldik Designer
+ link:		öffne den Heraldik Designer
+ busy:		Aktualisieren und bestätigen Deines Entwurfes...
+ update:		Aktualisiere und prüfe Entwurf
+ random:		Generiere per Zufall
+ save:		Speichere den Entwurf
+ issues:		Es gibt ein oder mehrere Probleme mit Deinem Entwurf:
+ ok:			Dein Entwurf ist zulässig.
+ saving:		Dein Entwurf wird erstellt und gespeichert, dies kann einen Moment dauern. Diese Seite wird automatisch aktualisiert nachdem der Vorgang abgeschlossen wurde.
+ saved:		Dein neues Wappen wurde gespeichert.
+ payment:	Das Speichern Deines Wappens kostet %crestfee% Kredite von Deinem Konto.
+ poor:		Leider hast Du im Moment nur %amount% Kredite auf Deinem Konto.
+
+warning:
+ needname:	 Bitte gib Deinem Entwurf einen Namen.
+ needshield: Du mußt einen Schild für Deinen Entwurf wählen.
+ nopatterncolour: Wenn Du eine Zeichnung verwendest mußt Du auch eine Farbe für Deine Zeichnung wählen.
+ nochargecolour: Wenn Du eine Belegung verwendest mußt Du auch eine Farbe für Deine Belegung wählen.
+ simple:		Dein Entwurf ist zu simpel. Wähle entweder eine Zeichnung oder eine Belegung oder beides.
+ same:		Beide Deiner Elemente haben die gleiche Farbe - das würde Dein Wappen schwer erkennbar machen. Wähle bitte verschiedene Farben. 
+ metals:		Nach dem Brauch der Tinktur sollten Metalle nicht über Metallen verwendet werden. Ändere eines Deiner Metalle in eine Farbe. 
+ colours:	Nach dem Brauch der Tinktur sollten Farben nicht über Farben verwendet werden. Ändere eine Deiner Farben in ein Metall.
+ taken:		Dieser Entwurf wird bereits von jemandem anderen verwendet.
+
+
+badge: Oval
+french: französische Form
+german: deutsche Form
+italian: italienische Form
+polish: polnische Form
+spanish: spanische Form
+swiss: schweizer Form 
+
+base: Schildfuß
+bend: Schrägbalken 
+bend_sinister: Schrägrechtsbalken
+chevron: Sparren 
+chief: Schildhaupt 
+cross: Kreuz 
+fess: Balken 
+flaunches: Flaunches
+gryon: Ständerung 
+pale: Pfahl 
+per_bend: Schrägrechtsteilung 
+per_bend_sinister: Schräglinksteilung
+per_chevron: Göpel
+per_fess: geteilt 
+per_pale: gespalten 
+per_saltire: schräge Vierung
+pile: Keil, stehend 
+quarterly: Vierung 
+saltire: Schräggeviert 
+shakefork: Deichsel
+
+beasts: Tiere
+objects: Objekte
+arm_cubit_habited: Arm, gewandet
+arm_cubit_in_armor: Arm, gerüsted
+arm_embowed_in_armor: Arm, eingebogen, gerüsted
+battle_axe: Schlachtaxt
+bear_head_couped: Bärenschädel, schwebend
+bear_head_erased: Bärenschädel, abgerissen
+bear_head_muzzled: Bärenschädel, Maulkorb
+bear_passant: Bär, schreitend
+bear_rampant: Bär, steigend
+bear_sejant_erect: Bär, aufrecht sitzend
+bear_statant: Bär, stehend
+boar_head_couped: Eber Schädel, schwebend
+boar_head_erased: Eber Schädel, abgerissen
+boar_passant: Eber, schreitend
+boar_rampant: Eber, steigend
+boar_statant: Eber, stehend
+broad_arrow: Pfeil, breit
+buck_head_couped: Bockschädel, schwebend
+caltrap: Fußangel
+catamount_passant_guardant: Wildkatze, schreitend, wachsam
+catamount_sejant_guardant: Wildkatze, sitzend, wachsam
+catamount_sejant_guardant_erect: Wildkatze, aufrecht sitzend, wachsam
+chess_rook: Turm
+chevalier_on_horseback: Ritter, reitend
+church_bell: Kirchenglocke
+coney: Hase
+crescent: Halbmond, liegend
+decrescent: Halbmond, abnehmend
+dragon_passant: Drache, schreitend
+dragon_rampant: Drache, steigend
+dragon_statant: Drache, stehend
+eagle_displayed: Adler
+falcon: Falke
+fluer_de_lis: Lilie
+fox_mask: Fuchs, Anlitz
+fox_passant: Fuchs, schreitend
+fox_sejant: Fuchs, sitzend
+hind: Hirschkuh
+horse_courant: Pferd, gallopierend
+horse_passant: Pferd, schreitend
+horse_rampant: Pferd, steigend
+javelin: Speer
+lion_rampant: Löwe, steigend
+lynx_coward: Luchs, furchtsam
+martlet_volant: Amsel, im Flug
+pegasus_passant: Pegasus, schreitend
+reindeer: Rentier
+scymitar: Säbel
+serpent_nowed: Schlange, geknoted
+squirrel_sejant_erect: Eichhörnchen, aufrecht sitzend
+stag-atgaze: Hirsch, schauend
+stag-lodged: Hirsch, liegend
+stag-springing: Hirsch, springend
+stag-statant: Hirsch, stehend
+stag-trippant: Hirsch, schreitend
+stagshead-caboshed: Hirschkopf, frontal
+stagshead-erased: Hirschkopf, abgerissen
+sun_in_splendor: Sonne, strahlend
+sword: Schwert
+unicorn_rampant: Einhorn, steigend
+winged_stag_rampant: Geflügelter Hirsch, steigend
+wolf_courant: Wolf, jagend
+wolf_passant: Wolf, schreitend
+wolf_rampant: Wolf, steigend
+wolf_salient: Wolf, springend
+wolf_statant: Wolf, stehend
+
+label:
+ name:		Name
+ shield:		Schild
+ shieldc:	Schildfarbe
+ pattern:	Muster
+ patternc:	Musterfarbe
+ charge:		Wappen
+ chargec:	Wappenfarbe
+ shading:	Schattierung
+
+metal:			Metalle
+colours:			Farben
+argent:			Silber
+or:				Gold
+azure:			lapislazuli
+blue celeste:	azurit
+gules:			zinnober
+murrey:			maulbeer
+purpure:			purpur
+sable:			zobel
+sanguine:		blutrot
+tenne:			brandbraun
+vert:				giftgrün
+cendree:			aschfarben
+
+blazon:
+ and:			und
+ over:		über allem
+ a:			ein
+ an:			ein

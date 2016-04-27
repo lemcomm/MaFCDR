@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Vote">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="vote" type="smallint"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="votes"/>
+		<many-to-one field="election" target-entity="Election" inversed-by="votes"/>
+
+		<many-to-one field="target_character" target-entity="Character"/>
+
+		<unique-constraints>
+			<unique-constraint columns="character_id,election_id,target_character_id" name="votex_idx" />
+		</unique-constraints>
+
+	</entity>
+</doctrine-mapping>

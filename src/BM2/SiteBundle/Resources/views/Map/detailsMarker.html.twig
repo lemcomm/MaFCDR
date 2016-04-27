@@ -1,0 +1,12 @@
+<div id="sd_content">
+	<h2 id="sd_name">{{ ('marker.'~marker.type)|trans|title }}</h2>
+	<div id="sd_id" class="hidden">{{ marker.id }}</div>
+	<dl>
+		<dt>{{ 'marker.name'|trans|title }}</dt>
+		<dd>{{ marker.name }}</dd>
+		<dt>{{ 'marker.owner'|trans|title }}</dt>
+		<dd>{{ link(marker.owner) }}</dd>
+		<dt>{{ 'marker.realm'|trans|title }}</dt>
+		<dd>{{ link(marker.realm) }}</dd>
+	</dl>
+</div>

@@ -1,0 +1,11 @@
+/web/bundles/
+/app/bootstrap*
+/app/cache/*
+/app/logs/*
+/app/config/parameters.yml
+/app/config/parameters_test.yml
+/vendor/
+/src/Calitarus
+**/.DS_Store
+composer.phar
+composer.lock

@@ -1,0 +1,485 @@
+# Might & Fealty
+# action text strings - german
+# Author: Tom Vogt <tom@mightandfealty.com>
+queued: Die Aktion wurde deiner Befehlsliste hinzugefügt.
+form:
+ choose: -- wähle --
+# these are the group names for soldiers - translate them if you use non-latin alphabets in your language
+a: a
+b: b
+c: c
+d: d
+e: e
+f: f
+g: g
+h: h
+i: i
+j: j
+k: k
+l: l
+m: m
+n: n
+o: o
+p: p
+q: q
+r: r
+s: s
+t: t
+u: u
+v: v
+w: w
+x: x
+y: y
+z: z
+support:
+ name:		Eine Aktion unterstützen
+ submit:		unterstütze
+ already:	Du unterstützt derzeit diese Aktion
+ success:
+  settlement:
+   take: 	Du unterstützt nun die Bemühungen von %character%, %target% einzunehmen.
+oppose:
+ name: 		Einer Aktion entgegenstellen
+ submit: 	entgegenstellen
+ already: 	Du stellst Dich derzeit dieser Aktion entgegen
+ success:
+  settlement:
+   take: 	Du stellst Dich nun den Bemühungen von %character% entgegen, %target% einzunehmen.<br /> Bitte bedenke, daß dies allein die Aktion <b>nicht verhindern wird</b>. Es wird sie verzögern und Dir Zeit geben, mit anderen Aktivitäten wie einem Angriff Tatsachen zu schaffen. Du kannst den Fortschritt der Kontrollübernahme in der Befehlsliste verfolgen.
+either:
+ submit: 	unterstützen/entgegenstellen
+ invalid:
+  noid:		fehlende Aktions ID
+  wrongid:	Aktions ID unbekannt
+  action:	für diese Aktion nicht möglich
+  already:	Du unterstützt oder stellst dich dieser Aktion bereits entgegen.
+queue:
+ title:		Befehlsliste
+ manage:		Liste verwalten
+ prio:		Priorität
+ action:		Aktion
+ progress:	Fortschritt
+ finishing:	fast fertig
+ block:		blockiert reisen?
+ start:		angefangen
+ end:			geschätztes Ende
+ target:
+  character:	Charakter
+  battle:		Schlacht
+ support:	Aktion unterstützen
+ oppose:		der Aktion entgegenstellen
+ supported:	unterstützt von
+ opposed:	dagegen
+ details: 	Details
+ up:			hoch
+ down:		runter
+ cancel:		Aktion abbrechen
+ cancelled:	diese Aktion wurde abgebrochen
+ settlement:
+  loot: 		Siedlung plündern
+  take:		Siedlung einnehmen
+  rename:	Siedlung umbenennen
+  attack:	Siedlung angreifen
+  defend:	Siedlung verteidigen
+  grant:		Siedlung abgeben
+ military:
+  battle:	Schlacht kämpfen
+  disengage:	Aus Schlacht zurückziehen
+  evade:		Alle Schlachten vermeiden
+ task:
+  research:	Journalforschung
+location:
+ title:		Lokale Interaktionen
+ enter:
+  name: 		Siedlung betreten
+  description: 	Die Siedlung friedvoll betreten, so daß du ihre Einrichtungen nutzen kannst.
+  description2:	Die Siedlung betreten und deinen Kidnapper mit hinein nehmen.
+  result:
+   entered:	Du hast die Tore passiert und bist nun in %settlement%.
+   denied:	Die Wachen an den Toren von %settlement% verweigern dir den Eintritt. Du kannst dir natürlich den Weg freikämpfen, in dem du die Siedlung angreifst.
+ embark:
+#  name: ((missing translation - original: Embarking))
+#  description: ((missing translation - original: Embark ships at nearby docks.))
+#  longdesc: ((missing translation - original: Use the nearby docks to embark on ships and continue your travel by sea.))
+#  description2: ((missing translation - original: Return to your ships.))
+#  longdesc2: ((missing translation - original: Return to your nearby ships and continue your travel by sea.))
+#  done: ((missing translation - original: You have embarked upon ships at %dockname% and are now travelling at sea.<br /> The ships can land you at most coastal locations, but you can only embark at a dock with the appropriate permissions or, of course, return to where you landed as your ships will wait for up to 30 days for you there. This means if you are not careful, landing can be a one-way trip.<br /> To land, simply travel towards land. You will disembark at the first point where your travel hits solid ground.))
+#  done2: ((missing translation - original: You have returned to your ships and are now travelling at sea.<br /> The ships can land you at most coastal locations, but you can only embark at a dock with the appropriate permissions or, of course, return to where you landed as your ships will wait for up to 30 days for you there. This means if you are not careful, landing can be a one-way trip.<br /> To land, simply travel towards land. You will disembark at the first point where your travel hits solid ground.))
+ library:
+#  name: ((missing translation - original: Library))
+#  intro: ((missing translation - original: At the library of %settlement%, scrolls and maps are available for your perusal. The local scholars and cartographers have collected data not readily available unless curated.<br /> <i>(for maximum usefulness, when you click on the maps you get a full-size image. Use your browsers "back" button to return to this page.)</i>))
+  maps:
+#   name: ((missing translation - original: Maps))
+#   allrealms: ((missing translation - original: all realms of the world))
+#   2ndrealms: ((missing translation - original: second-level realms))
+#   majorrealms: ((missing translation - original: major realms of the world))
+#  description: ((missing translation - original: Visit the scholars and cartographers at the local library.))
+ temple:
+#  name: ((missing translation - original: Visit Temple))
+#  intro: ((missing translation - original: The local temple of %settlement% keeps a record of births and deaths, allowing you to trace back the settlements development into time.<br /> The priests have prepared a nice graph for you. As they explain, the height of the line shows the population, and the far right is yesterday, while the line further to the left goes into the past, with the number at the bottom showing how many days into the past.))
+#  description: ((missing translation - original: Visit the local temple and its priests.))
+ barracks:
+#  name: ((missing translation - original: Inspect Barracks))
+#  intro: ((missing translation - original: Thanks to local barracks of %settlement% providing housing for its soldiers, it can also keep a record of militia within the settlement.<br /> A clerk has prepared a nice graph for you. As he explains, the height of the line shows the number of militia in the settlement on any given day, with higher meaning more. The far right shows yesterday, while the line further to the left goes into the past, with the number at the bottom showing how many days into the past.))
+#  description: ((missing translation - original: Inspect the local barracks and soldier records.))
+nearby:
+ spy:
+#  name: ((missing translation - original: Spy on a noble))
+#  description: ((missing translation - original: Send a spy to find out details about a nearby noble.))
+control:
+# name: ((missing translation - original: local control actions))
+# all: ((missing translation - original: all control actions))
+ take:
+  name: 			einnehmen
+  description: Erkläre dich zum Herrscher über diese Leute und mache dir die Siedlung zu eigen.
+  intro: 		Um die Resourcen und Bevölkerung %type%, you need to take control of it first.<br /> This process simply takes time. In a small settlement, you simply convince the people directly, while in larger settlements you will take control of the local administration.<br /> The amount of time required depends on the settlement size and on forces supporting and/or opposing you. This includes the local militia, which will automatically oppose you.<br /> Taking control of this settlement will take an estimated %time%, if nobody else interferes.))
+  newbie:		Bist du sicher, daß du weißt, was du tust? Dies ist eine <i>feindliche Aktion</i> gegen die Siedlung eines anderen Spielers. Dein Charakter ist neu im Spiel und könnte dabei oder aus Rache leicht <i>getötet werden</i>.<br /> Wenn du dir nicht sicher bist, rede vielleicht lieber mit dem Besitzer der Siedlung über die <a href="%url%">Nachrichten</a>.
+  owned: 		Diese Siedlung wird derzeit von %owner% beherrscht.
+  others:
+#   title: ((missing translation - original: Other Control attempts))
+#   intro: ((missing translation - original: The following nobles are also currently trying to take control of this settlement. Without diplomacy or battle, this will likely result in a mess of conflicting claims resolving over time. If you want to succeed, you will almost certainly have to make them all stop, either by convincing them or by attacking them.<br /> Your other alternative is supporting someone else, which will speed up their process of taking the settlement.))
+  others2:
+#   title: ((missing translation - original: Enemy Control attempts))
+#   intro: ((missing translation - original: The following nobles are currently trying to take control of this settlement. You should almost certainly oppose each of them.))
+#  defended: ((missing translation - original: Defending forces are making it more difficult to raise your banner. Attacking and culling them first might speed up your action.))
+#  undefended: ((missing translation - original: There are no defending forces at this settlement, making it very easy and quick to take control.))
+#  realm: ((missing translation - original: in the name of))
+#  submit: ((missing translation - original: take control))
+#  success: ((missing translation - original: You are now in the process of taking control of this settlement. The process will take an estimated %time%, though this estimate will change with the support or opposition of other nobles.))
+ takeX:
+#  name: ((missing translation - original: defend against taking))
+#  description: ((missing translation - original: Your estate is currently being claimed by others, oppose them.))
+ changerealm:
+#  name: ((missing translation - original: Change realm allegiance.))
+#  description: ((missing translation - original: Decide to which of your realms this settlement is aligned.))
+#  intro: ((missing translation - original: As the owner of %settlement%, you decide which realm it is considered to belong to. While this is a simple matter of declaration to change, the political consequences can be massive, so consider them well.<br /> Also remember that your membership in realms depends on you holding estates within their hierarchy, so changing the allegiance of a settlement can result in you leaving a realm if it is your only estate within.))
+#  current: ((missing translation - original: %settlement% is currently a part of %realm%.))
+#  nocurrent: ((missing translation - original: %settlement% is not considered part of any realm at this time.))
+#  realm: ((missing translation - original: change to realm))
+#  submit: ((missing translation - original: change allegiance))
+#  success: ((missing translation - original: You have successfully changed the allegiance of this settlement to %newrealm%.))
+#  leftrealm: ((missing translation - original: Since you now hold no estates within %oldrealm% anymore, you are no longer a member of that realm.))
+  fail:
+#   same: ((missing translation - original: The settlement already belongs to this realm.))
+ grant:
+#  name: ((missing translation - original: grant control))
+#  description: ((missing translation - original: Hand over control over these people to another noble.))
+#  intro: ((missing translation - original: Settlements you control can be handed off to someone else.<br /> Note that this does <em>not</em> make the recipient your vassal automatically. This action merely hands over control, questions of vassalage and legitimacy are for you to resolve.))
+#  introwr: ((missing translation - original: You can grant a settlement "with its realm", meaning you make the new lord a member of the realm the settlement belongs to. Alternatively, you can grant without, which makes the settlement independent before granting it and is useful to giving settlements away to other realms.))
+#  to: ((missing translation - original: grant control to))
+#  withrealm: ((missing translation - original: with realm?))
+#  submit: ((missing translation - original: grant))
+#  success: ((missing translation - original: You have now given control over this settlement to %newowner%.))
+#  queued: ((missing translation - original: You will soon be meeting with %newowner% and arrange the details of the transfer, as well as informing the settlement leaders.))
+ rename:
+#  name: ((missing translation - original: rename settlement))
+#  description: ((missing translation - original: Change the name of this settlement.))
+#  intro: ((missing translation - original: As the lord of this %type%, you can change its name to make it easier to distinguish, or to placate your ego.))
+#  newname: ((missing translation - original: new name))
+#  submit: ((missing translation - original: change name))
+#  tooshort: ((missing translation - original: Settlement names should be at least 3 characters long.))
+#  success: ((missing translation - original: You have now declared that this place shall be known as "%newname%".<br /> Maps and signs will be updated at once.))
+#  queued: ((missing translation - original: The settlement leaders have been instructed to change the name of this place to "%newname%".<br /> Maps and signs will be updated over the next few hours. You will see the change completed soon.))
+ culture:
+#  name: ((missing translation - original: change culture))
+#  description: ((missing translation - original: Change the culture of this settlement.))
+#  intro: ((missing translation - original: As the lord of this <em>%current%</em> %type%, you can change its culture.<br /> The culture of a settlement defines its flair, visuals and the names of the entourage and soldiers recruited here.<br /> This should be used sparingly, as it would be unrealistic to change all the time. It also makes a lot more sense to communicate with your neighors and set up cultural areas.<br /> <br /> The central european is available to everyone. Additional cultures can be bought on your account page (Credits and Gifts). If you conquer a settlement belonging to a culture you do not own, it will retain its culture, but you can only change settlements to cultures you own.))
+#  newculture: ((missing translation - original: new culture))
+#  success: ((missing translation - original: You have now declared that this place follows the %culture% culture.))
+#  queued: ((missing translation - original: The settlement leaders have been instructed to adapt to a %culture% culture.<br /> You will see the change completed soon.))
+ permissions:
+#  name: ((missing translation - original: manage permissions))
+#  description: ((missing translation - original: Set and change permissions for others))
+#  intro: ((missing translation - original: As lord of %settlement%, you can determine how the settlement officials should treat others, if they should allow them into the settlement at all, if they can use the resources of the settlement to resupply or even pick up recruits.<br /> To make everything more accessible, this system uses the <a href="%listsurl%">lists system</a> to define permission owners.))
+#  general: ((missing translation - original: general permissions))
+#  specific: ((missing translation - original: specific permissions))
+#  spawn: ((missing translation - original: allow new characters to spawn here?))
+#  submit: ((missing translation - original: set new permissions))
+#  success: ((missing translation - original: Your new permissions have been saved.))
+military:
+# name: ((missing translation - original: military actions))
+# all: ((missing translation - original: all military actions))
+# other: ((missing translation - original: other military actions))
+ disengage:
+#  name: ((missing translation - original: Disengage))
+#  description: ((missing translation - original: try to avoid the upcoming battle.))
+#  longdesc: ((missing translation - original: attempt to disengage from the forces attacking you and avoid the battle that is currently being forced upon you.))
+#  intro: ((missing translation - original: You are being attacked, and you may or may not be looking forward to this battle. As the enemy is still maneuvering to engage you, you can also still escape. With your current unit size, it will take %time% to pack up everything and leave, at which point you will find out if you succeed in making a run for it, or are already surrounded.))
+#  battles: ((missing translation - original: choose the battle(s) you want to disengage from))
+#  submit: ((missing translation - original: avoid battle))
+#  success: ((missing translation - original: You have instructed your troops to pack up and avoid the upcoming battle. You might want to also travel away or you will probably be engaged again.))
+ evade:
+#  name: ((missing translation - original: Evade))
+#  description: ((missing translation - original: evade enemy forces.))
+#  longdesc: ((missing translation - original: Instruct your troops to automatically attempt to disengage from any battles you are forced into.))
+#  intro: ((missing translation - original: You can instruct your troops to avoid any battles you are forced into. While this might sound like something you want to do all the time, also keep in mind that if you are travelling with a larger army of realm mates, it might mean some of you evade the battle and others don't, splitting forces up.<br /> This action will remain in effect until you cancel it and apply to any and all battles that you do not voluntarily join.<br /> <br /> Since enemy troops could enage you again after a successful evade, it is strongly recommended that you also set travel away from your enemy in order to avoid being re-engaged.))
+#  submit: ((missing translation - original: evade all battles))
+#  success: ((missing translation - original: Your troops are now instructed to immediately disengage if a battle is forced upon you.))
+ settlement:
+#  all: ((missing translation - original: all military actions on settlements))
+  defend:
+#   name: ((missing translation - original: defend settlement))
+#   description: ((missing translation - original: set your troops up to defend this settlement, should it get attacked.))
+#   intro: ((missing translation - original: Order your soldiers to defend %settlement%.<br /> They will set up defenses, making use of any fortifications available, and defend the settlement against anyone ordering an attack.))
+#   submit: ((missing translation - original: set up defenses))
+#   queued: ((missing translation - original: Your soldiers are now preparing for an attack, and are ready to defend.))
+  attack:
+#   name: ((missing translation - original: attack settlement))
+#   description: ((missing translation - original: invade this settlement in order to kill or drive away its defenders.))
+#   intro: ((missing translation - original: Order your soldiers to attack %settlement%.<br /> There will be a battle between your forces as well as any other attackers, against the settlement militia and anyone choosing to defend. If you are victorious, you have forced your way into the settlement, and actions such as taking control of the settlement for yourself or attacking nobles inside will appear.<br /> <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>))
+#   submit: ((missing translation - original: attack!))
+#   success: ((missing translation - original: Your soldiers are preparing for the attack and will commence battle shortly.))
+#   reminder: ((missing translation - original: Remember that in order to not just attack, but also take control of the settlement, you need to issue a <a href="%url%">%take%</a> action as well.))
+  loot:
+#   name: ((missing translation - original: loot settlement))
+#   description: ((missing translation - original: plunder this settlement for valuables and resources.))
+#   intro: ((missing translation - original: Looting enemy settlements allows you to take resources or thralls by force and transfer them to any estate of your choice (preferably yours, typically).<br /< You can also loot for personal profit or raid the workshops for supply, or simply burn the place down.<br /> The more options you select, the longer everything will take and the more distributed the effects will be. To maximize the efficiency of specific goals, you should focus on one or two options.<br /> Like battles, looting commits you - once you have initiated a looting action, you cannot cancel it or travel elsewhere, until it is complete.))
+#   outside: ((missing translation - original: As you are outside the settlement, you can only loot the countryside, which offers fewer targets. Fight, bribe or trick your way inside the settlement for more effective looting.))
+#   time: ((missing translation - original: The selected looting options will take <span id="time">4</span> hours to complete.))
+#   target: ((missing translation - original: send plunder to))
+#   options: ((missing translation - original: loot actions))
+   option:
+#    thralls: ((missing translation - original: take thralls))
+#    resources: ((missing translation - original: take resources))
+#    supply: ((missing translation - original: steal supply))
+#    wealth: ((missing translation - original: steal wealth))
+#    burn: ((missing translation - original: burn down buildings))
+#   submit: ((missing translation - original: begin looting))
+ battles:
+  initiate:
+#   name: ((missing translation - original: initiate battle))
+#   description: ((missing translation - original: prepare for battle with other nobles.))
+#   intro: ((missing translation - original: Face your enemies in battle by positioning your troops so they cannot easily retreat, forcing them into an encounter.<br /> By declaring one or more primary targets, you decide who to engage. However, everyone within reach of the battle can join in on either your or their side, so you cannot be sure who you will face in the end.<br /> Battle preparations take time depending on the size of the involved forces, so both you and your target(s) have a short time to call in allies for support.<br /> If you are inside a settlement, you can only attack others who are also inside (but you can leave to attack those outside). If you are outside a settlement, you cannot attack nobles inside a settlement, you will have to attack the settlement to get inside.<br /> <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>))
+#   success: ((missing translation - original: You are now engaging the enemy and battle prepartions are being made on both sides, estimated time until the battle will commence is %time%, but could change as you and/or the enemy get more support.<br /> Your enemy has been notified of the impending attack.))
+  join:
+#   name: ((missing translation - original: join battle))
+#   description: ((missing translation - original: join a nearby battle and choose your side.))
+#   intro: ((missing translation - original: One or more battles have been initiated nearby. Choose which side to fight on.))
+#   battle: ((missing translation - original: Battle))
+#   settlement: ((missing translation - original: This is an attack on the settlement %settlement%. The local militia will join the defenders.))
+#   attackers: ((missing translation - original: attackers))
+#   defenders: ((missing translation - original: defenders))
+#   success: ((missing translation - original: You have chosen your side and will participate in this battle.<br /> You can keep an eye on the progress of battle progress and other details on the battle details page: %battle%, also available through your actions list.))
+#   join: ((missing translation - original: join))
+#   submit: ((missing translation - original: engage))
+ block:
+#  name: ((missing translation - original: block area))
+#  description: ((missing translation - original: prevent others from passing through.))
+#  longdesc: ((missing translation - original: deploy your forces to block others from passing through your action range. Most effective at choke points like bridges.))
+economy:
+# name: ((missing translation - original: settlement economy actions))
+# all: ((missing translation - original: all economy actions))
+# others: ((missing translation - original: other economy actions))
+# workhours: ((missing translation - original: work hours))
+# tomake: ((missing translation - original: %hours% work hours to make))
+# totrain: ((missing translation - original: %lessons% lessons to train))
+# roadworkers: ((missing translation - original: workers assigned to <a href="%url%">road construction</a>))
+# buildworkers: ((missing translation - original: workers assigned to <a href="%url%">building construction</a>))
+# featureworkers: ((missing translation - original: workers assigned to <a href="%url%">features construction</a>))
+ roads:
+#  name: ((missing translation - original: road construction))
+#  description: ((missing translation - original: Order the construction or destruction of roads.))
+#  intro: ((missing translation - original: In order to speed up travel and improve trade, you can construct roads between any features on your land. Mostly, you will want to build from the settlement to border posts or bridges, but you can build between any features.<br /> You can also upgrade existing roads by assigning workers to them.<br /> Like other construction projects, you assign a percentage of the local workforce to road construction.))
+#  tofeatures: ((missing translation - original: Roads require always link features with each other or the settlement. Go to the <a href="%link%">features construction page</a> to build road markers and other features.))
+#  from: ((missing translation - original: from))
+#  to: ((missing translation - original: towards))
+#  status: ((missing translation - original: type))
+#  progress: ((missing translation - original: construction progress))
+#  workers: ((missing translation - original: workers assigned))
+#  new: ((missing translation - original: commission a new road))
+#  submit: ((missing translation - original: assign workers))
+ features:
+#  name: ((missing translation - original: bridges and features))
+#  description: ((missing translation - original: construction of features outside the settlement.))
+#  intro: ((missing translation - original: Bridges, watchtowers and other features of the area around the settlement complete its strategic and economic value. You can order their construction here by selecting the type of feature you want to build, the workers to assign and then place it on the map by clicking on the spot you want to construct it.<br /> Bridges will automatically snap to the nearest river upon construction, border posts will snap to the nearest border, docks to the nearest coast.))
+#  toroads: ((missing translation - original: The primary purpose of sign and border posts is to allow road construction. Go to the <a href="%link%">road construction page</a> to build roads.))
+#  existing: ((missing translation - original: existing constructions))
+#  building: ((missing translation - original: under construction))
+#  progress: ((missing translation - original: construction progress))
+#  workers: ((missing translation - original: workers assigned))
+#  completion: ((missing translation - original: estimated remaining))
+#  new: ((missing translation - original: build new feature))
+#  effortlong: ((missing translation - original: It takes about %hours% work hours to build this feature.))
+#  never: ((missing translation - original: never))
+#  submit: ((missing translation - original: update work orders))
+ build:
+#  name: ((missing translation - original: Buildings))
+#  description: ((missing translation - original: Construction and management of important infrastructure buildings.))
+#  intro: ((missing translation - original: While the peasants will take care of most of the infrastructure as they need it, you can also order the construction of buildings before they emerge naturally.<br /> Construction will require and tie up resources while it is underway. Many buildings require resources, a minimum number of population or other buildings constructed first.))
+#  status: ((missing translation - original: status))
+#  speed: ((missing translation - original: productivity))
+#  focus: ((missing translation - original: focus))
+#  underconstruction: ((missing translation - original: buildings under construction))
+#  building: ((missing translation - original: under construction))
+#  abandoned: ((missing translation - original: abandoned))
+#  progress: ((missing translation - original: construction progress))
+#  workers: ((missing translation - original: workers assigned))
+#  employees: ((missing translation - original: people employed))
+#  completion: ((missing translation - original: estimated remaining))
+#  never: ((missing translation - original: never))
+#  effort: ((missing translation - original: construction effort))
+#  existing: ((missing translation - original: existing buildings))
+#  canbuild: ((missing translation - original: available for construction))
+#  cannotbuild: ((missing translation - original: not buildable))
+#  submit: ((missing translation - original: assign workers))
+#  abandon: ((missing translation - original: abandon))
+  error:
+#   population: ((missing translation - original: The settlement needs a population of at least %content%.))
+#   prerequisite: ((missing translation - original: %content% required before this building can be constructed.))
+#   already: ((missing translation - original: This building has already been constructed or is currently under construction.))
+#   over100percent: ((missing translation - original: You have assigned more workers than your settlement has to road and building construction work. This allocation will not be accepted.))
+  warning:
+#   over20percent: ((missing translation - original: You are assigning a considerable part of your population to construction work (roads and buildings). You might want to make sure that this will not result in a food shortage.))
+#   over50percent: ((missing translation - original: You are assigning the majority of your population to construction work (roads and buildings). Make sure that this will not result in starvation.))
+ trade:
+#  name: ((missing translation - original: Trade/Tribute Deals))
+#  owner: ((missing translation - original: Review and propose trade deals of this settlement.))
+#  foreign: ((missing translation - original: Offer trade deals to this foreign settlement))
+  intro:
+#   owned: ((missing translation - original: As the lord of this settlement, you can review all trade and tribute deals, and of course change or cancel existing outbound deals at any time. You can also respond to any inbound trade.<br /> All trade and tribute deals are constant supply deals - they last until they are changed or cancelled. As a lord, you never deal with an individual shipment, only with long-term supply.))
+#   foreign: ((missing translation - original: You can offer this settlement trade or tribute from any of your estates, with shipments beginning immediately.<br /> Unless you are offering tribute, you will usually insist on a reciprocal deal, but someone has to make the first move. Trust is the most valuable currency of trade.<br /> All deals are constant supply deals - they last until they are changed or cancelled. As a lord, you never deal with an individual shipment, only with long-term supply.))
+#  submit: ((missing translation - original: initiate trade or tribute))
+#  cancel: ((missing translation - original: cancel deal))
+#  inbound: ((missing translation - original: inbound trade))
+#  outbound: ((missing translation - original: outbound trade))
+#  towards: ((missing translation - original: trades from your estates to this settlement))
+#  resources: ((missing translation - original: resources of your estates))
+#  amount: ((missing translation - original: amount))
+#  res: ((missing translation - original: resource))
+#  to: ((missing translation - original: to))
+#  from: ((missing translation - original: from))
+#  localres: ((missing translation - original: local resources))
+#  production: ((missing translation - original: production))
+#  demand: ((missing translation - original: demand))
+#  trade: ((missing translation - original: trade))
+#  sum: ((missing translation - original: sum))
+#  transcost: ((missing translation - original: trade cost))
+#  new: ((missing translation - original: new deal))
+recruit:
+# name: ((missing translation - original: recruitment actions))
+# all: ((missing translation - original: all recruitment actions))
+ entourage:
+#  name: ((missing translation - original: recruit entourage))
+#  description: ((missing translation - original: Add specialists to your personal entourage.))
+#  intro: ((missing translation - original: As lord of %settlement%, you can hire peasants from this %type% to serve in your entourage.<br /> Buildings of training can provide specialists with higher initial experience and professions that require formal education.))
+#  limit: ((missing translation - original: You will be able to find at most %max% more peasants for training today. If you want to train more new specialists, continue recruitment tomorrow.))
+#  atlimit: ((missing translation - original: Rounding up more peasants for training will take more time and will have to wait until tomorrow.))
+#  provided: ((missing translation - original: provided by))
+#  available: ((missing translation - original: available))
+#  submit: ((missing translation - original: recruit))
+#  success: ((missing translation - original: You have now recruited %number% %type%.))
+#  supply: ((missing translation - original: Due to a lack of training, only %only% of %planned% planned %type% could be added.))
+ troops:
+#  name: ((missing translation - original: train soldiers))
+#  description: ((missing translation - original: Train soldiers to serve as militia or in your military unit.))
+#  intro: ((missing translation - original: As lord of %settlement%, you can recruit peasants from this %type% to be trained as soldiers.<br /> Once trained, they will automatically be added to the defensive force of the settlement, but you can also take them with you on your campaigns at any time.<br /> Military buildings can provide trained soldiers with higher skills and more advanced equipment.))
+#  limit: ((missing translation - original: You will be able to find at most %max% more peasants for training today. If you want to train more new soldiers, continue recruitment tomorrow.))
+#  atlimit: ((missing translation - original: Rounding up more peasants for training will take more time and will have to wait until tomorrow.))
+#  traintime: ((missing translation - original: training time))
+#  provided: ((missing translation - original: provided by))
+#  current: ((missing translation - original: You are currently training %number% new soldiers in this settlement.<br /> Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might want to wait for current training to finish.<br /> Details of the current recruit training is available on the <a href="%url%">%page%</a> page.))
+#  time2: ((missing translation - original: You can train about %amount% soldiers at once before training speeds slow down.))
+#  submit: ((missing translation - original: recruit))
+#  cancel: ((missing translation - original: cancel))
+#  canceldone: ((missing translation - original: Training of %name% (%type%) cancelled.))
+#  cancelinfo: ((missing translation - original: You can stop training, which will send the recruits back into the militia or settlement workforce.))
+#  recruitlink: ((missing translation - original: You can start additional recruit training <a href="%url%">on the recruitment page</a>.))
+#  aftercancel: ((missing translation - original: Training times, supplies and the militia list above will be updated when you visit the training center the next time.))
+#  returns: ((missing translation - original: will return to militia))
+#  disbands: ((missing translation - original: will return to workforce))
+#  supply: ((missing translation - original: Due to a lack of equipment, only %only% of %planned% planned recruits could be added.))
+ warning:
+#  over25percent: ((missing translation - original: You are recruiting a considerable share of your population into military service. These peasants will no longer be available for construction, farming or production. Make sure you can handle the consequences.))
+#  over50percent: ((missing translation - original: You are recruiting more than half of your population into military service. Unless you have taken specific steps to prevent it, this will likely result in the economic destruction of this settlement. Make sure you know what you are doing.))
+ unavailable:
+#  over100percent: ((missing translation - original: Obviously, you cannot recruit more soldiers than you have peasants.))
+ militia:
+#  name: ((missing translation - original: manage militia))
+#  description: ((missing translation - original: Equip or pick up militia from this settlement.))
+#  recruit: ((missing translation - original: recruit))
+ cancel:
+#  name: ((missing translation - original: cancel training))
+ manage:
+#  intro: ((missing translation - original: Here you can manage your soldiers, depending on their current status. You can only resupply troops if their equipment is available in this settlement. You can only assign troops to other characters who are in the same location (and not on the other side of city walls) and not locked into battle.))
+#  choose: ((missing translation - original: -- action --))
+#  disband: ((missing translation - original: disband))
+#  assign: ((missing translation - original: assign...))
+#  assignto: ((missing translation - original: assign selected soldiers to:))
+#  assignto2: ((missing translation - original: assign selected entourage to:))
+#  bury: ((missing translation - original: bury))
+#  makesoldier: ((missing translation - original: mobilize))
+#  makemilitia: ((missing translation - original: set as militia))
+#  resupply: ((missing translation - original: resupply))
+#  retrain: ((missing translation - original: retrain))
+#  retraininfo: ((missing translation - original: Retrain the above selected soldiers to the following equipment set:<br /><small>(they will be added to the settlement training queue and leave active service until training is complete)</small>))
+#  current: ((missing translation - original: current))
+#  submit: ((missing translation - original: issue orders))
+ offers:
+#  name: ((missing translation - original: knights offers))
+#  description: ((missing translation - original: Set aside soldiers to offer to new knights swearing allegiance to you.))
+#  intro: ((missing translation - original: Knights are lower nobles who fight in your name, using your soldiers. To attract new knights to your banner, you can set aside soldiers on your estate(s) that are available immediately to any knight on the condition of his loyalty.<br /> Be aware of robber-knights, though. You should not make the majority of your troops available this way, or your new knights just might decide that looting or taking your estate is more rewarding.))
+#  soldiers: ((missing translation - original: Soldiers to assign))
+#  offertext: ((missing translation - original: A short text to accompany the offer))
+#  submit: ((missing translation - original: publish offer))
+#  new: ((missing translation - original: create a new offer))
+#  old: ((missing translation - original: manage existing offers))
+#  details: ((missing translation - original: Offer Details))
+#  location: ((missing translation - original: offer location))
+#  realm: ((missing translation - original: part of realm))
+#  text: ((missing translation - original: accompanying text))
+#  contains: ((missing translation - original: soldiers included in this offer))
+#  delete: ((missing translation - original: retract offer))
+ assigned:
+#  name: ((missing translation - original: assigned soldiers))
+#  description: ((missing translation - original: Review and reclaim soldiers assigned to knights.))
+#  intro: ((missing translation - original: Soldiers you recently assigned to knights or settlements can be reclaimed as their loyalty still lies with you.<br /> This option will only last for a limited time as the soldiers will form a bond with their new commander after a while, but it means you can be trusting with new knights, for example, because you can take your men back if they turn out to be cowards or traitors.))
+#  submit: ((missing translation - original: reclaim soldiers))
+#  success: ((missing translation - original: After issuing your orders, %return% of your soldiers return (they have been assigned to group %group%). %lost% soldiers decided not to come back.))
+#  fail: ((missing translation - original: You issue your orders, but none of your former soldiers return to you, all %lost% of them decided otherwise.))
+entourage:
+ assign:
+#  action: ((missing translation - original: Action))
+#  select: ((missing translation - original: assign...))
+#  submit: ((missing translation - original: assign entourage))
+meta:
+# name: ((missing translation - original: character meta actions))
+ background:
+#  name: ((missing translation - original: background))
+#  description: ((missing translation - original: edit descriptions))
+#  descdeath: ((missing translation - original: edit descriptions and death cause))
+#  intro: ((missing translation - original: The character background gives %name% depth and meaning. These are simply text-fields here that you can fill with as much or as little as you want, though we strongly recommend at least one sentence for each.))
+#  skip: ((missing translation - original: You can <a href="%url%">skip this part</a> if you prefer and return to it later via the "background" link on the status page.))
+  appearance:
+#   name: ((missing translation - original: Appearance))
+#   desc: ((missing translation - original: Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant -  whatever those who encounter the character will recognize and remember.<br /> <em>This field is publicly visible on your character page</em>))
+  personality:
+#   name: ((missing translation - original: Personality))
+#   desc: ((missing translation - original: Describes the manner and behavior of your character, how he or she thinks and acts. It can include traits such as introvert or extrovert, quick to act or thoughtful, easy to anger or calm - or really anything that gives you and (some) others a better grasp on the character.<br /> <em>This text is only visible to your family members and those in a relationship with this character.</em>))
+  secrets:
+#   name: ((missing translation - original: Goals & Secrets))
+#   desc: ((missing translation - original: This field is for your notes and any information you have learnt that you want to remember that your character knows, as well as any ambitions and future plans. They are for you and in order to give meaning to your character.<br /> <em>Secrets are just that, and visible only to you.</em>))
+  death:
+#   name: ((missing translation - original: Death))
+#   desc: ((missing translation - original: A description of how the character died.<br /> <em>Visible to everyone.</em>))
+#  submit: ((missing translation - original: update background descriptions))
+#  updated: ((missing translation - original: Your background descriptions have been updated.))
+ rename:
+#  name: ((missing translation - original: rename))
+#  description: ((missing translation - original: change character name))
+#  intro: ((missing translation - original: You can change the name of your character at any time, but we <em>strongly</em> suggest that you keep this for events that would reasonable lead to a change of a person's name, such as marriage or ascension to the throne.<br /> All name changes are recorded in your characters public history.))
+#  newname: ((missing translation - original: New Name))
+#  submit: ((missing translation - original: rename character))
+#  success: ((missing translation - original: Your character has been renamed.))
+ kill:
+#  name: ((missing translation - original: kill))
+#  description: ((missing translation - original: make character dead))
+#  intro: ((missing translation - original: You can kill your character at any time.<br /> This action will merely make your character dead without any reason given. You should roleplay an appropriate death so history and your fellow players know how %he% died.<br /> <div class="warning">This action cannot be undone or reversed.</div>))
+#  sure: ((missing translation - original: really, really sure?))
+#  submit: ((missing translation - original: welcome death's embrace))
+#  success: ((missing translation - original: Your character is now dead.))
+ heraldry:
+#  name: ((missing translation - original: heraldry))
+#  description: ((missing translation - original: assign or change crest))
+#  intro: ((missing translation - original: Here you can assign the <a href="%url%">heraldic crests</a> that you have created to your character.<br /> A character can only have one crest, it identifies him and/or his family, dynasty or other group he belongs to.))
+#  remove: ((missing translation - original: use no crest))
+#  submit: ((missing translation - original: assign crest))
+#  nocrests: ((missing translation - original: You do not have any crests available. Follow the link above to design crests for your characters.))

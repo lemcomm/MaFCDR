@@ -1,0 +1,33 @@
+dungeon:
+    resource: "@DungeonBundle/Resources/config/routing.yml"
+    prefix:   /
+
+_bm2_intl:
+    resource: "@BM2SiteBundle/Resources/config/routing.yml"
+#    prefix:   /
+# should work, but doesn't
+    prefix:   /{_locale}
+    requirements:
+     _locale: en|de|fr|it|es|ru
+    defaults:
+     _locale: en
+
+msg:
+    resource: "@MsgBundle/Resources/config/routing.yml"
+#    prefix:   /
+# should work, but doesn't
+    prefix:   /{_locale}
+    requirements:
+     _locale: en|de|fr|it|es|ru
+    defaults:
+     _locale: en
+
+
+_catcher:
+ path:	/{url}
+ defaults:
+  _controller: BM2SiteBundle:Default:localeRedirect
+  url:			-
+ requirements:
+  url:			".+"
+

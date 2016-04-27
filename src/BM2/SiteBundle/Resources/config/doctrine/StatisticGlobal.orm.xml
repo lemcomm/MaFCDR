@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\StatisticGlobal" table="statistic.global">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="cycle" type="integer"/>
+
+		<field name="users" type="integer"/>
+		<field name="active_users" type="integer"/>
+		<field name="ever_paid_users" type="integer"/>
+		<field name="paying_users" type="integer"/>
+		<field name="characters" type="integer"/>
+		<field name="living_characters" type="integer"/>
+		<field name="active_characters" type="integer"/>
+		<field name="deceased_characters" type="integer"/>
+		<field name="realms" type="integer"/>
+		<field name="major_realms" type="integer"/>
+		<field name="buildings" type="integer"/>
+		<field name="constructions" type="integer"/>
+		<field name="abandoned" type="integer"/>
+		<field name="features" type="integer"/>
+		<field name="roads" type="integer"/>
+
+		<field name="trades" type="integer"/>
+		<field name="battles" type="integer"/>
+
+		<field name="soldiers" type="integer"/>
+		<field name="militia" type="integer"/>
+		<field name="recruits" type="integer"/>
+		<field name="offers" type="integer"/>
+		<field name="entourage" type="integer"/>
+		<field name="peasants" type="integer"/>
+		<field name="thralls" type="integer"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,1 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 350" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path d="M 150,1 A 149,174 0 0 1 150,349 A 149,174 0 0 1 150,1 z" id="badge"/><clipPath id="boundary"><use xlink:href="#badge"/></clipPath></defs><use xlink:href="#badge" fill="rgb(255,255,255)" stroke="black" stroke-width="2"/></svg>

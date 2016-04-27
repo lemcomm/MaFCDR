@@ -1,0 +1,96 @@
+<ul>
+	<li><a href="{{ path('bm2_map') }}">{{ 'menu.travel'|trans }}</a></li>
+	<li>
+		<a href="{{ path('bm2_character') }}">{{ 'menu.status'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<h3>Your Status</h3>
+					<ul>
+						<li><a href="{{ path('bm2_character') }}">{{ 'menu.status'|trans }}</a></li>
+						<li><a href="{{ path('bm2_recent') }}">{{ 'menu.recent'|trans }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>Your Party</h3>
+					<ul>
+						{% if character.soldiers is not empty %}
+							<li><a href="{{ path('bm2_site_character_soldiers') }}">{{ 'npc.soldier'|transchoice(10) }}</a></li>
+						{% endif %}
+						{% if character.entourage is not empty %}
+							<li><a href="{{ path('bm2_site_character_entourage') }}">{{ 'np.entourage2'|transchoice(10) }}</a></li>
+						{% endif %}
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+	
+	<li>
+		<a href="{{ path('bm2_events') }}"{% if character.hasnewevents %} class="new"{% endif %}>{{ 'menu.events'|trans }}</a>
+	</li>
+
+	<li>
+		<a href="{{ path('cmsg_summary') }}"{% if character.hasnewmessages %} class="new"{% endif %}>{{ 'menu.messages'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<h3>Messages</h3>
+					<ul>
+						<li><a href="{{ path('cmsg_summary') }}">{{ 'summary.title'|trans({}, "MsgBundle") }}</a></li>
+						<li><a href="{{ path('cmsg_unread') }}">{{ 'unread.short'|trans({}, "MsgBundle") }}</a></li>
+						<li><a href="{{ path('cmsg_index') }}">{{ 'index.title'|trans({}, "MsgBundle") }}</a></li>
+						<li><a href="{{ path('cmsg_new_conversation') }}">{{ 'conversation.new.title'|trans({}, "MsgBundle") }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>Publications</h3>
+					<ul>
+						<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>Experimental</h3>
+					<i>This is an experimental new communications system</i>
+					<ul>
+						<li><a href="{{ path('bm2_communication') }}">read messages</a></li>
+						<li><a href="{{ path('bm2_msg_write') }}">write a message</a></li>
+						<li><a href="{{ path('bm2_msg_groups') }}">message groups</a></li>
+						<li><a href="{{ path('bm2_msg_links') }}">tower links</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<a href="{{ path('bm2_politics') }}">{{ 'menu.politics'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<ul>
+						<li><a href="{{ path('bm2_site_quests_myquests') }}">{{ 'menu.quests'|trans }}</a></li>
+						<li><a href="{{ path('bm2_politics') }}">{{ 'menu.politics'|trans }}</a></li>
+						<li><a href="{{ path('bm2_relations') }}">{{ 'menu.relations'|trans }}</a></li>
+						<li><a href="{{ path("bm2_lists") }}">{{ 'lists.name'|trans({},"politics") }}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<a href="{{ path('bm2_dungeon_dungeon_index') }}">{{ 'menu.dungeon'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<ul>
+						<li><a href="{{ path('bm2_dungeon_dungeon_index') }}">{{ 'dungeon.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('bm2_dungeon_dungeon_events') }}">{{ 'dungeon.events.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('bm2_dungeon_dungeon_chat') }}">{{ 'dungeon.chat.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('dungeons_cards') }}">{{ 'cards.title'|trans({}, "dungeons") }}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+
+</ul>

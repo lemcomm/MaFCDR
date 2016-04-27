@@ -1,0 +1,35 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>Users</h2>
+<table id="usertable">
+	<thead>
+		<tr>
+			<th>Username</th>
+			<th>Account Level</th>
+			<th>Last Login</th>
+			<th>Characters</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for u in users %}
+		<tr>
+			<td>{{ u.name }}</td>
+			<td align="right">{{ u.level }}</td>
+			<td>{{ u.last_login|date }}</td>
+			<td align="right">{{ u.characters }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
+
+{% block jquery %}
+$("#usertable").tablesorter({ sortList: [[0,0]] });
+{% endblock %}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\NewsReader">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="read" type="boolean"/>
+		<field name="updated" type="boolean"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="newspapers_reader"/>
+		<many-to-one field="edition" target-entity="NewsEdition" inversed-by="readers"/>
+	</entity>
+</doctrine-mapping>

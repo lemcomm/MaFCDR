@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Code">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="code" type="string"/>
+		<field name="sent_to_email" type="string"/>
+		<field name="limit_to_email" type="boolean"/>
+		<field name="sent_on" type="datetime"/>
+		<field name="credits" type="smallint"/>
+		<field name="vip_status" type="smallint"/>
+		<field name="used" type="boolean"/>
+		<field name="used_on" type="datetime" nullable="true"/>
+
+		<many-to-one field="sender" target-entity="User"/>
+		<many-to-one field="used_by" target-entity="User"/>
+
+		<unique-constraints>
+			<unique-constraint columns="code" />
+		</unique-constraints>
+
+	</entity>
+</doctrine-mapping>

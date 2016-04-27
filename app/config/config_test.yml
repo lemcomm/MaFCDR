@@ -1,0 +1,25 @@
+imports:
+    - { resource: parameters_test.yml }
+    - { resource: config.yml }
+
+framework:
+    test: ~
+    session:
+        storage_id: session.storage.mock_file
+
+web_profiler:
+    toolbar: false
+    intercept_redirects: false
+
+swiftmailer:
+    disable_delivery: true
+
+monolog:
+    handlers:
+        main:
+            type:  stream
+            path:  %kernel.logs_dir%/%kernel.environment%.log
+            level: debug
+        firephp:
+            type:  firephp
+            level: info

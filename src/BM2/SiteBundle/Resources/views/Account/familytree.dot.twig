@@ -1,0 +1,46 @@
+digraph familytree {
+bgcolor=transparent;
+node [color="#c0c0ccd0", fontcolor=white, style="rounded, filled", shape=box, fillcolor="#20408060"];
+edge [color=white, fontcolor=white];
+
+{% macro charbox(char) %}
+{{ char.id }} [label=<{{ char.name }}<br/><font point-size="7">{% if char.male %}♂{% else %}♀{% endif %}{% for trait in char.genome|split('',1) %} - {{ ('trait.name.'~trait)|trans }}{% endfor %}</font>>, fillcolor="{% if char.alive == false %}#404040a0{% elseif char.male %}#204080a0{% else %}#802040a0{% endif %}", url="{{ link(char, true) }}"];
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% for char in characters %}
+	{{ macros.charbox(char) }}
+	{% for parent in char.parents %}
+		{% if parent.user != char.user %}
+			{{ macros.charbox(parent) }}
+		{% endif %}
+		{{ parent.id }} -> {{ char.id }} [style="bold", tooltip="child"];
+	{% endfor %}
+	{% for child in char.children %}
+		{% if child.user != char.user %}
+			{{ macros.charbox(child) }}
+			{{ char.id }} -> {{ child.id }} [style="bold", tooltip="child"];
+		{% endif %}
+	{% endfor %}
+
+	{% for relation in char.partnerships %}
+		{# this is a family tree, only show active marriages #}
+		{% if relation.type == 'marriage' and relation.active and relation.public %}
+			{% set partner = relation.otherpartner(char) %}
+			{% if partner.user != char.user %}
+				{{ macros.charbox(partner) }}
+				{# draw only one line #}
+				{% if char.id > partner.id %}
+					{{ char.id }} -> {{ partner.id }} [arrowhead=none, constraint=false, style="bold", tooltip="married"];
+				{% endif %}
+			{% else %}
+				{# draw only one line #}
+				{% if char.id > partner.id %}
+					{{ char.id }} -> {{ partner.id }} [arrowhead=none, constraint=false, color="#f08080c0", style="bold", tooltip="married"];
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+{% endfor %}
+}

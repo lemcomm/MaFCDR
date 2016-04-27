@@ -1,0 +1,26 @@
+<div class="monsterdetails">
+<h3>{{ type.name|transchoice(1, {}, "dungeons")|title }}</h3>
+<p>{{ ('monsterdesc.'~type.name)|trans({}, "dungeons")|raw }}</p>
+
+<dl>
+	<dt>Class</dt>
+	<dd><ul>
+		{% for class in type.class %}
+			<li>{{ ("class."~class)|trans({}, "dungeons") }}</li>
+		{% endfor %}
+	</ul></dd>
+
+	<dt>Found in</dt>
+	<dd><ul class="shortlist">
+		{% for area in type.areas %}
+			<li>{{ ("area."~area)|trans({}, "dungeons") }}</li>
+		{% endfor %}
+	</ul></dd>
+
+	<dt>Danger</dt>
+	<dd>{{ type.danger }}</dd>
+
+	<dt>Resilience</dt>
+	<dd>{{ type.resilience }}</dd>
+</dl>
+</div>

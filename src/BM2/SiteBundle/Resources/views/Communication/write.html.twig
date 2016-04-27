@@ -1,0 +1,71 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>Write a Message</h2>
+
+{% if sent is defined %}
+	{% if reached > 0 %}
+		Your message has been broadcast to {{ reached }} settlements.
+	{% else %}
+		Your message was sent.
+	{% endif %}
+{% else %}
+	<p>
+	This system is currently experimental, so please do not send any relevant messages over it. People who do not participate in testing the new system will never see them.<br />
+	Also, many parts of the system do not yet work at all, or only in parts. This early preview is for testing and gathering feedback. You can post your impressions on <a href="http://forum.mightandfealty.com/index.php/topic,3424.msg26869.html">this forum topic</a>.
+	</p>
+
+	Towers that you have in range:
+	<table>
+	{% for tower in towers.settlements %}
+		{% set realmids = [] %}
+		{% if tower.settlement.realm %}
+			{% set myrealms = tower.settlement.realm.findAllSuperiors(true) %}
+			{% for realm in myrealms %}
+				{% set realmids = realmids|merge([realm.id]) %}
+			{% endfor %}
+		{% else %}
+			{% set myrealms = [] %}
+		{% endif %}
+		<tr id="tower_{{ tower.settlement.id }}" data-realms="{{ realmids|json_encode }}">
+			<td>{{ link(tower.settlement) }}</td>
+			<td align="right">{{ tower.distance|distance }}</td>
+			<td>{{ tower.send?'receive and send':'receive only'}}</td>
+			<td>
+				{% if tower.settlement.realm %}
+					<ul class="shortlist">
+					{% for realm in myrealms %}
+						<li>{{ link(realm) }}</li>
+					{% endfor %}
+					</ul>
+				{% endif %}
+			</td>
+			<td>{{ tower.link?'linked':''}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+charselect($("#message_seal_character"));
+
+$('#message_tower').change(function(){
+	var selected = $(this).val();
+	var realms = $("#tower_"+selected).data("realms");
+	$("#message_broadcast_realm option").each(function(){
+		var myrealm = $(this).val();
+		var enabled = false;
+		for (var i = 0; i < realms.length; i++ ) {
+			if (realms[i] == myrealm) {
+				enabled = true;
+			}
+		}
+		$(this).prop("disabled", !enabled);
+	});
+});
+{% endblock %}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\KnightOffer">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="description" type="string"/>
+		<field name="give_settlement" type="boolean"/>
+
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="knight_offers"/>
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="offered_as"/>
+		<one-to-many field="entourage" target-entity="Entourage" mapped-by="offered_as"/>
+
+	</entity>
+</doctrine-mapping>

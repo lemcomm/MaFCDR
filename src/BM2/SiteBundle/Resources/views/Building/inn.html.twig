@@ -1,0 +1,109 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+{% if success is defined %}
+	<h3>{{ "mercenaries.title"|trans({},"actions")|title }}</h3>
+	<p>{{ "mercenaries.success"|trans({},"actions") }}</p>
+{% else %}
+	<h2>{{ "building.inn.name"|trans({},"actions")|title }}</h2>
+	<p>{{ "building.inn.intro"|trans({},"actions")|raw }}</p>
+
+	<h3>{{ "mercenaries.title"|trans({},"actions")|title }}</h3>
+
+	{% if mercs|length > 0 %}
+		<p>{{ 'mercenaries.intro'|trans({"%gold%":gold},"actions")|raw }}</p>
+		<table>
+			<thead>
+			<tr>
+				<th>{{ 'mercenaries.name'|trans({},"actions") }}</th>
+				<th>{{ 'mercenaries.men'|trans({},"actions") }}</th>
+				<th>{{ 'weapon'|trans }}</th>
+				<th>{{ 'armour'|trans }}</th>
+				<th>{{ 'equipment'|trans }}</th>
+				<th>{{ 'experience'|trans }}</th>
+				<th>{{ 'mercenaries.price'|trans({},"actions") }}</th>
+			</tr>
+			</thead>
+			<tbody>
+				{% for merc in mercs %}
+					<tr>
+						<td>{{ merc.name }}</td>
+						<td align="center">{% if merc.minmen > 0 %}{{ merc.minmen }}{% else %}0{% endif %} - {{ merc.maxmen }}</td>
+						<td>{{ link(merc.weapon) }}</td>
+						<td>{% if merc.armour %}{{ link(merc.armour) }}{% endif %}</td>
+						<td>{% if merc.equipment %}{{ link(merc.equipment) }}{% endif %}</td>
+						<td align="right">{{ merc.xp }}</td>
+						<td align="right">{{ merc.price|number_format(2) }}</td>
+						<td><button class="mercgroup" data-id="{{ merc.id }}" data-name="{{ merc.name }}" data-minmen="{% if merc.minmen > 0 %}{{ merc.minmen }}{% else %}0{% endif %}" data-maxmen="{{ merc.maxmen }}" data-price="{{ merc.price|number_format(2) }}">{{ 'mercenaries.hire'|trans({},"actions") }}</button></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		{{ form_errors(form) }}
+		<div id="hiremercs" class="hidden">
+			<h3 id="hire_name"></h3>
+			{% if already %}
+				<p>{{ 'mercenaries.hiring.already'|trans({},"actions") }}</p>
+			{% else %}
+				{{ form(form) }}
+				<p>{{ 'mercenaries.hiring.price'|trans({},"actions")|raw }}</p>
+			{% endif %}
+		</div>
+
+	{% else %}
+		<p>{{ 'mercenaries.none'|trans({},"actions")|raw }}</p>
+	{% endif %}
+
+	<h3>{{ "recruit.offers.name"|trans({},"actions")|title }}</h3>
+	<table>
+		<thead>
+		<tr>
+			<th>settlement</th>
+			<th>offered</th>
+		</tr>
+		</thead>
+		<tbody>
+			{% for offer in offers %}
+				<tr>
+					<td>{{ link(offer.settlement) }}</td>
+					<td align="right">{{ offer.soldiers.count }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+var price = 0;
+var min = 0;
+var max = 0;
+$(".mercgroup").click(function(){
+	var id = $(this).data("id");
+	var name = $(this).data("name");
+	min = $(this).data("minmen");
+	max = $(this).data("maxmen");
+	price = $(this).data("price");
+	$("#hire_name").html(name);
+
+	$("#form_merc_id").val(id);
+	$("#form_merc_number").val(min);
+	$("#hire_price").html(Math.ceil(min*price));
+
+	$("#hiremercs").show();
+});
+
+$("#form_merc_number").change(function(){
+	var number = $(this).val();
+	if (number < min) {
+		number = min;
+		$(this).val(min);
+	} else if (number > max) {
+		number = max;
+		$(this).val(max);
+	}
+	$("#hire_price").html(Math.ceil(number*price));
+});
+{% endblock %}
+

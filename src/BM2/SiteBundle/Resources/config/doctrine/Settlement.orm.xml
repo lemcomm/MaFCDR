@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Settlement">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="population" type="integer"/>
+		<field name="thralls" type="integer"/>
+		<field name="recruited" type="integer"/>
+		<field name="starvation" type="float"/>
+		<field name="gold" type="integer"/>
+		<field name="war_fatigue" type="integer"/>
+
+		<field name="allow_spawn" type="boolean"/>
+		<field name="allow_thralls" type="boolean"/>
+
+		<many-to-one field="culture" target-entity="Culture"/>
+		<many-to-one field="owner" target-entity="Character" inversed-by="estates"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="estates"/>
+		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="settlement"/>
+		<one-to-one field="geo_marker" target-entity="GeoFeature"/>
+		<one-to-many field="resources" target-entity="GeoResource" mapped-by="settlement"/>
+		<one-to-many field="buildings" target-entity="Building" mapped-by="settlement" index-by="type"/>
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="base" index-by="id" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="claims" target-entity="SettlementClaim" mapped-by="settlement" fetch="EXTRA_LAZY"/>
+		<one-to-many field="knight_offers" target-entity="KnightOffer" mapped-by="settlement"/>
+
+		<one-to-many field="trades_outbound" target-entity="Trade" mapped-by="source"/>
+		<one-to-many field="trades_inbound" target-entity="Trade" mapped-by="destination"/>
+
+		<one-to-many field="quests" target-entity="Quest" mapped-by="home"/>
+		<one-to-many field="wartargets" target-entity="WarTarget" mapped-by="settlement"/>
+
+		<one-to-many field="characters_present" target-entity="Character" mapped-by="inside_settlement" fetch="EXTRA_LAZY"/>
+		<one-to-many field="battles" target-entity="Battle" mapped-by="settlement" fetch="EXTRA_LAZY"/>
+		<one-to-many field="related_actions" target-entity="Action" mapped-by="target_settlement" fetch="EXTRA_LAZY"/>
+		<one-to-many field="permissions" target-entity="SettlementPermission" mapped-by="settlement" fetch="EXTRA_LAZY"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="settlement"/>
+
+	</entity>
+</doctrine-mapping>

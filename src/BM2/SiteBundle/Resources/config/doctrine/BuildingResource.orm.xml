@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\BuildingResource" table="types.buildingresource">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="requires_construction" type="smallint"/>
+		<field name="requires_operation" type="smallint"/>
+		<field name="provides_operation" type="smallint"/>
+		<field name="provides_operation_bonus" type="smallint"/>
+
+		<many-to-one field="building_type" target-entity="BuildingType" inversed-by="resources"/>
+		<many-to-one field="resource_type" target-entity="ResourceType"/>
+
+	</entity>
+</doctrine-mapping>

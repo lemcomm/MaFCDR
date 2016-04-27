@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\NewsArticle">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="written" type="datetime"/>
+		<field name="updated" type="datetime" nullable="true"/>
+		<field name="title" type="string"/>
+		<field name="content" type="text"/>
+		<field name="position" type="integer"/>
+		<field name="row" type="smallint"/>
+		<field name="col" type="smallint"/>
+		<field name="size_x" type="smallint"/>
+		<field name="size_y" type="smallint"/>
+
+		<many-to-one field="author" target-entity="Character"/>
+		<many-to-one field="edition" target-entity="NewsEdition" inversed-by="articles"/>
+
+	</entity>
+</doctrine-mapping>

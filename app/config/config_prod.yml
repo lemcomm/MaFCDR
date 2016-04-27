@@ -1,0 +1,48 @@
+imports:
+    - { resource: parameters.yml }
+    - { resource: config.yml }
+
+doctrine:
+    orm:
+        metadata_cache_driver: apc
+        result_cache_driver: apc
+        query_cache_driver: apc
+
+monolog:
+    handlers:
+        main:
+            type:         fingers_crossed
+            action_level: error
+            handler:      grouped
+        grouped:
+            type:       group
+            members:    [streamed, buffered]
+        streamed:
+            type:       stream
+            path:       %kernel.logs_dir%/%kernel.environment%.log
+            level:      info
+        buffered:
+            type:       buffer
+            handler:    swift
+        swift:
+            type:       swift_mailer
+            from_email: server@mightandfealty.com
+            to_email:   tom@lemuria.org
+            subject:    "Might & Fealty Error"
+            level:      error
+        payment:
+            type:       stream
+            path:       %kernel.logs_dir%/payment.log
+            channels:   payment
+            level:      info
+        dungeons:
+            type:       stream
+            path:       %kernel.logs_dir%/dungeons.log
+            channels:   dungeons
+            level:      info
+        development:
+            type:       stream
+            path:       php://stdout
+            level:      info
+            channels:   [dungeons,turn]
+            formatter:  simple_formatter

@@ -1,0 +1,244 @@
+backlink:       Torna alla <a href="%url%">Pagina Azioni</a>.
+queued:         L'azione è stata aggiunta alla lista delle azioni.
+unavailable:
+ intro:          Questa azione non è al momento disponibile perché:
+ nosettlement:   Non siete nelle vicinanze di alcun insediamento.
+ notyours:       Non siete in controllo di questo insediamento.
+ nobody:         Nessun altro nobile nelle vicinanze.
+ nosoldiers:     Non avete alcun soldato.
+
+queue:
+ title:         lista delle azioni
+ settlement:
+  rename:       rinominare l'insediamento
+  attack:       attaccare l'insediamento
+  defend:       difendere l'insediamento
+
+control:
+ name:          azioni di controllo locali
+ all:           tutte le azioni di controllo
+ take:
+  name:         assumere il controllo
+  description:  Dichiaratevi signore di questa gente e fate vostro questo insediamento.
+  unavailable:
+   yours:       Siete già in controllo di questo insediamento.
+  intro:        Per poter comandare le risorse e la popolazione di questo/a %type%, dovete assumerne prima il controllo.
+  owned:        Al momento, questo insediamento è controllato da %owner%.
+  defended:     Forze stanziate a difesa vi impediscono di semplicemente innalzare il vostro stendardo senza colpo ferire. Dovrete prima attaccare e sconfiggerle.
+  undefended:   Siccome non vi sono forze stanziate a difesa, tuttavia, potete semplicemente rimuovere il suo stendardo e innalzare il vostro.
+  free: >
+    Dato che questo insediamento non è al momento sotto il controllo di nessuno, tutto ciò che serve è convincerne i paesani, che si riduce a piantare la vostra bandiera e abbattere il primo che provi ad opporsi.
+  submit:       assumi il controllo
+  success: >
+    La vostra bandiera sventola ora su questo insediamento, e la popolazione seguirà i vostri comandi.<br />
+    Tenete a mente che, a meno che non dispieghiate una milizia a difesa, il suo controllo vi potrà essere strappato nuovamente con eguale facilità.
+ grant:
+  name:         concedere controllo
+  description:  Consegnate il controllo su questa gente a un altro nobile.
+  unavailable:
+   owned:       Questo insediamento è controllato da qualcun altro, non voi.
+   free:        Voi non avete al momento controllo su questo insediamento, dovete prima assumerlo.
+  intro: >
+    Insediamenti sotto il vostro controllo possono essere consegnati a qualcun altro.<br />
+    Tenete a mente che ciò <em>non</em> rende il destinatario automaticamente vostro vassallo. Questa azione trasferisce semplicemente il controllo dell'insediamento, questioni di vassallaggio e legittimità sono vostre da risolvere.
+  to:           concedere il controllo a
+  submit:       concedi
+  success:      Avete ora consegnato il controllo su questo insediamento a %newowner%.
+ rename:
+  name:         rinominare l'insediamento
+  description:  Cambiate il nome di questo insediamento.
+  intro:        Come signore di questo/a %type%, potete cambiarne il nome per distinguerlo/a meglio or per soddisfare il vostro ego.
+  newname:      nuovo nome
+  submit:       cambiare il nome
+  success: >
+    Avete ora dichiarato che questo luogo sarà da ora noto con il nome "%newname%".<br />
+    Mappe e indicazioni saranno cambiate immediatamente.
+  queued: >
+    Sono state date indicazioni ai capi dell'insediamento affinché il nome di questo luogo venga cambiato in "%newname%".<br />
+    Mappe e indicazioni saranno aggiornate nelle prossime ore. Potrete notare il cambiamento completato a breve.
+
+military:
+ name:          azioni militari
+ all:           tutte le azioni militari
+ settlement:
+  all:          tutte le azioni militari su insediamenti
+  defend:
+   name:        difendere insediamento
+   description: schierate le vostre truppe per difendere questo insediamento, in caso venisse attaccato.
+   intro: >
+     Ordinate ai vostri soldati di difendere %settlement%.<br />
+     Loro si schiereranno a difesa, utilizzando qualsiasi fortificazione disponibile, e difenderanno l'insediamento contro chiunque lo attacchi. 
+   submit:      schierare la difesa
+   queued: >
+     I vostri soldati si stanno ora preparando contro eventuali attacchi, pronti a difendere.
+   unavailable:
+    already:    Avete già ordinato alle vostre truppe di difendere.
+    attacking:  Non potete attaccare e difendere allo stesso tempo.
+
+  attack:
+   name:        attaccare l'insediamento
+   description: invadete questo insediamento per uccidere o mettere in fuga i suoi difensori. 
+   intro: >
+     Ordinate ai vostri soldati di attaccare %settlement%.<br />
+     Vi sarà una battaglia tra le vostre forze unite a quelle di qualsiasi altro attaccante contro la milizia a difesa dell'insediamento e chiunque abbia deciso di difenderlo. Se vi sbarazzerete dei difensori, azioni come assumere il controllo dell'insediamento diverranno disponibili.
+   submit:      all'attacco!  
+   queued: >
+     I vostri soldati si stanno preparando per l'attacco e la battaglia comincerà a breve.
+   unavailable:
+    yours:      Siete già in controllo di questo insediamento.
+    nodefenders: Non ci sono truppe a difesa di questo insediamento, potete direttamente assumerne il controllo.
+    already:    Avete già dato l'ordine di attacco alle vostre truppe.
+    defending:  Non potete attaccare e difendere allo stesso tempo.
+  loot:
+   name:        razziare l'insediamento
+   description: saccheggiate questo insediamento per risorse e bottino.
+ others:
+  all:          tutte le azioni militari su altri nobili
+  attack:
+   name:        attaccare altri nobili
+   description: preparatevi alla battaglia contro altri nobili.
+   submit:      preparare l'attacco
+
+
+economy:
+ name:          azioni di gestione economica dell'insediamento
+ all:           tutte le azioni di gestione economica
+ others:        altre azioni di gestione economica
+ workhours:     ore lavorative
+ roads:
+  name:         costruzione di strade
+  description:  Ordinate la costruzione o la distruzione di strade e ponti.
+  intro: >
+    Per rendere più rapidi gli spostamenti e incrementare il commercio potete costruire strade dal vostro insediamento a quelli vicini, o perlomeno la parte sulle vostre terre.<br />
+    Se un fiume divide le vostre terre da quelle altrui, un ponte verrà automaticamente costruito se e solo se entrambe le parti dedicano risorse alla costruzione di strade.<br />
+    Come ogni altro progetto di costruzione, potrete assegnare una certa percentuale della economia locale alla costruzione di strade.
+  dest:         destinazione
+  destlord:     destinazione presso signore
+  status:
+   us:          stato della nostra parte
+   them:        stato della loro parte
+  river:        attraversamento del fiume
+  workers:      lavoratori assegnati
+  buildworkers: lavoratori assegnati alla costruzione di edifici
+  submit:       assegna lavoratori
+ build:
+  name:         costruzione di edifici
+  description:  Organizzate la costruzione di importanti edifici e infrastrutture
+  intro: >
+    Anche se i paesani si prenderanno cura della maggior parte delle infrastrutture al sorgere delle loro necessità, è possibile anche ordinare la costruzione di edifici prima che emergano spontaneamente.<br />
+    La costruzione richiederà e vincolerà risorse per la sua durata. Molti edifici richiedono risorse, una popolazione minima o la presenza di altri edifici.
+  active:       attiva
+  progress:     progresso della costruzione
+  workers:      lavoratori assegnati
+  completion:   tempo rimanente stimato
+  never:        mai
+  roadworkers:  lavoratori assegnati alla costruzione di strade
+  effort:       impegno a costruire
+  existing:     edifici esistenti
+  canbuild:     disponibile per la costruzione
+  cannotbuild:  non costruibili
+  submit:       assegna lavoratori
+  unavailable:
+   population:  L'insediamento richiede una popolazione di almeno %content%.
+   prerequisite: %content% è richiesto prima che questo edificio possa essere costrituito.
+   already:     Questo edificio è già stato costruito o sta venendo costruito al momento.
+   over100percent: Avete assegnato più lavoratori alla costruzione di edifici e strade di quelli disponibili nel vostro insediamento. Tale assegnazione non sarà accettata.
+  warning:
+   over20percent: State assegnando una considerabile parte della vostra popolazione a lavori di costruzione (strade ed edifici). Dovreste assicurarvi che ciò non comporterà scarsità di cibo.
+   over50percent: State assegnando la maggioranza della vostra popolazione a lavori di costruzione (strade ed edifici). Assicuratevi che ciò non porterà a carestia.
+
+ trade:
+  name:        Accordi Tributari/Commerciali
+  owner:       Revisionate e proponete accordi commerciali di questo insediamento. 
+  foreign:     Offrite accordi commerciali a questo insediamento straniero 
+  unavailable:
+   noestate:   Non possedete alcuna tenuta tramite cui commerciare.
+  intro:
+   owned: >
+     Come signore di questo insediamento voi potete revisionare tutti gli accordi commerciali e tributari, e chiaramente cambiare o cancellare accordi in uscita verso altri al momento in vigore. Potete anche rispondere a qualsiasi accordo proposto in ingresso.<br />
+     Tutti gli accordi commerciali e tributari forniscono quantità costanti - ovvero durano finchè non vengono modificati o cancellati. Come signore, voi non avrete mai a che fare con singole consegne, ma esclusivamente con forniture a lungo termine. 
+   foreign: >
+     Potete offrire a questo insediamento commerci o tributi da ciascuna vostra tenuta, con consegne che verrebbero realizzate immediatamente.<br />
+     A meno che voi non stiate offrendo un tributo, è uso insistere per ottenere un accordo con scambio reciproco, ma qualcuno deve fare la prima mossa. La fiducia è la valuta pi√π preziosa nel commercio. <br />
+     Tutti gli accordi commerciali e tributari forniscono quantità costanti - ovvero durano finchè non vengono modificati o cancellati. Come signore, voi non avrete mai a che fare con singole consegne, ma esclusivamente con forniture a lungo termine. 
+  submit:       iniziare commerci o tributi
+  cancel:       cancellare accordo
+  inbound:      commerci in entrata
+  outbound:     commerci in uscita 
+  towards:      commerci dalle vostre tenute a questo insediamento
+  resources:    risorse delle vostre tenute
+  amount:       quantità
+  res:          risorsa
+  to:           a
+  from:         da
+  localres:     risorse locali
+  production:   produzione
+  demand:       richiesta
+  trade:        scambio
+  sum:          somma
+  transcost:    costo dello scambio
+  new:          nuovo accordo
+
+recruit:
+ name:          azioni di reclutamento
+ all:           tutte le azioni di reclutamento
+ entourage:
+  name:         recluta entourage
+  description:  Aggiungete specialisti al vostro entourage personale.
+  intro: >
+    Come signore di %settlement%, potete reclutare paesani da questo/a %type% per servirvi come entourage.<br />
+    Edifici finalizzati ad addestrare possono formare specialisti con una esperienza iniziale maggiore e professioni che richiedono un'educazione formale.
+  provided:     fornito da
+  submit:       recluta
+ troops:
+  name:         addestra soldati
+  description:  Addestrate soldati per servire come miliziani o nella vostra unità militare. 
+  intro: >
+    Come signore di %settlement%, potete reclutare paesani da questo/a %type% perché siano addestrati da soldati.<br />
+    Una volta addestrati, verranno automaticamente aggiunti alla forza difensiva dell'insediamento, ma potrete anche portarli con voi nelle vostre campagne in qualsiasi momento.<br />
+    Edifici militari possono fornire soldati meglio addestrati e con equipaggiamento migliore.
+  traintime:    durata dell'addestramento
+  provided:     fornito da
+  current: >
+    State al momento addestrando %number% nuovi soldati in questo insediamento.<br />
+    Le durate degli addestramenti crescono nel momento in cui più soldati vengono addestrati allo stesso tempo. A meno che non vogliate creare una sequenza, potreste attendere la fine dell'attuale addestramento.<br />
+    I dettagli dell'attuale addestramento reclute è disponibile alla <a href="%url%">%page%</a> pagina.
+  time:         Durata dell'addestramento stimato per nuove reclute:<span id="total">%est%</span> giorni.
+  submit:       recluta
+ militia:
+  name:         gestisci la milizia
+  description:  Equipaggiate o prelevate milizia da questo insediamento.
+  recruit:      recluta
+  unavailable:
+   none:        Qui non vi sono soldati disponibili.
+ manage:
+  choose:       -- seleziona --
+  disband:      sciogli
+  makesoldier:  mobilita
+  makemilitia:  schiera come milizia
+  submit:       conferma
+
+meta:
+ name:          azioni sul personaggio
+ rename:
+  name:         rinominare
+  description:  cambia il nome del personaggio
+  intro: >
+    E' possibile cambiare il nome del personaggio in qualsiasi momento, ma è <em>fortemente</em> consigliato conservare questa azione per eventi che ci si aspetterebbe portassero a un cambiamento del nome di una persona, come ad esempio un matrimonio o l'ascesa al trono.<br />
+    Tutti i cambi di nome sono salvati ed elencati nella storia pubblica del personaggio.
+  newname:      Nuovo Nome
+  submit:       rinomina personaggio
+  success:      Il personaggio è stato rinominato
+ kill:
+  name:         uccidi
+  description:  uccide il personaggio
+  intro: >
+    E' possibile uccidere il personaggio in qualsiasi momento.<br />
+    Tale azione render√† il personaggio morto senza alcuna motivazione. Sarebbe il caso di fornire una descrizione adeguata, in ruolo, per fare in modo che la storia e gli altri giocatori possano sapere come %he% sia morto.<br />
+    <div class="warning">Questa azione non può essere annullata o in alcun modo invertita.</div>
+  sure:         sicuro sicuro?
+  submit:       accogli l'abbraccio della morte
+
+
+
+

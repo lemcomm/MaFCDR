@@ -1,0 +1,60 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>Beastiary</h2>
+
+<table id="beastiary">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Points</th>
+			<th>Class</th>
+			<th>Areas</th>
+			<th>MinDepth</th>
+			<th>Power</th>
+			<th>Attacks</th>
+			<th>Defense</th>
+			<th>Wounds</th>
+			<th>Danger</th>
+			<th>Resilience</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for beast in beastiary %}
+			<tr>
+				<td>{{ ('monster.'~beast.name)|transchoice(1, {}, "dungeons") }}</td>
+				<td align="right">{{ beast.points }}</td>
+				<td><ul class="shortlist">
+					{% for class in beast.class %}
+						<li>{{ class }}</li>
+					{% endfor %}
+				</ul></td>
+				<td><ul class="shortlist">
+					{% for area in beast.areas %}
+						<li>{{ area }}</li>
+					{% endfor %}
+				</ul></td>
+				<td align="right">{{ beast.mindepth }}</td>
+				<td align="right">{{ beast.power }}</td>
+				<td align="right">{{ beast.attacks }}</td>
+				<td align="right">{{ beast.defense }}</td>
+				<td align="right">{{ beast.wounds }}</td>
+				<td align="right">{{ beast.danger }}</td>
+				<td align="right">{{ beast.resilience }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
+
+{% block jquery %}
+$("#beastiary").tablesorter({
+	sortList: [[0,0]],
+});
+{% endblock %}

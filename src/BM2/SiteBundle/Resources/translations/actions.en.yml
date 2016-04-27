@@ -1,0 +1,957 @@
+# Might & Fealty
+# text strings for actions
+# Author: Tom Vogt <tom@mightandfealty.com>
+queued:         The action has been added to your orders queue.
+
+form:
+ choose:  -- choose --
+
+# these are the group names for soldiers - translate them if you use non-latin alphabets in your language
+a: a
+b: b
+c: c
+d: d
+e: e
+f: f
+g: g
+h: h
+i: i
+j: j
+k: k
+l: l
+m: m
+n: n
+o: o
+p: p
+q: q
+r: r
+s: s
+t: t
+u: u
+v: v
+w: w
+x: x
+y: y
+z: z
+
+support:
+ name:          Supporting an action
+ submit:        support
+ already:       you are currently supporting this action
+ success:
+  settlement:
+   take:        You are now supporting the attempt of %character% to take control of %target%.
+oppose:
+ name:          Opposing an action
+ submit:        oppose
+ already:       you are currently opposing this action
+ success:
+  settlement:
+   take: >
+     You are now opposing the attempt of %character% to take control of %target%.<br />
+     Note that this alone will <i>not prevent</i> their action. It will delay it, giving you time
+     for more decisive actions such as attacking them.<br />
+     You can monitor the progress of the control attempt in your action queue.
+either:
+ submit:        support/oppose
+ invalid:
+  noid:         no action id
+  wrongid:      action id unknown
+  action:       not available on this type of action
+  already:      you are already opposing or supporting this action
+
+queue:
+ title:         actions queue
+ manage:        manage queue
+ prio:          priority
+ action:        action
+ progress:      progress
+ finishing:     finishing
+ fighting:      in progress
+ block:         blocks travel?
+ start:         started
+ end:           est. complete
+ target:
+  character:    character
+  battle:       battle
+  list:         list
+ support:       supporting
+ oppose:        opposing
+ supported:     supported by
+ opposed:       opposed by
+ details:       details
+ up:            up
+ down:          down
+ cancel:        cancel action
+ cancelled:     this action has been cancelled
+ support:       support action
+ oppose:        oppose action
+ settlement:
+  loot:         loot settlement
+  take:         take settlement
+  rename:       rename settlement
+  attack:       attack settlement
+  defend:       defend settlement
+  grant:        grant settlement
+  receive:      receive settlement
+ military:
+  battle:       fight battle
+  regroup:      regroup
+  disengage:    disengage from battle
+  evade:        evade all battles
+  damage:       damage feature
+  aid:          military aid
+  block:        block area
+  hire:         hire mercenaries
+  reclaim:      reclaim soldiers
+ task:
+  research:     research journal
+ dungeon:
+  explore:      explore dungeon
+ character:
+  escape:       escape
+
+location:
+ title:         Local Interactions
+ all:           all local interactions
+ marker:
+  name:         Map Markers
+  description:  set and remove map markers.
+ enter:
+  name:         Enter settlement
+  description:  Peacefully enter the settlement so you have access to its facilities.
+  description2: Enter the settlement and bring your captor inside as well.
+  result:
+   entered:     You have passed the gates and are now inside %settlement%.
+   denied:      Guards at the gates of %settlement% deny you entry. You can force your way in by attacking the settlement, of course.
+ quests:
+  name:         Local Quests
+  description:  Check out current and past quests from this region.
+  longdesc:     Quests are tasks and requests of a lord that anyone passing by can complete for a reward.
+  intro: >
+    Quests are tasks given by the local lord to anyone who feels like completing it. They also have a reward attached that is offered to sometimes
+    the first and sometimes everyone who completes it. All the details are specific to the quest, so read them carefully.
+  noquests:     There are no current nor past quests in this region.
+ embark:
+  name:         Embarking
+  description:  Embark ships at nearby docks.
+  longdesc:     Use the nearby docks to embark on ships and continue your travel by sea.
+  description2: Return to your ships.
+  longdesc2:    Return to your nearby ships and continue your travel by sea.
+  done: >
+    You have embarked upon ships at %dockname% and are now travelling at sea.<br />
+    The ships can land you at most coastal locations, but you can only embark at a dock with the appropriate permissions or, of course,
+    return to where you landed as your ships will wait for up to 30 days for you there. This means if you are not careful, landing can be a one-way trip.<br />
+    To land, simply travel towards land. You will disembark at the first point where your travel hits solid ground.
+  done2: >
+    You have returned to your ships and are now travelling at sea.<br />
+    The ships can land you at most coastal locations, but you can only embark at a dock with the appropriate permissions or, of course,
+    return to where you landed as your ships will wait for up to 30 days for you there. This means if you are not careful, landing can be a one-way trip.<br />
+    To land, simply travel towards land. You will disembark at the first point where your travel hits solid ground.
+ giveship:
+  name:         Give ship
+  description:  Give your ship to someone else.
+  longdesc:     Grant control of your ship to someone else, allowing that person to use it, but losing the ship for yourself.
+  intro: >
+    You can give your ship to someone else, so that noble can use it, instead of you. Because once you have given your ship
+    away, you can not use it yourself anymore.<br />
+    Giving a ship away does not extend the time the captain will wait, it is still 30 days after you landed.
+  success:      You have given control of your ship to %newowner% now.
+ givegold:
+  name:         Give gold
+  description:  Give some of your gold to someone else.
+  intro: >
+    You can give some (or all) of your gold to someone else. Simply choose the amount and the recipient, and a servant will run
+    with a sack of gold.<br />
+    You currently have %gold% gold.
+  success:      You have given %amount% gold to %target%.
+ giveartifact:
+  name:         Give Artifact
+  description:  Give an artifact to someone else.
+ dungeons:
+  name:         Enter Dungeon
+  description:  Explore the nearby dungeon.
+
+building:
+ title:         Local Buildings
+ all:           all building actions
+ tavern:
+  name:         Visit Tavern
+  description:  Peasants' rumours from the area.
+  intro: >
+    Peasants from here an nearby settlements gather in the tavern. You can send someone to the tavern to gather rumours from
+    the immediate area, learning this and that about nearby settlements.
+  slumber:      The lord of %settlement% has not been seen for a long time, and is apparently slumbering.
+  nobles:       High-ranking nobles that the peasants are speaking about:
+  in:           was seen in %settlement%.
+ inn:
+  name:         Visit Inn
+  description:  Get a drink and check for rumours and mercenaries.
+  intro: >
+    In the inn, you can hear rumours from abroad, especially about what other lords offer for prospective knights. And if
+    you are looking for sell-swords, soldiers of fortune, men-at-arms - in a word: Mercenaries, the inn is where you will
+    most likely find them.<br />
+    They are usually easy to spot as they are looking for employers the same way you are looking for them. Their services, 
+    however, are less easy. They will follow you as long as you pay them well. You can also not retrain, assign or set them
+    as militia. And you can only disband them all at once.
+ library:
+  name:         Library
+  description:  Visit the scholars and cartographers at the local library.
+  intro: >
+    At the library of %settlement%, scrolls and maps are available for your perusal. The local scholars and cartographers have collected
+    data not readily available unless curated.<br />
+    <i>(for maximum usefulness, when you click on the maps you get a full-size image. Use your browsers "back" button to return to this page.)</i>
+  maps:
+   name:        Maps
+   allrealms:   all realms of the world
+   2ndrealms:   second-level realms
+   majorrealms: sovereign realms of the world
+  top:
+   name:        World Rumours
+   realms:      The scholars have gathered rumours and travel reports and are listing the largest realms of the known world as follows:
+   settlements: From travellers, scholars and other sources, they have also compiled a list of the largest settlements:
+ temple:
+  name:         Visit Temple
+  description:  Visit the local temple and its priests.
+  intro: >
+    The local temple of %settlement% keeps a record of births and deaths, allowing you to trace back
+    the settlements development into time.<br />
+    The priests have prepared a nice graph for you. As they explain, the height of the line shows the population, and the
+    far right is yesterday, while the line further to the left goes into the past, with the number at the bottom showing how
+    many days into the past.
+ barracks:
+  name:         Inspect Barracks
+  description:  Inspect the local barracks and soldier records.
+  intro: >
+    Thanks to local barracks of %settlement% providing housing for its soldiers, it can also keep a record of militia
+    within the settlement.<br />
+    A clerk has prepared a nice graph for you. As he explains, the height of the line shows the number of militia in the
+    settlement on any given day, with higher meaning more. The far right shows yesterday, while the line further to the
+    left goes into the past, with the number at the bottom showing how many days into the past.
+
+nearby:
+ spy:
+  name:         Spy on an estate
+  description:  Send a spy to the nearest settlement.
+  intro: >
+    You can leave one of your spies behind in this settlement, and he will keep you updated about everything that is going on,
+    supplying you with access to the settlements event log and local details, just as if you were there yourself.<br />
+    Over time, the spy might be discovered, or disappear.
+  intro2: >
+    You can send one of your spies to infiltrate this settlement. There is a reasonable chance that he will make it inside, but
+    he could also be captured during the attempt. If he makes it, he will keep you updated about everything that is going on,
+    supplying you with access to the settlements event log and local details, just as if you were there yourself.<br />
+    Over time, the spy might be discovered, or disappear.
+
+control:
+ name:          local control actions
+ all:           all control actions
+ take:
+  name:         take control
+  description:  Declare your lordship over these people and make this settlement yours.
+  intro: >
+    In order to command the resources and population of this %type%, you need to take control of it first.<br />
+    This process simply takes time. In a small settlement, you simply convince the people directly, while in larger settlements you
+    will take control of the local administration.<br />
+    The amount of time required depends on the settlement size and on forces supporting and/or opposing you. This includes the local militia,
+    which will automatically oppose you.<br />
+    Taking control of this settlement will take an estimated %time%, if nobody else interferes.
+  newbie: >
+    Are you absolutely sure you know what you are doing? This is a <i>hostile action</i> on a settlement owned by another player.
+    Your character is new in the game and could easily <i>be killed</i> in retaliation.<br />
+    Unless you are certain and know what you are doing, talking to the settlement owner via the <a href="%url%">messages tab</a>
+    is very likely a much better idea.
+  limit:      With a free account, you can control at most three estates. Keep that in mind and select carefully, or support the game with a subscription.
+  long: >
+    You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead, 
+    we won't stop you, but probably you should bring more troops, reduce the militia by attacking first or gain the support
+    of allies who will aid you.
+  owned:        This settlement is currently controlled by %owner%.
+  others:
+   title:       Other Control attempts
+   intro: >
+     The following nobles are also currently trying to take control of this settlement. Without diplomacy or battle, this will likely result in
+     a mess of conflicting claims resolving over time. If you want to take control yourself, you will almost certainly have to make them all stop,
+     either by convincing them or by attacking them.<br />
+     Your other alternative is supporting someone else, which will speed up their process of taking the settlement.
+  defended: >
+    Defending forces are making it more difficult to raise your banner. Attacking and culling them first might speed up your action.
+  undefended: >
+    There are no defending forces at this settlement, making it very easy and quick to take control.
+  realm:        in the name of
+  submit:       take control
+  success:      You are now in the process of taking control of this settlement. The process will take an estimated %time%, though this estimate will change with the support or opposition of other nobles.
+ takeX:
+  name:         defend against taking
+  description:  Your estate is currently being claimed by others, oppose them.
+ changerealm:
+  name:         Change realm allegiance.
+  description:  Decide to which of your realms this settlement is aligned.
+  intro: >
+    As the owner of %settlement%, you decide which realm it is considered to belong to. While this is a simple
+    matter of declaration to change, the political consequences can be massive, so consider them well.<br />
+    Also remember that your membership in realms depends on you holding estates within their hierarchy, so changing
+    the allegiance of a settlement can result in you leaving a realm if it is your only estate within.
+  current:      %settlement% is currently a part of %realm%.
+  nocurrent:    %settlement% is not considered part of any realm at this time.
+  realm:        change to realm
+  submit:       change allegiance
+  success:      You have successfully changed the allegiance of this settlement to %newrealm%.
+  leftrealm:    Since you now hold no estates within %oldrealm% anymore, you are no longer a member of that realm.
+  fail:
+   same:        The settlement already belongs to this realm.
+ grant:
+  name:         grant control
+  description:  Hand over control over these people to another noble.
+  intro: >
+    Settlements you control can be handed off to someone else.<br />
+    Note that this does <em>not</em> make the recipient your vassal automatically. This action merely hands
+    over control, questions of vassalage and legitimacy are for you to resolve.
+  introwr: >
+    You can grant a settlement "with its realm", meaning you make the new lord a member of the realm the settlement
+    belongs to. Alternatively, you can grant without, which makes the settlement independent before granting it and
+    is useful to giving settlements away to other realms.
+  to:           grant control to
+  withrealm:    with realm?
+  withrealm2:   If you grant an estate "with realm", the estate will stay in its current realm and the new lord will join that realm if he is not already a member.
+  keepclaim:    keep claim?
+  keepclaim2:   If you keep a claim to the estate, you grant it "in fief", but you continue to consider it your property. The claim will allow you to take it back easily.
+  success:      You have now given control over this settlement to %newowner%.
+  queued:       You will soon be meeting with %newowner% and arrange the details of the transfer, as well as informing the settlement leaders.
+ rename:
+  name:         rename settlement
+  description:  Change the name of this settlement.
+  intro:        As the lord of this %type%, you can change its name to make it easier to distinguish, or to placate your ego.
+  newname:      new name
+  submit:       change name
+  tooshort:     Settlement names should be at least 3 characters long.
+  success: >
+    You have now declared that this place shall be known as "%newname%".<br />
+    Maps and signs will be updated at once.
+  queued: >
+    The settlement leaders have been instructed to change the name of this place to "%newname%".<br />
+    Maps and signs will be updated over the next few hours. You will see the change completed soon.
+ culture:
+  name:         change culture
+  description:  Change the culture of this settlement.
+  intro: >
+    As the lord of this <em>%current%</em> %type%, you can change its culture.<br />
+    The culture of a settlement defines its flair, visuals and the names of the entourage and soldiers recruited here.<br />
+    This should be used sparingly, as it would be unrealistic to change all the time. It also makes a lot more sense to
+    communicate with your neighors and set up cultural areas.<br />
+    <br />
+    The central european is available to everyone. Additional cultures can be bought on your account page (Credits and Gifts).
+    If you conquer a settlement belonging to a culture you do not own, it will retain its culture, but you can only change
+    settlements to cultures you own.
+  newculture:   new culture
+  success: >
+    You have now declared that this place follows the %culture% culture.
+  queued: >
+    The settlement leaders have been instructed to adapt to a %culture% culture.<br />
+    You will see the change completed soon.
+ permissions:
+  name:         manage permissions
+  description:  Set and change permissions for others
+  intro: >
+    As lord of %settlement%, you can determine how the settlement officials should treat others, if they should allow them
+    into the settlement at all, if they can use the resources of the settlement to resupply or even pick up recruits.<br />
+    To make everything more accessible, this system uses the <a href="%listsurl%">lists system</a> to define permission owners.
+  general:      general permissions
+  specific:     specific permissions
+  spawn:        allow new characters to spawn here?
+  thralls:      allow slavery (thralls) ?
+  submit:       set new permissions
+  success:      Your new permissions have been saved.
+ quests:
+  name:         manage quests
+  description:  Create and edit quests for this settlement
+  intro: >
+    As lord of %settlement%, you can set quests for other characters passing by to complete.<br />
+    A quest can be absolutely any task that you can describe in words and where you can determine if it was completed or not. It will
+    be written on message boards everywhere inside the region, so it is available to anyone who enters the region, even if they
+    do not or are not allowed to enter the settlement itself.<br />
+    Quests should also contain a reward. This as well can be anything. Quests can be completed once or many times, as you wish. In
+    essence, quests are entirely free-form and you determine everything, including if you will give out the promised reward or betray
+    the knight you finished your quest.<br />
+    Quests are public knowledge, so other people can see all past and current quests, who has taken them up, if they think the quest
+    was completed, if you agree and if they consider the reward to be received or not.
+  new:          Create New Quest
+  create: >
+    To create a quest, describe the task to do and the reward given.<br />
+    You can give a short summary, a long description and a description of the reward. You should include all important information,
+    including whether the quest reward will be given only to the first to complete it, or to multiple people, and on which conditions,
+    such as evidence of conclusion, or time limits.
+
+military:
+ name:          military actions
+ all:           all military actions
+ other:         other military actions
+ war:
+  name:         Declare War
+  description:  A formal declaration of war allows you to target enemy settlements for conquest and have a formal conflict that can gain your realm glory and respect.
+  summary:      Short title or summary:
+  desc:         Full description (you can use markup):
+  targets:      Select settlements to conquer:
+  declare:      declare war!
+ disengage:
+  name:         Disengage
+  description:  try to avoid the upcoming battle.
+  longdesc:     attempt to disengage from the forces attacking you and avoid the battle that is currently being forced upon you.
+  intro: >
+    You are being attacked, and you may or may not be looking forward to this battle. As the enemy is still maneuvering to engage you,
+    you can also still escape. With your current unit size, it will take %time% to pack up everything and leave, at which point you
+    will find out if you succeed in making a run for it, or are already surrounded.
+  battles:      choose the battle(s) you want to disengage from
+  submit:       avoid battle
+  success:      You have instructed your troops to pack up and avoid the upcoming battle. You might want to also travel away or you will probably be engaged again.
+ evade:
+  name:         Evade
+  description:  evade enemy forces.
+  longdesc:     Instruct your troops to automatically attempt to disengage from any battles you are forced into.
+  intro: >
+    You can instruct your troops to avoid any battles you are forced into. While this might sound like something you want to do all the time, also
+    keep in mind that if you are travelling with a larger army of realm mates, it might mean some of you evade the battle and others don't, splitting
+    forces up.<br />
+    This action will remain in effect until you cancel it and apply to any and all battles that you do not voluntarily join.<br />
+    <br />
+    Since enemy troops could enage you again after a successful evade, it is strongly recommended that you also set travel away from your
+    enemy in order to avoid being re-engaged.
+  submit:       evade all battles
+  success:      Your troops are now instructed to immediately disengage if a battle is forced upon you.
+ settlement:
+  all:          all military actions on settlements
+  defend:
+   name:        defend settlement
+   description: set your troops up to defend this settlement, should it get attacked.
+   intro: >
+     Order your soldiers to defend %settlement%.<br />
+     They will set up defenses, making use of any fortifications available, and defend the settlement against
+     anyone ordering an attack.
+   submit:      set up defenses
+   queued: >
+     Your soldiers are now preparing for an attack, and are ready to defend.
+
+  attack:
+   name:        attack settlement
+   description: invade this settlement in order to kill or drive away its defenders.
+   intro: >
+     Order your soldiers to attack %settlement%.<br />
+     There will be a battle between your forces as well as any other attackers, against the settlement militia
+     and anyone choosing to defend. If you are victorious, you have forced your way into the settlement, and actions such as taking control of the
+     settlement for yourself or attacking nobles inside will appear.<br />
+     <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>
+   war:         war that this attack supports:
+   submit:      attack!
+   success:     Your soldiers are preparing for the attack and will commence battle shortly.
+   reminder:    Remember that in order to not just attack, but also take control of the settlement, you need to issue a <a href="%url%">%take%</a> action as well.
+  loot:
+   name:        loot settlement
+   description: plunder this settlement for valuables and resources.
+   intro: >
+     Looting enemy settlements allows you to take resources or thralls by force and transfer them to any estate of your choice (preferably yours, typically).<br /<
+     You can also loot for personal profit or raid the workshops for supply, or simply burn the place down.<br />
+     The more options you select, the longer everything will take and the more distributed the effects will be. To maximize the efficiency of specific goals,
+     you should focus on one or two options.<br />
+     Like battles, looting commits you - once you have initiated a looting action, you cannot cancel it or travel elsewhere, until it is complete.
+   owner:       As you are the lord of this settlement, you can <i>steal wealth</i> very effectively with no negative effects. You will call this an unscheduled tax collection.
+   outside:     As you are outside the settlement, you can only loot the countryside, which offers fewer targets. Fight, bribe or trick your way inside the settlement for more effective looting.
+   time:        The selected looting options will take <span id="time">4</span> hours to complete.
+   target:      send plunder to
+   options:     loot actions
+   option:
+    thralls:    take thralls
+    resources:  take resources
+    supply:     steal supply
+    food:       steal food
+    wealth:     steal wealth
+    burn:       burn down buildings
+   submit:      begin looting
+ battles:
+  initiate:
+   name:        initiate battle
+   description: prepare for battle with other nobles.
+   intro: >
+     Face your enemies in battle by positioning your troops so they cannot easily retreat, forcing them into an encounter.<br />
+     By declaring one or more primary targets, you decide who to engage. However, everyone within reach of the battle can join
+     in on either your or their side, so you cannot be sure who you will face in the end.<br />
+     You should include an in-character message with the attack, explaining why you are attacking or mocking your enemy or writing
+     a short roleplay about the attack or anything else that gives the battle more depth.<br />
+     Battle preparations take time depending on the size of the involved forces, so both you and your target(s) have a short time to call
+     in allies for support.<br />
+     If you are inside a settlement, you can only attack others who are also inside (but you can leave to attack those outside). If you are
+     outside a settlement, you cannot attack nobles inside a settlement, you will have to attack the settlement to get inside.<br />
+     <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>
+   success: >
+     You are now engaging the enemy and battle prepartions are being made on both sides, estimated time until the battle will commence is %time%,
+     but could change as you and/or the enemy get more support.<br />
+     Your enemy has been notified of the impending attack.
+  join:
+   name:          join battle
+   description:   join a nearby battle and choose your side.
+   intro:         One or more battles have been initiated nearby. Choose which side to fight on.
+   battle:        Battle #%battle%
+   settlement:    This is an attack on the settlement %settlement%. The local militia will join the defenders.
+   attackers:     attackers
+   defenders:     defenders
+   success: >
+     You have chosen your side and will participate in this battle.<br />
+     You can keep an eye on the progress of battle progress and other details on the battle details page: %battle%, also available through your actions list.
+   join:          join
+   submit:        engage
+ aid:
+  name:          military aid
+  description:   support other nobles in future battles.
+  intro: >
+    You can choose to always support other nobles in their battles. This will make you automatically join any battles
+    they are involved in, if they are in your interaction range.<br />
+    The most common use for this is when you see an ally involved in a battle nearby to set travel there and also this
+    action, so you immediately join after arriving at the battle, even if you are not online at that time. You can also
+    use this action to defend a nearby noble, much like the <b>defend settlement</b> action.<br />
+    To protect you from unintended consequences, this action always has a time limit. You can choose one of three
+    durations below. It will also always end once you have entered a battle. If your target is involved in multiple
+    simultaneous battles, you will aid them in all.<br />
+    <br />
+    Note that you <b>can</b> have multiple military aid actions running for multiple target characters. They will be
+    resolved in the order in your action queue, and you will only join the first character on your list that is in a battle.
+  target:         Character to aid
+  success: >
+    You are now lending your aid to %character%, and will become involved in their battles.
+ block:
+  name:           block area
+  description:    Prevent others from passing through.
+  longdesc:       Deploy your forces to block others from passing through your action range. Most effective at choke points like bridges.
+  intro: >
+    By blocking an area, you will (try to) prevent others from passing through it, by engaging them in battle if they get near.
+    Obviously, this is most useful either at chokepoints such as bridges, passes, etc. or when working with others so you can cover a large area.<br />
+    You cannot move while blocking. Your army will camp in the area and send patrols around. This allows you to automatically
+    engage your targets at twice your normal interaction range.<br />
+    Target selection uses the <a href="%listsurl%">lists system</a> in order to allow you to create sophisticated orders.
+    Slumbering nobles, however, will never be engaged. You can attack them normally, but for block area they will be ignored.<br />
+    Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself 
+    in battle with a vastly superior enemy if you are not careful.<br />
+    Blocking area can be cancelled at any time from your actions queue.
+  mode:
+   label:         modus operandi
+   allow:         allow these, attack all others
+   attack:        attack these, allow all others
+  target:         target
+  submit:         issue block orders
+  success: >
+    Your men will now set up camp and patrol the area.
+ damage:
+  name:           damage feature
+  description:    Try to destroy a bridge or other feature.
+  longdesc:       Use your soldiers to tear down or damage a bridge, watchtower or sign to disrupt enemy operations.
+  intro: >
+    You can use your soldiers to tear apart features such as bridges, watchtowers or signs.<br />
+    Typically, you do this to your enemy to disrupt them, but sometimes you may want to get rid of features in your own lands.<br />
+    This action takes 4 hours, except for signs where it takes only 1 hour.<br />
+    <br />
+    The following feature(s) is/are within range:
+  target:         Choose which feature to damage or destroy.
+  inactive:       (inactive)
+  submit:         proceed with destruction
+  success:        You have destroyed the %featuretype%.
+  success2:       You have damaged the %featuretype%, making it inoperative.
+  success3:       You have damaged the %featuretype%, by about %damage% % of the effort required to build it.
+
+economy:
+ name:          settlement economy actions
+ all:           all economy actions
+ others:        other economy actions
+ workhours:     work hours
+ tomake:        %hours% work hours to make
+ totrain:       %lessons% lessons to train
+ roadworkers:  workers assigned to <a href="%url%">road construction</a>
+ buildworkers: workers assigned to <a href="%url%">building construction</a>
+ featureworkers: workers assigned to <a href="%url%">features construction</a>
+ roads:
+  name:         road construction
+  description:  Order the construction or destruction of roads.
+  intro: >
+    In order to speed up travel and improve trade, you can construct roads between any features on
+    your land. Mostly, you will want to build from the settlement to border posts or bridges, but
+    you can build between any features.<br />
+    You can also upgrade existing roads by assigning workers to them.<br />
+    Like other construction projects, you assign a percentage of the local workforce to road construction.
+  tofeatures:   Roads require always link features with each other or the settlement. Go to the <a href="%link%">features construction page</a> to build road markers and other features.
+  from:         from
+  to:           towards
+  status:       type
+  progress:     construction progress
+  workers:      workers assigned
+  new:          commission a new road
+  submit:       assign workers
+ features:
+  name:         bridges and features
+  description:  construction of features outside the settlement.
+  intro: >
+    Bridges, watchtowers and other features of the area around the settlement complete its
+    strategic and economic value. You can order their construction here by selecting the type of
+    feature you want to build, the workers to assign and then place it on the map by clicking on
+    the spot you want to construct it.<br />
+    Bridges will automatically snap to the nearest river upon construction, border posts will
+    snap to the nearest border, docks to the nearest coast.
+  toroads:      The primary purpose of sign and border posts is to allow road construction. Go to the <a href="%link%">road construction page</a> to build roads.
+  existing:     existing constructions
+  building:     under construction
+  progress:     construction progress
+  workers:      workers assigned
+  progress:     construction progress
+  completion:   estimated remaining
+  new:          build new feature
+  effortlong:   It takes about %hours% work hours to build this feature.
+  never:        never
+  submit:       update work orders
+ build:
+  name:         Buildings
+  description:  Construction and management of important infrastructure buildings.
+  intro: >
+    While the peasants will take care of most of the infrastructure as they need it, you can also
+    order the construction of buildings before they emerge naturally.<br />
+    Construction will require and tie up resources while it is underway. Many buildings require
+    resources, a minimum number of population or other buildings constructed first.
+  status:       status
+  speed:        productivity
+  focus:        focus
+  underconstruction: buildings under construction
+  building:     under construction
+  abandoned:    abandoned
+  progress:     construction progress
+  workers:      workers assigned
+  employees:    people employed
+  production:   weekly production
+  completion:   estimated remaining
+  never:        never
+  effort:       construction effort
+  existing:     existing buildings
+  canbuild:     available for construction
+  cannotbuild:  not buildable
+  submit:       assign workers
+  abandon:      abandon
+  error:
+   population:  The settlement needs a population of at least %content%.
+   prerequisite: %content% required before this building can be constructed.
+   conditions:  Special conditions not met, see building description page.
+   already:     This building has already been constructed or is currently under construction.
+   over100percent: You have assigned more workers than your settlement has to road and building construction work. This allocation will not be accepted.
+  warning:
+   over20percent: You are assigning a considerable part of your population to construction work (roads and buildings). You might want to make sure that this will not result in a food shortage.
+   over50percent: You are assigning the majority of your population to construction work (roads and buildings). Make sure that this will not result in starvation.
+
+ trade:
+  name:        Trade/Tribute Deals
+  owner:       Review and propose trade deals of this settlement.
+  foreign:     Offer trade deals to this foreign settlement
+  intro:
+   owned: >
+     As the lord of this settlement, you can review all trade and tribute deals, and of course change or cancel existing
+     outbound deals at any time. You can also respond to any inbound trade.<br />
+     All trade and tribute deals are constant supply deals - they last until they are changed or cancelled. As a lord, you
+     never deal with an individual shipment, only with long-term supply.
+   foreign: >
+     You can offer this settlement trade or tribute from any of your estates, with shipments beginning immediately.<br />
+     Unless you are offering tribute, you will usually insist on a reciprocal deal, but someone has to make the first move.
+     Trust is the most valuable currency of trade.<br />
+     All deals are constant supply deals - they last until they are changed or cancelled. As a lord, you
+     never deal with an individual shipment, only with long-term supply.
+  submit:       initiate trade or tribute
+  cancel:       cancel deal
+  inbound:      inbound trade
+  outbound:     outbound trade
+  towards:      trades from your estates to this settlement
+  resources:    resources of your estates
+  amount:       amount
+  res:          resource
+  to:           to
+  from:         from
+  localres:     local resources
+  production:   production
+  demand:       demand
+  trade:        trade
+  sum:          sum
+  transcost:    trade cost
+  new:          new deal
+
+recruit:
+ name:          recruitment actions
+ all:           all recruitment actions
+ entourage:
+  name:         recruit entourage
+  description:  Add specialists to your personal entourage.
+  intro: >
+    As lord of %settlement%, you can hire peasants from this %type% to serve in your entourage.<br />
+    Buildings of training can provide specialists with higher initial experience and professions that require formal education.
+  limit:        You will be able to find at most %max% more peasants for training today. If you want to train more new specialists, continue recruitment tomorrow.
+  atlimit:      Rounding up more peasants for training will take more time and will have to wait until tomorrow.
+  provided:     provided by
+  available:    available
+  submit:       recruit
+  success:      You have now recruited %number% %type%.
+  supply:       Due to a lack of training, only %only% of %planned% planned %type% could be added.
+ troops:
+  name:         train soldiers
+  description:  Train soldiers to serve as militia or in your military unit.
+  intro: >
+    As lord of %settlement%, you can recruit peasants from this %type% to be trained as soldiers.<br />
+    Once trained, they will automatically be added to the defensive force of the settlement, but you can also
+    take them with you on your campaigns at any time.<br />
+    Military buildings can provide trained soldiers with higher skills and more advanced equipment.
+  limit:        You will be able to find at most %max% more peasants for training today. If you want to train more new soldiers, continue recruitment tomorrow.
+  atlimit:      Rounding up more peasants for training will take more time and will have to wait until tomorrow.
+  traintime:    training time
+  provided:     provided by
+  current: >
+    You are currently training %number% new soldiers in this settlement.<br />
+    Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might
+    want to wait for current training to finish.<br />
+    Details of the current recruit training is available on the <a href="%url%">%page%</a> page.
+  time2:        You can train about %amount% soldiers at once before training speeds slow down.
+  submit:       recruit
+  cancel:       cancel
+  canceldone:   Training of %name% (%type%) cancelled.
+  cancelinfo:   You can stop training, which will send the recruits back into the militia or settlement workforce.
+  recruitlink:  You can start additional recruit training <a href="%url%">on the recruitment page</a>.
+  aftercancel:  Training times, supplies and the militia list above will be updated when you visit the training center the next time.
+  returns:      will return to militia
+  disbands:     will return to workforce
+  supply:       Due to a lack of equipment, only %only% of %planned% planned recruits could be added.
+ warning:
+  over25percent:  You are recruiting a considerable share of your population into military service. These peasants will no longer be available for construction, farming or production. Make sure you can handle the consequences.
+  over50percent:  You are recruiting more than half of your population into military service. Unless you have taken specific steps to prevent it, this will likely result in the economic destruction of this settlement. Make sure you know what you are doing.
+ unavailable:
+  over100percent: Obviously, you cannot recruit more soldiers than you have peasants.
+ militia:
+  name:         manage militia
+  description:  Equip or pick up militia from this settlement.
+  recruit:      recruit
+ cancel:
+  name:         cancel training
+ manage:
+  intro: >
+    Here you can manage your soldiers, depending on their current status. You can only resupply troops if their equipment is available in this
+    settlement. You can only assign troops to other characters who are in the same location (and not on the other side of city walls) and not locked into battle.
+  limited:      Due to your current ongoing actions (such as battle or looting), your management options are limited.
+  choose:       -- action --
+  nothing:      (no action)
+  apply:        apply to group
+  disband:      disband
+  assign:       assign...
+  assignto:     assign selected soldiers to:
+  assignto2:    assign selected entourage to:
+  bury:         bury
+  bury2:        leave corpse
+  makesoldier:  mobilize
+  makemilitia:  set as militia
+  resupply:     resupply
+  retrain:      retrain
+  retraininfo:  Retrain the above selected soldiers to the following equipment set:<br /><small>(they will be added to the settlement training queue and leave active service until training is complete)</small>
+  current:      current
+  submit:       issue orders
+  group1:       group by type
+  group2:       group detailed
+  groupinfo:    Automatically group soldiers according to equipment. Warning: This will overwrite any groups you may have.
+  grouped:      Your soldiers have been automatically put into groups
+ offers:
+  name:         knights offers
+  description:  Set aside soldiers to offer to new knights swearing allegiance to you.
+  intro: >
+    Knights are lower nobles who fight in your name, using your soldiers. To attract new knights to your banner, you can set aside
+    soldiers on your estate(s) that are available immediately to any knight on the condition of his loyalty.<br />
+    Be aware of robber-knights, though. You should not make the majority of your troops available this way, or your new knights
+    just might decide that looting or taking your estate is more rewarding.<br />
+    <br />
+    You can also automatically give the settlement to the new knight, turning him into a landed lord on arrival. In this
+    case, no soldiers will be given (even if you select some). As the new lord, he will have command of the whole militia
+    anyways. This is a risky option that you only want if getting rid of the estate is important to you. Giving an estate
+    in this way always retains you an enforceable claim on the settlement.
+  givesettlement: Give settlement?
+  soldiers:     Soldiers to assign
+  offertext:    A short text to accompany the offer
+  submit:       publish offer
+  new:          create a new offer
+  old:          manage existing offers
+  lordship:     lordship
+  details:      Offer Details
+  location:     offer location
+  realm:        part of realm
+  text:         accompanying text
+  contains:     soldiers included in this offer
+  contains2:    this offer grants
+  withsettlement: lordship over the settlement (you will become a lord)
+  delete:       retract offer
+ assigned:
+  name:         assigned soldiers
+  description:  Review and reclaim soldiers assigned to knights.
+  intro: >
+    Soldiers you recently assigned to knights or settlements can be reclaimed as their loyalty still lies with you.<br />
+    This option will only last for a limited time as the soldiers will form a bond with their new commander after a while,
+    but it means you can be trusting with new knights, for example, because you can take your men back if they turn out
+    to be cowards or traitors.<br />
+    You cannot reclaim soldiers if they are still available to you in any way, being stationed at your own estates or
+    you own characters. You can also not reclaim soldiers when the character they are assigned to is currently in battle
+    preparations. Such reclaims will fail silently, but you can try again later.<br />
+    Note that reclaiming soldiers means <b>you remain stationary with travel blocked for 2-4 in-game days</b> because
+    the reclaimed soldiers need to march and join up with your army.
+  submit:       reclaim soldiers
+  success:      After issuing your orders, %return% of your soldiers return (they have been assigned to group %group%). %lost% soldiers decided not to come back.
+  fail:         You issue your orders, but none of your former soldiers return to you, all %lost% of them decided otherwise.
+
+entourage:
+ assign:
+  action:       Action
+  select:       assign...
+  submit:       assign entourage
+
+meta:
+ name:          character meta actions
+ background:
+  name:         background
+  description:  edit descriptions
+  descdeath:    edit descriptions and death cause
+  intro: >
+    The character background gives %name% depth and meaning. These are simply text-fields here that you can fill
+    with as much or as little as you want, though we strongly recommend at least one sentence for each.
+  skip:         You can <a href="%url%">skip this part</a> if you prefer and return to it later via the "background" link on the status page.
+  traits:       Your character was born with two traits, inherited from parents and/or the family lineage. Here is what the genetic lottery gave you:
+  appearance:
+   name:      Appearance
+   desc: >
+    Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant - 
+    whatever those who encounter the character will recognize and remember.<br />
+    <em>This field is publicly visible on your character page.</em>
+  personality:
+   name:      Personality
+   desc: >
+    Describes the manner and behavior of your character, how he or she thinks and acts. It can include traits
+    such as introvert or extrovert, quick to act or thoughtful, easy to anger or calm - or really anything that
+    gives you and (some) others a better grasp on the character.<br />
+    <em>This text is only visible to your family members and those in a relationship with this character.</em>
+  secrets:
+   name:        Goals & Secrets
+   desc: >
+     This field is for your notes and any information you have learnt that you want to remember that your
+     character knows, as well as any ambitions and future plans. They are for you and in order to give meaning to
+     your character.<br />
+     <em>Secrets are just that, and visible only to you.</em>
+  death:
+   name:        Death
+   desc: >
+     A description of how the character died.<br />
+     <em>Visible to everyone.</em>
+  submit:       update background descriptions
+  updated:      Your background descriptions have been updated.
+ rename:
+  name:         rename
+  description:  change character name
+  intro: >
+    You can change the name of your character at any time, but we <em>strongly</em> suggest that you keep this for
+    events that would reasonable lead to a change of a person's name, such as marriage.<br />
+    Also remember that your character name <b>must</b> be a proper name, not a silly name, not a codename, but a
+    a plausible, actual name.<br />
+    All name changes are recorded in your characters public history.<br />
+    <br />
+    You can also add a religious or political name or monicker that the character uses himself or is being called 
+    by others. If you want your character to be known by something besides his name, this is the place to put it. 
+    Alexander "The Great" as well as "Brother Gregory" are examples from the real world.<br />
+    The "known as" can be more free-form than the character name, but should still pass a common sense "would someone really be called like that in a medieval world?"
+    test. In other words: No silliness, no modern or Internet speak, something that passes the giggle test when you
+    imagine composing a letter starting with "My esteemed (...)".<br />
+    If set, this name will be shown instead of the character name everywhere, but in <i>italics</i>. 
+    The character details page will show both.<br />
+  newname:      New Name
+  knownas:      add a "known as"
+  submit:       rename character
+  success:      Your character has been renamed.
+ kill:
+  name:         kill
+  description:  make character dead
+  intro: >
+    You can kill your character at any time.<br />
+    This action will merely make your character dead without any reason given. You should roleplay an appropriate death
+    so history and your fellow players know how %he% died.<br />
+    <div class="warning">This action cannot be undone or reversed.</div>
+  sure:         really, really sure?
+  submit:       welcome death's embrace
+  success:      Your character is now dead.
+ respawn:
+  name:         Respawn
+  description:  return character to pool
+  sure:         are you sure?
+  success:      The character has been returned to the pool.
+ heraldry:
+  name:         heraldry
+  description:  assign or change crest
+  intro: >
+    Here you can assign the <a href="%url%">heraldic crests</a> that you have created to your character.<br />
+    A character can only have one crest, it identifies him and/or his family, dynasty or other group he belongs to.
+  remove:       use no crest
+  submit:       assign crest
+  nocrests:     You do not have any crests available. Follow the link above to design crests for your characters.
+
+escape:
+ name:      escape
+ description: ...or at least try to.
+ intro:     Despite the ancient oath sworn, you can attempt to fool %captor% and escape from captivity.
+ low:       Your chances of success, however, are quite small and your captor will be informed of your attempt. There may be dire consequences.
+ high:      As your captor has not been seen for many days, your chances of success are very high.
+ submit:    attempt escape
+ queued:    You are now working on your escape plan. It will take %hours% hours to implement.
+
+surrender:
+ name:          surrender
+ description:   become a prisoner, voluntarily.
+ intro: >
+   If there is no hope left, you can throw yourself at the mercy of your enemy and go into captivity.
+   You will become a prisoner, just as if you had been captured in battle. Typically, you might want to choose
+   this action when there is no way out, to ensure the most merciful opponent captures you and not the one
+   who will take your head.
+ success:       You have surrendered yourself and are now a prisoner of %character%.
+
+personal:
+ party:
+  name:         Dungeon Party
+  description:  Check the status of your dungeon exploration group.
+ dungeoncards:
+  name:         Dungeon Actions
+  description:  Review your available dungeon actions.
+
+
+mercenaries:
+ title:     Available Mercenary Groups
+ none:      Apparently, there are no mercenary groups in the area at this time. Wait for some days or try your luck elsewhere.
+ intro: >
+   You find members of the following mercenary groups who are somewhere in the area and will come when you hire them.<br />
+   These mercenaries send members to many inns in the vicinity, so if come back later, they might be gone because someone
+   even in another settlement hired them.<br />
+   You can hire parts or all of the group, as shown below. You currently have <b>%gold% gold</b> in your purse.
+ name:      name of the group
+ men:       available men
+ price:     gold per man
+ hire:      hire this group
+ label:            mercenary
+ intro2: >
+    Mercenary groups can be hired for battle like normal soldiers, but with some restrictions.
+    They want payment and will leave you if you do not pay. Additionally, they cannot be assigned to
+    others or set as militia, and you can only disband them as a group (all or none of them).
+ summary:          This mercenary group is currently in your employ, and consists of %men% men. You will pay %price% gold at the beginning of every week and every battle.
+ hired:            A mercenary group currently employed by someone else.
+ equipment:        Their equipment:
+ available:        The group has between %min_men% and %max_men% men available for hire, at a price from %min_price% to %max_price% gold (per week and additionally per battle).
+ hiring:
+  amount:   Number of men
+  submit:   hire them
+  price:    This will cost <span id="hire_price">0</span> gold.
+  already:  You hired a mercenary unit recently, and are busy with arranging this deal.
+ success:   You have successfully hired mercenaries. They are now listed in your normal soldiers list and will march and fight with you, as long as you pay them at the beginning of every week and every battle.
+
+quests:
+ summary:   quest summary
+ questers:  currently active on this quest
+ questers2: completed by
+ desc:      full description
+ reward:    reward promised
+ submit:    announce quest
+ details:   details
+ current:   Current Quests
+ past:      Past Quests

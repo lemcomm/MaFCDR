@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\StatisticRealm" table="statistic.realm">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="cycle" type="integer"/>
+		<many-to-one field="realm" target-entity="Realm"/>
+		<many-to-one field="superior" target-entity="Realm"/>
+
+		<field name="estates" type="integer"/>
+		<field name="population" type="integer"/>
+		<field name="soldiers" type="integer"/>
+		<field name="militia" type="integer"/>
+		<field name="area" type="integer"/>
+		<field name="characters" type="integer"/>
+		<field name="players" type="integer"/>
+
+	</entity>
+</doctrine-mapping>

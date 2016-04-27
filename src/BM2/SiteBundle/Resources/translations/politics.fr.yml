@@ -1,0 +1,148 @@
+status:
+ self:
+  landless:			Vous êtes un chevalier sans terre.
+  independent:	Vous êtes un seigneur indépendant.
+  vassal:			  Vous êtes un vassal de <a href="%url%">%name%</a>.
+  ruler:  			Vous êtes le souverain de <a href="%url%">%name%</a>.
+  realm:        Vous êtes un membre de <a href="%url%">%name%</a>.
+  ultimate:     Vous êtes un souverain indépendant, mais qui n'ont pas encore formé un royaume.
+ other:
+  landless:			%He% est un chevalier sans terre.
+  independent:	%He% est un  indépendant seigneur.
+  vassal:			  %He% est le vassal de <a href="%url%">%name%</a>.
+  ruler:	   		%He% est le souverain de <a href="%url%">%name%</a>.
+  realm:        %He% est membre de <a href="%url%">%name%</a>.
+  ultimate:     %He% est un souverain indépendant, mais n'a pas encore formé un royaume.
+
+oath:
+ name:		Serment de fidélité
+ intro: >
+   Fidélité est ce qui définit la hiérarchie et le système politique. Le contenu d'un serment - vassalité, le service militaire, 
+   les actions de revenus fonciers, la protection, de l'honneur et de la politique - est négociable entre liege et vassal.<br />
+   Ici vous pouvez prêter serment de fidélité à un caractère à proximité, qui feront de vous son vassal. Cela permettra également de 
+   faire votre succession une partie de sa/son royaume.
+ hasvassals: >
+   Tous vos vassaux deviendra également une partie du domaine que vous choisissez de se joindre, en tant que leur serment à 
+   vous les lie à vos décisions. Bien sûr, si vous agir contre leur volonté, ils pourraient vous quittez la suite.
+ isruler: >
+   Cette action va signifier la fin de votre domaine comme une entité indépendante.
+ hasliege: >
+   Votre serment actuel sera automatiquement dissoute et votre liege actuelle, %liege%, sera informé.
+ current:   serment actuel
+ swear:     prêter un nouveau serment
+ nobody:    Il n'y a pas de nouveaux seigneurs éligibles à proximité.
+ newliege:	liege nouvelle
+ choose:		-- choisissez liege --
+ submit:		prêter serment
+ fail:
+  vassal:	Vous ne pouvez pas prêter serment à vos propres vassaux (ou à leurs vassaux).
+ success:	Prestation de serment de fidélité, vous êtes maintenant un vassal de %newliege%.
+
+successor:
+ name:      votre successeur
+ you:       Vous êtes un successeur à
+ intro: >
+   Étant donné que la mort fait partie de la vie, il est important pour tous les nobles d'attribuer un successeur à ses titres et 
+   participations.<br />
+   Vous pouvez sélectionner n'importe quel caractère à proximité d'échanger des documents, ou n'importe qui de vos caractères 
+   (car ils sont supposés être de la même famille ou dynastie) indépendamment de la distance. 
+   Notez que vos terres, titres, etc laissera votre contrôle si elles sont héritées par un caractère qui ne vous appartient pas.
+ set:       attribuer un nouveau successeur
+ choose:    -- choisissez successeur --
+ submit:    fixé successeur
+ success:   Vous avez choisi %successor% comme votre nouveau successeur.
+
+partners:
+ name:      gérer les partenaires
+ intro: >
+   Les relations avec les autres caractères peuvent prendre de nombreuses formes. Leurs détails sont sujets à jeu de rôle, les mécanismes de jeu
+   ne couvrent que quelques actions.<br />
+   Seulement les relations publiques sera montré aux autres joueurs. Seules les relations qui incluent rapports sexuels permettre aux deux partenaires 
+   de créer de nouveaux caractères avec ces partenaires en tant que parents.
+ none:      Vous n'avez pas de partenariat (comme un mariage ou une liaison) actuellement.
+ one:       Vous êtes fidèlement %type% %partner%.
+ several:   Vous êtes impliqué dans plusieurs partenariats actuellement, à savoir:
+ new:
+  name:     nouvelles relations
+  intro:    Vous pouvez proposer une nouvelle relation à n'importe quel caractère à proximité. Il ou elle doit accepter pour que la relation devienne actif.
+  none:     Il n'y a pas d'éventuels partenaires à proximité.
+ old:
+  name:     relations existantes
+  intro:    Vous pouvez rompre avec les partenaires existants ou faire quelques modifications unilatérales à la relation. Cela pourrait entraîner leur rupture avec vous.
+
+relation:
+ text:        vous êtes %type% %partner%.
+ engagement:  engagé à
+ marriage:    mariée avec
+ liason:      avez une liaison avec
+ proposedto:  demandé la main
+ proposedyou: demandé ta main
+ public:      publique
+ secret:      secrète
+ with:        avec
+ sex:         inclut les rapports sexuels
+ nosex:       sans rapports sexuels
+
+ choice:
+  choose:     -- choisissez --
+  type:       proposer une
+  partner:    à
+  engagement: fiançailles
+  marriage:   marriage
+  liason:     liaison
+  public:     Devrait être la relation publique?
+  sex:        Sera-ce une relation sexuelle, ce qui peut entraîner chez l'enfant?
+  submitnew:  proposer
+  nochange:   aucun changement
+  makepublic: rendre public
+  refusesex:  refuser les rapports sexuels
+  cancel:     rompre
+  withdraw:   retirer la proposition
+  accept:     accepter la proposition
+  reject:     rejeter la proposition
+  submitchange: s'engager à des changements
+
+realm:
+ new:
+  name:       Créer domaine
+  intro: >
+    Avec assez de puissance, et aucun seigneur au-dessus de vous, vous pouvez prendre un rôle plus grandiose sur la scène mondiale. Vous pouvez 
+    annoncer les terres sous votre contrôle comme un domaine, qui est un terme générique pour quoi que ce soit à partir d'une baronnie 
+    d'un empire.<br />
+    En fait, il est entièrement à vous ce qu'il faut appeler votre nouveau domaine. La seule chose qui vous empêche d'appeler trois villages 
+    d'un empire est le ridicule de vos pairs. Le mélange approprié entre l'ambition et la modestie pourrait être souhaitable.<br />
+    Vous pouvez changer la désignation de votre domaine plus tard.<br />
+  choose:     -- choisissez --
+  submit:     annoncer un nouveau domaine
+
+ name:        nom
+ formalname:  nom officiel
+ designation: désignation
+ type:
+  1: baronnie
+  2: comté
+  3: marche
+  4: duché
+#  5: ((missing translation))
+  6: royaume
+  7: empire
+ title:
+  male:
+   0: chevalier
+   1: baron
+   2: comte
+   3: marquis
+   4: duc
+#  5: ((missing translation))
+   6: roi
+   7: empereur
+  female:
+   0: dame
+   1: baronne
+   2: comtesse
+   3: marquise
+   4: duchesse
+#  5: ((missing translation))
+   6: reine
+   7: impératrice
+

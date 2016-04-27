@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\SoldierLog">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="content" type="string"/>
+		<field name="data" type="array"/>
+		<field name="ts" type="datetime"/>
+		<field name="cycle" type="integer"/>
+
+		<many-to-one field="soldier" target-entity="Soldier" inversed-by="events" orphan-removal="true">
+			<join-column on-delete="CASCADE" />
+		</many-to-one>
+
+	</entity>
+</doctrine-mapping>

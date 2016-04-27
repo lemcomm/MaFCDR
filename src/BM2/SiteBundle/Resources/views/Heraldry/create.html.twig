@@ -1,0 +1,423 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/default.css') }}" />
+	{# need to use older jquery here, because jquery.svg hasn't been updated since 2012 #}
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/swanky-purse/jquery-ui.css" />
+
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+	<script src="{{ asset('bundles/bm2site/js/jquery.svg.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/js/jquery.svgdom.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/jquery.svg.css') }}" />
+	<script src="{{ asset('bundles/bm2site/js/jquery.hoverintent.js') }}"></script>
+{% endblock %}
+
+{% form_theme form _self %}
+
+{% block svg_selector %}
+	<ul class="heraldry_choice" id="{{ type }}_selector">
+	{% for index,choice in choices %}
+		<li class="row">
+			<img class="tt" title="{{ choice.label|trans({}, "heraldry") }}" data-value="{{ choice.value }}" src="{{ asset('bundles/bm2site/heraldry-svg/'~type~'s/'~choice.value~'.svg')}}"/>
+		</li>
+	{% endfor %}
+	</ul>
+	<div class="hidden">{{ block('choice_widget') }}</div>
+{% endblock %}
+
+{% block colour_selector %}
+	<ul class="heraldry_choice" id="{{ type }}_selector">
+	{% for index,choice in choices %}
+		<li class="optgroup">
+			<span>{{ index }}:</span>
+			{% for colour in choice %}
+				<svg class="tt" title="{{ colour.label|trans({}, "heraldry") }}" data-value="{{ colour.value }}"><rect height="20" width="30" rx="3" ry="3" style="fill:{{ colour.value }}"/></svg>
+			{% endfor %}
+		</li>
+	{% endfor %}
+	</ul>
+	<div class="hidden">{{ block('choice_widget') }}</div>
+{% endblock %}
+
+{% block _heraldry_shield_widget %}
+	{% set type = "shield" %}
+	{{ block('svg_selector') }}
+{% endblock %}
+
+{% block _heraldry_shield_colour_widget %}
+	{% set type = "shield_colour" %}
+	{{ block('colour_selector') }}
+{% endblock %}
+
+{% block _heraldry_pattern_widget %}
+	{% set type = "pattern" %}
+	{{ block('svg_selector') }}
+{% endblock %}
+
+{% block _heraldry_pattern_colour_widget %}
+	{% set type = "pattern_colour" %}
+	{{ block('colour_selector') }}
+{% endblock %}
+
+{#
+{% block _heraldry_charge_widget %}
+	{% set type = "charge" %}
+	{{ block('svg_selector') }}
+{% endblock %}
+#}
+
+{% block _heraldry_charge_colour_widget %}
+	{% set type = "charge_colour" %}
+	{{ block('colour_selector') }}
+{% endblock %}
+
+
+{% block content %}
+<h2>{{ 'design.title'|trans({},"heraldry")|title }}</h2>
+<div style="min-height:350px">
+<div id="heraldry" style="width:300px;height:350px;float:right;margin-left:5em"></div>
+
+{{ form_errors(form) }}
+
+<form class="wide" action="{{ path('bm2_site_heraldry_create') }}" method="post" {{ form_enctype(form) }}>
+	{{ form_widget(form) }}
+
+	<div id="thebuttons">
+		<button type="button" id="update">{{ 'design.update'|trans({},"heraldry") }}</button>
+		<button type="button" id="random">{{ 'design.random'|trans({},"heraldry") }}</button>
+	</div>
+
+	<hr />
+
+	<p id="busy">{{ 'design.busy'|trans({},"heraldry") }}</p>
+
+	<div id="messages">
+		<p>{{ 'design.issues'|trans({},"heraldry") }}</p>
+		<ul id="msglist">
+		</ul>
+	</div>
+
+	<div id="cansave">
+		<p>{{ 'design.ok'|trans({},"heraldry") }}</p>
+		<p id="blazon"></p>
+		<p class="payment">{{ 'design.payment'|trans({"%crestfee%":crestfee},"heraldry") }}</p>
+		{% if crestfee > app.user.credits %}
+			<p>
+				<em>{{ 'design.poor'|trans({"%amount%":app.user.credits},"heraldry") }}</em>
+				<a href="{{ path("bm2_payment") }}">{{ 'account.payment.link'|trans|title }}</a>
+			</p>
+		{% else %}
+			<button type="submit" id="save">{{ 'design.save'|trans({},"heraldry") }}</button>
+		{% endif %}
+	</div>
+
+	<div id="saving">
+		<p><i>{{ 'design.saving'|trans({},"heraldry") }}</i></p>
+	</div>
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+
+$("#shield_selector img").click(function(){
+	$("#heraldry_shield").val($(this).data("value"));
+	do_update();
+});
+$("#pattern_selector img").click(function(){
+	$("#heraldry_pattern").val($(this).data("value"));
+	do_update();
+});
+$("#charge_selector img").click(function(){
+	$("#heraldry_charge").val($(this).data("value"));
+	do_update();
+});
+$("#shield_colour_selector svg").click(function(){
+	$("#heraldry_shield_colour").val($(this).data("value"));
+	do_update();
+});
+$("#pattern_colour_selector svg").click(function(){
+	$("#heraldry_pattern_colour").val($(this).data("value"));
+	do_update();
+});
+$("#charge_colour_selector svg").click(function(){
+	$("#heraldry_charge_colour").val($(this).data("value"));
+	do_update();
+});
+
+var basepath = "{{ asset('bundles/bm2site/heraldry-svg/') }}";
+var unique = "?";
+
+$("#busy").hide();
+$("#messages").hide();
+$("#cansave").hide();
+$("#saving").hide();
+
+$("#heraldry").svg();
+
+$("select").change(function(){
+	$("#cansave").hide();
+});
+
+$("#save").click(function(){
+	$("#saving").show();
+	$("#cansave").hide();
+	$("#thebuttons").hide();
+});
+
+$("#update").click(function(){
+	do_update();
+});
+
+function do_update() {
+	$("#msglist").html("");
+	$("#cansave").hide();
+	$("#messages").hide();
+	$("#busy").show();
+
+	var svg = $("#heraldry").svg('get');
+	svg.clear(true);
+
+	var other = false;
+	var good = true;
+
+	if ($("#heraldry_name").val()=="") {
+		$("#msglist").append("<li>{{ 'warning.needname'|trans({},"heraldry") }}</li>");
+		good=false;
+	}
+
+	var shield = $("#heraldry_shield").val();
+	var shield_colour = $("#heraldry_shield_colour").val();
+	if (shield=="") {
+		$("#msglist").append("<li>{{ 'warning.needshield'|trans({},"heraldry") }}</li>");
+		good=false;
+	} else if (shield_colour=="") {
+		$("#msglist").append("<li>{{ 'warning.needshieldcolour'|trans({},"heraldry") }}</li>");
+		good=false;
+	} else {
+		svg.load(basepath+"shields/"+$("#heraldry_shield").val()+".svg", {
+			addTo: false,
+			changeSize: true,
+			onLoad: shieldDone
+		});
+	}
+
+	good = check_colours(good);
+
+	if (good) {
+		validateUnique();
+		getBlazon();
+	} else {
+		$("#messages").show();
+		$("#busy").hide();
+	}
+};
+
+
+$("#random").click(function(){
+	randomize($("#heraldry_shield option"), false);
+	var valid=false;
+	while (!valid) {
+		randomize($("#heraldry_pattern option"), true);
+		randomize($("#heraldry_charge option"), true);
+		if ($("#heraldry_pattern").val()!="" || $("#heraldry_charge").val()!="") {
+			valid=true;
+		}
+	}
+	valid=false;
+	while (!valid) {
+		randomize($("#heraldry_shield_colour option"), false);
+		if ($("#heraldry_pattern").val()=="") {
+			$("#heraldry_pattern_colour option")[0].selected = true;
+		} else {
+			randomize($("#heraldry_pattern_colour option"), false);
+		}
+		if ($("#heraldry_charge").val()=="") {
+			$("#heraldry_charge_colour option")[0].selected = true;
+		} else {
+			randomize($("#heraldry_charge_colour option"), false);
+		}
+		valid = check_colours(true);
+	}
+	$("#update").click();
+});
+
+function check_colours(good) {
+	var shield = $("#heraldry_shield_colour").val();
+	if ($("#heraldry_pattern").val()!="") {
+		other = $("#heraldry_pattern_colour").val();
+		if (other=="") {
+			$("#msglist").append("<li>{{ 'warning.nopatterncolour'|trans({},"heraldry") }}</li>");
+			good=false;
+		}
+	} else {
+		if ($("#heraldry_charge").val()!="") {
+			other = $("#heraldry_charge_colour").val();
+		} else {
+			$("#msglist").append("<li>{{ 'warning.simple'|trans({},"heraldry") }}</li>");
+			good=false;
+		}
+	}
+	if ($("#heraldry_charge").val()!="" && $("#heraldry_charge_colour").val() =="") {
+			$("#msglist").append("<li>{{ 'warning.nochargecolour'|trans({},"heraldry") }}</li>");
+			good=false;
+	}
+	if (good && other) {
+		if (shield==other) {
+			$("#msglist").append("<li>{{ 'warning.same'|trans({},"heraldry") }}</li>");
+			good=false;
+		} else {
+			if ( (shield=="rgb(240,240,240)" || shield=="rgb(255,220,10)" || shield=="rgb(184,115,51)") && (other=="rgb(240,240,240)" || other=="rgb(255,220,10)" || other=="rgb(184,115,51)") ) {
+				$("#msglist").append("<li>{{ 'warning.metals'|trans({},"heraldry") }}</li>");
+				good=false;
+			}
+			if ( (shield!="rgb(240,240,240)" && shield!="rgb(255,220,10)" && shield!="rgb(184,115,51)") && (other!="rgb(240,240,240)" && other!="rgb(255,220,10)" && other!="rgb(184,115,51)") ) {
+				$("#msglist").append("<li>{{ 'warning.colours'|trans({},"heraldry") }}</li>");
+				good=false;
+			}
+		}
+	}
+	return good;	
+}
+
+function randomize(item, can_be_empty) {
+	if (can_be_empty) {
+		pick = Math.floor(Math.random() * (item.length));
+	} else {
+		pick = Math.floor(Math.random() * (item.length-1))+1;
+	}
+	item[pick].selected = true
+}
+
+function shieldDone() {
+	var svg = $("#heraldry").svg('get');
+	var shield = $("#"+$("#heraldry_shield").val(), svg.root());
+	var colour = $("#heraldry_shield_colour").val();
+	shield.attr('fill', colour);
+	shield.attr('stroke', "black");
+	shield.attr('stroke-width', 2);
+
+	var clp = svg.clipPath("boundary");
+	svg.clone(clp, shield);
+
+	if ($("#heraldry_pattern").val()!="") {
+		svg.load(basepath+"patterns/"+$("#heraldry_pattern").val()+".svg", {
+			addTo: true,
+			changeSize: true,
+			onLoad: patternDone
+		});
+	} else {
+		loadCharge();
+	}
+}
+
+function patternDone() {
+	var svg = $("#heraldry").svg('get');
+	var pattern = $("#"+$("#heraldry_pattern").val(), svg.root());
+	var colour = $("#heraldry_pattern_colour").val();
+	pattern.attr('fill', colour);
+	pattern.attr('clip-path', "url(#boundary)");
+	loadCharge();
+}
+
+function loadCharge() {
+	if ($("#heraldry_charge").val()!="") {
+		var svg = $("#heraldry").svg('get');
+		svg.load(basepath+"charges/"+$("#heraldry_charge").val()+".svg", {
+			addTo: true,
+			changeSize: true,
+			onLoad: chargeDone
+		});
+	}
+}
+function chargeDone() {
+	var svg = $("#heraldry").svg('get');
+	var colour = $("#heraldry_charge_colour").val();
+	$("#fill", svg.root()).attr('fill', colour);
+	var outline="black";
+	if (colour=="rgb(0,0,0)") {
+		outline="rgb(60,60,60)";
+	}
+	$("#outline", svg.root()).attr('fill', outline);
+	loadShading();
+}
+
+function loadShading() {
+	if ($("#heraldry_shading").attr('checked')) {
+		var svg = $("#heraldry").svg('get');
+
+		svg.load(basepath+"shading/"+$("#heraldry_shield").val()+".svg", {
+			addTo: true,
+			changeSize: true,
+		});
+	}
+}
+
+
+
+function getBlazon() {
+	var blazon = "";
+
+	var shield_colour = $("#heraldry_shield_colour").find(":selected").text();
+	var pattern = $("#heraldry_pattern").val();
+	var pattern_name = $("#heraldry_pattern").find(":selected").text();
+	var pattern_colour = $("#heraldry_pattern_colour").find(":selected").text();
+	var charge = $("#heraldry_charge").val();
+	var charge_name = $("#heraldry_charge").find(":selected").text();
+	var charge_colour = $("#heraldry_charge_colour").find(":selected").text();
+
+	if (pattern=="quarterly" || pattern.indexOf("per_")==0) {
+		blazon = pattern_name+" "+shield_colour+" {{ "blazon.and"|trans({},"heraldry")}} "+pattern_colour;
+	} else {
+		blazon = shield_colour;
+		if (pattern!="") {
+			blazon = blazon+", "+add_article(pattern_name)+" "+pattern_name+" "+pattern_colour;
+		}
+	}
+	if (charge!="") {
+		blazon = blazon+", ";
+		if (pattern!="") {
+			blazon = blazon+"{{ "blazon.over"|trans({},"heraldry")}} ";
+		}
+		blazon = blazon+", "+add_article(charge_name)+" "+charge_name+" "+charge_colour;
+	}
+	$("#blazon").html(blazon);
+}
+
+function validateUnique() {
+	$.get("{{ path("bm2_site_heraldry_validate") }}", {
+		shield: $("#heraldry_shield_colour").val(),
+		pattern: $("#heraldry_pattern").val(),
+		patterncolour: $("#heraldry_pattern_colour").val(),
+		charge: $("#heraldry_charge").val(),
+		chargecolour: $("#heraldry_charge_colour").val()
+	}, function(data){
+		DesignValidated(data);
+	});
+}
+
+function DesignValidated(result) {
+	if (result===true || result=="true") {
+		$("#cansave").show();
+	} else {
+		$("#msglist").append("<li>{{ 'warning.taken'|trans({},"heraldry") }}</li>");
+		$("#messages").show();
+	}
+	$("#busy").hide();
+}
+
+/* FIXME: this is english-specific! */
+function add_article(pattern) {
+	if (pattern.search(/^aeiou.*/)==-1) {
+		return "{{ "blazon.a"|trans({},"heraldry")}}";
+	} else {
+		return "{{ "blazon.an"|trans({},"heraldry")}}";
+	}
+}
+
+
+{% endblock %}

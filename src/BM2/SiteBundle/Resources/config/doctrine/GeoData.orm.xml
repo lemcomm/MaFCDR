@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\GeoData">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="center" type="point" nullable="true"/>
+		<field name="poly" type="polygon"/>
+		<field name="altitude" type="integer"/>
+		<field name="hills" type="boolean"/>
+		<field name="coast" type="boolean"/>
+		<field name="lake" type="boolean"/>
+		<field name="river" type="boolean"/>
+		<field name="humidity" type="float"/>
+		<field name="passable" type="boolean"/>
+
+		<many-to-one field="biome" target-entity="Biome" inversed-by="geo_data"/>
+
+		<one-to-many field="roads" target-entity="Road" mapped-by="geo_data"/>
+		<one-to-many field="features" target-entity="GeoFeature" mapped-by="geo_data"/>
+		<one-to-one field="settlement" target-entity="Settlement" mapped-by="geo_data"/>
+
+	</entity>
+</doctrine-mapping>

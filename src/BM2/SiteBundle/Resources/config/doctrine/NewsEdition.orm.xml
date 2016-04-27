@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\NewsEdition">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="number" type="smallint"/>
+		<field name="collection" type="boolean"/>
+		<field name="published_cycle" type="integer" nullable="true"/>
+		<field name="published" type="datetime" nullable="true"/>
+
+		<many-to-one field="paper" target-entity="NewsPaper" inversed-by="editions"/>
+		<one-to-many field="articles" target-entity="NewsArticle" mapped-by="edition">
+			<order-by>
+				<order-by-field name="position" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+		<one-to-many field="readers" target-entity="NewsReader" mapped-by="edition"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,218 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<div class="chat">
+	<div id="accordion">
+		<h3>{{ 'dungeon.chat.title'|trans({}, "dungeons")|title }}</h3>
+		<div>
+		{{ form(chat, {'action':path('bm2_dungeon_dungeon_chat')}) }}
+		{% if dungeon.party.messages.count > 0 %}
+			<hr />
+			<dl class="messages">
+				{% for msg in messages %}
+				<dt>{{ link(msg.sender.character) }} <small>({{ msg.ts|date }})</small></dt>
+				<dd>{{ msg.content }}</dd>
+				{% endfor %}
+			</dl>
+			{% if dungeon.party.messages.count > messages|length %}
+				<hr />
+				<a href="{{ path("bm2_dungeon_dungeon_chat") }}">{{ 'dungeon.chat.link'|trans({"%count%":dungeon.party.messages.count}, "dungeons") }}</a>
+			{% endif %}
+		{% endif %}
+		</div>
+
+		<h3>{{ 'dungeon.events.title'|trans({}, "dungeons")|title }}</h3>
+		<div>
+		<dl class="events">
+			{% set last = null %}
+			{% for event in events %}
+			{% if event.content == '---' %}
+				<hr />
+			{% else %}
+				<dt>
+					{% if event.ts != last %}
+						{{ event.ts|date }}
+						{% set last = event.ts %}
+					{% endif %}
+				</dt>
+				<dd>{{ event|dungeoneventfilter }}</dd>
+			{% endif %}
+			{% endfor %}
+		</dl>
+		{% if dungeon.party.events.count > events|length %}
+			<hr />
+			<a href="{{ path("bm2_dungeon_dungeon_events") }}">{{ 'dungeon.events.link'|trans({"%count%":dungeon.party.events.count}, "dungeons") }}</a>
+		{% endif %}
+		</div>
+	</div>
+</div>
+
+<h2>{{ 'dungeon.title'|trans({}, "dungeons")|title }}</h2>
+<p>{{ 'dungeon.forum'|trans({"%url%":"http://forum.mightandfealty.com/index.php/board,20.0.html"}, "dungeons")|raw }}</p>
+{% if dungeon.currentlevel is null %}
+	<p>{{ 'dungeon.prepare'|trans({"%area%":('area.'~dungeon.area)|trans({},"dungeons")}, "dungeons")|raw }}</p>
+	{% if party < 3 %}
+		<p>{{ 'dungeon.minparty'|trans({"%min%":3}, "dungeons")|raw }}</p>
+	{% endif %}
+{% else %}
+	<p>{{ 'dungeon.level'|trans({"%level%":dungeon.currentlevel.depth, "%area%":('area.'~dungeon.area)|trans({},"dungeons")}, "dungeons")|raw }}</p>
+{% endif %}
+
+{% if dungeon.currentlevel is null and (missing > party/2 or party < 3)%}
+	<p>{{ 'dungeon.waiting'|trans({}, "dungeons")|raw }}</p>
+{% else %}
+	<p>{{ 'dungeon.progress'|trans({"%party%":party, "%missing%":missing, "%timeleft%":timeleft}, "dungeons")|raw }}</p>
+	{% set progress = (dungeon.tick*100/wait) // 1 %}
+	<div class="progress_column">
+	<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ progress }} %</span></div></td>
+	</div>
+{% endif %}
+
+<hr />
+
+<div class="third">
+<h3>{{ 'dungeon.actions'|trans({}, "dungeons")|title }}</h3>
+<table>
+	<thead>
+		<tr>
+			<th>{{ 'dungeoneer'|trans({}, "dungeons") }}</th>
+			<th>{{ 'wounds'|trans({}, "dungeons") }}</th>
+			<th>{{ 'lastaction'|trans({}, "dungeons") }}</th>
+			<th colspan="2">{{ 'currentaction'|trans({}, "dungeons") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for dungeoneer in dungeon.party.members %}
+	<tr>
+	<td>
+		{% if not dungeoneer.indungeon %}<strike>{% endif %}
+		{{ link(dungeoneer.character) }}
+		{% if not dungeoneer.indungeon %}</strike>{% endif %}
+	</td>
+	<td align="right">{{ dungeoneer.wounds }}</td>
+		{% if dungeoneer.lastaction %}
+			<td class="tt" title="{{ ('card.'~dungeoneer.lastaction.type.name~'.text')|trans({},"dungeons")|raw }}">{{ ('card.'~dungeoneer.lastaction.type.name~'.title')|trans({},"dungeons") }}</td>
+		{% else %}
+			<td>{{ ('card.pass')|trans({},"dungeons") }}</td>
+		{% endif %}
+		{% if dungeoneer.currentaction %}
+			{% if dungeoneer == me %}
+				<td class="tt" title="{{ ('card.'~me.currentaction.type.name~'.text')|trans({},"dungeons")|raw }}">{{ ('card.'~me.currentaction.type.name~'.title')|trans({},"dungeons") }}</td>
+				<td>
+					{# TODO: target #}
+					{% if target_monster %}
+						{{ form(target_monster, {'action':path('bm2_dungeon_dungeon_target', {"type":"monster"})}) }}
+					{% endif %}
+					{% if target_treasure %}
+						{{ form(target_treasure, {'action':path('bm2_dungeon_dungeon_target', {"type":"treasure"})}) }}
+					{% endif %}
+					{% if target_dungeoneer %}
+						{{ form(target_dungeoneer, {'action':path('bm2_dungeon_dungeon_target', {"type":"dungeoneer"})}) }}
+					{% endif %}
+				</td>
+			{% else %}
+				<td colspan="2">{{ ('card.selected')|trans({},"dungeons") }}</td>
+			{% endif %}
+		{% else %}
+			<td colspan="2">{{ ('card.none')|trans({},"dungeons") }}</td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+</tbody></table>
+</div>
+
+<div class="third">
+<h3>{{ 'dungeon.details.title'|trans({}, "dungeons")|title }}</h3>
+{% if dungeon.currentlevel %}
+	{% if dungeon.currentlevel.scoutlevel == 0 %}
+		<p>{{ 'dungeon.details.none'|trans({}, "dungeons") }}</p>
+	{% else %}
+		<p>{{ 'dungeon.details.rank'|trans({"%rank%":dungeon.currentlevel.scoutlevel}, "dungeons") }}</p>
+		{% if dungeon.currentlevel.scoutlevel == 1 %}
+			<p>{{ 'dungeon.details.1'|trans({"%monsters%":dungeon.currentlevel.monsters.count}, "dungeons") }}</p>
+		{% elseif dungeon.currentlevel.scoutlevel == 2 %}
+			<p>{{ 'dungeon.details.2'|trans({"%treasures%":dungeon.currentlevel.treasures.count}, "dungeons") }}</p>
+		{% elseif dungeon.currentlevel.scoutlevel == 3 %}
+			<p>{{ 'dungeon.details.3'|trans({"%monsters%":dungeon.currentlevel.monsters.count}, "dungeons") }}</p>
+		{% elseif dungeon.currentlevel.scoutlevel > 3 %}
+			<p>{{ 'dungeon.details.4'|trans({"%monsters%":dungeon.currentlevel.monsters.count}, "dungeons") }}</p>
+		{% endif %}
+		{% if dungeon.currentlevel.scoutlevel > 1 %}
+			<ul>
+				{% for monster in dungeon.currentlevel.monsters %}
+					<li>{{ 'target.monsterlink'|trans({
+							"%amount%": monster.amount,
+							"%size%": ('size.'~monster.size)|trans({},"dungeons"),
+							"%type%": ('monster.'~monster.type.name)|transchoice(monster.amount, {}, "dungeons"),
+							"%url%": path("bm2_dungeon_monsters_index", {"type":monster.type.id})
+							}, "dungeons")|raw
+						}}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		{% if dungeon.currentlevel.scoutlevel > 2 %}
+			<ul>
+				{% for treasure in dungeon.currentlevel.treasures %}
+					<li data-id="{{ treasure.id }}">
+						{{ ('treasure')|trans({"%value%":treasure.value},"dungeons") }}
+						{% if dungeon.currentlevel.scoutlevel > 3 and treasure.trap %}
+							{{ ('trap')|trans({},"dungeons") }}
+						{% endif %}
+					</li>
+				{% else %}
+					<li>{{ ('notreasure')|trans({},"dungeons") }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+	{% endif %}
+{% else %}
+	<p>{{ 'dungeon.details.notstarted'|trans({}, "dungeons")|title }}</h3>
+{% endif %}
+</div>
+
+<hr class="clear" />
+
+<h3>{{ 'dungeon.cards'|trans({}, "dungeons")|title }}</h3>
+<p>{{ 'dungeon.cardstext'|trans({}, "dungeons")|raw }}</p>
+<ul class="cardslist">
+{% for card in cards %}
+	<li data-id="{{ card.id }}" class="{% if (card.amount-card.played)>0 %}available{% else %}unavailable{% endif %}">
+		<h4>{{ ('card.'~card.type.name~'.title')|trans({},"dungeons") }}</h4>
+		<div class="cardsamount">{{ (card.amount - card.played) }}</div>
+		<div class="rarity {{ card.type.raretext }}">{{ ('rarity.'~card.type.raretext)|trans({},"dungeons") }}</div>
+		<p class="description">{{ ('card.'~card.type.name~'.text')|trans({},"dungeons")|raw }}</p>
+	</li>
+{% endfor %}
+</ul>
+
+<br class="clear" />
+
+<div class="hidden">
+	{{ form(cardselect, {'action':path('bm2_dungeon_dungeon_cardselect')}) }}
+</div>
+
+
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+
+$(".available").click(function(){
+	var id = $(this).data("id");
+	$("#cardselect_card").val(id);
+	$("#cardselect").closest("form").submit();
+});
+
+$("form.targetselect").change(function(){
+	/* FIXME: AJAX submit would be enough here! */
+	$(this).submit();
+});
+
+$( "#accordion" ).accordion({
+	heightStyle: "content"
+});
+{% endblock %}

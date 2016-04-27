@@ -1,0 +1,137 @@
+status:
+ self:
+  landless:			Siete un cavaliere senza terra.
+  independent:	Siete un signore indipendente.
+  vassal:			  Siete un vassallo di <a href="%url%">%name%</a>.
+  ruler:  			Siete il sovrano di <a href="%url%">%name%</a>.
+  realm:        Siete un membro di <a href="%url%">%name%</a>.
+  ultimate:     Siete un leader indipendente, ma non avete ancora formato un reame.
+ other:
+  landless:			%He% è un cavaliere senza terra.
+  independent:	%He% è un signore indipendente.
+  vassal:			  %He% è un vassallo di <a href="%url%">%name%</a>.
+  ruler:	   		%He% è il sovrano di <a href="%url%">%name%</a>.
+  realm:        %He% è un membro di <a href="%url%">%name%</a>.
+  ultimate:     %He% è un leader indipendente che non ha ancora formato un reame.
+
+oath:
+ name:		Giuramento di Sudditanza
+ intro: >
+   La sudditanza è ciò che definite la gerarchia e il sistema politico. I dettagli circa cosa sia contenuto in un dato giuramento - vassallaggio, servizio militare, divisione delle entrate delle tenute, protezione, onore e politica - è negoziabile tra signore feudale e vassallo.<br />
+   Qui voi potete giurare sudditanza ad un personaggio nelle vicinanze, così da divenire suo vassallo. Questo renderà la vostra tenuta parte del suo reame.
+ hasvassals: >
+   Anche tutti i vostri vassalli diventeranno a loro volta membri del reame a cui state per unirvi, dato che il loro giuramento verso di voi li vincola alle vostre decisioni. Chiaramente se agite contro la loro volontà potrebbero decidere di abbandonarvi successivamente.
+ isruler: >
+   Questa azione significherà la fine del vostro reame come entità indipendente.
+ hasliege: >
+   Il vostro attuale giuramento sarà dissolto e il vostro attuale signore, %liege%, sarà informato.
+ current:   giuramento attuale
+ swear:     nuovo giuramento di sudditanza
+ nobody:    Non vi sono nuovi signori disponibili all'interno del vostro raggio d'azione.
+ newliege:	nuovo signore
+ choose:		-- seleziona il signore --
+ submit:		giurate sudditanza
+ fail:
+  vassal:	Non potete giurare sudditanza ad uno dei vostri vassalli (o ad un loro vassallo).
+ success:	Avendo giurato sudditanza, siete ora un vassallo di %newliege%.
+
+successor:
+ name:      il vostro successo
+ you:       siete il successore di
+ intro: >
+   Essendo la morte parte della vita, è importante per ogni nobile assegnare un successore ai suoi titoli e possedimenti.<br />
+   E' possibile selezionare qualsiasi personaggio sufficientemente vicino per scambiare documenti, o uno dei vostri personaggi (che si assume siano membri della stessa famiglia o dinastia) indipendentemente dalla distanza. Tenete a mente che le vostre tenute, titoli eccetera non saranno più sotto il vostro controllo se sono ereditati da un personaggio che non vi appartiene.
+ set:       assegna un nuovo successore
+ choose:    -- seleziona il successore --
+ submit:    impostare il successore
+ success:   Avete ora scelto %successor% come vostro successore.
+
+partners:
+ name:      Gestione dei partner
+ intro: >
+   Le relazioni con altri personaggi possono avere diverse forme. I dettagli sono a discrezione del gioco di ruolo, le meccaniche del gioco si prendono cura solo di quegli aspetti che rendono eventualmente disponibili nuove opzioni.<br />
+   Solamente le relazioni pubbliche sono mostrate ad altri giocatori. Solamente le relazioni che includono rapporti sessuali permettono ad entrambi i partner di creare nuovi personaggi con questi partner come genitori.
+ none:      Non avete alcuna relazione (come matrimoni o liaison) attualmente.
+ one:       Siete fedelmente %type% %partner%.
+ several:   Avete multiple relazioni al momento, specificamente:
+ new:
+  name:     nuove relazioni
+  intro:    Potete proporre una nuova relazione a qualsiasi personaggio nelle vicinanze. Lui o lei dovrà accettare perché la relazione divenga attiva.
+  none:     Non vi sono potenziali partner all'interno del vostro raggio d'azione.
+ old:
+  name:     relazioni esistenti
+  intro:    Potete lasciare partner esistenti o cambiare unilateralmente la relazione a vostra discrezione. Questo potrebbe, chiaramente, portare loro a lasciare voi.
+
+relation:
+ text:        Siete %type% %partner%.
+ engagement:  in una relazione con
+ marriage:    sposato con
+ liason:      in una liaison con
+ proposedto:  proposto a
+ proposedyou: le vostre proposte
+ public:      pubblica
+ secret:      segreta
+ with:        con
+ sex:         con sesso
+ nosex:       senza sesso
+
+ choice:
+  choose:     -- scegli --
+  type:       Proponi un/a
+  partner:    a
+  engagement: relazione
+  marriage:   matrimonio
+  liason:     liaison
+  public:     Volete che la relazione sia pubblica?
+  sex:        Volete che il sesso sia incluso, così che potrebbe portare a bambini?
+  submitnew:  proponete
+  nochange:   nessun cambiamento
+  makepublic: rendi pubblica
+  refusesex:  rifiuta il sesso
+  cancel:     lascia
+  withdraw:   ritira proposta
+  accept:     accetta proposta
+  reject:     rifiuta proposta
+  submitchange: effettua i cambiamenti
+
+realm:
+ new:
+  name:       Creazione di un regno
+  intro: >
+    Con sufficiente potere e nessuno al di sopra di voi, potrebbe essere il momento di entrare nello scenario della politica mondiale. Potete annunciare che le terre sotto il vostro controllo formano un <i>reame</i>, che è un termine generico per qualsiasi cosa a partire da una baronia fino a un impero.<br />
+    Più specificamente, è a vostra completa discrezione come chiamare il vostro nuovo reame. L'unica cosa che potrebbe farvi desistere dal chiamare tre paesi un impero è la derisione dei vostri pari che ne scaturirebbe. E' consigliabile la giusta miscela di ambizione e modestia.<br />
+    E' possibile cambiare la designazione del vostro reame successivamente.<br />
+  choose:     -- scegli --
+  submit:     annunciate il nuovo regno
+
+ name:        nome
+ formalname:  nome formale
+ designation: designazione
+ type:
+  1: baronia
+  2: contea
+  3: marca
+  4: ducato
+#  5: ((missing translation))
+  6: regno
+  7: impero
+ title:
+  male:
+   0: cavaliere
+   1: barone
+   2: conte
+   3: marchese
+   4: duca
+#  5: ((missing translation))
+   6: re
+   7: imperatore
+  female:
+   0: dama
+   1: baronessa
+   2: contessa
+   3: marchesa
+   4: duchessa
+#  5: ((missing translation))
+   6: regina
+   7: imperatrice
+

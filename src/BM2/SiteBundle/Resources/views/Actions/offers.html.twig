@@ -1,0 +1,96 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "recruit.offers.name"|trans({},"actions")|title }}</h2>
+<p>{{ "recruit.offers.intro"|trans({},"actions")|raw }}</p>
+
+<h3>{{ "recruit.offers.new"|trans({},"actions")|title }}</h3>
+<form action="{{ path('bm2_site_actions_offers') }}" method="post">
+{{ form_errors(form) }}
+{{ form_widget(form._token) }}
+
+{{ form_row(form.givesettlement) }}
+
+{# FIXME: add tabelsorter to this table #}
+<table id="offerstable"><thead>
+	<tr>
+		<th data-sorter="false"></th>
+		<th>{{ 'soldier.name'|trans }}</th>
+		<th>{{ 'soldier.type'|trans }}</th>
+		<th>{{ 'experience'|trans }}</th>
+		<th>{{ 'group'|trans }}</th>
+		<th>{{ 'weapon'|trans }}</th>
+		<th>{{ 'armour'|trans }}</th>
+		<th>{{ 'equipment'|trans }}</th>
+		<th>{{ 'home'|trans }}</th>
+	</tr></thead>
+	<tbody>
+	{% for soldier in form.soldiers %}
+		{% set id = soldier.vars.value %}
+		{% set man = militia[id] %}
+		<tr>
+			<td>{{ form_widget(soldier) }}</td>
+			<td>{{ man.name }}</td>
+			<td>{{ man.type }}</td>
+			<td align="right">{{ man.experience }}</td>
+			<td align="center">{{ man.groupName }}</td>
+			<td>{% if man.weapon %}{{ link(man.weapon) }}{% endif %}</td>
+			<td>{% if man.armour %}{{ link(man.armour) }}{% endif %}</td>
+			<td>{% if man.equipment %}{{ link(man.equipment) }}{% endif %}</td>
+			<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
+		</tr>	
+	{% endfor %}
+	</tbody></table>
+	<br />
+	{{ form_label(form.intro) }}<br />
+	{{ form_widget(form.intro) }}
+	<br />
+	<button type="submit" name="submit">{{ "recruit.offers.submit"|trans({},"actions") }}</button>
+</form>
+
+{% if offers is not empty %}
+	<h3>{{ "recruit.offers.old"|trans({},"actions")|title }}</h3>
+	<dl>
+		{% for offer in offers %}
+			<dt>
+			{% if offer.givesettlement %}
+				{{ "recruit.offers.lordship"|trans({},"actions") }}
+			{% else %}
+				{{ offer.soldiers|length }} {{ 'npc.soldier'|transchoice(offer.soldiers|length) }}
+			{% endif %}
+			</dt>
+			<dd>
+				<button class="offerdetails" value="{{ offer.id }}">{{ 'viewdetails'|trans }}</button>
+				<a href="{{ path("bm2_site_actions_offerdelete", {"offer":offer.id}) }}"><button>{{ 'recruit.offers.delete'|trans({},"actions") }}</button></a>
+			</dd>
+		{% endfor %}
+	</dl>
+	<div id="details"></div>
+{% endif %}
+
+{% endblock %}
+{# FIXME: links in offers don't open in a popup (equipment) - reload the javascript from the main layout file #}
+{% block jquery %}
+var url = "{{ path('bm2_site_actions_offerdetails', {'offer': '000'}) }}";
+$(".offerdetails").click(function(){
+	var id = $(this).val();
+	$("#details").load(url.replace("000", id));
+});
+
+$("#offerstable").tablesorter({
+	sortList: [[1,0]]
+});
+
+$("#knightoffer_givesettlement").change(function(){
+	if ($(this).is(':checked')) {
+		$("#offerstable").hide();
+	} else {
+		$("#offerstable").show();	
+	}
+});
+{% endblock %}

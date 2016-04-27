@@ -1,0 +1,45 @@
+<dl class="eventlog">
+{% set gap = false %}
+{% set shown = 0 %}
+{% for event in log.events %}
+	{% set visible = false %}
+	{% if event.log.quest is not null or event.log.artifact is not null or event.log.war is not null %}
+		{# some log types are always public - FIXME: can't we just test if metas is false? #}
+		{% set visible = true %}
+	{% else %}
+		{% for meta in metas %}
+			{% if (meta.accessfrom is null or meta.accessfrom <= event.cycle) and (meta.accessuntil is null or meta.accessuntil >= event.cycle) %}
+				{% set visible = true %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+	{% if visible %}
+		{% set shown = shown + 1 %}
+		{% set gap = false %}
+{# TODO: being able to use the History:: consts here would be really cool #}
+		<dt class="prio_{{ event.priority }}">{{ event.cycle|gametime('short') }}</dt>
+		<dd class="prio_{{ event.priority }}">{{ event|eventtranslate }}</dd>
+	{% elseif gap == false %}
+		{% set gap = true %}
+		<dt>...</dt>
+		<dd>...</dd>
+	{% endif %}
+{% endfor %}
+</dl>
+
+{% if log.events|length > shown %}
+	{% if research is defined and research.assignedEntourage is defined %}
+		<p>{{ 'events.research.ongoing'|transchoice(research.assignedEntourage|length, {"%amount%":research.assignedEntourage|length}) }}</p>
+	{% else %}
+		<p class="possible">{{ 'events.research.intro'|trans }}</p>
+		{% if scholars > 0 %}
+			<p>{{ 'events.research.can'|transchoice(scholars, {"%amount%":scholars}) }}</p>			
+		{% endif %}
+	{% endif %}
+	{% if form %}
+		<form class="wide" action="{{ path('bm2_eventlog', {'id':log.id}) }}" method="post" {{ form_enctype(form) }}>
+			{{ form_widget(form) }}
+			<button name="submit">{{ 'entourage.assign.submit'|trans({},"actions") }}</button>
+		</form>
+	{% endif %}
+{% endif %}

@@ -1,0 +1,379 @@
+# Might & Fealty
+# text strings for events
+# Author: FARevolution
+rss:
+ desc:        Might & Fealty Registro de Eventos
+ feed:        obtener actualizaciones de eventos a través de RSS
+
+event:
+ settlement:
+  ownership:
+   gained:      Ha tomado el control de %settlement%.
+   lost:        Ha perdido el control de %settlement%, ya que ha sido tomado por %character%.
+  inherited:    Fue heredado por %character%.
+  inherifail:   Cayó a la independencia en la muerte de %character%, que dejó ningún heredero.
+  take:
+   started:     %character% ha iniciado acciones para tomar el control.
+   stopped:     %character% ha abandonado los intentos de tomar el control.
+  taken:        Control establecido por %character%.
+  taken2:       Control establecido por %character% de %realm%.
+  loot:         El asentamiento está siendo saqueada por %character%.
+  lootgain:
+   resource:    Recursos robados de %settlement%, saqueados por %character%, han llegado.
+   thralls:     %amount% esclavos tomados de %settlement% por %character%, han llegado.
+  renamed:      Nombre antiguo "%oldname%" cambiado a "%newname%".
+  granted:      Concedido a %character%.
+  changed:      Lealtad cambiada a %realm%.
+  realm:        Se convirtió en una villa fundadora de %realm%.
+  subrealm:     Dividido para ser parte de %realm%.
+  realmfail:    Regresó a la independencia con el fracaso de %realm%.
+  realmfail2:   Se convirtió en parte de %realm-1% con el fracaso de %realm-2%.
+  autoconstruction: >
+    Debido a la demanda popular, los campesinos han iniciado la construcción de el %buildingtype% en su propia voluntad.
+    %workers% trabajadores se han ofrecido como voluntarios para el proyecto.
+  addconstruction: >
+    La demanda de %buildingtype% ha provocado que los campesinos sean voluntarios para acelerar los trabajos de construcción.
+    La cantidad de los trabajadores en el proyecto se ha elevado a %workers%.
+  tradefail:    Comercio saliente de %amount% %resource% para %settlement% tuvo que ser suspendido debido a las cantidades insuficientes disponibles.
+  tradereduce:  Recursos insuficientes para el comercio saliente de %amount% %resource% para %settlement%. Volumen de comercio ha sido reducido a %newamount%.
+  tradestop:    El comercio de %amount% %resource% de %settlement% ha cesado.
+  tradereduced: El comercio de %resource% procedente de %settlement% ha disminuido en volumen. En vez de las %amount% unidades anteriores, ahora son %newamount% unidades.
+  setback:      Debido a la escasez de alimentos, los trabajadores están abandonando los proyectos de construcción para cuidar de sus familias.
+  hunger:       La escasez de alimentos y el hambre se están convirtiendo en un problema.
+  starvation:   El hambre ha llegado a niveles serios.
+  crash:        Producción y construcción han sido detenidos debido a la fuerza de trabajo insuficiente. Edificios están cerrando y cayendo en la desesperación
+  disrepair:    El %buildingtype% se ha roto sin remedio y debe considerarse perdida.
+  burned:       El %buildingtype% ha sido dañada por las fuerzas enemigas.
+  burned2:      El %buildingtype% ha sido quemada por las fuerzas enemigas.
+  attacked:     El asentamiento está siendo atacado por las tropas de %character%.
+  battle:       Una %battle% se libró.
+  entered:      %character% ingresó al asentamiento.
+  entered2:     %character% ha entrado en el asentamiento con %soldiers% soldados.
+  left:         %character% ha sido visto saliendo.
+  spot:         La torre de vigilancia "%tower%" ha visto a %character% en la cercanías.
+  spot2:        La torre de vigilancia "%tower%" vio un barco en la cercanías.
+  spot3:        La torre de vigilancia "%tower%" vio a %character% en la vecindad, con %count% soldados.
+  claim:
+   added:       %character% ha anunciado una reclamación a este asentamiento.
+   cancelled:   %character% ha retirado la reclamación a este asentamiento.
+  newyear:      Celebraciones de Año Nuevo, ambiente festivo y bebidas alcohólicas resultaron en unos predecibles %babies% bebés adicionales naciendo.
+ travel:
+  cantland:     El capitán del barco no puede encontrar un lugar de desembarque adecuado, por favor intente una corta distancia más arriba o hacia abajo de la costa.
+ character:
+  created:      Primer mención en crónica familiar.
+  start:        Ha aparecido en %settlement%.
+  renamed:      Se ha cambiado el nombre de "%oldname%" a "%newname%".
+  death:        Murió.
+  death2:       Murió en la batalla.
+  npcdeath:     Sin tropas, desapareció y murió.
+  deathreclaim: %amount% 50 soldados devueltos después de la muerte de %character%, el que los tuvo asignados.
+  killgold:     Tomaste %gold% oro del cuerpo de %character%.
+  child:        Tuvo un hijo, %character%.
+  inherit:
+   estate:      Heredó el asentamiento de %settlement% de %character%.
+   realm:       Heredó el dominio de %realm% de %character%.
+  inheritvia:
+   estate:      Heredado el asentamiento de %settlement% de %character-1% (por %character-2%).
+   realm:       Heredó el dominio de %realm% de %character-1% (por %character-2%).
+  wasgranted:   Concedido el control de %settlement% por %character%.
+  realmfounded: Fundó el dominio de %realm%.
+  realmgranted: Regencia otorgada de %realm% por %character%.
+  abdicated:    Ha abdicado la regencia de %realm% y se la ha dado a %character%.
+  abdicated2:   Ha abdicado la regencia de %realm% sin sucesor.
+  succeeds:     Ha adquirido regencia de %realm% a través de la abdicación de %character%.
+  appointed:    Fue nombrado regente de %realm% por %character%.
+  position:
+   appointed:    Nombrado %realmposition% en %realm%.
+   demoted:      Degradado de %realmposition% en %realm%.
+   elected:      Electo %realmposition% en %realm%.
+  liegedied:    Tu Señor %character% ha muerto. Esto disuelve su juramento de fidelidad.
+  liegedied2:   Tu Señor %character% ha muerto. Esto disuelve su juramento de fidelidad y te has convertido en un noble errante sin afiliación a ningun dominio.
+  spot:         Sus exploradores han visto a %character% en las proximidades.
+  spot2:        Sus exploradores han visto a %character% en las inmediaciones, con %count% soldados.
+  gotship:      Se os dio un barco por %character%. El barco tocó tierra cerca, hace %remain% días.
+  proposed:
+   marriage:    Usted ha recibido una propuesta matrimonial de %character%. Aceptar o rechazar en la página de relaciones.
+   engagement:  Usted ha recibido una propuesta para comprometerse a %character%. Aceptar o rechazar en la página de relaciones.
+   liason:      %character% está haciendo avances a usted y obviamente se está moviendo hacia una aventura. Permitir o refutarla en la página de relaciones.
+  rejected:
+   marriage:    %character% ha rechazado su propuesta de matrimonio.
+   engagement:  %character% se ha negado a comprometerse con usted.
+   liason:      %character% ha rechazado sus avances hacia una aventura.
+  public:
+   marriage:    Se ha casado con %character%.
+   engagement:  Se comprometió con %character%.
+  secret:
+   marriage:    Se ha casado en secreto con %character%.
+   engagement:  Te has comprometido en secreto a %character%.
+   liason:      Ha comenzado un romance con %character%.
+  capture:      Rendido en combate a %character% y fue hecho prisionero.
+  prison:
+   free:        Liberado de prisión.
+   free2:       Liberado de prisión por la muerte de %character%
+   kill:
+    behead:     Decapitado por %character% como prisionero.
+    hang:       Mientras estaba en prisión por %character%, ejecutado en la horca.
+    burn:       Quemado vivo por %character% como prisionero.
+    quarter:    Brutalmente asesinado por cuarteo mientras que era prisionero de %character%.
+    impale:     Sacrificado por empalamiento mientras era prisionero de %character%.
+   killer:
+    behead:     Decapitó a %character%.
+    hang:       Ejecutó a %character% en la horca.
+    burn:       Quemó a %character% con vida.
+    quarter:    Brutalmente asesinó a %character% por cuarteo.
+    impale:     Masacró %character% por empalamiento.
+   assign:      Usted fue trasladado y ahora es prisionero de %character%.
+   assign2:     Transferido a %character-1% a través de la muerte de %character-2%.
+   received:    %character-1% le ha dado a %character-2% como prisionero.
+   received2:   El asesinato de %character-1% le ha dado a %character-2% como prisionero.
+  dungeon:
+   newcard1:    Has mejorado la acción %card% en el calabozo y ahora puede hacerlo más a menudo.
+   newcard2:    Usted aprendió una nueva acción mientras estaba en el calabozo: %card%
+   gold:        Su botín del calabozo llegó a un total de %gold% oro.
+   closed:      Rumours dicen que un calabozo cercano ha sido completamente explorado y ya no es interesante.
+  inactive:
+   prisoner:    Su captor %character% no ha sido visto desde hace tiempo. Quizás el tizón de sueño se lo llevó? En cualquier caso, el escape ahora debería ser fácil.
+   vassal:      Su vasallo %character% no ha sido visto desde hace tiempo y rumores tienen que ha contraído el tizón de sueño.
+   liege:       Su señor, %character%, no ha sido visto desde hace tiempo. Algunos dicen, que ha contraído el tizón de sueño.
+   partner:     Su pareja %character% parece haber desaparecido, o tal vez ha contraído el tizón de sueño?
+   position:    El %realmposition% %character% no ha sido visto desde hace mucho tiempo y debe ser asumido que es una víctima del tizón de sueño.
+ military:
+  assigned:     Usted fue asignado %count% soldados por %character%. Ellos se han añadido al grupo %group%.
+  assigned2:    Usted fue asignado %count% séquito por %character%.
+  reclaimed:    %character% ha reclamado %count% soldados asignados a usted. %stay% de ellos decidieron permanecer bajo su comando.
+
+ realm:
+  founded:      Fundada por %character%.
+  inherited:    Regencia pasó a %character-2% tras la muerte de %character-1%.
+  inherifail:   Regencia disputada después de la muerte de %character%, quien dejó ningún heredero.
+  elected:      %character% fue elegido como soberano.
+  joined:       Se convirtió en una parte de %realm%.
+  wasjoined:    Adquirido el control de %realm%.
+  left:         Dejó %realm% y se convirtió en independiente.
+  wasleft:      Perdió control de %realm%, que se declaró independiente.
+  gained:       Obtuvo la posesión de %settlement%.
+  gained2:      Obtuvo la posesión de %settlement% de %realm%.
+  lost:         Perdió la posesión de %settlement%.
+  lost2:        Perdió la posesión de %settlement% de %realm%.
+  abdicated:    %character-1% ha abdicado y entregó el control del dominio a %character-2%.
+  abdicated2:   %character% ha abdicado sin un sucesor.
+  deserted:     Desapareció en la historia con ningún miembro restante.
+ subrealm:
+  founded:      Fundada por %character-1% como un subdominio de %realm% con la regencia concedida a %character-2%.
+ position:
+  death:        %character% ha muerto y así salió de la oficina de %realmposition%.
+  inactive:     %character% ha caído al tizón de sueño y así salió de la oficina de %realmposition%.
+
+report:
+ building:
+  complete:     Construcción de %buildingtype% se ha completado.
+ feature:
+  complete:     %featuretype% se ha completado.
+ road:
+  complete:     Construcción de calzada ha terminado.
+
+soldier:
+ recruited:     Reclutado por %character% en %settlement% con %item-1%/%item-2%/%item-3%.
+ traincancel:   Entrenamiento cancelado, revertido al viejo equipo.
+ traincomplete: Entrenamiento completado.
+ retrain:       Reentrenado en %settlement% para utilizar %item-1%/%item-2%/%item-3%.
+ militia:       Establecido como milicia en %settlement%.
+ mobilize:      Movilizado por %character%.
+ assign:        Asignado a %character%.
+ battle:        Participó en batalla %battle%.
+ routed:
+  ranged:       Enrutado debido al fuego de tiro con arco.
+  melee:        Enrutado en combate cuerpo a cuerpo.
+ dropped:
+  shield:       Abandonó el escudo mientras huía.
+  weapon:       Abandonó arma mientras huía.
+ killed:        Asesinado en batalla.
+ wounded:
+  ranged:       Herido por el fuego de tiro con arco.
+  melee:        Herido en combate cuerpo a cuerpo.
+  escape:       Herido durante el retiro.
+ casualties:    Causó %nr% bajas al enemigo.
+ starved:       Murió de hambre.
+
+politics:
+ oath:
+  offer:      %character% ha aceptado una de sus ofertas de caballero y se conviertió en tu caballero.
+  offer2:     %character% ha aceptado su oferta de caballero en %settlement% y se conviertió en tu caballero.
+  taken:      Ha aparecido como un caballero de %character% en %settlement%.
+  broken:     %character% ha roto el juramento de lealtad a usted y se conviertió en un pícaro.
+  nowruler:   %character% se ha convertido en regente de %realm% y por lo tanto ya no es un vasallo.
+  changed:    %character-1% ha roto el juramento de lealtad a usted y ha realizado un juramento a %character-2%.
+  new:        %character-1% le ha visitado y ha realizado un juramento de lealtad, y se ha convertido en su vasallo.
+  new2:       %character-1% le ha visitado y ha realizado un juramento de lealtad, rompiendo su viejo juramento a %character-3% y se convirtió en su vasallo.
+  mynew:      Ha hecho un juramento de lealtad a %character-2%.
+  mynew2:     Ha roto el juramento de fidelidad a %character-3% y hecho un juramento a %character-2% en su lugar.
+ successor:
+  set:        Ha establecido a %character% como sucesor.
+  changed:    Ha cambiado el sucesor, en lugar de %character-1%, ahora será %character-2%.
+  new:        Usted ha sido declarado como el sucesor de %character%.
+  removed:    %character% le ha eliminado como sucesor.
+
+
+resolution:
+ take:
+  failed:       Su intento de tomar el control de %settlement% ha fallado.
+  success:      Su estandarte ahora vuela sobre %settlement% y su gente seguirá sus órdenes.
+ rename:
+  failed:       Su intento de cambiar el nombre de %settlement% ha fallado.
+  success:      Usted ha cambiado el nombre de el asentamiento a "%new%".
+ grant:
+  failed:       Su intento de otorgar %settlement% a %character% ha fracasado.
+  success:      Usted ha concedido %settlement% a %character%.
+ unavailable:
+  nosettlement: Sólo se puede completar las acciones en asentamientos mientras esté ahí.
+  notyours:     Usted ya no controla este asentamiento.
+  notinside:    Usted ya no está dentro del asentamiento.
+ attack:
+  success:      Usted ha se ha encontrado con el enemigo. Preparativos de la batalla están en marcha.
+  targeted:     Las tropas enemigas le han encontrado. Preparativos de la batalla están en marcha. tieneS un tiempo estimado de %time% para acciones o solicitudes de apoyo que usted desee hacer.
+  evading:      Las tropas enemigas le han encontrado. Siguiendo las instrucciones, sus tropas van a tratar de evadir la batalla, pero si no lo hacen, la lucha ocurrirá en un tiempo estimado de %time%.
+ defend:
+  success:      %settlement% está siendo atacado. Según lo ordenado, sus tropas se están movilizando para defenderla. Se espera que la batalla que se produzca en %time%.
+  removed:      Ya no estás defendiendo %settlement%, porque se ha movido demasiado lejos de ella.
+ disengage:
+  success:      Usted ha evadido exitosamente la batalla.
+  failed:       Su intento de evadir la batalla ha fallado.
+ research:
+  complete:     El diario de %log% ha sido completamente investigado.
+ enter:
+  success:      Has entrado a %settlement%.
+  failed:       Guardias en %settlement% le han negado la entrada.
+ escape:
+  success:      Usted ha escapado con éxito de su cautiverio.
+  failed:       Su intento de escapar de su cautiverio ha fallado. Su captor se ha informado.
+  by:           %character% se ha escapado de su cautiverio, rompiendo el antiguo juramento.
+  try:          %character% ha tratado de escapar de su cautiverio, pero sus guardias han frustrado el intento.
+
+battle:
+ participated:  Participó en una %battle%.
+ failed:        La batalla no sucedió.
+
+mail:
+ sender:        Servicio de notificación
+ subject:       Might & Fealty Aviso Importante de Eventos
+ intro:         Acontecimiento importante para tu personaje %name%:
+ intro2:        Evento importante en el asentamiento %settlement%, propiedad su personaje %character%:
+ intro3:        Acontecimiento importante para el dominio %realm%, regido por su personaje %character%:
+ footer:        <small>(si usted ya no desea recibir estos mensajes, desactive las notificaciones en la configuración)</small>
+
+
+news:
+ title:     publicación|publicaciones
+ edition:   edición|ediciones
+ number:    Edición %number%
+ readers:   %count% suscriptor|%count% suscriptores
+ collection:  colección de artículos
+ create:
+  title:    crear publicación
+  intro:    Aquí puede crear una nueva publicación, que puede servir como un diario, un servicio de anuncios para el dominio, manual de estrategia, el libro de ley o cualquier otra cosa que quiera.<br />Te convertirás automáticamente en el primer propietario, editor, autor y publicador, pero usted podrá agregar otros más tarde.
+  newname:  elegir un nombre único
+  submit:   crear publicación
+  unpublished:  inédito
+ member:    usted es miembro de:
+ members:   miembros de esta publicación:
+ reader:    publicaciones que está leyendo:
+ local:     publicado localmente:
+ local2:    publicaciones locales
+ owner:     propietario
+ editor:    editor
+ author:    autor
+ publisher: publicador
+ layout:
+  edit:     editar
+  delete:   borrar
+  update:   actualización de diseño
+  updating: actualizando...
+  done:     diseño actualizado
+ publish:
+  do:       publicar esta edición
+  updating: publicando...
+  done:     edición publicada
+ article:
+  title:    título
+  author:   por %name%
+  content:  contenido
+  new:      nuevo artículo
+  create:   crear artículo
+  edit:     actualizar artículo
+ change:    cambiar
+ delmember: Si elimina todos los privilegios de un miembro, éste será removido como miembro. La entrada se mantendrá en esta página para que pueda deshacer errores, pero se habrá ido en la próxima recarga.
+ save:      guardar los cambios
+ addmember: agregar un nuevo miembro
+ addintro:  Los nuevos miembros se añadirán como publicadores de forma automática, a continuación, les puede conceder un mayor acceso después.
+ moved:     Artículo se trasladó a artículos de colección.
+ del:       Artículo eliminado.
+ rest:      mover
+ restore:   ed. %num%
+ restored:  Artículo se trasladó a la edición actual.
+ help:
+  owner:      Los propietarios pueden añadir, eliminar o cambiar el estado de los otros miembros.
+  editor:     Los editores pueden colocar e publicar ediciones.
+  author:     Los autores pueden escribir artículos para la publicación.
+  publisher:  Editores distribuyen la publicación, pero no añaden contenido.
+ examples:
+  title0:     Lorem Ipsum
+  content0:   Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima.
+  title1:     Bienvenido a su publicación
+  content1:   Su primera edición se ha creado y llenado de algunos artículos de ejemplo para que pueda experimentar con la funcionalidad de diseño y ver cómo funciona todo. Los botones de la parte superior derecha de cada artículo le permiten cambiar ellos.
+  title2:     Arrástrame
+  content2:   Puede reorganizar los artículos de arrastrar y soltar, simplemente haga clic en cualquier parte del artículo, mantiene y se arrastra alrededor. Se desliza en su lugar siempre que haya espacio.
+  title3:     Cambiarme de tamaño
+  content3:   Usted puede cambiar el tamaño de un artículo haciendo clic en el botón (o cualquiera que sea el tamaño actual es) "1x1" y eligiendo un nuevo tamaño.
+ subscribe:
+  title:      subscribe
+  intro: >
+    Si quieres llevar una copia de esta edición con usted para hacer referencia a él más tarde, puede suscribirse a élmediante el botón de abajo.
+    Esto agregará la edición a su lista de lectores y usted será capaz de acceder a él en el futuro. Si la publicación se configura como un
+    periódico, usted también recibirá una notificación y una copia de las futuras ediciones.
+  submit:     suscríbase ahora
+  done:       Ahora se ha suscrito al "%paper%".
+
+trans:
+ _friend:         amistoso
+ _neutral:        neutral
+ _hostile:        hostil
+ _settlement:     asentamiento para insertar
+ _realm:          dominio para insertar
+ dontunderstand:  Lo siento, pero no entiendo su mensaje. Por favor, use un %translator% para comunicarse conmigo.
+ _dontunderstand: qué?
+ mylang:          Mi primer idioma es %language%.
+ _mylang:         idioma
+ _hello:          hola
+ hello:
+  friend:         Saludos, amigo mío. Mi nombre es %name% y vengo con intenciones pacíficas.
+  neutral:        Saludos a un compañero noble. Mi nombre es %name%, encantado de conocerte.
+  hostile:        Usted está en la presencia de %name%, gusano. Tiembla ante mí.
+ _demand:         demanda
+ demand:
+  _vassal:        se mi vasallo
+  _settlement:    dame un asentamiento
+  _realmjoin:     unete a mi dominio
+  vassal:
+   friend:        Me gustaría ofrecerle mi protección a cambio de su lealtad. Estás interesado?
+   neutral:       Siempre hay espacio para más vasallos en mi corte, y me gustaría darle la bienvenida como uno.
+   hostile:       Inclínate ante mí y jura lealtad, o te consideraré como un enemigo y te aplastaré.
+  settlement:
+   friend:        Me gustaría cuidar de %settlement% por usted, si desea otorgarmelo a mí.
+   neutral:       Permítame proponer que usted conceda %settlement% a mí.
+   hostile:       Exijo que usted conceda %settlement% a mí, o yo lo tomaré por la fuerza.
+  realmjoin:
+   friend:        Yo estaría muy contento si usted fuera a unirse a mi dominio de %realm%.
+   neutral:       Una cooperación de beneficio mutuo estaría en nuestros futuros, si usted fuera a unirse a mi dominio de %realm%.
+   hostile:       Usted y todo lo que le pertenece se convertirá en parte de %realm%. Esta es su única oportunidad de someterse de forma pacífica.
+ _answer:         respuesta
+ answer:
+  _yes:           sí
+  _no:            no
+  yes:
+   friend:        Con mucho gusto voy a aceptar su oferta.
+   neutral:       Su solicitud suena bien y lo acepto.
+   hostile:       No me deja otra opción que sucumbir a su solicitud.
+  no:
+   friend:        Lo siento, pero no puedo aceptar su oferta en este momento.
+   neutral:       Tengo que rechazar su solicitud.
+   hostile:       Usted puede tener lo que es mío por derecho si lo toma de mis manos frías y muertas.

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\SpotEvent">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="ts" type="datetime"/>
+		<field name="location" type="point"/>
+		<field name="current" type="boolean"/>
+
+		<many-to-one field="spotter" target-entity="Character"/>
+		<many-to-one field="target" target-entity="Character"/>
+
+		<many-to-one field="tower" target-entity="GeoFeature"/>
+	</entity>
+</doctrine-mapping>

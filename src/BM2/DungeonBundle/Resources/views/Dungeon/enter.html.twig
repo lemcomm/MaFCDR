@@ -1,0 +1,8 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'dungeon.error.title'|trans({}, "dungeons")|title }}</h2>
+<p>{{ 'dungeon.error.intro'|trans({}, "dungeons")|raw }}</p>
+<p>{{ ('dungeon.error.reason.'~reason)|trans({}, "dungeons")|raw }}</p>
+
+{% endblock %}

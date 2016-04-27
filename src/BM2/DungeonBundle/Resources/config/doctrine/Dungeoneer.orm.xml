@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\Dungeoneer">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="power" type="smallint"/>
+		<field name="defense" type="smallint"/>
+		<field name="wounds" type="smallint"/>
+		<field name="gold" type="smallint"/>
+		<field name="mod_defense" type="smallint"/>
+		<field name="mod_power" type="smallint"/>
+		<field name="in_dungeon" type="boolean"/>
+
+		<one-to-one field="character" target-entity="BM2\SiteBundle\Entity\Character" inversed-by="dungeoneer"/>
+		<one-to-one field="last_action" target-entity="DungeonCard"/>
+		<one-to-one field="current_action" target-entity="DungeonCard"/>
+		<one-to-many field="cards" target-entity="DungeonCard" mapped-by="owner"/>
+
+		<many-to-one field="party" target-entity="DungeonParty" inversed-by="members"/>
+		<one-to-many field="messages" target-entity="DungeonMessage" mapped-by="sender"/>
+
+		<many-to-one field="target_dungeoneer" target-entity="Dungeoneer" inversed-by="targeted_by"/>
+		<one-to-many field="targeted_by" target-entity="Dungeoneer" mapped-by="target_dungeoneer"/>
+		<many-to-one field="target_monster" target-entity="DungeonMonster" inversed-by="targeted_by"/>
+		<many-to-one field="target_treasure" target-entity="DungeonTreasure" inversed-by="targeted_by"/>
+
+	</entity>
+</doctrine-mapping>

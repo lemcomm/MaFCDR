@@ -1,0 +1,179 @@
+ul.cardslist li {
+	list-style: none;
+    border: 0.25em outset #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 1em;
+	width: 20em;
+	height: 8em;
+	margin: 1em 2em;
+	box-shadow: 0.2em 0.25em 0.5em rgba(0,0,0,0.5);
+	padding: 0.5em 1em;
+	background: white;
+	float: left;
+	position: relative;
+}
+ul.cardslist li.unavailable {
+	background: #ccc;
+}
+ul.cardslist li.available {
+    cursor: hand;
+    cursor: pointer;
+}
+
+ul.cardslist li:hover {
+	box-shadow: 0.4em 0.5em 0.75em rgba(0,0,0,0.5);
+	margin: 0.5em 2.5em 1.5em 1.5em;
+}
+ul.cardslist li.unavailable:hover {
+    margin: 1em 2em;
+    box-shadow: 0.2em 0.25em 0.5em rgba(0,0,0,0.5);
+}
+
+ul.cardslist h4 {
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 1em;
+    font-family: "KingthingsCalligraphicaLight","Serif";
+    font-size: 1.5em;
+    line-height: 0.8em;
+}
+
+ul.cardslist li div.cardsamount {
+    position: absolute;
+    top: -0.25em;
+    right: -0.25em;
+    border: 2px solid blue;
+    border-radius: 5em;
+    box-shadow: 0 0 0.25em black;
+    width: 1.5em;
+    height: 1.5em;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.5em;
+    font-size: 150%;
+    background: rgba(0,0,255,0.75);
+    color: white;
+    font-weight: bold;
+}
+
+div.rarity {
+    position: absolute;
+    bottom: -1.2em;
+    z-index: -10;
+    border: 2px solid #ccc;
+    border-radius: 2em;
+    text-align: center;
+    vertical-align: middle;
+    background: none repeat scroll 0 0 rgba(100, 100, 100, 0.75);
+    color: rgb(255,255,255);
+    font-weight: bold;
+    width: 10em;
+    left: 4em;
+    font-family: "KingthingsCalligraphicaLight","Serif";
+    font-size: 120%;   
+}
+ul.cardslist li:hover div.rarity {
+    bottom: -1.6em;
+    left: 4.4em;
+}
+ul.cardslist li.unavailable:hover div.rarity {
+    bottom: -1.2em;
+    left: 4em;
+}
+
+div.rarity.common {
+    border: 2px solid rgba(50,50,50, 0.75);
+    background: none repeat scroll 0 0 rgba(120, 120, 120, 0.75);
+    color: rgb(50,50,50);
+}
+div.rarity.uncommon {
+    border: 2px solid rgba(50,50,200, 0.75);
+    background: none repeat scroll 0 0 rgba(120, 120, 250, 0.75);
+    color: rgb(50,50,200);
+}
+div.rarity.rare {
+    border: 2px solid rgba(100,40,40, 0.75);
+    background: none repeat scroll 0 0 rgba(200, 80, 80, 0.75);
+    color: rgb(100,40,40);
+}
+div.rarity.legendary {
+    border: 2px solid rgba(150,50,0, 0.75);
+    background: none repeat scroll 0 0 rgba(250, 200, 0, 0.75);
+    color: rgb(150,50,0);
+}
+
+
+
+ul.cardslist .description {
+	font-size: 90%;
+}
+
+ul.simplelist li {
+    list-style:none;
+}
+
+
+div.chat {
+/*    background: url("../images/bg.jpg") repeat scroll 0 0 #404040; */
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-bottom-left-radius: 0.5em;
+    border-top-right-radius: 1em;
+    box-shadow: -0.25em 0.25em 0.5em rgba(0, 0, 0, 0.75);
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    float: right;
+    padding: 0.25em 1em;
+    margin: -1em -2em 1em 1em;
+    width: 40%;
+}
+
+div.chat h1, div.chat h2, div.chat h3, div.chat h4 {
+    color: #dddddd;
+}
+
+div.chat a {
+    color: #ddf;
+}
+div.chat a:hover {
+    color: #ffffff;
+}
+
+#chat_content {
+	width: 100%;
+}
+#chat_submit {
+	display: none;
+}
+
+
+dl.messages dt {
+	float: none;
+	font-size: 85%;
+}
+dl.messages dd {
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+
+div.monsterdetails {
+    margin: 1em 2em;
+}
+
+dl.events dt {
+    color: rgba(0,40,80,0.75);
+}
+dl.events dd {
+    margin-left: 15em;
+}
+.chat dl.events dt {
+    font-size: 75%;
+    color: rgba(200,220,240,0.75);
+}
+.chat dl.events dd {
+    margin-left: 10em;
+    font-size: 80%;
+}
+
+dl.events em {
+    font-family: "KingthingsCalligraphicaLight","Serif";
+    font-size: 1.2em;
+    line-height: 0.8em;
+}

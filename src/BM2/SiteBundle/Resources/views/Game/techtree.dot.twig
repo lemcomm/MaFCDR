@@ -1,0 +1,40 @@
+<pre>
+digraph techtree {
+{% for npc in entourage %}
+	"{{ npc.name }}" [label="{{ ('npc.'~npc.name)|transchoice(1)|title }}" shape=box color="blue" fontcolor="blue"];
+{% endfor %}
+
+{% for item in equipment %}
+	"{{ item.name }}" [label="{{ ('item.'~item.name)|transchoice(1)|title }}" shape=box color="green" fontcolor="green"];
+{% endfor %}
+
+{% for building in buildings %}
+	"{{ building.name }}" [label="{{ ('building.'~building.name)|trans({},"economy")|title }}"];
+{% endfor %}
+
+
+
+{% for item in equipment %}
+{% if item.provider %}
+	"{{ item.provider.name }}" -> "{{ item.name }}"
+{% endif %}
+{% if item.trainer %}
+	"{{ item.trainer.name }}" -> "{{ item.name }}"
+{% endif %}
+{% endfor %}
+
+
+{% for npc in entourage %}
+{% if npc.provider %}
+	"{{ npc.provider.name }}" -> "{{ npc.name }}"
+{% endif %}
+{% endfor %}
+
+
+{% for building in buildings %}
+{% for target in building.enables %}
+	"{{ building.name }}" -> "{{ target.name }}"
+{% endfor %}
+{% endfor %}
+}
+</pre>

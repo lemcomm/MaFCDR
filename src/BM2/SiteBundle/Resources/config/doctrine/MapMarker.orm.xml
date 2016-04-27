@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\MapMarker">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="type" type="string"/>
+		<field name="location" type="point"/>
+		<field name="placed" type="integer"/>
+
+		<many-to-one field="owner" target-entity="Character"/>
+		<many-to-one field="realm" target-entity="Realm"/>
+	</entity>
+</doctrine-mapping>

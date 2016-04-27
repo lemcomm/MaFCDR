@@ -1,0 +1,20 @@
+digraph hierarchy {
+bgcolor=transparent;
+node [color="#c0c0ccd0", fontcolor=white, style="bold, rounded, filled", shape=box, fillcolor="#20408060"];
+edge [color=white, fontcolor=white, arrowhead="vee"];
+
+{% for realm in hierarchy %}
+	{% if realm.active == false %}
+		{% set opacity = "30" %}
+	{% elseif realm == me %}
+		{% set opacity = "a0" %}
+	{% else %}
+		{% set opacity = "60" %}
+	{% endif %}
+	{{ realm.id }} [label="{{ realm.name }}", fillcolor="#206080{{opacity}}", url="{{ link(realm, true) }}"];
+	{% if realm.superior %}
+	{{ realm.superior.id }} -> {{ realm.id }};
+	{% endif %}
+{% endfor %}
+
+}

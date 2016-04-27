@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\CharacterRating">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="content" type="string"/>
+		<field name="trust" type="smallint"/>
+		<field name="honor" type="smallint"/>
+		<field name="respect" type="smallint"/>
+		<field name="last_change" type="datetime"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="ratings"/>
+		<many-to-one field="given_by_user" target-entity="User" inversed-by="ratings_given"/>
+
+		<one-to-many field="votes" target-entity="CharacterRatingVote" mapped-by="rating"/>
+	</entity>
+</doctrine-mapping>

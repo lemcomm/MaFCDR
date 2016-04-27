@@ -1,0 +1,910 @@
+# Might & Fealty
+# generic text strings - german
+# Author: Tom Vogt <tom@mightandfealty.com>
+dateformat: d.m.Y
+gametime:
+ current: Es ist Jahr %year%, Woche %week%, Tag %day% in der Welt von Might & Fealty
+ long: Jahr %year%, Woche %week%, Tag %day%
+ short: %year%-%week%-%day%
+realtime:
+ forever: Ewigkeit
+ day: %d% Tag (Echtzeit)|%d% Tage (Echtzeit)
+ hour: %h% Stunde (Echtzeit)|%h% Stunden (Echtzeit)
+ minute: %d% Minute (Echtzeit)|%d% Minuten (Echtzeit)
+menu:
+ playing: spiele %name%
+ profile: Profil
+ characters: Charaktere
+ homepage: Startseite
+ terms: Konditionen
+ credits: Impressum
+ contact: Kontakt
+ forum: Forum
+ about: Über M&F
+ manual: Handbuch
+ vips: VIPs
+ fiction: Geschichten
+ community: Community
+ translator: Übersetzungen
+ register: Mitspielen
+ map: Karte
+ travel: Karte & Reisen
+ status: Zustand
+ recent: Übersicht
+ events: Ereignisse
+ messages: Nachrichten
+ news: Veröffentlichungen
+ relations: Beziehungen
+ politics: Politik
+ actions: Aktionen
+ allactions: alle Aktionen
+ character:
+  background: Charaktergeschichte
+  start: Charakter plazieren
+contact:
+ title: Kontakt
+# forum: ((missing translation - original: For questions, help or most other things related to the game, the best way with the fastest responses is very often our forum, which you can reach at this link:<br /> <br /> <a href="http://forum.mightandfealty.com/">http://forum.mightandfealty.com/</a><br /> <br /> This community is a great place to talk with other players as well as with the developers, who prefer to answer questions on the forum because that way future players with the same question can find an answer there.))
+# tom: ((missing translation - original: If you need to contact Tom directly, send an e-mail to <a href="mailto:tom@mightandfealty.com">tom@mightandfealty.com</a>.))
+terms:
+# title: ((missing translation - original: Terms of Service))
+registration:
+ title: Anmeldung
+# intro: ((missing translation - original: Welcome to Might & Fealty - we are looking forward to your story and experience.<br /> <div class="success">Join now and get <b>30 days of free game time</b> to explore the world of Might & Fealty  while you decide if this is the game for you.</div>))
+# direct: ((missing translation - original: Please supply the required information below.<br /> You will then receive an e-mail with an activation link. We apologize for that additional step,  but it keeps spammers and bots out.))
+# toslink: ((missing translation - original: By registering, you agree to our <a href="%url%" target="_blank">Terms of Service</a>.))
+ complete:
+#  name: ((missing translation - original: Complete Registration))
+#  intro: ((missing translation - original: Please verify or correct the data we have received from your identity provider below and confirm.))
+ first:
+#  title: ((missing translation - original: First Steps))
+#  intro: ((missing translation - original: Welcome to Might & Fealty.<br /> To start playing, <a href="%charpage%">create a character</a> on the character page, also accessible in the navigation menu.<br /> <br /> We also strongly recommend the <a href="https://www.youtube.com/watch?v=YWC6n9CnB3U">tutorial video</a> and the rest of the manual.))
+ help:
+#  username: ((missing translation - original: A name of your choice to use to log in. Will not be revealed to anyone unless you choose so.))
+#  email: ((missing translation - original: Your e-mail address for password resets and notifications. Will not be revealed to anyone unless you choose so.))
+#  password: ((missing translation - original: Choose a password to log in. Can be any length. Your responsibility to choose a good one.))
+#  repeat: ((missing translation - original: Repeat the password to make sure you did not make any typos.))
+login:
+# intro: ((missing translation - original: Provide the username or e-mail you used to register below to log in:))
+pager:
+# showing: ((missing translation - original: showing %from% to %to%, %total% total))
+# prev: ((missing translation - original: previous))
+# next: ((missing translation - original: next))
+#togglelist: ((missing translation - original: toggle list style))
+map:
+ title:
+  map: Karte
+  both: Karte & Reisen
+# map: ((missing translation - original: abstract map))
+# graphical: ((missing translation - original: graphical map))
+# search: ((missing translation - original: search for settlement))
+# searching: ((missing translation - original: searching...))
+# settlements: ((missing translation - original: settlements))
+# realms: ((missing translation - original: major realms))
+# rivers: ((missing translation - original: rivers))
+# towers: ((missing translation - original: towers))
+# roads: ((missing translation - original: roads))
+ chars: Deine anderen Charaktere
+# route: ((missing translation - original: route plot))
+# invalid: ((missing translation - original: invalid route))
+# usedroads: ((missing translation - original: road travel))
+# offers: ((missing translation - original: knight offers))
+ poi: interessante Orte
+ you: Aufenthaltsort
+# area: ((missing translation - original: local area))
+ howto: Ihr könnt direkt auf der Karte Eure Reiseroute sehen und einstellen. Einfach "Route setzen" rechts wählen und dann per Mausklick Wegpunkte auf der Karte setzen.<br /> Die Route kann so direkt oder verschlungen sein, wie Ihr wünscht. Bitte denkt daran, daß Ihr in der Nähe einer Siedlung sein müsst, um dort Aktionen vorzunehmen und daß Flüsse nur mit Brücken überquert werden können.
+ legend: Legende
+ yourchars: deine anderen Charaktere
+ others: Fremde Charaktere
+ ownedplace: beherrschte Siedlungen
+ indyplace: freie Siedlungen
+ spot: Sichtweite
+ act: Aktionsradius
+# select: ((missing translation - original: select method))
+# click: ((missing translation - original: info))
+ hover: Route setzen
+# clickselect: ((missing translation - original: Click a settlement or character flag to get details.))
+# hoverselect: ((missing translation - original: Hover over a settlement or character flag to get details.))
+ travel: Reisen
+ draw: Klick auf die Karte, um Wegpunkte zu setzen.
+# disabled: ((missing translation - original: Switch to routing to draw waypoints.))
+ submit: Route setzen
+ rmlast: letzten löschen
+# enter: ((missing translation - original: enter destination))
+ clear: alle löschen
+ newroute: Die neue Route wurde eingestellt. Die Reise wird voraussichtlich %duration% Tage dauern.
+# disembark: ((missing translation - original: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% days considers the route until that point. Red lines show the invalid travel section.</small>))
+ crossings:
+  title: Flußüberquerungen
+  river: Den %river% an der Brücke nahe %nearby%.
+ cleared: Route gelöscht.
+ error:
+  impassable: Die Route enthält unpassierbare Sektionen, wie auf der Karte markiert.<br /><small>Rote Linien gehen durch unpassierbare Gebiete, rot/schwarze Punkte zeigen Flußüberquerungen ohne nahe Brücke.</small>
+#  world: ((missing translation - original: You are trying to leave the known world. The gods will not allow that.))
+#  prisoner: ((missing translation - original: As a prisoner, you cannot travel freely.))
+ info:
+  length: Länge der Route
+vip:
+# title: ((missing translation - original: VIPlayers))
+# intro: ((missing translation - original: These players helped make Might & Fealty come into existence by contributing considerably to the crowdfunding campaign:))
+ status:
+#  10: ((missing translation - original: Hero))
+#  20: ((missing translation - original: Legend))
+#  30: ((missing translation - original: Immortal))
+account:
+ title: Konto
+ characters: Charaktere
+ nocharacters: Du hast noch keine Charaktere angelegt.
+# flag: ((missing translation - original: click to toggle this character between primary/secondary characters list))
+# created: ((missing translation - original: created: %date%))
+# lastlogin: ((missing translation - original: last login: %date%))
+# identities: ((missing translation - original: Authentication))
+# authmail: ((missing translation - original: username/email and password))
+# locked: ((missing translation - original: Your characters are currently locked because you have run out of game-time. Please renew your subscription on the profile page.))
+ level:
+#  0: ((missing translation - original: locked))
+#  10: ((missing translation - original: casual))
+#  20: ((missing translation - original: basic))
+#  40: ((missing translation - original: intense))
+#  50: ((missing translation - original: ultimate))
+#  name: ((missing translation - original: account level))
+#  limit: ((missing translation - original: character limit))
+#  cpm: ((missing translation - original: credits/month))
+#  firstmonth: ((missing translation - original: first month))
+ data:
+#  link: ((missing translation - original: Edit Data))
+#  title: ((missing translation - original: Personal Data))
+#  saved: ((missing translation - original: Your personal data has been updated.))
+ settings:
+#  link: ((missing translation - original: edit settings))
+  title: Einstellungen
+#  language: ((missing translation - original: Your language))
+#  notifications: ((missing translation - original: E-Mail notifications))
+  submit: abspeichern
+#  saved: ((missing translation - original: your settings have been updated.))
+ autologin:
+#  title: ((missing translation - original: Auto-Login))
+#  intro: ((missing translation - original: This is an <b><i>experimental and possibly insecure</i></b> feature.<br /> Auto-Login will save a token in your browser, which enables it to complete the login procedure fully automated, giving you one-click logins (simply click on "login" and you are in).<br /><br /> <b>Security Advantage:</b> The token saved in your browser is not your password. In fact, when using auto-login, your password is not stored on your computer at all (unlike the password-manager functionality of most browsers) and is never transmitted across the Internet. If you lose or someone steals the token, simply click the enable button below again to generate a new token.<br /> <b>Security Danger:</b> If someone gets access to your computer or browser, he can log in to the game without knowing your password. Do not use this feature if you share your computer with other people. Do not <i>activate</i> it while you are on an insecure network, because if someone captures the token sent when you click the button, he can use it. <i>Additionally, this feature has not yet been peer-reviewed by other security experts and may contain additional weaknesses unknown at this time.</i><br /> <br /><br /> To activate or disable Auto-Login, click the buttons below:))
+#  enable: ((missing translation - original: enable))
+#  disable: ((missing translation - original: disable))
+ payment:
+#  title: ((missing translation - original: Account Balance))
+#  credits: ((missing translation - original: You have %amount% credits in your account.))
+#  link: ((missing translation - original: Get More Credits))
+#  shop: ((missing translation - original: Buying Credits))
+#  intro: ((missing translation - original: Choose your preferred payment method below. Both PayPal and Google Wallet also handle <b>credit card payments</b>, so if you want to pay by credit card, simply pick whichever service you like more.<br /> Payments are handled through my company, <b>Calitarus GmbH</b>, so that is what you'll see on your order and receipt.))
+#  history: ((missing translation - original: Payment History))
+#  type: ((missing translation - original: transaction type))
+#  date: ((missing translation - original: date))
+#  amount: ((missing translation - original: amount))
+#  currency: ((missing translation - original: currency))
+#  code: ((missing translation - original: transaction code))
+#  success: ((missing translation - original: The transaction has been completed successfully. It will take a few seconds to process.))
+#  fail: ((missing translation - original: The transaction could not be completed. Sorry. Check your payment provider statement for errors. If the payment went through on your side, please contact tom@mightandfealty.com so I can fix this problem manually.))
+ code:
+#  title: ((missing translation - original: redeem code))
+#  intro: ((missing translation - original: If you have a code from a friend or the crowdfunding campaign, you can redeem it here.))
+#  label: ((missing translation - original: code:))
+#  submit: ((missing translation - original: redeem))
+#  redeemed: ((missing translation - original: A code for %credits% game credits was found for your e-mail and automatically redeemed.))
+#  redeemed2: ((missing translation - original: A code was found for your e-mail and automatically redeemed into %credits% game credits and a VIP status of "%vip%".))
+#  redeemed3: ((missing translation - original: The code you have entered is valid and has been redeemed for %credits% game credits.))
+#  redeemed4: ((missing translation - original: The code you have entered is valid and has been redeemed for %credits% game credits and a VIP status of "%vip%".))
+ credits:
+#  name: ((missing translation - original: credits))
+#  sum: ((missing translation - original: %amount% credits))
+#  title: ((missing translation - original: Credits & Gifts))
+#  link: ((missing translation - original: Credits and Gifts))
+#  short: ((missing translation - original: Spend credits on additional content or make gifts to friends.))
+#  shop: ((missing translation - original: Spend Credits))
+#  shopdesc: ((missing translation - original: You can spend credits on various items that will change the appearance of your characters or estates.<br /> None of these items give any advantages, except for prestige and recognition. We are strongly opposed to any "pay-2-win" game concepts.))
+#  gifts: ((missing translation - original: Making gifts to friends))
+#  giftdesc: ((missing translation - original: You can make gifts to friends in the form of credits. Be it because you just like them, or they don't have a credit card or any of the other payment options, or for whatever other reason.))
+#  history: ((missing translation - original: Credit History))
+ sub:
+#  title: ((missing translation - original: Subscription))
+#  summary: ((missing translation - original: At your current subscription level of <b>%mylevel%</b>, you are paying %myfee% credits per month.<br /> Your next renewal is due on %until%.))
+#  short: ((missing translation - original: Your current subscription level is <b>%mylevel%</b>, your next renewal is due on %until%.))
+#  description: ((missing translation - original: If you have not accessed your account for more than 3 weeks, not only will your characters be set to inactive automatically, we will also reduce the base fee to %reduced%. After more than 3 months, we automatically reduce it further to %min%.<br /> Read more about our <a href="%url%" class="link_ajax">payment concept</a>.))
+#  description2: ((missing translation - original: Developing and running Might & Fealty is not free, so we charge a small monthly fee to play.<br /> We believe in using a transparent, simple payment system instead of the various "Free2Play" or "Pay2Win" models that nag you about  "premium features" constantly. In Might & Fealty, we want you to enjoy the game to the max without hiding features away into  parts you have to pay extra for.<br /> Read more about our <a href="%url%" class="link_ajax">payment concept</a>.))
+#  description3: ((missing translation - original: The price for 100 credits is 1 &euro; or the <a href="http://www.xe.com/currency/eur-euro">equivalent in your local currency</a> (our payment providers will automatically convert currencies for you).))
+#  link: ((missing translation - original: Change subscription level))
+#  submit: ((missing translation - original: change subscription))
+#  remaining: ((missing translation - original: Your new subscription will start today, the first month subscription fee will automatically be reduced by %refund% credits remaining from your current subscription.))
+#  changed: ((missing translation - original: Your subscription level has been changed.))
+ play: spielen
+# viewlog: ((missing translation - original: View History))
+ familytree: Stammbaum
+# famtreedesc: ((missing translation - original: Inspect the family tree of your characters))
+ heraldry:
+#  link: ((missing translation - original: Heraldry))
+ culture:
+#  link: ((missing translation - original: Culture))
+#  title: ((missing translation - original: Culture))
+#  intro: ((missing translation - original: The core culture that Might & Fealty represents is central european. You can buy access to other cultures and decide for each of the settlements controlled by your characters which culture they belong to. Depending on the particular set, this always includes the names of soldiers and entourage recruited there and can also include visuals such as buildings, troops and entourage.<br /> Once unlocked, a culture is yours forever and can be used by all of your characters as often as you like. You will also automatically get any updates to a culture pack (such as added graphics).))
+#  owned: ((missing translation - original: Culture Packs you own))
+#  buyable: ((missing translation - original: Culture Packs you can buy))
+#  buy: ((missing translation - original: buy))
+#  name: ((missing translation - original: culture))
+#  cost: ((missing translation - original: cost))
+#  contains: ((missing translation - original: contains))
+  contents:
+#   names: ((missing translation - original: names))
+#  submit: ((missing translation - original: buy selected culture pack(s)))
+#  change: ((missing translation - original: change culture))
+#  upgrades: ((missing translation - original: Culture packs are occasionally updated and extended, so a pack that does not contain graphics, for example, may get them added in the future. If you by a culture pack, you will always get all updates for free.))
+#  notenoughcredits: ((missing translation - original: You do not have enough credits for this purchase.))
+  bought:
+#   title: ((missing translation - original: Culture Pack Bought|Culture Packs Bought))
+#   intro: ((missing translation - original: Congratulations, you have bought a culture pack:|Congratulations, you have bought %amount% culture packs:))
+#   contains: ((missing translation - original: this pack contains:))
+ gift:
+#  link: ((missing translation - original: Gift to existing player))
+#  title: ((missing translation - original: Gift for a friend))
+#  intro: ((missing translation - original: You can make gifts to friends in the form of credits. Be it because you just like them, or they don't have a credit card or any of the other payment options, or for whatever other reason you have.<br /> You need to know your friends e-mail address for this. We will generate a code and send it to both you and your friend. If your friend doesn't want the gift, you can simply use the code yourself to take it back.))
+#  email: ((missing translation - original: send to e-mail))
+#  credits: ((missing translation - original: amount of credits))
+#  text: ((missing translation - original: text to include in e-mail))
+#  invite: ((missing translation - original: invite your friend))
+#  gift: ((missing translation - original: make this gift))
+ invite:
+#  link: ((missing translation - original: Invite with a gift))
+#  title: ((missing translation - original: Invite a friend))
+#  intro: ((missing translation - original: You can invite your friends to the game and if they aren't sure they will love it, sweeten it by sending them some starting credits.<br /> This will send an invitation e-mail to them, with a special invite code. Your credits will be put into escrow and used only if your friend actually signs up with the game. Until (s)he does, you can cancel the invite at any time by using the code yourself (you will get a copy of the mail, including the code).<br /> <br /> And since we like new players, you will get up to half of your credits back if your friend likes the game and becomes a subscriber. Yes, you can have your cake and eat it, too.<br /> <small>(You will get half of your gift or half of your friends' first subscription, whatever is lower. Limit of one code per new subscriber.)</small>))
+#  success: ((missing translation - original: An invitation e-mail has been sent to your friend (and you in cc).<br /> When the code for %credits% credits gets redeemed and your friend later subscribes, you will get half of either it or the subscription value  of your friend credited to your account automatically.<br /> You can also redeem the code yourself to cancel the invite.))
+  mail:
+#   subject: ((missing translation - original: Might & Fealty Friend Invite))
+#   body: ((missing translation - original: <p>Your friend (cc'ed in this e-mail) has invited you to play Might & Fealty. And to sweeten the deal, or maybe as a  bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. He also sent this message:</p> <hr /><p>%message%</p><hr /> <p>Join your friend in creating history, check out the game here:</p> <p><a href="http://mightandfealty.com/">Might & Fealty</a></p> <p>or sign up directly through this link:</p> <p><a href="http://mightandfealty.com/register/">registration</a></p> <p>If you register with this e-mail address, the game will automatically redeem the invite gift code for you. If not,  simply enter the code below under "get more credits" after registration.</p> <p><b>%code%</b></p> <p>Welcome to Might & Fealty - come and create history with us!</p>))
+  mail2:
+#   subject: ((missing translation - original: Might & Fealty Friend Subscription))
+#   body: ((missing translation - original: <p>Your friend with the e-mail address %mail% has made his first subscription. Since your invite helped win this new player to the game, we have credited your account with %credits% credits, as promised.<p> <p>Thank you so much for helping the game become bigger and better.</p>))
+newcharacter:
+# title: ((missing translation - original: Create Character))
+# description: ((missing translation - original: create a new character or ancestor))
+# intro: ((missing translation - original: Enter the vital details of your new character below. Of these, only the name can later be changed, and only under special circumstances, so pick carefully.<br /> Please note that the character name should be a full name, including a surname. Characters of the same family should, obviously, share a surname unless their personal history provides a reason not to.<br /> Please choose a proper name, not a funny or silly or modern-Internet-speak one. This is both for the atmosphere of the game and for your own benefit as many players frown upon silly names and diplomacy would be much harder. So please, proper names only.<br /> Choosing a father and mother is optional, if you leave it empty then one or both of the parents will simply be people that don't exist as characters in the game. If you want to create a family tree, make sure to start with the older generations.<br /> All characters are <a href="%firstoneurl%">First Ones</a> and begin the game as fully trained and equipped knights.))
+# limit: ((missing translation - original: You can create %limit% more living character today.|You can create %limit% more living characters today.))
+# limited: ((missing translation - original: You cannot create new living characters anymore today. You will get more available character slots every real-life day.))
+# spawnlimit: ((missing translation - original: You currently have several unspawned characters. Please start playing them first, before you create more characters.))
+# accountlimit: ((missing translation - original: You are currently playing %active% of %limit% possible characters.))
+# overlimit: ((missing translation - original: You already have as many characters as your current subscription level allows. If you want to create additional characters, you will need to raise your subcription level first.))
+ help:
+#  name: ((missing translation - original: The full name of your character, including given and family name, but not including any titles. required))
+#  gender: ((missing translation - original: required))
+#  father: ((missing translation - original: Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the later case, the mother will have to be the (or one of the) fathers partner(s).))
+#  mother: ((missing translation - original: Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the later case, the father will have to be the (or one of the) mothers partner(s).))
+#  partner: ((missing translation - original: If you want to start a character as married to another of your own characters. Marriages with characters of other players have to be secured in-game.))
+#  dead: ((missing translation - original: You can create characters who have died already in order to complete your family tree. You will, obviously, not be able to play a dead character.))
+# submit: ((missing translation - original: create))
+summary:
+# title: ((missing translation - original: Recent Events & Messages))
+# events: ((missing translation - original: Recent Events))
+# nobody: ((missing translation - original: no nearby nobles spotted))
+# nobattles: ((missing translation - original: no battles nearby))
+# nothing: ((missing translation - original: no recent events))
+# fullread: ((missing translation - original: mark all as read))
+# fullread2: ((missing translation - original: mark all as read for all my characters))
+first:
+# title: ((missing translation - original: Welcome to Might & Fealty))
+# liege: ((missing translation - original: You have accepted the knight offer of %liege% and are now his vassal. This settlement belongs to %liege%, so you are in friendly territory at this time.<br /> Talk to your liege first to find out what the current political situation is and where you are needed. A welcome message should be below. Also make yourself familiar with your troops and the surrounding area.))
+# free: ((missing translation - original: You have decided to begin as an independent noble. This is a hard and challenging path. One of the first things you will want to do is check out the surrounding area, find out who owns the settlement you spawned in, and talk to him or her.<br /> You have no troops and no income at this time, so finding allies should be your first priority. Serve a lord as a knight until you can secure an estate for yourself, for example.))
+# manual: ((missing translation - original: Might & Fealty being a slow game, don't expect much action on your first turn. If you haven't yet, check out  <a href="%manual%">the game manual</a> for more information and basic concepts. There's also a link at the top, so you can check the manual for reference at any time.<br /> Lastly, Might & Fealty is a game where communication with other players is very important. Check out the messages section and start talking with characters around you.))
+character:
+ name: Name
+ gender: Geschlecht
+# gold: ((missing translation - original: Gold: %gold% gold))
+ father: Vater
+ mother: Mutter
+# married: ((missing translation - original: married to))
+ partner: verheiratet mit
+ none: (kein Character)
+ child: Kind|Kinder
+ status: Zustand von %name%
+ history: Charaktergeschichte
+# inactive: ((missing translation - original: this character has not been played in a while))
+ notstarted:
+#  title: ((missing translation - original: Rumours))
+#  text: ((missing translation - original: Only rumours about this noble have been heard, as this character has not yet been started (placed in the world).))
+# prisoner: ((missing translation - original: this character is currently a captive of %captor%.))
+# prisoner2: ((missing translation - original: You are currently a captive of %captor%.))
+# full: ((missing translation - original: view full details))
+ list:
+#  1: ((missing translation - original: primary))
+#  2: ((missing translation - original: secondary))
+#  99: ((missing translation - original: recently deceased))
+#  100: ((missing translation - original: historic))
+#  150: ((missing translation - original: ancestors))
+ start:
+  title: Charakter plazieren
+  intro: Select the starting location of your new character. This is an important choice and will greatly influence your early play experience.
+#  offer: ((missing translation - original: Accept fealty offer))
+#  offerintro: ((missing translation - original: Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers is the easiest way to start out.<br /> Your character will automatically be placed in the estate of your new lord and receive the promised amount of troops. In addition, %he% will have an initial oath of fealty to the lord that made the offer.))
+#  offerchoice: ((missing translation - original: Offer))
+#  offersummary: ((missing translation - original: %name%, %count% soldiers))
+  family: Place with Family
+  existing: Your new character can begin the game in the estate of any of your existing characters, or you can pick a start location on the map below.<br /> Note that being at a family estate does <b>not</b> grant you any control over the settlement, including recruitment. If you want soldiers for your new character, the owner of the estate will have to be there and assign them.
+  estate: Starting Estate
+  submit: start here
+  selection: Place on Map
+  mapintro: You can also select any settlement from the map below, showing all settlements near already settled lands.<br /> We strongly recommend picking an undefended independent settlement so you can take control of it and have an estate right away.
+ details:
+#  realm: ((missing translation - original: realm(s)))
+#  ultimate: ((missing translation - original: major realm(s)))
+#  entourage: ((missing translation - original: entourage))
+#  soldiers: ((missing translation - original: soldiers))
+achievements:
+ title: Errungenschaften
+ type:
+  battles: Schlachten geschlagen
+  captures: Adlige gefangen
+  kills:
+   soldiers: Menschen erledigt
+   nobles: Adlige getötet
+politics:
+ hierarchy: Hierarchie
+gender:
+ he: er
+ she: sie
+ his: sein
+ her: ihr
+ son: Sohn
+ daughter: Tochter
+form:
+# username: ((missing translation - original: Username))
+# displayname: ((missing translation - original: Public Name))
+# aka: ((missing translation - original: aka <b>%name%</b>))
+# email: ((missing translation - original: E-Mail))
+# password: ((missing translation - original: Password))
+# password_confirmation: ((missing translation - original: Repeat password))
+# browser: ((missing translation - original: (browser setting)))
+ choose: -- auswählen --
+# none: ((missing translation - original: (none)))
+# submit: ((missing translation - original: submit))
+ help:
+#  displayname: ((missing translation - original: The name shown in public lists such as the VIP players list))
+settlement:
+# name: ((missing translation - original: settlement))
+ title: %type% %name%
+ details: Details der Siedlung
+ dummy: Siedlung auf der Karte auswählen, um hier Details zu sehen.
+ area: Gebiet von %name%
+ type: Typ
+# fortified: ((missing translation - original: fortified))
+ size:
+  1: Flecken
+  2: kleines Dorf
+  3: mittleres Dorf
+  4: grosses Dorf
+  5: kleine Ortschaft
+  6: mittlere Ortschaft
+  7: grosse Ortschaft
+  8: kleine Stadt
+  9: mittlere Stadt
+  10: grosse Stadt
+  11: Metropole
+ population: Bevölkerung
+ pop:
+#  change: ((missing translation - original: current development))
+#  stable: ((missing translation - original: stable))
+  grow:
+#   1: ((missing translation - original: slightly growing))
+#   2: ((missing translation - original: growing))
+#   3: ((missing translation - original: growing quickly))
+  shrink:
+#   1: ((missing translation - original: slightly falling))
+#   2: ((missing translation - original: falling))
+#   3: ((missing translation - original: falling quickly))
+#   4: ((missing translation - original: falling dramatically))
+ geography: Geographie
+# culture: ((missing translation - original: culture))
+# biome: ((missing translation - original: biome))
+ neighbours: Nachbarn
+ political: Politisch
+ independent: Dies ist eine unabhängige Siedlung
+ unowned: unabhängig
+# owner: ((missing translation - original: owner))
+ ownedby: Diese Siedlung wird von %owner% beherrscht.
+# realm: ((missing translation - original: This settlement is part of %realm%.))
+# norealm: ((missing translation - original: This settlement does not belong to any realm.))
+ economy: Wirtschaft
+ starvation:
+  1: hat etwas zu wenig Nahrung
+  2: hat viel zu wenig Nahrung
+  3: leidet Hunger
+  4: leidet schwer Hunger
+  5: erleidet Hungersnot
+ shortage:
+#  1: ((missing translation - original: minor shortage of %resource%))
+#  2: ((missing translation - original: shortage of %resource%))
+#  3: ((missing translation - original: dramatic shortage of %resource%))
+#  effect: ((missing translation - original: production and construction requiring this resource are slowed down.|production and construction requiring these resources are slowed down.))
+#  none: ((missing translation - original: all resource demands are satisfied.))
+ security:
+#  0: ((missing translation - original: struggling for economic security))
+#  1: ((missing translation - original: low economic security))
+#  2: ((missing translation - original: adequate economic security))
+#  3: ((missing translation - original: good economic security))
+#  4: ((missing translation - original: excellent economic security))
+ militia: in %name% stationierte Soldaten
+ recruits: soldiers in training in %name%
+# resupply: ((missing translation - original: equipment available for resupply))
+# retrain: ((missing translation - original: equipment available for re-training))
+# train: ((missing translation - original: equipment available for training))
+# militiacount: ((missing translation - original: %count% combat-ready local militia))
+# recruitscount: ((missing translation - original: %count% recruits in training))
+ resources:
+  type: Type
+  base: Grundwert
+  current: Produktion
+  demand: Eigenbedarf
+#  buildings: ((missing translation - original: buildings))
+#  construction: ((missing translation - original: construction))
+#  total: ((missing translation - original: total))
+  trade:
+#   name: ((missing translation - original: trade))
+#   in: ((missing translation - original: incoming))
+#   out: ((missing translation - original: outgoing))
+#   balance: ((missing translation - original: trade balance))
+  balance: Gesamtbilanz
+#  prospector: ((missing translation - original: A prospector could supply a more detailed report.))
+ workforce:
+#  atroads: ((missing translation - original: %number% assigned to road construction))
+#  atbuildings: ((missing translation - original: %number% assigned to building construction))
+#  atfeatures: ((missing translation - original: %number% assigned to features construction))
+#  employed: ((missing translation - original: %number% employed in various buildings))
+#  available: ((missing translation - original: %number% available for farming and local economy))
+road:
+ quality:
+  0: -
+  1: Sandpfad
+  2: Sandstraße
+  3: einfache Straße
+  4: feste Straße
+  5: gepflasterte Straße
+ workers: Arbeiter
+direction:
+ long:
+  north: Nord
+  east: Ost
+  south: Süd
+  west: West
+  northeast: Nord-Ost
+  northwest: Nord-West
+  southeast: Süd-Ost
+  southwest: Süd-West
+ short:
+  north: N
+  east: O
+  south: S
+  west: W
+  northeast: NO
+  northwest: NW
+  southeast: SO
+  southwest: SW
+culture:
+ european:
+#  central: ((missing translation - original: central european))
+#  northern: ((missing translation - original: northern european))
+#  southern: ((missing translation - original: southern european))
+#  eastern: ((missing translation - original: eastern european))
+# african: ((missing translation - original: african))
+# oriental: ((missing translation - original: oriental))
+# indian: ((missing translation - original: indian))
+# asian: ((missing translation - original: asian))
+status: Zustand
+#locked: ((missing translation - original: locked))
+#dead: ((missing translation - original: dead))
+#inactive: ((missing translation - original: inactive))
+#prisoner: ((missing translation - original: prisoner of %captor%))
+#wounded: ((missing translation - original: wounded))
+#hungry: ((missing translation - original: hungry))
+#veryhungry: ((missing translation - original: starving))
+#routed: ((missing translation - original: routed))
+#offered: ((missing translation - original: included in a knight offer))
+#assigned: ((missing translation - original: assigned from %from%, could still be reclaimed))
+#lastbattle: ((missing translation - original: last battle))
+#islocked: ((missing translation - original: currently being reassigned to you))
+#hour: ((missing translation - original: hour|hours))
+#minute: ((missing translation - original: minute|minutes))
+#untilturn: ((missing translation - original: %h% %hours%, %m% %minutes% until next turn))
+#untilturn2: ((missing translation - original: %m% %minutes% until next turn))
+location: Ort
+coordinates: Koordinaten
+#spotdistance: ((missing translation - original: spotting distance))
+#actdistance: ((missing translation - original: interaction distance))
+#travelspeed: ((missing translation - original: travel speed))
+#travellocked: ((missing translation - original: Your recent travel was blocked by local actions or battles.))
+#base: ((missing translation - original: (base: %distance%)))
+nearest: nächstgelegene Siedlung
+nothingnear: keine Siedlung in der Nähe
+nearbyothers: Adlige in der Nähe
+#nearbattles: ((missing translation - original: Nearby Battles))
+viewdetails: Details ansehen
+none: keine
+yes: ja
+no: nein
+techtree: Technologiebaum
+#travelling: ((missing translation - original: travelling))
+#newevents: ((missing translation - original: %number% event|%number% events))
+#newmessages: ((missing translation - original: %number% message|%number% messages))
+#inside: ((missing translation - original: inside %place%))
+#near: ((missing translation - original: near %place%))
+#atsea: ((missing translation - original: at sea))
+#tradename: ((missing translation - original: name (optional)))
+#zoom: ((missing translation - original: zoom to fit))
+distance: Entfernung
+#length: ((missing translation - original: length))
+dist:
+ m: %value% m|%value% m
+ metre: %value% Meter|%value% Meter
+ y: %value% s|%value% s
+ yard: %value% Schritt|%value% Schritte
+ mi: %value% M|%value% M
+ mile: %value% Meile|%value% Meilen
+ league: %value% Landesmeile|%value% Landesmeilen
+area:
+ hectare: %value% Hektar|%value% Hektare
+ sqm: %value% Quadratmeile|%value% Quadratmeilen
+ sql: %value% Quadratlandesmeile|%value% Quadratlandesmeilen
+metre_abr: m
+popdensity: Leute pro Quadratmeile
+day: Tag|Tage
+today: heute
+source: Herkunft
+destination: Zielort
+resources: Rohstoffe
+food: Nahrung
+wood: Holz
+metal: Metal
+goods: Güter
+money: Gold
+#background: ((missing translation - original: background))
+estate: Anwesen|Anwesen
+building: Gebäude|Gebäude
+#feature: ((missing translation - original: feature|features))
+build:
+ workers: Arbeiter
+# available: ((missing translation - original: %number% (%percent% %) workers available))
+# employees: ((missing translation - original: employed))
+ underway: wird gebaut
+workforce: Arbeitskräfte
+inheritance: Erbschaft
+nobody: niemand
+#underconstruction: ((missing translation - original: under construction))
+#finished: ((missing translation - original: finished))
+biome:
+ scrub: Buschland
+ thin scrub: dünnes Buschland
+ grass: Grasebene
+ thin grass: dünne Grasebene
+ marsh: Sumpf
+ forest: Wald
+ dense forest: dichter Wald
+ snow: verschneite Berge
+ rock: Bergland
+ desert: Wüste
+ ocean: Ozean
+ lake: See
+ water: See
+ river: Fluss
+error:
+ title: Fehler
+ notfound:
+  page: Page not found
+  character: Character not found
+#  action: ((missing translation - original: Action not found))
+  settlement: Settlement not found
+#  buildingtype: ((missing translation - original: no such building type))
+#  featuretype: ((missing translation - original: no such feature type))
+#  entouragetype: ((missing translation - original: no such entourage type))
+#  equipmenttype: ((missing translation - original: no such equipment type))
+#  log: ((missing translation - original: event journal does not exist))
+#  battle: ((missing translation - original: battle not found))
+#  battlereport: ((missing translation - original: battle report not found))
+#  recruit: ((missing translation - original: recruit not found))
+#  listing: ((missing translation - original: list not found))
+#  paper: ((missing translation - original: publication not found))
+#  position: ((missing translation - original: realm position not found))
+#  realmrelation: ((missing translation - original: realm relation not found))
+#  election: ((missing translation - original: election not found))
+ noaccess:
+#  character: ((missing translation - original: character does not belong to you))
+#  log: ((missing translation - original: you do not have access to this log))
+#  settlement: ((missing translation - original: you do not have full access to this settlement))
+#  paper: ((missing translation - original: you are not a member of this publication))
+#  edition: ((missing translation - original: you do not have a copy of this edition))
+#  paperowner: ((missing translation - original: you are not an owner of this publication))
+#  library: ((missing translation - original: you cannot create new publications because none of your estates has a library))
+#  battlereport: ((missing translation - original: you were not a participant in that battle, so you have to rely on eye witness reports for its details))
+ missing:
+#  character: ((missing translation - original: Character required, but missing. Please select a character from the character page or log in again.))
+#  location: ((missing translation - original: This character does not have a location, select a start location first.))
+#  soul: ((missing translation - original: This character is dead and cannot affect the world of the living anymore.))
+#  user: ((missing translation - original: You are not logged in or your session has expired. Please log in (again).))
+ payment:
+#  already: ((missing translation - original: This code has already been redeemed, maybe automatically as you logged in. Check your credit history, please. If you believe this to be an error, please contact tom@mightandfealty.com for details.))
+#  notforyou: ((missing translation - original: This code is locked to a specific e-mail address, different from yours.))
+# iseditor: ((missing translation - original: Could not add %character%, who is already a member.))
+selectall: alle auswählen
+withall: mit den ausgewählten...
+experience: Erfahrung
+weapon: Waffe
+armour: Rüstung
+equipment: Ausrüstung
+home: Heimat
+npc:
+ type: Typ
+ name: Name
+ number: Anzahl
+# supply: ((missing translation - original: supply))
+# entourage: ((missing translation - original: entourage member|entourage members))
+# follower: ((missing translation - original: camp follower|camp followers))
+ scout: Späher|Späher
+ prospector: Prospektor|Prospektoren
+ merchant: Händler|Händler
+ spy: Spion|Spione
+ priest: Priester|Priester
+ herald: Herold|Herolde
+ translator: Übersetzer|Übersetzer
+ scholar: Gelehrter|Gelehrte
+ soldier: Soldat|Soldaten
+soldier:
+ type: Typ
+ home: home
+ group: group
+ name: Name
+ train: Training
+ complete: ungefähr fertig
+# assigned_to: ((missing translation - original: assigned to))
+# assigned_since: ((missing translation - original: assigned since))
+# reclaim: ((missing translation - original: reclaim chance))
+# buryall: ((missing translation - original: bury all dead))
+# resupplyall: ((missing translation - original: resupply all))
+# rabble: ((missing translation - original: rabble|rabble))
+ light infantry: light infantry|light infantry
+ medium infantry: medium infantry|medium infantry
+ heavy infantry: heavy infantry|heavy infantry
+ archer: Bogenschütze|Bugenschützen
+ mounted archer: mounted archer|mounted archers
+# cavalry: ((missing translation - original: cavalry|cavalry))
+# noble: ((missing translation - original: noble|nobles))
+item:
+# none: ((missing translation - original: (none)))
+# choose: ((missing translation - original: -- choose --))
+# current: ((missing translation - original: (current)))
+ axe: Axt
+ broadsword: Breitschwert
+ chainmail: Kettenrüstung
+ cloth armour: cloth armour
+ crossbow: crossbow
+ horse: Pferd
+ improvised: improvisiert
+# javelin: ((missing translation - original: javelin))
+ leather armour: leather armour
+ longbow: longbow
+ pike: pike
+ plate armour: plate armour
+ scale armour: scale armour
+# shield: ((missing translation - original: shield))
+ shortbow: shortbow
+# short sword: ((missing translation - original: short sword))
+ spear: Speer
+ sword: Schwert
+# war horse: ((missing translation - original: war horse))
+events:
+# title: ((missing translation - original: Event Journals))
+# log: ((missing translation - original: Journal))
+# type: ((missing translation - original: type))
+# logtitle: ((missing translation - original: Event Journal of %subject%))
+# from: ((missing translation - original: available from))
+# until: ((missing translation - original: available until))
+# events: ((missing translation - original: events))
+# new: ((missing translation - original: new))
+# read: ((missing translation - original: read))
+# allread: ((missing translation - original: mark as read for all my characters))
+# alldone: ((missing translation - original: marked as read for all your characters))
+# alldone2: ((missing translation - original: marked as read for this character))
+ research:
+#  ongoing: ((missing translation - original: A scholar of yours is currently researching older records in this journal.|%amount% of your scholars are currently researching older records in this journal.))
+#  intro: ((missing translation - original: There are more events in older records, a scholar will be able to research them.))
+#  can: ((missing translation - original: You have a scholar available for research work.|You have %amount% scholars available for research work.))
+ filter:
+#  all: ((missing translation - original: all events))
+#  medium: ((missing translation - original: only interesting))
+#  high: ((missing translation - original: only important))
+#  ultra: ((missing translation - original: only very important))
+interaction:
+ message:
+  name: Empfänger
+  subject: Thema
+  body: Inhalt
+  submit: Brief absenden
+ attack:
+#  name: ((missing translation - original: target(s)))
+#  submit: ((missing translation - original: initiate attack))
+ publication:
+#  name: ((missing translation - original: new member(s)))
+#  submit: ((missing translation - original: add member(s)))
+ abdicate:
+#  name: ((missing translation - original: announce as successor:))
+#  submit: ((missing translation - original: abdicate))
+battle:
+# title: ((missing translation - original: Battle Report))
+# upcoming: ((missing translation - original: Upcoming Battle))
+# participants: ((missing translation - original: participants))
+ location:
+#  nowhere: ((missing translation - original: Neverwhere battle.))
+#  of: ((missing translation - original: The battle of %location%.))
+#  near: ((missing translation - original: A battle near %location%.))
+# initial: ((missing translation - original: initial troops))
+# combat: ((missing translation - original: combat))
+ ranged:
+#  title: ((missing translation - original: ranged phase))
+#  shots: ((missing translation - original: %i% shot fired|%i% shots fired))
+#  hits: ((missing translation - original: %i% hit|%i% hits))
+#  kill: ((missing translation - original: %i% enemy killed|%i% enemies killed))
+#  wound: ((missing translation - original: %i% enemy wounded|%i% enemies wounded))
+#  routed: ((missing translation - original: %i% enemy routed|%i% enemies routed))
+ melee:
+#  title: ((missing translation - original: melee phase %i%))
+#  alive: ((missing translation - original: %i% soldier fighting|%i% soldiers fighting))
+#  kill: ((missing translation - original: %i% enemy killed|%i% enemies killed))
+#  wound: ((missing translation - original: %i% enemy wounded|%i% enemies wounded))
+#  panic: ((missing translation - original: %i% enemy routed|%i% enemies routed))
+#  capture: ((missing translation - original: %i% enemy noble captured|%i% enemy nobles captured))
+ hunt:
+#  title: ((missing translation - original: hunt))
+#  killed: ((missing translation - original: %i% enemy was killed while fleeing|%i% enemies were killed while fleeing))
+#  wounded: ((missing translation - original: %i% enemy was wounded during the rout|%i% enemies were wounded during the rout))
+#  dropped: ((missing translation - original: %i% soldier dropped his equipment to run away faster|%i% soldiers dropped their equipment to run faster))
+# finish: ((missing translation - original: survivors))
+ fate:
+#  title: ((missing translation - original: fate of nobles))
+#  killed: ((missing translation - original: %character% was killed.))
+#  wounded: ((missing translation - original: %character% was wounded.))
+#  victory: ((missing translation - original: %character% was victorious.))
+#  retreat: ((missing translation - original: %character% retreated.))
+#  captured: ((missing translation - original: %character% captured by the enemy))
+description:
+# scout: ((missing translation - original: Usually a fleet-footed peasant with good eyes, the scout will search the nearby area for anything unusual, notifying his noble of any finds.<br /> Scouts increase your spotting range. The more scouts you have, the farther away you notice details of the land and other characters.))
+# prospector: ((missing translation - original: An expert in surveying and estimating, the prospector allows you to get data on the local economy and its capabilities. One prospector is enough, though you can choose to have more than one, just in case.))
+# merchant: ((missing translation - original: Just like a sword is best met with a sword, and a thief with a thief, merchants are useful for setting up trade deals without being robbed blind by the middle men.<br /> One merchant is needed (and will stay behind) for each time you want to close a trade deal with more profitable transaction costs.))
+# spy: ((missing translation - original: Spies are versatile experts in subterfuge and information gathering, allowing you to infiltrate an enemy (or friendly, if you are so inclined) settlement and gather details about its military or political status.))
+# priest: ((missing translation - original: The record keepers and scribes as well as managers of day-to-day affairs of peasants such as births, marriages, etc.<br /> Priests allow you to create elections.))
+# herald: ((missing translation - original: Announcer and runner for a noble, who is not only practically a requirement if you want to be taken seriously as a major player in politics and diplomacy. He allows you to send messages at spotting, rather than interaction distance. In addition, heralds allow you to announce claims to settlements.))
+# translator: ((missing translation - original: A scribe trained in foreign languages, the translator allows you to send messages to nobles who do not speak or understand your language. One translator is enough, though you can choose to have more than one, just in case.))
+# scholar: ((missing translation - original: Trained in the arts of reading and writing, documentation and a dozen other arts and techniques that a proper noble cares little about, the scholar can at times be useful to gather and sort information and old documents.<br /> His main use is to discover more about the history of people and places.))
+# follower: ((missing translation - original: Camp followers are people following the soldiers in your army. They can be professionals, such as smiths, cooks or whores, or they can be relatives and family members of the soldiers. Camp followers allow your army to carry additional supplies and reserves, making resupply in the field possible.))
+# axe: ((missing translation - original: An old and fairly primitive weapon, nevertheless both deadly and common on the battlefield.))
+# broadsword: ((missing translation - original: A heavy and sturdy sword designed more for massive impact force than speed.))
+# chainmail: ((missing translation - original: Interlocking metal rings providing impressive armor and yet fairly low weight.))
+# cloth armour: ((missing translation - original: Reinforced clothing, basically several layers of thick cloth. Does not really make much of a difference against real weapons, but can help against weak or glancing blows.))
+# crossbow: ((missing translation - original: Technically advanced ranged weapon that requires less training than a bow and provides more accurate power, but requires longer loading times.))
+# horse: ((missing translation - original: Riding horse trained to suffer through the heat of battle without too much complaining.))
+# improvised: ((missing translation - original: Farm tools, other tools, big sticks - anything that was lying around and just might hurt someone.))
+# javelin: ((missing translation - original: A short spear, balanced for throwing. One-use weapon that gives melee troops a small amount of ranged power.))
+# leather armour: ((missing translation - original: Hardened leather in multiple layers, slightly hindering movement but providing considerable protection.))
+# longbow: ((missing translation - original: The ultimate one-man ranged weapon, requiring long training and strong arms to use. Can pierce even solid metal armor at great distances.))
+# pike: ((missing translation - original: A long pole-arm weapon with a blade and point, easy to learn and often the first serious weapon for conscripts to pick up.))
+# plate armour: ((missing translation - original: The ultimate in armor protection, consisting of solid metal plates covering every part of the body, interlocked and reinforced.))
+# scale armour: ((missing translation - original: A mixture of metal and leather, the scale armor has a solid leather body with numerous metal plates overlayed, affording more freedom of movement than more solid metal armors.))
+# shield: ((missing translation - original: A primitive and yet highly efficient defensive choice, a shield protects against both melee and ranged attacks.))
+# shortbow: ((missing translation - original: A very common type of bow, used mainly for hunting but quite effective against lightly armored enemies, too.))
+# spear: ((missing translation - original: Another simple and common weapon, popular due to its considerable reach.))
+# sword: ((missing translation - original: Rare among the lower ranks, common amongst the nobility and those who can afford proper weaponsmiths.))
+# short sword: ((missing translation - original: A smaller sidearm to be used mostly as a fallback melee option for ranged troops, or as reserve weapon.))
+# war horse: ((missing translation - original: A large and heavy horse, specifically trained for battle and equipped with horse armor.))
+about:
+ title: Über Might & Fealty
+ intro: Einleitung
+ concept: Philosophie
+ gameplay: Das Spiel
+ tech: Technologie
+# cost: ((missing translation - original: Costs))
+#paymentconcept: ((missing translation - original: Payment Concept))
+fiction:
+ title: Might & Fealty Geschichten
+ header: Diese Sammlung von Mythen, Legendn und Kurzgeschichten ist zu deiner Unterhaltung, sowie um die Atmosphäre und Hintergrundwelt lebend werden zu lassen.
+ intro:
+  title: Einleitung
+  text: <p>Die folgenden Geschichte sind alle Teil der fiktiven Spielwelt, in Form von Legenden und Mythen, die dein Charakter zu hören bekommen könnte oder bereits kennt.</p> <p>Geschichten werden oft erzählt oder gesungen und weniger gelesen, da die meisten Bauern weder lesen noch schreiben können. In der Welt von Might & Fealty herrscht vor allem mündliche Überlieferung, obwohl viele der älteren oder bekannteren Legenden von Schriftgelerten niedergeschrieben wurden. Es gibt natürlich auch Autoren und Schreiben, auch wenn die meisten ihrer Werke eher aufgeführt als gelesen werden.</p>
+ untranslated: Tut uns leid, aber diese Geschichte wurde noch nicht ins Deutsche übersetzt.
+ page:
+  fall: Der Fall des Tymetras
+#  creation: ((missing translation - original: Creation))
+#  lendan: ((missing translation - original: The Lendan Stones))
+#  geas: ((missing translation - original: The Ancient Geas))
+manual:
+ title: Handbuch
+# intro: ((missing translation - original: introduction))
+# background: ((missing translation - original: background))
+# videos: ((missing translation - original: videos))
+# basics: ((missing translation - original: basic concepts))
+# knight: ((missing translation - original: playing a knight))
+# lord: ((missing translation - original: playing a lord))
+# ruler: ((missing translation - original: playing a ruler))
+# others: ((missing translation - original: other roles))
+# characters: ((missing translation - original: characters))
+# economy: ((missing translation - original: economy))
+# battles: ((missing translation - original: battles))
+# relations: ((missing translation - original: marriage and relations))
+# fealty: ((missing translation - original: oaths of fealty))
+# soldiers: ((missing translation - original: soldiers))
+# entourage: ((missing translation - original: entourage))
+# settlements: ((missing translation - original: settlements))
+# realms: ((missing translation - original: realms))
+# travel: ((missing translation - original: travel))
+# trade: ((missing translation - original: trade & tribute))
+# politics: ((missing translation - original: politics))
+# diplomacy: ((missing translation - original: diplomacy))
+# elections: ((missing translation - original: elections))
+# messages: ((missing translation - original: messages))
+# publications: ((missing translation - original: publications))
+# history: ((missing translation - original: history & events))
+# permissions: ((missing translation - original: permission system))
+# prison: ((missing translation - original: captivity))
+# supply: ((missing translation - original: army supply))
+# reference: ((missing translation - original: reference))
+# units: ((missing translation - original: units of measurement))
+# test: ((missing translation - original: test instance))
+list:
+# buildingtypes: ((missing translation - original: list of all building types))
+# featuretypes: ((missing translation - original: list of all feature types))
+# entouragetypes: ((missing translation - original: list of all entourage members))
+# equipmenttypes: ((missing translation - original: list of all equipment))
+editor:
+# help: ((missing translation - original: formatting help))
+ preview:
+#  title: ((missing translation - original: preview))
+#  intro: ((missing translation - original: Here's what the message will look like:))
+# syntax: ((missing translation - original: <p>Our editor uses a subset of the <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a> syntax.</p> <p>Simply write your text as you would write plain text and it will usually come out the way you want it.</p> <p>The one quirk you should be aware of is that single newlines are ignored, if you want to force a linebreak, add two or more spaces to the end of the line before hitting enter.</p>))
+unavailable:
+# intro: ((missing translation - original: Sorry, but this action is not currently available, because:))
+# already: ((missing translation - original: You are already conducting this action.))
+# supporting: ((missing translation - original: You are already supporting someone else in this action.))
+# atsea: ((missing translation - original: You are travelling at sea.))
+# nosettlement: ((missing translation - original: You are not near any settlement.))
+# notinside: ((missing translation - original: You are not inside the settlement.))
+# nodock: ((missing translation - original: There are no docks nearby.))
+# notyours: ((missing translation - original: The settlement owner has not granted you permission to do this.))
+# notyours2: ((missing translation - original: You do not control this settlement.))
+# notrain: ((missing translation - original: No available training options.))
+# nobody: ((missing translation - original: No other nobles within range.))
+# nosoldiers: ((missing translation - original: You do not have any soldiers.))
+# nomilitia: ((missing translation - original: There are no soldiers available here.))
+# nobattles: ((missing translation - original: There are no battles nearby))
+# nooffers: ((missing translation - original: No soldiers or existing offers available.))
+# noassigned: ((missing translation - original: You have no soldiers assigned.))
+# inbattle: ((missing translation - original: You are already involved in a battle.))
+# nobattle: ((missing translation - original: You are not involved in any battle.))
+# nobattle2: ((missing translation - original: You are not being forced into any battle, but have committed yourself.))
+# intercepted: ((missing translation - original: You already tried to disengage from this battle, and failed.))
+# noprisoners: ((missing translation - original: You don't have any prisoners))
+# prisoner: ((missing translation - original: You are a prisoner and have only very limited actions available.))
+# notmember: ((missing translation - original: You are not a member of this realm.))
+# leader: ((missing translation - original: As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.))
+# notleader: ((missing translation - original: You are not the ruler of this realm.))
+# notdiplomat: ((missing translation - original: You do not hold a position with diplomacy permissions in this realm.))
+# noothers: ((missing translation - original: There are no other characters nearby.))
+# vassal: ((missing translation - original: You cannot do this as long as you are the vassal of someone else.))
+# norealms: ((missing translation - original: You do not belong to any realms.))
+# haverealm: ((missing translation - original: You already have a realm.))
+# novassals: ((missing translation - original: You do not have any vassals (your own characters don't count).))
+# fewestates: ((missing translation - original: A new realm needs to have at least two estates.))
+# notvassal: ((missing translation - original: You are not a vassal.))
+# toolow: ((missing translation - original: Your realm is of the lowest designation and thus cannot have subrealms.))
+# toosmall: ((missing translation - original: Your realm needs to have at least two estates to split one (or more) off into a subrealm.))
+# attacking: ((missing translation - original: you are busy attacking the nearby settlement.))
+# defending: ((missing translation - original: you are busy defending the nearby settlement.))
+# both: ((missing translation - original: You cannot both attack and defend at the same time.))
+ enter:
+#  inside: ((missing translation - original: You are already inside.))
+#  notyours: ((missing translation - original: As a prisoner, you can only follow your captor or bring him into your own settlements.))
+ location:
+#  library: ((missing translation - original: This settlement does not have a library.))
+#  temple: ((missing translation - original: This settlement does not have a temple.))
+#  barracks: ((missing translation - original: This settlement does not have barracks.))
+#  yours: ((missing translation - original: You already control this settlement.))
+#  fortified: ((missing translation - original: You cannot take control of a fortified settlement from the outside.))
+#  nodefenders: ((missing translation - original: There are no troops defending this settlement, you can simply take it.))
+ trade:
+#  noestate: ((missing translation - original: You do not have any estates with which to trade.))
+#  nooptions: ((missing translation - original: There are no possible trade/tribute deals you could make at this location.))

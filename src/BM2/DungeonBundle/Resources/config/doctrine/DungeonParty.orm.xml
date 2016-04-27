@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonParty">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="counter" type="smallint" nullable="true"/>
+
+		<one-to-one field="dungeon" target-entity="Dungeon" inversed-by="party"/>
+		<one-to-one field="current_level" target-entity="DungeonLevel"/>
+		<one-to-many field="members" target-entity="Dungeoneer" mapped-by="party"/>
+		<one-to-many field="messages" target-entity="DungeonMessage" mapped-by="party">
+			<order-by>
+				<order-by-field name="ts" direction="DESC"/>
+			</order-by>
+		</one-to-many>
+		<one-to-many field="events" target-entity="DungeonEvent" mapped-by="party">
+			<order-by>
+				<order-by-field name="ts" direction="ASC"/>
+				<order-by-field name="id" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+	</entity>
+</doctrine-mapping>

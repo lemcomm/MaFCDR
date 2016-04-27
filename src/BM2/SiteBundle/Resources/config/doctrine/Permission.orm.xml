@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Permission" table="types.permission">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="class" type="string"/>
+		<field name="name" type="string"/>
+		<field name="translation_string" type="string"/>
+		<field name="use_value" type="boolean"/>
+		<field name="use_reserve" type="boolean"/>
+
+	</entity>
+</doctrine-mapping>

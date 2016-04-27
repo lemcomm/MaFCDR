@@ -1,0 +1,18 @@
+{% block choice_widget_expanded %}
+{% spaceless %}
+<div {{ block('widget_container_attributes') }}>
+	<ul class="simple">
+	{% for child in form %}
+		<li>
+			{{ form_widget(child) }}
+			{% if child.vars.value %}
+				{{ character_link(child.vars.value, child.vars.label) }}
+			{% else %}
+				{{ child.vars.label|trans }}
+			{% endif %}
+		</li>
+	{% endfor %}
+	</ul>
+</div>
+{% endspaceless %}
+{% endblock choice_widget_expanded %}

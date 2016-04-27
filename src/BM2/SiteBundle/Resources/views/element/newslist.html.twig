@@ -1,0 +1,10 @@
+<h3>{{ title }}</h3>
+<ul>
+	{% for edition in list %}
+		<li>
+			<a href="{{ path('bm2_site_news_read', {'edition':edition.id}) }}"><b>{{ edition.paper.name }}</b>, {{ "news.number"|trans({"%number%":edition.number},"communication") }}, {{ edition.published|date }}</a>
+		</li>
+	{% else %}
+		<em>{{ 'none'|trans }}</em>
+	{% endfor %}
+</ul>

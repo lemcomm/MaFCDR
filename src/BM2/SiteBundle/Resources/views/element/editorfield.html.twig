@@ -1,0 +1,63 @@
+<div id="message_edit">
+	(<span id="syntaxhelp">{{ "editor.help"|trans }}</span>)
+	<form class="wide" action="{{ url }}" method="post">
+		{{ form_widget(form) }}
+	</form>
+</div>
+
+<div id="message_preview">
+	{# FIXME: translate #}
+	<h3>{{ "editor.preview.title"|trans|title }}</h3>
+	<p>{{ "editor.preview.intro"|trans }}</p>
+	<div id="preview" class="messenger_thread_message_body"></div>
+</div>
+<div class="clear"></div>
+<div id="syntax">
+	{{ "editor.syntax"|trans|raw }}</p>
+	<table class="syntax">
+		<tbody>
+{# TODO: references [c:123] etc. #}
+			<tr>
+				<th colspan="2">emphasis</th>
+			</tr><tr>
+				<td>_italic_ or *italic*</td>
+				<td><i>italic</i></td>
+			</tr><tr>
+				<td>**bold** or __bold__</td>
+				<td><b>bold</b></td>
+			</tr><tr>
+				<th colspan="2">headers</th>
+			</tr><tr>
+				<td>header 1<br />===</td>
+				<td><h1>header 1</h1></td>
+			</tr><tr>
+				<td>header 2<br />---</td>
+				<td><h2>header 2</h2></td>
+			</tr><tr>
+				<th colspan="2">lists</th>
+			</tr><tr>
+				<td>* one<br />* two<br />* three</td>
+				<td><ul><li>one</li><li>two</li><li>three</li></ul></td>
+			</tr><tr>
+				<td>1. one<br />2. two<br />3. three</td>
+				<td><ol><li>one</li><li>two</li><li>three</li></ol></td>
+			</tr><tr>
+				<th colspan="2">other</th>
+			</tr><tr>
+				<td>&gt; quote</td>
+				<td><blockquote>quote</blockquote></td>
+			</tr>
+			{% if extended is defined %}
+				{# also supported in news articles:
+    	"bold", "italic", "underline", "strikethrough",
+    	"|",
+    	"p", "h5", "orderedList", "unorderedList",
+    	"|",
+    	"indent", "outdent", "justifyleft", "justifycenter", "justifyright",
+    	"|",
+    	"forecolor", "horizontalrule"
+		#}
+			{% endif %}
+		</tbody>
+	</table>
+</div>

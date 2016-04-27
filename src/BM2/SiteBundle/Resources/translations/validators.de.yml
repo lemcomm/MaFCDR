@@ -1,0 +1,46 @@
+# Might & Fealty
+# validation text strings - german
+# Author: Tom Vogt <tom@mightandfealty.com>
+password:
+ old: 		falsches derzeitiges Kennwort
+ minlength: '[0,Inf]Dein Kennwort muß mindestens 6 Zeichen lang sein'
+ match: 		neues Kennwort und Kennwortbestätigung stimmen nicht überein
+realm:
+ new:
+  toosimilar:
+   name: 		Der Reichsname ist einem anderen zu ähnlich, und zwar %other%.
+   formalname: Der förmliche Reichsname ist einem anderen zu ähnlich, und zwar %other%.
+character:
+ burst: 				Du hast während der letzten Minute schon einen Charakter erstellt. Wir bremsen Dich etwas aus, um sicherzustellen, daß Du kein Roboter bist.
+ spawnlimit:		Du hast schon 2 nicht auf der Karte platzierte Charaktere. Fang doch erstmal an, die zu spielen.
+ homosexual: 		Tut uns leid, wir simulieren eine mittelalterliche Welt vor der Aufklärung. Daher gibt es noch keine homosexuellen Ehen.
+ foreignparent: 	Mindestens einer der Eltern muß einer Deiner Charaktere sein.
+ nosex:				Die Eltern Deines Charakters müssen eine sexuelle Beziehung haben.
+trade:
+ toomuch:			So viel ist nicht verfügbar.
+ allremote:			Entweder Ursprungs- oder Zielort eines Handels müssen Dein aktueller Ort sein.
+ same: 				Ein Produkt neu verpacken und am gleichen Ort nochmal verkaufen wurde noch nicht erfunden. Bitte warte bis zur Gründung der Wall Street und der Rating-Agenturen. Danke.
+economy:
+ toomany:			Du kannst nicht mehr Arbeiter zu Bauprojekten zuweisen, als vorhanden sind. Sollte eigentlich klar sein.
+feature:
+ location: 		Wähle bitte einen Ort für das neue Bauwerk, indem Du auf die Karte klickst.
+ outside: 		Der gewählte Ort ist nicht Teil der Umgebung dieser Siedlung.
+ noriver: 		Es gibt hier in der Nähe der Siedlung keinen Fluß.
+ nocoast: 		Diese Siedlung liegt nicht in Ufernähe.
+ needworkers: 	Bitte weise diesem Bauprojekt auch Arbeiter zu.
+recruit:
+ entourage:
+  toomany: 		Du kannst nicht mehr Gefolge anheuern, als die Siedlung Einwohner hat.
+  toomany2: 	Diese Siedlung kann höchstens %max% Bauern pro Tag ausbilden.
+ troops:
+  toomany: 		Du kannst nicht mehr Soldaten anheuern, als die Siedlung Einwohner hat.
+  toomany2:		Diese Siedlung kann höchstens %max% Bauern pro Tag in die Ausbildung schicken.
+  noweapon:		Du kannst keine Soldaten ohne Waffe rekrutieren, die wären nicht wirklich Soldaten, oder?
+ offer:
+  empty: 		Angebote an Vasallen müssen irgend etwas beinhalten, ansonsten würdes Du ja nichts anbieten und dafür etwas (Treue) verlangen.
+road:
+ same: 			Das ist eine interessante Idee, aber Start- und Endpunkt einer Straße sollten schon unterschiedlich sein.
+ exists: 		Diese Straße gibt es schon.
+ invalid:		Die Arbeiter entschuldigen sich vielfach und erwarten dein Urteil, aber sie waren nicht in der Lage, einen Weg zwischen diesen beiden Punkten zu finden, der nicht durch Wasser oder unpassierbares Gelände führt.
+attack:
+ nobody: 		Du mußt mindestens einen Gegner angreifen. Schattenboxen ist nicht.

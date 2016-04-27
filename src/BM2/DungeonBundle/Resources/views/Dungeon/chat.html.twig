@@ -1,0 +1,16 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'dungeon.chat.title'|trans({}, "dungeons")|title }}</h2>
+<p>{{ 'dungeon.chat.intro'|trans({"%party%":dungeon.party.countactivemembers, "%area%":('area.'~dungeon.area)|trans({},"dungeons")}, "dungeons") }}</p>
+<hr />
+{{ form(chat, {'action':path('bm2_dungeon_dungeon_chat')}) }}
+<hr />
+<dl class="messages">
+	{% for msg in messages %}
+	<dt>{{ link(msg.sender.character) }} <small>({{ msg.ts|date }})</small></dt>
+	<dd>{{ msg.content }}</dd>
+	{% endfor %}
+</dl>
+
+{% endblock %}

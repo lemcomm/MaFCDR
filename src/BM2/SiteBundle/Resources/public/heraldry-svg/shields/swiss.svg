@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="300px" height="350px" xmlns="http://www.w3.org/2000/svg">
+<g>
+<path d="M 1,1 C 1,1 1,1 1,80 C 1,160 25,325 150,349 C 275,325 299,160 299,80 C 299,1 299,1 299,1 C 280,10 250,20 225,20 C 200,20 170,10 150,1 C 130,10 100,20 75,20 C 50,20 20,10 1,1
+z" id="swiss" />
+</g>
+</svg>

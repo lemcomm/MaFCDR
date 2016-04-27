@@ -1,0 +1,59 @@
+# Might & Fealty
+# validation text strings
+# Author: Tom Vogt <tom@mightandfealty.com>
+password:
+ old:			contraseña incorrecta
+ minlength:	'[0,Inf]la contraseña debe tener como mínimo 6 caracteres'
+ match:		nuevos campos de contraseña y confirmación de contraseña no coinciden
+
+realm:
+ new:
+  toosimilar:
+   name:				El nombre de su dominio es demasiado similar a otro dominio, %other%.
+   formalname:		Su nombre de dominio formal es demasiado similar a otro dominio, %other%.
+
+character:
+ burst:				Usted ya ha creado un personaje en el último minuto. Le estamos desacelerando para asegurarse de que no eres un robot.
+ spawnlimit:		Ya tiene 2 personajes que no han sido engendrados. Empieza a jugar esos personajes antes de crear más personajes.
+ homosexual:		Lo sentimos, pero estamos simulando un mundo de fantasía medieval que es anterior a la pre - iluminación. Todavía, no hay matrimonios homosexuales.
+ foreignparent:	Por lo menos un padre debe ser uno de sus propios personajes.
+ nosex:				Los padres de tus personaje necesitan tener una relación sexual.
+
+trade:
+ toomuch:    Usted no tiene esa cantidad disponible.
+ allremote:  El origen o el destino de un comercio debe ser su ubicación actual.
+ same:		 Re-empaquetando  el mismo producto y venderlo como algo mejor en el mismo lugar todavía no se ha inventado. Espere a la invención de las agencias y Wall Street premiero. Gracias.
+
+economy:
+ toomany:    Es obvio que no se puede asignar más campesinos a trabajar proyectos, si la cantidad excede a los campesinos que hay.
+
+feature:
+ location:     Por favor seleccione una ubicación para la nueva pieza haciendo clic en el mapa.
+ outside:      La ubicación elegida no es parte de la zona que este asentamiento controla.
+ noriver:		No hay ningún río adyacente a esta área.
+ nocoast:		Esto no es una zona costera.
+ needworkers:  Por favor asigne algunos trabajadores a este proyecto.
+
+recruit:
+ entourage:
+  toomany:      Es obvio que no se puede contratar a una cantidad de especialistas que sobrepase la población del asentamiento.
+  toomany2:		 Este asentamiento sólo puede entrenar a %max% campesinos por día.
+ troops:
+  toomany:      Es obvio que no se puede contratar a una cantidad de soldados que sobrepase la población del asentamiento.
+  toomany2:		 Este asentamiento sólo puede comenzar el entrenamiento de %max% campesinos por día.
+  noweapon:		 No se puede reclutar soldados sin armas, no serían soldados, verdad?
+ offer:
+  empty:        ofertas para caballeros debe incluir algo, o estaría ofreciendo nada a cambio de algo (lealtad).
+
+
+road:
+ same:		Esa es una idea interesante, pero en serio, inicio y destino de una calzada debe ser diferente.
+ exists:		Ya existe esa calzada.
+ invalid:   Los trabajadores están muy arrepentidos y esperan su juicio, pero no fueron capaces de encontrar una conexión entre esos dos puntos que no cruzarían a través del agua o de otro terreno impasable.
+
+
+attack:
+ nobody:		Debe seleccionar al menos un objetivo para atacar.
+
+loot:
+ target:		Si usted toma los recursos o esclavos, debe nombrar un asentamiento de destino para enviar su botín.

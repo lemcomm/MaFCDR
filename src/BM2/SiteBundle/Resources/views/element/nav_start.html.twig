@@ -1,0 +1,7 @@
+<ul>
+	<li><a href="{{ path('bm2_map') }}">{{ 'menu.map'|trans }}</a></li>
+	<li><a href="{{ path('bm2_site_character_background') }}">{{ 'menu.character.background'|trans }}</a></li>
+	{% if character.alive %}
+	<li><a href="{{ path('bm2_site_character_start') }}">{{ 'menu.character.start'|trans }}</a></li>
+	{% endif %}
+</ul>

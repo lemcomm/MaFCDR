@@ -1,0 +1,4 @@
+password:
+ old:			password attuale errata
+ minlength:	'[0,Inf]la vostra password deve essere di almeno 6 caratteri'
+ match:		i campi 'nuova password' e 'conferma password' non coincidono

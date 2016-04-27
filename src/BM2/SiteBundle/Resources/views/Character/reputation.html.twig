@@ -1,0 +1,61 @@
+<h2>{{ 'rating.title'|trans|title }}</h2>
+<p>{{ 'rating.intro'|trans }}</p>
+{% if ratings is not empty %}
+	<div id="graph" style="height: 5em; width: 20em"></div>
+{% endif %}
+<dl>
+{% set have_an_opinion = false %}
+{% for data in ratings %}
+	<dt>
+		{{ 'rating.votes'|trans }}: +{{ (data.pro-1.0)|number_format(1) }} / -{{ (data.contra-1.0)|number_format(1) }}
+		{% if data.rating.givenbyuser == app.user %}
+			{% set have_an_opinion = true %}
+		{% else %}
+			{% if char.user != app.user %}
+			<button class="upvote{% if data.myvote == 1 %} selected{% elseif data.myvote == -1 %} inactive{% endif %}" data-id="{{ data.rating.id }}">+1</button>
+			<button class="downvote{% if data.myvote == -1 %} inactive{% elseif data.myvote == 1 %} selected{% endif %}" data-id="{{ data.rating.id }}">-1</button>
+			{% endif %}
+		{% endif %}
+		<small>({{ data.rating.lastchange|date("F j, Y") }})</small>
+	</dt>
+	<dd>{{ data.rating.content }}</dd>
+{% else %}
+	{{ 'rating.empty'|trans }}
+{% endfor %}
+</dl>
+
+
+{% if char.user != app.user %}
+	<hr />
+	<h3>{{ (have_an_opinion?'rating.edit':'rating.write')|trans|title }}</h3>
+	{{ form(form, {'action':path('bm2_site_character_rate')}) }}
+{% endif %}
+
+{% if ratings is not empty %}
+<script language="javascript" type="text/javascript">
+	var yes = [ ["{{ 'rating.respect.label'|trans }}", {{ respect.yes }}], ["{{ 'rating.honor.label'|trans }}", {{ honor.yes }}], ["{{ 'rating.trust.label'|trans }}", {{ trust.yes }}] ];
+	var no  = [ ["{{ 'rating.respect.label'|trans }}", -{{ respect.no }}], ["{{ 'rating.honor.label'|trans }}", -{{ honor.no }}], ["{{ 'rating.trust.label'|trans }}", -{{ trust.no }}] ];
+
+	$.plot($("#graph"), [ yes, no ], {
+		series: {
+			bars: {
+				show: true,
+				barWidth: 0.8,
+				lineWidth: 0,
+				align: "center"
+			},
+		},
+		colors: ["#0c4", "#d00"],
+		xaxis: {
+			mode: "categories",
+			tickLength: 0
+		},
+		yaxis: {
+			show: false
+		},
+		grid: {
+			borderWidth: 0
+		}
+	}); 
+</script>
+{% endif %}

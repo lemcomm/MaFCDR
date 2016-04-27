@@ -1,0 +1,468 @@
+status:
+ self:
+  landless: Du bist ein Ritter ohne Land.
+#  landless2: ((missing translation - original: You are a landless noble.))
+  independent: Du bist ein freier Herr.
+  vassal: Du bist Vasall von %liege%.
+  realm: Du gehörst zu %realm%
+  ultimate: Du bist ein freier Anführer, hast aber noch kein Reich gegründet.
+  liege: Lehnsherr von:
+  position: %position% von %realm%.
+ other:
+  landless: %He% ist ein Ritter ohne Land.
+#  landless2: ((missing translation - original: %He% is a landless noble.))
+  independent: %He% ist ein freier Herr.
+  vassal: %He% ist Vasall von %liege%.
+  realm: %He% gehört zu %realm%
+  ultimate: %He% ist ein freier Anführer, der noch kein Reich gegründet hat.
+  liege: Lehnsherr von:
+ realm:
+  independent: %name% ist ein unabhängiges Reich.
+  ultimate: %name% ist ein souveränes Reich (Spitze seiner Hierarchie).
+  second: %name% ist Teil von %ultimate%.
+  inferior: %name% ist Teil von %superior% und beide gehören zu %ultimate%.
+  partof: Teil von %superior%
+  myinferiors: Reiche, die zu %name% gehören
+relations:
+# name: ((missing translation - original: Relations))
+# intro: ((missing translation - original: Manage your personal and feudal relations to other characters here.))
+politics:
+# name: ((missing translation - original: Politics))
+# intro: ((missing translation - original: Manage your realm(s) and political relations here.))
+#inheritance: ((missing translation - original: inheritance))
+elections:
+# name: ((missing translation - original: Elections))
+# description: ((missing translation - original: View, vote in or create new elections for %name%.))
+# intro: ((missing translation - original: Elections allow the members of %realm% to vote for positions or any other topic.<br /> Handling of elections is done by priests, and creating a new election will remove one priest from your entourage.))
+# intro2: ((missing translation - original: Create a new election for %realm% by filling out the details below. Be aware that election details can <b>not</b> be changed later on, the election will run its course exactly as you order here. Handling of elections is done by priests, and creating a new election will remove one priest from your entourage.))
+# nopriest: ((missing translation - original: As you have no priest with you, you cannot create a new election.))
+# current: ((missing translation - original: Current Elections))
+# title: ((missing translation - original: title))
+# complete: ((missing translation - original: complete))
+# votes: ((missing translation - original: votes))
+# new: ((missing translation - original: start a new election))
+# desc: ((missing translation - original: descriptive text for this election))
+ duration:
+#  name: ((missing translation - original: duration (real time)))
+#  empty: ((missing translation - original: -- choose --))
+#  1: ((missing translation - original: one day))
+#  3: ((missing translation - original: 3 days))
+#  5: ((missing translation - original: 5 days))
+#  7: ((missing translation - original: one week))
+#  10: ((missing translation - original: 10 days))
+ method:
+#  name: ((missing translation - original: voting method))
+#  empty: ((missing translation - original: -- choose --))
+#  banner: ((missing translation - original: by banner (per noble)))
+#  spears: ((missing translation - original: by spears (per soldier)))
+#  swords: ((missing translation - original: by swords (per weighted soldier)))
+#  land: ((missing translation - original: by land (per estate)))
+#  heads: ((missing translation - original: by heads (per peasant)))
+# submit: ((missing translation - original: create election))
+votes:
+# link: ((missing translation - original: cast/view votes))
+# link2: ((missing translation - original: view votes))
+# name: ((missing translation - original: Election "%name%"))
+# intro: ((missing translation - original: This election within %realm% will end on %complete%. Votes are counted %type%.))
+# intro2: ((missing translation - original: This election within %realm% has been closed. Votes have been counted %type%. The winner was %winner%.))
+# intro3: ((missing translation - original: This election within %realm% has ended without a winner.))
+# forposition: ((missing translation - original: This election will grant the position of %position% to the winner.))
+# forposition2: ((missing translation - original: This election has granted the position of %position% to the winner.))
+# list: ((missing translation - original: Candidates & Votes))
+# howto: ((missing translation - original: Add your vote into the appropriate rows and columns below. You can vote for or against as many candidates as you want.))
+# candidate: ((missing translation - original: candidate))
+# pro: ((missing translation - original: in favor))
+# contra: ((missing translation - original: opposed))
+# sum: ((missing translation - original: vote count))
+ add:
+#  name: ((missing translation - original: Add candidate))
+#  label: ((missing translation - original: new candidate))
+#  procontra: ((missing translation - original: your vote))
+#  submit: ((missing translation - original: add))
+#  done: ((missing translation - original: Your candidate has been added.))
+# remove: ((missing translation - original: remove vote))
+# updated: ((missing translation - original: Your votes have been updated.))
+oath:
+ view:
+#  name: ((missing translation - original: Oath Tree))
+#  description: ((missing translation - original: See your oaths in a graphical view.))
+#  longdesc: ((missing translation - original: View the tree of oaths that you belong to. (might take a short while to generate for large trees)))
+# name: ((missing translation - original: Oath of Fealty))
+# intro: ((missing translation - original: Fealty is what defines the hierarchy and political system. What exactly an oath contains - vassalage, military service,  shares of estate income, protection, honour and politics - is negotiable between liege and vassal.<br /> Here you can swear an oath of fealty to a nearby character, which turns you into his or her vassal. This will also make your estate a part of his/her realm.))
+# hasvassals: ((missing translation - original: All your vassals will also become a part of the realm you join, as their oath to you binds them to your decisions. Of course, if you act against their will, they might leave you afterwards.))
+# isruler: ((missing translation - original: This action will mean the end of your realm as an independent entity.))
+# hasliege: ((missing translation - original: Your current oath will automatically be dissolved and your current liege, %liege%, will be notified.))
+# current: ((missing translation - original: current oath))
+# swear: ((missing translation - original: swear a new oath))
+# swearintro: ((missing translation - original: Since a lord can hold estates in or be ruler of different realms, some lords may appear multiple times with different realms, and you get to choose which of their realms to join.))
+# nobody: ((missing translation - original: There are no eligible new lords within your action range.))
+# newliege: ((missing translation - original: new liege))
+# choose: ((missing translation - original: -- choose liege --))
+# norealm: ((missing translation - original: independent))
+# swearto: ((missing translation - original: swear oath to...))
+# submit: ((missing translation - original: swear oath))
+ fail:
+#  vassal: ((missing translation - original: You cannot swear an oath to your own vassals (or their vassals).))
+# success: ((missing translation - original: Swearing an oath of fealty, you are now a vassal of %newliege%.))
+# unavailable: ((missing translation - original: Nobles unavailable as lords))
+ reason:
+#  liege: ((missing translation - original: already is your current liege))
+#  vassal: ((missing translation - original: is your vassal or a vassal of one of your vassals))
+rogue:
+# name: ((missing translation - original: Go Rogue))
+# description: ((missing translation - original: Declare independence.))
+# longdesc: ((missing translation - original: You can also break your oath without swearing a new one, becoming an independent lord or knight.))
+# intro: ((missing translation - original: You can break your oath of fealty at any time, declaring yourself independent, a rogue noble without realm or lord.<br /> This step is not to be taken lightly, as other nobles can and will hunt you and your vassals for fame and fortune. Having no lord also means having no protection, both militarily and politically. Make sure you know what you are doing.))
+# submit: ((missing translation - original: become a rogue noble))
+# success: ((missing translation - original: You are now an independent noble, or a rogue as your fellow nobles will consider you to be.))
+successor:
+# name: ((missing translation - original: your successor))
+# you: ((missing translation - original: you are successor to))
+# intro: ((missing translation - original: Death being a part of life, it is important for every noble to assign a successor to his or her titles and holdings.<br /> You can select any character nearby enough to exchange documents, or anyone of your characters (as they are assumed to be from the same family or dynasty) irrespective of distance. Note that your estates, titles, etc. will leave your control  if they are inherited by a character that does not belong to you.))
+# set: ((missing translation - original: assign a new successor))
+# choose: ((missing translation - original: -- choose successor --))
+# submit: ((missing translation - original: set successor))
+# success: ((missing translation - original: You have now chosen %successor% as your new successor.))
+# hasone: ((missing translation - original: You have currently declared %successor% as your successor.))
+partners:
+# name: ((missing translation - original: manage partners))
+# intro: ((missing translation - original: Relationships with other characters can take many forms. Their details are subject to roleplaying, the game mechanics only cover those aspects that decide upon available options.<br /> Only public relationships will be shown to other players. Only relationships that include sex allow both partners to create new characters with these partners as parents.))
+# none: ((missing translation - original: You do not have any partnerships (such as a marriage or a liason) at this time.))
+# several: ((missing translation - original: You have several partnerships going at this time, namely:))
+ new:
+#  name: ((missing translation - original: new relationships))
+#  intro: ((missing translation - original: You can propose a new relation to any nearby character. He or she will have to accept in order for the relation to become active.))
+#  none: ((missing translation - original: There are no potential partners within your action range.))
+ old:
+#  name: ((missing translation - original: existing relationships))
+#  intro: ((missing translation - original: You can break up with existing partners or make a few unilateral changes to the relationship. Which, of course, might result in them breaking up with you.))
+relation:
+# text: ((missing translation - original: You are %type% %partner%.))
+# proposed: ((missing translation - original: %partner% has proposed a %type% to you.))
+# proposed2: ((missing translation - original: You proposed a %type% to %partner%.))
+# engagement: ((missing translation - original: engaged to))
+# marriage: ((missing translation - original: married to))
+# liason: ((missing translation - original: having a liason with))
+# proposedto: ((missing translation - original: proposed))
+# proposedyou: ((missing translation - original: your proposed))
+# public: ((missing translation - original: public))
+# secret: ((missing translation - original: secret))
+# with: ((missing translation - original: with))
+# sex: ((missing translation - original: includes sex))
+# nosex: ((missing translation - original: without sex))
+# crest: ((missing translation - original: share heraldry))
+ choice:
+#  choose: ((missing translation - original: -- choose --))
+#  type: ((missing translation - original: Propose a))
+#  partner: ((missing translation - original: to))
+#  engagement: ((missing translation - original: engagement))
+#  marriage: ((missing translation - original: marriage))
+#  liason: ((missing translation - original: liason))
+#  public: ((missing translation - original: Should this relationship be public?))
+#  sex: ((missing translation - original: Will it be a sexual relationship, so that it might result in children?))
+#  submitnew: ((missing translation - original: propose))
+#  nochange: ((missing translation - original: no change))
+#  makepublic: ((missing translation - original: make public))
+#  refusesex: ((missing translation - original: refuse sex))
+#  cancel: ((missing translation - original: break up))
+#  withdraw: ((missing translation - original: withdraw proposal))
+#  accept: ((missing translation - original: accept proposal))
+#  reject: ((missing translation - original: reject proposal))
+#  submitchange: ((missing translation - original: commit to changes))
+#  crest: ((missing translation - original: allow partner to bear your crest?))
+realm:
+ view:
+#  name: ((missing translation - original: Hierarchy Tree))
+#  description: ((missing translation - original: See a graphical view of the realm hierarchy.))
+#  longdesc: ((missing translation - original: View the tree of realm hierarchy that this realm belongs to. (might take a short while to generate for large trees)))
+ new:
+#  name: ((missing translation - original: Create Realm))
+#  description: ((missing translation - original: Declare yourself ruler of your own realm.))
+#  longdesc: ((missing translation - original: With vassals under your command, you can declare your own realm, joining the political arena and maybe attracting yet more followers to your banner.))
+#  intro: ((missing translation - original: With sufficient power and no one above you, it might be time to step unto the stage of world politics. You can announce the lands under your control as a <i>realm</i>, which is a generic term for anything from a barony to an empire.<br /> In fact, it is entirely up to you what to call your new realm. The only thing stopping you from calling three villages an empire is the ridicule of your peers. The proper mixture of ambition and modesty might be advisable.<br /> You can change the designation of your realm later on.<br />))
+#  choose: ((missing translation - original: -- choose --))
+#  submit: ((missing translation - original: announce new realm))
+ manage:
+#  name: ((missing translation - original: Manage Realm))
+#  description: ((missing translation - original: Change realm name, color and other details.))
+#  longdesc: ((missing translation - original: As you are the ruler of %formalname%, you have complete executive control over your realm. Whether or not your vassals will stand for it if you exert it too freely, however, is a different question.))
+#  intro: ((missing translation - original: As the ruler of %name%, you can change the realm's details at any time. Please note that realistically, these details almost never change, so make sure you have a good reason.<br /> The designation of your realm must always stay above that of all inferior realms, limiting your choices.))
+#  submit: ((missing translation - original: announce changes))
+#  success: ((missing translation - original: Realm details have been updated.))
+ abdicate:
+#  name: ((missing translation - original: Abdicate))
+#  description: ((missing translation - original: Renounce rulership and hand it to someone else.))
+#  longdesc: ((missing translation - original: If you are tired of ruling %formalname% or are being forced out and want to leave graciously, you can hand over the reigns to someone else.))
+#  intro: ((missing translation - original: As the ruler of %name%, you can abdicate and hand the reigns to someone else. Your successor has to be nearby (within action distance).))
+#  done: ((missing translation - original: You have now given up rulership of this realm.))
+ positions:
+#  name: ((missing translation - original: Realm Positions))
+#  description: ((missing translation - original: Define and appoint/revoke positions.))
+#  longdesc: ((missing translation - original: Lesser positions within %name% can be defined, appointed and revoked by you.))
+#  empty: ((missing translation - original: The realm does not have any positions defined at this time.))
+#  new: ((missing translation - original: create a new position))
+#  holder: ((missing translation - original: holder|holders))
+#  manage: ((missing translation - original: manage position))
+#  appoint: ((missing translation - original: appoint officials))
+ laws:
+#  name: ((missing translation - original: Realm Laws))
+#  description: ((missing translation - original: Declare and change realm laws.))
+#  longdesc: ((missing translation - original: Laws and regulations for %name% can be declared by you. Most are optional, but some are mandatory and set to default values on realm creation.))
+# name: ((missing translation - original: name))
+# formalname: ((missing translation - original: formal name))
+# colour: ((missing translation - original: official colour))
+# language: ((missing translation - original: official language))
+# description: ((missing translation - original: description))
+# designation: ((missing translation - original: designation))
+# ruler: ((missing translation - original: ruler|rulers))
+# history: ((missing translation - original: realm history))
+# details: ((missing translation - original: Realm Details))
+# size: ((missing translation - original: size))
+ type:
+  1: Baronie
+  2: Grafschaft
+  3: Mark
+  4: Fürstentum
+  5: Prinzentum
+  6: Königreich
+  7: Imperium
+ title:
+  male:
+   0: Ritter
+   1: Baron
+   2: Graf
+   3: Markgraf
+   4: Fürst
+   5: Prinz
+   6: König
+   7: Imperator
+  female:
+   0: Freifrau
+   1: Baronin
+   2: Gräfin
+   3: Markgräfin
+   4: Fürstin
+   5: Prinzessin
+   6: Königin
+   7: Imperatorin
+position:
+# name: ((missing translation - original: title))
+# description: ((missing translation - original: formal description))
+# elected: ((missing translation - original: is elected))
+# inherit: ((missing translation - original: can be inherited))
+# term: ((missing translation - original: term length))
+ terms:
+#  0: ((missing translation - original: for life))
+#  365: ((missing translation - original: four years (1 year real time)))
+#  90: ((missing translation - original: one year (3 months real time)))
+#  30: ((missing translation - original: one quarter (30 days real time)))
+# permissions: ((missing translation - original: permissions))
+# submit: ((missing translation - original: edit position))
+# remove: ((missing translation - original: remove position))
+ help:
+#  elected: ((missing translation - original: Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.))
+#  inherit: ((missing translation - original: Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.))
+ appoint:
+#  intro: ((missing translation - original: You can appoint and discharge officials from this position at any time for any reason. They will, of course, be informed about your decision immediately and as simple as the mechanics are, the political consequences of your decisions here could be grave.))
+#  intro2: ((missing translation - original: You can appoint new rulers for this realm at any time for any reason. <b>Keep in mind that you cannot demote them again</b>. Once they are appointed, they are your equals in power and neither of you can remove the other from it.))
+#  candidates: ((missing translation - original: candidates))
+#  submit: ((missing translation - original: announce changes))
+#  done: ((missing translation - original: Your changes have been completed and announced.))
+#  nodemoruler: ((missing translation - original: Rulers cannot be demoted, this change has been ignored.))
+diplomacy:
+# name: ((missing translation - original: Diplomacy))
+# description: ((missing translation - original: Manage the realms dependencies and formal diplomacy.))
+# longdesc: ((missing translation - original: Relations of %formalname% to other realms determine if %name% is independent or part of a larger realm. You can also break allegiance or create sub-realms here.))
+ status:
+#  name: ((missing translation - original: relation status))
+#  nemesis: ((missing translation - original: nemesis))
+#  war: ((missing translation - original: war))
+#  peace: ((missing translation - original: peace))
+#  friend: ((missing translation - original: friend))
+#  ally: ((missing translation - original: ally))
+ report:
+#  myrealm: ((missing translation - original: relations with %myrealm%))
+#  we: ((missing translation - original: we see them as %status%))
+#  they: ((missing translation - original: they see us as %status%))
+#  link: ((missing translation - original: view details))
+#  between: ((missing translation - original: Diplomatic relations between %myrealm% and %targetrealm%))
+#  position: ((missing translation - original: diplomatic positon of %realm%))
+#  undefined: ((missing translation - original: (no diplomatic position defined)))
+ change:
+#  name: ((missing translation - original: Change Realm))
+#  description: ((missing translation - original: You can take your realm away from the current parent realm it belongs to and join a different realm for whatever political or personal reasons you might have.))
+#  intro: ((missing translation - original: While %realm% is a part of %parent% at this time, you can change its allegiance at any time. What your fellow nobles think of you if you do this constantly, on the other hand...<br /> In order to change, a member of your new superior realm must be nearby. Also note that you can only join realms with a higher designation then your own realm has, so a kingdom, for example, cannot become a part of a barony.))
+ join:
+#  name: ((missing translation - original: Join Realm))
+#  description: ((missing translation - original: Submitting to another realm integrates your realm into their hierarchy, making it a part of the other realm. While this means giving up on sovereignty, it makes you and your vassals a part of something bigger and possibly more powerful.<br /> Your submission can be handed to any member of the new superior realm.<br /> Also note that you can only join realms with a higher designation than your own realm has, so a kingdom, for example, cannot become a part of a barony.))
+#  label: ((missing translation - original: Realm to join))
+#  empty: ((missing translation - original: -- choose --))
+#  via: ((missing translation - original: available via))
+#  submit: ((missing translation - original: join realm))
+#  noothers: ((missing translation - original: No realms to join available.))
+#  unavailable: ((missing translation - original: Realms that have nobles nearby but are not available to join, and the reasons why:))
+  unavail:
+#   type: ((missing translation - original: Does not have a higher designation than your realm.))
+#   current: ((missing translation - original: Is your current superior realm.))
+#  done: ((missing translation - original: You have successfully submitted to the superior power of %target% and made your %realm% a part of it.))
+ subrealm:
+#  name: ((missing translation - original: Create Subrealm))
+#  description: ((missing translation - original: Turn parts of your realm into a smaller sub-realm.))
+#  intro: ((missing translation - original: As the ruler of %name%, you can create sub-realms within your realm by splitting your estates up between your main realm and the new vassal realm.<br /> Simply select the estates that you want to be part of the new sub-realm below, then give it a name, a designation and pick one of the lords of the  new realm as its ruler.<br /> Your new sub-realm must have at least one estate and at least one estate must remain with your main realm.))
+#  estates: ((missing translation - original: estates joining the new realm))
+#  newname: ((missing translation - original: name of the new realm))
+#  ruler: ((missing translation - original: ruler of the new realm))
+#  empty: ((missing translation - original: -- choose --))
+#  submit: ((missing translation - original: create realm))
+  invalid:
+#   ruler: ((missing translation - original: your selected ruler is not the lord of any of the estates you picked to join the new subrealm.))
+#   size: ((missing translation - original: the subrealm must contain at least one estate, and at least one must remain with your main realm.))
+#  success: ((missing translation - original: Your subrealm has been created.))
+ break:
+#  name: ((missing translation - original: Declare Independence))
+#  description: ((missing translation - original: Take your realm back to independence, declaring it seperate from its current superior realm.))
+#  intro: ((missing translation - original: While %realm% is a part of %parent% at this time, you can always declare that relation null and void and make %realm% an independent %type%.<br /> Of course, you should make sure you are willing to handle the possible repercussions of this step.))
+#  submit: ((missing translation - original: declare independence))
+#  done: ((missing translation - original: %realm% is now an independent %type%.))
+ relations:
+#  name: ((missing translation - original: Relations))
+#  title: ((missing translation - original: Diplomatic Relations))
+#  description: ((missing translation - original: The diplomatic relations of your realm define how you view and treat other realms and gives both your people and theirs information about the diplomatic status between the realms.))
+#  they: ((missing translation - original: target realm))
+#  ourstatus: ((missing translation - original: our status))
+#  theirstatus: ((missing translation - original: their status))
+  new:
+#   title: ((missing translation - original: New Relation))
+#   intro: ((missing translation - original: To create a diplomatic relation with a realm, follow this link:))
+#   link: ((missing translation - original: create new relation))
+#  edit: ((missing translation - original: edit relation))
+#  target: ((missing translation - original: target realm))
+#  public: ((missing translation - original: public statement))
+#  internal: ((missing translation - original: internal statement))
+#  delivered: ((missing translation - original: delivered statement))
+#  emptytarget: ((missing translation - original: -- choose realm --))
+#  emptystatus: ((missing translation - original: -- choose summary --))
+#  submit: ((missing translation - original: announce new diplomatic status))
+#  success: ((missing translation - original: diplomatic relations have been updated and the changes announced))
+ prisoners:
+#  name: ((missing translation - original: Prisoners))
+#  description: ((missing translation - original: Manage, execute or release prisoners.))
+#  intro: ((missing translation - original: These nobles are currently bound to you as prisoners. They will accompany you anywhere you are going and have only a very limited set of actions they can do while imprisoned by you. However, you can set them free at any time, or alternatively remove them of the burden of their head. You can also transfer your prisoners to other nobles.))
+#  free: ((missing translation - original: set free))
+#  execute: ((missing translation - original: execute))
+#  assign: ((missing translation - original: assign to...))
+#  choose: ((missing translation - original: -- choose --))
+  kill:
+#   behead: ((missing translation - original: by beheading))
+#   hang: ((missing translation - original: by hanging))
+#   burn: ((missing translation - original: by burning))
+#   quarter: ((missing translation - original: by quartering))
+#   impale: ((missing translation - original: by impaling))
+  done:
+#   free: ((missing translation - original: %prisoner% has been set free.))
+#   execute: ((missing translation - original: %prisoner% has been executed.))
+#   assign: ((missing translation - original: %prisoner% has been assigned to %target%.))
+lists:
+# name: ((missing translation - original: Manage lists))
+# description: ((missing translation - original: Defining lists of realms and people you consider allies, friends, enemies, etc. makes it easier to make targeted actions.<br /> These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others, but not all.<br />))
+# intro: ((missing translation - original: Defining lists of realms and people you consider allies, friends, enemies, etc. makes it easier to make targeted actions.<br /> These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others,  but not all.<br /> You can define <i>realms</i> or <i>nobles</i> as list members, in both cases with or without subservients (i.e. sub-realms or vassals).<br /> Permissions will be evaluated in order (top-down) until the first match, so you can allow something to an entire realm, except one person - or vice versa. Your rules can be as complicated or simple as you want.<br /> To include your vassals, add yourself and include subs. You cannot "lock yourself out" using lists.))
+# creator: ((missing translation - original: created by %character%))
+# new: ((missing translation - original: create new list))
+# members: ((missing translation - original: Members of this list))
+ member:
+#  allowed: ((missing translation - original: allowed?))
+#  realm: ((missing translation - original: realm))
+#  character: ((missing translation - original: noble))
+#  subs: ((missing translation - original: with subs?))
+#  add: ((missing translation - original: add new member))
+#  del: ((missing translation - original: remove))
+#  none: ((missing translation - original: no members defined))
+#  inherited: ((missing translation - original: inherited rules:))
+# submit: ((missing translation - original: update list))
+# updated: ((missing translation - original: The list has been updated.))
+# searchinfo: ((missing translation - original: Enter parts of the name to get a list of matches for realms and characters. For realm names, your input will be matched against both the short and the formal name of the realm.))
+# changes: ((missing translation - original: You have unsaved changes.))
+ delete:
+#  submit: ((missing translation - original: delete this list))
+#  locked: ((missing translation - original: You cannot delete this list at this time, because:))
+#  used: ((missing translation - original: it is used in settlement permissions.))
+#  descendants: ((missing translation - original: other lists inherit from it.))
+#  done: ((missing translation - original: The list "%name%" has been deleted.))
+perm:
+# name: ((missing translation - original: permission))
+# value: ((missing translation - original: amount))
+# reserve: ((missing translation - original: reserve))
+# add: ((missing translation - original: add new permission))
+# del: ((missing translation - original: remove))
+# none: ((missing translation - original: no permissions defined))
+# listing: ((missing translation - original: grant to))
+# choose: ((missing translation - original: -- choose --))
+# visit: ((missing translation - original: enter settlement))
+# docks: ((missing translation - original: embark at docks))
+# resupply: ((missing translation - original: resupply))
+# mobilize: ((missing translation - original: mobilize troops))
+# construct: ((missing translation - original: manage constructions))
+# recruit: ((missing translation - original: manage recruitment))
+# trade: ((missing translation - original: manage trade))
+# positions: ((missing translation - original: manage positions))
+# expel: ((missing translation - original: expel estates))
+# diplomacy: ((missing translation - original: manage diplomacy))
+# laws: ((missing translation - original: change laws))
+ desc:
+#  title: ((missing translation - original: Description of permissions))
+#  visit: ((missing translation - original: Allow others to enter the settlement, precondition for most other actions as well as interactions with nobles inside.))
+#  resupply: ((missing translation - original: Allows others to resupply their soldiers at your settlement, up to a number of items per day that you can  limit with the <em>amount</em> value. This amount is shared by everyone on the list.))
+#  mobilize: ((missing translation - original: Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of  soldiers that can be mobilized per day is limited by the <em>amount</em> value, which is shared by everyone on the list.<br /> To prevent depletion of your defenses, you can also set a <em>reserve</em> value declaring that the reserve number of soldiers always has to remain in the settlement.))
+#  construct: ((missing translation - original: Allows others to initiate and manage construction projects in your settlement.<br /> To prevent excessive building, you can define a <em>reserve</em> value, which is the percentage of peasants that must remain in the workforce.))
+#  recruit: ((missing translation - original: Allows others to train new soldiers in your settlement.<br /> To prevent excessive recruitment, you can set the <em>amount</em> value, which limits the number of new soldiers sent into training per day. This value is shared by everyone on the list.))
+#  trade: ((missing translation - original: Allows others to initiate trades from your settlement towards others, i.e. outbound trade.<br /> Be very careful with this option as it cannot be limited, and someone trading all your food away can very quickly bring ruin to your settlement. Only grant this to the most trusted people.))
+#  docks: ((missing translation - original: Allow the use of the docks (if you have them) to embark on sea journeys.))
+#  positions: ((missing translation - original: Allows the management of non-rulership positions and their permissions within the realm. This is a very powerful position as the ability to grant or remove positions puts the holder above everyone, except the ruler(s).))
+#  expel: ((missing translation - original: Expelling estates from the realm will remove them from the realm hierarchy, together with their lords and knights, provided these are not linked to the realm through a different estate as well (i.e. to remove a person from the realm, make sure you expel all estates they are lord or knight of, in all sub-realms).))
+#  diplomacy: ((missing translation - original: Allows the negotiation and signing of treaties with other realms.))
+#  laws: ((missing translation - original: Grants editorial access to the realms laws and regulations publication.))
+law:
+ header:
+#  name: ((missing translation - original: name))
+#  desc: ((missing translation - original: description))
+#  current: ((missing translation - original: current law))
+ label:
+#  succession: ((missing translation - original: succession by heir))
+#  ruler_election: ((missing translation - original: ruler election method))
+#  estates: ((missing translation - original: estates inheritance))
+ desc:
+#  succession: ((missing translation - original: Determines whether the rulers successor can inherit the realm or not. If not, the rulers death or resignation will always trigger an election.))
+#  ruler_election: ((missing translation - original: How a new ruler is elected whenever such is necessary.))
+#  estates: ((missing translation - original: If estates can be inherited, or who they fall to in case of death of the lord.))
+ value:
+#  enabled: ((missing translation - original: enabled))
+#  disabled: ((missing translation - original: disabled))
+  name:
+#   banner: ((missing translation - original: by banner))
+#   spears: ((missing translation - original: by spears))
+#   swords: ((missing translation - original: by swords))
+#   land: ((missing translation - original: by land))
+#   heads: ((missing translation - original: by heads))
+#   inherit: ((missing translation - original: inherit))
+#   liege: ((missing translation - original: liege))
+#   ruler: ((missing translation - original: ruler))
+  desc:
+#   banner: ((missing translation - original: one vote per noble))
+#   spears: ((missing translation - original: one vote per warrior commanded))
+#   swords: ((missing translation - original: one vote per vassal))
+#   land: ((missing translation - original: one vote per estate))
+#   heads: ((missing translation - original: one vote per peasant ruled))
+#   inherit: ((missing translation - original: inherited by successor))
+#   liege: ((missing translation - original: fall to the lord))
+#   ruler: ((missing translation - original: fall to the ruler))
+claim:
+# title: ((missing translation - original: claims))
+# none: ((missing translation - original: no current claims))
+# add: ((missing translation - original: announce a claim))
+# cancel: ((missing translation - original: withdraw your claim))
+# cost: ((missing translation - original: Announcing a claim will send a herald to the settlement, removing him from your entourage.))
+# already: ((missing translation - original: You already hold a claim to this settlement.))
+# noherald: ((missing translation - original: You need a herald to announce a claim to a settlement.))
+# added: ((missing translation - original: Your claim has been added.))
+# cancelled: ((missing translation - original: You have withdrawn your claim.))
+# donthave: ((missing translation - original: You cannot withdraw a claim you do not hold.))

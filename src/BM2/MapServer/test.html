@@ -1,0 +1,79 @@
+<html>
+<head>
+   <script src="http://openlayers.org/api/OpenLayers.js"></script>
+</head>
+<body>
+
+<div id="map" style="width:1200px;height:800px"></div>
+
+<script language="javascript" type="text/javascript">
+var map, layer;
+var host = 'mightandfealty.com';
+
+init();
+
+function init(){
+        var mapBounds = new OpenLayers.Bounds(0, 0, 100000, 100000);
+
+        var options = {
+                maxExtent: mapBounds
+//                projection: new OpenLayers.Projection('EPSG:4326'),
+        };
+        map = new OpenLayers.Map('map', options);
+
+/*
+  baselayer = new OpenLayers.Layer.MapServer("Mapserver",
+       "http://va.mightandfealty.com/mapserver",
+       {map: 'basemap', layers: ['regions']}, {singleTile:true});
+  map.addLayer(baselayer);
+*/
+
+  var style = new OpenLayers.Style({
+    fillColor: '#ffff00',
+    strokeColor: '#0040ff',
+    strokeWidth: 5
+  });
+
+  layer = new OpenLayers.Layer.WMS("Base Map",
+      "http://"+host+"/tilecache",  {
+      layers: 'basic',
+      format: 'image/png'
+  });
+  map.addLayer(layer);
+  layer.setVisibility(true);
+
+  var heightmap = new OpenLayers.Layer.WMS("Heightmap",
+      "http://"+host+"/qgis",  {
+      layers: 'heightmap',
+      format: 'image/png'
+  });
+  map.addLayer(heightmap);
+  heightmap.setVisibility(true);
+
+  var humidity = new OpenLayers.Layer.WMS("Humidity",
+      "http://"+host+"/qgis",  {
+      layers: 'humiditymap',
+      format: 'image/png'
+  });
+  map.addLayer(humidity);
+  humidity.setVisibility(true);
+
+  var test = new OpenLayers.Layer.WMS("Test",
+      "http://"+host+"/qgis",  {
+      layers: 'biome,river,water,road,settlement,settlement_data,geofeature',
+      format: 'image/png'
+  });
+  map.addLayer(test);
+  test.setVisibility(true);
+
+
+  map.zoomToMaxExtent();
+  map.zoomIn(3);
+  var switcher = new OpenLayers.Control.LayerSwitcher();
+  map.addControl(switcher);
+
+}
+
+</script>
+</body>
+</html>

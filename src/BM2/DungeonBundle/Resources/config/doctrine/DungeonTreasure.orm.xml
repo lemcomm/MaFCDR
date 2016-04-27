@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonTreasure">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="nr" type="smallint"/>
+		<field name="value" type="smallint"/>
+		<field name="taken" type="smallint"/>
+		<field name="trap" type="smallint"/>
+		<field name="hidden" type="smallint"/>
+		<many-to-one field="level" target-entity="DungeonLevel" inversed-by="treasures"/>
+		<one-to-many field="targeted_by" target-entity="Dungeoneer" mapped-by="target_treasure"/>
+	</entity>
+</doctrine-mapping>

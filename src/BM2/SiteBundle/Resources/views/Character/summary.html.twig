@@ -1,0 +1,273 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="meta">
+	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
+</div>
+{% if character.actions is not empty %}
+<div class="queue secondary">
+	<h3>{{ "queue.title"|trans({}, "actions")|title }}</h3>
+	<ol>
+	{% for action in character.actions %}
+		{% if action.hidden == false %}
+			<li>{{ ("queue."~action.type)|trans({}, "actions") }}</li>
+		{% endif %}
+	{% endfor %}
+	</ol>
+	<hr />
+	<div class="center">
+		<a href="{{ path('bm2_site_queue_manage') }}">{{ 'queue.manage'|trans({}, "actions") }}</a>
+	</div>
+</div>
+{% endif %}
+
+<h2>{{ 'summary.title'|trans|title }}</h2>
+{% if character.prisoner %}
+	<p class="inactive">
+		<img src="{{ asset('bundles/bm2site/images/nicubunu_chain.svg') }}" alt="{{ 'prisoner'|trans }}" height="16px" align="bottom" />
+		{{ 'character.prisoner2'|trans({"%captor%":link(character.prisonerof)})|raw }}
+		<img src="{{ asset('bundles/bm2site/images/nicubunu_chain.svg') }}" alt="{{ 'prisoner'|trans }}" height="16px" align="bottom" />
+	</p>
+	{% if character.prisonerof.slumbering == true %}
+	<p>
+		{{ 'character.captorinactive'|trans({"%url%":path('bm2_site_character_escape')})|raw }}
+	</p>
+	{% endif %}
+{% endif %}
+{% if character.healthvalue < 0.9 %}
+	{{ ('character.health.'~character.healthstatus)|trans }}
+{% endif %}
+
+<h3>{{ 'summary.events'|trans|title }}</h3>
+{% set has_events = false %}
+<table class="eventlog">
+	<thead></thead>
+	<tbody>
+	{% for event in events %}
+		{% set has_events = true %}
+		<tr class="prio_{{ event.priority }}">
+			<td>{{ event.cycle|gametime('short') }}</td>
+			<td>{{ link(event.log) }}</td>
+			<td>{{ event|eventtranslate }}</td>
+		</td>
+	{% else %}
+		<tr><td colspan="3">{{ 'summary.nothing'|trans }}</td></tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% if has_events %}{# testing count or length would be better, but it doesn't work due to some code-fuckup I can't be arsed with debugging #}
+	<div id="fullread_wrapper">
+		<button id="fullread">{{ 'summary.fullread'|trans }}</button>
+		<button style="margin-left: 3em" id="fullread2">{{ 'summary.fullread2'|trans }}</button>
+	</div>
+{% endif %}
+
+{% if soldiers.hungry > 10 or soldiers.wounded > 10 or soldiers.lost > 10 %}
+	<h4>{{ 'summary.soldiers.title'|trans|title }}</h4>
+	<ul>
+	{% if soldiers.starving > 80 %}
+		<li>{{ 'summary.soldiers.starving.3'|trans }}</li>
+	{% elseif soldiers.starving > 50 %}
+		<li>{{ 'summary.soldiers.starving.2'|trans }}</li>
+	{% elseif soldiers.starving > 15 %}
+		<li>{{ 'summary.soldiers.starving.1'|trans }}</li>
+	{% endif %}
+
+	{% if soldiers.hungry > 80 %}
+		<li>{{ 'summary.soldiers.hungry.3'|trans }}</li>
+	{% elseif soldiers.hungry > 50 %}
+		<li>{{ 'summary.soldiers.hungry.2'|trans }}</li>
+	{% elseif soldiers.hungry > 15 %}
+		<li>{{ 'summary.soldiers.hungry.1'|trans }}</li>
+	{% endif %}
+
+	{% if soldiers.dead > soldiers.alive %}
+		<li>{{ 'summary.soldiers.dead.2'|trans }}</li>
+	{% elseif soldiers.dead > soldiers.alive * 0.333 %}
+		<li>{{ 'summary.soldiers.dead.1'|trans }}</li>
+	{% endif %}
+
+	{% if soldiers.wounded > 80 %}
+		<li>{{ 'summary.soldiers.wounded.3'|trans }}</li>
+	{% elseif soldiers.wounded > 50 %}
+		<li>{{ 'summary.soldiers.wounded.2'|trans }}</li>
+	{% elseif soldiers.wounded > 15 %}
+		<li>{{ 'summary.soldiers.wounded.1'|trans }}</li>
+	{% endif %}
+
+	{% if soldiers.lost > 80 %}
+		<li>{{ 'summary.soldiers.lost.3'|trans }}</li>
+	{% elseif soldiers.lost > 50 %}
+		<li>{{ 'summary.soldiers.lost.2'|trans }}</li>
+	{% elseif soldiers.lost > 15 %}
+		<li>{{ 'summary.soldiers.lost.1'|trans }}</li>
+	{% endif %}
+
+	{% if soldiers.distance > 20 %}
+		<li>{{ 'summary.soldiers.distance.3'|trans }}</li>
+	{% elseif soldiers.distance > 15 %}
+		<li>{{ 'summary.soldiers.distance.2'|trans }}</li>
+	{% elseif soldiers.distance > 10 %}
+		<li>{{ 'summary.soldiers.distance.1'|trans }}</li>
+	{% elseif soldiers.distance < 5 %}
+		<li>{{ 'summary.soldiers.distance.0'|trans }}</li>
+	{% endif %}
+
+	</ul>
+	<a href="{{ path('bm2_site_character_soldiers') }}">{{ 'viewdetails'|trans|title }}</a>
+{% endif %}
+
+<h3>{{ 'unread.title'|trans({}, "MsgBundle")|title }}</h3>
+{# add a simple form - hidden input field with id, button to click "mark as read" #}
+<ul>
+{% for meta in unread %}
+	<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+{% else %}
+	<li>{{ 'summary.nonew'|trans({}, "MsgBundle") }}</li>
+{% endfor %}
+</ul>
+
+{% if others %}
+<div id="nearbyothers">
+	<h3>{{ 'nearbyothers'|trans|title }} (old system) <button id="expandscouting">{{ 'expand'|trans }}</button></h3>
+	<ul>
+	{% for other in others %}
+		<li>{{ link(other.character) }} (
+			{% if other.character.prisonerof %}
+				{{ 'prisonerof'|trans({'%captor%':link(other.character.prisonerof)})|raw }}
+			{% else %}
+				{{ other.distance|distance(true) }}
+				{% if other.character.insidesettlement %}
+					, {{ 'inside'|trans({'%place%':link(other.character.insidesettlement)})|raw }}
+				{% endif %}
+			{% endif %}
+		)</li>
+	{% endfor %}
+	</ul>
+</div>
+{% endif %}
+
+{% if spottings %}
+<div id="nearbyothers">
+	<h3>{{ 'nearbyothers'|trans|title }} (new system)</h3>
+	<ul>
+	{% for spot in spottings %}
+		<li>{{ link(spot.target) }}
+			{% if spot.target.insidesettlement %}
+				, {{ 'inside'|trans({'%place%':link(spot.target.insidesettlement)})|raw }}
+			{% endif %}
+			{% if spot.target.prisonerof %}
+				, {{ 'prisonerof'|trans({'%captor%':link(spot.target.prisonerof)})|raw }}
+			{% endif %}
+			<small>(spotted by <ul class="shortlist" style="display:inline">
+			{% for event in spot.events %}
+				<li>
+				{% if event.spotter %}
+					{% if event.tower %}
+						your scouts from tower {{ event.tower.name }}
+					{% else %}
+						your scouts
+					{% endif %}
+				{% else %}
+					tower {{ event.tower.name }} near {{ link(event.tower.geodata.settlement) }}
+				{% endif %}
+				</li>
+			{% endfor %}
+			</ul>)</small>
+		</li>
+	{% endfor %}
+	</ul>
+</div>
+{% endif %}
+
+{% if character.prisoners is not empty %}
+	<h2>{{ 'prisoner'|transchoice(character.prisoners.count)|capitalize }}</h2>
+	<ul class="shortlist">
+		{% for prisoner in character.prisoners %}
+			<li>{{ link(prisoner) }}</li>
+		{% endfor %}
+	</ul>
+	<a href="{{ path('bm2_site_politics_prisoners') }}">{{ 'summary.manageprisoners'|trans }}</a>
+{% endif %}
+
+{% if battles %}
+	<h3>{{ 'nearbattles'|trans|title }}</h3>
+	<ul>
+	{% for battle in battles %}
+		<li>{{ link(battle.battle) }} ({{ battle.distance|distance(true) }}, {{ battle.direction|direction(true)|trans }})</li>
+	{% endfor %}
+	</ul>
+{% endif %}
+
+{% if character.dungeoneer and character.dungeoneer.isindungeon %}
+	<h3>{{ 'dungeon.title'|trans({}, "dungeons")|title }}</h3>
+	<p>{{ 'dungeon.blabla'|trans({}, "dungeons") }}</p>
+	<p><a href="{{ path('bm2_dungeon_dungeon_index') }}">{{ 'dungeon.link'|trans({}, "dungeons") }}</a></p>
+{% elseif character.dungeoneer and character.dungeoneer.party %}
+	<h3>{{ 'dungeon.title'|trans({}, "dungeons")|title }}</h3>
+	<p>{{ 'dungeon.withparty'|trans({"%url%":path("dungeons_party")}, "dungeons")|raw }}</p>
+{% elseif dungeons %}
+	<h3>{{ 'nearby'|trans({}, "dungeons")|title }}</h3>
+	{% set actionable = false %}
+	<ul>
+	{% for dungeon in dungeons %}
+		{% if dungeon.distance < 10000 %}
+			{% set dir = dungeon.direction|direction(true)|trans %}
+		{% else %}
+			{% set dir = dungeon.direction|direction(true, true)|trans %}
+		{% endif %}
+		{% set data = {
+				"%area%":('area.'~dungeon.dungeon.area)|trans({}, "dungeons"),
+				"%distance%":dungeon.distance|distance(true),
+				"%direction%":dir
+			}
+		%}
+		{% if dungeon.distance < spotrange %}
+			<li>
+				{{ 'spotted'|trans(data, "dungeons") }}
+				{% if dungeon.distance < actrange %}
+					{% set actionable = true %}
+				{% endif %}
+			</li>
+		{% elseif dungeon.distance < 10000 %} {# FIXME: hardcoded for now #}
+			<li>{{ 'close'|trans(data, "dungeons") }}</li>
+		{% else %}
+			<li>{{ 'far'|trans(data, "dungeons") }}</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+	{% if actionable %}
+		<a href="{{ path('bm2_dungeons') }}">{{ 'enter.link'|trans({}, "dungeons") }}</a>
+	{% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+$("#fullread").click(function(){
+	$.post("{{ path('bm2_site_events_fullread', {"which":"me"}) }}", function() {
+		$("#fullread").replaceWith('<div class="success">{{ "events.alldone2"|trans }}</div>');
+	});
+});
+$("#fullread2").click(function(){
+	$.post("{{ path('bm2_site_events_fullread', {"which":"all"}) }}", function() {
+		$("#fullread_wrapper").replaceWith('<div class="success">{{ "events.alldone"|trans }}</div>');
+	});
+});
+
+$("#expandscouting").click(function(){
+	$("#expandscouting").parent().after('<img src="{{ asset('bundles/bm2site/images/loader.png') }}"/>');
+	$("#expandscouting").remove();
+	$.get("{{ path('bm2_scouting') }}", function(data) {
+		$("#nearbyothers").replaceWith(data);
+		$("#scouting").tablesorter({
+			sortList: [[0,0]],
+		});
+	});
+});
+{% endblock %}

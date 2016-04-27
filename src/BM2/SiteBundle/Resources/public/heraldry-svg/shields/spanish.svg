@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="300px" height="350px" xmlns="http://www.w3.org/2000/svg">
+<g>
+<path d="M 1,1 L 1,200 C 1,275 75,349 150,349 C 225,349 299,275 299,200 L 299,1 z" id="spanish" />
+</g>
+</svg>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\BuildingType" table="types.buildingtype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="icon" type="string" nullable="true"/>
+		<field name="build_hours" type="integer"/>
+		<field name="min_population" type="integer"/>
+		<field name="auto_population" type="integer"/>
+		<field name="per_people" type="integer"/>
+		<field name="defenses" type="integer"/>
+		<field name="special_conditions" type="boolean"/>
+
+		<one-to-many field="resources" target-entity="BuildingResource" mapped-by="building_type"/>
+
+		<many-to-many field="requires" target-entity="BuildingType" inversed-by="enables">
+			<join-table name="types.building_requires">
+				<join-columns>
+					<join-column name="requirer_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="enabler_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+		<many-to-many field="enables" target-entity="BuildingType" mapped-by="requires"/>
+
+		<one-to-many field="provides_entourage" target-entity="EntourageType" mapped-by="provider"/>
+		<one-to-many field="provides_equipment" target-entity="EquipmentType" mapped-by="provider"/>
+		<one-to-many field="provides_training" target-entity="EquipmentType" mapped-by="trainer"/>
+
+		<one-to-many field="buildings" target-entity="Building" mapped-by="type" fetch="EXTRA_LAZY"/>
+	</entity>
+</doctrine-mapping>

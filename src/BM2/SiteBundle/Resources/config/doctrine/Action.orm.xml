@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Action">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="type" type="string"/>
+		<field name="started" type="datetime" nullable="true"/>
+		<field name="complete" type="datetime" nullable="true"/>
+		<field name="hidden" type="boolean"/>
+		<field name="hourly" type="boolean"/>
+		<field name="can_cancel" type="boolean"/>
+		<field name="block_travel" type="boolean"/>
+		<field name="priority" type="integer" nullable="true"/>
+		<field name="number_value" type="float" nullable="true"/>
+		<field name="string_value" type="string" nullable="true"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="actions"/>
+		<one-to-many field="assigned_entourage" target-entity="Entourage" mapped-by="action"/>
+
+		<many-to-one field="target_realm" target-entity="Realm"/>
+		<many-to-one field="target_settlement" target-entity="Settlement" inversed-by="related_actions"/>
+		<many-to-one field="target_character" target-entity="Character"/>
+		<many-to-one field="target_soldier" target-entity="Soldier"/>
+		<many-to-one field="target_entourage_type" target-entity="EntourageType"/>
+		<many-to-one field="target_equipment_type" target-entity="EquipmentType"/>
+		<many-to-one field="target_battlegroup" target-entity="BattleGroup" inversed-by="related_actions"/>
+		<many-to-one field="target_listing" target-entity="Listing"/>
+
+		<many-to-one field="supported_action" target-entity="Action" inversed-by="supporting_actions">
+			<join-column name="supported_action_id" referenced-column-name="id" on-delete="CASCADE" on-update="CASCADE"/>
+		</many-to-one>
+		<one-to-many field="supporting_actions" target-entity="Action" mapped-by="supported_action">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+		<many-to-one field="opposed_action" target-entity="Action" inversed-by="opposing_actions">
+			<join-column name="opposed_action_id" referenced-column-name="id" on-delete="CASCADE" on-update="CASCADE"/>
+		</many-to-one>
+		<one-to-many field="opposing_actions" target-entity="Action" mapped-by="opposed_action">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+
+		<lifecycle-callbacks>
+			<lifecycle-callback type="preRemove" method="onPreRemove" />
+		</lifecycle-callbacks>
+
+	</entity>
+</doctrine-mapping>

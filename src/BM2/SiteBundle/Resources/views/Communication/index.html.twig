@@ -1,0 +1,112 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>Read Messages</h2>
+<p>
+This system is currently experimental, so please do not send any relevant messages over it. People who do not participate in testing the new system will never see them.<br />
+Also, many parts of the system do not yet work at all, or only in parts. This early preview is for testing and gathering feedback. You can post your impressions on <a href="http://forum.mightandfealty.com/index.php/topic,3424.msg26869.html">this forum topic</a>.<br />
+On this page, all the buttons on individual messages don't show, and the game does not hide read/old messages at the moment.
+</p>
+
+{% if sealed > 0 %}
+	<div class="message_sealed">{{ sealed }} sealed messages</div>
+{% endif %}
+<div class="message_selector">
+<ul>
+	<li><button id="filtertoggle" class="message_button">toggle all</button></li>
+	<li><button id="filterhide" class="message_button">hide all</button></li>
+	<li><button id="filtershow" class="message_button">show all</button></li>
+	{% for tag in tags %}
+		<li><button class="message_button filter" data-tag="{{ tag }}">{{ tag }}</button></li>
+	{% endfor %}
+</ul>
+</div>
+
+{% for link in messages %}
+	{% include "BM2SiteBundle:Communication:message.html.twig" with {"message":link.message, "read":link.read} only %}
+{% endfor %}
+
+<div class="message_selector">
+	<ul>
+		<li><button id="mark_read_all" class="message_button">mark all as read for all my characters</button></li>
+	</ul>
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+$(".message_footer").hide();
+$(".message_container").hover(
+	function() { $(".message_footer", $(this)).show(); },
+	function() { $(".message_footer", $(this)).hide(); }
+);
+
+$("#mark_read_all").click(function(){
+	$.post("{{ path('bm2_msg_read', {"which":"all"}) }}", function() {
+		$("#mark_read_all").replaceWith('<div class="success">{{ "message.allread2"|trans }}</div>');
+	});
+});
+
+
+$("#filtertoggle").click(function(){
+	$("button.filter").click();
+});
+$("#filterhide").click(function(){
+	$("button.filter").removeClass("filter_show").addClass("filter_hide").data("filter", "hide");
+	filter();
+});
+$("#filtershow").click(function(){
+	$("button.filter").removeClass("filter_hide").addClass("filter_show").data("filter", "show");
+	filter();
+});
+
+$("button.filter").click(function(){
+	$(this).removeClass("filter_show").removeClass("filter_hide");
+	switch ($(this).data("filter")) {
+		case 'show':
+			$(this).data("filter", "default");
+			break;
+		case 'hide':
+			$(this).addClass("filter_show");
+			$(this).data("filter", "show");
+			break;
+		case 'default':
+		default:
+			$(this).addClass("filter_hide");
+			$(this).data("filter", "hide");
+	}
+	filter();
+});
+
+function filter() {
+	var shown = 0;
+	var hidden = 0;
+	$(".message_container").each(function(){
+		var show = false;
+		var hide = false;
+		var tags = $(this).data("tags");
+		for (var i=0; i < tags.length; i++) {
+			$("button.filter").each(function(){
+				var filter_tag = $(this).data("tag");
+				if (filter_tag == tags[i]) {
+					switch ($(this).data("filter")) {
+						case 'show':	show = true; break;
+						case 'hide':	hide = true; break;
+					}
+				}
+			});
+		}
+		if (show) {
+			$(this).show();
+			shown++;
+		} else if (hide) {
+			$(this).hide();
+			hidden++;
+		} else {
+			$(this).show();
+			shown++;
+		}
+	});
+	console.log(shown+" msgs shown, "+hidden+"msgs hidden");
+}
+{% endblock %}

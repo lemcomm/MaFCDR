@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\EquipmentType" table="types.equipmenttype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="icon" type="string" nullable="true"/>
+		<field name="type" type="string"/>
+		<field name="ranged" type="smallint"/>
+		<field name="melee" type="smallint"/>
+		<field name="defense" type="smallint"/>
+		<field name="training_required" type="smallint"/>
+		<field name="resupply_cost" type="smallint"/>
+
+		<many-to-one field="provider" target-entity="BuildingType" inversed-by="provides_equipment" />
+		<many-to-one field="trainer" target-entity="BuildingType" inversed-by="provides_training" />
+
+	</entity>
+</doctrine-mapping>

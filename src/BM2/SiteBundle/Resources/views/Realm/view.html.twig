@@ -1,0 +1,158 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="queue">
+	<h3>{{ 'realm.history'|trans({},"politics")|title }}</h3>
+	<dl>
+	{% for event in realm.log.events if event.public %}
+		<dt>{{ event.cycle|gametime('short') }}</dt>
+		<dd>{{ event|eventtranslate }}</dd>
+	{% endfor %}
+	</dl>
+</div>
+
+<div style="float:right">
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+	<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
+</div>
+<div id="sd_anchor" style="margin-right:1em;height:30em;float:right"></div>
+<div id="sd" class="hidden" title="dummy"></div>
+
+<h2>{{ realm.formalname }}</h2>
+
+<dl>
+	<dt>{{ 'realm.name'|trans({},"politics") }}</dt>
+	<dd>{{ realm.name }}</dd>
+	<dt>{{ 'realm.designation'|trans({},"politics") }}</dt>
+	<dd>{{ ('realm.type.'~realm.type)|trans({},"politics") }}</dd>
+	<dt>{{ 'realm.language'|trans({},"politics") }}</dt>
+	<dd>{% if realm.language %}{{ realm.language }}{% else %}-{% endif %}</dd>
+	<dt>{{ 'realm.ruler'|transchoice(realm.findrulers.count, {},"politics") }}</dt>
+	<dd><ul class="shortlist">
+		{% for ruler in realm.findrulers %}
+			<li>{{ link(ruler) }}</li>
+		{% else %}
+			<li>-</li>
+		{% endfor %}
+	</ul></dd>
+</dl>
+
+{% if realm.ultimate %}
+	{% if realm.inferiors is empty %}
+		<p>{{ 'status.realm.independent'|trans({"%name%":link(realm)}, "politics")|raw }}</p>
+	{% else %}
+		<p>{{ 'status.realm.ultimate'|trans({"%name%":link(realm)}, "politics")|raw }}</p>
+	{% endif %}
+{% else %}
+	{% if realm.superior.ultimate %}
+		<p>{{ 'status.realm.second'|trans({"%name%":link(realm), "%ultimate%":link(realm.superior)}, "politics")|raw }}</p>
+	{% else %}
+		<p>{{ 'status.realm.inferior'|trans({"%name%":link(realm), "%superior%":link(realm.superior), "%ultimate%":link(realm.findultimate)}, "politics")|raw }}</p>
+	{% endif %}
+{% endif %}
+
+{% if realm.inferiors is not empty %}
+	{{ 'status.realm.myinferiors'|trans({"%name%":link(realm)},"politics")|raw }}:
+	<ul class="shortlist">
+		{% for subrealm in realm.inferiors %}
+			<li{% if subrealm.active == false %} class="disabled"{% endif %}>{{ link(subrealm) }}</li>
+		{% endfor %}
+	</ul>
+{% endif %}
+
+{% if realm.superior or realm.inferiors is not empty %}
+	<p><a href="{{ path('bm2_site_realm_hierarchy', {'realm':realm.id}) }}">{{ 'viewdetails'|trans|title }}</a></p>
+{% endif %}
+
+<h3>{{ 'realm.details'|trans({},"politics")|title }}</h3>
+<dl>
+	<dt>{{ 'estate'|transchoice(estates) }}</dt>
+	<dd>{{ estates }}</dd>
+	<dt>{{ 'settlement.population'|trans }}</dt>
+	<dd>{{ population }}</dd>
+	<dt>{{ 'realm.size'|trans({},"politics") }}</dt>
+	<dd>{{ area|area }}</dd>
+	<dt>{{ 'soldier.noble'|transchoice(nobles) }}</dt>
+	<dd>{{ nobles }}</dd>
+</dl>
+
+<h3>{{ 'realm.positions.name'|trans({},"politics")|title }}</h3>
+<dl>
+	{% for position in realm.positions %}
+	<dt>
+		{% if position.ruler %}
+			{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
+		{% else %}
+			{{ position.name }}
+		{% endif %}
+	</dt>
+	<dd>
+		{{ position.description }}
+		<br />
+		{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+		<ul class="shortlist" style="display:inline">
+			{% for holder in position.holders %}
+				<li>{{ link(holder) }}</li>
+			{% else %}
+				<li>{{ 'nobody'|trans }}</li>
+			{% endfor %}
+		</ul>
+	</dd>
+	{% endfor %}
+</dl>
+
+<h3>{{ 'diplomacy.other'|trans({},"politics")|title }}</h3>
+<table>
+<thead>
+</thead>
+<tbody>
+{% for relation in diplomacy %}
+<tr>
+	<td>{{ link(relation.target) }}</td>
+	<td>
+		{% if relation.we %}
+			{{ ('diplomacy.status.'~relation.we)|trans({},"politics") }}
+		{% else %}
+			-
+		{% endif %}
+	</td>
+	<td>
+		{% if relation.they %}
+			{{ ('diplomacy.status.'~relation.they)|trans({},"politics") }}
+		{% else %}
+			-
+		{% endif %}
+	</td>
+	<td><a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+
+{% if realm.description is not null and realm.description != "" %}
+	<h3>{{ 'realm.description'|trans({},"politics")|title }}</h3>
+	{{ realm.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+	mapinit('map', false, false, true);
+	{% if realmpoly %}
+		{% if parentpoly and parentpoly != '' %}
+			addoutline('{{ parentpoly }}', '#cccc20', 1, '{{ realm.superior.colourhex}}', 0.3);
+		{% endif %}
+		{% for sub in subpolygons if sub != '' %}
+			addoutline('{{ sub }}', '#b01020', 1, '#000000', 0, 'dash');
+		{% endfor %}
+		addoutline('{{ realmpoly }}', '#cc2030', 2, '{{ realm.colourhex}}', 0.5);
+	{% endif %}
+{% endblock %}

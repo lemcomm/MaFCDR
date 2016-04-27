@@ -1,0 +1,233 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% macro member_row(member) %}
+{% spaceless %}
+{% if member.listing is defined %}<td style="display:none">{{ form_widget(member.listing) }}</td>{% endif %}
+<td style="display:none">{{ form_widget(member.priority) }}</td>
+<td align="center">{{ form_widget(member.allowed) }}</td>
+<td>{{ form_widget(member.targetRealm) }}</td>
+<td>{{ form_widget(member.targetCharacter) }}</td>
+<td align="center">{{ form_widget(member.includeSubs) }}</td>
+{% endspaceless %}
+{% endmacro %}
+
+{% macro inheritance(sublisting) %}
+	{% for member in sublisting.members %}
+		<tr class="inherited">
+			<td align="center"><input type="checkbox" checked="{{ member.allowed }}" disabled="true"/></td>
+			<td>{% if member.targetRealm %}{{ link(member.targetRealm) }}{% endif %}</td>
+			<td>{% if member.targetCharacter %}{{ link(member.targetCharacter) }}{% endif %}</td>
+			<td align="center"><input type="checkbox" checked="{{ member.includeSubs }}"  disabled="true"/></td>
+		</tr>
+	{% endfor %}
+	{% if sublisting.inheritFrom %}
+		{{ _self.inheritance(sublisting.inheritFrom) }}
+	{% endif %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block content %}
+<h2><a href="{{ path("bm2_lists") }}">{{ "lists.name"|trans({},"politics")|title }}</a></h2>
+<p>{{ "lists.description"|trans({"%listsurl%":path('bm2_lists')},"politics")|raw }}</p>
+
+{{ form_errors(form) }}
+<table style="display:none">
+<tr id="prototype">
+	{{ macros.member_row(form.members.vars.prototype) }}
+</tr>
+</table>
+<form class="wide" action="{{ path('bm2_site_politics_list', {'id':listing.id?listing.id:0}) }}" method="post" {{ form_enctype(form) }}>
+	{{ form_widget(form._token) }}
+	{{ form_row(form.name) }}
+	{{ form_row(form.public) }}
+	{% if form.inheritFrom is defined %}
+		{{ form_row(form.inheritFrom) }}
+	{% endif %}
+	<br />
+	
+	<h3>{{ 'lists.members'|trans({},"politics")|title }}</h3>
+	<table class="members">
+		<thead><tr>
+			<th>{{ 'lists.member.allowed'|trans({}, "politics") }}</th>
+			<th>{{ 'lists.member.realm'|trans({}, "politics") }}</th>
+			<th>{{ 'lists.member.character'|trans({}, "politics") }}</th>
+			<th>{{ 'lists.member.subs'|trans({}, "politics") }}</th>
+		</tr></thead>
+		<tbody>
+		{% for member in form.members %}
+			<tr>{{ macros.member_row(member) }}</tr>
+		{% endfor %}
+
+		</tbody>
+		{% if listing.inheritFrom %}
+			<tfoot>
+			<tr class="inherited"><th>{{ 'lists.member.inherited'|trans({},"politics") }}</th></tr>
+			{{ macros.inheritance(listing.inheritFrom) }}
+			</tfoot>
+		{% endif %}
+	</table>
+	
+	<br /><br />
+
+	<div id="changes" class="warning" style="display:none">
+		{{ "lists.changes"|trans({},"politics") }}
+	</div>
+	{# TODO: a part here that says "unsaved changes" and is unhidden when anything is changed #}
+
+	<button type="submit" name="submit">{{ "lists.submit"|trans({},"politics") }}</button>
+</form>
+
+<hr />
+
+{% if is_new == false %}
+<h3>{{ "lists.delete.submit"|trans({},"politics")|title }}</h3>
+{% if can_delete %}
+	{{ form(form_delete) }}
+{% else %}
+	{{ "lists.delete.locked"|trans({},"politics") }}
+	<ul>
+	{% for reason in locked_reasons %}
+		<li>{{ ("lists.delete."~reason)|trans({},"politics") }}</li>
+	{% endfor %}
+	</ul>
+{% endif %}
+
+{% if used_by and used_by is not empty %}
+<h3>{{ "lists.usedby"|trans({},"politics")|title }}</h3>
+<ul class="shortlist">
+	{% for settlement in used_by %}
+		<li>{{ link(settlement) }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block jquery %}
+
+{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+
+// Get the ul that holds the collection of tags
+var collectionHolder = $('table.members');
+
+// setup an "add a tag" link
+var newLink = $('<button type="button" class="add_tag_link">{{ 'lists.member.add'|trans({}, "politics") }}</button>');
+
+// add the "add a tag" anchor and li to the tags ul
+collectionHolder.after(newLink);
+
+// add a delete link to all of the existing tag form li elements
+collectionHolder.find('tbody').find('tr').not('.inherited').each(function() {
+	addActionButtons($(this));
+});
+
+// count the current form inputs we have (e.g. 2), use that as the new
+// index when inserting a new item (e.g. 2)
+collectionHolder.data('index', collectionHolder.find(':input').length);
+
+newLink.on('click', function(e) {
+	// add a new tag form (see next code block)
+	addTagForm(collectionHolder);
+});
+
+charselect(collectionHolder.find("input[id$='_targetCharacter']"));
+realmselect(collectionHolder.find("input[id$='_targetRealm']"));
+
+// renumber priorities
+var prio=0;
+$("input[id$='_priority']").each(function(){
+	$(this).val(prio);
+	prio++;
+});
+console.log("prio is "+prio);
+
+function addTagForm(collectionHolder) {
+	console.log("prio is "+prio);
+	// Get the data-prototype explained earlier
+	var prototype = $("#prototype").html();
+
+	// get the new index
+	var index = collectionHolder.data('index');
+
+	// Replace '__name__' in the prototype's HTML to
+	// instead be a number based on how many items we have
+	var newForm = prototype.replace(/__name__/g, index);
+
+	// increase the index with one for the next item
+	collectionHolder.data('index', index + 1);
+
+	// Display the form in the page in an li, before the "Add a tag" link li
+	var newRow = $('<tr class="changed"></tr>').append(newForm);
+	$('table.members tbody').append(newRow);
+
+	// add a delete link to the new form
+	addActionButtons(newRow);
+
+	// set priority
+	newRow.find('input[id$="_priority"]').val(prio);
+	console.log("setting value of ");
+	console.log(newRow.find('input[id$="_priority"]'));
+	console.log("to "+prio);
+	prio++;
+
+	// defaults
+	newRow.find("input[id$='_allowed']").prop('checked', true);
+	newRow.find("input[id$='_includeSubs']").prop('checked', false);
+	realmselect(newRow.find("input[id$='_targetRealm']"));
+	charselect(newRow.find("input[id$='_targetCharacter']"));
+
+	$("#changes").show();
+}
+
+$("input").change(function(){
+	$(this).closest('tr').addClass("changed");
+	$("#changes").show();
+});
+
+function addActionButtons(row) {
+	var field = $('<td></td>');
+	row.append(field);
+	var upButton = $('<button type="button">{{ 'queue.up'|trans({}, "actions") }}</button>');
+	field.append(upButton);
+	upButton.on('click', function(e) {
+		var me = $(this).closest('tr');
+		var other = me.prev();
+		switch_rows(me, other);
+	});
+
+	var downButton = $('<button type="button">{{ 'queue.down'|trans({}, "actions") }}</button>');
+	field.append(downButton);
+	downButton.on('click', function(e) {
+		var me = $(this).closest('tr');
+		var other = me.next();
+		switch_rows(other, me);
+	});
+
+	var removeButton = $('<button type="button">{{ 'lists.member.del'|trans({}, "politics") }}</button>');
+	field.append(removeButton);
+	removeButton.on('click', function(e) {
+		row.hide();
+		row.find("input[id$='_targetRealm']").val("");
+		row.find("input[id$='_targetCharacter']").val("");
+		$("#changes").show();
+	});
+
+}
+
+function switch_rows(first, second) {
+	if (first.length==0) return;
+	if (second.length==0) return;
+
+	var first_prio = first.find('input[id$="_priority"]').val();
+	var second_prio = second.find('input[id$="_priority"]').val();
+	first.after(second);
+	first.find('input[id$="_priority"]').val(second_prio);
+	second.find('input[id$="_priority"]').val(first_prio);
+
+	$("#changes").show();
+}
+
+{% endblock %}

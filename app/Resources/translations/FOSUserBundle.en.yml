@@ -1,0 +1,21 @@
+# Password resetting
+resetting:
+    email:
+        subject: Might & Fealty Password Reset
+        message: |
+            Hello %username%!
+
+            Someone, probably you, requested a password reset for your Might & Fealty account.
+            To reset your password - please visit %confirmationUrl%
+            To leave your password unchanged, simply ignore this message.
+
+            Regards,
+            the Might & Fealty server
+
+# Registration
+registration:
+    check_email: An email has been sent to %email%. It contains an activation link you must click to activate your account. If you do not receive it within the next few minutes, check your spam folder or use the "I forgot my password" link to get it re-send.
+
+security:
+    login:
+        reset: forgot your password?

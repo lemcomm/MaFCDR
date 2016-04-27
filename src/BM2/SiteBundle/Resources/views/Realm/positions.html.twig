@@ -1,0 +1,42 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'realm.positions.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+
+{% if positions is empty %}
+	{{ 'realm.positions.empty'|trans({},"politics") }}
+{% else %}
+	<dl class="long">
+		{% for position in positions %}
+		<dt>
+			{% if position.ruler %}
+				{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
+			{% else %}
+				{{ position.name }}
+			{% endif %}
+		</dt>
+		<dd>
+			{{ position.description }}
+			<hr />
+			{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+			<ul class="shortlist" style="display:inline">
+				{% for holder in position.holders %}
+					<li>{{ link(holder) }}</li>
+				{% else %}
+					<li>{{ 'nobody'|trans }}</li>
+				{% endfor %}
+			</ul><br />
+			{# TODO: make this a list or something #}
+			<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.manage'|trans({},"politics") }}</a>
+			-
+			<a href="{{ path('bm2_site_realm_officials', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.appoint'|trans({},"politics") }}</a>
+		</dd>
+		{% endfor %}
+	</dl>
+{% endif %}
+
+<br />
+<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':0}) }}">{{ 'realm.positions.new'|trans({},"politics") }}</a>
+
+
+{% endblock %}

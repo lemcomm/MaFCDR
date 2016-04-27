@@ -1,0 +1,35 @@
+<h3>{{ 'nearbyothers'|trans|title }}</h3>
+<table id="scouting">
+	<thead>
+		<tr>
+			<th>{{ 'character.name'|trans|title }}</th>
+			<th>{{ 'distance'|trans|title }}</th>
+			<th>{{ 'character.details.realm'|trans|title }}</th>
+			<th>{{ 'character.details.ultimate'|trans|title }}</th>
+			<th>{{ 'character.details.entourage'|trans|title }}</th>
+			<th>{{ 'character.details.soldiers'|trans|title }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for spot in spotted %}
+			<tr>
+				<td>{{ link(spot.char) }}</td>
+				<td align="right" data-text="{{ spot.distance }}">{{ spot.distance|distance(true) }}</td>
+				<td><ul class="shortlist">
+					{% for realm in spot.realms %}
+						{% if not realm.isultimate %}
+							<li>{{ link(realm) }}</li>
+						{% endif %}
+					{% endfor %}
+				</ul></td>
+				<td><ul class="shortlist">
+					{% for realm in spot.ultimates %}
+						<li>{{ link(realm) }}</li>
+					{% endfor %}
+				</ul></td>
+				<td align="right">{{ spot.entourage }}</td>
+				<td align="right">{{ spot.soldiers }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>

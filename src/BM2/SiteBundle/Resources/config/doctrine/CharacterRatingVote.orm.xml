@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\CharacterRatingVote">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="value" type="smallint"/>
+
+		<many-to-one field="rating" target-entity="CharacterRating" inversed-by="votes"/>
+		<many-to-one field="user" target-entity="User" inversed-by="rating_votes"/>
+	</entity>
+</doctrine-mapping>

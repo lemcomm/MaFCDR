@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\StatisticSettlement" table="statistic.settlement">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="cycle" type="integer"/>
+		<many-to-one field="settlement" target-entity="Settlement"/>
+		<many-to-one field="realm" target-entity="Realm"/>
+
+		<field name="population" type="integer"/>
+		<field name="thralls" type="integer"/>
+		<field name="militia" type="integer"/>
+		<field name="starvation" type="float"/>
+		<field name="war_fatigue" type="integer"/>
+
+	</entity>
+</doctrine-mapping>

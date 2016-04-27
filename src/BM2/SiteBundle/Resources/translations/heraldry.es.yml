@@ -1,0 +1,170 @@
+# Might & Fealty
+# text strings for the heraldry designer
+# Author: Tom Vogt <tom@mightandfealty.com>
+title:		Heráldica
+intro: >
+  Por unos pocos créditos, se puede diseñar un escudo heráldico único que se puede asignar a cualquiera de sus personajes. Una vez creada,
+  la cresta es suya para siempre, y se puede asignar a tantos personajes suyos como quiera.<br />
+  Una vez creada, la cresta está bloqueada y no puede ser creada por otra persona de nuevo, por lo que la cresta es siempre única para usted. Como crestas reales,
+  puede ser utilizada para identificar una familia o dinastía.
+
+list:
+ title:		Sus Crestas Existentes
+
+form:
+ choose:		-- escoger --
+design:
+ title:		Diseñador de Heráldica
+ link:		abrir el diseñador de heráldica
+ busy:		actualizar y validar su diseño...
+ update:		actualizar y revisar el diseño
+ random:		generar aleatoriamente
+ save:		salvar diseño
+ issues:		Hay uno o más problemas con su diseño:
+ ok:			Su diseño es válido.
+ saving:		crear y guardar su diseño, esto puede tomar un breve momento. Esta página se actualizará automáticamente cuando todo esté terminado.
+ saved:		Su nuevo diseño de bandera se ha guardado.
+ payment:	Guardar una cresta para el uso de su cuenta le restará %crestfee% créditos de su cuenta.
+ poor:		Por desgracia, sólo se han encontrado %amount% créditos en su cuenta.
+
+warning:
+ needname:	 Por favor, dar a su un nombre a su diseño.
+ needshield: Usted debe elegir un diseño del escudo.
+ nopatterncolour: Si usted tiene un patrón, también es necesario seleccionar un color para el patrón.
+ nochargecolour: Si usted tiene una figura, también es necesario seleccionar un color para la figura.
+ simple:		Su diseño es demasiado simple. Elija por lo menos un patrón o una figura, o ambos.
+ same:		Ambos de sus esmaltes comparten el mismo color, por lo que es difícil de detectar. Elija diferentes colores.
+ metals:		De acuerdo con la ley de la tintura, metales no deben ser colocados en los metales. Cambie uno de sus metales a un color.
+ colours:	De acuerdo con la ley de la tintura, los colores no se deben colocar en los colores. Cambie uno de sus colores a un metal.
+ taken:		Este diseño ya ha sido elegido por otra persona.
+
+
+badge: medalla
+french: francés
+german: alemán
+italian: italiano
+polish: polaco
+spanish: español
+swiss: suizo
+
+base: campaña
+bend: banda
+bend_sinister: barra
+chevron: cabrio
+chief: jefe
+cross: cruz
+fess: faja
+flaunches: flaunches
+gryon: gryon
+pale: palo
+per_bend: per banda
+per_bend_sinister: per banda barra
+per_chevron: jirón
+per_fess: per faja
+per_pale: per palo
+per_saltire: per aspa
+pile: pila
+quarterly: trimestral
+saltire: aspa
+shakefork: perla
+
+beasts: animales
+objects: objetos
+arm_cubit_habited: codo del brazo habitada
+arm_cubit_in_armor: codo del brazo con armadura
+arm_embowed_in_armor: brazo curvo en la armadura
+battle_axe: hacha de batalla
+bear_head_couped: cbz. de oso cerrada
+bear_head_erased: cbz. de oso borrada
+bear_head_muzzled: cbz. de oso amordazada
+bear_passant: oso caminando
+bear_rampant: oso rampante
+bear_sejant_erect: oso sentado recto
+bear_statant: oso de pie
+boar_head_couped: cbz. de jabalí cerrada
+boar_head_erased: cbz. de jabalí borrada
+boar_passant: jabalí caminando
+boar_rampant: jabalí rampante
+boar_statant: jabalí de pie
+broad_arrow: jabalí con flecha
+buck_head_couped: cbz. de macho cerrada
+caltrap: abrojo
+catamount_passant_guardant: puma pasando vigilando
+catamount_sejant_guardant: puma sentado vigilando
+catamount_sejant_guardant_erect: puma sentado recto vigilando
+chess_rook: torre de ajedrez
+chevalier_on_horseback: knight on horseback
+church_bell: campana de la iglesia
+coney: conejo
+crescent: luna creciente
+decrescent: luna decreciente
+dragon_passant: dragón pasando
+dragon_rampant: dragón rampante
+dragon_statant: dragón de pie
+eagle_displayed: águila en exposición
+falcon: halcón
+fluer_de_lis: flor del lirio
+fox_mask: máscara de zorro
+fox_passant: zorro pasando
+fox_sejant: zorro sentado
+hind: ciervo femenino
+horse_courant: caballo corriendo
+horse_passant: caballo pasando
+horse_rampant: caballo rampante
+javelin: jabalina
+lion_rampant: león rampante
+lynx_coward: lince espantado
+martlet_volant: martinete volando
+pegasus_passant: pegaso pasando
+reindeer: reno
+scymitar: cimitarra
+serpent_nowed: serpiente entrelazada
+squirrel_sejant_erect: ardilla sentado recto
+stag-atgaze: ciervo en la mirada
+stag-lodged: ciervo presentado
+stag-springing: ciervo saltando
+stag-statant: ciervo de pie
+stag-trippant: ciervo caminando
+stagshead-caboshed: cbz. de ciervo
+stagshead-erased: cbz. ciervo borrada
+sun_in_splendor: sol en su esplendor
+sword: espada
+unicorn_rampant: unicornio rampante
+winged_stag_rampant: ciervo alado rampante
+wolf_courant: lobo corriendo
+wolf_passant: lobo pasando
+wolf_rampant: lobo rampante
+wolf_salient: lobo alzado
+wolf_statant: lobo de pie
+
+label:
+ name:		nombre
+ shield:		escudo
+ shieldc:	color de escudo
+ pattern:	patrón
+ patternc:	color de patrón
+ charge:		figura
+ chargec:	color de figura
+ shading:	sombreado
+
+metal:			metales
+colours:			colores
+argent:			blanco plateado
+or:				dorado
+copper:			cobre
+azure:			azul brillante
+blue celeste:	azul celeste
+gules:			rojo
+murrey:			morado oscuro
+purpure:			morado
+sable:			negro
+sanguine:		rojo sangre
+tenne:			naranja-castaño
+vert:				verde
+cendree:			gris
+
+blazon:
+ and:			y
+ over:		sobre todo
+ a:			un
+ an:			una

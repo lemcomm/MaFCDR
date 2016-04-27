@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Heraldry">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+
+		<field name="shield" type="string"/>
+		<field name="shield_colour" type="string"/>
+		<field name="pattern" type="string" nullable="true"/>
+		<field name="pattern_colour" type="string" nullable="true"/>
+		<field name="charge" type="string" nullable="true"/>
+		<field name="charge_colour" type="string" nullable="true"/>
+		<field name="shading" type="boolean"/>
+
+		<field name="svg" type="text"/>
+
+		<many-to-one field="user" target-entity="User" inversed-by="crests"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Building">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="workers" type="float"/>
+		<field name="active" type="boolean"/>
+		<field name="focus" type="smallint"/>
+		<field name="condition" type="integer"/>
+		<field name="resupply" type="integer"/>
+		<field name="current_speed" type="float"/>
+
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="buildings"/>
+		<many-to-one field="type" target-entity="BuildingType" inversed-by="buildings"/>
+
+	</entity>
+</doctrine-mapping>

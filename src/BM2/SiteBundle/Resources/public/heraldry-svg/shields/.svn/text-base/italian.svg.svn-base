@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="300px" height="350px" xmlns="http://www.w3.org/2000/svg">
+<g>
+<path d="M 75,1 C 50,1 50,50 1,50 C 1,200 50,150 50,270 C 50,310 100,349 150,349 C 200,349 250,310 250,270 C 250,150 299,200 299,50 C 250,50 250,1 225,1 C 200,1 100,1 75,1 z" id="italian" />
+</g>
+</svg>

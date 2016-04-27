@@ -1,0 +1,48 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.sub.title'|trans|title }}</h2>
+<p>{{ 'account.sub.summary'|trans({"%myfee%":myfee, "%mylevel%":('account.level.'~app.user.accountlevel)|trans, "%until%":app.user.paiduntil|date('dateformat'|trans)})|raw }}</p>
+<p>{{ 'account.sub.description'|trans({"%url%":concepturl})|raw }}</p>
+
+<div id="leveldetails_wrapper">
+{% for i,level in levels if level.selectable %}
+<div id="level_{{ i }}" data-index="{{i}}" class="leveldetails{% if i == app.user.accountlevel %} active{% endif %}{% if level.fee - refund > app.user.credits %} disabled{% endif %}">
+	<h3>{{ ('account.level.'~i)|trans }}</h3>
+	<dl>
+		<dt>{{ 'account.level.limit'|trans}}</dt>
+		<dd>{{ level.characters }}</dd>
+		<dt>{{ 'account.level.cpm'|trans}}</dt>
+		<dd>{{ level.fee }}</dd>
+		<dt>{{ 'account.level.firstmonth'|trans}}</dt>
+		<dd>{{ level.fee - refund }}</dd>
+	</dl>
+</div>
+{% endfor %}
+</div>
+
+<form action="{{ path('bm2_site_payment_subscription') }}" method="post" {{ form_enctype(form) }}>
+	<span class="hidden">{{ form_widget(form) }}</span>
+	<button>{{ 'account.sub.submit'|trans }}</button>
+</form>
+
+<div class="footnote">
+	{{ 'account.sub.remaining'|trans({"%refund%":refund}) }}
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+$("input").click(function(){
+	var sel = $(this).val();
+	$(".leveldetails").removeClass("active");
+	$("#level_"+sel).addClass("active");
+});
+$(".leveldetails").not(".disabled").click(function(){
+	var sel = $(this).attr("data-index");
+	$(".leveldetails").removeClass("active");
+	$(this).addClass("active");
+	$("input[value="+sel+"]").prop("checked");
+	$('input[value="'+sel+'"]').prop("checked", true);
+})
+{% endblock %}

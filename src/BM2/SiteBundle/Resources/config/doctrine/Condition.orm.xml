@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Condition">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="type" type="string"/>
+		<field name="number_value" type="float" nullable="true"/>
+		<field name="string_value" type="string" nullable="true"/>
+
+		<many-to-one field="character" target-entity="Character"/>
+
+		<many-to-one field="target_realm" target-entity="Realm"/>
+		<many-to-one field="target_character" target-entity="Character"/>
+		<many-to-one field="target_trade" target-entity="Trade"/>
+	</entity>
+</doctrine-mapping>

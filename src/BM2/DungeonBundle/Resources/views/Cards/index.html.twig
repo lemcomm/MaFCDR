@@ -1,0 +1,20 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'cards.title'|trans({}, "dungeons")|title }}</h2>
+<p>{{ 'cards.intro'|trans({}, "dungeons")|raw }}</p>
+
+<ul class="cardslist">
+{% for card in cards %}
+	<li>
+		<h4>{{ ('card.'~card.type.name~'.title')|trans({},"dungeons") }}</h4>
+		<div class="cardsamount">{{ card.amount }}</div>
+		<div class="rarity {{ card.type.raretext }}">{{ ('rarity.'~card.type.raretext)|trans({},"dungeons") }}</div>
+		<p class="description">{{ ('card.'~card.type.name~'.text')|trans({},"dungeons")|raw }}</p>
+	</li>
+{% endfor %}
+</ul>
+
+<br class="clear" />
+
+{% endblock %}

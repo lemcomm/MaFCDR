@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\User" table="fos_user">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="display_name" type="string"/>
+		<field name="created" type="datetime"/>
+		<field name="new_chars_limit" type="smallint"/>
+		<field name="genome_set" type="string" length="26"/>
+		<field name="app_key" type="string"/>
+		<field name="language" type="string" nullable="true"/>
+		<field name="notifications" type="boolean"/>
+		<field name="newsletter" type="boolean"/>
+		<field name="artifacts_limit" type="smallint"/>
+
+		<field name="account_level" type="smallint"/>
+		<field name="vip_status" type="smallint"/>
+		<field name="paid_until" type="date"/>
+		<field name="credits" type="smallint"/>
+		<one-to-many field="payments" target-entity="UserPayment" mapped-by="user" />
+		<one-to-many field="credit_history" target-entity="CreditHistory" mapped-by="user" />
+		<field name="restricted" type="boolean"/>
+
+		<one-to-many field="characters" target-entity="Character" mapped-by="user" />
+		<one-to-one field="current_character" target-entity="Character"/>
+		<one-to-many field="ratings_given" target-entity="CharacterRating" mapped-by="given_by_user" fetch="EXTRA_LAZY"/>
+		<one-to-many field="rating_votes" target-entity="CharacterRatingVote" mapped-by="user" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="artifacts" target-entity="Artifact" mapped-by="creator" fetch="EXTRA_LAZY"/>
+		<one-to-many field="listings" target-entity="Listing" mapped-by="owner" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="crests" target-entity="Heraldry" mapped-by="user" />
+		<many-to-many field="cultures" target-entity="Culture" inversed-by="users">
+			<join-table name="user_culture">
+				<join-columns>
+					<join-column name="user_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="culture_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+
+		<unique-constraints>
+			<unique-constraint columns="username" />
+			<unique-constraint columns="email" />
+		</unique-constraints>
+	</entity>
+</doctrine-mapping>

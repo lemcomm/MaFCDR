@@ -1,0 +1,268 @@
+# Might & Fealty
+# text strings for economy and buildings
+# Author: Tom Vogt <tom@mightandfealty.com>
+req:        requires
+reqfor:     required for
+provides:   provides
+provider:   provided by %building%
+trainer:    trained at %building%
+trainingfor:   training for %item%
+bonus:      production bonus
+defbonus:   defensive bonus
+minpop:     %pop% minimum population to construct
+optpop:     full efficiency requires %pop%+ population
+
+feature:
+ name:         Name
+ none:         (none)
+ bridge:       Bridge
+ tower:        Watchtower
+ borderpost:   Border Post
+ signpost:     Sign Post
+ docks:        Docks
+
+building:
+ Academy: Academy
+ Alchemist: Alchemist
+ Archery Range: Archery Range
+ Archery School: Archery School
+ Armourer: Armorer
+ Armoury: Armory
+ Bank: Bank
+ Barracks: Barracks
+ Blacksmith: Blacksmith
+ Bladesmith: Bladesmith
+ Bowyer: Bowyer
+ Carpenter: Carpenter
+ Citadel: Citadel
+ City Hall: City Hall
+ Dirt Streets: Dirt Streets
+ Fairground: Fairground
+ Fishery: Fishery
+ Fortress: Fortress
+ Garrison: Garrison
+ Great Temple: Great Temple
+ Guardhouse: Guardhouse
+ Heavy Armourer: Heavy Armorer
+ Inn: Inn
+ Irrigation Ditches: Irrigation Ditches
+ Leather Tanner: Leather Tanner
+ Library: Library
+ Lumber Yard: Lumber Yard
+ Market: Market
+ Mason: Mason
+ Master Mason: Master Mason
+ Merchants Quarter: Merchants Quarter
+ Mill: Mill
+ Mine: Mine
+ Palisade: Palisade
+ Paved Streets: Paved Streets
+ Royal Mews: Royal Mews
+ Saddler: Saddler
+ School: School
+ Shrine: Shrine
+ Stables: Stables
+ Stone Castle: Stone Castle
+ Stone Towers: Stone Towers
+ Stone Wall: Stone Wall
+ Tailor: Tailor
+ Tavern: Tavern
+ Temple: Temple
+ Town Hall: Town Hall
+ Training Ground: Training Ground
+ University: University
+ Weaponsmith: Weaponsmith
+ Wood Castle: Wood Castle
+ Wood Towers: Wood Towers
+ Wood Wall: Wood Wall
+
+description:
+ bridge: >
+   Bridges provide the necessary means to cross rivers, even with an army or heavy equipment. They are often
+   important strategic points.
+ tower: >
+   The watch tower provides an elevated spot to watch for nearby activity. They do not serve as defensive
+   structures and are not fortified.<br />
+   Whenever a watchtower is within your spotting distance, you automatically gain access to the towers spotting
+   circle as your scouts use the tower to increase their own range.
+ borderpost: >
+   Sometimes just a border marker, such as a boundary stone, and sometimes a toll booth and small guard post,
+   no matter the appearance, the border post shows where one crosses into a different territory.<br />
+   Border posts are mostly used as meeting points of roads between settlements.
+ signpost: >
+   Marked with directions, signposts are usually posted near crossroads or intersections. It also works the
+   other way around: Where a signpost is, a trail and then a road often follows, as people follow the
+   direction signs.<br />
+   Sign posts are spots that you can use to build roads to and from.
+ docks: >
+   Landing and embarkation location for ships and naval travel.<br />
+   Docks allow travellers to switch between land and ocean travel.
+ Academy: >
+   Merging the knowledge of the university and the practical experience of the greatest military minds creates
+   the great academy, where new strategies and tactics are discovered.
+ Alchemist: >
+   Usually set at the edge of the settlement, the alchemist is always expected to blow up spectacularily, but
+   in reality most of his experiments are far less dangerous or spectacular. While much of the research done
+   here is of questionable quality, there is the occasional poison or interesting substance discovered.
+ Archery Range: >
+   A reserved spot with targets and some wood walls to catch misfires. A place for archers to train and learn
+   how to draw, aim and fire. Required if you want to train any kind of archers.
+ Archery School: >
+   The famous longbow requires more extensive training than other ranged weapons and the archery school offers
+   just that, adding more versatility and greater ranges to the archery range.
+ Armourer: >
+   A specialist creating all kinds of armor for your soldiers, the armorer combines cloth, leather and metal
+   into some serious protection.
+ Armoury: >
+   Also known as an arsenal, the armory is a storage location for weapons and armors where they can also be
+   kept in shape, organized and handed out quickly and efficiently. It is required for major fortifications.
+ Bank: >
+   A fortified building that can store valuables and treasures, as well as provide money-lending services and
+   even issue special bond notes that can be exchanged for gold at some other banks.
+ Barracks: >
+   Housing and living rooms for soldiers, allowing full-time professional soldiers.
+ Blacksmith: >
+   Forge, anvil and loud noises - the blacksmith turns metal into tools for sale and simple weapons to equip soldiers.
+ Bladesmith: >
+   Specialised on swords, this craftsman knows the ancient secrets of how to make a blade both light and strong,
+   and forge metal into swords.
+ Bowyer: >
+   A specialist craftsman who builds bows, crossbows and other personal ranged weapons.
+ Carpenter: >
+   Any kind of advanced wood workings require a carpenter, especially larger buildings whose frames are made of intricate
+   wooden constructions.
+ Citadel: >
+   The ultimate in defensive constructions, the citadel is the envy of kings. This brutally massive construction is all
+   but impenetrable and shrugs off even determined and well-equipped invaders.
+ City Hall: >
+   A large public building housing the administration as well as rooms for courts, archives and other essentials
+   of an organized city.
+ Dirt Streets: >
+   More solid and reliable streets within the settlement allow for better travel and are required for some heavy transports
+   and the buildings that require them.
+ Fairground: >
+   A larger and more permanent place of trade, the fairground allows for extensive trade and barter as well as special
+   events which bring in traders from far away places and through trade increase the local wealth.
+ Fishery: >
+   A small port, boat yard and processing facilities for sea fishing, adding more fish to the menu of the local inhabitants
+   as fishermen can go further out with better boats and better nets than they can build by themselves.<br />
+   Not the same as the dock feature, which is for military transport ships.
+ Fortress: >
+   Very few lords can afford the construction of one of these massive fortifications. A fortress is a reinforced stone
+   castle with additional defensive and offensive constructions. It can be held against all but the most overwhelming
+   attacks with but a modest force.
+ Garrison: >
+   A permanent heavy building to meet the needs of professional soldiers, from housing and gathering areas to weapons and
+   armor storage as well as a permanent reserve that can be called out at short notice.
+ Great Temple: >
+   The largest and most impressive religious building, often a place that the faithful travel to from far away. Provides
+   living room for its many priests and servants.
+ Guardhouse: >
+   A small house for the guards and soldiers of the settlement to gather and store their equipment, allowing for the
+   training and recruitment of some basic soldier types.
+ Heavy Armourer: >
+   A rare specialist for heavy armor who can work miracles with metal and create the rare and valuable plate armor, the
+   ultimate in personal armor.
+ Inn: >
+   The village inn or for towns and cities a collection of roadhouses, inns, brothels and similar places for travellers to 
+   rest and spend the night, this is where you can also find the odd talent to hire or meet shady figures at corner tables
+   who can provide you with mercenaries.
+ Irrigation Ditches: >
+   A series of small canals and ditches bringing water from a river deeper into the nearby farmland, which will improve
+   fertility, but at the cost of constant management tying up manpower that could work the fields otherwise. Not very
+   useful in already fertile regions, but very useful in less fertile ones.
+ Leather Tanner: >
+   A basic craftsman who turns animal hides into leather and simple leather products.
+ Library: >
+   Storage place for books and manuscripts of both holy and secular importance. <br />
+   This building is also required to create your own publications.
+ Lumber Yard: >
+   Central storage and processing area for woodcutting and forestry work. This improves the efficiency of woodcutting
+   in the area, resulting in higher wood production.
+ Market: >
+   A place for merchants and local farmers to buy and sell their products. A market improves trade and local economy,
+   giving a slight boost to wealth.
+ Mason: >
+   A basic craftsman, the mason is required for stoneworks and buildings made of stone.
+ Master Mason: >
+   The most advanced masonry techniques of the age are known only to a select few craftsman.
+ Merchants Quarter: >
+   An entire section of the settlement dedicated to trade and commerce, housing warehouses, an exchange, market places and
+   guild houses.
+ Mill: >
+   Wind or water mills turn grain into flour, enhancing local food production. The miller usually takes a part of the grain
+   for himself as payment, which makes him both well-off and disliked in most places. Nevertheless, the mill is a lot faster
+   and less manual work than manual grindstones.
+ Mine: >
+   Ore and other valuables need to be dug up and that is what the miners do inside a mine. Greatly enhancing metal production,
+   the mine improves the creation of metal-based goods, weapons and armors.<br />
+   <b>Important:</b> A mine only works in regions with metal deposits. If the metal production of the region is zero, building
+   a mine will not give any benefits.
+ Palisade: >
+   The most primitive type of fortification, a palisade is very useful against wild animals and roaming bandits, giving the
+   inhabitants of a settlement a feeling of security.
+ Paved Streets: >
+   Paving the streets of the settlement allows for better transport especially with wheeled vehicles. Even more importantly,
+   it makes travel more independent from weather, and is necessary for some large-scale constructions.
+ Royal Mews: >
+   Larger and with more experienced breeders and trainers than the regular stables, the royal mews allow for the
+   breeding and training of the rare and valuable war horses, massive steeds who won't panic in battle and will
+   under a capable rider trample down an enemy.
+ Saddler: >
+   A specialised craftsman who creates saddles, stirrups, bridles, reins and other gear for horses and carts.
+ School: >
+   A government-sponsored place of learning for a select few pupils will provide more educated people. It also
+   provides and distributes knowledge, making more refined work flows and buildings possible.
+ Shrine: >
+   A small place of religious worship, often maintained by the locals and without a full-time priest.
+ Stables: >
+   The stables house and breed horses for both work and battle.
+ Stone Castle: >
+   Stronger and larger than a wooden fortification, the stone castle is a powerful defensive structure that an enemy can neither
+   conquer nor destroy without siege weapons.
+ Stone Towers: >
+   Made of stone, these towers can be built higher than those made of wood, and are almost impossible to destroy except with the
+   strongest siege technology.
+ Stone Wall: >
+   A solid stone wall is the symbol of a well-defended settlement. It cannot be burnt down and can only be broken through
+   with massive siege engines.
+ Tailor: >
+   A basic craftsman providing the peasants with clothes of a higher quality than their home-made ones and also capable of
+   creating large batches of tabards and even simple cloth armor.
+ Tavern: >
+   The village pub, or a collection of taverns and pubs for a larger settlement, this is where the peasants meet for
+   their evening ale and some gossip.
+ Temple: >
+   A large place of religious worship, usually with one or more full-time priests as well as a number of helpers.
+ Town Hall: >
+   A public building with room for offices, a public court and other administrative necessities of a growing town.
+ Training Ground: >
+   A large open space equipped for soldier training, allowing the training and recruitment of some basic types of
+   soldiers.
+ University: >
+   The highest place of learning available to your people, the university is a center of knowledge and the foundation of some
+   of the most rare and valuable experts.
+ Weaponsmith: >
+   A specialised craftsman forging weapons. While most of his work is similar to the blacksmith, he also handles some woodwork
+   for handles and uses more advanced smelting and forging techniques to create weapons capable of withstanding a higher
+   amount of stress than the average farm tools require.
+ Wood Castle: >
+   An enclosed center of your military, with walls, towers, a guardhouse and fortified defenses. The wooden castle allows for
+   excellent defenses and will hold even against attackers with considerable superior numbers.
+ Wood Towers: >
+   Adding towers to the fortifications of a settlement allows the defenders to fight back and increases the spotting distance
+   of the settlement, allowing for early warnings.
+ Wood Wall: >
+   A more fortified and refined palisade, the wood wall encloses the settlement and provides it with basic defenses,
+   against wild animals, bandit and unorganized attackers.
+
+condition:
+ Mine:         Can only be built in mountains and hills with metal ore in the ground.
+ Stables:      Can only be built in grass- or scrublands.
+ Royal Mews:   Can only be built in grasslands.
+ Fortress:     Cannot be built in marshland.
+ Citadel:      Cannot be built in marshland.
+ Fishery:      Can only be built at the coast (both ocean and lakes).
+ Lumber Yard:  Can only be built in forests.
+ Irrigation Ditches: Can only be built near rivers, can't be built in mountains or marshes.
+ Archery Range:   Cannot be built in mountains and dense forests.

@@ -1,0 +1,77 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.culture.title'|trans|title }}</h2>
+<p>{{ 'account.culture.intro'|trans|raw }}</p>
+
+{% if bought is defined %}
+	<h3>{{ 'account.culture.bought.title'|transchoice(bought.count)|title }}</h3>
+	<p>{{ 'account.culture.bought.intro'|transchoice(bought.count, {"%amount%":bought.count})|raw }}</p>
+	<dl>
+		{% for culture in bought %}
+		<dt>{{ ('culture.'~culture.name)|trans }}</dt>
+		<dd>
+			{{ 'account.culture.bought.contains'|trans }}
+			<ul class="shortlist">
+				{% for inside in culture.contains %}
+					<li>
+						{% if inside == 'names' %}
+							{{ namescount[culture.id] }} 
+						{% endif %}
+						{{ ('account.culture.contents.'~inside)|trans }}
+					</li>
+				{% endfor %}
+			</ul>
+		</dd>
+		{% endfor %}
+	</dl>
+{% else %}
+	<h3>{{ 'account.culture.owned'|trans|title }}</h3>
+	<ul>
+	{% for culture in cultures %}
+		{% if culture.free or app.user.cultures.contains(culture) %}
+		<li>{{ ('culture.'~culture.name)|trans }}</li>
+		{% endif %}
+	{% endfor %}
+	</ul>
+
+	<h3>{{ 'account.culture.buyable'|trans|title }}</h3>
+	<p><small>{{ 'account.culture.upgrades'|trans|raw }}</small></p>
+	{{ form_start(form) }}
+	{{ form_errors(form) }}
+	<table>
+		<thead>
+			<tr>
+				<th>{{ 'account.culture.buy'|trans }}</th>	
+				<th>{{ 'account.culture.name'|trans }}</th>
+				<th>{{ 'account.culture.cost'|trans }}</th>
+				<th>{{ 'account.culture.contains'|trans }}</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for culture in form.culture %}
+			{% set id = culture.vars.name %}
+			<tr>
+				<td>{{ form_widget(culture) }}</td>
+				<td>{{ ('culture.'~cultures[id].name)|trans }}</td>
+				<td align="right">{{ cultures[id].cost }} {{ 'account.credits.name'|trans }}</td>
+				<td>
+					<ul class="shortlist">
+						{% for inside in cultures[id].contains %}
+							<li>
+								{% if inside == 'names' %}
+									{{ namescount[id] }} 
+								{% endif %}
+								{{ ('account.culture.contents.'~inside)|trans }}
+							</li>
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	{{ form_end(form) }}
+{% endif %}
+{% endblock %}
+

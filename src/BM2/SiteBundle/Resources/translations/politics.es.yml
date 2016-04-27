@@ -1,0 +1,602 @@
+# Might & Fealty
+# text strings for politics, diplomacy and relations
+# Author: Tom Vogt <tom@mightandfealty.com>
+status:
+ self:
+  landless:			Usted es un caballero sin tierra.
+  landless2:    Usted es un noble sin tierra.
+  independent:	Eres un señor independiente.
+  vassal:			  Usted es un vasallo de %liege%.
+  realm:        Usted es miembro de %realm%
+  ultimate:     Usted es un líder independiente, pero no ha formado un dominio todavía.
+  liege:        Soberano de:
+  position:     %position% de %realm%.
+ other:
+  landless:			%He% es un caballero sin tierra.
+  landless2:    %He% es un noble sin tierra.
+  independent:	%He% es un señor independiente.
+  vassal:			  %He% es un vasallo de %liege%.
+  realm:        %He% es miembro de %realm%
+  ultimate:     %He% es líder independiente, pero no ha formado un dominio todavía.
+  liege:        Soberano de:
+ realm:
+  independent:  %name% es un dominio independiente.
+  ultimate:     %name% es un dominio soberano (el superior de su jerarquía).
+  second:       %name% es parte de %ultimate%.
+  inferior:     %name% es parte de %superior% y ambos son partes de %ultimate%.
+  partof:       , parte de %superior%
+  myinferiors:  Dominios que son parte de %name%
+
+relations:
+ name:        Relaciones
+ intro: >
+   Gestione sus relaciones personales y feudales con otros personajes aquí.
+politics:
+ name:        Políticas
+ all:         todas las acciones políticas
+ intro: >
+   Gestione su dominio(s) y las relaciones políticas aquí.
+
+inheritance:  herencia
+
+elections:
+ name:          Elecciones
+ description:   Ver, votar o crear nuevas elecciones para %name%.
+ intro: >
+   Las elecciones permiten a los miembros de %realm% a votar por cargos o cualquier otro tema.<br />
+   Manipulación de las elecciones es realizada por los sacerdotes, y la creación de una nueva elección eliminará un sacerdote de su séquito.
+ intro2: >
+   Crea una nueva elección para %realm% rellenando el formulario. Tenga en cuenta que los detalles de las elecciones <b>no</b> se
+   podrán cambiar más adelante, la elección seguirá su curso tal y como usted ordene aquí.
+   Manipulación de las elecciones es realizada por los sacerdotes, y la creación de una nueva elección eliminará un sacerdote de su séquito.
+ nopriest:      Como no lleva un sacerdote con usted, no se puede crear una nueva elección.
+ current:       Elecciones Actuales
+ title:         título
+ complete:      completo
+ votes:         votos
+ new:           iniciar una nueva elección
+ desc:          texto descriptivo para esta elección
+ duration:
+  name:         duración (tiempo real)
+  empty:        -- elegir --
+  1:            un día
+  3:            3 días
+  5:            5 días
+  7:            una semana
+  10:           10 días
+ method:
+  name:         método de votación
+  empty:        -- elegir --
+  banner:       por bandera (por noble)
+  spears:       por lanzas (por soldado)
+  swords:       por espadas (por soldado ponderado)
+  land:         por tierra (por villas)
+  heads:        por cabeza (por campesino)
+ submit:        crear elección
+
+votes:
+ link:          emitir/ver votos
+ link2:         ver votos
+ name:          Elección "%name%"
+ intro:         Esta elección dentro %realm% finalizará en %complete%. Los votos se cuentan %type%.
+ intro2:        Esta elección dentro %realm% ha sido cerrada. Votos han sido contados %type%. El ganador fue %winner%.
+ intro3:        Esta elección dentro %realm% ha terminado sin un ganador.
+ forposition:   Esta elección le otorgará la posición de %position% al el ganador.
+ forposition2:  Esta elección ha concedido la posición de %position% al el ganador.
+ list:          Candidatos y Votos
+ howto:         Añadir tu voto en las filas y columnas correspondientes a continuación. Usted puede votar a favor o en contra de tantos candidatos como desee.
+ candidate:     candidato
+ pro:           a favor
+ contra:        oposición
+ sum:           recuento de votos
+ add:
+  name:         Añadir candidato
+  label:        nuevo candidato
+  procontra:    tu voto
+  submit:       añadir
+  done:         Su candidato ha sido añadido.
+ remove:        retirar voto
+ updated:       Tus votos han sido actualizados.
+
+oath:
+ view:          
+  name:         Árbol de Juramento
+  description:  Ver sus juramentos en una vista gráfica.
+  longdesc:     Ver el árbol de los juramentos que perteneces a. (puede tardar unos segundos para generar grandes árboles)
+ name:          Juramento de Lealtad
+ intro: >
+   Lealtad es lo que define el sistema de jerarquía y política. Exactamente lo que un juramento contiene - vasallaje, el servicio militar, 
+   parte de los ingresos de las villas, la protección, el honor y la política - es negociable entre señor y vasallo.<br />
+   Aquí usted puede hacer un juramento de lealtad a un personaje cercano, haciéndole su vasallo. Esto también hará
+   sus villas parte de su dominio.
+ hasvassals: >
+   Todos sus vasallos también se unirán al dominio que usted se une, como su juramento de lealtad que los ata a sus decisiones. Por supuesto,
+    si se actúa en contra de su voluntad, podrían dejarte después.
+ isruler: >
+   Esta acción significaría el fin de su dominio como una entidad independiente.
+ hasliege: >
+   Su juramento actual será automáticamente disuelto y su soberano actual, %liege%, será notificado.
+ current:   juramento actual
+ swear:     jurar un nuevo juramento
+ swearintro: Dado que un señor puede contener villas en o ser gobernante de diferentes dominios, algunos señores pueden aparecer varias veces con diferentes dominios, y usted tiene que elegir cuál de sus dominios para unirse.
+ nobody:    No hay nuevos señores elegibles dentro de su radio de acción.
+ newliege:	nueva soberano
+ choose:		-- elegir soberano --
+ norealm:   independiente
+ swearto:   jurar juramento a...
+ submit:		jurar juramento
+ fail:
+  vassal:	No se puede hacer un juramento a sus propios vasallos (o sus vasallos).
+ success:	Hacer un juramento de lealtad, ahora eres un vasallo de %newliege%.
+ unavailable: Nobles no disponibles como soberano
+ reason:
+  liege:   ya es tu soberano actual
+  vassal:  es su vasallo o un vasallo de uno de sus vasallos
+
+vassals:
+ view:          
+  name:         Vassals
+  description:  Review and manage your vassals
+  longdesc:     View details on your vassals and manage them, including disowning them.
+
+rogue:
+ name:        Ir Independiente
+ description: Declarar independencia.
+ longdesc:    También puede romper su juramento sin jurar uno nuevo, convirtiéndose en un señor o caballero independiente.
+ intro: >
+   Puede romper su juramento de fidelidad en cualquier momento, proclamando a sí mismo independiente, un pícaro noble sin dominio o señor.<br />
+   Este paso no es para tomarse a la ligera, ya que otros nobles pueden y van a cazar a usted ya sus vasallos por la fama y la fortuna. Al no tener señor también
+   significa no tener protección, tanto militar como políticamente. Asegúrese de que usted sepa lo que está haciendo.
+ submit:      convertirse en noble pícaro
+ success:     Ahora eres un noble independiente, o un pícaro como tus compañeros nobles considerarán que eres.
+
+successor:
+ name:      tu sucesor
+ you:       usted es sucesor de
+ intro: >
+   La muerte es parte de la vida, es importante que cada noble asigne un sucesor para sus títulos y posesiones.<br />
+   Usted puede seleccionar cualquier personaje cercano suficiente para intercambiar documentos o cualquiera de sus personajes (ya que se supone que son
+   de la misma familia o dinastía) independientemente de la distancia. Tenga en cuenta que sus villas, títulos, etc. dejarán su mando
+   si son heredados por un personaje que no le pertenece a usted.
+ set:       asignar un nuevo sucesor
+ choose:    -- elegir sucesor --
+ submit:    establecer sucesor
+ success:   Usted ha elegido a %successor% como su nuevo sucesor.
+ hasone:    Usted ya ha declarado a %successor% como su sucesor.
+
+partners:
+ name:      gestionar relaciones
+ intro: >
+   Las relaciones con otros personajes pueden tomar muchas formas. Sus detalles están sujetos a los juegos de rol, sólo la mecánica del juego
+   cubre aquellos aspectos que deciden las opciones disponibles.<br />
+   Sólo las relaciones públicas se mostrarán a otros jugadores. Sólo relaciones que incluyen sexo permiten a ambas partes crear
+   nuevos personajes con estos personajes como padres.
+ none:      Usted no tiene ninguna asociación (como un matrimonio o una liason) en este momento.
+ several:   Usted tiene varias asociaciones en este momento, siendo:
+ new:
+  name:     nuevas relaciones
+  intro:    Puede proponer una nueva relación con cualquier personaje cercano. Él o ella tendrá que aceptar para que la relación se vuelva activa.
+  none:     No hay socios potenciales dentro de su radio de acción.
+ old:
+  name:     relaciones existentes
+  intro:    Puede romper con los socios existentes o hacer algunos cambios unilaterales a la relación. Lo cual, por supuesto, podría dar lugar a que ellos la termien con usted.
+
+relation:
+ text:        Usted es %type% %partner%.
+ proposed:    %partner% ha propuesto una %type% a usted.
+ proposed2:   Usted a propuesto una %type% a %partner%.
+ engagement:  comprometido con
+ marriage:    casado con
+ liason:      tiene un romance con
+ proposedto:  propuesto
+ proposedyou: su propuesta
+ public:      público
+ secret:      secreto
+ with:        con
+ sex:         incluye sexo
+ nosex:       sin sexo
+ crest:       compartir heráldica
+
+ choice:
+  choose:     -- elegir --
+  type:       Proponer un
+  partner:    a
+  engagement: compromiso
+  marriage:   matrimonio
+  liason:     amorío
+  public:     Debería esta relación ser pública?
+  sex:        ¿Será una relación sexual, por lo que podría resultar en hijos?
+  submitnew:  proponer
+  nochange:   ningún cambio
+  makepublic: hacer público
+  refusesex:  rechazar el sexo
+  cancel:     disolver
+  withdraw:   retirar la propuesta
+  accept:     aceptar la propuesta
+  reject:     rechazar la propuesta
+  submitchange: ejecutar cambios
+  crest:      permitír pareja llevar su cresta?
+
+realm:
+ view:
+  name:         Árbol de Jerarquía
+  description:  Ver una vista gráfica de la jerarquía del dominio.
+  longdesc:     Ver el árbol de jerarquía que este dominio pertenece a. (puede tardar unos segundos para generar grandes árboles)
+ new:
+  name:         Crear Dominio
+  description:  Declárese soberano de su propio dominio.
+  longdesc:     Con vasallos bajo su mando, se puede declarar su propio dominio, uniéndose a la arena política y tal vez atraer aún más seguidores a su bandera.
+  intro: >
+   Con el poder suficiente y nadie por encima de ti, podría ser el momento de unirse a el escenario de la política mundial. Usted puede
+    anunciar las tierras bajo su control como un <i>dominio</i>, que es un término genérico para cualquier cosa,
+    desde una baronía hasta un imperio.<br />
+    De hecho, es totalmente decidido por usted lo que debe llamar a su nuevo dominio. La única cosa que le detiene de llamar a tres
+    villas un imperio es la burla de sus compañeros. La mezcla adecuada de ambición y modestia podría ser aconsejable.<br />
+    Usted puede cambiar la designación de su dominio más tarde.<br />
+  choose:     -- elegir --
+  submit:     anunciar nuevo dominio
+ manage:
+  name:         Gestionar Dominio
+  description:  Cambiar el nombre del territorio, el color y otros detalles.
+  longdesc:     Como usted es el soberano de %formalname%, usted tiene el control ejecutivo completo sobre su dominio. Sea o no su vasallos se mantendrán por ello si usted ejerce demasiado libremente, sin embargo, es una cuestión diferente.
+  intro: >
+    Como soberano de %name%, usted puede cambiar los datos del dominio en cualquier momento. Tenga en cuenta que siendo realistas, éstos
+    detalles casi nunca cambian, así que asegúrate de que tengas una buena razón.<br />
+    La designación de su dominio siempre debe mantenerse por encima de la de todos los dominios inferiores, lo que limita sus opciones.
+  submit:       anunciar cambios
+  success:      Detalles del dominio se han actualizado.
+ abdicate:
+  name:         Abdicar
+  description:  Renuncia a la soberania y entregarla a otra persona.
+  longdesc:     Si estás cansado de regir %formalname% o está siendo forzado a salir y quiere dejar amablemente, puede entregar las riendas a alguien más.
+  intro: >
+    Como el soberano de %name%, puede abdicar y entregarle las riendas a otra persona. Su sucesor tiene que estar cerca (a poca distancia a la acción).
+  done:         Ahora ha renunciado a la soberania de este dominio.
+ positions:
+  name:         Posiciones del Dominio
+  description:  Definir y nombrar/revocar posiciones.
+  longdesc:     Posiciones menores dentro de %name% se pueden definir, nombrar y revocar por ti.
+  empty:        El dominio no tiene ninguna posición definida en este momento.
+  new:          crear una nueva posición
+  holder:       poseedor|poseedores
+  manage:       gestionar posición
+  appoint:      nombrar oficiales
+ laws:
+  name:         Leyes del Dominio
+  description:  Declarar y cambiar las leyes del dominio.
+  longdesc:     Leyes y reglamentos para %name% pueden ser declarados por usted. La mayoría son opcionales, pero algunos son obligatorios y establecidos por defecto en la creación del dominio.
+
+ name:        nombre
+ formalname:  nombre formal
+ colour:      color oficial
+ language:    idioma oficial
+ description: descripción
+ designation: designación
+ ruler:       mandatario|mandatarios
+ history:     historia del dominio
+ details:     Detalles del Dominio
+ size:        tamaño
+ type:
+  1: baronía
+  2: condado
+  3: marca
+  4: ducado
+  5: principado
+  6: reino
+  7: imperio
+ title:
+  male:
+   0: caballero
+   1: barón
+   2: conde
+   3: marqués
+   4: duque
+   5: príncipe
+   6: rey
+   7: emperador
+  female:
+   0: dama
+   1: baronesa
+   2: condesa
+   3: marquesa
+   4: duquesa
+   5: princesa
+   6: reina
+   7: emperatriz
+
+position:
+ name:        título
+ description: descripción formal
+ elected:     es electo
+ inherit:     puede ser heredada
+ term:        longitud del término
+ terms:
+  0:          de por vida
+  365:        cuatro años (1 año en tiempo real)
+  90:         un año (3 meses de tiempo real)
+  30:         un trimestre (30 días en tiempo real)
+ permissions: permisos
+ submit:      editar posición
+ remove:      remover posición
+ help:
+  elected:    Marque esta casilla para esta posición es electo cada vez que está libre. Si deja la casilla sin marcar, la posición debe ser designado por el soberano o alguien con los permisos "Posiciones".
+  inherit:    Marque esta casilla para hacer que esta posición sea hereditaria. Si se marca, el poseedor de la oficina heredará la posición después de su muerte. Si no se controla, la posición será libre si su poseedor muere.
+ appoint:
+  intro: >
+    Puede nombrar y descargar oficiales de esta posición en cualquier momento y por cualquier razón. Ellos, por supuesto, ser informados acerca de su
+    decisión de inmediato y tan simple como la mecánica es, las consecuencias políticas de sus decisiones aquí podrían ser graves.
+  intro2: >
+    Usted puede nombrar a los nuevos gobernantes para este dominio en cualquier momento y por cualquier razón. <b>Tenga en cuenta que no se puede degradar de nuevo</b>.
+    Una vez que son nombrados, son tus iguales en poder y ninguno de los dos pueden quitar el otro de la posición.
+  candidates: candidatos
+  submit:     anunciar cambios
+  done:       Sus cambios se han completado y anunciado.
+  nodemoruler:  Los soberanos no pueden ser degradados, este cambio ha sido ignorado.
+
+diplomacy:
+ name:         Diplomacia
+ other:        relaciones diplomáticas a otros dominios
+ description:  Gestionar las dependencias del dominio y la diplomacia formal.
+ longdesc:     Relaciones de %formalname% a otros dominios determinan si %name% es independiente si o parte de un dominio más grande. También puede romper la lealtad o crear sub-dependencias del dominio aquí.
+ status:
+  name:      estado de relación
+  nemesis:   rival
+  war:       guerra
+  peace:     paz
+  friend:    amigo
+  ally:      aliado
+ report:
+  myrealm:     relaciones con %myrealm%
+  we:          los vemos como %status%
+  they:        nos ven como %status%
+  link:        ver detalles
+  between:     Las relaciones diplomáticas entre %myrealm% y %targetrealm%
+  position:    posición diplomática de %realm%
+  undefined:   (ninguna posición diplomática definida)
+ change:
+  name:         Cambiar Dominio
+  description: >
+    Usted puede tomar su dominio fuera de la esfera principal actual que pertenece y unirse a un
+    dominio diferente por cualquier razón política o personal que pueda tener.
+  intro: >
+    Mientras %realm% es parte de %parent% en este momento, puede cambiar su lealtad en cualquier momento.
+    Lo que sus compañeros nobles piensan de usted si usted hace esto constantemente, por otro lado...<br />
+    Para cambiar, un miembro de su nuevo dominio superior, debe estar cerca. También tenga en cuenta que sólo se puede unir con dominios
+    que una designación más alta que su propio dominio tiene, por lo que un reino, por ejemplo, no puede ser parte de una baronía.
+
+ join:
+  name:         Unirse a un Dominio
+  description: >
+    Someterse a otro dominio integra su dominio a su jerarquía, haciéndolo una parte del otro dominio.
+    Si bien esto significa renunciar a la soberanía, lo hace a usted y sus vasallos parte de algo más
+    grande y posiblemente más potente<br />
+    Su sumisión puede ser entregado a cualquier miembro del nuevo dominio superior.<br />
+    También tenga en cuenta que sólo se puede unir con dominios que una designación más alta
+    que su propio dominio tiene, por lo que un reino, por ejemplo, no puede ser parte de una baronía.
+  label:        Dominio para unirse
+  empty:        -- elegir --
+  via:          disponible a través de
+  submit:       unirse al dominio
+  noothers:     No hay dominios para unirse disponible.
+  unavailable:  Dominios que tienen nobles cercanos, pero no están disponibles para unirse, y las razones:
+  unavail:
+   type:        No tiene una designación más alta que su dominio.
+   current:     Es el dominio superior actual.
+  done:         Usted se ha rendido a la fuerza superior de %target% y ha hecho su %realm% una parte de ella.
+
+ subrealm:
+  name:         Crear Sub-Dominio
+  description:  Vuelva partes de su dominio en un sub-dominio más pequeño.
+  intro: >
+    Como el soberano de %name%, puede crear sub-dominios dentro de su dominio mediante el fraccionamiento de su villas entre su dominio principal y el nuevo dominio vasallo.<br />
+    Sólo tiene que seleccionar las villas que desee ser parte del nuevo sub-dominio a continuación, y luego darle un nombre,
+    una designación y elegir uno de los señores de el nuevo dominio como su regente.<br />
+    Su nuevo sub-dominio debe tener al menos una villa y al menos una de las villas debe permanecer con su dominio principal.
+  estates:      villas que se unirán al nuevo dominio
+  newname:      nombre del nuevo dominio
+  ruler:        regent del nuevo dominio
+  empty:        -- elegir --
+  submit:       crear dominio
+  invalid:
+   ruler:       tu regente seleccionado no es el señor de cualquiera de las villas que escogiste para unirse al nuevo sub-dominio.
+   size:        el sub-dominio debe contener al menos una villa, y al menos una debe permanecer con su dominio principal.
+  success:      Su sub-dominio ha sido creado.
+
+ break:
+  name:         Declarar Independencia
+  description:  Lleve a su dominio de nuevo a la independencia, declarándolo separado de su actual dominio superior.
+  intro: >
+    Mientras %realm% es parte de %parent% en este momento, siempre se puede declarar esa relación nula y hacer
+    %realm% una %type% independiente.<br />
+    Por supuesto, usted debe asegurarse de que usted está dispuesto a manejar las posibles repercusiones de este paso.
+  submit:       declarar independencia
+  done:         %realm% es ahora un %type% independiente.
+
+ relations:
+  name:         Relaciones
+  title:        Relaciones Diplomáticas
+  description: >
+    Las relaciones diplomáticas de su dominio definen la forma de ver y tratar a otros dominios y le da tanto a sus personas
+    y su información sobre el estado diplomático entre los dominios.
+  they:       dominio objetivo
+  ourstatus:  nuestro estatus
+  theirstatus: su estatus
+  new:
+   title:     Nueva Relación
+   intro:     Para crear una relación diplomática con un dominio, siga este enlace:
+   link:      crear una nueva relación
+  edit:       editar relación
+  target:     dominio objetivo
+  public:     declaración pública
+  internal:   declaración interna
+  delivered: declaración presentada
+  emptytarget: -- elegir dominio --
+  emptystatus: -- elegir resumen --
+  submit:     anunciar la nueva condición diplomática
+  success:    las relaciones diplomáticas se han actualizado y los cambios anunciados
+
+ prisoners:
+  name:         Prisioneros
+  description:  Gestionar, ejecutar o liberar a los prisioneros.
+  intro: >
+    Estos nobles están vinculados a usted como prisioneros. Ellos le acompañarán a cualquier lugar que vaya y tienen un muy limitado
+    conjunto de acciones que pueden hacer mientras están en prisión. Sin embargo, puede dejarlos en libertad en cualquier momento, o bien eliminarlos de la
+    carga de su cabeza. También puede transferir su prisioneros a otros nobles.
+  free:         liberar
+  execute:      ejecutar
+  assign:       asignar a...
+  choose:       -- elegir --
+  kill:
+   behead:      por decapitación
+   hang:        en la horca
+   burn:        prenderles fuego
+   quarter:     por descuartizamiento
+   impale:      a la espiga
+  done:
+   free:        %prisoner% ha sido puesto en libertad.
+   execute:     %prisoner% ha sido ejecutado.
+   assign:      %prisoner% ha sido asignado a %target%.
+
+lists:
+ name:          Administrar listas
+ description: >
+   Definición de listas de dominios y las personas que considere aliados, amigos, enemigos, etc. hace que sea más fácil hacer acciones específicas.<br />
+   Estas listas se utilizan para las acciones, los permisos del asentamiento y cualquier otro lugar donde desea alguna actividad para aplicar a algunos otros, pero no todos.<br />
+ intro: >
+   Definición de listas de dominios y las personas que considere aliados, amigos, enemigos, etc. hace que sea más fácil hacer acciones específicas.<br />
+   Estas listas se utilizan para las acciones, los permisos del asentamiento y cualquier otro lugar donde desea alguna actividad para aplicar a algunos otros,
+   pero no todos.<br />
+   Puede definir <i>dominios</i> o <i>nobles</i> como miembros de la lista, en ambos casos con o sin sirvientes (es decir, sub-dominios o vasallos).<br />
+   Permisos serán evaluadas en orden (de arriba hacia abajo) hasta que el primer encuentro, por lo que puede permitir algo a un
+   todo dominio, excepto una persona - o viceversa. Sus reglas pueden ser tan complicado o tan simple como usted quiere.<br />
+   Para incluir sus vasallos, agregue usted mismo e incluir 'sirvs'. No se puede "bloquear usted mismo", utilizando listas.
+ creator:   creado por %character%
+ new:           crear nueva lista
+ members:       Miembros de esta lista
+ member:
+  allowed:   permitido?
+  realm:     dominio
+  character: noble
+  subs:      con sirvs?
+  add:       añadir nuevo miembro
+  del:       remover
+  none:      ningún miembro definidos
+  inherited: reglas heredadas:
+ submit:     actualizar la lista
+ updated:    La lista se ha actualizado.
+ searchinfo: >
+   Introduzca partes del nombre para obtener una lista de coincidencias en dominios y personajes. Para nombres de dominio,
+   su entrada será igualada con el nombre corto y formal del dominio.
+ changes:     Usted tiene cambios no guardados.
+ delete:
+  submit:       Eliminar esta lista
+  locked:       No se puede eliminar esta lista en este momento, debido a que:
+  used:         se utiliza en los permisos de asentamiento.
+  descendants:  otras listas heredan de ella.
+  done:         La lista "%name%" ha sido eliminado.
+
+perm:
+ name:      permiso
+ value:     cantidad
+ reserve:   reserva
+ add:       añadir nuevo permiso
+ del:       remover
+ none:      no hay permisos definidos
+ listing:   conceder a
+ choose:    -- elegir --
+ visit:     entrar al asentamiento
+ docks:     embarcarse en los muelles
+ resupply:  reabastecimiento
+ mobilize:  movilizar tropas
+ construct: gestionar construcciones
+ recruit:   gestionar el reclutamiento
+ trade:     gestionar el comercio
+ positions: gestionar las posiciones
+ expel:     expulsar villas
+ diplomacy: gestionar la diplomacia
+ laws:      cambio de leyes
+ desc:
+  title:    Descripción de permisos
+  visit: >
+    Permitir que otras personas entren en el asentamiento, condición previa para la mayoría de las demás acciones, así como las interacciones con los nobles en el interior.
+  resupply: >
+    Permite a otros a reabastecer a sus soldados en su asentamiento, hasta un número de objetos por día que se puede
+    limitar con el <em>cantidad</em>. Esta cantidad es compartida por todos en la lista.
+  mobilize: >
+    Permite a otros a movilizar tropas de su milicia, es decir reclutarlos como a sus propios soldados. El número de
+    soldados que se pueden movilizar por día está limitado por el <em>cantidad</em>, que es compartida por todos en la lista.<br />
+    Para evitar el agotamiento de sus defensas, también puede establecer la <em>Reserva</em> 
+     para declarar el número de reservas de soldados siempre tiene que permanecer en el asentamiento.
+  construct: >
+    Permite a otros para iniciar y gestionar proyectos de construcción en el asentamiento.<br />
+    Para evitar la construcción excesiva, se puede definir un <em>Reserva</em> que es el porcentaje de campesinos
+     que deben permanecer en la fuerza laboral.
+  recruit: >
+    Permite a otros para entrenar nuevos soldados en su asentamiento.<br />
+    Para prevenir el reclutamiento excesivo, se puede establecer el <em>cantidad</em> lo que limita el número de
+    nuevos soldados enviados al entrenamiento por día. Este valor es compartido por todos en la lista.
+  trade: >
+    Permite a otros a iniciar las operaciones desde su asentamiento hacia los demás, es decir, el comercio de salida.<br />
+    Tenga mucho cuidado con esta opción, ya que no puede ser limitado, y alguien la negociación todos los alimentos de distancia
+    puede traer muy rápidamente ruina su asentamiento. Sólo conceder esto a la gente de más confianza.
+  docks: >
+    Permitir el uso de los muelles (si los tiene) para embarcarse en viajes por mar.
+  positions: >
+    Permite la gestión de posiciones menores y sus permisos dentro del reino. Esta es una posición muy poderosa como la capacidad
+    de conceder o revocar las  posiciones pone el poseedor por encima de todos, a excepción de el soberano (s).
+  expel: >
+    La expulsión de villas del reino se eliminarán de la jerarquía del dominio, junto con sus señores y caballeros, proporcionadas
+    estos no están vinculados a la esfera a través de una villa diferente, así (es decir, para eliminar a una persona del dominio, asegúrese
+    expulsar todos las villas que sean señor o caballero de, en todos los sub-dominios).
+  diplomacy: >
+    Permite la negociación y firma de tratados con otros dominios.
+  laws: >
+    Otorga acceso editorial a las leyes del dominio y publicaciones de regulación.
+
+law:
+ header:
+  name:     nombre
+  desc:     descripción
+  current:  ley actual
+ label:
+  succession:       sucesión por el heredero
+  ruler_election:   método de elección de soberano
+  estates:          herencia de villas
+ desc:
+  succession:       Determina si el sucesor del soberano puede heredar el dominio o no. Si no, la muerte o renuncia del soberano siempre activarán una elección.
+  ruler_election:   Un nuevo soberano es elegido cada vez que tal es necesario.
+  estates:          Si las villas se pueden heredar, o quién se encargará en el caso de la muerte del señor.
+# these are defined in the RealmManager
+ value:
+  enabled:    habilitado
+  disabled:   desactivado
+  name:
+   banner:    por bandera
+   spears:    por lanzas
+   swords:    por espadas
+   land:      por tierra
+   heads:     por cabezas
+   inherit:   heredar
+   liege:     soberano
+   ruler:     señor
+  desc: 
+   banner:    un voto por noble
+   spears:    un voto por cada guerrero comandado
+   swords:    un voto por vasallo
+   land:      un voto por villa
+   heads:     un voto por cada campesino gobernado
+   inherit:   heredado por el sucesor
+   liege:     caer al soberano
+   ruler:     caer al señor
+
+claim:
+ title:       reclamaciones
+ none:        ninguna reclamación corrientes
+ add:         anunciar una reclamación
+ cancel:      retirar su reclamo
+ cost:        Al anunciar un reclamo enviará un heraldo al asentamiento, sacándolo de su séquito.
+ already:     Usted ya tiene una reclamación en este asentamiento.
+ noherald:    Necesitas un heraldo para anunciar una reclamación en los asentamientos.
+ added:       Su reclamo ha sido añadido.
+ cancelled:   Usted ha retirado su reclamación.
+ donthave:    Usted no puede retirar un reclamo que no tiene.

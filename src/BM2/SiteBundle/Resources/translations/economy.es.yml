@@ -1,0 +1,237 @@
+# Might & Fealty
+# text strings for economy and buildings
+# Author: Tom Vogt <tom@mightandfealty.com>
+req:        requiere
+reqfor:     requerido para
+provides:   provee
+provider:   provisto por %building%
+trainer:    entrenado en %building%
+trainingfor:   entrenamiento para %item%
+bonus:      bono de producción
+defbonus:   bono de defensa
+
+feature:
+ name:         nombre
+ none:         (nada)
+ bridge:       Puente
+ tower:        Atalaya
+ borderpost:   Puesto Fronterizo
+ signpost:     Letrero
+ docks:        Muelle
+
+building:
+ Academy: Academia
+ Alchemist: Alquimista
+ Archery Range: Campo de Arquería
+ Archery School: Escuela de Arquería
+ Armourer: Armero
+ Armoury: Armería
+ Bank: Bank
+ Barracks: Barracks
+ Blacksmith: Blacksmith
+ Bowyer: Bowyer
+ Carpenter: Carpenter
+ Citadel: Citadel
+ City Hall: City Hall
+ Dirt Streets: Dirt Streets
+ Fairground: Fairground
+ Fortress: Fortress
+ Garrison: Garrison
+ Great Temple: Great Temple
+ Guardhouse: Guardhouse
+ Heavy Armourer: Heavy Armorer
+ Inn: Posada
+ Leather Tanner: Curtidor de Cuero
+ Library: Biblioteca
+ Market: Mercado
+ Mason: Albañil
+ Master Mason: Maestro Albañil
+ Merchants Quarter: Distrito de Comerciantes
+ Mill: Molino
+ Mine: Mina
+ Palisade: Empalizada
+ Paved Streets: Calles Asfaltadas
+ Royal Mews: Caballeriza Real
+ Saddler: Talabartero
+ School: Escuela
+ Shrine: Santuario
+ Stables: Establos
+ Stone Castle: Castillo de Piedra
+ Stone Towers: Torres de Piedra
+ Stone Wall: Muro de Piedra
+ Tailor: Sastrería
+ Tavern: Taberna
+ Temple: Templo
+ Town Hall: Ayuntamiento
+ Training Ground: Campo de Entrenamiento
+ University: Universidad
+ Weaponsmith: Herrero
+ Wood Castle: Castillo de Madera
+ Wood Towers: Torres de Madera
+ Wood Wall: Muro de Madera
+
+description:
+ bridge: >
+   Puentes proporcionan los medios necesarios para cruzar ríos, incluso con un ejército o equipo pesado.
+   A menudo son importantes puntos estratégicos.
+ tower: >
+   La torre de vigilancia proporciona un lugar elevado para observar las actividades cercanas.
+   No sirven como estructuras defensivas y no están fortificados.<br />
+   Cada vez que una torre de vigilancia está dentro de su area de detección, ganas automáticamente el acceso al circulo
+   de detección de la torre gracias a sus exploradores que utilizan la torre para aumentar su propia gama de detección.
+ borderpost: >
+   A veces, sólo un marcador de la frontera, como una línea de límite, y a veces una cabina de peaje y un pequeño puesto
+   de guardia no importa la apariencia, el puesto fronterizo de muestra donde se cruza a un territorio diferente.<br />
+   Puestos fronterizos se utilizan sobre todo como puntos de encuentro de las calzadas entre los asentamientos.
+ signpost: >
+   Marcado con las direcciones, postes indicadores se fijan generalmente cerca de los cruces y las intersecciones.
+   También funciona al revés: Cuando una señal es un sendero y luego un camino a menudo sigue, como la gente sigue
+   las señales de dirección.<br />
+   Puestos de señal son lugares que se pueden utilizar para construir caminos hacia y desde.
+ docks: >
+   Ubicación de desembarco y embarque para barcos y viajes navales.<br />
+   Los muelles permiten a los viajeros para cambiar entre la tierra y los viajes oceánicos.
+ Academy: >
+   La fusión de los conocimientos de la universidad y la experiencia práctica de las mentes
+   más brillantes militares crea la gran academia donde se descubren nuevas estrategias y tácticas.
+ Alchemist: >
+   Por lo general fijado en el borde del asentamiento, siempre se espera que el alquimista haga estallar espectacularmente,
+   pero en realidad la mayor parte de sus experimentos son mucho menos peligrosos o espectaculares. Si bien gran parte de la
+   investigación llevada a cabo aquí es de dudosa calidad, está el veneno ocasional o sustancia interesante descubierto.
+ Archery Range: >
+   Un lugar reservado con objetivos y algunas paredes de madera para coger tiros fallados. Un lugar para
+   los arqueros para entrenar y aprender a usár in arco. Requerido si quieres entrenar cualquier tipo de arqueros.
+ Archery School: >
+   El famoso arco largo requiere una formación más amplia que otras armas de largo alcance y la escuela de tiro
+   con arco ofrece justo eso añadiendo más versatilidad y mayores rangos para las tiro con arco.
+ Armourer: >
+   Un especialista en la creación de todo tipo de armas para sus soldados,
+   el armero combina tela, cuero y metal para una cierta protección.
+ Armoury: >
+   El arsenal es un lugar de almacenamiento para armas y armaduras, donde se pueden mantener en forma.
+   Organizados y entregados de manera rápida y eficiente, es requerido para grandes fortificaciones.
+ Bank: >
+   Un edificio fortificado que puede almacenar objetos de valor y tesoros, así como ofrecer servicios de préstamo
+   de dinero e incluso emitir billetes de bonos especiales que pueden ser canjeados por oro en algunos otros bancos.
+ Barracks: >
+   Vivienda y salas de estar para los soldados, lo que permite soldados profesionales a tiempo completo.
+ Blacksmith: >
+   Forja, yunques y ruidos fuertes - el herrero vuelve metal en herramientas para la venta y armas sencillas para equipar a los soldados.
+ Bowyer: >
+   Un artesano especialista que construye arcos, ballestas y otras armas a distancia personales.
+ Carpenter: >
+   Cualquier tipo de trabajos de madera avanzados requiere un carpintero, especialmente los
+   edificios más grandes cuyos marcos están hechos de construcciones de madera intrincados.
+ Citadel: >
+   El último en construcciones defensivas, la ciudadela es la envidia de los reyes. Esta construcción brutalmente
+   masiva es casi impenetrable y hace caso omiso de los invasores ya determinada y bien equipadas.
+ City Hall: >
+   Un gran edificio público que alberga la administración, así como salas para tribunales,
+   archivos y otros elementos esenciales de una ciudad organizada.
+ Dirt Streets: >
+   Calles más sólidas y confiables dentro del asentamiento permiten un mejor recorrido y así como eventos
+   especiales que traen los comerciantes de lugares lejanos a través del comercio y aumenta la riqueza local.
+ Fairground: >
+   Un lugar más grande y más permanente de comercio, el recinto ferial permite un amplio comercio y el trueque,
+   events which bring in traders from far away places and through trade increase the local wealth.
+ Fortress: >
+   Muy pocos señores pueden permitirse la construcción de una de estas fortificaciones masivas.
+   Una fortaleza es un castillo de piedra reforzado con construcciones defensivas y ofensivas adicionales.
+   Se puede mantener contra todos, pero los ataques más contundentes con una fuerza modesta.
+ Garrison: >
+   Un edificio pesado permanente para satisfacer las necesidades de los soldados profesionales,
+   procedentes de zonas de vivienda y la recolección a armas y armaduras de almacenamiento.
+ Great Temple: >
+   El edificio religioso más grande e impresionante, a menudo un lugar que los fieles viajan desde muy lejos.
+   Proporciona salón para sus numerosos sacerdotes y sirvientes.
+ Guardhouse: >
+   Una pequeña casa para los guardias y soldados del asentamiento para recolectar y almacenar sus equipos,
+   lo que permite la formación y contratación de algunos tipos de soldado básicos.
+ Heavy Armorer: >
+   Una raro especialista de armadura pesada que puede hacer milagros con el metal
+   y crear la armadura rara y valiosa de placas, lo último en la armadura personal.
+ Inn: >
+   La posada del pueblo es una colección de paradores, hostales, prostíbulos y lugares similares para los viajeros
+   para descansar y pasar la noche, aquí es donde también se puede contratar o conocer a figuras sombrías en mesas de esquina
+   que pueden proporcionar mercenarios.
+ Leather Tanner: >
+   Un artesano básico que vuelve pieles de animales a cuero y productos simples.
+ Library: >
+   Lugar de almacenamiento para libros y manuscritos de importancia santo y secular. <br />
+   También se requiere este edificio para crear sus propias publicaciones.
+ Market: >
+   Un lugar para los comerciantes y los agricultores locales para comprar y vender sus productos.
+   El mercado mejora el comercio y la economía local, dando un ligero impulso a la riqueza.
+ Mason: >
+   Un artesano básico, el albañil se requiere para mamposterías y edificios de piedra.
+ Master Mason: >
+   Las técnicas de albañilería más avanzadas de la época se conocen sólo a unos pocos elegidos artesanos.
+ Merchants Quarter: >
+   Una sección entera del asentamiento dedicado al comercio, almacenes de vivienda,
+   un intercambio, mercados y casas gremiales.
+ Mill: >
+   Molinos de viento o agua convierten el grano en harina, mejora la producción local de alimentos.
+   El molinero usualmente toma una parte del grano por sí mismo como forma de pago,
+   sin embargo, el molino es mucho más rápido y menos trabajo manual que muelas manuales.
+ Mine: >
+   El oro y otros objetos de valor deben ser desenterrados y eso es lo que hacen los mineros en el interior de una mina. Mejora en gran
+   medida la producción de metales, la mina mejora la creación básica de objetos de metal como mercancías, armas y armaduras.<br />
+   <b>Importante:</b> Una mina sólo funciona en regiones con depósitos de metales.  Si la producción de metales de la región es cero
+   la construcción de una mina no tiene ninguna ventaja.
+ Palisade: >
+   El tipo más primitivo de la fortificación, una empalizada es muy útil contra los animales salvajes y bandidos,
+   dando a los habitantes del asentamiento una sensación de seguridad.
+ Paved Streets: >
+   Pavimentación de las calles permite un mejor transporte, especialmente con vehículos de ruedas. Aún más importante,
+   hace que el viaje sea independiente del tiempo, y es necesario para algunas construcciones de gran escala.
+ Royal Mews: >
+   Grande con criadores y entrenadores más experimentados que los establos regulares,
+   las caballerizas reales permiten la cría y entrenamiento de los caballos de guerra raros,
+   que no asustan batalla y con un jinete capaz de pisotear a un enemigo.
+ Saddler: >
+   Un artesano especializado que crea sillas de montar, estribos, frenos, riendas y otros engranajes para los caballos y carros.
+ School: >
+   Un lugar patrocinado por el gobierno de aprendizaje para un grupo selecto de alumnos que ofrecerá personas más educadas.
+   También produce y distribuye el conocimiento, por lo que hará ejores flujos de trabajo y edificios más refinados.
+ Shrine: >
+   Un pequeño lugar de culto religioso, a menudo mantenido por la gente del lugar y sin sacerdote de tiempo completo.
+ Stables: >
+   El establo produce caballos de raza estables para el trabajo y batalla.
+ Stone Castle: >
+   Más fuerte y más grande que una fortificación de madera, el castillo de piedra es una poderosa estructura
+   defensiva que un enemigo puede no conquistarán ni destruirán sin armas de asedio.
+ Stone Towers: >
+   Hecho de piedra, estas torres se pueden construir más altas que las de madera,
+   y son casi imposibles de destruir excepto con la tecnología de asedio.
+ Stone Wall: >
+   Un sólido muro de piedra es el símbolo de un asentamiento bien defendido.
+   No puede ser incendiada y sólo puede romperse a través de máquinas de asedio masivas.
+ Tailor: >
+   Un artesano básico que facilita a los campesinos con la ropa de una calidad superior a sus seres caseros
+   y también capaces de crear grandes lotes de tabardos y armaduras de tela.
+ Tavern: >
+   El bar del pueblo, o una colección de tabernas y pubs para un asentamiento más grande,
+   aquí es donde los campesinos se reúnen para su cerveza por la noche y algunos chismes.
+ Temple: >
+   Un gran lugar de culto religioso, por lo general con uno o más sacerdotes a tiempo completo, así como un número de ayudantes.
+ Town Hall: >
+   Un edificio público con espacio para oficinas, un tribunal público y otras necesidades administrativas de una ciudad en crecimiento.
+ Training Ground: >
+   Un gran espacio abierto equipado para el entrenamiento militar, lo que permite la 
+   formación y contratación de algunos tipos básicos de soldados.
+ University: >
+   El lugar más alto de aprendizaje a disposición de su gente, la universidad
+   es un centro de conocimiento y la base de algunos de los expertos más raros y valiosos.
+ Weaponsmith: >
+   Un artesano especializado en la forja de armas. Si bien la mayor parte de su obra es similar al herrero, el objetos de carpintería
+   como mangos y utiliza fundición avanzada y técnicas de forja para crear armas y herramientas capaces de soportar una mayor cantidad de
+   mayor cantidad de estrés que la granja promedio requieren.
+ Wood Castle: >
+   Un centro adjunto de militares, con murallas, torres, una caseta de vigilancia y defensas fortificadas.
+   El castillo de madera, permitie excelentes defensas y se mantendrá incluso contra atacantes con números superiores.
+ Wood Towers: >
+   Adición de torres a las fortificaciones de un asentamiento permite que los defensores puedan defenderse
+   y aumenta la distancia de detección del asentamiento, permitiendo alertas tempranas.
+ Wood Wall: >
+   Una empalizada más fortificada y refinada, el muro de madera encierra el asentamiento y le proporciona
+   defensas básicas contra los animales salvajes, los bandidos y los atacantes no organizados.

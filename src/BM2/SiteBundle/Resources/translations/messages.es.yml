@@ -1,0 +1,1240 @@
+# Might & Fealty
+# generic text strings
+# Author: FARevolution
+dateformat:   A-m-d
+gametime:
+ current:     Es el año %year%, semana %week%, día %day% en el mundo de Might & Fealty
+ long:        año %year%, semana %week%, día %day%
+ short:       %year%-%week%-%day%
+realtime:
+ forever:     eternidad
+ day:         %d% día (tiempo real)|%d% días (tiempo real)
+ hour:        %h% hora (tiempo real)|%h% horas (tiempo real)
+ minute:      %m% minuto (tiempo real)|%m% minutos (tiempo real)
+
+menu:
+ playing:   jugando %name%
+ profile:   perfil
+ characters:  personajes
+ homepage:  página principal
+ terms:     condiciones
+ credits:   créditos
+ contact:   contactar
+ forum:     foro
+ bugs:      gestor de fallos
+ about:     acerca de
+ manual:    manual
+ vips:      PMI
+ fiction:   ficción
+ community: comunidad
+ translator:  traducciones
+ register:  registrar
+ map:       mapa
+ travel:    mapa y viajes
+ status:    estado
+ recent:    resumen
+ rss:       suministro de RSS
+ events:    eventos
+ messages:  mensajes
+ news:      publicaciones
+ relations: relaciones
+ politics:  política
+ actions:   acciones
+ allactions: todas las acciones
+ character:
+  background: antecedentes del personaje
+  start:    colocación de personaje
+ dungeon:   calabozo
+
+contact:
+ title:     Contactar
+ forum: >
+   Para preguntas, ayuda o la mayoría de otras cosas relacionadas con el juego, la mejor manera para obtener
+   respuestas es en nuestro foro, donde se puede llegar con este enlace:<br />
+   <br />
+   <a href="http://forum.mightandfealty.com/">http://forum.mightandfealty.com/</a><br />
+   <br />
+   Esta comunidad es un gran lugar para hablar con otros jugadores, así como con los desarrolladores, que prefieren responder a las preguntas
+   del foro porque de esa manera los futuros jugadores con la misma pregunta pueden encontrar una respuesta allí.
+ tom: >
+   Si necesita ponerse en contacto con Tom directamente, envíe un correo electrónico a <a href="mailto:tom@mightandfealty.com">tom@mightandfealty.com</a>.
+
+terms:
+ title:     Términos de Servicio
+
+registration:
+ title:   Inscripción
+ intro: >
+   Bienvenido a Might & Fealty - estamos esperando sus relato y experiencias.<br />
+ direct: >
+   Por favor, facilite la información solicitada a continuación.<br />
+   A continuación, recibirá un correo electrónico con un enlace de activación. Pedimos disculpas por este paso adicional,
+   pero esto mantiene a los spammers y robots fuera.
+ openid: >
+   Alternativamente, si usted tiene una cuenta en alguno de los siguientes, puede utilizarlo para registrarse:
+ toslink: Al registrarse, usted acepta nuestros <a href="%url%" target="_blank">Términos de Servicio</a>.
+ complete:
+  name: Completar Inscripción
+  intro: Por favor, verificar o corregir los datos que hemos recibido de su proveedor de identidad de abajo y confirme.
+ first:
+  title: Primeros Pasos
+  intro: >
+    Bienvenido a Might & Fealty.<br />
+    Para empezar a jugar, <a href="%charpage%">crear un personaje</a> en la página de personaje también se puede acceder en el menú de navegación.<br />
+    <br />
+    También le recomendamos el <a href="https://www.youtube.com/watch?v=YWC6n9CnB3U">video tutorial</a> y el resto del manual.
+ help:
+  username:   Un nombre que desee utilizar para conectarse. No será revelado a nadie a menos que usted elija hacerlo.
+  email:      Tu dirección de correo electrónico para el restablecimiento de contraseñas y notificaciones. No será revelada a nadie a menos que usted elija hacerlo.
+  password:   Elija una contraseña para iniciar sesión. Puede ser cualquier longitud. Es su responsabilidad para elegir una buena.
+  repeat:     Repita la contraseña para asegurarse de que usted no hizo errores tipográficos.
+login:
+ intro: Proporcione el nombre de usuario o correo electrónico que utilizó para registrarse abajo para iniciar sesión:
+ openid: >
+   o acceda con cualquiera de sus cuentas existentes en uno de los siguientes:
+
+pager:
+ showing:       mostrando %from% a %to%, %total% total
+ prev:          anterior
+ next:          siguiente
+
+togglelist:     alternar estilo de lista
+
+map:
+ title:
+  map:         mapa
+  both:        mapa y viajes
+ layers:       capas
+ map:          mapa abstracto
+ graphical:    mapa gráfico
+ search:       buscar un asentamiento
+ searching:    buscando...
+ settlements:  asentamientos
+ realms:       dominios mayores 
+ rivers:       ríos
+ cultures:     culturas
+ towers:       torres
+ roads:        calzadas
+ chars:        personajes
+ route:        ruta
+ invalid:      ruta inválida
+ usedroads:    desplazamientos por calzada
+ offers:       ofertas de caballero
+ poi:          POI
+ you:          su ubicación
+ area:         área local
+ howto: >
+    Puede ver y establecer su viaje justo en el mapa. Seleccione la opción "viajes" a la derecha y luego haga clic para establecer puntos de referencia.<br />
+    La ruta puede ser tan directa o elaborado como usted desea. Tenga en cuenta que usted necesita estar cerca de un asentamiento para interactuar con él,
+    sólo pueden cruzarse ríos con puentes y no se pueden cruzar acantilados en absoluto.
+ legend:    leyenda
+ yourchars: sus otros personajes
+ others:    personajes extraños
+ ownedplace: sus asentamientos
+ indyplace: asentamientos independientes
+ spot:      su distancia de detección
+ act:       su distancia de interacción
+ clickselect: Haga clic en la bandera de un asentamiento o un personaje para obtener más detalles.
+ travel:    Viajar
+ locked:    En este momento no es posible viajar (debido a la batalla u otras acciones). Puede establecer una ruta de viaje, pero no empezará a viajar hasta que esta situación se haya resuelto.
+ traveldetails: Detalles de Viaje
+ draw:      Haga clic en el mapa para establecer puntos de referencia.
+ submit:    fijar la ruta
+ rmlast:    quitar último
+ enter:     entrar destinación
+ clear:     despejar
+ newroute:  Su nueva ruta se ha establecido. Le llevará aproximadamente %duration% días para completar.
+ disembark: Su nueva ruta se ha establecido. Atraviesa a la tierra, por lo que desembarcará en el punto rojo.<br /><small>La estimación de tiempo de viaje de %duration% días considera la ruta hasta ese punto. Las líneas rojas muestran la sección de viajes no válido.</small>
+ crossings:
+  title:    cruces de ríos
+  river:    El %river% en el puente "%bridge%" cerca de %nearby%.
+ cleared:   Ruta despejada.
+ error:
+  impassable: Ruta contiene secciones intransitables marcados en el mapa ahora.<br /><small>Líneas rojas pasan por zonas intransitables, puntos rojos/negros muestran cruces de ríos sin un puente cercano o acantilados demasiado escarpados para cruzar.</small>
+  world:      Usted está tratando de dejar el mundo conocido. Los dioses no permitirán eso.
+  prisoner:   Como prisionero, usted no puede viajar libremente.
+  restricted: Debido a que su cuenta está restringida, no puedes viajar.
+ info:
+  length:   Longitud de la ruta
+
+vip:
+ title:     PMImportantes
+ intro: >
+   Estos jugadores ayudaron a que Might & Fealty viniera a la vida, contribuyendo considerablemente a la campaña de financiación colectiva:
+ status:
+  10:       Héroe   
+  20:       Leyenda
+  30:       Inmortal
+
+account:
+ title:         Cuenta
+ characters:    Personajes
+ nocharacters:  Usted todavía no ha creado ningún personaje.
+ abovelimit: >
+   Usted tiene personajes más activo que su nivel de suscripción actual permite. Hasta que no haya elevado su nivel de suscripción
+   o reducír el número de personajes que viven, las acciones y los viajes de todos sus personajes estarán muy limitadas. Usted puede
+   escribir mensajes y revisar sus personajes con el fin de decidir cuál se retirara y hacerlo de una forma correcta, pero usted no
+   será capaz de realmente jugarlos.
+ flag:          Haga clic para activar este personaje entre la lista primaria/secundaria.
+ created:       creado: %date%
+ lastlogin:     último acceso: %date%
+ identities:    Autenticación
+ authmail:      nombre de usuario/dirección de correo electrónico y contraseña
+ locked:        Sus personajes están actualmente bloqueados porque se han quedado fuera del tiempo de juego. Por favor renueva su suscripción en la página de perfil.
+ level:
+  0: bloqueado
+  10: casual
+  20: básico
+  40: intenso
+  50: definitiva
+  name: nivel de cuenta
+  limit: límite de personajes
+  cpm: créditos/mes
+  firstmonth: primer mes
+ data:
+  link:   Editar datos
+  title:  Datos Personales
+  saved:  Sus datos personales se han actualizado.
+ settings:
+  link:   editar los ajustes
+  title:  Ajustes
+  language:    Su lengua
+  notifications: Notificaciones de correo electrónico
+  newsletter: Boletín ocasional
+  submit: actualizar
+  saved:  los ajustes se han actualizado.
+ autologin:
+  title:    Inicio de Sesión Automático
+  intro: >
+    Esta es una función <b><i>experimental y posiblemente insegura</i></b>.<br />
+    Inicio de Sesión Automático ahorrará un token en su navegador, lo que le permite completar el proceso de inscripción, totalmente automatizado,
+    que le da los inicios de sesión de un solo clic (simplemente haga clic en "Login" y está listo).<br /><br />
+    <b>Ventaja de Seguridad:</b> El token guardado en tu navegador no es su contraseña. De hecho, cuando se utiliza el inicio de sesión automático, la
+    contraseña no se almacena en el equipo (a diferencia de la funcionalidad del gestor de contraseñas de otros navegadores) y nunca se transmite a través
+    del Internet. Si pierde o le roban el token, haga clic a continuación en el botón de activación para generar un nuevo token.<br />
+    <b>Seguridad en Peligro:</b> Si alguien tiene acceso a su computadora o el navegador, puede iniciar sesión en el juego sin conocer su contraseña.
+    No utilice esta función si comparte su computadora con otras personas. No lo <i>active</i> mientras usted está en una red insegura, porque si alguien
+    capta la señal enviada al hacer clic en el botón, puede utilizarlo. <i>Además, esta función aún no ha sido revisada por otros expertos en seguridad por
+    pares y puede contener debilidades adicionales desconocidos por el momento.</i><br />
+    <br /><br />
+    Para activar o desactivar el Inicio de Sesión Automático, haga clic en los botones de abajo:
+  enable:   habilitar
+  disable:  deshabilitar
+ payment:
+  title:    Balance de la Cuenta
+  credits:  Tiene %amount% créditos en su cuenta.
+  link:     Obtenga Más Créditos
+  shop:     Comprando Créditos
+  intro: >
+    Elija su método de pago preferido a continuación. PayPal y Google Wallet también manejan los <b>pagos con tarjeta de crédito</b>, así
+    que si usted quiere pagar con tarjeta de crédito, sólo tiene que elegir el servicio que más le guste.<br />
+    Los pagos se manejan a través de mi empresa, <b>Calitarus GmbH</b>, así que eso es lo que usted verá en su pedido y recibo.
+  history:  Historial de Pagos
+  type:     tipo de transacción
+  date:     fecha
+  amount:   cantidad
+  currency: moneda
+  code:     código de transacción
+  success:  La transacción se ha realizado correctamente. Tardará unos segundos en procesar.
+  fail:     La operación no se pudo completar. Revise su proveedor de pago por errores. Si el pago pasó por su lado, por favor póngase en contacto con tom@mightandfealty.com para que pueda solucionar este problema de forma manual.
+ code:
+  title:    canjear código
+  intro:    Si tiene un código de un amigo o la campaña financiación colectiva, puedes canjearlo aquí.
+  label:    código:
+  submit:   canjear
+  redeemed:   Se encontró un código para %credits% créditos del juego por su e-mail y redimido automáticamente.
+  redeemed2:  Se encontró un código por su e-mail y redimido automáticamente en %credits% créditos y un estatus PMI de "%vip%".
+  redeemed3:  El código que ha ingresado es válido y ha sido redimido por %credits% créditos del juego.
+  redeemed4:  El código que ha ingresado es válido y ha sido redimido por %credits% créditos del juego y un estatus PMI de "%vip%".
+ credits:
+  name:     créditos
+  sum:      %amount% créditos
+  title:    Créditos y Regalos
+  link:     Créditos y Regalos
+  short:    Gastar créditos en contenido adicional o hacer regalos a los amigos.
+  shop:     Gastar Créditos
+  shopdesc: >
+    Puede gastar créditos en diversos artículos que cambiarán el aspecto de tus personajes o asentamientos.<br />
+    Ninguno de estos elementos da ninguna ventaja, a excepción de prestigio y reconocimiento. Nos oponemos firmemente a cualquier concepto de "pago-para-ganar".
+  gifts:    Hacer regalos a los amigos
+  giftdesc: >
+    Usted puede hacer regalos a los amigos en forma de créditos. Ya sea porque simplemente les gusta, o que no tiene una tarjeta
+    de crédito o, o por cualquier otra razón.
+  history:  Historia de Crédito
+ sub:
+  title:     Suscripción
+  summary: >
+    En su nivel de suscripción actual de <b>%mylevel%</b>, está pagando %myfee% créditos por mes.<br />
+    Su próxima renovación es debida el %until%.
+  short:      Tu nivel de suscripción actual es <b>%mylevel%</b>, su próxima renovación se debe en %until%.
+  description: >
+    Si usted no ha accedido a su cuenta durante más de 3 semanas, sus personajes se fijarán inactivos automáticamente.
+    Después de más de 2 meses, ponemos automáticamente su cuenta en el almacenamiento y la guardamos, de forma gratuita.<br />
+    Leer más acerca de nuestro <a href="%url%" class="link_ajax">concepto de pago</a>.
+  description2: >
+    Desarrollar y dirigir Might & Fealty no es gratis, por lo que cobramos una pequeña cuota mensual para jugar.<br />
+    Creemos en el uso de un sistema de pago transparente, simple en lugar de los modelos "PagarParaGanar" o "GratisParaJugar" que te
+    molesten sobre "características premium" constantemente. En Might & Fealty, queremos que usted pueda disfrutar del juego al máximo
+    sin ocultar características en partes para que tenga que pagar extra.<br />
+    Leer más acerca de nuestro <a href="%url%" class="link_ajax">concepto de pago</a>.
+  description3: >
+    El precio de 100 créditos es 1 euro; o el <a href="http://www.xe.com/es/currency/eur-euro">equivalente en su moneda local</a> (nuestros proveedores de pagos convertirán automáticamente las monedas para usted).
+  link:      Cambiar nivel de suscripción
+  submit:    cambiar suscripción
+  remaining: Su nueva suscripción comenzará hoy, la primera cuota de suscripción mensual se reducirá automáticamente por %refund% de los créditos restantes de su suscripción actual.
+  changed:   Tu nivel de suscripción se ha cambiado.
+ play: Jugar
+ viewlog: Ver Historia
+ familytree: Árbol Genealógico
+ famtreedesc: Inspeccione el árbol genealógico de sus personajes
+ overview:
+  link:     Visión de Conjunto
+  desc:     Mapa de todos sus personajes y propiedades
+  title:    Visión de Conjunto de Personajes
+  intro: >
+    Esta página muestra todos sus personajes, sus propiedades y reclamaciones.<br />
+    Regiones amarillas en negrilla son villas de uno de sus personajes. Regiones naranja son reclamados por uno de tus personajes.
+ heraldry:
+  link:     Heráldica
+ culture:
+  link:     Cultura
+  title:    Cultura
+  intro: >
+    La cultura de que Might & Fealty representa es europa central. Usted puede comprar el acceso a otras culturas y decidir cual de sus
+    asentamientos controlados por sus personajes cambiará de cultura. Dependiendo de la configuración, esto incluye siempre los nombres
+    e los soldados y séquito reclutados allí y también puede incluir elementos visuales tales como edificios, tropas y séquito.<br />
+    Una vez desbloqueado, una cultura es suya para siempre y puede ser utilizado por todos sus personajes tan a menudo como quiera.
+    También obtendrá automáticamente las actualizaciones del paquete de cultura (como gráficos añadidos).
+  owned:    Paquetes de Cultura que tiene
+  buyable:  Paquetes de Cultura que puede comprar
+  buy:      comprar
+  name:     cultura
+  cost:     costo
+  contains: contiene
+  contents:
+   names:   nombres
+  submit:   comprar paquete de cultura seleccionado (s)
+  change:   cambiar cultura
+  upgrades: >
+    Paquetes de Cultura en ocasiones se actualizan y se extienden, por lo que un paquete que no contiene gráficos, por ejemplo, pueden
+    conseguir que se añada en el futuro. Si compra un paquete de la cultura, siempre obtendrá todas las actualizaciones de forma gratuita.
+  notenoughcredits:   No tienes suficiente credito para esta compra.
+  bought:
+   title:   Paquete de Cultura Comprado|Paquetes de Cultura Comprados
+   intro:   Felicitaciones, usted ha comprado un paquete decultura:|Felicitaciones, usted ha comprado %amount% paquete cultura:
+   contains:  este paquete contiene:
+ gift:
+  link:     Regalo a jugador existente
+  title:    Regalo para un amigo
+  intro: >
+    Usted puede hacer regalos a los amigos en forma de créditos. Ya sea porque simplemente les gusta, o que no tiene una tarjeta
+    de crédito o, o por cualquier otra razón.<br />
+    Usted necesita saber la dirección de correo electrónico de su amigo para esto. Vamos a generar un código y enviarlo a usted y su amigo.
+    Si tu amigo no quiere que el regalo, usted puede simplemente utilizar el código usted mismo para tomarlo de nuevo.
+  email:    enviar al correo electrónico
+  credits:  cantidad de créditos
+  text:     texto para incluir en el correo electrónico
+  invite:   invitar a su amigo
+  gift:     hacer regalo
+  error:
+   self:      Usted puede hacer regalos para si mismo, pero no en créditos de Might & Fealty.
+   notarget:  Ningún usuario con esta dirección de correo electrónico se encontró.
+  mail:
+   subject:   Might & Fealty Regalo
+   body: >
+     <p>Tu amigo (aparece en CC en este correo) le ha dado un regalo de <b>%credits% créditos</b> en Might & Fealty.</p>
+     <p>También envía este mensaje:</p>
+     <hr />
+     <p>%message%</p>
+ invite:
+  link:     Invitar con un regalo
+  title:    Invitar un amigo
+  intro: >
+    Puedes invitar a tus amigos al juego y si no están seguros de si les encantará, endulzarlo enviándoles algunos créditos iniciales.<br />
+    Esto enviará una invitación por correo electrónico a ellos, con un código de invitación especial. Sus créditos serán puestos en depósito
+    de garantía y utilizarse si su amigo en realidad se inscribe en el juego. Hasta que el(la) se una, puede cancelar la invitación en cualquier
+    momento utilizando el código usted mismo (usted recibirá una copia del correo, incluyendo el código).<br />
+    <br />
+    AY como nos gustan los nuevos jugadores, obtendrá hasta la mitad de sus créditos de vuelta si su amigo le gusta el juego y se
+    convierte en un suscriptor. Sí, usted puede tener su pastel y comérselo también.<br />
+    <small>(Usted recibirá la mitad de su regalo o la mitad de la primera suscripción de sus amigos, lo que sea menor. Límite de un código por cada nuevo suscriptor.)</small>
+  success: >
+    Una invitación mensaje ha sido enviado a su amigo (y a usted en cc).<br />
+    Cuando el código de %credits% créditos se redimió y tu amigo se suscribe después, usted recibirá la mitad
+    de bien o el valor de suscripción de su amigo acreditado a su cuenta automáticamente.<br />
+    También puede canjear el código usted mismo para cancelar la invitación.
+  mail:
+   subject:   Might & Fealty Invitación de Amigo
+   body: >
+     <p>Tu amigo (aparece en CC en este correo electrónico) te ha invitado a jugar Might & Fealty. Y para endulzar el trato, o tal vez como un
+     soborno para apoyar algunas ambiciones en el juego, la invitación viene con un código de <b>%credits% créditos</b>. También envió este mensaje:</p>
+     <hr /><p>%message%</p><hr />
+     <p>Únase a su amigo en la creación de la historia, visitar el juego aquí:</p>
+     <p><a href="http://mightandfealty.com/">Might & Fealty</a></p>
+     <p>o inscribirse directamente a través de este enlace:</p>
+     <p><a href="http://mightandfealty.com/register/">registro</a></p>
+     <p>Si se registra con esta dirección de correo electrónico, el juego redimirá automáticamente el código de invitación para usted.
+     Si no, simplemente introduzca el código de abajo en "conseguir más créditos" después de Registrarse.</p>
+     <p><b>%code%</b></p>
+     <p>Bienvenido a Might & Fealty - venir y hacer historia con nosotros!</p>
+  mail2:
+   subject:   Might & Fealty Suscripción de Amigo
+   body: >
+     <p>Su amigo con la dirección de correo electrónico %mail% ha hecho su primera suscripción. Dado que su invitación ayudó a ganar este nuevo jugador para el juego,
+     hemos acreditado a su cuenta con %credits% créditos, como se había prometido.<p>
+     <p>Muchas gracias por ayudarnos a que el juego se convierta en más grande y mejor.</p>
+
+newcharacter:
+ title: Crear Personaje
+ description: crear un nuevo personaje o ascendiente
+ intro: >
+   Introduzca los datos vitales de su nuevo personaje a continuación. De éstos, sólo el nombre más adelante se puede cambiar,
+   y sólo bajo circunstancias especiales, así que escoja cuidadosamente.<br />
+   Tenga en cuenta que el nombre del personaje debe ser un nombre completo, incluyendo un apellido. Personajes de la misma familia
+   deben, obviamente, compartir un apellido a menos que su historia personal ofrece una razón para no hacerlo.<br />
+   Por favor, elija un nombre propio, no uno gracioso o tonto del Internet. Esto es para la atmósfera del juego y para su beneficio
+   ya que muchos jugadores desaprueban nombres tontos y la diplomacia sería mucho más difícil. Así que por favor, sólo nombres apropiados.<br />
+   Elegir un padre y una madre es opcional, si lo deja vacía, entonces uno o ambos de los padres van a ser simplemente
+   personas que no existen como personajes en el juego. Si desea crear un árbol genealógico, asegúrese de comenzar con las
+   viejas generaciones.<br />
+   Todos los personajes son <a href="%firstoneurl%">Primeros</a> y empiezan el juego como caballeros completamente equipados y capacitados..
+ limit:     Puede crear %limit% personajes vivos hoy.|Puede crear %limit% personajes vivos hoy.
+ limited:   Usted no puede crear más personajes vivos hoy. Usted recibirá más espacio disponible para personajes todos los días de la vida real.
+ spawnlimit:  Actualmente tienes varios personajes que no están en el mapa. Por favor, comience a jugarlos primero, antes de crear más personajes.
+ accountlimit:  En este momento está jugando %active% de %limit% personajes posibles.
+ overlimit: Usted ya tiene muchos personajes como su nivel de suscripción actual permite. Si desea crear personajes adicionales, tendrá que elevar su nivel de suscripción primero.
+ help:
+  name:      El nombre completo de su personaje, incluyendo nombre y apellido, pero sin incluir ningún título. necesario
+  gender:    necesario
+  father:    Su padre puede ser cualquier personaje masculino suyo o en una relación sexual con uno de sus personajes femeninos. En el último caso, la madre tendrá que ser la (o una de las) pareja(s) del padre.
+  mother:    Su madre puede ser cualquier personaje femenino suyo o en una relación sexual con uno de sus personajes masculinos. En el último caso, el padre tendrá que ser la (o uno de las) pareja(s) de la madre.
+  partner:   Si desea iniciar un personaje que esté casado con otro de sus personajes. Los matrimonios con personajes de otros jugadores tienen que ser asegurado en el juego.
+  dead:      Puede crear personajes que han muerto con el fin de completar su árbol genealógico. Usted, evidentemente, no será capaz de jugar a un personaje muerto.
+ submit: crear
+
+
+summary:
+ title:     Eventos Recientes & Mensajes
+ events:    Eventos Recientes
+ nothing:   no hay eventos recientes
+ fullread:  Marcar todos como leídos
+ fullread2: Marcar todos como leídos para todos mis personajes
+ soldiers:
+  title:    advertencias de estado de soldados
+  starving:
+   1:       algunos de sus soldados se mueren de hambre.
+   2:       muchos de sus soldados se mueren de hambre.
+   3:       la mayoría de sus soldados se mueren de hambre.
+  hungry:
+   1:       algunos de sus soldados tienen hambre.
+   2:       muchos de sus soldados tienen hambre.
+   3:       la mayoría de sus soldados tienen hambre.
+  wounded:
+   1:       algunos de sus soldados están heridos.
+   2:       muchos de sus soldados están heridos.
+   3:       la mayoría de sus soldados están heridos.
+  lost:
+   1:       algunos de sus soldados han perdido equipo.
+   2:       muchos de sus soldados han perdido equipo.
+   3:       la mayoría de sus soldados han perdido equipo.
+
+first:
+ title:     Bienvenido a Might & Fealty
+ liege: >
+   Usted ha aceptado la oferta de caballero de %liege% y ahora eres su vasallo. 
+   Este asentamiento pertenece a %liege%, por lo que estás en territorio amigo en este momento.<br />
+   Hable con su señor primero en descubrir cuál es la situación política actual es y donde se necesitan.
+   Un mensaje de bienvenida debe estar por debajo. También familiarícese con sus tropas y sus alrededores.
+ free: >
+   Usted ha decidido comenzar como un noble independiente. Este es un camino duro y difícil. Una de las primeras cosas que querrá
+   hacer es comprobar los alrededores, descubrir quién posee el asentamiento que has aparecido en, y hablar con él o ella.<br />
+   No tiene tropas y ningún ingreso en este momento, por lo que buscar aliados debe ser su primera prioridad.
+   Sirva un señor como un caballero hasta que pueda asegurar una herencia por sí mismo, por ejemplo.
+ manual: >
+   Might & Fealty es un juego lento, no esperes mucha acción en su primer día. Si todavía no los ha hecho, echa un vistazo a
+   <a href="%manual%">el manual del juego</a> para más información y conceptos básicos. También hay un enlace en la parte superior,
+   para que pueda consultar el manual de referencia en cualquier momento.<br />
+   Finalmente, Might & Fealty es un juego donde la comunicación con otros jugadores es muy importante.
+   Echa un vistazo a la sección de mensajes y empieza a hablar con los personajes que le rodean.
+
+character:
+ name:    Nombre
+ gender:  Género
+ gold:    Oro: %gold% oro
+ father:  Padre
+ mother:  Madre
+ married: Casado con
+ partner: pareja|parejas
+ none:    (ningún personaje)
+ child:   hijo|hijos
+ status:  Situación de %name%
+ history: historia del personaje
+ inactive:  este personaje no se ha jugado desde hace tiempo
+ newplayer: Este personaje está siendo jugado por un jugador que es nuevo en el juego. Por favor, actúe en consecuencia.
+ notstarted:
+  title:    Rumores
+  text:     Solamente los rumores sobre este noble se han escuchado, aún no se ha iniciado este personaje (colocados en el mundo).
+ prisoner:  este personaje es actualmente un prisionero de %captor%.
+ prisoner2: Actualmente se encuentra prisionero de %captor%.
+ captorinactive: Su captor no ha sido visto en bastante tiempo. Debieras <a href="%url%">tratar de escapar</a>.
+ full:    ver más detalles
+ list:
+  1:  primario
+  2:  secundario
+  99: recientemente fallecido
+  100: histórico
+  150: antepasados
+ start:
+  title:      Colocación de Personaje
+  intro:      Seleccione la ubicación inicial para %name%. Esta es una opción importante y va a influir en gran medida su experiencia de juego antes de tiempo.
+  offer:      Accept fealty offer
+  offerintro: >
+    Muchos nobles ofrecen un contingente de tropas para caballeros leales a luchar en su nombre.
+    La aceptación de una de estas ofertas es la forma más fácil de comenzar.<br />
+    Tu personaje se colocará automáticamente en la villa de su nuevo señor y recibirá la cantidad prometida de tropas.
+    Adicionalmente, %he% tendrá un juramento inicial de fidelidad al Señor que hizo la oferta.
+  offerchoice: Oferta
+  offersummary: %name%, %count% soldados
+  family:     Colocar con familia
+  existing: >
+    Su nuevo personaje puede comenzar el juego en la villa de alguno de sus personajes existentes, y conseguir ayuda para comenzar su carrera por los familiares.
+  estate:     Villa de Inicio
+  submit:     comience aquí
+  selection:  Colocar en el mapa
+  mapintro: >
+    También puede seleccionar cualquier pueblo no independiente de este mapa, y negociar con sus señores para conseguir soldados
+    o de qué otra manera comenzará su búsqueda. Esta es una opción avanzada se recomienda sólo si ninguna de las anteriores están disponibles o 
+    usted está buscando algo especial para empezar.
+ details:
+  realm:      dominio(s)
+  ultimate:   mayores dominio(s)
+  entourage:  séquito
+  soldiers:   soldados
+
+bandits:
+ title:   Bandidos
+ intro:   También puede jugar los personajes bandidos, ver [bandits]. Elija uno de los bandidos libres a continuación:
+ choose:  Bandido a jugar:
+ submit:  elegir este personaje bandido
+
+achievements:
+ title:       logros
+ type:
+  battles:    batallas libradas
+  captures:   nobles capturados
+  kills:
+   soldiers:  soldados matados
+   nobles:    nobles matados en combate
+
+politics:
+ hierarchy: jerarquía
+
+gender:
+ he:        él
+ she:       ella
+ his:       su
+ her:       su
+ son:       hijo
+ daughter:  hija
+
+form:
+ username:    Nombre de Usuario
+ displayname: Nombre Público
+ aka:         aka <b>%name%</b>
+ email:       Correo Electrónico
+ password:    Contraseña
+ password_confirmation: Repetir Contraseña
+ browser:     (ajustes de navegador)
+ choose:      -- elegir --
+ none:        (ningún)
+ submit:      ejecutar
+ help:
+  displayname:  El nombre se muestra en las listas públicas tales como la lista de jugadores como PMI
+
+settlement:
+ name:  asentamiento
+ title: %type% de %name%
+ details: Detalles del Asentamiento
+ dummy:   Haga clic en un asentamiento en el mapa para mostrar sus detalles aquí.
+ area:  %name% zona
+ type:  tipo
+ fortified: fortificado
+ size:
+  name: tamaño
+  1:    aldea
+  2:    pueblo pequeño
+  3:    pueblo medio
+  4:    pueblo grande
+  5:    villa pequeña
+  6:    villa media
+  7:    villa grande
+  8:    ciudad pequeña
+  9:    ciudad media
+  10:   ciudad grande
+  11:   metrópolis
+ population:  población
+ pop:
+  change:     desarrollo actual
+  stable:     estable
+  grow:
+   1:         ligeramente creciendo
+   2:         creciendo
+   3:         creciendo rápidamente
+  shrink:
+   1:         ligeramente cayendo
+   2:         cayendo
+   3:         cayendo rápidamente
+   4:         cayendo dramáticamente
+ geography:   geografía
+ culture:     cultura
+ biome:       bioma
+ neighbours:  vecinos
+ political:   político
+ independent: Este es un asentamiento independiente
+ unowned:     independiente
+ owner:       dueño
+ ownedby:     Este asentamiento regido por %owner%.
+ realm:       Este asentamiento es parte de %realm%.
+ realm2:      dominio
+ ultimate:    dominios mayores
+ norealm:     Este asentamiento no pertenece a ningún dominio.
+ economy:     economía
+ build:       construcción actual
+ starvation:
+  1:  experimentando una menor escasez de alimentos
+  2:  experimentando una grave escasez de alimentos
+  3:  experimentando una dramática escasez de alimentos
+  4:  sufriendo de hambre
+  5:  sufriendo de hambre severa
+ shortage:
+  1:  escasez menor de %resource%
+  2:  escasez de %resource%
+  3:  escasez dramática de %resource%
+  effect:   producción y construcción que requieran este recurso se retrasan.|producción y construcción que requieren estos recursos se retrasan.
+  none:     todas las demandas de recursos están satisfechas.
+ security:
+  tt: Que tan protegido el asentamiento está en contra de las fuerzas de la naturaleza y los bandidos. Se puede mejorar con construcciones defensivas, milicia, etc.
+  0:  luchando por seguridad económica
+  1:  baja seguridad económica
+  2:  seguridad económica adecuada
+  3:  buena seguridad económica
+  4:  excelente seguridad económica
+ corruption:
+  name: corrupción
+  tt:   Poco a poco aumenta con el número de fincas usted sostiene personalmente en todos sus personajes. Dé fincas a vasallos para reducir la corrupción. Consulte el manual para más detalles.
+ militia:   soldados estacionados en %name%
+ militia2:  milicia
+ recruits:  soldados en entrenamiento en %name%
+ recruits2: reclutas
+ resupply:  equipos disponibles para reabastecimiento
+ retrain:   equipos disponibles para re-entrenamiento
+ train:     equipo disponible para entrenamiento
+ militiacount:  %count% milicia local preparada
+ recruitscount: %count% reclutas en entrenamiento
+ resources:
+  type:     tipo
+  base:     rendimiento base
+  current:  producción
+  demand:   demanda
+  base:         base
+  buildings:    edificaciones
+  construction: construcción
+  total:        total
+  storage:      almacenamiento
+  trade:
+   name:      comercio
+   in:        entrante
+   out:       saliente
+   balance:   balanza comercial
+  balance:    saldo total
+  prospector: Un prospector podría suministrar un informe más detallado.
+ workforce:
+  atroads:      %number% asignados a construcción de caminos
+  atbuildings:  %number% asignados a construcción de edificios
+  atfeatures:   %number% asignados a construcción de piezas
+  employed:     %number% empleados en varios edificios
+  available:    %number% disponibles para la agricultura y la economía local
+
+road:
+ quality:
+  0: (planificado)
+  1: camino de tierra
+  2: camino de tierra
+  3: camino rural
+  4: camino duro
+  5: camino asfaltada
+ workers:   trabajadores
+
+direction:
+ long:
+  north:      norte
+  east:       este
+  south:      sur
+  west:       oeste
+  northeast:  noreste
+  northwest:  noroeste
+  southeast:  sur-este
+  southwest:  sur-oeste
+ short:
+  north:      N
+  east:       E
+  south:      S
+  west:       O
+  northeast:  NE
+  northwest:  NO
+  southeast:  SE
+  southwest:  SO
+
+culture:
+ european:
+  central:    europeo central
+  northern:   norte europeo
+  southern:   europeo sureño
+  eastern:    europeo del este
+ african:     africano
+ oriental:    oriental
+ indian:      indio
+ asian:       asiático
+
+status:       estado
+locked:       bloqueado
+dead:         muerto
+inactive:     inactivo
+prisoner:     prisionero|prisioneros
+wounded:      herido
+hungry:       hambriento
+veryhungry:   famélico
+routed:       desviado
+offered:      incluido en una oferta de caballero
+assigned:     asignado de %from%, aún podría ser reclamado
+lastbattle:   última batalla
+islocked:     siendo reasignado a usted
+hour:         hora|horas
+minute:       minuto|minutos
+untilturn:    %h% %hours%, %m% %minutes% hasta el próximo cambio de día
+untilturn2:   %m% %minutes% hasta el próximo cambio de día
+location:     ubicación
+coordinates:  coordenadas
+spotdistance: distancia de detección
+actdistance:  distancia de interacción
+travelspeed:  velocidad de desplazamiento
+travellocked: Su viaje reciente fue bloqueado por las acciones locales o batallas.
+base:         (base: %distance%)
+nearest:      asentamiento más cercano
+nothingnear:  ningún asentamiento cercano
+nearbyothers: Nobles Cercanos
+nearbattles:  Batallas Cercanas
+viewdetails:  ver detalles
+none:         ninguno
+yes:          sí
+no:           no
+techtree:     Árbol de Tecnología
+travelling:   de viaje
+newevents:    %number% evento|%number% eventos
+newmessages:  %number% mensaje|%number% mensajes
+inside:       dentro de %place%
+near:         cerca de %place%
+prisonerof:   prisionero de %captor%
+atsea:        en el mar
+tradename:    nombre (opcional)
+zoom:         agrandar para encajar
+expand:       expandir
+fewoffers:    Sólo hay %count% ofertas de caballero abiertas en este momento. Creación de más ofertas de caballero ahora tiene una muy buena oportunidad de darle nuevos caballeros.
+
+distance:    distancia
+length:      longitud
+dist:
+ m:          %value% m|%value% m
+ metre:      %value% metro|%value% metros
+ y:          %value% y|%value% y
+ yard:       %value% yarda|%value% yardas
+ mi:         %value% mi|%value% mi
+ mile:       %value% milla|%value% millas
+ league:     %value% liga|%value% ligas
+area:
+ hectare:    %value% hectare|%value% hectares
+ sqm:        %value% square mile|%value% square miles
+ sql:        %value% square league|%value% square leagues
+metre_abr:   m
+popdensity:  personas por milla cuadrada
+day:         día|días
+today:       hoy
+
+source:      fuente
+destination: destino
+resources:   recursos
+food:        comida
+wood:        madera
+metal:       metal
+goods:       bienes
+money:       riqueza
+
+background:  antecedentes
+estate:      villa|villas
+realm:       dominio|dominios
+building:    edificación|edificaciones
+feature:     pieza|piezas
+build:
+ workers:    trabajadores
+ available:  %number% (%percent% %) trabajadores disponibles
+ employees:  empleados
+ underway:   bajo construcción
+workforce:   fuerza laboral
+inheritance: herencia
+nobody:      nadie
+underconstruction:  bajo construcción
+finished:           terminado
+
+biome:
+ scrub:        matorral
+ thin scrub:   matorral delgado
+ grass:        pradera
+ thin grass:   pradera delgada
+ marsh:        pantano
+ forest:       bosque
+ dense forest: bosque denso
+ snow:         montañas nevadas
+ rock:         montañas
+ desert:       desierto
+ ocean:        océano
+ lake:         lago
+ water:        lago
+ river:        río
+
+error:
+ title:        Error
+ notfound:
+  page:        Página no encontrada
+  character:   Personaje no encontrado
+  action:      Acción no encontrada
+  settlement:  Asentamiento no encontrado
+  buildingtype: no hay tal tipo de edificio
+  featuretype:  no hay tal tipo de pieza
+  entouragetype: no hay tal tipo de séquito
+  equipmenttype: no hay tal tipo de equipo
+  log:          diario de eventos no existe
+  battle:       batalla no encontrada
+  battlereport: informe de batalla no encontrada
+  recruit:      recluta no encontrado
+  listing:      lista no encontrada
+  paper:        publicación no encontrada
+  position:     posición de dominio no encontrada
+  realmrelation:  relación de dominio no encontrada
+  election:     elección no encontrado
+  newliege:     dueño del asentamiento no encontrado, por favor elija una oferta caballero diferente.
+  offer:        por favor, seleccione una oferta de caballero.
+ noaccess:
+  character:    personaje no pertenece a usted
+  busy:         este bandido ya ha sido elegido por otra persona.
+  notnpc:       esto no es un personaje bandido.
+  log:          usted no tiene acceso a este registro
+  settlement:   usted no tiene acceso completo a este asentamiento
+  paper:        usted no es miembro de esta publicación
+  edition:      usted no tiene una copia de esta edición
+  paperowner:   usted no es un propietario de esta publicación
+  library:      no se puede crear nuevas publicaciones porque ninguno de sus villas tiene una biblioteca
+  battlereport: no eran un participante en esa batalla, así que tienes que confiar en los informes de testigos oculares de sus detalles
+
+ missing:
+  character:    Personaje obligatorio, pero falta. Por favor, seleccione un personaje en la página de personajes o iniciar sesión.
+  location:     Este personaje no tiene una ubicación, seleccione una ubicación de inicio en primer lugar.
+  soul:         Este personaje está muerto y no puede afectar al mundo de los vivos más.
+  user:         Usted no se ha identificado o su sesión ha caducado. Por favor conectarse (otra vez).
+
+ payment:
+  already:      Este código ya ha sido redimido, tal vez de forma automática a medida que ha identificado. Revise su historial de crédito, por favor. Si usted cree que esto es un error, por favor póngase en contacto con tom@mightandfealty.com para más detalles.
+  notforyou:    Este código se bloquea a una dirección de correo electrónico específica, diferente a la suya.
+
+ iseditor:      No se pudo añadir %character%, dado que ya es miembro.
+
+selectall:    seleccionar todo
+withall:      con todo seleccionado...
+
+experience: experiencia
+weapon:     arma
+armour:     armadura
+equipment:  equipamiento
+home:       hogar
+group:      grupo
+
+npc:
+ type:         tipo
+ name:         nombre
+ number:       número
+ supply:       provisión
+ is:           bandido errante
+ maxreached:   Usted ya está jugando el número máximo permitido de bandidos.
+ entourage:    miembro de séquito|miembros de séquito
+ entourage2:   séquito|séquito
+ follower:     simpatizante|simpatizantes
+ scout:        explorador|exploradores
+ prospector:   prospector|prospectores
+ merchant:     comerciante|comerciantes
+ spy:          espía|espías
+ priest:       sacerdote|sacerdotes
+ herald:       heraldo|heraldos
+ translator:   traductor|traductores
+ scholar:      erudito|eruditos
+ soldier:      soldado|soldados
+
+soldier:
+ type:             tipo
+ home:             hogar
+ group:            grupo
+ name:             nombre
+ train:            entrenando
+ complete:         finalización estimada
+ assigned_to:      asignado a
+ assigned_since:   asignado desde
+ reclaim:          probabilidad de recuperar
+ buryall:          enterrar muertos
+ resupplyall:      reabastecer todos
+
+ rabble:           gentuza|gentuza
+ light infantry:   infantería ligera|infantería ligera
+ medium infantry:  infantería media|infantería media
+ heavy infantry:   infantería pesada|infantería pesada
+ archer:           arquero|arqueros
+ mounted archer:   arquero montado|arqueros montados
+ cavalry:          caballería|caballería
+ noble:            noble|nobles
+
+item:
+ none:             (nada)
+ choose:           -- elegir --
+ current:          (actual)
+ axe:              hacha
+ broadsword:       sable
+ chainmail:        cota de malla
+ cloth armour:     armaduras de tela
+ crossbow:         ballesta
+ horse:            caballo
+ improvised:       improvisado
+ javelin:          jabalina
+ leather armour:   armadura de cuero
+ longbow:          arco largo
+ pike:             pica
+ plate armour:     armadura de placas
+ scale armour:     armadura de escamas
+ shield:           escudo
+ shortbow:         arco corto
+ short sword:      espada corta
+ spear:            lanza
+ sword:            espada
+ war horse:        caballo de guerra
+
+events:
+ title:     Diario de Eventos
+ log:       Diario
+ type:      tipo
+ logtitle:  Diario de Eventos de %subject%
+ from:      disponible de
+ until:     disponible hasta
+ events:    eventos
+ new:       nuevo
+ read:      leer
+ allread:   Marcar como leído para todos mis personajes
+ alldone:   marcado como leído para todos tus personajes
+ alldone2:  marcado como leído para este personaje
+ research:
+  ongoing:  Un estudioso de suyo está investigando los documentos más antiguos en este diario.|%amount% de sus estudiosos están investigando los documentos más antiguos en este diario.
+  intro:    Hay más eventos en los registros más antiguos, un erudito será capaz de investigar ellos.
+  can:      Usted tiene un estudioso disponible para el trabajo de investigación.|Tienes %amount% académicos disponibles para el trabajo de investigación.
+ filter:
+  all:      todos los eventos
+  medium:   sólo lo interesante
+  high:     sólo lo importante
+  ultra:    sólo lo muy importante
+
+interaction:
+ message:
+  name:     recipiente(s)
+  subject:  tema
+  body:     contenido
+  submit:   enviar carta
+ attack:
+  name:     objetivo(s)
+  submit:   iniciar ataque
+ grant:
+  name:         otorgar control
+  submit:       otorgar
+ publication:
+  name:     nuevo(s) miembro(s)
+  submit:   añadir miembro(s)
+ abdicate:
+  name:     anunciar como sucesor:
+  submit:   abdicar
+ giveship:
+  name:     dar barco a:
+  submit:   dar
+
+battle:
+ title:         Reporte de Batalla
+ upcoming:      Próxima Batalla
+ participants:  participantes
+ location:
+  nowhere:      Batalla Nuncajamas
+  of:           La batalla de %location%.
+  near:         Batalla cerca de %location%.
+ defenses:      Un asalto contra una posición defendida con
+ initial:       tropas iniciales
+ combat:        combate
+ ranged:        
+  title:        fase a distancia
+  shots:        %i% disparo efectuado|%i% disparos efectuados
+  hits:         %i% golpe|%i% golpes
+  kill:         %i% enemigo asesinado|%i% enemigos asesinados
+  wound:        %i% eenemigo herido|%i% enemigos heridos
+  routed:       %i% enemigo desviado|%i% enemigos desviados
+  capture:      %i% enemigo noble rendido|%i% enemigos nobles rendidos
+ melee:         
+  title:        fase de combate cuerpo a cuerpo %i%
+  alive:        %i% soldado luchando|%i% soldados luchando
+  kill:         %i% enemigo asesinado|%i% enemigos asesinados
+  wound:        %i% eenemigo herido|%i% enemigos heridos
+  panic:        %i% enemigo desviado|%i% enemigos desviados
+  capture:      %i% enemigo noble rendido|%i% enemigos nobles rendidos
+ hunt:          
+  title:        caza
+  killed:       %i% enemigo fue asesinado o herido cuando huía.|%i% enemigos fueron asesinados o heridos cuando huían.
+  entkilled:    %i% miembro de séquito enemigo fue asesinado durante la derrota.|%i% miembros del séquito enemigo fueron asesinados durante la derrota.
+  dropped:      %i% soldado bajó el equipamiento para huir más rápido.|%i% soldados bajaron el equipamiento para huir más rápido.
+ finish:        sobrevivientes
+ fate:
+  title:        destino de nobles
+  killed:       %character% fue asesinado.
+  wounded:      %character% fue herido.
+  victory:      %character% fue victorioso.
+  retreat:      %character% se retiró.
+  captured:     %character% capturado por el enemigo
+
+description:
+ scout: >
+   Por lo general, un campesino de pies ligeros con buenos ojos, el explorador buscará
+   la zona para detectar cualquier anormalidad, notificando su noble de los hallazgos.<br />
+   Exploradores incrementan su gama de detección. Entre más exploradores tenga, más lejos se
+   notan detalles de la tierra y otros personajes.
+ prospector: >
+   Un experto en topografía y la estimación, el buscador le permite obtener datos sobre la economía local y sus capacidades.
+   Un prospector es suficiente, aunque se puede optar por tener más de uno, por si acaso.
+ merchant: >
+   Al igual que una espada es mejor reunida con una espada, y un ladrón con un ladrón, los comerciantes son útiles para el
+   establecimiento de acuerdos comerciales sin que te roben ciegos por los intermediarios.<br />
+   Se necesita un comerciante (y se quedará atrás) por cada vez que desea cerrar un acuerdo
+   comercial con los costos de transacción más rentables.
+ spy: >
+   Los espías son expertos versátiles de subterfugio y la recolección de la información, lo que le permite
+   infiltrarse en el asentamiento de un enemigo (o aliado, si usted está tan inclinado) y
+   reunir detalles sobre su condición política o militar.
+ priest: >
+   Los encargados y los escribas de registros, así como directivos de día a día de los
+   asuntos de campesinos tales como nacimientos, matrimonios, etc.<br />
+   Los sacerdotes le permiten crear elecciones.
+ herald: >
+   Locutor y corredor para un noble, que no sólo es prácticamente un requisito si usted desea ser tomado en
+   serio como un actor importante en la política y la diplomacia. Él le permite enviar mensajes a detección,
+   en lugar de distancia de interacción. Además, heraldos le permiten anunciar reclamaciones a los asentamientos.
+ translator: >
+   Un escriba entrenado en lenguas extranjeras, el traductor le permite enviar mensajes a los nobles que no
+   hablan o entienden su idioma. Un traductor es suficiente, aunque usted puede optar por tener más de uno,
+   por si acaso.
+ scholar: >
+   Entrenado en las artes de la lectura y la escritura, la documentación y una docena de otras artes y técnicas que un noble adecuado
+   adecuado se preocupa poco, el erudito a veces puede ser útil para reunir y ordenar la información y documentos antiguos.<br />
+   Su uso principal es para descubrir más sobre la historia de personas y lugares.
+ follower: >
+   Seguidores del campamento son personas que siguen los soldados en su ejército. Pueden ser profesionales, tales como herreros,
+   cocineros o putas, o pueden ser parientes y los familiares de los soldados. Seguidores de campo permiten a su ejército para
+   llevar suministros y reservas adicionales, por lo que el reabastecimiento en el campo posible.
+
+ axe:             Una vieja y bastante primitiva arma, sin embargo, tanto mortal y común en el campo de batalla.
+ broadsword:      Una espada pesada y robusta diseñada para la fuerza de impacto masivo y no la velocidad.
+ chainmail:       Anillos entrelazados de metal que proporcionan impresionante armadura y ha bastante bajo peso.
+ cloth armour:    Ropa blindada, básicamente varias capas de tela gruesa. Realmente no hace una gran diferencia frente a las armas reales, pero puede ayudar contra golpes débiles o de refilón.
+ crossbow:        Técnicamente avanzada arma a distancia que requiere menos entrenamiento que un arco y proporciona energía más precisa, pero requiere tiempos de carga más largos.
+ horse:           Montar a caballo entrenado a sufrir por el calor de la batalla sin demasiadas quejas.
+ improvised:      Herramientas agrícolas, otras herramientas, grandes palos - cualquier cosa que fue por ahí y sólo podría herir a alguien.
+ javelin:         Una lanza corta, equilibrada por lanzar. Un-uso de armas que da tropa decuerpo a cuerpo una pequeña cantidad de energía a distancia.
+ leather armour:  Cuero endurecido en múltiples capas, lo que dificulta un poco el movimiento, pero que proporciona una protección considerable.
+ longbow:         La mejor arma unipersonal a distancia, lo que requiere mucho entrenamiento y armas contundentes para usar. Puede perforar la armadura de metal sólido incluso a grandes distancias.
+ pike:            Un arma de asta de largo con una cuchilla y punto, fácil de aprender y, a menudo la primera arma seria para los reclutas para recoger.
+ plate armour:    Lo último en protección de armadura, que consiste en placas de metal sólida que cubren todas las partes del cuerpo, entrelazadas y reforzadas.
+ scale armour:    Una mezcla de metal y cuero, la armadura de escamas tiene un cuerpo sólido de cuero con numerosas placas metálicas superpuestas, dando más libertad de movimiento que las armaduras de metales sólidos.
+ shield:          Una opción primitiva y sin embargo altamente eficiente, un escudo protege contra los ataques cuerpo a cuerpo a distancia.
+ shortbow:        Un tipo muy común de arco, que se utiliza principalmente para la caza pero bastante eficaz contra los enemigos con armaduras ligeras, también.
+ spear:           Otra arma simple y común, popular debido a su considerable alcance.
+ sword:           Raro entre los rangos inferiores, común entre la nobleza y los que puedan permitirse armeros adecuados.
+ short sword:     Un arma más pequeña que se utiliza sobre todo como una opción de combate cuerpo a cuerpo de repliegue de las tropas a distancia, o como arma de reserva.
+ war horse:       Un caballo grande y pesado, específicamente entrenados para la batalla y están equipadas con barda.
+
+
+about:
+ title:     Acerca de Might & Fealty
+ intro:     Introducción
+ concept:   Filosofía
+ gameplay:  Jugabilidad
+ tech:      Tecnología
+ cost:      Costos
+
+paymentconcept: Concepto de Pago
+
+fiction:
+ title:   Might & Fealty Ficción
+ header: >
+   Esta colección de piezas de la mitología, cuentos y otras obras de ficción es para su entretenimiento,
+   así como para la atmósfera y de fondo del mundo.
+ intro:
+  title:  Introducción
+  text: >
+    <p>Las siguientes historias son todas en-personaje de ficción, leyendas y mitos del mundo
+    de Might & Fealty que tu personaje puede escuchar o incluso podría ya saber.</p>
+    <p>Historias a menudo se les dice o cantan, en lugar de leer, como la mayoría de los campesinos no saben leer ni escribir.
+    La tradición oral es todavía muy fuerte en el mundo de Might & Lealtad, aunque muchas de las  leyendas más antiguas o
+    populares desde entonces se han escrito por los estudiosos. Hay, por supuesto, también los escritores de ficción y de la
+    canción en el mundo, aunque sus obras se realizan con más frecuencia de lo leído.</p>
+ untranslated: Lo sentimos, pero esta historia aún no se ha traducido a su idioma.
+ page:
+  creation: Creación
+  firstones: Los Primeros
+  fall:     La caída de Tymetras
+  lendan:   Las Piedras de Lendan
+  geas:     Un Antiguo Geas
+
+
+manual:
+ title:       Manual del Juego
+ intro:       introducción
+ background:  antecedentes
+ videos:      vídeos
+ basics:      conceptos básicos
+ knight:      jugando un caballero
+ lord:        jugando un señor
+ ruler:       jugando un regente
+ others:      otros papeles
+ characters:  personajes
+ economy:     economía
+ battles:     batallas
+ relations:   matrimonio y relaciones
+ fealty:      juramentos de fidelidad
+ soldiers:    soldados
+ entourage:   séquito
+ settlements: asentamientos
+ claims:      reclamaciones
+ realms:      dominios
+ travel:      viajes
+ trade:       comercio & tributo
+ politics:    política
+ diplomacy:   diplomacia
+ elections:   elecciones
+ messages:    mensajes
+ publications:  publicaciones
+ history:       historia  eventos
+ permissions:   sistema de permisos
+ prison:        cautiverio
+ bandits:       bandidos
+ supply:        suministro para ejército
+ reference:     referencia
+ units:         unidades de medida
+ test:          instancia de prueba
+
+list:
+ buildingtypes:   lista de todos los tipos de edificios
+ featuretypes:    lista de todos los tipos de piezas
+ entouragetypes:  lista de todos los miembros del séquito
+ equipmenttypes:  lista de todo el equipamiento
+
+editor:
+ help:    ayuda de formateo
+ preview:
+  title:  preestreno
+  intro:  Esto es lo que el mensaje se verá:
+ syntax: >
+   <p>Nuestro editor utiliza un subconjunto de sintaxis <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a></p>
+   <p>Sólo tienes que escribir el texto como se escribirían texto plano y por lo general va a salir la forma que desee.</p>
+   <p>La única peculiaridad que debe tener en cuenta es que las nuevas líneas individuales son ignoradas, si desea forzar un salto de línea, añadir dos o más espacios al final de la línea antes de oprimir la tecla Enter.</p>
+
+
+rating:
+ title:     reputación
+ intro:     Cada noble tiene una reputación que le sigue. Reputación es hecha por otros nobles, a través de los chismes.
+ empty:     ningún rumores acerca de este personaje ... todavía.
+ edit:      actualizar chisme
+ write:     añadir chisme
+ content:   palabras de chisme
+ respect:
+  label:    respetuoso
+  help:     Este noble presenta etiqueta adecuada y muestra respeto a amigos y enemigos?
+ trust:
+  label:    digno de confianza
+  help:     Es este noble fiel a las palabras dadas, y leal a los juramentos y promesas?
+ honor:
+  label:    honorable
+  help:     Tiene este noble acto honorable, con la gracia de la victoria y la decencia en la derrota?
+ none:      (no opinión)
+ yes:       sí
+ no:        no
+ submit:    presentar chisme
+ votes:     votos
+
+unavailable:
+ intro:         Lo sentimos, pero esta acción no está disponible actualmente, debido a que:
+ restricted:    Su cuenta está actualmente restringida.
+ free:          Esta acción no está disponible para las cuentas de prueba.
+ free2:         Con una cuenta gratuita, sólo se puede tener 3 villas por personaje.
+ npc:           No está disponible para personajes de bandidos.
+ already:       Usted ya está llevando a cabo esta acción.
+ supporting:    Usted ya está apoyando a alguien más en esta acción.
+ atsea:         Usted está viajando en el mar.
+ nosettlement:  Usted no está cerca de ningún asentamiento.
+ notinside:     Usted no está en el interior del asentamiento.
+ noregion:      Usted no está en una zona habitada.
+ nodock:        No hay muelles cerca.
+ noship:        Usted no tiene un barco cercano.
+ nofeatures:    No hay piezas dañables cercanas.
+ notyours:      El propietario del asentamiento no le ha concedido permiso para hacer esto.
+ notyours2:     No controlas este asentamiento.
+ notrain:       No hay opciones de entrenamiento disponibles.
+ nobody:        No hay otros nobles dentro del alcance.
+ nosoldiers:    Usted no tiene ningún soldado.
+ nomilitia:     No hay soldados disponibles aquí.
+ nobattles:     No hay batallas cercanas.
+ nooffers:      No hay soldados u ofertas existentes disponibles.
+ noassigned:    No tiene soldados asignados.
+ nospies:       Usted no tiene ningún espía en su empleo.
+ inbattle:      Usted ya está involucrado en una batalla.
+ nobattle:      Usted no está involucrado en ninguna batalla.
+ nobattle2:     Usted no está siendo forzado en ninguna batalla, pero has comprometido.
+ intercepted:   Usted ya ha intentado desvincularse de esta batalla, y ha fallado.
+ noprisoners:   Usted no tiene ningún prisionero.
+ notprisoner:   Usted no es un prisionero.
+ prisoner:      Usted es un prisionero y sólo tiene acciones muy limitadas disponibles.
+ notmember:     Usted no es un miembro de este dominio.
+ leader:        Como el soberano de un dominio, no se puede hacer esto. Gestione la lealtad de su dominio en su lugar.
+ notleader:     Usted no es el soberano de este dominio.
+ notdiplomat:   Usted no tiene una posición con permisos de diplomacia en este dominio.
+ noothers:      No hay otros personajes cercanos.
+ vassal:        Usted no puede hacer esto, siempre y cuando usted sea el vasallo de otra persona.
+ norealms:      Usted no pertenece a ningún dominio.
+ haverealm:     Ya tiene un dominio.
+ novassals:     Usted no tiene ningún vasallos (sus propios personajes no cuentan).
+ fewestates:    Un nuevo dominio tiene que tener por lo menos dos villas.
+ notvassal:     Usted no es un vasallo.
+ toolow:        Su dominio es la designación más baja y por lo tanto no puede tener subdominios.
+ toosmall:      Su dominio tiene que tener por lo menos dos villas para dividir uno (o más) fuera para un subdominio.
+ attacking:     usted está ocupado atacando el asentamiento cercano.
+ defending:     usted está ocupado defendiendo el asentamiento cercano.
+ both:          No se puede atacar y defender al mismo tiempo.
+ enter:
+  inside:       Usted ya está dentro.
+  notyours:     Como prisionero, sólo puede seguir su captor o traerlo en sus propios asentamientos.
+ location:
+  library:      Este asentamiento no tiene una biblioteca.
+  temple:       Este asentamiento no tiene un templo.
+  barracks:     Este asentamiento no tiene cuarteles.
+  yours:        Usted ya controla este asentamiento.
+  fortified:    No se puede tomar el control de un asentamiento fortificado desde el exterior.
+  nodefenders:  No hay tropas defensoras este asentamiento, sólo tiene que tomarlo.
+ trade:
+  noestate:     Usted no tiene ninguna villas con las que comerciar.
+  nooptions:    There are no possible trade/tribute deals you could make at this location.
+

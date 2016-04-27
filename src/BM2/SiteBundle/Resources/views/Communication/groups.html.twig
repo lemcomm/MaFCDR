@@ -1,0 +1,70 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>Your Message Groups</h2>
+<p>(to create, administrate or join open groups, visit a Lendan Tower)</p>
+
+<h3>Groups Owned</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Members</th>
+			<th>Owners</th>
+			<th>Towers</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for group in ownerships %}
+		<tr>
+			<td>{{ group.name }}</td>
+			<td align="right">{{ group.members.count }}</td>
+			<td align="right">{{ group.owners.count }}</td>
+			<td>
+				<ul class="shortlist">
+				{% for tower in group.towers %}
+					<li>{{ link(tower) }}</li>
+				{% endfor %}
+				</ul>
+			</td>
+			<td>
+				<form method="post" action="{{ path('bm2_msg_leavegroup', {'group':group.id}) }}">
+					<button type="submit" class="leave_group" data-id="{{ group.id }}">{{ 'message.group.leave'|trans }}</button>
+				</form>
+			</td>
+			<td><a href=""><button class="admin_group" data-id="{{ group.id }}">{{ 'message.group.manage'|trans }}</button></a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<h3>Groups you are a Member in</h3>
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Members</th>
+			<th>Owners</th>
+			<th>Towers</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for group in ownerships %}
+		<tr>
+			<td>{{ group.name }}</td>
+			<td align="right">{{ group.members.count }}</td>
+			<td align="right">{{ group.owners.count }}</td>
+			<td>
+				<ul class="shortlist">
+				{% for tower in group.towers %}
+					<li>{{ link(tower) }}</li>
+				{% endfor %}
+				</ul>
+			</td>
+			<td><button class="leave_group" data-id="{{ group.id }}">{{ message.group.leave|trans }}</button></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Partnership">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="type" type="string"/>
+		<field name="active" type="boolean"/>
+		<field name="public" type="boolean"/>
+		<field name="with_sex" type="boolean"/>
+		<field name="partner_may_use_crest" type="boolean"/>
+		<field name="start_date" type="datetime" nullable="true"/>
+		<field name="end_date" type="datetime" nullable="true"/>
+
+		<many-to-one field="initiator" target-entity="Character"/>
+
+		<many-to-many field="partners" target-entity="Character" inversed-by="partnerships">
+			<join-table name="partnerships_characters">
+				<join-columns>
+					<join-column name="partnership_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="character_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+
+	</entity>
+</doctrine-mapping>

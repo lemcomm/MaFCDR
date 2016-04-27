@@ -1,0 +1,79 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+{% if announcements is defined %}
+<div class="subcontent_wrapper"><div class="subcontent">
+	{{ announcements|markdown }}
+</div></div>
+<div class="maincontent">
+{% endif %}
+
+{% for notice in notices %}
+	{% if notice.result == 'success' %}
+		<div class="success">
+			{% if notice.code.vipstatus > 0 %}
+				{{ 'account.code.redeemed2'|trans({"%credits%":notice.code.credits, "%vip%":('vip.status.'~notice.code.vipstatus)|trans}) }}
+			{% else %}
+				{{ 'account.code.redeemed'|trans({"%credits%":notice.code.credits}) }}
+			{% endif %}
+		</div>
+	{% else %}
+		<div class="error">{{ notice.result|trans }}</div>
+	{% endif %}
+{% endfor %}
+
+<div class="act">
+	<h2>{{ 'account.title'|trans|title }}</h2>
+	<div data-role="collapsible">
+		<div class="act_actions">
+			<a href="{{ path("bm2_site_account_data") }}">{{ 'account.data.link'|trans|title }}</a>
+		</div>
+		<h3>{{ 'account.data.title'|trans|title }}</h3>
+		<ul class="simple">
+			<li>{{ app.user.username }} {% if app.user.displayname!="(anonymous)" %}{{ 'form.aka'|trans({"%name%":app.user.displayname})|raw }} {% endif %}({{ app.user.email }})</li>
+			<li>{{ 'account.created'|trans({'%date%':app.user.created|date}) }}</li>
+			<li>{{ 'account.lastlogin'|trans({'%date%':app.user.lastLogin|date}) }}</li>
+		</ul>
+	</div>
+
+	<div data-role="collapsible">
+		<div class="act_actions">
+			<a href="{{ path("bm2_site_account_settings") }}">{{ 'account.settings.link'|trans|title }}</a>
+		</div>
+		<h3>{{ 'account.settings.title'|trans|title }}</h3>
+		<ul class="simple">
+			<li>{{ 'account.settings.notifications'|trans }}: {% if app.user.notifications %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</li>
+			<li>{{ 'account.settings.language'|trans }}: {% if app.user.language %}{{ app.user.language }}{% else %}<i>{{ 'form.browser'|trans }}</i>{% endif %}</li>
+		</ul>
+		<h3>{{ 'account.identities'|trans|title }}</h3>
+		<p>
+			{{ 'account.authmail'|trans }}
+		</p>
+	</div>
+
+	<div data-role="collapsible" class="topspace">
+		<div class="act_actions">
+			<a href="{{ path("bm2_payment") }}">{{ 'account.payment.link'|trans|title }}</a>
+		</div>
+		<h2>{{ 'account.payment.title'|trans|title }}</h2>
+		<p>{{ 'account.payment.credits'|trans({'%amount%':app.user.credits}) }}</p>
+		<div class="act_actions">
+			<a href="{{ path("bm2_site_payment_credits") }}">{{ 'account.credits.link'|trans|title }}</a>
+		</div>
+		<h3>{{ 'account.credits.title'|trans|title }}</h3>
+		<p>{{ 'account.credits.short'|trans }}</p>
+		<div class="act_actions">
+			<a href="{{ path("bm2_site_payment_subscription") }}">{{ 'account.sub.link'|trans|title }}</a>
+		</div>
+		<h3>{{ 'account.sub.title'|trans|title }}</h3>
+		<p>{{ 'account.sub.short'|trans({"%mylevel%":('account.level.'~app.user.accountlevel)|trans, "%until%":app.user.paiduntil|date('dateformat'|trans)})|raw }}</p>
+	</div>
+</div>
+{% if announcements is defined %}
+</div>
+{% endif %}
+
+<br class="clear" />
+
+{% endblock %}
+

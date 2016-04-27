@@ -1,0 +1,747 @@
+# Might & Fealty
+# text strings for actions
+# Author: Tom Vogt <tom@mightandfealty.com>
+queued:         Esta acción ha sido añadida a su cola de órdenes.
+
+form:
+ choose:  -- escoge --
+
+# these are the group names for soldiers - translate them if you use non-latin alphabets in your language
+a: a
+b: b
+c: c
+d: d
+e: e
+f: f
+g: g
+h: h
+i: i
+j: j
+k: k
+l: l
+m: m
+n: n
+o: o
+p: p
+q: q
+r: r
+s: s
+t: t
+u: u
+v: v
+w: w
+x: x
+y: y
+z: z
+
+support:
+ name:          Apoyando una acción
+ submit:        apoyo
+ already:       usted está actualmente apoyando esta acción
+ success:
+  settlement:
+   take:        Usted está apoyando el intento de %character% para tomar control de %target%.
+oppose:
+ name:          Oponerse a esta acción
+ submit:        oponerse
+ already:       Usted está actualmente oponiendose a esta acción
+ success:
+  settlement:
+   take: >
+     Usted está oponiendose al intento de %character% para tomar el control de %target%.<br />
+     Ten en cuenta que esto por sí solo <i>no detendrá</i> su acción. Sólo la demorará, dándole tiempo
+     para acciones más decisivas tales como atacarlos.<br />
+     Usted puede monitorear el desarrollo de su intento de control en su cola de acciones.
+either:
+ submit:        apoyar/oponerse
+ invalid:
+  noid:         no id de acción
+  wrongid:      id de acción desconocido
+  action:       no disponible en este tipo de acción
+  already:      usted ya está oponiendose o apoyando esta acción
+
+queue:
+ title:         cola de acciones
+ manage:        gestionar cola
+ prio:          prioridad
+ action:        acción
+ progress:      progreso
+ finishing:     terminando
+ fighting:      en progreso
+ block:         interrumpe viajes?
+ start:         commenzado
+ end:           est. completa
+ target:
+  character:    personaje
+  battle:       batalla
+ support:       apoyando
+ oppose:        oponiendo
+ supported:     apoyado por
+ opposed:       opuesto por
+ details:       detalles
+ up:            arriba
+ down:          abajo
+ cancel:        cancelar la acción
+ cancelled:     esta acción ha sido cancelada
+ support:       apoyar acción
+ oppose:        oponer acción
+ settlement:
+  loot:         saquear asentamiento
+  take:         tomar asentamiento
+  rename:       renombrar asentamiento
+  attack:       atacar asentamiento
+  defend:       defender asentamiento
+  grant:        conceder asentamiento
+ military:
+  battle:       luchar batalla
+  disengage:    retirarse de la batalla
+  evade:        evadir las batallas
+ task:
+  research:     investigar diario
+ dungeon:
+  explore:      explorar calabozo
+ character:
+  escape:       escapar
+
+location:
+ title:         Interacciones Locales
+ all:           todas las interacciones
+ enter:
+  name:         Entrar al asentamiento
+  description:  Entrat pacíficamente al asentamiento para tener acceso a sus instalaciones.
+  description2: Entrar al asentamiento y traer al prisionero.
+  result:
+   entered:     Usted ha pasado el portón y se encuentra dentro de %settlement%.
+   denied:      Los guardias en el portón de %settlement% te niegan la entrada. Puedes forzar tu entrada atacando el asentamiento.
+ embark:
+  name:         Embarcando
+  description:  Embarcar barcos en muelles cercanos.
+  longdesc:     Utilice muelles cercanos para embarcar barcos y continuar su viaje a través del mar.
+  description2: Regrese a sus barcos.
+  longdesc2:    Regrese a sus barcos cercanos y continúe su viaje a través del mar.
+  done: >
+    Usted ha embarcado en los barcos de %dockname% y está viajando en el mar.<br />
+    Los barcos pueden llevarte a la mayoría de ubicaciones costeras, pero sólo se puede embarcar en un muelle con los permisos apropiados o,
+    volver de donde desembarcastes ya que tus barcos esperarán hasta por 30 días por ti ahí. Esto significa que si no tienes cuidado, el desembarco puede ser un viaje de ida.<br />
+    Para desembarcar, simplemente viaja hacia tierra. Usted desembarcará en el momento que su viaje toque terreno sólido.
+  done2: >
+    Usted ha regresado as sus barcos y ahora está viajando en el mar.<br />
+    Los barcos pueden llevarte a la mayoría de ubicaciones costeras, pero sólo se puede embarcar en un muelle con los permisos apropiados o,
+    volver de donde desembarcastes ya que tus barcos esperarán hasta por 30 días por ti ahí. Esto significa que si no tienes cuidado, el desembarco puede ser un viaje de ida.<br />
+    Para desembarcar, simplemente viaja hacia tierra. Usted desembarcará en el momento que su viaje toque terreno sólido.
+ giveship:
+  name:         Ceder barco
+  description:  Ceder barco a otra persona.
+  longdesc:     Conceder el control de sus barcos a otra persona, permitiendo a esa persona usarlo, resultando en la pérdida del barco para usted.
+  intro: >
+    Puedes darle tu barco a otra persona, para que ese noble pueda usarlo, en lugar de usted. Porque una vez que hayas cedido control
+    a otra persona, no lo podrás utilizar de nuevo.<br />
+    Ceder el control de su barco no extenderá el tiempo en el que el capitan esperará, todavía serán 30 días desde que desembarcó.
+  success:      Usted ha cedido el control de su barco a %newowner%.
+ inn:
+  name:         Visitar Posada
+  intro: >
+    En la posada, usted puede escuchar rumores desde el extranjero, sobre todo acerca de lo que otros señores ofrecen a futuros caballeros.
+    Y si usted está buscando caballeros errantes, soldados de fortuna o jinetes - en una palabra: Mercenarios, la posada es donde
+    es muy probable encontrarlos.<br />
+    Por lo general son fáciles de detectar, ya que ellos están buscando empleadores de la misma manera que usted los está buscando. Sus servicios, 
+    sin embargo, son menos fáciles. Ellos te seguirán siempre y cuando se les pague bien. Pero tendrás que pagar extra por cada muerte
+    o los sobrevivientes te abandonarán. No se podrán reentrenar, ceder o establecerlos como milicia. Y sólo se puede disolverlos
+    todos a la vez.
+  description:  Tomar una bebida y verificar si hay rumores y mercenarios.
+ library:
+  name:         Biblioteca
+  intro: >
+    En la biblioteca de %settlement%, pergaminos y mapas están disponibles para su lectura. Los eruditos y cartógrafos locales han coleccionado
+    información que no está disponible al menos que sea comisariada.<br />
+    <i>(Al hacer clic en los mapas se obtiene una imagen de tamaño completo. Utilice el botón de retroceso en su navegador para regresar a esta página.)</i>
+  maps:
+   name:        Mapas
+   allrealms:   todos los dominios del mundo
+   2ndrealms:   dominios de segundo nivel
+   majorrealms: principales dominios del mundo
+  description:  Visitar los eruditos y cartógrafos en la biblioteca local.
+ temple:
+  name:         Visitar Templo
+  intro: >
+    El templo local de %settlement% mantiene un registro de nacimientos y muertes, permitiendole rastrear
+    el desarrollo del asentamiento en el tiempo.<br />
+    Los sacerdotes han preparado un diagrama para usted. Según explican, la altura de la línea muestra la población, y la
+    extrema derecha es de ayer, mientras que la línea más a la izquierda va hacia el pasado, con el número en la parte inferior
+    que muestra cuántos días en el pasado.
+  description:  Visita el templo local y sus sacerdotes.
+ barracks:
+  name:         Inspeccionar Cuarteles
+  intro: >
+    Gracias a los cuarteles locales de %settlement% proveyendo alojamiento para sus soldados,
+    también puede mantener un registro de la milicia dentro del asentamiento.<br />
+    Los sacerdotes han preparado un diagrama para usted. Según explican, la altura de la línea muestra la milicia en el asentamiento
+    en cualquier día, entre más elevada major el número. La extrema derecha muestra ayer, mientras que la línea más a la izquierda
+    va hacia el pasado, con el número en la parte inferior que muestra cuántos días en el pasado.
+  description:  Inspeccionar los cuarteles locales y registros de los soldados.
+ dungeons:
+  name:         Entrar al Calabozo
+  description:  Explorar el calabozo cercano.
+nearby:
+ spy:
+  name:         Espiar en un asentamiento
+  description:  Enviar un espía al asentamiento mas cercano.
+  intro: >
+    Puedes dejar uno de tus espías detrás en este asentamiento, y él lo mantendrá informado sobre todo lo que suceda,
+    supplying you with access to the settlements event log and local details, just as if you were there yourself.<br />
+    Con el tiempo, el espía podría ser descubierto, o desaparecerá.
+  intro2: >
+    Usted puede enviar a uno de sus espías para infiltrarse en este asentamiento. Hay una posibilidad razonable de que llegará
+    al interior, pero también podría ser capturado en el intento. Si lo hace, le mantendrá informado sobre todo lo que está pasando,
+    el le dará acceso al registro de eventos del asentamiento y datos locales, como si estuvieras allí mismo.<br />
+    Con el tiempo, el espía podría ser descubierto, o desaparecerá.
+
+control:
+ name:          acciones de control locales
+ all:           todas las acciones de control
+ take:
+  name:         tomar el control
+  description:  Declare su señorío sobre estas personas y hacer este asentamiento suyo.
+  intro: >
+    Con el fin de ordenar los recursos y la población de este %type%, necesita tomar el control primero.<br />
+    Este proceso toma tiempo. En un pequeño asentamiento, sólo tiene que convencer a la gente directamente,
+    mientras que en los asentamientos más grandes debe a tomar el control de la administración local.<br />
+    La cantidad de tiempo requerido depende del tamaño del asentamiento y de las fuerzas de apoyo y/o de oposición.
+    Esto incluye la milicia local, que automáticamente le oponen.<br />
+    Tomar el control del asentamiento tendrá un tiempo estimado de %time%, si nadie interfiere.
+  newbie: >
+    ¿Estás absolutamente seguro de que sabe lo que está haciendo? Se trata de una <i>acción hostil</i> en un asentamiento de otro jugador.
+    Tu personaje es nuevo en el juego y podría fácilmente <i>ser matado</i> en represalia.<br />
+    A menos que esté seguro y sabe lo que está haciendo, hable con el dueño del asentamiento a través de la <a href="%url%">pestaña de mensajes</a>
+    es probablemente una idea mucho mejor.
+  owned:        Este asentamiento es controlado por %owner%.
+  others:
+   title:       Otros intentos de Control
+   intro: >
+     Los siguientes nobles también están tratando de tomar el control de este asentamiento. Sin la diplomacia o la batalla,
+     esto probablemente resultará en reclamos conflictivos resolviendo con el tiempo. Si usted quiere tomar control,
+     es casi seguro que tendrá que hacer todos ellos se detengan, ya sea por convencerlos o atacándolos.<br />
+     Su otra alternativa es apoyar a otra persona, lo que acelerará su proceso de tomar el asentamiento.
+  defended: >
+   Fuerzas defensoras están haciendo que sea más difícil de levantar su bandera. Atacar y matarlos primero podría acelerar su acción.
+  undefended: >
+   No hay fuerzas que defienden a este asentamiento, por lo que es muy fácil y rápido para tomar control.
+  realm:        en el nombre de
+  submit:       tomar control
+  success:      Ahora se encuentra en el proceso de tomar el control de este asentamiento. El proceso llevará un tiempo estimado de %time%, aunque esta estimación cambiará con el apoyo o la oposición de otros nobles.
+ takeX:
+  name:         defenderse contra la toma
+  description:  Su villa está siendo reclamada por otros, oponerse a ellos.
+ changerealm:
+  name:         Cambie lealtad del dominio.
+  description:  Decidir cuál de sus dominios este asentamiento está alineado.
+  intro: >
+    Como propietario de %settlement%, puede decidir qué dominio se considera alineado a. Si bien esto es una simple
+    cuestión de declaración de cambio, las consecuencias políticas pueden ser masivas, por lo que debe considerarlo.<br />
+    Recuerde que su membresía en dominons depende cuales villas esten dentro de su jerarquía, por lo que cambiar la
+    lealtad de un asentamiento puede dar lugar a que abandonen el dominio si es su única villa dentro.
+  current:      %settlement% es actualmente una parte de %realm%.
+  nocurrent:    %settlement% no se considera parte de ningún dominio en este momento.
+  realm:        cambiar al dominio
+  submit:       cambiar lealtad
+  success:      Ha cambiado la lealtad de este asentamiento a %newrealm%.
+  leftrealm:    Ya que ahora no retiene más villas dentro de %oldrealm%, ya no es miembro de ese dominio.
+  fail:
+   same:        El asentamiento ya pertenece a este dominio.
+ grant:
+  name:         otorgar control
+  description:  Entregue el control sobre estas personas a otro noble.
+  intro: >
+    Asentamientos que ya controla pueden ser entregado a otra persona.<br />
+    Tenga en cuenta que esto <em>no</em> hace el destinatario su vasallo automáticamente. Esta acción sólo
+    entrega el control, las cuestiones de vasallaje y la legitimidad son para que usted resuelva.
+  introwr: >
+    Puede otorgar un asentamiento "con su dominio", lo que significa usted hace el nuevo señor miembro del dominio
+    del asentamiento al que pertenece. Alternativamente, puede conceder sin, que hace el asentamiento independiente
+    antes de concederlo y es útil para dar a los asentamientos de distancia a otros dominios.
+  to:           otorgar el control a
+  withrealm:    con dominio?
+  success:      Has dado el control de este asentamiento a %newowner%.
+  queued:       Usted pronto se va a reunir con %newowner% y planear los detalles de la transferencia, así como informar a los dirigentes de los asentamientos.
+ rename:
+  name:         renombrar asentamiento
+  description:  Cambiar nombre de este asentamiento.
+  intro:        Como el señor de esta %type%, puede cambiar su nombre para que sea más fácil distinguir, o para aplacar a su ego.
+  newname:      nuevo nombre
+  submit:       cambiar nombre
+  tooshort:     Nombres de asentamieto deben tener al menos 3 caracteres.
+  success: >
+    Ha declarado que este lugar se conocerá como "%newname%".<br />
+    Mapas y señales se actualizarán de una vez.
+  queued: >
+    Los dirigentes del asentamientos han sido instruidos para cambiar el nombre de este lugar a "%newname%".<br />
+    Mapas y señales se actualizarán durante las próximas horas. Usted verá el cambio finalizado pronto.
+ culture:
+  name:         cambiar cultura
+  description:  Cambiar la cultura de este asentamiento.
+  intro: >
+    Como el señor de esta <em>%current%</em> %type%, usted puede cambiar su cultura.<br />
+    La cultura de un asentamiento define su estilo, efectos visuales y los nombres del séquito y soldados reclutados aquí.<br />
+    Esto se debe utilizar con moderación, ya que sería poco realista para cambiar todo el tiempo.
+    También tiene mucho más sentido para comunicarse con sus vecinos y establecer áreas culturales.<br />
+    <br />
+    El centroeuropeo está a disposición de todos. Culturas adicionales se pueden comprar en su página de cuenta (Créditos y Regalos).
+    Si conquista un asentamiento perteneciente a una cultura que no es tiene, conservará su cultura, pero sólo se puede
+    cambiar asentamientos a las culturas que tiene.
+  newculture:   nueva cultura
+  success: >
+    Ahora ha declarado que este lugar sigue la cultura %culture%.
+  queued: >
+    Los dirigentes del asentamiento han sido instruidos para adaptarse a la cultura %culture%.<br />
+    Usted verá el cambio finalizado pronto.
+ permissions:
+  name:         administrar los permisos
+  description:  Establecer y cambiar los permisos para los demás
+  intro: >
+    Como señor de %settlement%, puede determinar cómo los funcionarios del asentamiento deben tratar a los demás, si se deben permitir 
+    en el asentamiento en lo absoluto, si pueden utilizar los recursos del asentamiento para reabastecer o incluso recoger reclutas.<br />
+    Para que todo sea más accesible, utilize el sistema de <a href="%listsurl%">sistema de listas</a> para definir los dueños de permisos.
+  general:      permisos generales
+  specific:     permisos específicos
+  spawn:        permitir nuevos personajes para aparecer aquí?
+  submit:       establecer nuevos permisos
+  success:      Sus nuevos permisos se han guardado.
+
+military:
+ name:          acciones militares
+ all:           todas las acciones militares
+ other:         otras acciones militares
+ disengage:
+  name:         Desenganchar
+  description:  tratar de evitar la próxima batalla.
+  longdesc:     intente desvincularse de las fuerzas de ataque y evitar la batalla que está siendo forzado sobre usted.
+  intro: >
+    Usted está siendo atacado, y usted puede o no puede estar mirando adelante a esta batalla. A medida que el enemigo aún está
+    maniobrando participar contra usted, aún puede escapar. Con el tamaño de su unidad actual, que llevará %time% a empacar todo
+    y salir, momento en el que descubrirás si tienes éxito en hacer una carrera para él, o si ya estás rodeado.
+  battles:      elegir la(s) batalla(s) que desea retirarse de
+  submit:       evitar batalla
+  success:      Usted ha instruido a sus tropas para empacar y evitar la próxima batalla. Es posible que desee también viajar lejos o es probable que se comprometan de nuevo.
+ evade:
+  name:         evadir
+  description:  evadir fuerzas enemigas.
+  longdesc:     Instruya a sus tropas para automáticamente intentar retirarse de las batallas que se ven obligados a.
+  intro: >
+    Puede indicar a sus tropas para evitar batallas se ven obligados a. Esto puede sonar como algo que quieres hacer todo el tiempo, tenga en
+    cuenta que si usted viaja con un ejército más grande de compañeros de dominio, podría significar que algunos de ustedes podrán evadir
+    la batalla y otros no.<br />
+    Esta acción se mantendrá en efecto hasta que la cancele y se aplica a cualquier y todas las batallas que no se una voluntariamente.<br />
+    <br />
+    Dado que las tropas enemigas podían participar de nuevo después de una evasión con éxito, se recomienda encarecidamente que también
+    establezca viajes lejos de su enemigo con el fin de evitar ser re-activado.
+  submit:       evadir todas las batallas
+  success:      Sus tropas ahora tienen instrucciones para desenganchar inmediatamente si una batalla es forzada en usted.
+ settlement:
+  all:          todas las acciones militares contra asentamientos
+  defend:
+   name:        defender asentamiento
+   description: fijar sus tropas para defender este asentamiento, en caso de ser atacado.
+   intro: >
+     Ordene a sus soldados defender %settlement%.<br />
+     Ellos establecerán las defensas, utilizando una de las fortificaciones disponibles, y defender el
+     asentamiento en contra de cualquiera ordenando un ataque.
+   submit:      establecer defensas
+   queued: >
+     Sus soldados ahora se están preparando para un ataque, y están dispuestos a defender.
+
+  attack:
+   name:        atacar asentamiento
+   description: invadir este asentamiento con el fin de matar o ahuyentar a sus defensores.
+   intro: >
+     Ordene sus soldados para atacar a %settlement%.<br />
+     Habrá una batalla entre sus fuerzas, así como cualquier otros atacantes, contra la milicia del asentamiento
+     y cualquier persona que opte por defenderse. Si es victorioso, ha forzado su camino en el asentamiento, y acciones
+     tales como la toma de control del asentamiento para usted o para atacar a los nobles en el interior aparecerá.<br />
+     <i>Una vez iniciado, las batallas no se pueden cancelar. Una vez que está comprometido, está comprometido. Decida sabiamente.</i>
+   submit:      atacar!
+   success:     Sus soldados se preparan para el ataque y se iniciará en breve la batalla.
+   reminder:    Recuerde que para poder no solo atacar, pero también tomar control del asentamiento, es necesario emitir una <a href="%url%">%take%</a> acción también.
+  loot:
+   name:        saquear asentamiento
+   description: saquear este asentamiento para objetos de valor y recursos.
+   intro: >
+     Saquear asentamientos enemigos le permite tomar recursos o esclavos por la fuerza y transferirlos a cualquier villa de su elección (preferiblemente la suya, por lo general).<br /<
+     También puede saquear con fines de lucro personal o asaltar los talleres para el suministro, o simplemente quemar el lugar.<br />
+     Mientras más opciones seleccionadas, más tiempo tomará todo y cuanto más distribuido los efectos serán. Para maximizar la eficiencia
+     de los objetivos específicos, usted debe centrarse en una o dos opciones.<br />
+     Al igual que las batallas, saqueos le compromete - una vez que haya iniciado una acción de saqueo, no se puede cancelar o viajar a otro lugar, hasta que esté completa.
+   outside:     Como es de fuera del asentamiento, sólo se puede saquear el campo, que ofrece menos objetivos. Luche, soborne o engañe a su manera para llegar al asentamiento para un saqueo más eficaz.
+   time:        Las opciones de saqueo seleccionados tomarán <span id="time">4</span> horas para completar.
+   target:      enviar saqueo a
+   options:     acciones de saqueo
+   option:
+    thralls:    tomar esclavos
+    resources:  tomar recursos
+    supply:     robar suministro
+    wealth:     robar riquezas
+    burn:       incendiar edificios
+   submit:      comenzar saqueo
+ battles:
+  initiate:
+   name:        iniciar batalla
+   description: prepararse para la batalla con otros nobles.
+   intro: >
+     Enfréntate a tus enemigos en batalla situando sus tropas para que no puedan retirarse fácilmente, lo que obliga a un encuentro.<br />
+     Al declarar uno o más objetivos primarios, usted decide quién se compromete. Sin embargo, todo el mundo al alcance de la batalla puede
+     unirse a cualquiera lado, por lo que no puede estar seguro contra quien usted se enfrentará en la final.<br />
+     Preparativos de la batalla toman tiempo dependiendo del tamaño de las fuerzas en presencia, por lo que tanto usted como su objetivo(s)
+     tienen un corto tiempo para llamar a aliados de apoyo.<br />
+     Si está dentro de un asentamiento, sólo se puede atacar a otros que también están en el interior (pero puede dejar el asentamiento para
+     atacar a los de fuera). Si está fuera del asentamiento, no puedes atacar nobles dentro del asentamiento, tendrá que atacar el asentamiento para entrar.<br />
+     <i>Una vez iniciado, las batallas no se pueden cancelar. Una vez que está comprometido, está comprometido. Decida sabiamente.</i>
+   success: >
+     Ahora está enganchando el enemigo y los preparativos de batalla se están realizando en ambos lados, el tiempo estimado hasta la batalla dará comienzo es %time%,
+     pero podría cambiar a medida que usted y/o al enemigo reciba más apoyo.<br />
+     Tu enemigo ha sido notificado del ataque inminente.
+  join:
+   name:          unirse a la batalla
+   description:   unirse a una batalla cercana y elegir su lado.
+   intro:         Una o más batallas se han iniciado cerca. Elige de qué lado luchar.
+   battle:        Batalla #%battle%
+   settlement:    Este es un ataque contra el asentamiento %settlement%. The local militia will join the defenders.
+   attackers:     atacantes
+   defenders:     defensores
+   success: >
+     Usted ha elegido su lado y va a participar en esta batalla.<br />
+     Usted puede mantener un ojo sobre los avances y progreso de la batalla y otros detalles en la página de detalles de batalla: %battle%, también disponible a través de su lista de acciones.
+   join:          unirse
+   submit:        engage
+ block:
+  name:           bloquear la zona
+  description:    Impedir que otros pasen.
+  longdesc:       Despliegue sus fuerzas para impedir que otros pasen a través de su radio de acción. Más efectivo en los puntos de estrangulamiento como puentes.
+ damage:
+  name:           dañar la pieza
+  description:    Tratar de destruir un puente u otra pieza.
+  longdesc:       Use sus soldados para derribar o dañar un puente, torre de vigilancia o signo para interrumpir las operaciones del enemigo.
+  intro: >
+    Usted puede utilizar sus soldados para destrozar piezas tales como puentes, torres de vigilancia o signos.<br />
+    Por lo general, esto se hace a su enemigo perturbarlos, pero a veces es posible que desee deshacerse de piezas en sus propias tierras.<br />
+    La(s) siguiente(s) pieza(s) está/están dentro del cerca:
+  target:         Elija cual pieza para dañar o destruir.
+  submit:         proceder a la destrucción
+
+economy:
+ name:          acciones de economía del asentamiento
+ all:           todas las acciones de economía
+ others:        otras acciones de economía
+ workhours:     horas de trabajo
+ tomake:        %hours% horas de trabajo para hacer
+ totrain:       %lessons% lecciones para entrenar
+ roadworkers:  trabajadores asignados a <a href="%url%">construcción de caminos</a>
+ buildworkers: trabajadores asignados a <a href="%url%">construcción de edificios</a>
+ featureworkers: trabajadores asignados a <a href="%url%">construcción de piezas</a>
+ roads:
+  name:         construcción de caminos
+  description:  Ordenar la construcción o destrucción de caminos.
+  intro: >
+    Con el fin de agilizar los viajes y mejorar el comercio, puede construir carreteras entre las
+    piezas de su tierra. Sobre todo, tendrá que construir a partir del asentamiento hacia los puentes
+    o postes fronterizos, pero usted puede construir entre piezas.<br />
+    También puede actualizar los caminos existentes mediante la asignación de trabajadores a ellos.<br />
+    Al igual que otros proyectos de construcción, se asigna un porcentaje de la fuerza laboral local para construcción de caminos.
+  tofeatures:   Los caminos siempre requieren vincular piezas entre sí o el asentamiento. Ir a la <a href="%link%">Página de Piezas en Construcción</a> para construir marcas de camino y otras piezas.
+  from:         de
+  to:           hacia
+  status:       tipo
+  progress:     progreso de construcción
+  workers:      trabajadores asignados
+  new:          encargar un nuevo camino
+  submit:       asignar trabajadores
+ features:
+  name:         bridges and features
+  description:  construction of features outside the settlement.
+  intro: >
+    Puentes, torres de vigilancia y otras piezas de la zona que rodean el asentamiento completan
+    su valor estratégico y económico. Usted puede ordenar su construcción aquí al seleccionar el
+    tipo de pieza que desea construir, los trabajadores de asignar y luego se coloca en el mapa
+    haciendo clic en el lugar en que desee construirlo.<br />
+    Puentes se ajustarán automáticamente al río más cercano a la construcción, los puestos fronterizos
+    se ajustarán a la frontera más cercana, muelles hasta la costa más cercana.
+  toroads:      El propósito principal de postes de señales y de frontera es permitir construcción de caminos. Ir a <a href="%link%">Página de Construcción de Caminos</a> para construir caminos.
+  existing:     construcciones existentes
+  building:     bajo construcción
+  progress:     progreso de construcción
+  workers:      trabajadores asignados
+  progress:     progreso de construcción
+  completion:   restante estimado
+  new:          construir nueva pieza
+  effortlong:   Se tarda aproximadamente %hours% de trabajo para construir esta pieza.
+  never:        Nunca
+  submit:       actualizar las órdenes de trabajo
+ build:
+  name:         Edificios
+  description:  Construcción y gestión de edificios importantes de infraestructura.
+  intro: >
+    Mientras que los campesinos se encargarán de la mayor parte de la infraestructura que necesitan,
+    también puede ordenar la construcción de edificios antes de que surjan de forma natural.<br />
+    Construcción requerirá y atará los recursos una vez iniciado el proceso. Muchos edificios
+    requieren recursos, un número mínimo de población o de otros edificios construidos en primer lugar.
+  status:       estado
+  speed:        productividad
+  focus:        atención
+  underconstruction: edificios en construcción
+  building:     bajo construcción
+  abandoned:    abandonado
+  progress:     progreso de construcción
+  workers:      trabajadores asignados
+  employees:    personas empleadas
+  completion:   restante estimado
+  never:        nunca
+  effort:       esfuerzo de construcción
+  existing:     edificios existentes
+  canbuild:     disponible para construcción
+  cannotbuild:  no edificable
+  submit:       asignar trabajadores
+  abandon:      abandonar
+  error:
+   population:  El asentamiento necesita una población de al menos %content%.
+   prerequisite: %content% requerid0 antes de que este edificio se pueda construir.
+   already:     Este edificio ha sido construido o está actualmente en construcción.
+   over100percent: Ha asignado más trabajadores que el asentamiento tiene para los trabajos de construcción de caminos y edificios. No se aceptará esta asignación.
+  warning:
+   over20percent: Usted está asignando una parte considerable de su población a los trabajos de construcción (caminos y edificios). Es posible que desee asegurarse de que esto no dé lugar a una escasez de alimentos.
+   over50percent: Usted está asignando la mayoría de su población a los trabajos de construcción (caminos y edificios). Asegúrese de que esto no dé lugar a la hambruna.
+
+ trade:
+  name:        Acuerdos de Comercio/Tribute
+  owner:       Revisar y proponer acuerdos comerciales con este asentamiento.
+  foreign:     Ofrecer tratos comerciales a este asentamiento extranjero
+  intro:
+   owned: >
+     Como el señor de este asentamiento, puede revisar todos los acuerdos comerciales y de tributo y el cambio de rumbo o
+     cancelar tratos salientes existentes en cualquier momento. También puede responder a cualquier comercio entrante.<br />
+     Los tratos de comercio y tributo son acuerdos de suministro constantes - que duran hasta que sean modificados o cancelados.
+     Como un señor, nunca se trata con un envío individual, sólo con el suministro a largo plazo.
+   foreign: >
+     Usted puede ofrecerle a este asentamiento comercio o tributos de cualquiera de sus propiedades, con envíos que comienza inmediatamente.<br />
+     A menos que usted esté ofreciendo tributo, lo normal es insistir en un acuerdo recíproco, pero alguien tiene que hacer el primer movimiento.
+     La confianza es la moneda más valiosa del comercio.<br />
+     Todas las tratis son tratos de suministro constante - que duran hasta que sean modificados o cancelados.
+     Como un señor, nunca se trata con un envío individual, sólo con el suministro a largo plazo.
+  submit:       iniciar comercio o tributo
+  cancel:       cancelar trato
+  inbound:      comercio entrante
+  outbound:     comercio saliente
+  towards:      comercio de sus villas para este asentamiento
+  resources:    los recursos de sus villas
+  amount:       cantidad
+  res:          recurso
+  to:           a
+  from:         de
+  localres:     recursos locales
+  production:   producción
+  demand:       demanda
+  trade:        comercio
+  sum:          suma
+  transcost:    costo de comercio
+  new:          nuevo acuerdo
+
+recruit:
+ name:          acciones de reclutamiento
+ all:           todas las acciones de reclutamiento
+ entourage:
+  name:         reclutar séquito
+  description:  Añadir especialistas a su séquito personal.
+  intro: >
+    Como señor de %settlement%, usted puede contratar a los campesinos de esta %type% para servir en su séquito.<br />
+    Edificios de entrenamiento pueden proporcionar especialistas con mayor experiencia y profesiones que requieren la educación formal inicial.
+  limit:        Usted será capaz de encontrar %max% campesinos para el entrenamiento de hoy. Si quieres entrenar más nuevos especialistas, continue reclutamiento mañana.
+  atlimit:      Redondeando más campesinos para entrenamiento llevará más tiempo y tendrá que esperar hasta mañana.
+  provided:     proporcionado por
+  available:    disponible
+  submit:       reclutar
+  success:      Ha reclutado %number% %type%.
+  supply:       Debido a la falta de entrenamiento, sólo %only% de %planned% planificados %type% que podrían añadirse.
+ troops:
+  name:         entrenar soldados
+  description:  Entrenar soldados para servir como milicia o en su unidad militar.
+  intro: >
+    Como señor de %settlement%, puede reclutar los campesinos de esta %type% para ser entrenados como soldados.<br />
+    Una vez capacitados, ellos se añadirán automáticamente a la fuerza defensiva de el asentamiento, pero también se
+    puede llevar con usted en sus campañas en cualquier momento.<br />
+    Edificios militares pueden proporcionar soldados entrenados con mayores habilidades y equipo más avanzado.
+  limit:        Usted será capaz de encontrar %max% más campesinos para el entrenamiento de hoy. Si quieres entrenar más soldados, continue reclutamiento mañana.
+  atlimit:      Redondeando más campesinos para entrenamiento llevará más tiempo y tendrá que esperar hasta mañana.
+  traintime:    tiempo de entrenamiento
+  provided:     proporcionado por
+  current: >
+    En este momento está entrenando %number% nuevos soldados en este asentamiento.<br />
+    Los tiempos de entrenamiento aumentan a medida que más soldados están entrenados al mismo tiempo. A menos que
+    quiera configurar una cola, es posible que desee esperar a que entrenamiento actual se finalice.<br />
+    Los detalles del entrenamiento de reclutas actual está disponible en la <a href="%url%">%page%</a> página.
+  time2:        Usted puede entrenar %amount% soldados a la vez antes de que el entrenamiento se vuelva lento.
+  submit:       reclutar
+  cancel:       cancelar
+  canceldone:   Entrenamiento de %name% (%type%) cancelado.
+  cancelinfo:   Usted puede dejar de entrenar, esto enviará a los reclutas de nuevo a la milicia o arreglo personal.
+  recruitlink:  Puede comenzar entrenamiento adicional de reclutas  <a href="%url%">en la página de reclutamiento</a>.
+  aftercancel:  Tiempo de entrenamiento, los suministros y la lista de milicia anterior se actualizará cuando visita el centro de entrenamiento la próxima vez.
+  returns:      volverá a la milicia
+  disbands:     volverá a la fuerza de trabajo
+  supply:       Debido a la falta de equipo, sólo %only% de %planned% reclutas previstos podrán ser añadidos.
+ warning:
+  over25percent:  Usted está reclutando una parte considerable de su población en el servicio militar. Estos campesinos ya no estarán disponibles para la construcción, la agricultura o la producción. Asegúrese de que puede manejar las consecuencias.
+  over50percent:  Usted está reclutando más de la mitad de su población en el servicio militar. A menos que haya tomado medidas específicas para prevenir, esto probablemente resultará en la destrucción económica de este asentamiento. Asegúrese de que usted sabe lo que está haciendo.
+ unavailable:
+  over100percent: Obviamente, no se puede reclutar a más soldados que tienes campesinos.
+ militia:
+  name:         gestionar la milicia
+  description:  Equipar o recoger milicia de este asentamiento.
+  recruit:      reclutar
+ cancel:
+  name:         cancelar el entrenamiento
+ manage:
+  intro: >
+    Aquí usted puede administrar sus soldados, en función de su estado actual. Sólo puede reabastecer las tropas si su equipo está disponible en este asentamiento
+    Sólo puede asignar tropas a otros personajes que están en el mismo lugar (y no en el otro lado de la muralla de la ciudad) y no bloqueado en batalla.
+  choose:       -- acción --
+  nothing:      (no acción)
+  apply:        aplicar al grupo
+  disband:      disolver
+  assign:       asignar...
+  assignto:     asignar soldados seleccionados a:
+  assignto2:    asignar séquito seleccionado a:
+  bury:         enterrar
+  makesoldier:  movilizar
+  makemilitia:  establecer como milicia
+  resupply:     reabastecimiento
+  retrain:      reentrenar
+  retraininfo:  Reentrenar a los soldados seleccionados arriba para el siguiente conjunto de equipos:<br /><small>(se añadirán a la cola de la entrenamiento del asentamiento y dejanán el servicio activo hasta completar el entrenamiento)</small>
+  current:      actual
+  submit:       emitir órdenes
+  group1:       agruparlos por tipo
+  group2:       agruparlos por equipo
+  groupinfo:    Agrupar automáticamente los soldados de acuerdo con el equipo. Advertencia: Esto sobrescribirá cualquier grupos que pueda tener.
+  grouped:      Sus soldados se han puesto automáticamente en grupos
+ offers:
+  name:         ofertas de caballeros
+  description:  Ponga a un lado los soldados que ofrecer a los nuevos caballeros que juran lealtad a usted.
+  intro: >
+    Caballeros son nobles menores que luchan en su nombre, utilizando sus soldados. Para atraer a nuevos caballeros a su bandera, puede
+    reservar los soldados en su(s) villas(s) que están disponibles de inmediato paraa cualquier caballero en condición de su lealtad.<br />
+    Sea consciente de caballeros-ladrones. Usted no debe hacer la mayor parte de sus tropas disponibles de esta manera, o sus nuevos caballeros
+    sólo podría decidir que el saqueo o tomar su villa es más gratificante.
+  soldiers:     Soldados para asignar
+  offertext:    Un breve texto para acompañar a la oferta
+  submit:       publicar oferta
+  new:          crear una nueva oferta
+  old:          gestionar las ofertas existentes
+  details:      Detalles Oferta
+  location:     ubicación de oferta
+  realm:        parte del dominio
+  text:         texto que lo acompaña
+  contains:     soldados incluidos en esta oferta
+  delete:       retraer oferta
+ assigned:
+  name:         soldados asignados
+  description:  Revise y reclame soldados asignados a los caballeros.
+  intro: >
+    Los soldados que recientemente ha asignado a caballeros o asentamientos pueden ser reclamados como su lealtad todavía recae en usted.<br />
+    Esta opción sólo tendrá una duración de un tiempo limitado ya que los soldados formarán un vínculo
+    con su nuevo comandante después de un tiempo, pero significa que usted puede estar confiado con nuevos caballeros,
+    por ejemplo, porque se puede llevar a sus hombres de regreso si resultan ser cobardes o traidores.
+  submit:       recuperar soldados
+  success:      Después de emitir sus órdenes, %return% de sus soldados regresarán (si han sido asignados al grupo %group%). %lost% soldados decidieron no volver.
+  fail:         Se emite sus órdenes, pero ninguno de sus antiguos soldados regresa a usted, todos los %lost% de ellos decidieron otra cosa.
+
+entourage:
+ assign:
+  action:       Acción
+  select:       asignar...
+  submit:       asignar séquito
+
+meta:
+ name:          acciones meta de personajes
+ background:
+  name:         antecedentes
+  description:  editar descripciones
+  descdeath:    editar las descripciones y causa de muerte
+  intro: >
+    El antecedente del personaje le da %name% profundidad y significado. Estos son simplemente campos de texto que
+    puedes llenar con tanto o tan poco como desee, aunque le recomendamos al menos una oración para cada uno.
+  skip:         Puede <a href="%url%">saltar esta parte</a> si lo prefiere y volver a ella más tarde a través del enlace "antecedentes" en la página de estado.
+  appearance:
+   name:      Apariencia
+   desc: >
+    Es lo que otros ven cuando conocen su personaje. Cuerpo, la ropa, la conducta, sino también caballo favorito o sirviente constantemente presente - 
+    cualquiera cosa que los que encuentran el personaje reconocerán y recordarán.<br />
+    <em>Este campo es visible públicamente en su página de personaje</em>
+  personality:
+   name:      Personalidad
+   desc: >
+    Describe la forma y el comportamiento de su personaje cómo él o ella piensa y actúa. Puede incluir rasgos tales
+    como introvertido o extrovertido, rápidos para actuar o reflexivos, fácil de la ira o la calma -
+    o en realidad cualquier cosa que usted y (algunos) los demás dé una mejor idea sobre el personaje.<br />
+    <em>Este texto sólo es visible para los miembros de su familia y los que estén en relación con este personaje.</em>
+  secrets:
+   name:        Metas y Secretos
+   desc: >
+     Este campo es para sus notas y cualquier información que usted ha aprendido que desea recordar que su
+     personaje sabe, así como cualquier ambición y planes futuros.
+     Son para usted y para dar sentido a tu personaje.<br />
+     <em>Los secretos son sólo eso, y visible sólo para usted.</em>
+  death:
+   name:        Muerte
+   desc: >
+     Una descripción de cómo murió el personaje.<br />
+     <em>Visible para todo el mundo.</em>
+  submit:       actualizar las descripciones de antecedentes
+  updated:      Sus descripciones de antecedentes han sido actualizados.
+ rename:
+  name:         renombrar
+  description:  cambiar el nombre del personaje
+  intro: >
+    Puede cambiar el nombre de su personaje en cualquier momento, pero <em>fuertemente</em> sugerimos que mantenga esto
+    para eventos que llevarían razonable para un cambio de nombre de una persona, como el matrimonio o la ascensión al trono.<br />
+    Todos los cambios de nombres se registran en la historia pública de su personajes.
+  newname:      Nuevo Nombre
+  submit:       renombrar personaje
+  success:      Su personaje ha cambiado de nombre.
+ kill:
+  name:         matar
+  description:  hacer personaje muerto
+  intro: >
+    Se puede matar a tu personaje en cualquier momento.<br />
+    Esta acción se limita a hacer que su personaje muera sin ninguna razón dada. Usted debe rolear 
+    una muerte apropiada para la historia y sus compañeros de juego saber cómo %he% falleció.<br />
+    <div class="warning">Esta acción no se puede deshacer o revertir.</div>
+  sure:         realmente muy seguro?
+  submit:       dé la bienvenida a los brazos de la muerte
+  success:      Tu personaje está ahora muerto.
+ respawn:
+  name:         Reaparición
+  description:  devolver personaje a la piscina
+  sure:         estás seguro?
+  success:      El personaje ha sido devuelta a la piscina.
+ heraldry:
+  name:         heráldica
+  description:  asignar o cambiar cresta
+  intro: >
+    Aquí puede asignar <a href="%url%">crestas heráldicas</a> que ha creado para su personaje.<br />
+    Un personaje sólo puede tener una cresta, que lo identifica y/o de su familia, la dinastía u otro grupo al que pertenece.
+  remove:       utilizar ninguna cresta
+  submit:       asignar cresta
+  nocrests:     Usted no tiene ningún crestas disponible. Siga el enlace anterior para diseñar crestas para tus personajes.
+
+escape:
+ name:      escapar
+ description: ...o por lo menos intentarlo.
+ intro:     A pesar del antiguo juramento, puede intentar engañar a %captor% y escapar de su cautiverio.
+ low:       Sus posibilidades de éxito, sin embargo, son bastante pequeñas y su captor será informado de su intento. Puede haber graves consecuencias.
+ high:      Como su captor no ha sido visto por muchos días, sus posibilidades de éxito son muy altas.
+ submit:    intentar escapar
+ queued:    Ahora está trabajando en su plan de escape. Tomará %hours% horas para implementar.
+
+personal:
+ party:
+  name:         Equipo de Calabozo
+  description:  Compruebe el estado de su grupo de explorando el calabozo.
+ dungeoncards:
+  name:         Acciones de Calabozo
+  description:  Revise sus acciones de calabozo disponibles.

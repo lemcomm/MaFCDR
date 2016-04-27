@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    {% block includes %}
+    {% endblock %}
+</head>
+<body>
+    <div class="symfony-content" data-role="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script language="javascript" type="text/javascript">
+    {% block javascript %}
+    {% endblock %}
+    $(document).ready(function() {
+        {% block jquery %}
+        {% endblock %}
+    });
+    </script>
+</body>
+</html>

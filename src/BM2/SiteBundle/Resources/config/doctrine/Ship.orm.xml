@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Ship">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="location" type="point" nullable="true"/>
+		<field name="cycle" type="integer"/>
+
+		<many-to-one field="owner" target-entity="Character"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,1882 @@
+
+@import url(http://fonts.googleapis.com/css?family=Merriweather:400,700);
+@import "../fonts/kingthings/stylesheet.css";
+
+
+html{
+    background: url("../images/parchment-dark.jpg") repeat scroll 0 0 #db9;
+    color:      #100218; /* "deep purple night" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+
+body {
+    font-size:      14px;
+    font-family:    "Merriweather", "Times New Roman", Times, serif;
+    margin:         0;
+}
+
+#offer {
+    background: none repeat scroll 0% 0% rgba(120, 255, 160, 0.5);
+    position: relative;
+    top: 0;
+    display: inline-block;
+    padding: 1em 2em;
+    border: 3px solid darkred;
+    border-radius: 1em;
+    box-shadow: 0.5em 0.5em 0.5em rgba(0,0,0,0.75);
+    font-weight: bold;
+    margin-left: 12em;
+    -webkit-transform: rotate(-20deg); 
+    -moz-transform: rotate(-20deg); 
+    -o-transform: rotate(-20deg);
+    -ms-transform: rotate(-20deg); 
+}
+
+p {
+    line-height: 1.5em;
+}
+p.condensed {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}
+
+a {
+    color:           #206;
+    text-decoration: none;
+    font-weight:     bold;
+}
+
+a:hover {
+    color:           #208;
+    text-decoration: underline;
+}
+
+#debug {
+    background: white;
+    color: black;
+    z-index: 5000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+}
+
+.ui-front {
+    /* OpenLayers puts stuff way above the jQuery-UI default of 100 */
+    z-index: 1100 !important;
+}
+/* override fonts of jgquery themes */
+.symfony-content .ui-widget {
+    font-family:      "Merriweather", "Times New Roman", Times, serif;
+}
+.symfony-content .ui-widget-content {
+    color: #EFEFEF;
+}
+.symfony-content .ui-widget-content a {
+    color:  #ccf;
+}    
+.symfony-content .ui-widget-content h1, .symfony-content .ui-widget-content h2, .symfony-content .ui-widget-content h3, .symfony-content .ui-widget-content h4 {
+    color:  #EFEFEF;
+}
+
+h4 {
+    margin-bottom: 0.25em;
+}
+
+.ui-tooltip {
+    font-size: 12px !important;
+    z-index: 1001 !important;
+}
+
+.ui-autocomplete {
+    z-index: 1501 !important;    
+}
+
+input[type=number] {
+    text-align: right;
+}
+input[type=radio] {
+    margin-right: 1em;
+}
+textarea {
+/*    width: 60em; */
+    min-width: 40em;
+    height: 20em;
+    min-height: 5em;
+}
+.translator textarea {
+    width: 35em;
+    min-height: 3em;
+    height: 6em;
+}
+table.translator th {
+    border-left: 2px solid #eee;
+    border-right: 2px solid #eee;
+    border-bottom: 1px solid #aaa;
+}
+
+table {
+    border-spacing: 1em 0.1em;
+}
+
+table tr.big th {
+    font-size: 150%;
+    padding: 0 1em;
+}
+table tr.center td {
+    text-align: center;
+}
+
+table.electionslist td.closed {
+    text-decoration: line-through;
+}
+
+table.votes tbody td {
+    vertical-align: top;
+    border-top: 1px solid black;
+}
+table.votes .self {
+    font-weight: bold;
+    background-color: rgba(0,0,0,0.2);
+}
+.votebox {
+    display: none;
+}
+
+table.hidebuttons button {
+    display: none;
+}
+table.hidebuttons td:hover button {
+    position: absolute;
+    box-shadow: 0.25em 0.25em 0.25em rgba(0,0,0,0.75);
+/*    width: 100%; */
+    display: block;
+}
+
+table.hidebuttons td:active button {
+    box-shadow: 0.1em 0.1em 0.25em rgba(0,0,0,0.75);
+}
+
+ul.horizontal li {
+    display: inline;
+}
+
+ul.shortlist {
+    padding-left: 0;
+    margin: 0;
+}
+ul.shortlist li {
+    display: inline;
+}
+ul.shortlist li:before {
+    content: ", ";
+    white-space:pre;
+}
+ul.shortlist li:first-child:before {
+    content: "";
+}
+dl {
+    margin: 1em 0;
+    padding: 0;
+}
+dt {
+    float: left;
+}
+dd {
+    margin-left: 10em;
+    margin-bottom: 0.25em;
+}
+dl.wide dd {
+    margin-left: 20em;
+}
+dl.rightvalues dd {
+    text-align: right;
+    min-width: 4em;
+}
+dl.long dt {
+    font-weight: bold;
+    float: none;
+    margin-top: 2.5em;
+}
+dl.long dd .time {
+    font-style: italic;
+}
+
+ul.simple {
+    padding-left: 0;
+}
+ul.simple li {
+    list-style:none;
+}
+
+table ul.simple {
+    margin: 0;
+}
+
+.characterrow .edit-list {
+    width: 1.2em;
+}
+.characterrow .edit-list img {
+    display: none;
+}
+
+.characterrow:hover .edit-list img {
+    display: inline;
+}
+
+.editable {
+    cursor: hand;
+    cursor: pointer;
+}
+
+.tt {
+    cursor: help;
+}
+.tt_bot {
+    cursor: help;
+}
+
+#logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#identity {
+    color: #600;
+    font-family: "KingthingsCalligraphica2Rg","Serif";
+    font-size: 1.8em;
+    left: 60%;
+    position: absolute;
+    top: 2em;
+    /* http://www.colourlovers.com/color/FFE500/Gold_Watch and http://www.colourlovers.com/color/FFDD00/Conrad_Gold */
+    text-shadow: 1px 1px 1px #FFE500, -1px 1px 1px #FFDD00, -1px -1px 1px #FFDD00, 1px -1px 1px #FFE500;
+}
+#identity a:hover {
+    text-shadow: 2px 2px 2px #fff, -2px 2px 2px #fff, -2px -2px 2px #fff, 2px -2px 2px #fff;
+    text-decoration: none;    
+}
+
+#title {
+    text-align: center;
+    margin-bottom: -3em;
+}
+#title img {
+    width: 100%;
+    max-width: 1200px;
+}
+
+#symfony-wrapper {
+    width:  100%;
+    margin: 0;
+}
+
+#symfony-header {
+    font-size:  18px;
+    position:   relative;
+    padding:    60px 0 0 0;
+    text-align: right;
+/*    min-height: 110px; */
+    margin-right: 60px;
+}
+
+.flash-message {
+    background:     #202010;
+    color:          #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    border:         2px solid #706020;
+    padding:        0.5em 2em;
+    border-radius:  1em;
+    margin:         1em 2em;
+}
+.flash-message a {
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+.flash-message a:hover {
+    color: #fff;
+}
+
+
+
+/* ===== Navigation Bar ===== */
+
+#symfony-navigation {
+    font-size: 1.2em;
+    height: 2.1em;
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+    box-shadow: 0 0.5em 0.5em rgba(0,0,0,0.5);
+    text-align: center;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-left: 0;
+    border-right: 0;
+    position: absolute;
+    top: 130px;
+    width: 100%;
+}
+#symfony-navigation.simple {
+    position: relative;
+    top: 3em;
+}
+#symfony-navigation li {
+    list-style: none;
+}
+#symfony-navigation ul {
+    margin: 0;
+    padding: 0;
+}
+
+#symfony-navigation>ul>li {
+    display: inline-block;
+    margin: 0 -0.15em;
+    padding: 0;
+    border-right: 5px groove rgba(0,0,0,0.3);
+}
+#symfony-navigation>ul>li:first-child {
+    border-left: 5px groove rgba(0,0,0,0.3);
+}
+#symfony-navigation>ul>li>a {
+    line-height: 2em;
+    display: block;
+    padding: 0em 0.75em;
+    color: white;
+    text-decoration: none;
+}
+#symfony-navigation>ul>li>a.new {
+    background: url("../images/star16.png") no-repeat scroll right;
+    padding-right: 24px;
+}
+
+#symfony-navigation>ul>li>a:hover {
+    background: linear-gradient(to bottom, rgba(238,234,242,0.1) 0%, rgba(238,234,242,0.25) 50%, rgba(238,234,242,0.1) 100%);
+    box-shadow: 0 0 0.5em rgba(5,34,67,0.75);
+}
+#symfony-navigation>ul>li.current>a {
+    box-shadow: 0 0 0.5em rgba(248,249,249,0.75);
+    font-family: 'DroidSansBold', Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    background: linear-gradient(to bottom, rgba(0,200,0,0.75) 0%, rgba(0,200,0,0.95) 50%, rgba(0,200,0,0.75) 100%);
+}
+
+#symfony-navigation .sub {
+    position: absolute;
+    z-index: 9999;
+    display: none;
+    padding: 1em 2em 0;
+/*
+    background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0.75) 100%);
+*/
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+    border-bottom-right-radius: 0.5em;
+    border-bottom-left-radius: 0.5em;
+    font-size: 75%;
+    color: white;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-top: 0;
+}
+
+#symfony-navigation .row {
+    width: 100%;
+    margin-bottom: 1em;
+}
+#symfony-navigation .sub li {
+    width: 100%;
+}
+#symfony-navigation .sub li.part {
+    display: inline-block;
+    width: 12em;
+    vertical-align: top;
+}
+#symfony-navigation .sub h3 {
+    padding: 0; margin: 0;
+    font-size: 1.1em;
+    text-decoration: underline;
+    color:white;
+}
+#symfony-navigation .sub a {
+    float: none;
+    text-indent: 0;
+    height: auto;
+    padding: 0.5em 0.5em 0.5em 1em;
+    display: block;
+    text-decoration: none;
+    color: white;
+}
+#symfony-navigation .sub a:hover {
+    color: white;
+    background: rgba(255,255,255,0.2);
+    border-radius: 0.5em;
+}
+
+#symfony-navigation.fixed {
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+}
+
+
+
+
+
+ul.navbar {
+    font-size:  18px;
+    margin: 0;
+    position: absolute;
+    top: 0.2em;
+    right: 20px;
+}
+
+ul.navbar li {
+    display: inline;
+    margin-left: 2em;
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.5em;
+    padding: 1em 0.4em 0.1em 0.4em;
+    box-shadow: 0 0 0.2em #4F2700; /* http://www.colourlovers.com/color/4F2700/dark_wood */
+}
+ul.navbar li.active {
+/*
+    padding-bottom: 12px;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+*/
+}
+
+ul.navbar li a {
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+ul.navbar li a:hover {
+    color: #fff;
+}
+ul.navbar li a.new {
+    background: url("../images/star16.png") no-repeat scroll right;
+    padding-right: 24px;
+}
+
+#themenuactor {
+    color: #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+}
+
+#themenu {
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+/*
+    opacity: 0.8;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.65) 10%, rgba(0,0,0,0.95) 25%, rgba(0,0,0,0.90) 90%, rgba(0,0,0,0.60) 95%, rgba(0,0,0,0.0) 100%);
+*/
+    background: linear-gradient(to left, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.95) 50%, rgba(0,0,0,0.75) 100%);
+    box-shadow: 0 0 1.5em 2em rgba(0,0,0,0.75);
+
+    display: none;
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    font-weight: bold;
+    padding-left: 1em;
+    padding-right: 0.5em;
+    z-index: 9999;
+}
+#themenu .column {
+    width: 25%;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: top;
+}
+#themenu .wrapper {
+    margin: 1em 2em;
+}
+#themenu ul {
+    padding: 0;
+    line-height: 2em;
+}
+
+#themenu li {
+    list-style: none;
+}
+
+#themenu li a {
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    padding: 0 0.25em;
+    margin-left: -0.25em;
+}
+#themenu li a:hover {
+    /* "memory blue" - http://www.colourlovers.com/color/EFF3FF/memory_blue */
+    color: rgb(239,243,255);
+    background: rgba(239,243,255, 0.25);
+    box-shadow: 0 0 5px 3px rgba(239,243,255, 0.25);
+    border-radius: 2em;
+}
+
+
+ul.lang-menu {
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    right: 20px;
+    top: 2px;
+}
+ul.lang-menu li {
+    list-style: none;
+    line-height: 22px;
+}
+ul.lang-menu a:hover img {
+    box-shadow: 0 0 5px 3px rgba(255, 255, 200, 0.75);
+}
+hr.spacer {
+    color: #aab;
+    margin: 1em;
+}
+div.topspace {
+    margin-top: 3em;
+}
+th.topspace {
+    padding-top: 2em;
+}
+
+.symfony-content {
+    background:                 rgba(255,250,242,0.4);
+    box-shadow:                 0 0 1em rgba(0, 0, 0, 0.75) inset;
+    color:                      black;
+    border:                     2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-left:                0;
+    border-top-right-radius:    1em;
+    border-bottom-right-radius: 1em;
+    margin:                     110px 2em 1em 0;
+    padding:                    1em 2em;
+    word-wrap:                  break-word;
+}
+
+.maincontent {
+    width: 75%;
+}
+
+.leftmain {
+    float:  left;
+    clear:  left;
+    width:  98%;
+}
+
+.subcontent_wrapper {
+    width: 24%;
+    float: right;
+}
+.subcontent {
+    background:     rgba(255,250,242,0.4);
+    box-shadow:     0 0 1em rgba(0, 0, 0, 0.75) inset;
+    border:         1px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    margin:         1em 0;
+    padding:        1em 2em;
+    border-radius:  1em;
+    color:          #460702;
+}
+.inline_announcements ul {
+    padding-left: 1em;
+}
+
+.symfony-content h1, .symfony-content h2, .symfony-content h3, .symfony-content h4 {
+    color: #020729; /* "which" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+h2:not(:first-of-type) {
+    padding-top: 1em;
+}
+h3:not(:first-of-type) {
+    padding-top: 0.5em;
+}
+h3.subtitle {
+    margin-top: -1em;
+    margin-bottom: 2em;
+}
+
+
+#viewer .symfony-content {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+}
+#viewer.ui-dialog-content {
+    padding: 0;
+}
+#viewer h2, #viewer h3 {
+    color: #fff;
+}
+
+#direct_login, #direct_register {
+    float: left;
+    width: 45%;
+}
+#symfony-footer {
+    background:     rgba(255,250,242,0.4);
+    box-shadow:     0 0 1em rgba(0, 0, 0, 0.75) inset;
+    color:          #100218; /* "deep purple night" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    border:         2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius:  1em;
+    padding:        0.5em 3em;
+    text-align:     center;
+    margin: 1em 3em 1em 1em;
+}
+#symfony-footer div {
+    display: inline-block;
+    margin: 0 2em;
+}
+#symfony-footer hr {
+    color: #706020;
+}
+
+#sd_anchor {
+    margin: 0;
+    padding: 0;
+}
+
+#mapviewer .minimizeDiv, #mapviewer .maximizeDiv {
+    display:none;
+}
+
+#mapviewer .ui-widget-content {
+    background: url("../images/parchment.jpg") repeat scroll 0 0 #d2be8c;
+    color: #000;
+    border-color: #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-width: 2px;
+    font-size: 14px;
+}
+
+#mapviewer .ui-widget-content a {
+    color:           #206;
+    text-decoration: none;
+    font-weight:     bold;
+}
+
+#mapviewer .ui-widget-content a:hover {
+    color:           #208;
+    text-decoration: underline;
+}
+
+#mapviewer h1 {
+    color: #DC8E20;
+}
+
+.symfony-content #mapviewer .ui-widget-content h3, .symfony-content #mapviewer .ui-widget-content h4, {
+    color: #000;
+}
+
+
+#switcher {
+    padding: 0;
+    margin: 0;
+    position: relative;
+    top: 0;
+}
+
+#legend {
+    padding: 0.5em 1em;
+}
+#legend h3 {
+    color: #000;
+    text-align: center;
+}
+#legend ul {
+    padding-left: 1em;
+}
+#legend li {
+    line-height: 1.2em;   
+    margin-bottom: 0.75em;
+}
+
+
+
+#travel {
+    width: 100%;
+    margin-top: 2em;
+    border: 2px solid #333;
+    border-radius: 0.2em;
+    padding: 0.5em 1em;
+}
+
+
+.hidden {
+    display: none;
+}
+.center {
+    text-align: center;
+}
+.right {
+    text-align: right;
+}
+.clear {
+    clear: both;
+}
+.red {
+    color: #e02010;
+}
+.green {
+    color: #00e040;
+}
+.disabled {
+    color: #888;
+}
+.disabled a {
+    color: #777;
+}
+.disabled a:hover {
+    color: #999;
+}
+p.inactive {
+    color: #876;
+    margin-top: -1em;
+}
+
+.enforceable, .enforceable a {
+    color: #800;
+    font-weight: bold;
+}
+
+a.full {
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    background-color: rgba(0,0,0, 0.5);
+    display: block;
+    padding: 0.5em 2em;
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+#soldierslist .disabled {
+    text-decoration: line-through;
+}
+
+div.success {
+    background: none repeat scroll 0 0 #080;
+    border: 2px solid #2b2;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #ffa;
+    padding: 0.5em 1em;
+    font-weight: bold;
+}
+div.warning {
+    background: none repeat scroll 0 0 #aa0;
+    border: 2px solid #dd2;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #002;
+    padding: 0.5em 1em;
+    font-weight: bold;
+}
+div.error {
+    background: none repeat scroll 0 0 #800;
+    border: 2px solid #b22;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #faa;
+    padding: 0.5em 1em;
+    font-weight: bold;
+}
+div.exception {
+    background: none repeat scroll 0 0 #800;
+    border: 2px solid #b22;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #faa;
+    font-weight: bold;
+    padding: 1em 2em;
+}
+div.exception h2 {
+    color: #fbb;
+    margin-top: 0;
+}
+
+ul.error_list {
+    background: none repeat scroll 0 0 #800;
+    border: 2px solid #b22;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #faa;
+    padding: 0.5em 2em;
+}
+ul.error_list li {
+    list-style: none;
+}
+
+div.queue, div.meta {
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-bottom-left-radius: 0.5em;
+    border-top-right-radius: 1em;
+    box-shadow: -0.25em 0.25em 0.5em rgba(0, 0, 0, 0.75);
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    float: right;
+    padding: 0.25em 1em;
+    margin: -1em -2em 1em 1em;
+    max-width: 30%;
+}
+div.queue.secondary, div.meta.secondary {
+    clear: right;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0.5em;
+    margin-top: 1em;
+}
+div.queue h1, div.queue h2, div.queue h3, div.meta h1, div.meta h2, div.meta h3  {
+    color: #dddddd;
+}
+
+div.queue a, div.meta a {
+    color: #ddf;
+}
+div.queue a:hover, div.meta a:hover {
+    color: #ffffff;
+}
+div.queue dd {
+    margin-left: 5em;
+}
+
+
+div.meta a:after {
+    content: " - ";
+}
+
+div.pager {
+    margin-bottom: 1.5em;
+    color: #add;
+}
+
+#realmofficials_candidates {
+    column-width: 20em;
+    column-gap: 2em;
+    column-rule: 1px solid rgba(0,0,0,0.25);
+    -moz-column-width: 20em;
+    -moz-column-gap: 2em;
+    -moz-column-rule: 1px solid rgba(0,0,0,0.25);
+    -webkit-column-width: 20em;
+    -webkit-column-gap: 2em;
+    -webkit-column-rule: 1px solid rgba(0,0,0,0.25);
+    margin-bottom: 2em;
+}
+
+div.artviewer {
+    color: #000;
+    float: right;
+    padding: 0.2em;
+    margin: 0.1em 0.1em 0.1em 1em;
+    text-align: center;
+    max-width: 40%;
+}
+div.withbg {
+    background: url("../images/parchment.jpg") repeat scroll 0 0 #d2be8c;
+    border: 2px solid #706020;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;    
+}
+img.clipart {
+    width: 100%;
+    height: 100%;
+}
+
+
+div.linklist li a:after {
+    content: " - ";
+}
+
+div.linklist li span.nolink:after {
+    content: " - ";
+}
+
+div.boxlist ul {
+    margin: -2em 0 0 0;
+    padding: 0;
+}
+
+div.boxlist li {
+    display: block;
+    background: rgba(0,0,0,0.1);
+    float: left;
+    width: 18em;
+    height: 4.25em;
+    margin: 1em;
+    padding: 1em;
+    border-radius: 1em;
+}
+div.boxlist li:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+
+div.boxlist li a, div.boxlist li span.nolink {
+    display: block;
+    font-size: 120%;
+}
+
+div.act {
+    margin-left: 12em;
+    margin-bottom: 2.5em;
+}
+div.act:after {
+    clear: both;
+}
+div.act_title {
+    clear: both;
+    margin-left: 8em;
+    margin-bottom: 0;
+}
+div.act_actions {
+    float: left;
+    margin-left: -10em;
+    width: 8em;
+}
+
+div.act_actions a, a.actions_link {
+    background-color: #301010;
+    color: #ddf;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.5em;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+    margin-bottom: 1em;
+    text-align: center;
+    display: block;
+}
+
+a.actions_link {
+    display: inline;
+}
+
+div.act_actions a:hover, a.actions_link:hover {
+    color: #fff;
+}
+
+div.terms {
+    clear: both;
+    margin-top: 4em;
+}
+
+div.terms_full {
+    width: 70%;
+    border-right: 1px solid #666;
+    margin-bottom: 2em;
+    padding-right: 2em;
+    font-size: 80%;
+    color: #300;
+}
+
+div.terms_short {
+    float: right;
+    width: 25%;
+    font-size: 120%;
+}
+p.terms_basic {
+    color: #300;
+    font-weight: bold;
+    font-size: 90%;
+    margin: 0;
+}
+
+.possible {
+    font-size: 90%;
+    font-style: italic;
+    color: #126;
+}
+
+.inline form {
+    display: inline;
+}
+
+form.compact label {
+    margin-right: 1em;
+}
+form.compact div {
+    margin-bottom: 0.5em;
+}
+form.wide label {
+    float: left;
+    width: 15em;
+}
+form.wide>div>div>div>label {
+    float: none;
+    width: auto;
+    margin-right: 2em;
+}
+form.wide>div>div {
+    margin-bottom: 1em;
+}
+
+form.tall label {
+    display: block;
+}
+form.tall>div>div {
+    margin-bottom: 2em;
+}
+form div.subselect {
+    padding: 0.65em 2em;
+    margin: 0.75em 0;
+    background: #79b;
+    border-radius: 0.5em;
+}
+
+#listselect input {
+    float: left;
+}
+
+#interaction textarea {
+    display: block;
+}
+.fullwidth textarea {
+    width: 100%;
+    height: 10em;
+    min-height: 5em;
+    margin-bottom: 2em;
+}
+
+.texts dt {
+    width: 25em;
+    clear: both;
+}
+
+.texts dd {
+    margin-left: 26em;
+}
+
+.texts textarea {
+    margin-top: 4em;
+}
+
+img.sketch {
+    float: right;
+    width: 50%;
+    border: 0.5em ridge #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.2em;
+    margin: 0 0 1em 1em;
+}
+
+div.mapthumb {
+    float: left;
+    border: 0.5em ridge #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.2em;
+    margin: 0 0 1em 1em;
+    text-align: center;
+    background: url("../images/parchment-dark.jpg") repeat scroll 0 0 #ca8;
+}
+
+div.mapthumb img {
+    display: block;
+    margin: 0.5em;
+    border: 3px inset black;
+}
+
+#charimg {
+    float: right;
+    max-width: 50%;
+    height: 32em;
+    margin: 0 0 1em 1em;
+}
+
+#sd_content {
+    margin: .5em 1em;
+}
+#sd_content h2 {
+    margin: 0;
+}
+
+#sd_content dd {
+    text-align: right;
+    margin-bottom: 0.25em;
+    margin-left: 0;
+}
+.sd_button a {
+    background-color: #301010;
+    border: 2px solid #402020;
+    border-radius: 0.25em;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+    margin-bottom: 1em;
+    text-align: center;
+    display: block;
+}
+
+#map {
+    background-color:rgb(0,55,89);    
+    border: 2px inset #555;
+    border-radius: 4px;
+}
+
+#mapviewer {
+    margin-top: -1.8em;
+}
+
+.olTileImage { -webkit-backface-visibility: visible !important; -webkit-transform: none !important; } 
+
+#searchbox {
+    z-index: 1000;
+    position: relative;
+    top: 3.5em;
+    z-index: 1000;
+    left: 4em;
+    border-radius: 0.25em;
+}
+#searchbox #search {
+    background: url("../images/parchment.jpg") repeat scroll 0 0 #db9;
+    border-radius: 0.25em;
+}
+#searchbox #searchrunning {
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    font-weight: bold;
+}
+
+#insertbox {
+    border-radius: 0.25em;
+}
+#replydialog #insertbox {
+    font-size: 0.85em;
+}
+#insertbox input {
+    background: url("../images/parchment.jpg") repeat scroll 0 0 #db9;
+    border-radius: 0.25em;
+}
+
+
+.progress_small {
+    max-width: 25em;
+}
+.progress_column {
+    min-width: 10em;
+}
+.progress_column .progressbar {
+    height: 1.2em;
+}
+.progress_column .progress_value {
+    margin: 0 1em;
+    float: left;
+}
+
+th.bar li {
+    padding: 0 1em;
+}
+
+.bar ul {
+    margin-left: 0;
+    display: block;
+    clear: both;
+}
+
+.bar li {
+    float:left;
+    list-style:none;
+    text-align:center;
+    background-color: silver;
+}
+
+.bar li.data {
+    height: 1.4em;
+}
+
+.bar .bar_prod_base {
+    background-color: rgba(182,216,132, 0.8);
+}
+.bar .bar_prod_build {
+    background-color: rgba(143,205,158, 0.8);
+}
+.bar .bar_trade_in {
+    background-color: rgba(118,203,200, 0.8);
+}
+.bar .bar_dem_base {
+    background-color: rgba(245,152,170, 0.8);
+}
+.bar .bar_corruption {
+    background-color: rgba(80,80,80, 0.7);
+}
+.bar .bar_dem_build {
+    background-color: rgba(249,180,138, 0.8);
+}
+.bar .bar_dem_constr {
+    background-color: rgba(254,205,126, 0.8);
+}
+.bar .bar_trade_out {
+    background-color: rgba(153,119,180, 0.8);
+}
+
+
+table.battlereport {
+    border-spacing: 5em 0.1em;
+}
+
+table.battlereport th {
+    border-top: 1px solid silver;
+}
+
+table.battlereport td.reportcolumn {
+    min-width: 20em;
+}
+
+
+table.battlereport h2, table.battlereport h3, table.battlereport h4 {
+    margin: 0.25em;
+}
+table.battlereport ul {
+    padding: 0;
+    margin: 0;
+}
+table.battlereport li {
+    list-style: none;
+}
+
+table.battlejoin {
+    border-collapse: collapse;
+}
+table.battlejoin td, table.battlejoin th {
+    padding: 0.2em 3em;
+}
+table.battlejoin td:not(:first-of-type), table.battlejoin th:not(:first-of-type) {
+    border-left: 1px solid silver;
+    padding: 0.2em 3em;
+}
+
+.eventlog .prio_0 {
+    color: #666;
+}
+.eventlog .prio_10 {
+    color: #333;
+}
+.eventlog .prio_20 {
+    color: #840;
+}
+.eventlog .prio_30 {
+    color: #800;
+}
+.eventlog em {
+    font-family: "KingthingsCalligraphicaLight","Serif";
+    font-size: 1.2em;
+    line-height: 0.8em;
+}
+
+#leveldetails_wrapper {
+    clear: both;
+    overflow: auto;
+    margin: 2em;
+}
+.leveldetails {
+    background: url("../images/parchment-dark.jpg") repeat scroll 0 0 #db9;
+    border: 2px solid darkorange;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #100218; /* "deep purple night" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    float: left;
+    padding: 0.25em 1em;
+    margin: 12px;
+    cursor: pointer;
+}
+.leveldetails h3 {
+    color: black !important;
+}
+.leveldetails.active {
+    background: url("../images/parchment-verydark.jpg") repeat scroll 0 0 #ca8;
+    border: 4px solid orange;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: black;
+    font-weight: bold;
+    float: left;
+    padding: 0.25em 1em;
+    margin: 10px;
+}
+.leveldetails.active h3 {
+    text-decoration: underline;
+}
+.leveldetails.disabled {
+    background: none repeat scroll 0 0 #222;
+    border: 2px solid #666;
+    color: #aaa;
+    cursor: default;
+}
+
+div.footnote {
+    font-size: 90%;
+    margin-top: 4em;
+    color: #333;
+}
+
+div.fiction {
+    font-family: "KingthingsCalligraphica2Rg","Serif";
+    font-size: 120%;
+}
+div.fiction h2, div.fiction h3, div.fiction h4 {
+    color: black !important;
+    margin-top: 0;
+}
+.ui-tabs.ui-tabs-vertical {
+    padding: 0;
+}
+.ui-tabs.ui-tabs-vertical .ui-widget-header {
+    border: none;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav {
+    float: left;
+    background: #CCC;
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid gray;
+    margin-right: 2em;
+    margin-bottom: 1em;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav li {
+    clear: left;
+    width: 100%;
+    margin: 0.2em 0;
+    border: 1px solid gray;
+    border-width: 1px 0 1px 1px;
+    border-radius: 4px 0 0 4px;
+    overflow: hidden;
+    position: relative;
+    right: -2px;
+    z-index: 2;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav li a {
+    display: block;
+    width: 100%;
+    padding: 0.6em 1em;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav li a:hover {
+    cursor: pointer;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
+    margin-bottom: 0.2em;
+    padding-bottom: 0;
+    border-right: 1px solid white;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-nav li:last-child {
+    margin-bottom: 10px;
+}
+.ui-tabs.ui-tabs-vertical .ui-tabs-panel {
+    background: url("../images/parchment.jpg") repeat scroll 0 0 #d2be8c;
+    color: #402000;
+    border-left: 1px solid gray;
+    border-radius: 0;
+    position: relative;
+    left: -1px;
+}
+
+.charselect {
+    min-width: 16em;
+}
+
+ul.heraldry_choice {
+    padding-left: 15em;
+}
+
+ul.heraldry_choice li.row {
+    display: inline;
+}
+ul.heraldry_choice li.optgroup {
+    list-style: none;
+}
+
+.heraldry_choice img {
+    height: 30px;
+    cursor: hand;
+    cursor: pointer;
+    background-color: rgba(255,255,255,0.333);
+    padding: 2px;
+    border-radius: 2px;
+}
+
+.heraldry_choice svg {
+    height: 20px;
+    width: 30px;
+    cursor: hand;
+    cursor: pointer;
+}
+
+.heraldry_choice span {
+    vertical-align: top;
+    width: 5em;
+    display: inline-block;
+}
+
+
+.heraldrylist {
+    margin: 0;
+}
+.heraldrylist li {
+    width: 120px;
+    display: inline-block;
+/*    float: left; */
+    margin: 0 2em;
+}
+.heraldrylist li.selectable {
+    cursor: hand;
+    cursor: pointer;
+}
+.heraldrylist li h4 {
+    text-align: center;
+}
+
+.vip {
+    float: right;
+    margin: 0 5em;
+}
+
+.heraldry {
+    width: 150px;
+    float: right;
+    margin: 0 5em;
+}
+
+.battlebanners ul, .battlebanners li, .battlebanners img, .battlebanners div {
+    width: 50px !important;
+}
+
+td.battlebanners {
+    vertical-align: top;
+    width: 50px;
+}
+
+
+div#emptycrest {
+    width: 120px;
+    height: 140px;
+    background-color: rgba(255,255,255,0.25);
+    border-radius: 0.5em;
+}
+
+
+.payment {
+    background: none repeat scroll 0 0 #aa0;
+    border: 2px solid #dd2;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: #002;
+    padding: 0.5em 1em;
+    font-weight: bold;
+}
+
+
+.rssfeed {
+    float:right ;
+}
+.rssfeed img {
+    width: 2em;
+    vertical-align: middle;
+}
+
+li.offersdetailslink {
+    text-decoration: underline;
+}
+
+li.offersdetailslink:hover {
+    cursor: hand;
+    cursor: pointer; 
+}
+
+div.announcements {
+    background: url("../images/bg.jpg") repeat scroll 0 0 #404040;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-bottom-left-radius: 0.5em;
+    border-top-right-radius: 1em;
+    box-shadow: -0.25em 0.25em 0.5em rgba(0, 0, 0, 0.75);
+    color: #eeeaf2; /* "edelweiss white" - http://www.colourlovers.com/palette/951046/lucky_moon_and_stars */
+    float: right;
+    padding: 0.25em 1em;
+    margin: -1em -2em 0 0;
+}
+div.announcements h2, div.queue h3 {
+    color: #dddddd;
+}
+
+div.announcements a {
+    color: #ddf;
+}
+div.announcements a:hover {
+    color: #ffffff;
+}
+
+.newspaper {
+    background: rgba(250, 250, 250, 0.8);
+    width: 980px;
+    padding-bottom: 20px;
+    margin-top: 1em;
+}
+
+.newspaper .newsheader {
+    background: white;
+    color: black;
+    text-align: center;
+    position: relative;
+    margin: 1em;
+}
+.newspaper .newsheader h1 {
+    font-size: 250%;   
+}
+
+.newspaper #number {
+    color: #333;
+    position: absolute;
+    bottom: 0;
+    left: 1em;
+}
+
+.newspaper #pubdate {
+    color: #333;
+    position: absolute;
+    bottom: 0;
+    right: 1em;
+}
+
+
+.newspaper li {
+    background: white;
+    color: black;
+    overflow: hidden;
+    padding: 10px;
+    text-align: justify;
+}
+
+
+.newspaper h1, .newspaper h2, .newspaper h3, .newspaper h4 {
+    color: black !important;
+    margin: 0 0 0.5em 0;
+    font-size: 200%;
+}
+
+.newspaper .article li {
+    overflow: visible;
+    padding: 0;
+    position: relative;
+}
+
+.newspaper .author {
+    color: #999;
+    font-size: 70%;
+    margin-bottom: 0.5em;
+}
+.newspaper .author a {
+    color: #88e;
+}
+
+.newspaper a:hover {
+    color:           #66d;
+    text-decoration: underline;
+}
+
+
+.newspaper .editbox {
+    background: #ccc;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.2em 0.5em;
+}
+
+.newspaper .editbox button, .newspaper .editbox select {
+    display: block;
+    width: 100%;
+}
+
+.status_working {
+    color: #33a;
+}
+.status_success {
+    color: #2a3;
+}
+.status_error {
+    color: #b22;
+    font-weight: bold;
+}
+
+.vip_column {
+    float: left;
+    margin: 0 3%;
+    width: 27%;
+}
+
+.vip_column img {
+    width: 100%;
+}
+
+table.laws {
+    border-collapse: collapse;
+}
+
+table.laws thead th {
+    background-color: rgba(0,0,0,0.2);
+}
+table.laws tbody tr {
+    border-top: 2px solid rgba(0,0,0,0.5);
+}
+
+table.laws tbody th {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.4em 0.8em;
+}
+
+table.laws td {
+    vertical-align: top;
+    max-width: 25em;
+    padding: 0.4em 0.8em;
+}
+
+table.members {
+    border-collapse: collapse;
+}
+
+table.members td {
+    padding: 0.2em 1em;
+}
+
+table.members tr.changed {
+    background-color: rgba(255,200,0,0.4);
+}
+
+
+
+li.plot:hover {
+    background: rgba(0,0,0,0.25);
+}
+
+
+/* forms styling */
+
+select, input {
+    font-size:          13px;
+    font-family:        "Merriweather", "Times New Roman", Times, serif;
+}
+
+button {
+    font-size:          14px;
+    font-family:        "Merriweather", "Times New Roman", Times, serif;
+}
+
+
+table.syntax th {
+    background: rgba(0,0,0,0.5);
+}
+
+
+
+/* tablesorter */
+th.tablesorter-header {
+    background-position: center right;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+th.tablesorter-header.sorter-false {
+    background-image: none !important;
+    padding-right: 0 !important;
+}
+th.tablesorter-headerUnSorted {
+    background-image: url("../images/ice-unsorted.gif");
+    padding-right: 16px;
+}
+th.tablesorter-headerAsc {
+    background-image: url("../images/ice-asc.gif");
+    padding-right: 16px;
+}
+th.tablesorter-headerDesc {
+    background-image: url("../images/ice-desc.gif");
+    padding-right: 16px;
+}
+
+ul.traits {
+    padding: 0px;
+    margin-top: -1em;
+}
+dl.traits {
+    line-height: 2em;
+}
+ul.traits li {
+    list-style: none;
+    display: inline-block;
+}
+ul.traits li::first-letter {
+  font-weight: bold;
+  color: white;
+  background: rgba(140,80,0,0.5);
+  font-size: 16px;
+  border-radius: 4px;
+  padding: 0.25em 0.5em;
+}
+
+dl.traits dt::first-letter {
+  font-weight: bold;
+  color: white;
+  background: rgba(140,80,0,0.5);
+  font-size: 14px;
+  border-radius: 3px;
+  padding: 0.25em 0.5em;
+}
+
+
+div#reputation dt {
+    float: none;
+    color: #226;
+    margin-top: 1em;
+}
+
+div#reputation dd {
+    margin-left: 0;
+}
+
+div#reputation textarea {
+    height: auto;
+    min-height: initial;
+}
+
+div#reputation button {
+    color: #000;
+}
+div#reputation button.selected {
+    color: #262;
+    font-weight: bold;
+}
+div#reputation button.inactive {
+    color: #ccc;
+    font-weight: normal;
+}
+div#reputation button.inactive:hover {
+    color: #4a4;
+    font-weight: bold;
+}
+
+div.symfony-shortcuts {
+    position: fixed;
+    right: -1.5em;
+    top: 15em;
+}
+
+div.symfony-shortcuts>ul {
+    margin: 0;
+    padding: 0;
+}
+
+div.symfony-shortcuts li {
+    list-style: none;
+    margin-bottom: 1em;
+    z-index: 9999;
+}
+
+div.symfony-shortcuts>ul>li {
+    font-size: 75%;
+    text-align: center;
+    background: url('../images/bg.jpg') repeat scroll 0px 0px #404040;
+    color: #DC8E20;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.5em;
+    box-shadow: -0.5em 0.5em 0.5em rgba(0,0,0,0.5);
+    padding: 1em 2em 0.5em 0.5em;
+}
+div.symfony-shortcuts .value {
+    font-size: 180%;
+    display: block;
+}
+div.symfony-shortcuts a {
+    text-decoration: none;
+    color: #DC8E20;
+}
+div.symfony-shortcuts a:hover {
+    color: #FFE500;
+}
+
+div.symfony-shortcuts li.drawer ul {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: url('../images/bg.jpg') repeat scroll 0px 0px #404040;
+    color: #DC8E20;
+    border: 2px solid #DC8E20; /* http://www.colourlovers.com/color/DC8E20/Dark_Gold_Spice */
+    border-radius: 0.5em;
+    box-shadow: -0.5em 0.5em 0.5em rgba(0,0,0,0.5);
+    padding: 1em 2em 0em 0.5em;
+    margin-right: 1em;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 120%;
+}
+
+.message_container {
+    margin-bottom: 2em;
+    position: relative;
+}
+.message_container.old {
+    opacity: 0.5;
+}
+.message_container.old:hover {
+    opacity: 1;
+}
+.message_tags {
+    float: right;
+    position: absolute;
+    top: 0.5em;
+    right: 1em;
+}
+.message_container ul, .message_selector ul {
+    padding-left: 0;
+    margin: 0;
+}
+.message_container li, .message_selector li {
+    display: inline-block;
+    border: 0;
+    border-radius: 0.5em;
+    text-shadow: 0px 1px 0px #ffe6a5;
+    padding: 0 0.5em;
+    color: #4f2f2f;
+    font-size: 14px;
+}
+.message_container li.tag, .message_selector li.tag {
+    background: #ffc835;
+}
+.message_container li.recipient, .message_selector li.recipient {
+    background: #acf;
+}
+.message_header {
+    padding: 0.25em 1em;
+    background: rgba(0,0,0,0.2);
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
+.message_footer {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+    display: inline-block;
+    text-align: center;
+}
+.message_footer ul {
+    padding: 0.5em 1.5em;
+    background: rgba(0,0,0,0.2);
+    display: inline-block;
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+}
+.message_content {
+    padding: 0.5em 1em;
+    background: rgba(0,0,0,0.1);    
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+}
+.message_button {
+    border-color: #ebae3e;
+    border-width: 1px;
+    border-style: solid;
+    transition: all 0.2s ease-in-out;
+    background: #ffc835;
+    border: 0;
+    box-shadow: 0px 1px 0px 0px #ffe04f inset, 0px 0px 0px 2px #ffed99;
+    border-radius: 0.5em;
+}
+.message_button:hover {
+    background: #eb1;
+    cursor: hand;
+    cursor: pointer;
+    box-shadow: 0px 1px 0px 0px #fe5 inset, 0px 0px 0px 2px #ffa;
+}
+.message_sealed {
+    margin-bottom: 1em;
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    background: rgba(10,0,40,0.2);
+}
+.message_selector {
+    position: relative;
+    margin-bottom: 2em;
+    padding: 0.5em 1em;
+    border-radius: 0.5em;
+    background: rgba(10,40,80,0.5);
+}
+.message_button.filter_show {
+    background: #fea;
+}
+.message_button.filter_hide {
+    opacity: 0.5;
+}
+
+

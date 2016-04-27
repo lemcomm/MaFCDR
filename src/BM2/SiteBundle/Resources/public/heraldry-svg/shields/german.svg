@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="300px" height="350px" xmlns="http://www.w3.org/2000/svg">
+<g>
+<path d="M 15,120 C 35,120 55,115 55,95 C 55,75 40,55 1,70 C 1,70 0,50 25,30 C 50,10 75,10 110,20 C 120,20 150,1 220,1 C 255,1 299,25 299,25 C 299,25 265,45 265,85 C 265,125 285,140 295,185 C 315,275 250,340 150,349 C 50,340 -15,245 5,165 C 10,145 15,140 15,120 z" id="german" />
+</g>
+</svg>

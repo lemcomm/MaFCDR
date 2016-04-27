@@ -1,0 +1,59 @@
+{% extends "DungeonBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'party.title'|trans({}, "dungeons")|title }}</h2>
+<p>
+{% if party %}
+	{% if party.dungeon %}
+		{% if dungeoneer.isindungeon %}
+			{{ 'party.intro.inside'|trans({"%party%":party.members.count, "%area%":('area.'~party.dungeon.area)|trans({},"dungeons")}, "dungeons") }}
+		{% else %}
+			{{ 'party.intro.inside2'|trans({"%party%":party.members.count, "%inside%":party.countactivemembers, "%area%":('area.'~party.dungeon.area)|trans({},"dungeons")}, "dungeons") }}
+		{% endif %}
+	{% else %}
+		{{ 'party.intro.outside'|trans({"%party%":party.countactivemembers}, "dungeons") }}
+	{% endif %}
+{% else %}
+	{{ 'party.intro.alone'|trans({}, "dungeons") }}
+{% endif %}
+</p>
+
+{% if party %}
+<p>
+{# FIXME: this should be a micro-form and POST, because it changes data #}
+<a href="{{ path('dungeons_leaveparty') }}"><button>{{ 'party.leave'|trans({}, "dungeons") }}</button></a>
+</p>
+
+<hr />
+
+<h3>{{ 'dungeon.events.title'|trans({}, "dungeons")|title }}</h3>
+<dl class="events">
+	{% set last = null %}
+	{% for event in party.events %}
+	{% if event.content == '---' %}
+		<hr />
+	{% else %}
+		<dt>
+			{% if event.ts != last %}
+				{{ event.ts|date }}
+				{% set last = event.ts %}
+			{% endif %}
+		</dt>
+		<dd>{{ event|dungeoneventfilter }}</dd>
+	{% endif %}
+	{% endfor %}
+</dl>
+
+<hr />
+
+<h3>{{ 'dungeon.chat.title'|trans({}, "dungeons")|title }}</h3>
+<dl class="messages">
+	{% for msg in party.messages %}
+	<dt>{{ link(msg.sender.character) }} <small>({{ msg.ts|date }})</small></dt>
+	<dd>{{ msg.content }}</dd>
+	{% endfor %}
+</dl>
+
+{% endif %}
+
+{% endblock %}

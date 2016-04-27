@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Listing">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="public" type="boolean"/>
+
+		<one-to-many field="members" target-entity="ListMember" mapped-by="listing">
+			<order-by>
+				<order-by-field name="priority" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+
+		<many-to-one field="creator" target-entity="Character"/>
+		<many-to-one field="owner" target-entity="User" inversed-by="listings"/>
+
+		<many-to-one field="inherit_from" target-entity="Listing" inversed-by="descendants"/>
+		<one-to-many field="descendants" target-entity="Listing" mapped-by="inherit_from"/>
+
+	</entity>
+</doctrine-mapping>

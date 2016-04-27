@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\RealmLaw">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="description" type="text"/>
+		<field name="mandatory" type="boolean"/>
+		<field name="value_boolean" type="boolean" nullable="true"/>
+		<field name="value_integer" type="integer" nullable="true"/>
+		<field name="value_string" type="string" nullable="true"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="laws"/>
+
+	</entity>
+</doctrine-mapping>

@@ -1,0 +1,31 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+	<script src="{{ asset('bundles/bm2site/js/jquery.svg.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/js/jquery.svgdom.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/jquery.svg.css') }}" />
+{% endblock %}
+
+
+{% block content %}
+<h1>{{ 'title'|trans({},"heraldry")|title }}</h1>
+<p>{{ 'intro'|trans({},"heraldry")|raw }}</p>
+
+<h2>{{ 'list.title'|trans({},"heraldry")|title }}</h2>
+<ul class="heraldrylist">
+{% for crest in crests %}
+	<li>
+		<h4>{{ crest.name }}</h4>
+		<img src="{{ path("bm2_site_heraldry_crest", {"id":crest.id}) }}"/>
+	</li>
+{% endfor %}
+</ul>
+
+<br class="clear"/>
+
+<h2>{{ 'design.title'|trans({},"heraldry")|title }}</h2>
+<a href="{{ path('bm2_site_heraldry_create') }}">{{ 'design.link'|trans({},"heraldry") }}</a>
+
+{% endblock %}

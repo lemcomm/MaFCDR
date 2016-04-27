@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Mercenaries">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="location" type="point"/>
+		<field name="active" type="boolean"/>
+		<field name="wait" type="smallint"/>
+
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="mercenary" index-by="id"/>
+		<many-to-one field="hired_by" target-entity="Character"/>
+
+		<field name="min_men" type="smallint"/>
+		<field name="max_men" type="smallint"/>
+		<field name="xp" type="smallint"/>
+		<field name="price" type="float"/>
+
+		<many-to-one field="weapon" target-entity="EquipmentType"/>
+		<many-to-one field="armour" target-entity="EquipmentType"/>
+		<many-to-one field="equipment" target-entity="EquipmentType"/>
+	</entity>
+</doctrine-mapping>

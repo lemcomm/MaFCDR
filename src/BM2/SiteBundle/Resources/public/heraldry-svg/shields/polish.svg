@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="300px" height="350px" xmlns="http://www.w3.org/2000/svg">
+<g>
+<path d="M 150,15 C 135,1 115,1 100,1 C 75,1 55,25 25,10 L 17,60 C 50,50 50,100 10,120 C -8,185 -8,268 75,316 C 103,331 139,334 150,349 C 161,334 197,331 225,316 C 308,268 308,185 290,120 C 250,100 250,50 283,60 L 275,10 C 245,25 225,1 200,1 C 185,1 165,1 150,15 z" id="polish" />
+</g>
+</svg>

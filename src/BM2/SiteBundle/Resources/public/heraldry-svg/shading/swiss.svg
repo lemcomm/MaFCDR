@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="300px" height="350px" viewBox="0 0 300 350" enable-background="new 0 0 300 350" xml:space="preserve">
+<g>
+	<defs>
+		<path id="swiss_5_" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+			s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+	</defs>
+	<clipPath id="swiss_6_">
+		<use xlink:href="#swiss_5_"  overflow="visible"/>
+	</clipPath>
+	<g clip-path="url(#swiss_6_)">
+		<defs>
+			<path id="swiss_2_" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+				s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+		</defs>
+		<clipPath id="swiss_7_">
+			<use xlink:href="#swiss_2_"  overflow="visible"/>
+		</clipPath>
+		<g id="Layer_1_copy" clip-path="url(#swiss_7_)">
+			<path fill="none" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+				s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			
+				<radialGradient id="SVGID_1_" cx="-49.5" cy="548" r="278.2555" gradientTransform="matrix(1 0 0 1 88 -441)" gradientUnits="userSpaceOnUse">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+			</radialGradient>
+			<rect x="-241.5" y="-169.5" opacity="0.5" fill="url(#SVGID_1_)" enable-background="new    " width="560" height="553"/>
+			<path fill="none" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+				s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			
+				<radialGradient id="SVGID_2_" cx="-12.5" cy="453.0273" r="53.2535" gradientTransform="matrix(1 0 0 1 88 -441)" gradientUnits="userSpaceOnUse">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+			</radialGradient>
+			<path opacity="0.5" fill="url(#SVGID_2_)" enable-background="new    " d="M1,1c0,0,72.875,49.625,149,0
+				c0,0-40.375,18.996-74.5,18.998S1,1,1,1z"/>
+			<path fill="none" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+				s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			
+				<radialGradient id="SVGID_3_" cx="136.5" cy="453.0273" r="53.2535" gradientTransform="matrix(1 0 0 1 88 -441)" gradientUnits="userSpaceOnUse">
+				<stop  offset="0" style="stop-color:#FFFFFF"/>
+				<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+			</radialGradient>
+			<path opacity="0.5" fill="url(#SVGID_3_)" enable-background="new    " d="M150,1c0,0,72.875,49.625,149,0
+				c0,0-40.375,18.996-74.5,18.998S150,1,150,1z"/>
+			<path fill="none" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79c-19,9-49,19-74,19
+				s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			<g id="Basic_Shape" opacity="0.2">
+				
+					<linearGradient id="swiss_8_" gradientUnits="userSpaceOnUse" x1="-87" y1="616" x2="211" y2="616" gradientTransform="matrix(1 0 0 1 88 -441)">
+					<stop  offset="0" style="stop-color:#FFFFFF"/>
+					<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+				</linearGradient>
+				<path id="swiss_1_" fill="url(#swiss_8_)" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79
+					c-19,9-49,19-74,19s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			</g>
+			<g id="Basic_Shape_1_" opacity="0">
+				
+					<linearGradient id="swiss_9_" gradientUnits="userSpaceOnUse" x1="-87" y1="616" x2="211" y2="616" gradientTransform="matrix(1 0 0 1 88 -441)">
+					<stop  offset="0" style="stop-color:#FFFFFF"/>
+					<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+				</linearGradient>
+				<path id="swiss_3_" fill="url(#swiss_9_)" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79
+					c-19,9-49,19-74,19s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+			</g>
+		</g>
+	</g>
+	<g id="Basic_Shape_2_" opacity="0" clip-path="url(#swiss_6_)">
+		
+			<linearGradient id="swiss_10_" gradientUnits="userSpaceOnUse" x1="-87" y1="616" x2="211" y2="616" gradientTransform="matrix(1 0 0 1 88 -441)">
+			<stop  offset="0" style="stop-color:#FFFFFF"/>
+			<stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+		</linearGradient>
+		<path id="swiss_4_" fill="url(#swiss_10_)" d="M1,1c0,0,0,0,0,79c0,80,24,245,149,269c125-24,149-189,149-269c0-79,0-79,0-79
+			c-19,9-49,19-74,19s-55-10-75-19c-20,9-50,19-75,19S20,10,1,1z"/>
+	</g>
+</g>
+</svg>

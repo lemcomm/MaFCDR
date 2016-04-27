@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\DungeonBundle\Entity\DungeonCardType">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="rarity" type="smallint"/>
+		<field name="monsterclass" type="string"/>
+		<field name="target_monster" type="boolean"/>
+		<field name="target_treasure" type="boolean"/>
+		<field name="target_dungeoneer" type="boolean"/>
+	</entity>
+</doctrine-mapping>

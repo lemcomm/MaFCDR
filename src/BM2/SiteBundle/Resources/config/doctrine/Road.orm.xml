@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Road">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="quality" type="smallint"/>
+		<field name="path" type="linestring"/>
+		<field name="workers" type="float"/>
+		<field name="condition" type="integer"/>
+
+		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="roads"/>
+
+		<many-to-many field="waypoints" target-entity="GeoFeature">
+			<join-table name="roads_features">
+				<join-columns>
+					<join-column name="road_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="feature_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+
+
+	</entity>
+</doctrine-mapping>

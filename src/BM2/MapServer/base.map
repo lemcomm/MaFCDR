@@ -1,0 +1,116 @@
+MAP
+  NAME        "test"
+  STATUS ON
+  EXTENT      0 0 100000 100000
+  UNITS       meters
+  SIZE        1200 800
+  IMAGECOLOR  0 40 120
+
+  WEB
+    MINSCALE 10
+    MAXSCALE 1000000000
+    METADATA
+        "wfs_title" "Might & Fealty WFS Service"
+        "wfs_srs" "EPSG:4326"
+        "wfs_onlineresouce" "http://va.mightandfealty.com/mapserver"
+        "wfs_enable_request" "*"
+    END
+  END
+
+  LAYER
+    NAME "regions"
+    STATUS ON
+    METADATA
+        "wfs_title" "estates"
+        "gml_type" "polygon"
+        "gml_featureid" "id"
+    END
+    TYPE POLYGON
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=127.0.0.1 port=5432 dbname=bm2 user=bm2 password=kugelfisch"
+    DATA "poly from geodata"
+    FILTER (passable=true)
+    CLASS
+      STYLE
+        OUTLINECOLOR 200 20 20
+        COLOR 20 200 20
+        WIDTH 1
+        ANTIALIAS true
+      END
+    END
+  END
+
+   LAYER
+    NAME "rivers"
+    STATUS ON
+    METADATA
+        "wfs_title" "rivers"
+        "gml_type" "line"
+        "gml_featureid" "id"
+    END
+    TYPE LINE
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=127.0.0.1 port=5432 dbname=bm2 user=bm2 password=kugelfisch"
+    DATA "course from river"
+    CLASS
+      STYLE
+        COLOR 0 80 160
+        WIDTH 4
+        ANTIALIAS true
+      END
+    END
+  END
+
+   LAYER
+    NAME "settlements"
+    STATUS ON
+    METADATA
+        "wfs_title" "settlements"
+        "gml_type" "point"
+        "gml_featureid" "id"
+    END
+    TYPE POINT
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=127.0.0.1 port=5432 dbname=bm2 user=bm2 password=kugelfisch"
+    DATA "center from geodata"
+    FILTER (passable=true)
+    JOIN
+      NAME "settlement"
+      CONNECTIONTYPE postgresql
+      CONNECTION "host=127.0.0.1 port=5432 dbname=bm2 user=bm2 password=kugelfisch"
+      TABLE "settlements"
+      FROM "id"
+      TO "geodata_id"
+      TYPE ONE-TO-ONE
+    END
+    CLASS
+      STYLE
+        COLOR 220 40 40
+        WIDTH 4
+        ANTIALIAS true
+      END
+    END
+  END
+
+   LAYER
+    NAME "roads"
+    STATUS ON
+    METADATA
+        "wfs_title" "roads"
+        "gml_type" "line"
+        "gml_featureid" "id"
+    END
+    TYPE LINE
+    CONNECTIONTYPE POSTGIS
+    CONNECTION "host=127.0.0.1 port=5432 dbname=bm2 user=bm2 password=kugelfisch"
+    DATA "path from road"
+    CLASS
+      STYLE
+        COLOR 160 120 120
+        WIDTH 2
+        ANTIALIAS true
+      END
+    END
+  END
+
+END

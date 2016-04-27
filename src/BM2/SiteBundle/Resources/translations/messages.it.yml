@@ -1,0 +1,408 @@
+menu:
+ playing:   stai giocando come %name%
+ homepage:  pagina iniziale
+ contact:   contacts
+ about:     informazioni su
+ manual:    manuale
+ community: community
+ register:  registrazione
+ map:       mappa
+ travel:    mappa & viaggi
+ status:    stato
+ messages:  messaggi
+ politics:  politica
+ actions:   azioni
+ character:
+  start:    posizione del personaggio
+
+contact:
+ title:     Contact
+
+registration:
+ title:   Registrazione
+ intro: >
+   Benvenuto in Might & Fealty - siamo ansiosi di conoscere la tua storia ed esperienza.<br />
+   <br />
+   Per favore inserisci più in basso le poche informazioni richieste.<br />
+   Riceverai quindi una e-mail con un link per l'attivazione. Siamo spiacenti per questo passaggio aggiuntivo, ma è necessario per tenere lontani spammer e bot.<br />
+   <br />
+   <div class="warning">Il gioco è al momento in un Alpha Test<br /><br />
+   E' veramente importante avere presente quel che questo significa: quasi niente funziona al 100% o del tutto, in pratica tutto è incompleto, intere sezioni del gioco sono completamente mancanti; inoltre l'interfaccia, la grafica e la struttura sono tutte preliminari.<br />
+   Questo <em>non</em> è come provare a fare un giro su una macchina nuova. E' più simile a farsi mostrare il motore e ricevere mezzo sterzo per avere una vaga idea. A meno che tu non sia entusiasmato dall'idea e voglia aiutare a rendere questo gioco una realtà, dovresti almeno aspettare la fase di beta testing. <br />
+   </div><br />
+   Per essere sicuri tu abbia compreso tutto ciò, ti chiediamo di inserire qui sotto un codice che puoi trovare nella  <a href="http://forum.mightandfealty.com/index.php/topic,2.0.html">Sezione Alpha Testing del Forum Might & Fealty</a>.
+
+map:
+ title:
+  map:          mappa
+  both:         mappa e viaggio
+  settlements:  insediamenti
+  rivers:       fiumi
+  roads:        strade
+  chars:        personaggi
+  route:        intinerario
+  invalid:      itinerario non valido
+  you:          la vostra posizione
+ howto: >
+    E' possibile vedere e decidere dove viaggiare direttamente sulla mappa. Basta cliccare per aggiungere una destinazione.<br />
+    Il vostro itinerario può essere diretto o tortuoso quanto volete. Tenete presente che dovrete essere vicino a un insediamento per interagirci e che fiumi possono essere attraversati solo dove esistono ponti, che vengono costruiti automaticamente quando le strade superano la qualità "sentiero".
+ legend:    legenda
+ you:       la vostra posizione
+ chars:     i vostri altri personaggi
+ others:    personaggi stranieri
+ ownedplace: insediamenti posseduti
+ indyplace: insediamenti indipendenti
+ spot:      distanza di individuazione
+ act:       distanza di interazione
+ hover:     Passa il cursore su un insediamento o l'emblema di un personaggio per dettagli.
+ travel:    Spostamento
+ draw:      Cliccate sulla mappa per aggiungere destinazioni.
+ submit:    imposta itinerario
+ rmlast:    rimuovi l'ultimo
+ clear:     cancella tutto
+ newroute:  Il vostro nuovo itinerario è stato impostato. Avrete bisogno di circa %duration% giorni per completarlo.
+ crossings:
+  title:    attraversamenti di fiumi
+  river:    Il %river% tramite il ponte vicino a %nearby%.
+ cleared:   Itinerario cancellato.
+ error:
+  impassable: L'itinerario contiene zone invalicabili segnate sulla mappa in questo momento.<br /><small>Linee rosse attraversano zone invalicabili, pallini neri/rossi rappresentano attraversamenti di fiumi senza un ponte nelle vicinanze.</small>
+ info:
+  length:   Lunghezza dell'itinerario
+
+account:
+ title: Profilo utente
+ userdata: Dati Personali
+ characters: Personaggi
+ nocharacters: Non sono stati ancora creati personaggi.
+ newcharacter:
+  title: Crea Personaggio
+  intro: >
+    Inserisci i dettagli sulla vita del tuo personaggio qui sotto. Di questi solo il nome potrà essere cambiato, e solo in circostanze particolari; scegli con cura.<br />
+    Il nome del personaggio dovrebbe essere un nome completo, quindi con anche un cognome. Personaggi della stessa famiglia dovrebbero avere lo stesso cognome a meno che le loro storie personali contengano ragioni per il contrario. <br />
+    Scegliere una madre e un padre è facoltativo, lasciarlo vuoto significa che uno dei due o entrambi saranno semplicemente persone che non esistono come personaggi nel gioco. Se si vuole creare un albero genealogico, bisogna partire con le generazioni più vecchie.
+  submit: crea
+ settings:
+  title: Impostazioni
+  submit: aggiorna
+ play: Gioca
+ familytree: Albero Genealogico
+ data: modifica dati
+
+character:
+ name:    Nome
+ gender:  Sesso
+ father:  Padre
+ mother:  Madre
+ none:    (nessun personaggio)
+ child:   figlio|figli
+ status:  Stato di %name%
+ history: storia del personaggio
+ start:
+  title:      Posizionamento del personaggio
+  intro: >
+    Seleziona la posizione di partenza del tuo nuovo personaggio. Questa è una scelta importante e influenzerà molto il tuo primo periodo di gioco.
+  family:     Posiziona presso la Famiglia
+  existing: >
+    Il nuovo personaggio può iniziare il gioco presso la tenuta di ogni vostro altro personaggio già esistente, o si può scegliere una posizione di partenza differente sulla mappa sottostante.<br />
+    Iniziare presso la tenuta di un familiare <b>non</b> conferisce alcun controllo sull'insediamento, reclutamento incluso. Se volete dei soldati per il vostro nuovo personaggio il proprietario della tenuta dovrà essere lì e assegnarglieli.
+  estate:     Tenuta di partenza
+  submit:     inizia qui
+  selection:  Posizione sulla mappa
+  mapintro: >
+    E' possibile anche scegliere un qualsiasi insediamento nella mappa sottostante, che mostra tutti gli insediamenti vicini a terre già occupate.<br />
+    E' fortemente consigliato scegliere un insediamento indipendente e indifeso in modo che possiate prenderne subito il controllo e possedere quindi una tenuta il più presto possibile.
+
+politics:
+ hierarchy: gerarchia
+
+gender:
+ he:    lui
+ she:   lei
+ his:   suo
+ her:   sua
+
+form:
+ account:
+  name:       Username
+  email:			E-Mail
+  lastlogin:  Ultima autenticazione
+ choose:      -- scegli --
+
+settlement:
+ title: %type% di %name%
+ details: Dettagli dell'insediamento
+ dummy:   Passa il cursore sopra o clicca su di un insediamento sulla mappa per avere qui i suoi dettagli.
+ area:  %name% area
+ type:  tipo
+ size:
+  1:		borgo
+  2:		piccolo villaggio
+  3:		villaggio
+  4:		grande villaggio
+  5:		piccolo paese
+  6:		paese
+  7:		grande paese
+  8:		piccola città
+  9:		città
+  10:		grande città
+  11:		metropoli
+ population:  popolazione
+ geography:   geografia
+ biome:       bioma
+ neighbours:  vicini
+ political:   politica
+ independent: Questo è un insediamento indipendente
+ unowned:     indipendente
+ owner:       proprietario
+ ownedby:     Questo insediamento è governato da %owner%.
+ economy:     economia
+ starvation:
+  1:  c'è mancanza di cibo
+  2:  c'è una grave mancanza di cibo
+  3:  sta soffrendo la fame
+  4:  sta soffrendo gravemente la fame
+ militia:   soldati stazionati in %name%
+ recruits:  soldati in addrestramento in %name%
+ resources:
+  type:     tipo
+  base:     raccolto di base
+  current:  produzione
+  demand:   domanda locale
+  trade:    saldo commerciale
+  balance:  bilancio totale
+
+road:
+ quality:
+  0: -
+  1: sentiero
+  2: strada sterrate
+  3: strada di campagna
+  4: strada in terra battuta
+  5: strada lastricata
+ workers:   workers
+
+direction:
+ long:
+  north:      nord
+  east:       est
+  south:      sud
+  west:       ovest
+  northeast:  nordest
+  northwest:  nordovest
+  southeast:  sudest
+  southwest:  sudovest
+ short:
+  north:      N
+  east:       E
+  south:      S
+  west:       O
+  northeast:  NE
+  northwest:  NO
+  southeast:  SE
+  southwest:  SO
+
+status:       stato
+currentdate:  Siamo nell'anno %year%, settimana %week%, giorno %day% nel mondo di Might & Fealty
+location:     posizione
+coordinates:  coordinate
+nearest:      insediamento più vicino
+nothingnear:  nessun indediamento nelle vicinanze
+nearbyothers: Nobili nelle vicinanze
+viewdetails:  visualizza dettagli
+none:         nessuno
+yes:          sì
+no:           no
+techtree:     Albero delle tecnologie
+
+distance:    distanza
+metre_abr:   m
+metre:       metro|metri
+mile:        miglio|miglia
+squaremile:  miglio quadrato|miglia quadrate
+day:         giorno|giorni
+
+source:      origine
+destination: destinazione
+resources:   risorse
+food:        cibo
+wood:        legno
+metal:       metallo
+goods:       beni
+money:       oro
+
+
+estate:      tenuta|tenute
+building:    edificio|edifici
+build:
+ workers:    lavoratori
+ underway:   in costruzione
+workforce:   forza lavoro
+inheritance: eredità
+nobody:      nessuno
+
+biome:
+ scrub:        boscaglia
+ thin scrub:   boscaglia rada
+ grass:        prateria
+ thin grass:   prateria rada
+ marsh:        palude
+ forest:       foresta
+ dense forest: foresta fitta
+ snow:         montagne innevate
+ rock:         montagna
+ desert:       deserto
+ ocean:        oceano
+ lake:         lago
+ water:        lago
+ river:        fiume
+
+error:
+ notfound:
+  page:        Pagina non trovata
+  character:   Personaggio non trovato
+  settlement:  Insediamento non trovato
+ missing:
+  characterid: ID del personaggio richiesta, ma mancante. Per favore selezionare un personaggio dalla pagina di scelta personaggi o autenticarsi nuovamente.
+
+selectall:    seleziona tutti
+withall:      con tutti i selezionati...
+
+experience: esperienza
+weapon:     arma
+armour:     armatura
+equipment:  equipaggiamento
+
+npc:
+ type:         tipo
+ scout:        esploratore|esploratori
+ prospector:   prospettore|prospettori
+ merchant:     mercante|mercanti
+ spy:          spia|spie
+
+soldier:
+ type:             tipo
+ home:             origine
+ group:            grouppo
+ name:             nome 
+ train:            addestramento
+ complete:         estimated complete
+ archer:           arciere|arcieri
+ conscript:        coscritto|coscritti
+ crossbow archer:  balestriere|balestrieri
+ heavy cavalry:    cavalleria pesante|cavalleria pesanti
+ heavy infantry:   fante pesante|fanti pesante
+ hunter:           cacciatore|cacciatori
+ knight:           cavaliere|cavalieri
+ light cavalry:    cavalleria leggera|cavallerie pesante
+ light infantry:   fante leggera|fanti leggera
+ longbow archer:   arciere con arco lungo|arcieri con arco lungo
+ medium infantry:  fante medio|fanti medi
+ mounted archer:   arciere a cavallo|arcieri a cavallo
+ peasant:          paesano|paesani
+ pikeman:          picchiere|picchieri
+ spearman:         lanciere|lancieri
+
+item:
+ axe:              ascia
+ broadsword:       spadone
+ chainmail:        cotta di maglia
+ cloth armour:     armatura imbottita
+ crossbow:         balestra
+ horse:            cavallo
+ improvised:       improvvisata
+ leather armour:   armatura di cuoio
+ longbow:          arco lungo
+ pike:             picca
+ plate armour:     armatura di piastre
+ scale armour:     armatura di scaglie
+ shortbow:         arco corto
+ spear:            lancia
+ sword:            spada
+
+messages:
+ inbox:   messaggi inviati a voi
+ sent:    messaggi da voi inviati
+ unread:  Avete %number% messaggi/o non ancora letti.
+ createdby:     cominciato da 
+ participants:  partecipanti
+ you:           voi
+
+interaction:
+ message:
+  name:     destiatario/i
+  subject:  titolo
+  body:     contenuto
+  submit:   invia messaggio
+
+
+about:
+ title:     Informazioni su Might & Fealty
+ intro:
+  title:    Introduzione
+  opening:    Might & Fealty è un mondo persistente interamente guidato dalle azioni dei giocatori, dove la storia viene fatta, non semplicemente ripetuta. 
+  pitch: >
+    Un gioco di ruolo, di strategia, un gioco politico e diplomatico.<br />
+    <br />
+    Un simulatore di un mondo medioevale / low-fantasy non perché si ricrei una fisica realistica, ma nel senso di avere umani con motivazioni umane e ambizioni personali come ciò che guida questo mondo.<br />
+    <br />
+    Non c'è alcuna trama predeterminata né alcun genere di condizioni per vincere. Infatti non c'è proprio modo di vincere in un modo che faccia terminare il gioco: l'intero gioco è stato costruito per durare per sempre e rimanere giocabile per molti anni. Questo non significa rigiocare, ma nel senso di <em>una storia continuata</em> del mondo. Una storia creata, scritta e interpretata dai giocatori stessi.
+  description: >
+    Questo è il progetto dei miei sogni che è da forse due decenni che desidero creare.<br />
+    Più di un gioco è un sandbox politico e sociale. Non è nemmeno una simulazione, è la realtà in una più piccola scala. La prima, più giocabile e primitiva incarnazione di questo concetto - <a href="http://battlemaster.org">BattleMaster</a> - si è avvicinata così tanto alla vita reale che in certi momenti ha interessato insegnanti, fanatici di storia e professori universitari. <br />
+    <br />
+    Le principali caratteristiche di Might & Fealty sono libertà ed il creare qualcosa di emergente. Non vi è storia creata dagli sviluppatori, eppure ve ne saranno centinaia di storie. Storie vere, non inventate. Tra 10 anni vi sarà una vera e propria storia. Guerre, rivoluzioni, imperi e sovrani che sono esistiti veramente, non semplicemente come invenzioni di uno sceneggiatore.<br />
+    <br />
+    Al contrario di molto giochi, il mio approccio vuole riprodurre le incertezze e le ambiguità della vita reale. Voi siete i buoni non perché il gioco lo decide, ma perché siete voi a dirlo. E i vostri nemici diranno esattamente la stessa cosa su se stessi. Il concreto gioco di ruolo emerge dalle interazioni tra giocatori a tutti i livelli. E' imprevedibile, continuamente in cambiamento e appassionante. E sarà più vario e interessante di quel che i migliori sceneggiatori possano mai generare.<br />
+    <br />
+    Ho quasi 15 anni di esperienza con questo genere di giochi, e questo è ancora il più ambizioso.
+ concept:
+  title:    Filosofia
+  intro: >
+    Ci sono un certo numero di filosofie dietro la progettazione di Might & Fealty. Questi concetti stanno dietro a tutte le parti del gioco.
+  sandboxtitle: Sandbox
+  sandbox: >
+    L'idea di un sandbox è che il gioco non limita i giocatori. Il punto principale è:<br />
+    <b>Tu puoi fare tutto - ma tutto ciò che fai avrà conseguenze.</b><br />
+    Quindi non si deve raggiungere un punto in cui il gioco dice "non puoi attaccare questa persona" o "non puoi razziare questo villaggio". Le uniche regole che il gioco imporrà sono le leggi della fisica. Se non si hanno a disposizione abbastanza risorse per costruire un castello, allora non puoi farlo. Ma le interazioni tra giocatori - sia amichevoli che ostili - sono interamente libere. Il gioco le dovrà permettere, e non impedire.
+  eternitytitle:  Eterno
+  eternity: >
+    Il gioco è fatto per essere eterno. Tutto viene salvato, niente di importante viene cancellato (alcune cose hanno una certa durata, ovviamente). Personaggi e profili, per esempio, rimarranno. Certo, i vostri possedimenti saranno conquistati da altri giocatori, ma quando tornerete dopo tre anni, i vostri personaggi saranno ancora lì, con tutta la loro storia intatta.<br />
+    La storia non esiste se non c'è qualcuno che la scriva. Il gioco ne tiene traccia. Se vuoi sapere chi era il signore due anni fa della città che hai appena conquistato, lo puoi controllare.
+  emergencetitle: Strutture Emergenti
+  emergence: >
+    Il gioco dovrebbe permettere interazioni con altri giocatori e renderle sia necessarie che proficue. Non dovrebbe limitarle a traiettorie pre-determinate ma permettere l'evoluzione di qualsiasi genere di sistema politico, gerarchia o organizzazione.<br />
+    Strutture e comportamenti emergenti dovrebbe formare il social network del gioco, permettendo la massima libertà possibile ai gioctori. Le meccaniche del gioco dovranno gestire solo gli aspetti numerici più importanti e lasciare tutto il resto ai giocatori da sviluppare e modellare secondo i loro desideri.
+  limitedtitle: Risorse Limitate
+  limited: >
+    L'economia nel gioco non dovrebbe crescere esponenzialmente e in maniera illimitata, ma piuttosto simulare un mondo medioevale con risorse limitate e possibilità di migliorare la produttività molto ridotte. Il gioco non è fatto per fare costruire tutto cercando di farlo più rapidamente degli altri. Tale gioco sarebbe necessariamente limitato nel tempo e non (vedi sopra) eterno.<br />
+    Might & Fealty sostituisce la crescita con <em>lo scambio</em>. Commercio, tributi o razzie spostano risorse in giro per il mondo del gioco e permettono a qualcuno di prosperare alle spese di altri. Ogni città nel gioco dovrebbe esistere perché un certo numero di altri posti non sono diventati città - semplicemente non ci sono risorse sufficienti perché ogni insediamento si trasformi in una città.
+
+ gameplay:  
+  title:    Modalità di gioco
+  first: >
+    Utilizzando una comoda interfaccia, il gioco è una miscela di azioni a turni o immediate. Il concetto base che muove le meccaniche del gioco è che ogni azione richiede un certo tempo perché sia completata. Se, per esempio, ordinate la costruzione di un mercato, l'ordine è dato immediatamente e avrete finito, ma ci vorrà un certo tempo perché la costruzione venga completata.<br />
+    Le azioni che richiedono che il vostro personaggio fatta concretamente qualcosa sono messe in una <em>lista di azioni</em>. Quando non sarete collegati, il vostro personaggio seguirà questa lista di azioni. Tutto richiede tempo, che sia viaggiare o attaccare un castello nemico. Il fatto che le cose richiedano tempo permette anche agli altri giocatori di avere tempo per agire di conseguenza; siccome però avete anche una vita normale a cui badare allo stesso tempo, si possono lasciare ordini attivi che durano finché non si decida di rimuoverli. Se volete difendere un villaggio o il vostro re, ad esempio, è sufficiente definire quello come il vostro ordine attivo e nel caso vengano attaccati il vostro personaggio reagirà automaticamente. 
+  second: >
+    Il gioco è pianificato per essere sviluppato creando una sempre più profonda integrazione tra gli strumenti della vostra vita quotidiana e il gioco, permettendovi così di ricevere avvisi a proposito di importanti eventi nel gioco attraverso canali da voi selezionati. In questo modo che non è necessario controllare continuamente se sia successo qualcosa, essendo sicuri che qualora qualcosa richiedesse la vostra attenzione, verreste avvisati. 
+ tech:  
+  title:    Tecnologia
+  intro: >
+    NNot only in its concepts, but also in its implementation is Might & Fealty è ambizioso e unico non solo concettualmente ma anche nella sua implementazione. Alcune delle tecnologie usate per il gioco sono familiari, altre sono state viste raramente nel contesto dei videogiochi.
+  clienttitle: Interfaccia
+  client: >
+    L'incarnazione iniziale del gioco sarà un gioco online via browser. Una versione compatibile con smartphone è una delle maggiori priorità iniziali.<br />
+    Successivamente, per quanto permesso dai finanziamenti, vi saranno veri e propri client per PC e Mac, oltre che per dispositivi mobili iOS e Android, utilizzando come motore <a href="http://unity3d.com">Unity 3D</a>.
+  servertitle: Funzionamento
+  server: >
+    Per quanto riguarda il lato server, il gioco è costruito sul moderno <a href="http://symfony.com">Symfony 2</a> con un potente database
+    <a href="http://www.postgresql.org">PostgreSQL</a> dietro di esso.<br />
+    Questa è solo la superficie. La vera potenza per molte parti del gioco proviene dal far girare il mondo del gioco su un intero GIS dataset, con un supporto topologico completo. In termini meno tecnici, Might & Fealty non utilizza mappe artificiali fatte per videogiochi, ma utilizza la stessa tecnologia di Google Maps e altri reali programmi topografici. L'immagine su questa pagina è infatti presa da <a href="http://www.qgis.org/">Quantum GIS</a>, un programma utilizzato da università ed esperti sia pubblici che privati per gestire dati geospaziali.<br />
+    <br />
+    Attraverso l'uso di GIS, il gioco utilizza posizioni e distanze vere al posto di concetti astratti o qualche genere di casella. Tempi di spostamento e ricerca del percorso funzionano come i vostri navigatori e possono reagire a un mondo di gioco in cambiamento, dove vengono costruite strade e distrutti ponti. Le aree occupate da tenute non sono arbitrarie, ma determinate matematicamente come l'insieme dei punti più vicini a un particolare insediamento che a qualsiasi altro (diagrammi di Voronoi). Le strade seguono uno schema noto come triangolazione di Delaunay. Il tutto arricchito da un pizzico di rumore frattale per farlo apparire più realistico.<br />
+    Questo approccio è anche utile in vista del futuro. Nel futuro potremmo per esempio decidere di rendere i confini tra i possedimenti arbitrari, o permettere la costruzione di strade tra qualsiasi punto della mappa o seguendo una traiettoria a volontà. Oppure potremmo decidere di accrescere i dettagli della mappa e aggiungere torrenti, stagni o altri particolari elementi del paesaggio a qualsiasi livello desiderato. In teoria potremmo persino decidere di raggiungere il livello di singolo albero senza avere bisogno di cambiare nulla nel motore del gioco.
+
+manual:
+ title:     Manuale del gioco
+
+

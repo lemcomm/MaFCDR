@@ -1,0 +1,41 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'registration.title'|trans|title }}</h2>
+<p>{{ 'registration.intro'|trans|raw }}</p>
+<p>{{ 'registration.toslink'|trans({'%url%':path('bm2_terms')})|raw }}</p>
+
+<div id="direct_register">
+	<p>{{ 'registration.direct'|trans|raw }}</p>
+	<br />
+	<form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="wide fos_user_registration_register">
+		{{ form_widget(form) }}
+		<div id="feedback" class="warning" style="display:none"></div>
+		<button name="register_submit">{{ 'registration.submit'|trans({}, 'FOSUserBundle') }}</button>
+	</form>
+</div>
+
+<br class="clear" />
+
+
+{% endblock %}
+
+{% block jquery %}
+var tooltips = $("[title]").tooltip({
+	position: {
+		my: "left+20 center",
+		at: "right center",
+		collision: "fit"
+	}
+});
+
+$("#fos_user_registration_form_plainPassword_first").change(function(){
+	var pass = $(this).val();
+	$("#feedback").hide();
+	if (pass.length < 6) {
+		$("#feedback").html("Your password is very short. To protect your account better, you might want to choose a longer password.").show();
+	}
+	/* TODO: insert top-100 passwords and check against blacklist */
+
+});
+{% endblock %}

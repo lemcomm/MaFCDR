@@ -1,0 +1,24 @@
+parameters:
+#    dungeon.example.class: BM2\DungeonBundle\Example
+
+services:
+#    dungeon.example:
+#        class: %dungeon.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
+
+    dungeon_creator:
+        class:      BM2\DungeonBundle\Service\DungeonCreator
+        arguments:  [@doctrine.orm.entity_manager, @geography, @logger]
+        tags:
+            - { name: monolog.logger, channel: dungeons }
+    dungeon_master:
+        class:      BM2\DungeonBundle\Service\DungeonMaster
+        arguments:  [@doctrine.orm.entity_manager, @dungeon_creator, @history, @logger, @router]
+        tags:
+            - { name: monolog.logger, channel: dungeons }
+
+    twig.extension.dungeoneventfilter:
+        class:      BM2\DungeonBundle\Twig\DungeonEventFilterExtension
+        arguments:  [@doctrine.orm.entity_manager, @translator, @twig.extension.links]
+        tags:
+            - { name: twig.extension }

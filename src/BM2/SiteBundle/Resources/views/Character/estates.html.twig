@@ -1,0 +1,90 @@
+{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::plain.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h3>{{ 'estate'|transchoice(estates|length)|title }}</h3>
+<table id="estates">
+	<thead>
+		<tr>
+			<th>{{ 'settlement.name'|trans|title }}</th>
+			<th>{{ 'settlement.realm2'|trans|title }}</th>
+			<th>{{ 'settlement.ultimate'|trans|title }}</th>
+			<th>{{ 'settlement.size.name'|trans|title }}</th>
+			<th>{{ 'settlement.population'|trans|title }}</th>
+			<th>{{ 'settlement.civilians'|trans|title }}</th>
+			<th>{{ 'settlement.thralls'|trans|title }}</th>
+			<th>{{ 'settlement.pop.change'|trans|title }}</th>
+			<th>{{ 'settlement.militia2'|trans|title }}</th>
+			<th>{{ 'settlement.recruits2'|trans|title }}</th>
+			<th>{{ 'settlement.build'|trans|title }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for estate in estates %}
+			<tr>
+				<td>{{ settlement_link(estate.id, estate.name) }}</td>
+				<td>{% if estate.realm is defined %}{{ realm_link(estate.realm.id, estate.realm.name) }}{% endif %}</td>
+				<td>{% if estate.ultimate is defined %}{{ realm_link(estate.ultimate.id, estate.ultimate.name) }}{% endif %}</td>
+				<td>{{ ('settlement.size.'~estate.size)|trans }}</td>
+				<td align="right">{{ estate.pop }}</td>
+				<td align="right">{{ estate.peasants }}</td>
+				<td align="right">{{ estate.thralls }}</td>
+				<td>
+					{% if estate.popchange/estate.pop > 0.1 %}
+						{{ ('settlement.pop.grow.3')|trans }}
+					{% elseif estate.popchange/estate.pop > 0.05 %}
+						{{ ('settlement.pop.grow.2')|trans }}
+					{% elseif estate.popchange/estate.pop > 0.01 %}
+						{{ ('settlement.pop.grow.1')|trans }}
+					{% elseif estate.popchange/estate.pop < - 0.1 %}
+						{{ ('settlement.pop.shrink.4')|trans }}
+					{% elseif estate.popchange/estate.pop < - 0.05 %}
+						{{ ('settlement.pop.shrink.3')|trans }}
+					{% elseif estate.popchange/estate.pop < - 0.02 %}
+						{{ ('settlement.pop.shrink.2')|trans }}
+					{% elseif estate.popchange/estate.pop < - 0.01 %}
+						{{ ('settlement.pop.shrink.1')|trans }}
+					{% else %}
+						{{ ('settlement.pop.stable')|trans }}
+					{% endif %}
+				</td>
+				<td align="right">{{ estate.militia }}</td>
+				<td align="right">{{ estate.recruits }}</td>
+				<td>
+					<ul class="shortlist">
+						{% for build in estate.build %}
+							<li>{{ building_link(build.id, build.name) }}</li>
+						{% endfor %}
+					</ul>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% if not app.request.isXmlHttpRequest %}
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+
+	<div id="map" style="min-width:40em;min-height:30em;"></div>
+{% endif %}
+
+
+{% endblock %}
+
+{% if not app.request.isXmlHttpRequest %}
+	{% block includes %}
+		{{ parent() }}
+		<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+		<script src="{{ asset('bundles/bm2site/tablesorter/parsers/parser-input-select.js') }}"></script>
+		<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+		<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+	{% endblock %}
+	{% block jquery %}
+		$("#estates").tablesorter({
+			sortList: [[0,0]],
+		});
+		{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+		mapinit('map', false, false, false);
+		addoutline('{{ poly }}', '#cccc20', 3, '#cccc20', 0.4);
+	{% endblock %}
+{% endif %}
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\EventLog">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<one-to-many field="events" target-entity="Event" mapped-by="log">
+			<order-by>
+				<order-by-field name="ts" direction="DESC" />
+			</order-by>
+		</one-to-many>
+		<one-to-many field="metadatas" target-entity="EventMetadata" mapped-by="log"/>
+		<one-to-one field="settlement" target-entity="Settlement" mapped-by="log"/>
+		<one-to-one field="realm" target-entity="Realm" mapped-by="log"/>
+		<one-to-one field="character" target-entity="Character" mapped-by="log"/>
+		<one-to-one field="quest" target-entity="Quest" mapped-by="log"/>
+		<one-to-one field="artifact" target-entity="Artifact" mapped-by="log"/>
+		<one-to-one field="war" target-entity="War" mapped-by="log"/>
+
+	</entity>
+</doctrine-mapping>

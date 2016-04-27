@@ -1,0 +1,13 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+{% include "BM2SiteBundle:element:toc.html.twig" with {"toc":toc} %}
+
+<h1>{{ ('manual.'~page)|trans|title }}</h1>
+
+{{ content|markdown|manuallinks }}
+
+<div class="clear"></div>
+
+{% endblock %}
+

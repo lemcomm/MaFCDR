@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\CharacterBackground">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="appearance" type="text" nullable="true"/>
+		<field name="personality" type="text" nullable="true"/>
+		<field name="secrets" type="text" nullable="true"/>
+		<field name="death" type="text" nullable="true"/>
+
+		<one-to-one field="character" target-entity="Character" mapped-by="background"/>
+
+	</entity>
+</doctrine-mapping>

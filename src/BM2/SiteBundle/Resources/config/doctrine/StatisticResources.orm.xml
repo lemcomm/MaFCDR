@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\StatisticResources" table="statistic.resources">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="cycle" type="integer"/>
+		<field name="supply" type="integer"/>
+		<field name="demand" type="integer"/>
+		<field name="trade" type="integer"/>
+
+		<many-to-one field="resource" target-entity="ResourceType"/>
+
+	</entity>
+</doctrine-mapping>

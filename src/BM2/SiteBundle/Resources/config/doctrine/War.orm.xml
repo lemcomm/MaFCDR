@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\War">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="summary" type="string"/>
+		<field name="description" type="text"/>
+		<field name="timer" type="smallint"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="wars"/>
+		<one-to-many field="targets" target-entity="WarTarget" mapped-by="war"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="war"/>
+		<one-to-many field="related_battles" target-entity="Battle" mapped-by="war"/>
+		<one-to-many field="related_battle_reports" target-entity="BattleReport" mapped-by="war"/>
+
+	</entity>
+</doctrine-mapping>
