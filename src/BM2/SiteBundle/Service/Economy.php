@@ -559,7 +559,7 @@ class Economy {
 				$georesource->setBuildingsBonus(round($building_bonus*100));
 			} else {
 				$building_resource = $georesource->getBuildingsBase();
-				$building_bonus = $georesource->getBuildingsBonus()/100;
+				$building_bonus = $georesource->getBuildingsBonus()/10;
 			}
 		}
 		$baseresource += $building_resource;

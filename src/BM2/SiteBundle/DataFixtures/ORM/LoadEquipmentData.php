@@ -12,12 +12,12 @@ use BM2\SiteBundle\Entity\EquipmentType;
 class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $equipment = array(
-		'axe'               => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  10, 'defense' =>   0, 'train' => 20, 'resupply' => 20,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/streitaxt2.png'),
-		'spear'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  20, 'defense' =>   0, 'train' => 30, 'resupply' => 30,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/spear2.png'),
-		'pike'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  30, 'defense' =>   0, 'train' => 50, 'resupply' => 60,	'provider' => 'Weaponsmith',  'trainer' => 'Guardhouse',				'icon' => 'items/hellebarde2.png'),
-		'mace'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  35, 'defense' =>   0, 'train' => 60, 'resupply' =>100,	'provider' => 'Weaponsmith',  'trainer' => 'Barracks',				'icon' => 'items/hellebarde2.png'),
-		'sword'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  45, 'defense' =>   0, 'train' => 80, 'resupply' =>250,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',					'icon' => 'items/schwert2.png'),
-		'broadsword'        => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  50, 'defense' =>   0, 'train' => 90, 'resupply' =>350,	'provider' => 'Bladesmith', 'trainer' => 'Garrison',					'icon' => 'items/claymore2.png'),
+		'axe'               => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  15, 'defense' =>   0, 'train' => 20, 'resupply' => 20,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/streitaxt2.png'),
+		'spear'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  35, 'defense' =>   0, 'train' => 30, 'resupply' => 30,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/spear2.png'),
+		'pike'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  50, 'defense' =>   0, 'train' => 50, 'resupply' => 60,	'provider' => 'Weaponsmith',  'trainer' => 'Guardhouse',				'icon' => 'items/hellebarde2.png'),
+		'mace'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  65, 'defense' =>   0, 'train' => 60, 'resupply' =>100,	'provider' => 'Weaponsmith',  'trainer' => 'Barracks',				'icon' => 'items/hellebarde2.png'),
+		'sword'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  85, 'defense' =>   0, 'train' => 80, 'resupply' =>250,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',					'icon' => 'items/schwert2.png'),
+		'broadsword'        => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  95, 'defense' =>   0, 'train' => 90, 'resupply' =>350,	'provider' => 'Bladesmith', 'trainer' => 'Garrison',					'icon' => 'items/claymore2.png'),
 
 		'shortbow'          => array('type' => 'weapon',    'ranged' => 40, 'melee' =>   0, 'defense' =>   0, 'train' => 50, 'resupply' => 50,	'provider' => 'Bowyer',      'trainer' => 'Archery Range',			'icon' => 'items/shortbow2.png'),
 		'crossbow'          => array('type' => 'weapon',    'ranged' => 60, 'melee' =>   0, 'defense' =>   0, 'train' => 60, 'resupply' => 75,	'provider' => 'Bowyer',      'trainer' => 'Archery Range',			'icon' => 'items/armbrust2.png'),
@@ -31,9 +31,10 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 		'plate armour'      => array('type' => 'armour',    'ranged' =>  0, 'melee' =>   0, 'defense' =>  80, 'train' => 80, 'resupply' =>500,	'provider' => 'Heavy Armourer',	'trainer' => 'Wood Castle',		'icon' => 'items/plattenpanzer2.png'),
 
 		'horse'             => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>  20, 'defense' =>  20, 'train' => 60, 'resupply' =>300,	'provider' => 'Stables',     'trainer' => 'Barracks',					'icon' => 'items/packpferd2.png'),
-		'war horse'         => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>  25, 'defense' =>  30, 'train' =>100, 'resupply' =>800,	'provider' => 'Royal Mews',  'trainer' => 'Wood Castle',				'icon' => 'items/warhorse2.png'),
-		'shield'            => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>   0, 'defense' =>  25, 'train' => 40, 'resupply' => 40,	'provider' => 'Carpenter',   'trainer' => 'Guardhouse',				'icon' => 'items/shield2.png'),
+		'war horse'         => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>  35, 'defense' =>  40, 'train' =>100, 'resupply' =>800,	'provider' => 'Royal Mews',  'trainer' => 'Wood Castle',				'icon' => 'items/warhorse2.png'),
+		'shield'            => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>   0, 'defense' =>  30, 'train' => 40, 'resupply' => 40,	'provider' => 'Carpenter',   'trainer' => 'Guardhouse',				'icon' => 'items/shield2.png'),
 		'javelin'           => array('type' => 'equipment', 'ranged' => 65, 'melee' =>  10, 'defense' =>   0, 'train' => 40, 'resupply' => 35,	'provider' => 'Weaponsmith', 'trainer' => 'Guardhouse',				'icon' => 'items/javelin2.png'),
+		// Why does Javelin have a melee bonus?
 		'short sword'       => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>  10, 'defense' =>   5, 'train' => 40, 'resupply' => 50,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',					'icon' => 'items/kurzschwert2.png'),
 	);
 
