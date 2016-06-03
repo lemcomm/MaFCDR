@@ -32,7 +32,7 @@ class DungeonMaster {
 
 	private $initial_random_cards = 3;
 	private $min_party_size = 1;
-	private $max_party_size = 8;
+	private $max_party_size = 30;
 	private $max_cards_per_type = 8;
 	private $starting_wounds = 10;
 	private $max_notify_distance = 50000; // this should be the same as the hardcoded value in CharacterController::summaryAction
@@ -155,8 +155,8 @@ class DungeonMaster {
 
 	public function startDungeon(Dungeon $dungeon) {
 		list($party, $missing, $wait) = $this->calculateTurnTime($dungeon);
-		if ($party<3) return; // don't start until we have at least 3 people
-		if ($missing > $party/2) return; // don't start until at least half the members have selected an action
+		if ($party<1) return; // party must consist of at least one dungeoneer to begin
+		if ($missing > $party*0.75) return; // don't start until at least three-quarters of the party has selected an action
 		// FIXME: the above has the potential to blockade dungeons - long timer for kick?
 		$this->logger->info("starting dungeon #".$dungeon->getId().", $missing of $party actions missing = wait ".$dungeon->getTick()." / $wait");
 
@@ -273,13 +273,13 @@ class DungeonMaster {
 
 		if ($dungeon->getCurrentLevel() == null) {
 			// not yet started
-			if ($party < $this->min_party_size) return array(0,0,0); // dungeon will not start without at least 3
+			if ($party < $this->min_party_size) return array(0,0,0); // dungeon will not start without meeting the minimum party size
 			switch ($party) {
 				case 3:	$wait = 8; break;
 				case 4:	$wait = 4; break;
 				case 5:	$wait = 2; break;
 				default:	$wait = 1;
-			}
+			} 
 			switch ($missing) {
 				case 0:	break;
 				case 1:	$wait += 2; break;
@@ -297,7 +297,7 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	}
+	} // Question: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things?
 
 
 	public function addEvent(DungeonParty $party, $content, $data=null) {
@@ -321,7 +321,7 @@ class DungeonMaster {
 			$dungeoneer->setModPower(0);
 		}
 
-		// apply new modifiers for this round
+		// apply new modifiers for this round, plunder action reduces defense by 50, leaving by 20.
 		foreach ($party->getActiveMembers() as $dungeoneer) {
 			if ($dungeoneer->getCurrentAction()) switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 				case 'basic.plunder':	$dungeoneer->setModDefense(-50); break;
