@@ -297,7 +297,7 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	} // Question: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things? --Andrew
+	} // QUERY: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things? --Andrew
 
 
 	public function addEvent(DungeonParty $party, $content, $data=null) {
@@ -838,6 +838,7 @@ class DungeonMaster {
 
 					// closing the dungeon happens if we got deep enough, or it has been explored a lot
 					// but some randomness to avoid people gaming the system by pulling out early
+					// TODO: Rarer dungeons last longer! --Andrew
 					if ($max_depth > 0 && rand(0,100) < $max_depth*5 + $dungeon->getExplorationCount()*2) {
 						$this->logger->info("...closing dungeon #".$dungeon->getId()." (exploration ".$dungeon->getExplorationCount().")");
 						$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c, DungeonBundle:Dungeon d WHERE c.slumbering = false AND c.alive = true and c.travel_at_sea = false AND ST_Distance(c.location, d.location) < :maxdistance');
