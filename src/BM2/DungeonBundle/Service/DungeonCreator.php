@@ -76,8 +76,38 @@ class DungeonCreator {
 		$treasure_points = round(pow($depth-1, 1.8)  * $this->base_treasuremod * pow($members, 0.8));
 		$this->logger->info("$monster_points monster points / $treasure_points treasure points");
 
+		if ($members<3 && rand(0,100) < rand(0,50) {
+			// may I introduce the suicide run! Hahahaha --Andrew
+			$depth+3;
+		}
+
 		if ($members>4) {
-			// treat dungeon as one level deeper for large parties, or we will get dozens of small monsters
+			// treat dungeon as one level deeper for parties of 4-10, or we will get dozens of small monsters
+			$depth++;
+		}
+
+		if ($members>10) {
+			// treat dungeon as another level deeper for parties of 11-15 --Andrew
+			$depth++;
+		}
+
+		if ($members>15) {
+			// treat dungeon as another level deeper for parties of 16-19 --Andrew
+			$depth++;
+		}
+
+		if ($members>20) {
+			// treat dungeon as another level deeper for parties of 20-24 --Andrew
+			$depth++;
+		}
+
+		if ($members>25) {
+			// treat dungeon as another level deeper for parties of 25-29 --Andrew
+			$depth++;
+		}
+
+		if ($members>30) {
+			// treat dungeon as another level deeper for parties of 30 --Andrew
 			$depth++;
 		}
 
