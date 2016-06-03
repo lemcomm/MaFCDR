@@ -297,7 +297,7 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	} // Question: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things?
+	} // Question: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things? --Andrew
 
 
 	public function addEvent(DungeonParty $party, $content, $data=null) {
