@@ -556,7 +556,7 @@ class Economy {
 			if ($force_recalc) {
 				list($building_resource, $building_bonus) = $this->ResourceFromBuildings($settlement, $resource, $baseresource);
 				$georesource->setBuildingsBase($building_resource);
-				$georesource->setBuildingsBonus(round($building_bonus*100));
+				$georesource->setBuildingsBonus(round($building_bonus*10));
 			} else {
 				$building_resource = $georesource->getBuildingsBase();
 				$building_bonus = $georesource->getBuildingsBonus()/10;
@@ -627,7 +627,7 @@ class Economy {
 			$base += $result->getProvidesOperation();
 			$bonus+= $result->getProvidesOperationBonus();
 		}
-		return array($base, 1.0+($bonus/100));
+		return array($base, 1.0+($bonus/10));
 	}
 
 	public function ResourceDemand(Settlement $settlement, ResourceType $resource, $split_results=false) {
