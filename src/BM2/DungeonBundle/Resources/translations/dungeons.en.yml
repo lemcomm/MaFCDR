@@ -29,6 +29,10 @@ area:
  wild:		wilderness
  ruin:		ruin
  dungeon:	dungeon
+ lab: labyrinth
+ citadel: citadel
+ hold: hold
+ glade: glade
 
 areaintro:
  cave: >
@@ -45,6 +49,19 @@ areaintro:
  dungeon: > 
    An entrance guides you down. It is impossible to guess why someone would build an underground lair at a place like this,
    nor what it was for. You are certain that treasures are hidden inside, just as you are sure that they are well guarded.
+ lab: >
+   You're not quite sure who built this ancient labyrinth or what purpose it holds, but certainly it was built for a reason,
+   and anything of such size that has drawn such monsters to it must contain vast hoards of wealth.
+ citadel: >
+   This ancient citadel was so well built that not only is it still standing, it's still standing despite the hoards of
+   monsters that appear to have made it their home. Surely, even with all the fiends patrolling it, it must have something
+   of worth within it's monster filled halls.
+ hold: >
+   When you approached this palce, you were fairly certain the local authorities had built it, but now that you're closer
+   you can be quite certain that it's been taken over by a local brigand and his gang.
+ glade: >
+   When you imagine a glade, you don't normally expect it to be filled to the brim with monster filled nasties. But here
+   you are, in a monster filled clearing in a wood. Time to draw that weapon of yours, no?
 
 size:
  dark:  some
@@ -53,6 +70,10 @@ size:
  100:		normal
  120:		large
  150:		huge
+ 175:  massive
+ 200:  gigantic
+ 250:  immense
+ 300:  collosal
 
 monster:
  dark:      creature|creatures
