@@ -4,6 +4,8 @@ New dungeons have been described but not implemented: "lab / labyrinth" "citadel
 
 New monster sizes have been described but not implemented: "massive" "gigantic" "immense" "collosal"
 
+Implement shorter and longer dungeons. look at line 842 in DungeonBundle/Service/DungeonMaster.php
+
 Incorporate biomes into dungeon locations and types; look at line 189 in SiteBundle/Service/Economy.php:
 
 	public function checkSpecialConditions(Settlement $settlement, $building_name) {
