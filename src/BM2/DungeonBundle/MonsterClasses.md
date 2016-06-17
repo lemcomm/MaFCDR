@@ -1,12 +1,8 @@
-
-
 animal, human, monster, spirit, mech, first
 : no effect at this time, will be used later once cards have different affects against different types
 
 melee, mixed, ranged
 : no effect at this time, will be used later when movement is implemented
-
-
 
 stealth
 : can not be randomly targetted, you need scouting to attack this monster
@@ -29,4 +25,4 @@ handler
 boss
 : this is a monster that will (once implemented) cause the dungeon to close after it's killed, which will allow quests to tie in to the dungeon system.
 slime
-: slimes are interesting in that they float, don't float, go through things, don't go through things, can jump, but don't always splat. Eventually, we're going to code these lil' fun bunches into splitting. Whee!
+: slimes are interesting in that they float, don't float, go through things, don't go through things, can jump, but don't always splat. Eventually, we're going to code these lil' fun bunches into splitting.
