@@ -113,9 +113,12 @@ monster:
  fortcavalryh:  heavy cavalryman|heavy cavalrymen
  fortlord:      First One lord|First One lords
  fortlesslord:  First One|First Ones
+ hawk:          hawk|hawks
  lost:          lost hero|lost heroes
+ mongrel:       mongrel|mongrels
  ogre:          ogre|ogres
  rat:           rat|rats
+ shaman:        shaman|shamans
  slime:         green slime|green slimes
  snake:         snake|snakes
  troglodyte:    troglodyte|troglodytes
@@ -176,6 +179,8 @@ monsterdesc:
  eagle: >
    These giant eagles can grow to a surprising size, and hunt sheep, deer or even cows for food. They can be quite a match
    even for a well-armed First One, especially if encountered in groups. When they swoop down on you, take cover.
+ falcon: >
+   A trained hawk, probably the servant of someone, somewhere. Not that any of that matters since its attacking you.
  fortguard: >
    A simple footman in the service of their lord. It's unlikely they really understand their responsibilities or who they're
    serving. Equipped with a standard-issue infantry weapon.
@@ -217,10 +222,15 @@ monsterdesc:
    You're not quite certain how this First One got recruited by the lord they're following, but it doesn't matter. They are
    in your way, standing between you and the lord of this fortress. Your attempts to speak with them, to convince them of the
    worthiness of your cause are met only with grunts, insults, or attempts to kill you.
+ hawk: >
+   A large hawk, which seems to be bent on making you it's dinner. The talons on it seem capable of making that a distinct
+   possibility.
  lost: >
    A lost hero of old times, this elite warrior has been mentally damaged by all the carnage he has seen and caused. He has
    retreated to this hiding place, maybe he even fought here one time, and has lost himself in a world of his own. He will
    attack any intruders, and cannot be reasoned with anymore. He is an experienced and dangerous enemy.
+ mongrel: >
+   A stray dog, having gone feral from lack of proper care or attention. Now, it is little more than a wild beast.
  ogre: >
    Nobody knows what these creatures truly are. While they look like huge, ugly humans, they show no sign of human intelligence
    and the usage of clubs is the only sign that they may be smarter than most animals. They avoid humans, but if cornered
