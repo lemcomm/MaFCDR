@@ -45,7 +45,7 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 		'chimera'	=> array('power' => 75, 'attacks' =>  3, 'defense' => 45, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'mixed', 'fly', 'swim', 'poison', 'solo'), 'areas' => array('cave', 'lab', 'wild', 'citadel', 'glade', 'dungeon'))
 		'dragon'	=> array('power' =>250, 'attacks' =>  1, 'defense' =>100, 'wounds' => 8, 'mindepth' => 8, 'class' => array('monster', 'solo', 'mixed', 'fly', 'swim', 'boss'), 'areas' => array('cave', 'lab', 'dungeon', 'citadel'))
 		'ogre'		=> array('power' => 80, 'attacks' =>  1, 'defense' => 60, 'wounds' => 4, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('ruin', 'dungeon', 'lab')),
-		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  5, 'wounds' => 8, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort')),
+		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  1, 'wounds' => 8, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort')),
 		'troglodyte'	=> array('power' => 80, 'attacks' =>  2, 'defense' => 50, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('cave', 'wild', 'lab')),
 		'wyvern'	=> array('power' =>150, 'attacks' =>  2, 'defense' => 80, 'wounds' => 2, 'mindepth' => 5, 'class' => array('monster', 'fly'), 'areas' => array('wild', 'lab')),
 	
