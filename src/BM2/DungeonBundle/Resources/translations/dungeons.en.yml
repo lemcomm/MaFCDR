@@ -108,6 +108,7 @@ monster:
  fortguardv:    veteran infantryman|veteran infantrymen
  fortguardhv:   veteran heavy infantryman|veteran heavy infantrymen
  fortcavalry:   cavalryman|cavalrymen
+ fortcavalrya:  mounted archer|mounted archers
  fortcavalryc:  cavalry captain|cavalry captains
  fortcavalryh:  heavy cavalryman|heavy cavalrymen
  fortlord:      First One lord|First One lords
