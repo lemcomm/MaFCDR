@@ -1,7 +1,5 @@
 Andrew's Notes for future work:
 
-New dungeons have been described but not implemented: "lab / labyrinth" "citadel" "glade" "hold"
-
 New monster sizes have been described but not implemented: "massive" "gigantic" "immense" "collosal"
 
 Implement shorter and longer dungeons. look at line 842 in DungeonBundle/Service/DungeonMaster.php
@@ -71,3 +69,7 @@ Incorporate biomes into dungeon locations and types; look at line 189 in SiteBun
 	}
 	
 Implement a movement grid system? Something with width and depth to simulate the actual movement of the dungeoneers and monsters and to make ranged attacks actually mean something?
+
+Add more special dungeons (scenarios)! 
+
+Add more code to support special dungeons.
