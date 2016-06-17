@@ -266,23 +266,24 @@ monsterdesc:
 
 class:
  animal:    animal
- human:     human
- monster:   monstrous creature
- spirit:    spirit
- mech: mechanical construction
- melee:     melee fighter
- ranged:    ranged attacker
- mixed:     melee and ranged fighter
- stealth:   stealthy
- poison:    poisonous
  boss:      boss creature
  fly:       flying creature
  hover:     hovering creature
- swim:      swimming creature
- phantom:   non-corporeal creature
+ human:     human
+ mech: mechanical construction
+ melee:     melee fighter
+ mixed:     melee and ranged fighter
+ monster:   monstrous creature
+ ranged:    ranged attacker
  pack:      prefers to live in packs
+ phantom:   non-corporeal creature
+ poison:    poisonous
+ slime:     a type of slime
  solo:      prefers to live alone or in small groups
+ spirit:    spirit
+ stealth:   stealthy
  swarm:     swarm animals
+ swim:      swimming creature
 
 target:
  random:    (random)
