@@ -183,8 +183,9 @@ class DungeonCreator {
 		return 'firstfort';
 	}
 
+	// TODO: incorporate a max_depth setting to the monster spawner.
 	private function RandomMonsterType($area, $depth) {
-		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.min_depth <= :depth AND t.max_depth >= :depth");
+		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.min_depth <= :depth");
 		$query->setParameters(array('area' => '%'.$area.'%', 'depth'=>$depth));
 		$monsters = $query->getResult();
 		$pick = array_rand($monsters);
