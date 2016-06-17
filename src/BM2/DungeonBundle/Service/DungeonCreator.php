@@ -117,10 +117,12 @@ class DungeonCreator {
 			$max = min(ceil($monster_points / ($monster->getPoints()*$size/100)), ceil($depth*2.5));
 			if (in_array('swarm', $monster->getClass())) {	
 				$amount = 1;
-			} else if (in_array('pack', $monster->getClass())) {
+			} elseif (in_array('pack', $monster->getClass())) {
 				$amount = rand(ceil($max/2), $max);
 			} elseif (in_array('solo', $monster->getClass())) {
 				$amount = rand(ceil($max/4), ceil($max/2));
+			} elseif (in_array('indiv', $monster->getClass())) {
+				$amount = 1;
 			} else {
 				$amount = rand(ceil($max/4), $max);				
 			}
@@ -167,17 +169,22 @@ class DungeonCreator {
 
 
 	private function RandomDungeonType($biome) {
-		// TODO: for testing we simply use randomness - later on we randomly determine based on biome - wild, ruin, dungeon, etc.
-		$pick = rand(0,100);
-
+		// TODO: for testing we simply use randomness - later on we randomly determine based on biome: wild, ruin, dungeon, etc.; or by tieing in quests
+		$pick = rand(0,200);
+		
+		if ($pick < 20) return 'glade';
 		if ($pick < 40) return 'cave';
 		if ($pick < 70) return 'wild';
 		if ($pick < 90) return 'ruin';
-		return 'dungeon';
+		if ($pick < 130) return 'hold';
+		if ($pick < 160) return 'lab';
+		if ($pick < 190) return 'dungeon';
+		if ($pick < 199) return 'citadel';
+		return 'firstfort';
 	}
 
 	private function RandomMonsterType($area, $depth) {
-		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.min_depth <= :depth");
+		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.min_depth <= :depth AND t.max_depth >= :depth");
 		$query->setParameters(array('area' => '%'.$area.'%', 'depth'=>$depth));
 		$monsters = $query->getResult();
 		$pick = array_rand($monsters);
@@ -186,6 +193,34 @@ class DungeonCreator {
 		$depth -= $type->getMinDepth();
 
 		// our size depends on the dungeon level only, at least for now
+		// TODO: add the ability for monsters to randomly spawn at different sizes depending on their type. -- Andrew
+		$roll = rand(0,100);
+		if ($roll < 10-$depth) {
+			$size = 50;
+		} elseif ($roll < 25-($depth*2)) {
+			$size = 80;
+		} elseif ($roll < 80-($depth*3)) {
+			$size = 100;
+		} elseif ($roll < 100-($depth*4)) {
+			$size = 120;
+		} else {
+			$size = 150;
+		}
+
+		return array($type, $size);
+	}
+	
+	private function BossMonster($area, $depth) {
+		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.class LIKE 'boss'");
+		$query->setParameters(array('area' => '%'.$area.'%', 'depth'=>$depth));
+		$monsters = $query->getResult();
+		$pick = array_rand($monsters);
+		$type = $monsters[$pick];
+
+		$depth -= $type->getMinDepth();
+
+		// TODO: This isn't in use yet, but it will allow for the selection of boss monsters for special dungeons.
+		// When this is implemented, add " AND t.class !='boss'" to the query string used by RandomMonsterType. -- Andrew
 		$roll = rand(0,100);
 		if ($roll < 10-$depth) {
 			$size = 50;
