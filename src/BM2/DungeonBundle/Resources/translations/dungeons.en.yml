@@ -27,14 +27,15 @@ error:
 
 
 area:
- cave:		cave
- wild:		wilderness
- ruin:		ruin
- dungeon:	dungeon
- lab: labyrinth
- citadel: citadel
- hold: bandit hold
- glade: infested glade
+ cave:	    	cave
+ wild:		    wilderness
+ ruin:		    ruin
+ dungeon:	  dungeon
+ lab:       labyrinth
+ citadel:   citadel
+ hold:      bandit hold
+ glade:     infested glade
+ firstfort: first one fortress
 
 areaintro:
  cave: >
@@ -65,16 +66,16 @@ areaintro:
  glade: >
    When you imagine a glade, you don't normally expect it to be filled to the brim with monsters. But here you are, in a
    monster filled clearing. Time to draw that weapon of yours, no?
- fortress: >
+ firstfort: >
    You've heard a lot of stories in your time about first ones dieing trying to do what you're about to undertake. The one
    advantage that you've got though, is that they don't know you're coming, so you won't be taking on the entire garrison
    of this First One controlled fort at once. Of course, that does mean that you might encounter some very competent fighters
    here. If you want to take this on, be sure to bring as many friends as possible.
 
 size:
- dark:  some
- 50:		very small
- 80:		small
+ dark: some
+ 50:	 	very small
+ 80:	 	small
  100:		normal
  120:		large
  150:		huge
