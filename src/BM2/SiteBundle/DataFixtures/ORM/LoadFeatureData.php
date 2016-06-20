@@ -18,6 +18,8 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 		'borderpost'    => array('hidden'=>false,   'work'=>100,   'icon'=>'rpg_map/sign_post.svg',        'icon_uc'=>'rpg_map/sign_post_outline.svg'),
 		'signpost'      => array('hidden'=>false,   'work'=>60,    'icon'=>'rpg_map/sign_crossroad.svg',   'icon_uc'=>'rpg_map/sign_crossroad_outline.svg'),
 		'docks'         => array('hidden'=>false,   'work'=>10000, 'icon'=>'rpg_map/docks.svg',            'icon_uc'=>'rpg_map/docks_outline.svg'),
+		'fort'		=> array('hidden'=>false,   'work'=>90000, 'icon'=>'rpg_map/fort.svg',             'icon_uc'=>'rpg_map/fort_outline.svg')
+		'fortress'	=> array('hidden'=>true,    'work'=>280000,'icon'=>'rpg_map/fortress.svg'          'icon_uc'=>'rpg_map/fortress_outline.svg')
 	);
 
 	/**
