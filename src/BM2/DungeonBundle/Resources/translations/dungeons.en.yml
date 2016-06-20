@@ -116,6 +116,8 @@ monster:
  hawk:          hawk|hawks
  lost:          lost hero|lost heroes
  mongrel:       mongrel|mongrels
+ monhunter:     monster hunter|monster hunters
+ npcdungeoneer: mortal dungeoneer|mortal dungeoneers
  ogre:          ogre|ogres
  rat:           rat|rats
  shaman:        shaman|shamans
@@ -231,6 +233,12 @@ monsterdesc:
    attack any intruders, and cannot be reasoned with anymore. He is an experienced and dangerous enemy.
  mongrel: >
    A stray dog, having gone feral from lack of proper care or attention. Now, it is little more than a wild beast.
+ monhunter: >
+   Mortals who specialize in hunting dangerous beasts or monsters for profit or amusement. They usually sport  longbows and 
+   javelins as well as using a wide range of potent poisons. Often seen working along dungeoneers.
+ npcdungeoneer: >
+   Mortals who raid dungeons  for profit or other nefarious purposes. Having faced numerous dangers in their life, they are 
+   fearless, ruthless, highly disciplined and more well equipped than most elite soldiers, making them a formidable foe. 
  ogre: >
    Nobody knows what these creatures truly are. While they look like huge, ugly humans, they show no sign of human intelligence
    and the usage of clubs is the only sign that they may be smarter than most animals. They avoid humans, but if cornered
