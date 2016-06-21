@@ -2,6 +2,8 @@ Andrew's Notes for future work:
 
 New monster sizes have been described but not implemented: "massive" "gigantic" "immense" "collosal"
 
+Tweak the function that closes dungeons to better accommodate larger party sizes in the short term until code is added to force minimum/maximum dungeon lengths--this'll probably with the dungeon-types branch and it's incorporation to my master.
+
 Implement shorter and longer dungeons. look at line 842 in DungeonBundle/Service/DungeonMaster.php
 
 Incorporate biomes into dungeon locations and types; look at line 189 in SiteBundle/Service/Economy.php:
