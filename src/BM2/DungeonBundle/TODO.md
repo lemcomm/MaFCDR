@@ -73,3 +73,7 @@ Implement a movement grid system? Something with width and depth to simulate the
 Add more special dungeons (scenarios)! 
 
 Add more code to support special dungeons.
+
+Rework humanoid monsters to use experience descriptors rather than size in order to vary power ratings. Something like novice, experienced, veteran, legendary rather than small, large, giant, etc.
+
+Make monsters use cards rather than a calculation of attack power versus defense power as found in the Fights function in the DungeonMaster service.
