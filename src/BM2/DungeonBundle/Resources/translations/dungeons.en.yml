@@ -288,11 +288,12 @@ monsterdesc:
 class:
  animal:    animal
  boss:      boss creature
+ first:     first one
  fly:       flying creature
  hover:     hovering creature
  human:     human
  indiv:     prefers solitude
- mech: mechanical construction
+ mech:      mechanical construction
  melee:     melee fighter
  mixed:     melee and ranged fighter
  monster:   monstrous creature
