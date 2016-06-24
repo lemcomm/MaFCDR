@@ -45,9 +45,9 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 		// monsters
 		'barghest'	=> array('power' => 90, 'attacks' =>  1, 'defense' => 50, 'wounds' => 3, 'mindepth' => 3, 'class' => array('monster', 'melee'), 'areas' => array('cave', 'dungeon', 'citadel', 'glade', 'lab', 'mausoleum', 'shipgrave')),
 		'chimera'	=> array('power' => 75, 'attacks' =>  3, 'defense' => 45, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'mixed', 'fly', 'swim', 'poison', 'solo'), 'areas' => array('cave', 'lab', 'wild', 'citadel', 'glade', 'dungeon', 'mausoleum', 'shipgrave'))
-		'dragon'	=> array('power' =>250, 'attacks' =>  1, 'defense' =>100, 'wounds' => 8, 'mindepth' => 8, 'class' => array('monster', 'solo', 'mixed', 'fly', 'swim', 'boss'), 'areas' => array('cave', 'lab', 'dungeon', 'citadel'))
+		'dragon'	=> array('power' =>250, 'attacks' =>  3, 'defense' =>150, 'wounds' => 6, 'mindepth' => 8, 'class' => array('monster', 'solo', 'mixed', 'fly', 'swim', 'boss'), 'areas' => array('cave', 'lab', 'dungeon', 'citadel'))
 		'ogre'		=> array('power' => 80, 'attacks' =>  1, 'defense' => 60, 'wounds' => 4, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('ruin', 'dungeon', 'lab', 'shipgrave')),
-		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  1, 'wounds' => 8, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort', 'mausoleum', 'flooded', 'shipgrave')),
+		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  1, 'wounds' => 6, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort', 'mausoleum', 'flooded', 'shipgrave')),
 		'troglodyte'	=> array('power' => 80, 'attacks' =>  2, 'defense' => 50, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('cave', 'wild', 'lab', 'flooded', 'shipgrave')),
 		'wyvern'	=> array('power' =>150, 'attacks' =>  2, 'defense' => 80, 'wounds' => 2, 'mindepth' => 5, 'class' => array('monster', 'fly'), 'areas' => array('wild', 'lab', 'flooded', 'shipgrave')),
 	
@@ -62,8 +62,8 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 		'fortcavalryc'	=> array('power' => 90, 'attacks' =>  2, 'defense' => 45, 'wounds' => 4, 'mindepth' => 5, 'class' => array('human', 'mixed', 'mounted'), 'areas' => array('firstfort', 'lab'))
 		'fortcavalryh'	=> array('power' => 50, 'attacks' =>  2, 'defense' => 85, 'wounds' => 3, 'mindepth' => 4, 'class' => array('human', 'melee', 'mounted'), 'areas' => array('firstfort', 'lab'))
 		'fortcavalrya'	=> array('power' => 30, 'attacks' =>  2, 'defense' => 30, 'wounds' => 2, 'mindepth' => 2, 'class' => array('human', 'ranged', 'mounted,'), 'areas' => array('firstfort', 'lab'))
-		'fortlesslord'	=> array('power' => 80, 'attacks' =>  4, 'defense' => 80, 'wounds' => 6, 'mindepth' => 6, 'class' => array('first', 'mixed', 'solo'), 'areas' => array('firstfort')),
-		'fortlord'	=> array('power' =>100, 'attacks' =>  6, 'defense' =>100, 'wounds' =>10, 'mindepth' => 8, 'class' => array('first', 'mixed', 'indiv', 'boss'), 'areas' => array('firstfort')),
+		'fortlesslord'	=> array('power' => 80, 'attacks' =>  3, 'defense' => 80, 'wounds' => 6, 'mindepth' => 6, 'class' => array('first', 'mixed', 'solo'), 'areas' => array('firstfort')),
+		'fortlord'	=> array('power' =>100, 'attacks' =>  4, 'defense' =>100, 'wounds' =>10, 'mindepth' => 8, 'class' => array('first', 'mixed', 'indiv', 'boss'), 'areas' => array('firstfort')),
 	);
 
 	/**
