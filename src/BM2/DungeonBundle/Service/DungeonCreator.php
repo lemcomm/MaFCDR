@@ -174,10 +174,13 @@ class DungeonCreator {
 		
 		if ($pick < 20) return 'glade';
 		if ($pick < 40) return 'cave';
-		if ($pick < 70) return 'wild';
-		if ($pick < 90) return 'ruin';
-		if ($pick < 130) return 'hold';
+		if ($pick < 60) return 'wild';
+		if ($pick < 80) return 'flooded';
+		if ($pick < 100) return 'ruin';
+		if ($pick < 120) return 'hold';
+		if ($pick < 140) return 'mausoleum';
 		if ($pick < 160) return 'lab';
+		if ($pick < 180) return 'shipgrave';
 		if ($pick < 190) return 'dungeon';
 		if ($pick < 199) return 'citadel';
 		return 'firstfort';
