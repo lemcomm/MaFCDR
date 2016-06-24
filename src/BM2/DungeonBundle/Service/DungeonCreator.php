@@ -213,32 +213,5 @@ class DungeonCreator {
 
 		return array($type, $size);
 	}
-	
-	private function BossMonster($area, $depth) {
-		$query = $this->em->createQuery("SELECT t FROM DungeonBundle:DungeonMonsterType t WHERE t.areas LIKE :area AND t.class LIKE 'boss'");
-		$query->setParameters(array('area' => '%'.$area.'%', 'depth'=>$depth));
-		$monsters = $query->getResult();
-		$pick = array_rand($monsters);
-		$type = $monsters[$pick];
-
-		$depth -= $type->getMinDepth();
-
-		// TODO: This isn't in use yet, but it will allow for the selection of boss monsters for special dungeons.
-		// When this is implemented, add " AND t.class !='boss'" to the query string used by RandomMonsterType. -- Andrew
-		$roll = rand(0,100);
-		if ($roll < 10-$depth) {
-			$size = 50;
-		} elseif ($roll < 25-($depth*2)) {
-			$size = 80;
-		} elseif ($roll < 80-($depth*3)) {
-			$size = 100;
-		} elseif ($roll < 100-($depth*4)) {
-			$size = 120;
-		} else {
-			$size = 150;
-		}
-
-		return array($type, $size);
-	}
 
 }
