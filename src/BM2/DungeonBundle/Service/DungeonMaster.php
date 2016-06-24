@@ -557,7 +557,7 @@ class DungeonMaster {
 							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
 							$this->DungeoneerAttack($dungeoneer, $target, 6); 
 							} else {
-							$this->DungeoneerAttack($dungeoneer, $target);
+							$this->DungeoneerAttack($dungeoneer, $target, 0.5);
 							}
 						}
 						break;
