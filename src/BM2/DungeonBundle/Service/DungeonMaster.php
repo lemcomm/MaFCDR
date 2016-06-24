@@ -450,7 +450,7 @@ class DungeonMaster {
 				switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 					case 'basic.scout':		$level++; break;
 					case 'scout.double':		$level+=2; break;
-					case 'scout.tripple':	$level+=3; break;
+					case 'scout.tripple':		$level+=3; break;
 				}
 			}
 		}
@@ -549,6 +549,15 @@ class DungeonMaster {
 								if ($target->getAmount() > 0) {
 									$this->DungeoneerAttack($dungeoneer, $target, 1, 0.5, 0.5);
 								}
+							}
+						}
+						break;
+					case 'fight.slime':
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
+							$this->DungeoneerAttack($dungeoneer, $target, 6); 
+							} else {
+							$this->DungeoneerAttack($dungeoneer, $target);
 							}
 						}
 						break;
