@@ -445,6 +445,9 @@ card:
   bomb2:
    title: Burning Barrel
    text:  Light a barrel of oil and throw it at an enemy, burning every monster in a group severely.
+  slime:
+   title: Slay Slime
+   text:  Hunting slimes for so long has shown you the best ways to bring them down.
  scout:
   double:
    title: Excellent Scout
