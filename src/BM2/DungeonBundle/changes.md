@@ -4,9 +4,20 @@ FORMAT (latest thing first)
   YYYYMMDD
   : Changes
 
+20160623
+: Added 3 new dungeon types: Flooded Village, Mausoleum, Ship Graveyard
+: Added 1 new card: Slay Slime; for my first stab at cards, and a conditional, multi-result one at that, it's a good start.
+: Implemented monster class: Slime
+: Tweaked slimes and dragons a little.
+: Modified dungeon closing code to accomondate varying party sizes equally. Min: 3, Max: 15, Avg: 9
+: Added dungeon images. Mostly placeholds until we get something better.
+
+20160620
+: Added Mortal Dungeoneer and Monster Hunter
+
 20160617
 : Added monsters: Dragon, Guard Dog, Bandit Guard, a slew of soldiers, First Ones (special, super rare dungeon), hawks, falcons, villagers, slimes, shamans, chimeras, rats
-: Added/implemented dungeon: firstfort
+: Added/implemented dungeon: First One Fortress
 : Laid groundwork for future monster types, attack classes, and movement system, no idea when any of that will get added, but its best to assume it'll happen now than have to redo it all later.
 :: Added classes: mechanoid, spirit, mixed, hover, phantom, swim, handler, indiv, mounted, slime
 

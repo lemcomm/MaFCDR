@@ -71,6 +71,19 @@ areaintro:
    advantage that you've got though, is that they don't know you're coming, so you won't be taking on the entire garrison
    of this First One controlled fort at once. Of course, that does mean that you might encounter some very competent fighters
    here. If you want to take this on, be sure to bring as many friends as possible.
+ mausoleum: >
+   This impressive stone mausoleum must have taken the work of hundreds of people over hundreds of days to build. Perhaps
+   the last resting place of a forgotten monarch or even the tomb of a civilization, it contains untold treasures entrusted
+   to eternity alongside the dead. And untold dangers as its passages and halls have been colonized by all manner of strange
+   and vicious creatures.
+ shipgrave: >
+   When ships reached the end of their seaworthy lives, they were brought here to be broken up and scavenged for parts that
+   could be reused. Thought to be stripped of everything that could be used again, who knows what hidden treasures could have
+   been missed hidden in the broken hulks. The wreaks also make excellent dens for the creatures of the wild that have made
+   them their homes.
+ flooded: >
+   Once a thriving town, this place became the victim of a sudden shift in tides and water levels. Swiftly abandoned by a
+   fleeing population, all manner of items that were left behind wait to be discovered.
 
 size:
  dark: some
@@ -116,6 +129,8 @@ monster:
  hawk:          hawk|hawks
  lost:          lost hero|lost heroes
  mongrel:       mongrel|mongrels
+ monhunter:     monster hunter|monster hunters
+ npcdungeoneer: mortal dungeoneer|mortal dungeoneers
  ogre:          ogre|ogres
  rat:           rat|rats
  shaman:        shaman|shamans
@@ -231,6 +246,12 @@ monsterdesc:
    attack any intruders, and cannot be reasoned with anymore. He is an experienced and dangerous enemy.
  mongrel: >
    A stray dog, having gone feral from lack of proper care or attention. Now, it is little more than a wild beast.
+ monhunter: >
+   Mortals who specialize in hunting dangerous beasts or monsters for profit or amusement. They usually sport  longbows and 
+   javelins as well as using a wide range of potent poisons. Often seen working along dungeoneers.
+ npcdungeoneer: >
+   Mortals who raid dungeons  for profit or other nefarious purposes. Having faced numerous dangers in their life, they are 
+   fearless, ruthless, highly disciplined and more well equipped than most elite soldiers, making them a formidable foe. 
  ogre: >
    Nobody knows what these creatures truly are. While they look like huge, ugly humans, they show no sign of human intelligence
    and the usage of clubs is the only sign that they may be smarter than most animals. They avoid humans, but if cornered
@@ -267,11 +288,12 @@ monsterdesc:
 class:
  animal:    animal
  boss:      boss creature
+ first:     first one
  fly:       flying creature
  hover:     hovering creature
  human:     human
  indiv:     prefers solitude
- mech: mechanical construction
+ mech:      mechanical construction
  melee:     melee fighter
  mixed:     melee and ranged fighter
  monster:   monstrous creature
@@ -424,6 +446,9 @@ card:
   bomb2:
    title: Burning Barrel
    text:  Light a barrel of oil and throw it at an enemy, burning every monster in a group severely.
+  slime:
+   title: Slay Slime
+   text:  Hunting slimes for so long has shown you the best ways to bring them down.
  scout:
   double:
    title: Excellent Scout

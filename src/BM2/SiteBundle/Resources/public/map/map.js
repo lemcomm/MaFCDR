@@ -832,7 +832,7 @@ var zoomSupport = {
 			switch (feature.attributes.type) {
 				case 'bridge':			return imgpath+'rpg_map/bridge_stone1.svg';
 				case 'tower':			return imgpath+'rpg_map/watch_tower.svg';
-				case 'borderpost':	return imgpath+'rpg_map/sign_post.svg';
+				case 'borderpost':		return imgpath+'rpg_map/sign_post.svg';
 				case 'signpost':		return imgpath+'rpg_map/sign_crossroad.svg';
 				case 'docks':			return imgpath+'rpg_map/docks.svg';
 				case 'battle':  		return imgpath+'ryanlerch_sword_battleaxe_shield.svg';
@@ -842,7 +842,15 @@ var zoomSupport = {
 				case 'cave':			return imgpath+'rpg_map/cave_entrance.svg';
 				case 'wild':			return imgpath+'rpg_map/obelisk.svg';
 				case 'ruin':			return imgpath+'rpg_map/ruins.svg';
-				case 'dungeon':		return imgpath+'rpg_map/monastery.svg';
+				case 'dungeon':			return imgpath+'rpg_map/monastery.svg';
+				case 'glade':			return imgpath+'rpg_map/hill1.svg';
+				case 'lab':			return imgpath+'rpg_map/maze.svg';
+				case 'mausoleum':		return imgpath+'rpg_map/pyramid.svg';
+				case 'hold':			return imgpath+'rpg_map/tower_round.svg';
+				case 'citadel': 		return imgpath+'rpg_map/statue.svg';
+				case 'firstfort':		return imgpath+'rpg_map/fortress.svg';
+				case 'flooded':			return imgpath+'rpg_map/obelisk.svg';
+				case 'shipgrave':		return imgpath+'rpg_map/shipwreck.svg';
 			}
 		} else {
 			switch (feature.attributes.type) {

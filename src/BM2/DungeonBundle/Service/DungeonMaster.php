@@ -450,7 +450,7 @@ class DungeonMaster {
 				switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 					case 'basic.scout':		$level++; break;
 					case 'scout.double':		$level+=2; break;
-					case 'scout.tripple':	$level+=3; break;
+					case 'scout.tripple':		$level+=3; break;
 				}
 			}
 		}
@@ -549,6 +549,15 @@ class DungeonMaster {
 								if ($target->getAmount() > 0) {
 									$this->DungeoneerAttack($dungeoneer, $target, 1, 0.5, 0.5);
 								}
+							}
+						}
+						break;
+					case 'fight.slime':
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
+							$this->DungeoneerAttack($dungeoneer, $target, 6); 
+							} else {
+							$this->DungeoneerAttack($dungeoneer, $target, 0.5);
 							}
 						}
 						break;
@@ -838,8 +847,8 @@ class DungeonMaster {
 
 					// closing the dungeon happens if we got deep enough, or it has been explored a lot
 					// but some randomness to avoid people gaming the system by pulling out early
-					// TODO: Rarer dungeons last longer! --Andrew
-					if ($max_depth > 0 && rand(0,100) < $max_depth*5 + $dungeon->getExplorationCount()*2) {
+					// TODO: This is a short-term fix until I have the dungeon types coding implemented and all of this is dependent on the dungeon type. --Andrew
+					if ($max_depth > 0 && rand(21,141) < $dungeon->getExplorationCount()*10) {
 						$this->logger->info("...closing dungeon #".$dungeon->getId()." (exploration ".$dungeon->getExplorationCount().")");
 						$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c, DungeonBundle:Dungeon d WHERE c.slumbering = false AND c.alive = true and c.travel_at_sea = false AND ST_Distance(c.location, d.location) < :maxdistance');
 						$query->setParameters(array('maxdistance'=>Geography::DISTANCE_DUNGEON));
