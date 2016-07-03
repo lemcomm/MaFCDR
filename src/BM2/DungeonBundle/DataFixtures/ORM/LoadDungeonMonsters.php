@@ -20,14 +20,14 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 		'cat'		=> array('power' => 40, 'attacks' =>  1, 'defense' => 20, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'solo', 'stealth'), 'areas' => array('wild', 'ruin', 'glade', 'lab', 'shipgrave')),
 		'eagle'		=> array('power' => 40, 'attacks' =>  1, 'defense' => 25, 'wounds' => 2, 'mindepth' => 1, 'class' => array('animal', 'fly', 'melee'), 'areas' => array('wild', 'ruin', 'glade', 'lab')),
 		'mongrel'	=> array('power' => 20, 'attacks' =>  1, 'defense' => 10, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'solo', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'mausoleum', 'flooded', 'shipgrave'))
-		'rat'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  5, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'swim', 'melee'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort', 'mausoleum', 'flooded', 'shipgrave')),
+		'rat'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  5, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'swim', 'melee'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'roguefort', 'mausoleum', 'flooded', 'shipgrave')),
 		'snake'		=> array('power' => 30, 'attacks' =>  1, 'defense' => 10, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'melee', 'poison'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'lab', 'glade', 'mausoleum', 'flooded')),
 		'wolf'		=> array('power' => 25, 'attacks' =>  1, 'defense' => 20, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin',, 'lab', 'flooded')),
 		'wolfb'		=> array('power' => 60, 'attacks' =>  1, 'defense' => 40, 'wounds' => 2, 'mindepth' => 1, 'class' => array('animal', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'dungeon', 'citadel', 'lab', 'flooded')),
 
 		// beasts
-		'dog'		=> array('power' => 45, 'attacks' =>  1, 'defense' => 15, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'solo', 'melee'), 'areas' => array('cave', 'ruin', 'dungeon', 'citadel', 'hold', 'firstfort', 'lab'))
-		'falcon'	=> array('power' => 25, 'attacks' =>  1, 'defense' => 10, 'wounds' => 2, 'mindepth' => 1, 'class' => array('animal', 'fly', 'melee'), 'areas' => array('wild', 'ruin', 'glade', 'lab', 'citadel', 'firstfort', 'flooded', 'shipgrave')),
+		'dog'		=> array('power' => 45, 'attacks' =>  1, 'defense' => 15, 'wounds' => 1, 'mindepth' => 0, 'class' => array('animal', 'solo', 'melee'), 'areas' => array('cave', 'ruin', 'dungeon', 'citadel', 'hold', 'roguefort', 'lab'))
+		'falcon'	=> array('power' => 25, 'attacks' =>  1, 'defense' => 10, 'wounds' => 2, 'mindepth' => 1, 'class' => array('animal', 'fly', 'melee'), 'areas' => array('wild', 'ruin', 'glade', 'lab', 'citadel', 'roguefort', 'flooded', 'shipgrave')),
 		'hawk'		=> array('power' => 40, 'attacks' =>  1, 'defense' => 25, 'wounds' => 2, 'mindepth' => 2, 'class' => array('animal', 'fly', 'melee'), 'areas' => array('wild', 'ruin', 'glade', 'lab', 'flooded', 'shipgrave')),
 		
 		// humans
@@ -47,23 +47,23 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 		'chimera'	=> array('power' => 75, 'attacks' =>  3, 'defense' => 45, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'mixed', 'fly', 'swim', 'poison', 'solo'), 'areas' => array('cave', 'lab', 'wild', 'citadel', 'glade', 'dungeon', 'mausoleum', 'shipgrave'))
 		'dragon'	=> array('power' =>250, 'attacks' =>  3, 'defense' =>150, 'wounds' => 6, 'mindepth' => 8, 'class' => array('monster', 'solo', 'mixed', 'fly', 'swim', 'boss'), 'areas' => array('cave', 'lab', 'dungeon', 'citadel'))
 		'ogre'		=> array('power' => 80, 'attacks' =>  1, 'defense' => 60, 'wounds' => 4, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('ruin', 'dungeon', 'lab', 'shipgrave')),
-		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  1, 'wounds' => 6, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'firstfort', 'mausoleum', 'flooded', 'shipgrave')),
+		'slime'		=> array('power' =>  5, 'attacks' =>  1, 'defense' =>  1, 'wounds' => 6, 'mindepth' => 0, 'class' => array('monster', 'slime', 'melee', 'pack'), 'areas' => array('cave', 'wild', 'ruin', 'dungeon', 'glade', 'citadel', 'hold', 'lab', 'roguefort', 'mausoleum', 'flooded', 'shipgrave')),
 		'troglodyte'	=> array('power' => 80, 'attacks' =>  2, 'defense' => 50, 'wounds' => 3, 'mindepth' => 4, 'class' => array('monster', 'melee'), 'areas' => array('cave', 'wild', 'lab', 'flooded', 'shipgrave')),
 		'wyvern'	=> array('power' =>150, 'attacks' =>  2, 'defense' => 80, 'wounds' => 2, 'mindepth' => 5, 'class' => array('monster', 'fly'), 'areas' => array('wild', 'lab', 'flooded', 'shipgrave')),
 	
-		// First One Fortress
-		'fortguard'	=> array('power' => 30, 'attacks' =>  1, 'defense' => 30, 'wounds' => 1, 'mindepth' => 0, 'class' => array('human', 'melee'), 'areas' => array('firstfort', 'lab'))
-		'fortguarda'	=> array('power' => 45, 'attacks' =>  1, 'defense' => 30, 'wounds' => 1, 'mindepth' => 1, 'class' => array('human', 'ranged'), 'areas' => array('firstfort', 'lab'))
-		'fortguardc'	=> array('power' => 75, 'attacks' =>  2, 'defense' => 35, 'wounds' => 4, 'mindepth' => 5, 'class' => array('human', 'melee', 'indiv'), 'areas' => array('firstfort', 'lab'))
-		'fortguardh'	=> array('power' => 40, 'attacks' =>  1, 'defense' => 80, 'wounds' => 3, 'mindepth' => 4, 'class' => array('human', 'melee'), 'areas' => array('firstfort', 'lab'))
-		'fortguardv'	=> array('power' => 60, 'attacks' =>  2, 'defense' => 60, 'wounds' => 3, 'mindepth' => 3, 'class' => array('human', 'mixed', 'solo'), 'areas' => array('firstfort', 'lab'))
-		'fortguardhv'	=> array('power' => 90, 'attacks' =>  2, 'defense' => 80, 'wounds' => 4, 'mindepth' => 6, 'class' => array('human', 'mixed', 'indiv'), 'areas' => array('firstfort', 'lab'))
-		'fortcavalry'	=> array('power' => 35, 'attacks' =>  2, 'defense' => 40, 'wounds' => 2, 'mindepth' => 1, 'class' => array('human', 'melee'), 'areas' => array('firstfort', 'lab'))
-		'fortcavalryc'	=> array('power' => 90, 'attacks' =>  2, 'defense' => 45, 'wounds' => 4, 'mindepth' => 5, 'class' => array('human', 'mixed', 'mounted'), 'areas' => array('firstfort', 'lab'))
-		'fortcavalryh'	=> array('power' => 50, 'attacks' =>  2, 'defense' => 85, 'wounds' => 3, 'mindepth' => 4, 'class' => array('human', 'melee', 'mounted'), 'areas' => array('firstfort', 'lab'))
-		'fortcavalrya'	=> array('power' => 30, 'attacks' =>  2, 'defense' => 30, 'wounds' => 2, 'mindepth' => 2, 'class' => array('human', 'ranged', 'mounted,'), 'areas' => array('firstfort', 'lab'))
-		'fortlesslord'	=> array('power' => 80, 'attacks' =>  3, 'defense' => 80, 'wounds' => 6, 'mindepth' => 6, 'class' => array('first', 'mixed', 'solo'), 'areas' => array('firstfort')),
-		'fortlord'	=> array('power' =>100, 'attacks' =>  4, 'defense' =>100, 'wounds' =>10, 'mindepth' => 8, 'class' => array('first', 'mixed', 'indiv', 'boss'), 'areas' => array('firstfort')),
+		// Rogue Fortress
+		'fortguard'	=> array('power' => 30, 'attacks' =>  1, 'defense' => 30, 'wounds' => 1, 'mindepth' => 0, 'class' => array('human', 'melee'), 'areas' => array('roguefort', 'lab'))
+		'fortguarda'	=> array('power' => 45, 'attacks' =>  1, 'defense' => 30, 'wounds' => 1, 'mindepth' => 1, 'class' => array('human', 'ranged'), 'areas' => array('roguefort', 'lab'))
+		'fortguardc'	=> array('power' => 75, 'attacks' =>  2, 'defense' => 35, 'wounds' => 4, 'mindepth' => 5, 'class' => array('human', 'melee', 'indiv'), 'areas' => array('roguefort', 'lab'))
+		'fortguardh'	=> array('power' => 40, 'attacks' =>  1, 'defense' => 80, 'wounds' => 3, 'mindepth' => 4, 'class' => array('human', 'melee'), 'areas' => array('roguefort', 'lab'))
+		'fortguardv'	=> array('power' => 60, 'attacks' =>  2, 'defense' => 60, 'wounds' => 3, 'mindepth' => 3, 'class' => array('human', 'mixed', 'solo'), 'areas' => array('roguefort', 'lab'))
+		'fortguardhv'	=> array('power' => 90, 'attacks' =>  2, 'defense' => 80, 'wounds' => 4, 'mindepth' => 6, 'class' => array('human', 'mixed', 'indiv'), 'areas' => array('roguefort', 'lab'))
+		'fortcavalry'	=> array('power' => 35, 'attacks' =>  2, 'defense' => 40, 'wounds' => 2, 'mindepth' => 1, 'class' => array('human', 'melee'), 'areas' => array('roguefort', 'lab'))
+		'fortcavalryc'	=> array('power' => 90, 'attacks' =>  2, 'defense' => 45, 'wounds' => 4, 'mindepth' => 5, 'class' => array('human', 'mixed', 'mounted'), 'areas' => array('roguefort', 'lab'))
+		'fortcavalryh'	=> array('power' => 50, 'attacks' =>  2, 'defense' => 85, 'wounds' => 3, 'mindepth' => 4, 'class' => array('human', 'melee', 'mounted'), 'areas' => array('roguefort', 'lab'))
+		'fortcavalrya'	=> array('power' => 30, 'attacks' =>  2, 'defense' => 30, 'wounds' => 2, 'mindepth' => 2, 'class' => array('human', 'ranged', 'mounted,'), 'areas' => array('roguefort', 'lab'))
+		'fortlesslord'	=> array('power' => 80, 'attacks' =>  3, 'defense' => 80, 'wounds' => 6, 'mindepth' => 6, 'class' => array('human', 'mixed', 'solo'), 'areas' => array('roguefort')),
+		'fortlord'	=> array('power' => 95, 'attacks' =>  4, 'defense' => 95, 'wounds' => 9, 'mindepth' => 8, 'class' => array('human', 'mixed', 'indiv', 'boss'), 'areas' => array('roguefort')),
 	);
 
 	/**
