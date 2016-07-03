@@ -35,7 +35,7 @@ area:
  citadel:   citadel
  hold:      bandit hold
  glade:     infested glade
- firstfort: first one fortress
+ roguefort: mortal fortress
 
 areaintro:
  cave: >
@@ -66,11 +66,11 @@ areaintro:
  glade: >
    When you imagine a glade, you don't normally expect it to be filled to the brim with monsters. But here you are, in a
    monster filled clearing. Time to draw that weapon of yours, no?
- firstfort: >
-   You've heard a lot of stories in your time about first ones dieing trying to do what you're about to undertake. The one
-   advantage that you've got though, is that they don't know you're coming, so you won't be taking on the entire garrison
-   of this First One controlled fort at once. Of course, that does mean that you might encounter some very competent fighters
-   here. If you want to take this on, be sure to bring as many friends as possible.
+ roguefort: >
+   It doesn't happen very often, but occassionally one of those mortals gets some crazy idea in his head about how he can
+   can rule himself. Somehow, he manages to get a bunch of soldiers from the local garrisons to join him in his crazy idea
+   and now you end up with situations like this, were you and a few of your compatriots have deceided to teach the fool a
+   lesson about who's in charge.
  mausoleum: >
    This impressive stone mausoleum must have taken the work of hundreds of people over hundreds of days to build. Perhaps
    the last resting place of a forgotten monarch or even the tomb of a civilization, it contains untold treasures entrusted
@@ -124,8 +124,8 @@ monster:
  fortcavalrya:  mounted archer|mounted archers
  fortcavalryc:  cavalry captain|cavalry captains
  fortcavalryh:  heavy cavalryman|heavy cavalrymen
- fortlord:      First One lord|First One lords
- fortlesslord:  First One|First Ones
+ fortlord:      mortal lord|mortal lords
+ fortlesslord:  lesser mortal lord|mortal lesser lords
  hawk:          hawk|hawks
  lost:          lost hero|lost heroes
  mongrel:       mongrel|mongrels
@@ -231,12 +231,12 @@ monsterdesc:
    Their heavier armor looks like it could take some blows, and their weapons appear to be sharper, even moreso than their
    captain's armament.
  fortlord: >
-   You never thought you'd see the day when you and a team of your fellows fought your way throught a fortress just to kill
-   one of your own, but here you are, taking on possibly one of the hardest enemies you'll ever have fought. Goodluck.
+   Its a rare occurence, but every so often one of the mortals gets some idea that they can be you, and they start trying to do
+   absurd things like rule themselves--and not just their local settlement either. Left uncheck, who knows what this mortal could
+   pull off. Best end them now.
  fortlesslord: >
-   You're not quite certain how this First One got recruited by the lord they're following, but it doesn't matter. They are
-   in your way, standing between you and the lord of this fortress. Your attempts to speak with them, to convince them of the
-   worthiness of your cause are met only with grunts, insults, or attempts to kill you.
+   You know what they say about slimes, how if there's one there's more. Apparently the same thing happens when mortals get crazy
+   ideas about self-governance.
  hawk: >
    A large hawk, which seems to be bent on making you it's dinner. The talons on it seem capable of making that a distinct
    possibility.
