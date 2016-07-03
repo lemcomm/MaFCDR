@@ -155,7 +155,7 @@ class DungeonMaster {
 
 	public function startDungeon(Dungeon $dungeon) {
 		list($party, $missing, $wait) = $this->calculateTurnTime($dungeon);
-		if ($party<1) return; // party must consist of at least one dungeoneer to begin. Down from 3. --Andrew
+		if ($party < $this->min_party_size) return; // party must consist of the minimum party size defined at top. --Andrew
 		if ($missing > $party*0.75) return; // don't start until at least three-quarters of the party has selected an action. Up from half. --Andrew
 		// FIXME: the above has the potential to blockade dungeons - long timer for kick?
 		$this->logger->info("starting dungeon #".$dungeon->getId().", $missing of $party actions missing = wait ".$dungeon->getTick()." / $wait");
