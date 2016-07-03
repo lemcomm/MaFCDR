@@ -183,7 +183,7 @@ class DungeonCreator {
 		if ($pick < 180) return 'shipgrave';
 		if ($pick < 190) return 'dungeon';
 		if ($pick < 199) return 'citadel';
-		return 'firstfort';
+		return 'roguefort';
 	}
 
 	// TODO: incorporate a max_depth setting to the monster spawner.
