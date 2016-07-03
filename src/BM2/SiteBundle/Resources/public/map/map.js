@@ -848,7 +848,7 @@ var zoomSupport = {
 				case 'mausoleum':		return imgpath+'rpg_map/pyramid.svg';
 				case 'hold':			return imgpath+'rpg_map/tower_round.svg';
 				case 'citadel': 		return imgpath+'rpg_map/statue.svg';
-				case 'firstfort':		return imgpath+'rpg_map/fortress.svg';
+				case 'roguefort':		return imgpath+'rpg_map/fortress.svg';
 				case 'flooded':			return imgpath+'rpg_map/obelisk.svg';
 				case 'shipgrave':		return imgpath+'rpg_map/shipwreck.svg';
 			}
