@@ -31,7 +31,7 @@ class DungeonMaster {
 
 
 	private $initial_random_cards = 3;
-	private $min_party_size = 1;
+	private $min_party_size = 2;
 	private $max_party_size = 30;
 	private $max_cards_per_type = 8;
 	private $starting_wounds = 10;
@@ -297,8 +297,9 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	} // QUERY: what is the default wait time in real time? How do these numbers correlate to the real-world timing of things? --Andrew
-
+	} 
+/* Wait times here are in hours (Tom explained this). $missing is the number of people who've not selected cards to play yet. $party is the number of people in the party.
+In short before a dungeon starts you get a bit longer, but when it's running you get a while but not as long. --Andrew */
 
 	public function addEvent(DungeonParty $party, $content, $data=null) {
 		$event = new DungeonEvent;
