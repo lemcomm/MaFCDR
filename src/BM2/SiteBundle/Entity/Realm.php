@@ -120,6 +120,18 @@ class Realm {
 
 		return $all;
 	}
+	
+	public function findDeadInferiors() {
+		$all = new ArrayCollection;
+		$this->findAllInferiors() as $subrealms
+		foreach ($subrealms = $subrealm) {
+			if ($subrealm->getActive = false) {
+			$all->add($subrealm);
+			}
+		}
+	
+		return $all;
+	}
 
 	public function findAllSuperiors($include_myself = false) {
 		$all = new ArrayCollection;
