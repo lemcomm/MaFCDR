@@ -219,7 +219,7 @@ class RealmManager {
 			$this->history->logEvent(
 				$deadrealm,
 				'event.realm.restored',
-				array('%link-realm%'=>$realm->getID(), '%link-realm%'=>$deadrealm->getId(), '%link-character%'=>$newruler->getId()),
+				array('%link-realm%'=>$realm->getID(), '%link-character%'=>$newruler->getId()),
 				History::ULTRA, true
 			);
 		}
