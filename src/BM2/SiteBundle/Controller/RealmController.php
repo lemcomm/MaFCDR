@@ -14,6 +14,7 @@ use BM2\SiteBundle\Form\RealmManageType;
 use BM2\SiteBundle\Form\RealmOfficialsType;
 use BM2\SiteBundle\Form\RealmPositionType;
 use BM2\SiteBundle\Form\RealmRelationType;
+use BM2\SiteBundle\Form\RealmRestoreType;
 use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SubrealmType;
 use BM2\SiteBundle\Service\History;
@@ -595,6 +596,17 @@ class RealmController extends Controller {
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'form' => $form->createView()
 		);
+	}
+
+	/**
+	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Template
+	  */
+
+	public function restoreAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+		
+		if 
 	}
 
 	/**
