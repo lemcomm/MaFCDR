@@ -403,7 +403,7 @@ diplomacy:
    current:     Is your current superior realm.
   done:         You have successfully submitted to the superior power of %target% and made your %realm% a part of it.
 
- revive:
+ restore:
   name:         Revive Subrealm
   description:  Use your position as ruler of a realm to restore one if its abandoned subrealms.
   intro: >
@@ -412,6 +412,7 @@ diplomacy:
   submit:       revive realm
   invalid:
    realm:       in order to revive a realm, you must select the realm to revive.
+  success:      You have successfully restored the subrealm.
 
  subrealm:
   name:         Create Subrealm
