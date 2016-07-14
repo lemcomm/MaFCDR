@@ -606,7 +606,15 @@ class RealmController extends Controller {
 	public function restoreAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyRestoreTest');
 		
-		if 
+		$form = $this->createForm(new RestoreType($realm));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$this->get('realm_manager')->restoreSubRealm($realm, $deadrealm, $character);
+			$em = $this->getDoctrine()->getManager();
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
+			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
+		}
 	}
 
 	/**
