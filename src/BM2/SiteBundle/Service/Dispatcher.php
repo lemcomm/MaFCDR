@@ -1425,6 +1425,21 @@ class Dispatcher {
 		return $this->action("diplomacy.subrealm", "bm2_site_realm_subrealm", true, array('realm'=>$this->realm->getId()));
 	}
 
+	public function diplomacyRestoreTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"diplomacy.restore", "description"=>"unavailable.$check");
+		}
+		if ($this->realm->findInferiors()->count() > 0) {
+			return array("name"=>"diplomacy.restore", "description"=>"unavailable.nosubrealms");
+		}
+		if ($this->realm->findDeadInferiors()->count() = 0) {
+			return array("name"=>"diplomacy.restore", "description"=>"unavailable.tooalive");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"diplomacy.restore", "description"=>"unavailable.notleader");
+		}
+		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()))
+	}
 
 	public function diplomacyBreakHierarchyTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
