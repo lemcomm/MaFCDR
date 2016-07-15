@@ -31,8 +31,8 @@ class DungeonMaster {
 
 
 	private $initial_random_cards = 3;
-	private $min_party_size = 1;
-	private $max_party_size = 8;
+	private $min_party_size = 2;
+	private $max_party_size = 30;
 	private $max_cards_per_type = 8;
 	private $starting_wounds = 10;
 	private $max_notify_distance = 50000; // this should be the same as the hardcoded value in CharacterController::summaryAction
@@ -155,8 +155,8 @@ class DungeonMaster {
 
 	public function startDungeon(Dungeon $dungeon) {
 		list($party, $missing, $wait) = $this->calculateTurnTime($dungeon);
-		if ($party<3) return; // don't start until we have at least 3 people
-		if ($missing > $party/2) return; // don't start until at least half the members have selected an action
+		if ($party < $this->min_party_size) return; // party must consist of the minimum party size defined at top. --Andrew
+		if ($missing > $party*0.75) return; // don't start until at least three-quarters of the party has selected an action. Up from half. --Andrew
 		// FIXME: the above has the potential to blockade dungeons - long timer for kick?
 		$this->logger->info("starting dungeon #".$dungeon->getId().", $missing of $party actions missing = wait ".$dungeon->getTick()." / $wait");
 
@@ -273,13 +273,13 @@ class DungeonMaster {
 
 		if ($dungeon->getCurrentLevel() == null) {
 			// not yet started
-			if ($party < $this->min_party_size) return array(0,0,0); // dungeon will not start without at least 3
+			if ($party < $this->min_party_size) return array(0,0,0); // dungeon will not start without meeting the minimum party size
 			switch ($party) {
 				case 3:	$wait = 8; break;
 				case 4:	$wait = 4; break;
 				case 5:	$wait = 2; break;
 				default:	$wait = 1;
-			}
+			} 
 			switch ($missing) {
 				case 0:	break;
 				case 1:	$wait += 2; break;
@@ -297,8 +297,9 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	}
-
+	} 
+/* Wait times here are in hours (Tom explained this). $missing is the number of people who've not selected cards to play yet. $party is the number of people in the party.
+In short before a dungeon starts you get a bit longer, but when it's running you get a while but not as long. --Andrew */
 
 	public function addEvent(DungeonParty $party, $content, $data=null) {
 		$event = new DungeonEvent;
@@ -321,7 +322,7 @@ class DungeonMaster {
 			$dungeoneer->setModPower(0);
 		}
 
-		// apply new modifiers for this round
+		// apply new modifiers for this round, plunder action reduces defense by 50, leaving by 20.
 		foreach ($party->getActiveMembers() as $dungeoneer) {
 			if ($dungeoneer->getCurrentAction()) switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 				case 'basic.plunder':	$dungeoneer->setModDefense(-50); break;
@@ -450,7 +451,7 @@ class DungeonMaster {
 				switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 					case 'basic.scout':		$level++; break;
 					case 'scout.double':		$level+=2; break;
-					case 'scout.tripple':	$level+=3; break;
+					case 'scout.tripple':		$level+=3; break;
 				}
 			}
 		}
@@ -549,6 +550,15 @@ class DungeonMaster {
 								if ($target->getAmount() > 0) {
 									$this->DungeoneerAttack($dungeoneer, $target, 1, 0.5, 0.5);
 								}
+							}
+						}
+						break;
+					case 'fight.slime':
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
+							$this->DungeoneerAttack($dungeoneer, $target, 6); 
+							} else {
+							$this->DungeoneerAttack($dungeoneer, $target, 0.5);
 							}
 						}
 						break;
@@ -838,7 +848,8 @@ class DungeonMaster {
 
 					// closing the dungeon happens if we got deep enough, or it has been explored a lot
 					// but some randomness to avoid people gaming the system by pulling out early
-					if ($max_depth > 0 && rand(0,100) < $max_depth*5 + $dungeon->getExplorationCount()*2) {
+					// TODO: This is a short-term fix until I have the dungeon types coding implemented and all of this is dependent on the dungeon type. --Andrew
+					if ($max_depth > 0 && rand(21,141) < $dungeon->getExplorationCount()*10) {
 						$this->logger->info("...closing dungeon #".$dungeon->getId()." (exploration ".$dungeon->getExplorationCount().")");
 						$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c, DungeonBundle:Dungeon d WHERE c.slumbering = false AND c.alive = true and c.travel_at_sea = false AND ST_Distance(c.location, d.location) < :maxdistance');
 						$query->setParameters(array('maxdistance'=>Geography::DISTANCE_DUNGEON));

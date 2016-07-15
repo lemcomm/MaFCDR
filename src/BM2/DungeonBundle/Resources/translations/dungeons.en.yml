@@ -10,7 +10,7 @@ enter:
    and mortals are afraid of them, but young or desperate First Ones seek them for the experience and treasures they
    contain.<br />
    For sheer survival, you can join other First Ones and enter this dungeon together, fighting your way into its depths
-   until you beat it or it beats you. Teamwork is key.
+   until you beat it or it beats you. Teamwork is key. <br />
  noothers:	You appear to be the first visitor.
  others:		The following characters have already gathered near the entrance:
 dungeoneer:     dungeoneer
@@ -25,10 +25,15 @@ error:
 
 
 area:
- cave:		cave
- wild:		wilderness
- ruin:		ruin
- dungeon:	dungeon
+ cave:	    	cave
+ wild:		    wilderness
+ ruin:		    ruin
+ dungeon:	  dungeon
+ lab:       labyrinth
+ citadel:   citadel
+ hold:      bandit hold
+ glade:     infested glade
+ roguefort: mortal fortress
 
 areaintro:
  cave: >
@@ -45,35 +50,95 @@ areaintro:
  dungeon: > 
    An entrance guides you down. It is impossible to guess why someone would build an underground lair at a place like this,
    nor what it was for. You are certain that treasures are hidden inside, just as you are sure that they are well guarded.
+ lab: >
+   You're not quite sure who built this ancient labyrinth or what purpose it holds, but certainly it was built for a reason,
+   and anything of such size that has drawn such monsters to it must contain vast hoards of wealth. Some of the things you
+   see wandering inside don't even seem to understand they're lost within, as if they were under some sort of spell.
+ citadel: >
+   This ancient citadel was so well built that not only is it still standing, it's still standing despite the hoards of
+   monsters that appear to have made it their home. Surely, even with all the fiends patrolling it, it must have something
+   of worth within it's monster filled halls.
+ hold: >
+   When you approached this palce, you were fairly certain the local authorities had built it, but now that you're closer
+   you can be quite certain that it's been taken over by a local brigand and his gang.
+ glade: >
+   When you imagine a glade, you don't normally expect it to be filled to the brim with monsters. But here you are, in a
+   monster filled clearing. Time to draw that weapon of yours, no?
+ roguefort: >
+   It doesn't happen very often, but occassionally one of those mortals gets some crazy idea in his head about how he can
+   can rule himself. Somehow, he manages to get a bunch of soldiers from the local garrisons to join him in his crazy idea
+   and now you end up with situations like this, were you and a few of your compatriots have deceided to teach the fool a
+   lesson about who's in charge.
+ mausoleum: >
+   This impressive stone mausoleum must have taken the work of hundreds of people over hundreds of days to build. Perhaps
+   the last resting place of a forgotten monarch or even the tomb of a civilization, it contains untold treasures entrusted
+   to eternity alongside the dead. And untold dangers as its passages and halls have been colonized by all manner of strange
+   and vicious creatures.
+ shipgrave: >
+   When ships reached the end of their seaworthy lives, they were brought here to be broken up and scavenged for parts that
+   could be reused. Thought to be stripped of everything that could be used again, who knows what hidden treasures could have
+   been missed hidden in the broken hulks. The wreaks also make excellent dens for the creatures of the wild that have made
+   them their homes.
+ flooded: >
+   Once a thriving town, this place became the victim of a sudden shift in tides and water levels. Swiftly abandoned by a
+   fleeing population, all manner of items that were left behind wait to be discovered.
 
 size:
- dark:  some
- 50:		very small
- 80:		small
+ dark: some
+ 50:	 	very small
+ 80:	 	small
  100:		normal
  120:		large
  150:		huge
+ 175:  massive
+ 200:  gigantic
+ 250:  immense
+ 300:  collosal
 
 monster:
- dark:      creature|creatures
- arachnid:  arachnid|arachnids
- bandit:    bandit|bandits
- bandita:   bandit archer|bandit archers
- banditb:   bandit boss|bandit bosses
- barghest:  barghest|barghests
- bat:       dire bat|dire bats
- bear:      bear|bears
- beetle:    fire beetle swarm|fire beetle swarms
- cat:       wildcat|wildcats
- crazy:     crazy man|crazy men
- eagle:     eagle|eagles
- lost:      lost hero|lost heroes
- ogre:      ogre|ogres
- snake:     snake|snakes
- troglodyte: troglodyte|troglodytes
- wolf:		  wolf|wolves
- wolfb:     dire wolf|dire wolves
- wyvern:    wyvern|wyverns
+ dark:          creature|creatures
+ arachnid:      arachnid|arachnids
+ bandit:        bandit|bandits
+ bandita:       bandit archer|bandit archers
+ banditb:       bandit boss|bandit bosses
+ banditg:       bandit guard|bandit guards
+ barghest:      barghest|barghests
+ bat:           dire bat|dire bats
+ bear:          bear|bears
+ beetle:        fire beetle swarm|fire beetle swarms
+ cat:           wildcat|wildcats
+ crazy:         crazy man|crazy men
+ chimera:       chimera|chimeras
+ dragon:        dragon|dragons
+ eagle:         eagle|eagles
+ falcon:        falcon|falcons
+ fortguard:     infantryman|infantrymen
+ fortguarda:    archer|archers
+ fortguardc:    guard captain|guard captains
+ fortguardh:    heavy infantryman|heavy infantrymen
+ fortguardv:    veteran infantryman|veteran infantrymen
+ fortguardhv:   veteran heavy infantryman|veteran heavy infantrymen
+ fortcavalry:   cavalryman|cavalrymen
+ fortcavalrya:  mounted archer|mounted archers
+ fortcavalryc:  cavalry captain|cavalry captains
+ fortcavalryh:  heavy cavalryman|heavy cavalrymen
+ fortlord:      mortal lord|mortal lords
+ fortlesslord:  lesser mortal lord|mortal lesser lords
+ hawk:          hawk|hawks
+ lost:          lost hero|lost heroes
+ mongrel:       mongrel|mongrels
+ monhunter:     monster hunter|monster hunters
+ npcdungeoneer: mortal dungeoneer|mortal dungeoneers
+ ogre:          ogre|ogres
+ rat:           rat|rats
+ shaman:        shaman|shamans
+ slime:         green slime|green slimes
+ snake:         snake|snakes
+ troglodyte:    troglodyte|troglodytes
+ villager:      villager|villagers
+ wolf:		        wolf|wolves
+ wolfb:         dire wolf|dire wolves
+ wyvern:        wyvern|wyverns
 
 monsterdesc:
  arachnid: >
@@ -92,6 +157,9 @@ monsterdesc:
    Human outlaws hiding from a world that wants to see them hanging. These outlaw leaders add experience and better equipment
    to the mix, making them quite formidable opponents. Since they know the territory and consider it their home, you should
    expect dirty fighting and trickery.
+ banditg: >
+   Human outlaws hiding from a world that wants to see them hanging. These bandit guards have the nasty habit of being capable
+   with a variety of weapons, and also tending to be accompanied by an assortment of beasts.
  barghest: >
    At first glance, the barghest looks like a large, dirty wolf. But if you get closer, you understand he is nothing like a
    wolf. These creatures are hunters of beasts twice their size, their teeth are like daggers and their hide is thick. They
@@ -109,20 +177,90 @@ monsterdesc:
    Tiger, leopard, lion, panther, lynx - who can spot the difference? These cats are big, agile and dangerous. They are faster
    than many other animals and they are predators that combine stealth and speed into a package that should not be
    taken lightly.
+ chimera: >
+   It's hard to tell exactly what the main type of monster this is, but it appears to be a very . . . interesting, combination
+   of several very nasty, very deadly monsters.
  crazy: >
    Something has driven this man insane, and he is not to be argued with. He will attack on sight with whatever he can find,
    sticks, stones or bare hands. Best to put him out of his misery.
+ dragon: >
+   Of all the beasts that you can encounter, the dragon is the one that you hear most often of people seeing, not slaying.
+   Everything that you've heard about dragons, seems to be a statement of fact as you look upon the magnificent creature.
+ dog: >
+   A trained guard dog, clearly left here by someone or something that wants to be aware if someone tries sneaking up.
+   Its not much a threat to a trained adventurer, but it's masters certainly might be.
  eagle: >
    These giant eagles can grow to a surprising size, and hunt sheep, deer or even cows for food. They can be quite a match
    even for a well-armed First One, especially if encountered in groups. When they swoop down on you, take cover.
+ falcon: >
+   A trained hawk, probably the servant of someone, somewhere. Not that any of that matters since its attacking you.
+ fortguard: >
+   A simple footman in the service of their lord. It's unlikely they really understand their responsibilities or who they're
+   serving. Equipped with a standard-issue infantry weapon.
+ fortguarda: >
+   A simple footman in the service of their lord. It's unlikely they really understand their responsibilities or who they're
+   serving. Equipped with a standard-issue ranged weapon.
+ fortguardc: >
+   A guard captain in the service of their lord. It's possible that this individual might have some idea of the scope of their
+   responsibility. Regardless, they're a versatile and able combatant.
+ fortguardh: >
+   A heavy infantryman in the service of their lord. Clearly more capable than the footmen you've encountered previously.
+   Their heavier armor looks like it could take some blows, and their weapons appear to be sharper, even moreso than their
+   captain's armament.
+ fortguardv: >
+   A veteran soldier in the service of their lord. Between the scars and the way they carry themselves, this individual has
+   not only seen serious combat, but survived well enough to talk about it. Even their younger captains seem to show them
+   an amount of respect, uncommon to the rest of their company.
+ fortguardhv: >
+   A veteran heavy infantryman in the service of their lord. Between the scars the way they carry themselves, they're clearly
+   more capable than the footment you've encountered previously. Their armor looks sturdier, their weapons better maintained,
+   their eyes sharper, and their reflexes more attuned to your attacks. 
+ fortcavalry: >
+   A cavalryman in the service of their lord. It's unlikely they really understand their responsibilities or who they're
+   serving. Equipped with a standard-issue infantry weapon.
+ fortcavlarya: > 
+   A cavalryman in the service of their lord. It's unlikely they really understand their responsibilities or who they're
+   serving. Equipped with a standard-issue ranged weapon.
+ fortcavalryc: >
+   A cavalry captain in the service of their lord. It's possible that this individual might have some idea of the scope of their
+   responsibility. Regardless, they're a versatile and able combatant.
+ fortcavalryh: >
+   A heavy cavalryman in the service of their lord. Clearly more capable than the cavalrymen you've encountered previously.
+   Their heavier armor looks like it could take some blows, and their weapons appear to be sharper, even moreso than their
+   captain's armament.
+ fortlord: >
+   Its a rare occurence, but every so often one of the mortals gets some idea that they can be you, and they start trying to do
+   absurd things like rule themselves--and not just their local settlement either. Left uncheck, who knows what this mortal could
+   pull off. Best end them now.
+ fortlesslord: >
+   You know what they say about slimes, how if there's one there's more. Apparently the same thing happens when mortals get crazy
+   ideas about self-governance.
+ hawk: >
+   A large hawk, which seems to be bent on making you it's dinner. The talons on it seem capable of making that a distinct
+   possibility.
  lost: >
    A lost hero of old times, this elite warrior has been mentally damaged by all the carnage he has seen and caused. He has
    retreated to this hiding place, maybe he even fought here one time, and has lost himself in a world of his own. He will
    attack any intruders, and cannot be reasoned with anymore. He is an experienced and dangerous enemy.
+ mongrel: >
+   A stray dog, having gone feral from lack of proper care or attention. Now, it is little more than a wild beast.
+ monhunter: >
+   Mortals who specialize in hunting dangerous beasts or monsters for profit or amusement. They usually sport  longbows and 
+   javelins as well as using a wide range of potent poisons. Often seen working along dungeoneers.
+ npcdungeoneer: >
+   Mortals who raid dungeons  for profit or other nefarious purposes. Having faced numerous dangers in their life, they are 
+   fearless, ruthless, highly disciplined and more well equipped than most elite soldiers, making them a formidable foe. 
  ogre: >
    Nobody knows what these creatures truly are. While they look like huge, ugly humans, they show no sign of human intelligence
    and the usage of clubs is the only sign that they may be smarter than most animals. They avoid humans, but if cornered
    they are ruthless fighters, and can take an enormous amount of damage before they fall.
+ rat: >
+   The slime of the animal world.
+ shaman: >
+   Practitioners of mystic, dark, or the occult, shamans have been around almost as long as society. Whether or not their ways
+   actually work doesn't matter, just having one around can have an effect on things.
+ slime: >
+   Its a pretty standard green slime. They seem to be able to get basically anywhere.
  snake: >
    Some are small, some weigh more than a human and are several metres long. Many are poisonous, making them even more
    dangerous. Snakes love damp, dark places and can be a nasty surprise for anyone not expecting them.
@@ -131,6 +269,8 @@ monsterdesc:
    have a basic humanoid shape, but ash-grey reptilian skin, a salamander head and a lizard tail. They do not appear to possess
    more than basic intelligence, not do they communicate with more than grunts. As enemies, they are very dangerous as they can
    attack with claws and bites at the same time, and sometimes make use of clubs or other primitive weapons.
+ villager: >
+   You're not sure why this villager has taken up arms, or why they are using said arms against you, but does it really matter?
  wolf: >
    Wild canines that are excellent pack-hunters and highly territorial. As much as one wolf is not very dangerous for
    anyone with a sword and armor, a pack of wolves is bad news even for the well-equipped.
@@ -145,16 +285,26 @@ monsterdesc:
 
 class:
  animal:    animal
- human:     human
- monster:   monstrous creature
- melee:     melee fighter
- ranged:    ranged attacker
- stealth:   stealthy
- poison:    poisonous
+ boss:      boss creature
+ first:     first one
  fly:       flying creature
+ hover:     hovering creature
+ human:     human
+ indiv:     prefers solitude
+ mech:      mechanical construction
+ melee:     melee fighter
+ mixed:     melee and ranged fighter
+ monster:   monstrous creature
+ ranged:    ranged attacker
  pack:      prefers to live in packs
+ phantom:   non-corporeal creature
+ poison:    poisonous
+ slime:     a type of slime
  solo:      prefers to live alone or in small groups
+ spirit:    spirit
+ stealth:   stealthy
  swarm:     swarm animals
+ swim:      swimming creature
 
 target:
  random:    (random)
@@ -294,6 +444,9 @@ card:
   bomb2:
    title: Burning Barrel
    text:  Light a barrel of oil and throw it at an enemy, burning every monster in a group severely.
+  slime:
+   title: Slay Slime
+   text:  Hunting slimes for so long has shown you the best ways to bring them down.
  scout:
   double:
    title: Excellent Scout
