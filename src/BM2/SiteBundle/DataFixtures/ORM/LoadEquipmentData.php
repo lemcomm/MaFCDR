@@ -14,10 +14,10 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 	private $equipment = array(
 		'axe'               => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  10, 'defense' =>   0, 'train' => 20, 'resupply' => 20,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/streitaxt2.png'),
 		'spear'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  20, 'defense' =>   0, 'train' => 30, 'resupply' => 30,	'provider' => 'Blacksmith',  'trainer' => 'Training Ground',		'icon' => 'items/spear2.png'),
-		'pike'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  30, 'defense' =>   0, 'train' => 50, 'resupply' => 60,	'provider' => 'Weaponsmith',  'trainer' => 'Guardhouse',				'icon' => 'items/hellebarde2.png'),
-		'mace'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  35, 'defense' =>   0, 'train' => 60, 'resupply' =>100,	'provider' => 'Weaponsmith',  'trainer' => 'Barracks',				'icon' => 'items/hellebarde2.png'),
-		'sword'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  45, 'defense' =>   0, 'train' => 80, 'resupply' =>250,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',					'icon' => 'items/schwert2.png'),
-		'broadsword'        => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  50, 'defense' =>   0, 'train' => 90, 'resupply' =>350,	'provider' => 'Bladesmith', 'trainer' => 'Garrison',					'icon' => 'items/claymore2.png'),
+		'pike'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  40, 'defense' =>   0, 'train' => 50, 'resupply' => 60,	'provider' => 'Weaponsmith',  'trainer' => 'Guardhouse',				'icon' => 'items/hellebarde2.png'),
+		'mace'              => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  65, 'defense' =>   0, 'train' => 60, 'resupply' =>100,	'provider' => 'Weaponsmith',  'trainer' => 'Barracks',				'icon' => 'items/hellebarde2.png'),
+		'sword'             => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  75, 'defense' =>   0, 'train' => 80, 'resupply' =>250,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',					'icon' => 'items/schwert2.png'),
+		'broadsword'        => array('type' => 'weapon',    'ranged' =>  0, 'melee' =>  90, 'defense' =>   0, 'train' => 90, 'resupply' =>350,	'provider' => 'Bladesmith', 'trainer' => 'Garrison',					'icon' => 'items/claymore2.png'),
 
 		'shortbow'          => array('type' => 'weapon',    'ranged' => 40, 'melee' =>   0, 'defense' =>   0, 'train' => 50, 'resupply' => 50,	'provider' => 'Bowyer',      'trainer' => 'Archery Range',			'icon' => 'items/shortbow2.png'),
 		'crossbow'          => array('type' => 'weapon',    'ranged' => 60, 'melee' =>   0, 'defense' =>   0, 'train' => 60, 'resupply' => 75,	'provider' => 'Bowyer',      'trainer' => 'Archery Range',			'icon' => 'items/armbrust2.png'),
