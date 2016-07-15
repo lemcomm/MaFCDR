@@ -609,7 +609,13 @@ class RealmController extends Controller {
 		$form = $this->createForm(new RestoreType($realm));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			$this->get('realm_manager')->restoreSubRealm($realm, $deadrealm, $character);
+		    $data = $form->getData();
+            $fail = false;
+
+            if (!$fail) {
+                $this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
+            }
+
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
