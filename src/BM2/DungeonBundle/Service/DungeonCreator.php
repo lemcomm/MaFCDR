@@ -76,7 +76,7 @@ class DungeonCreator {
 		$treasure_points = round(pow($depth-1, 1.8)  * $this->base_treasuremod * pow($members, 0.8));
 		$this->logger->info("$monster_points monster points / $treasure_points treasure points");
 
-		if ($members<3 && rand(0,100) < rand(0,50) {
+		if ($members<3 && rand(0,100) < rand(0,50)) {
 			// may I introduce the suicide run! Hahahaha --Andrew
 			$depth+3;
 		}
