@@ -943,8 +943,8 @@ class ActionsController extends Controller {
 				if ($soldier->getCharacter() && $soldier->getCharacter()->isInBattle()) continue;
 				if ($soldier->getCharacter() && $soldier->getCharacter()->isDoingAction('military.regroup')) continue;
 				// FIXME: can't recall from your own estates or characters, but there should also be a message:
-				if ($soldier->getCharacter() && $soldier->getCharacter()->getUser() == $character->getUser()) continue;
-				if ($soldier->getBase() && $soldier->getBase()->getOwner() && $soldier->getBase()->getOwner()->getUser() == $character->getUser()) continue;
+				// if ($soldier->getCharacter() && $soldier->getCharacter()->getUser() == $character->getUser()) continue;
+				// if ($soldier->getBase() && $soldier->getBase()->getOwner() && $soldier->getBase()->getOwner()->getUser() == $character->getUser()) continue;
 
 				if ($soldier->getAssignedSince() == -1) {
 					$days = 0;
