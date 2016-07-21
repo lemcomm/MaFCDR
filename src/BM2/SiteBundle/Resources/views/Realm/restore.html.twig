@@ -1,0 +1,15 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'diplomacy.restore.name'|trans({},"politics")|title }}</h2>
+<div style="float:right;margin-top:-4em">
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+	<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
+</div>
+<div id="sd_anchor" style="margin-right:1em;height:30em;float:right"></div>
+<div id="sd" class="hidden" title="dummy"></div>
+<p>{{ 'diplomacy.restore.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+
+{{ form(form) }}
+
+{% endblock %}

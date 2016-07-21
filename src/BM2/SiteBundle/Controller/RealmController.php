@@ -14,6 +14,7 @@ use BM2\SiteBundle\Form\RealmManageType;
 use BM2\SiteBundle\Form\RealmOfficialsType;
 use BM2\SiteBundle\Form\RealmPositionType;
 use BM2\SiteBundle\Form\RealmRelationType;
+use BM2\SiteBundle\Form\RealmRestoreType;
 use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SubrealmType;
 use BM2\SiteBundle\Service\History;
@@ -595,6 +596,31 @@ class RealmController extends Controller {
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'form' => $form->createView()
 		);
+	}
+
+	/**
+	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Template
+	  */
+
+	public function restoreAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+		
+		$form = $this->createForm(new RestoreType($realm));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+		    $data = $form->getData();
+            $fail = false;
+
+            if (!$fail) {
+                $this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
+            }
+
+			$em = $this->getDoctrine()->getManager();
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
+			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
+		}
 	}
 
 	/**
