@@ -303,7 +303,7 @@ class BattleRunner {
 					}
 					if ($soldier->getDistanceHome() > 10000) {
 						// 50km = -10 / 100 km = -14 / 200 km = -20 / 500 km = -32
-						$distance_mod = sqrt(($soldier->getDistanceHome-10000)/500);
+						$distance_mod = sqrt(($soldier->getDistanceHome()-10000)/500);
 					} else {
 						$distance_mod = 0;
 					}
