@@ -23,7 +23,10 @@ class RealmRestoreType extends AbstractType {
         ));
     }
 
-    //FIXME: Find out what the random numbers are above and what they mean!
+    /* 
+    FIXME: Find out what the random numbers after "realmrestore_" are (above) and what they mean!
+    Since I've not gotten a response after about a week of waiting, I guess I'll just submit this and be told what breaks. -- Andrew 
+    */
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $realm = $this->realm;
