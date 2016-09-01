@@ -63,7 +63,7 @@ class RealmController extends Controller {
 	  */
 	public function viewAction(Realm $id) {
 		$realm = $id;
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter(false, true, true);
 
 		$territory = $realm->findTerritory();
 		$population = 0;
