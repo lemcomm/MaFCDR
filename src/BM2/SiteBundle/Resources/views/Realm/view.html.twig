@@ -129,7 +129,11 @@
 			-
 		{% endif %}
 	</td>
-	<td><a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a></td>
+	<td>
+		{% if character %}
+			<a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a>
+		{% endif %}
+	</td>
 </tr>
 {% endfor %}
 </tbody>
