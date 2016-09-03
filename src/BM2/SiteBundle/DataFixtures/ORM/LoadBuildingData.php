@@ -69,6 +69,10 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'           	  	=> array('auto' =>   1800, 'min' =>    500, 'work' =>   6000, 'ratio' =>   800, 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
 		'Lumber Yard'           => array('auto' =>      0, 'min' =>    600, 'work' =>   8000, 'ratio' =>  1400, 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
 		'Irrigation Ditches'    => array('auto' =>   3000, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'requires' => array('Carpenter','Blacksmith'), 'conditions'=>true),
+		
+		'Local Seat'		=> array('auto' =>	0, 'min' =>    100, 'work' =>   5000, 'ratio' =>   500, 'defenses' => 5, 'requires' => array('Carpenter','Dirt Streets'), 'conditions'=>true),
+		'Regional Seat'		=> array('auto' =>	0, 'min' =>   1000, 'work' => 500000, 'ratio' =>   250, 'defenses' => 10, 'requires' => array('Local Seat','Mason','Blacksmith','Paved Streets','Inn','School','Town Hall','Guardhouse','Wood Wall'), 'conditions'=>true),
+		'Imperial Seat'		=> array('auto' =>	0, 'min' =>   3000, 'work' =>1000000, 'ratio' =>   100, 'defenses' => 10, 'requires' => array('Regional Seat','Stone Wall','Library','Saddler','Barracks'), 'conditions'=>true),
 	);
 
 	private $resources = array(
@@ -127,6 +131,10 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'               => array('wood'=>array('construction'=>800), 'metal'=>array('construction'=>100), 'goods'=>array('construction'=>50), 'food'=>array('provides'=>50, 'bonus'=>5)),
 		'Lumber Yard'           => array('wood'=>array('construction'=>500, 'bonus'=>4), 'metal'=>array('construction'=>100, 'operation'=>1)),
 		'Irrigation Ditches'    => array('wood'=>array('construction'=>600), 'metal'=>array('construction'=>25), 'goods'=>array('construction'=>20), 'food'=>array('provides'=>100, 'bonus'=>1)),
+		
+		'Local Seat'		=> array('wood'=>array('construction'=>2000), 'metal'=>array('construction'=>300), 'money'=>array('construction'=>100, 'provides'=>2, 'bonus'=>1), 'food'=>array('bonus'=>1)),
+		'Regional Seat'		=> array('wood'=>array('construction'=>8000), 'metal'=>array('construction'=>1000), 'money'=>array('construction'=>1000, 'bonus'=>3), 'food'=>array('bonus'=>3)),
+		'Imperial Seat'		=> array('wood'=>array('construction'=>20000), 'metal'=>array('construction'=>2500), 'money'=>array('construction'=>2500, 'operation'=>10, 'bonus'=>6), 'food'=>array('bonus'=>6)),
 	);
 
 	/**
