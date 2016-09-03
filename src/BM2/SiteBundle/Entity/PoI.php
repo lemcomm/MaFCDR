@@ -30,10 +30,10 @@ class PoI {
 	}
 	
 	public function getInEstate() {
-	  if ($this->isInside() == true) {
-	  return true
-	  } else {
+	  if ($this->isInside() != true) {
 	  return false
+	  } else {
+	  return true
 	  }
 	}
 
