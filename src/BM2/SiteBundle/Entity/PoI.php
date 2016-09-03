@@ -29,12 +29,11 @@ class PoI {
 		return 'PoI.'.$this->getName();
 	}
 	
-	public function getInEstate() {
-	  if ($this->isInside() != true) {
-	  return false
-	  } else {
-	  return true
-	  }
+	public function getWhere() {
+		if ($this->getSettlement() != false) {
+			return $this->getSettlement()
+		} else {
+			return 'PoI.near.'.$this->getSettlement()
+		}
 	}
-
 }
