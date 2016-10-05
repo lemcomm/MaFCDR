@@ -72,10 +72,11 @@ class LinksExtension extends \Twig_Extension {
 				case 'vote':
 					$type = 'Election';
 					break;
-				case 'i':
-				case 'item':
-					$type = 'Item';
-					break;
+#These presently do not actually reference anything and using them will error out an entire conversation for all users.
+#				case 'i':
+#				case 'item':
+#					$type = 'Item';
+#					break;
 				case 'a':
 				case 'artifact':
 					$type = 'Artifact';
