@@ -19,8 +19,8 @@ class UserManager extends FosUserManager {
 	/**
 	 * @param ObjectManager $om
 	 */
-	public function __construct(ObjectManager $om, $class, EncoderFactoryInterface $encoderFactory, CanonicalizerInterface $usernameCanonicalizer, CanonicalizerInterface $emailCanonicalizer) {
-		parent::__construct($passwordUpdater, $usernameCanonicalizer, $emailCanonicalizer, $om, $class);
+	public function __construct(ObjectManager $om, $class, PasswordUpdaterInterface $passwordUpdater, CanonicalizerInterface $canonicalFieldsUpdater) {
+		parent::__construct($passwordUpdater, $canonicalFieldsUpdater, $om, $class);
 	}
 
 	/**
