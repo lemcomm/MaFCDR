@@ -6,7 +6,7 @@ use BM2\SiteBundle\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Doctrine\UserManager as FosUserManager;
 use FOS\UserBundle\Util\CanonicalizerInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use FOS\UserBundle\Util\PasswordUpdaterInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,7 +20,7 @@ class UserManager extends FosUserManager {
 	 * @param ObjectManager $om
 	 */
 	public function __construct(ObjectManager $om, $class, EncoderFactoryInterface $encoderFactory, CanonicalizerInterface $usernameCanonicalizer, CanonicalizerInterface $emailCanonicalizer) {
-		parent::__construct($encoderFactory, $usernameCanonicalizer, $emailCanonicalizer, $om, $class);
+		parent::__construct($passwordUpdater, $usernameCanonicalizer, $emailCanonicalizer, $om, $class);
 	}
 
 	/**
@@ -53,7 +53,7 @@ class UserManager extends FosUserManager {
 		$user->setCredits(0);
 		$user->setVipStatus(0);
 		$user->setRestricted(false);
-		// new users subscription is 30-days, as in the old trial, but mostly because our payment interval is monthyl for them
+		// new users subscription is 30-days, as in the old trial, but mostly because our payment interval is monthly for them
 		$until = new \DateTime("now");
 		$until->add(new \DateInterval('P30D'));
 		$user->setAccountLevel(10)->setPaidUntil($until);
