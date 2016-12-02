@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Doctrine\UserManager as FosUserManager;
-use FOS\UserBundle\Util\CanonicalizerInterface;
+use FOS\UserBundle\Util\CanonicalFieldsUpdater;
 use FOS\UserBundle\Util\PasswordUpdaterInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,7 +19,7 @@ class UserManager extends FosUserManager {
 	/**
 	 * @param ObjectManager $om
 	 */
-	public function __construct(ObjectManager $om, $class, PasswordUpdaterInterface $passwordUpdater, CanonicalizerInterface $canonicalFieldsUpdater) {
+	public function __construct(ObjectManager $om, $class, PasswordUpdaterInterface $passwordUpdater, CanonicalFieldsUpdater $canonicalFieldsUpdater) {
 		parent::__construct($passwordUpdater, $canonicalFieldsUpdater, $om, $class);
 	}
 
