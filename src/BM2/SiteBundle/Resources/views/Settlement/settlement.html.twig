@@ -62,7 +62,7 @@
 		{% if familiarity %}<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>{% endif %}
 		<li>{{ area|area }}</li>
 		<li>{{ density|number_format }} {{ 'popdensity'|trans }}</li>
-		{% if true or details.spot or isowner %}
+		{% if details.spot or isowner %}
 			<li class="tt_botleft" title="{{ ('settlement.security.tt')|trans }}">{{ ('settlement.security.'~security)|trans }}</li>
 		{% endif %}
 		{% if isowner %}
