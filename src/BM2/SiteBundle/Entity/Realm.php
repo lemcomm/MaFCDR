@@ -124,7 +124,7 @@ class Realm {
 	public function findDeadInferiors() {
 		$all = new ArrayCollection;
 		foreach ($this->getInferiors() as $subrealms) {
-			if ($subrealm->getActive() = false) {
+			if (!$subrealm->getActive()) {
 			$all->add($subrealm);
 			}
 		}
