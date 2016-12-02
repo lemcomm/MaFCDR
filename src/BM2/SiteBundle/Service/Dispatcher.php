@@ -1438,7 +1438,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.notleader");
 		}
-		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()))
+		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()));
 	}
 
 	public function diplomacyBreakHierarchyTest() {
