@@ -13,9 +13,11 @@
 		<many-to-one field="successor" target-entity="Character" inversed-by="successor_to_house"/>
 
 		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
+		
+		<one-to-many field="pending_members" target-entity="Character" mapped-by="pending_house"/>
 
-		<many-to-one field="superior" target-entity="Houses" inversed-by="inferiors"/>
-		<one-to-many field="inferiors" target-entity="Houses" mapped-by="superior" index-by="id"/>
+		<many-to-one field="superior" target-entity="House" inversed-by="inferiors"/>
+		<one-to-many field="inferiors" target-entity="House" mapped-by="superior" index-by="id"/>
 
 		<one-to-one field="description" target-entity="FamilyDescription" inversed by="house"/>
 		<one-to-one field="private_descirption" target-entity="FamilyDescription" inversed by="house"/>
@@ -29,8 +31,5 @@
 		<field name="gold" type="integer"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="house"/>
-
-		<many-to-one field="user" target-entity="User" inversed-by="houses"/>
-
 	</entity>
 </doctrine-mapping>
