@@ -32,4 +32,47 @@ class HouseController extends Controller {
 
 	private $house;
 
+	/**
+	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
+	  * @Template("BM2SiteBundle:House:house.html.twig")
+	  */
+	
+	public function viewAction(House $id) {
+		$house = $id;
+		$inhouse = false;
+		
+		$character = $this->get('appstate')getCharacters(false, true, true);
+		if ($character) {
+			if ($character->getHouse() == $house) {
+				$inhouse = true;
+			}
+		}
+	}
+	
+	/**
+	  * @Route("/{id}/edit", requirements={"id"="\d+"})
+	  * @Template
+	  */
+		
+	public function backgroundAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$house = $id;
+		$em = $this->getDoctrine()->getManager();
 
+		$form = $this->createForm(new HouseBackgroundType($house);
+		$form->handleRequest($request);
+		if ($character->getHouse()->getHead() !== $house->getHead()) {
+			throw createNotFoundException('error.notfound.head');
+		}
+		if ($form->isValid()) {
+			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
+			// FIXME: need to apply this here - maybe data transformers or something?
+			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('house.background.updated', array(), 'actions'));
+		}
+		return array(
+			'form' => $form->createView(),
+		);
+	}
+					  
