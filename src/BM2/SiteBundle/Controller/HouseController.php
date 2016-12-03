@@ -7,7 +7,8 @@ use BM2\SiteBundle\Entity\Character;
 
 use BM2\SiteBundle\Form\HouseBackgroundType;
 
-# use BM2\SiteBundle\Service\Geography;
+use BM2\SiteBundle\Service\Geography;
+
 # use BM2\SiteBundle\Service\History;
 
 use Doctrine\Common\Collections\ArrayCollection;
