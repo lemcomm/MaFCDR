@@ -24,6 +24,8 @@
 		<one-to-one field="secret_description" target-entity="HouseDescription" inversed by="house"/>
 
  		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
+		<many-to-one field="pending_settlement" target-entity="Settlement" inversed-by="houses_pending"/>
+		
    		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="house"/>
 		<one-to-one field="geo_marker" target-entity="GeoFeature"/>
 
