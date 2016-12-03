@@ -778,5 +778,17 @@ class Geography {
 		}
 		return array(false,false, false);
 	}
+	
+	public function findNearestHouse(Character $character) {
+		$query = $this->em->createQuery('SELECT f, ST_Distance(f.location, c.location) AS distance FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :char AND t.name = :type AND f.active = true ORDER BY distance ASC');
+		$query->setParameters(array('char'=> $character, 'type'=>'house'));
+		$query->setMaxResults(1);
+		$results = $query->getResult();
+		if ($results) {
+			return $results[0];
+		} else {
+			return false;
+		}
+	}
 
 }
