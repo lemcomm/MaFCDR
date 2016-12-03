@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Character" table="PlayerCharacter">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+
+		<many-to-one field="crest" target-entity="Heraldry"/>
+
+		<one-to-one field="head" target-entity="Character" inversed-by="head"/>
+
+		<many-to-one field="successor" target-entity="Character" inversed-by="successor_to_house"/>
+
+		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
+
+		<many-to-one field="superior" target-entity "Houses" inversed-by="inferiors"/>
+		<one-to-many field="inferiors" target-entity "Houses" mapped-by="superior" index-by="id"/>
+
+		<one-to-one field="description" target-entity="FamilyDescription" inversed by="house"/>
+		<one-to-one field="private_descirption" target-entity="FamilyDescription" inversed by="house"/>
+		<one-to-one field="secret_description" target-entity="FamilyDescription" inversed by="house"/>
+
+		<one-to-one field="achievements" target-entity="FamilyDescription" inversed by="house"/>
+
+ 		 <one-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
+   		 <one-to-one field="outside_settlement" target-entity="GeoFeature" inversed-by="is_house"/>
+
+		<field name="gold" type="integer"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="house"/>
+
+		<many-to-one field="user" target-entity="User" inversed-by="houses"/>
+
+	</entity>
+</doctrine-mapping>
