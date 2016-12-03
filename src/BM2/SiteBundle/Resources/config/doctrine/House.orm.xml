@@ -19,11 +19,9 @@
 		<many-to-one field="superior" target-entity="House" inversed-by="inferiors"/>
 		<one-to-many field="inferiors" target-entity="House" mapped-by="superior" index-by="id"/>
 
-		<one-to-one field="description" target-entity="FamilyDescription" inversed by="house"/>
-		<one-to-one field="private_descirption" target-entity="FamilyDescription" inversed by="house"/>
-		<one-to-one field="secret_description" target-entity="FamilyDescription" inversed by="house"/>
-
-		<one-to-one field="achievements" target-entity="FamilyDescription" inversed by="house"/>
+		<one-to-one field="description" target-entity="HouseDescription" inversed by="house"/>
+		<one-to-one field="private_descirption" target-entity="HouseDescription" inversed by="house"/>
+		<one-to-one field="secret_description" target-entity="HouseDescription" inversed by="house"/>
 
  		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
    		<one-to-one field="outside_settlement" target-entity="GeoFeature" inversed-by="is_house"/>
