@@ -14,8 +14,8 @@
 
 		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
 
-		<many-to-one field="superior" target-entity "Houses" inversed-by="inferiors"/>
-		<one-to-many field="inferiors" target-entity "Houses" mapped-by="superior" index-by="id"/>
+		<many-to-one field="superior" target-entity="Houses" inversed-by="inferiors"/>
+		<one-to-many field="inferiors" target-entity="Houses" mapped-by="superior" index-by="id"/>
 
 		<one-to-one field="description" target-entity="FamilyDescription" inversed by="house"/>
 		<one-to-one field="private_descirption" target-entity="FamilyDescription" inversed by="house"/>
