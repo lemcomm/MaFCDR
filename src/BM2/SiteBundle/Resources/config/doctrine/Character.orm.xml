@@ -94,7 +94,7 @@
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
 
-		<many-to-one field="house" target-entity="Houss" inversed-by="characters"/>
+		<many-to-one field="house" target-entity="House" inversed-by="characters"/>
 		<one-to-many field="head" target-entity="House" mapped-by="head"/>
 		<one-to-many field="successor_to_house" target-entity="House" mapped-by="successor"/>
 	</entity>
