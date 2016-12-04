@@ -68,12 +68,25 @@ class CharacterManager {
 		if ($father) {
 			$father->addChild($character);
 			$character->setGeneration($father->getGeneration()+1);
+			if ($father->getHouse > 0) {
+				$fatherhouse = $father->getHouse();
+			}
 		}
 		if ($mother) {
 			$mother->addChild($character);
 			if ($mother->getGeneration() >= $character->getGeneration()) {
                 $character->setGeneration($mother->getGeneration() + 1);
-            }
+            		}
+			if ($mother->getHouse > 0) {
+				$motherhouse = $mother->getHouse();
+			}
+		}
+		if ($fatherhouse > 0 && $motherhouse > 0) {
+			$character->setHouse(NULL);
+		} else if ($fatherhouse > 0) {
+			$character->setHouse($father->getHouse());
+		} else if ($motherhouse > 0) {
+			$character->setHouse($mother->getHouse());
 		}
 		if ($partner) {
 			$relation = new Partnership();
