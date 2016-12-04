@@ -19,9 +19,7 @@
 		<many-to-one field="superior" target-entity="House" inversed-by="cadets"/>
 		<one-to-many field="cadets" target-entity="House" mapped-by="superior" index-by="id"/>
 
-		<one-to-one field="description" target-entity="HouseDescription" inversed by="house"/>
-		<one-to-one field="private_descirption" target-entity="HouseDescription" inversed by="house"/>
-		<one-to-one field="secret_description" target-entity="HouseDescription" inversed by="house"/>
+		<one-to-one field="descriptions" target-entity="HouseDescription" inversed by="house"/>
 
  		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
 		<many-to-one field="pending_settlement" target-entity="Settlement" inversed-by="houses_pending"/>
