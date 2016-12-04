@@ -8,8 +8,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Form\HouseBackgroundType;
 
 use BM2\SiteBundle\Service\Geography;
-
-# use BM2\SiteBundle\Service\History;
+use BM2\SiteBundle\Service\History;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
@@ -43,19 +42,26 @@ class HouseController extends Controller {
 				$inhouse = true;
 			}
 		}
-	}
-	
+	}	
 
 	/**
 	  * @Route("/create")
 	  * @Template
 	  */	
 	
-	public function backgroundAction(Request $request) {
+	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$house = $id;
 		$em = $this->getDoctrine()->getManager();
-
+		$location = null;
+		$inside = null;
+		$crest = $character->getCrest();
+		if ($character->isInside()) {
+			$inside = true;
+		} else {
+			$location = $character->getLocation();
+		}
+		
 		$form = $this->createForm(new HouseBackgroundType($house);
 		$form->handleRequest($request);
 		if ($character->getHouse() > 0 ) {
@@ -65,8 +71,9 @@ class HouseController extends Controller {
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
+			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private_description'], $data['secret_description'], $crest, $location, $settlement, $character);
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('house.background.updated', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -78,7 +85,7 @@ class HouseController extends Controller {
 	  * @Template
 	  */
 		
-	public function backgroundAction(Request $request) {
+	public function editAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$house = $id;
 		$em = $this->getDoctrine()->getManager();
@@ -93,7 +100,7 @@ class HouseController extends Controller {
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('house.background.updated', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -111,9 +118,6 @@ class HouseController extends Controller {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		
 		$em = $this->getDoctrine()->getManager();
-		if ($character->getHouse() > 0) {
-			$hashouse = TRUE;
-		}
 		if ($character->isInside()->getHouses() !== $house) {
 			throw createNotFoundException('error.notfound.nohouse');
 		} 
@@ -126,11 +130,11 @@ class HouseController extends Controller {
 			if($nearest['distance'] < $this->geography->caluclateInteractionDistance($character)) {
 				$form = $this->createForm(new HouseJoinType($nearest);
 				$form->handleRequest($request);
-			} else throw createNotFoundException('error.found.toofar');
+			} else throw createNotFoundException('error.notfound.toofar');
 		}
 		if ($form->isValid()) {
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('house.background.join', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -156,7 +160,7 @@ class HouseController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('house.background.approve', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.member.approve', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
