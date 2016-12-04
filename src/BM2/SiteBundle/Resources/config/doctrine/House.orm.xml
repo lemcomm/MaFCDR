@@ -8,7 +8,7 @@
 
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
-		<one-to-one field="head" target-entity="Character" inversed-by="head"/>
+		<one-to-one field="head" target-entity="Character" inversed-by="head_of_house"/>
 
 		<many-to-one field="successor" target-entity="Character" inversed-by="successor_to_house"/>
 
