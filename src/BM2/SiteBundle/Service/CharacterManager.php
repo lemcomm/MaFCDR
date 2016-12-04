@@ -337,9 +337,11 @@ class CharacterManager {
 			foreach ($character->getEstates() as $estate) {
 				$this->bequeathEstate($estate, $heir, $character, $via);
 			}
-
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
+			}
+			if ($character->getHouse() == $character->getHouse()->getHead()) {
+				$this->transferHouseToHeir($character, $heir);
 			}
 		} else {
 			foreach ($character->getEstates() as $estate) {
@@ -347,6 +349,9 @@ class CharacterManager {
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
+			}
+			if ($character->getHouse() == $character->getHouse()->getHead()) {
+				$this->transferHouseNoHeir($character);
 			}
 		}
 
@@ -650,5 +655,32 @@ class CharacterManager {
 
 		return $rep;
 	}
+	public function transferHouseToHeir (Character $character, Character $heir) {
+		$house = $character->getHouse;
+		$house->setHead($heir);
+		$this->history->logEvent(
+			$heir,
+			'event.character.house.newhead',
+			array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
+			HISTORY::ULTRA, true
+		);
+	}
+	public function transferHouseNoHeir (Character $character)
+		$oldest = 0;
+		$best;
+		$house = $character->getHouse();
+		foreach ($house->getMembers() as $option) {
+			if ($option->DaysInGame > $best) {
+				$best = $option;
+			}
+		}
+		$house->setHead($best);
+		$this->history->logEvent(
+			$heir,
+			'event.character.house.newhead',
+			array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
+			HISTORY::ULTRA, true
+		);
+		}
 
 }
