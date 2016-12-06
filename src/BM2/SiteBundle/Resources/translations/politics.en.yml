@@ -639,3 +639,42 @@ claim:
  cancelled:   You have withdrawn your claim.
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
+
+house:
+ setup:
+  title:        Manage Your House
+  name:         Name your House
+  desc: >
+   Houses, sometimes referred to as Dynasties, Lineages, or Clans, can be everything from a small family to a powerful collection of
+   many different families. Historically, the most powerful dynasties have gone so far to place strangeholds on entire continents,
+   while even today certain families are known by the world over.<br />
+   In Might & Fealty this is still a new feature, in the first stages of deployment, but it will act as a way for characters to gather
+   together their characters outside the confines of a realm. Already it includes announcement for certain House related events
+   such as new characters being created into the house or joining, and can be created either inside an existing settlement, or
+   someone outside a settlement in the regions themselves.<br />
+   Beyond that, the House a character belongs to will be displayed prominently alongside their own name, bringing notoriety to them
+   when they own settlements or rule realms, and eventually this will expand beyond as new features are added and new properties are
+   created.<br />
+   Later this will include functionality to allow you to build up your House, appoint members to certain roles in the House, or perhaps
+   even control how succession works for not just your House, but Cadet Houses as well.
+  description: 
+   name:        Public Description 
+   description: >
+    This is the public description that will be shown to others when they look your house's information. <br />
+    The information displayed here will usually reflect the history or lore of the house, along with any significant accomplishments
+    of the house, in particular those they want to boast about, such as winning major battles or ruling powerful realms.
+  private:
+   name:        Private Description
+   description: >
+    This description will only be shown to members of the House. <br />
+    This is useful for planning house activites across multiple branches of the house or to share rumors or information that the house
+    has become aware of.
+  secret:
+   name:        Secret Description
+   description: >
+    And this field will only be shared by heads of the house. This will mostly only make it useful for storing notes from one head to
+    another head, such as where important artifacts might be located or some secret they learned of an enemy but couldn't risk sharing
+    in life.
+  submit:       submit
+    
+    
