@@ -998,7 +998,7 @@ class RealmController extends Controller {
 
 		$votes = $this->getVotes($election);
 
-		$my_weight = 1; // TODO: different voting mechanism
+		$my_weight = $election->getWeight($character);
 
 		return array(
 			'election' => $election,
@@ -1012,6 +1012,7 @@ class RealmController extends Controller {
 
 	private function getVotes(Election $election) {
 		$votes = array();
+		$voter = $vote->getCharacter();
 		foreach ($election->getVotes() as $vote) {
 			$id = $vote->getTargetCharacter()->getId();
 			if (!isset($votes[$id])) {
@@ -1021,7 +1022,7 @@ class RealmController extends Controller {
 					'contra' => array()
 				);
 			}
-			$weight = 1; // TODO: different voting mechanism
+			$weight = $election->getWeight($voter);
 			if ($vote->getVote() < 0) {
 				$votes[$id]['contra'][] = array('voter'=>$vote->getCharacter(), 'votes'=>$weight);
 			} else {
