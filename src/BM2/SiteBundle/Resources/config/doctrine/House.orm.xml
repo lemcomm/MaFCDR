@@ -8,25 +8,25 @@
 
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
-		<one-to-one field="head" target-entity="Character" inversed-by="head_of_dynasty"/>
+		<one-to-one field="head" target-entity="Character" inversed-by="head_of_house"/>
 		
-		<one-to-many field="members" target-entity="Character" mapped-by="dynasty"/>
+		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
 
 		<one-to-many field="pending_members" target-entity="Character" mapped-by="pending_house"/>
 
 		<many-to-one field="superior" target-entity="House" inversed-by="cadets"/>
 		<one-to-many field="cadets" target-entity="House" mapped-by="superior" index-by="id"/>
 
-		<one-to-one field="descriptions" target-entity="HouseDescription" inversed by="dynasty"/>
+		<one-to-one field="descriptions" target-entity="HouseDescription" inversed by="house"/>
 
- 		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="dynasties_present"/>
-		<many-to-one field="pending_settlement" target-entity="Settlement" inversed-by="dynasties_pending"/>
+ 		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
+		<many-to-one field="pending_settlement" target-entity="Settlement" inversed-by="houses_pending"/>
 		
-   		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="dynasty"/>
+   		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="house"/>
 		<one-to-one field="geo_marker" target-entity="GeoFeature"/>
 
 		<field name="gold" type="integer"/>
 
-		<one-to-one field="log" target-entity="EventLog" inversed-by="dynasty"/>
+		<one-to-one field="log" target-entity="EventLog" inversed-by="house"/>
 	</entity>
 </doctrine-mapping>
