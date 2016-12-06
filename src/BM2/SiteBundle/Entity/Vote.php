@@ -18,6 +18,28 @@ class Vote {
 					$pop += $e->getPopulation();
 				}
 				return $pop;
+			case 'castles':
+				$castles = 0;
+				foreach ($this->character->getEstates()->getBuildings() as $buildings) {
+					foreach ($buildings as $b) {
+						if ($b->getType() == 'Palisade') {
+							$castles++;
+						}
+						if ($b->getType() == 'Wood Castle') {
+							$castles += 2;
+						}
+						if ($b->getType() == 'Stone Castle') {
+							$castles += 4;
+						}
+						if ($b->getType() == 'Fortress') {
+							$castles += 8;
+						}
+						if ($b->getType() == 'Citadel') {
+							$castles += 16;
+						}
+					}
+				}
+				return $castles;
 			case 'banner':
 			default:
 				return 1;
