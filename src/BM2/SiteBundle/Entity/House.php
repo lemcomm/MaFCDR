@@ -29,7 +29,7 @@ class House {
 		return false;
 	}
 	
-	public function findAllLiving {
+	public function findAllLiving() {
 		$all_living = new ArrayCollection;
 		$all_members = $this->finalAllMembers();
 		foreach ($all_members as $member) {
@@ -40,7 +40,7 @@ class House {
 		return $all_living;
 	}
 	
-	public function findAllDead {
+	public function findAllDead() {
 		$all_dead = new ArrayCollection;
 		$all_members = $this->finalAllMembers();
 		foreach ($all_members as $member) {
@@ -51,7 +51,7 @@ class House {
 		return $all_dead;
 	}
 	
-	public function findAllMembers {
+	public function findAllMembers() {
 		$all_members = new ArrayCollection;
 		$all_cadets = $this->findAllCadets($include_myself=true);
 		foreach ($allcadets as $cadet) {
