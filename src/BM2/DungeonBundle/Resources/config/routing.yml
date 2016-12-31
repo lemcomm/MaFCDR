@@ -3,6 +3,6 @@ dungeons:
     type:     annotation
     prefix:   /{_locale}
     requirements:
-     _locale: en|de|fr|it|pt|ru|sv|no|da|lv
+     _locale: en|de|fr|it|es|ru
     defaults:
      _locale: en
