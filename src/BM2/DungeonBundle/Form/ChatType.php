@@ -4,7 +4,7 @@ namespace BM2\DungeonBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 
@@ -14,7 +14,7 @@ class ChatType extends AbstractType {
 		return 'chat';
 	}
 
-	public function configureOptions(OptionsResolverInterface $resolver) {
+	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'chat_14',
 			'data_class'			=> 'BM2\DungeonBundle\Entity\DungeonMessage',
