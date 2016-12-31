@@ -598,30 +598,30 @@ class RealmController extends Controller {
 		);
 	}
 
-#	/**
-#	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
-#	  * @Template
-#	  */
-#
-#	public function restoreAction(Realm $realm, Request $request) {
-#		$character = $this->gateway($realm, 'diplomacyRestoreTest');
-#		
-#		$form = $this->createForm(new RealmRestoreType($realm));
-#		$form->handleRequest($request);
-#		if ($form->isValid()) {
-#		    $data = $form->getData();
-#           $fail = false;
-#
-#            if (!$fail) {
-#                $this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
-#            }
-#
-#			$em = $this->getDoctrine()->getManager();
-#			$em->flush();
-#			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
-#			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
-#		}
-#	}
+	/**
+	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Template
+	  */
+
+	public function restoreAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+		
+		$form = $this->createForm(new RealmRestoreType($realm));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$fail = false;
+
+			if (!$fail) {
+                		$this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
+            		}
+
+			$em = $this->getDoctrine()->getManager();
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
+			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
+		}
+	}
 
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
