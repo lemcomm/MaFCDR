@@ -425,6 +425,7 @@ class Dispatcher {
 		$actions[] = $this->diplomacyHierarchyTest();
 		$actions[] = $this->diplomacySubrealmTest();
 		$actions[] = $this->diplomacyBreakHierarchyTest();
+		$actions[] = $this->diplomacyRestoreTest();
 
 		return array("name"=>"diplomacy", "elements"=>$actions);
 	}
