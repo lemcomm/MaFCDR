@@ -425,6 +425,7 @@ class Dispatcher {
 		$actions[] = $this->diplomacyHierarchyTest();
 		$actions[] = $this->diplomacySubrealmTest();
 		$actions[] = $this->diplomacyBreakHierarchyTest();
+		$actions[] = $this->diplomacyRestoreTest();
 
 		return array("name"=>"diplomacy", "elements"=>$actions);
 	}
@@ -1432,7 +1433,7 @@ class Dispatcher {
 		if ($this->realm->getInferiors()->count() > 0) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.nosubrealms");
 		}
-		if ($this->realm->findDeadInferiors()->count() = 0) {
+		if ($this->realm->findDeadInferiors()->count() == 0) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.tooalive");
 		}
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
