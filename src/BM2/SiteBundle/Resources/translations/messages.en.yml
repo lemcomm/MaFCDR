@@ -1462,6 +1462,7 @@ unavailable:
  trade:
   noestate:     You do not have any estates with which to trade.
   nooptions:    There are no possible trade/tribute deals you could make at this location.
+ nohouses:      There are no houses established nearby. If you are at a settlement and they are inside, you must be inside as well.
 
 marker:
  name:      marker name
