@@ -790,5 +790,22 @@ class Geography {
 			return false;
 		}
 	}
+	
+	public function findHousesNearMe(Character $character, $maxdistance=-1) {
+		if ($maxdistance==-1) {
+			$maxdistance = $this->calculateInteractionDistance($character);
+		}
+		$query = $this->em->createQuery('SELECT f as feature FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :me AND t.hidden = false AND t.name = :type AND ST_DWithin(f.location, c.location, :maxdistance) = true');
+		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance, 'type'=>'house'));
+		return $query->getResult();
+	}
+	
+	public function findHousesInSpotRange(Character $character) {
+		return $this->findHousesNearMe($character, $this->calculateSpottingDistance($character));
+	}
+	
+	public function findHousesInActionRange($character) {
+		return $this->findHousesNearMe($character);
+	}
 
 }
