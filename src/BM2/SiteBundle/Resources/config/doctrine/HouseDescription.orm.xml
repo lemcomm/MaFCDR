@@ -4,9 +4,9 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="description" type="text" nullable="true"/>
-		<field name="private_description" type="text" nullable="true"/>
-		<field name="secret_description" type="text" nullable="true"/>
+		<field name="public" type="text" nullable="true"/>
+		<field name="private" type="text" nullable="true"/>
+		<field name="secret" type="text" nullable="true"/>
 
 		<one-to-one field="house" target-entity="House" mapped-by="descriptions"/>
 
