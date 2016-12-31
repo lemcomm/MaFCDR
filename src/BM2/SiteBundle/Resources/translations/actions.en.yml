@@ -171,6 +171,9 @@ location:
  dungeons:
   name:         Enter Dungeon
   description:  Explore the nearby dungeon.
+ houses:
+  name:         Visit Houses
+  description:  Visit the nearby House(s).
 
 building:
  title:         Local Buildings
