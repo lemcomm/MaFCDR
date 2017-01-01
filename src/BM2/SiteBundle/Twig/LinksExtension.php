@@ -85,13 +85,24 @@ class LinksExtension extends \Twig_Extension {
 				case 'war':
 					$type = 'War';
 					break;
+				case 'news':
+				case 'newspaper':
+				case 'newsedition':
+				case 'edition':
+				case 'pub':
+				case 'publication':
+					$type = 'NewsEdition';
 				default:
 					return "[<em>invalid reference</em>]";
 			}
 			$entity = $this->em->getRepository('BM2SiteBundle:'.$type)->find($id);
 			if ($entity) {
 				$url = $this->generator->generate($this->getLink($type), array('id' => $id));
-				$name = $entity->getName();
+				if ($type == 'NewsEdition') {
+					$name = $entity->getPaper()->getName();
+				} else {
+					$name = $entity->getName();
+				}
 				$link .= '<a href="'.$url.'">'.$name.'</a>';
 			} else {
 				$link = "[<em>invalid reference</em>]";
@@ -140,6 +151,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'quest':				return 'bm2_site_quests_details';
 			case 'artifact':			return 'bm2_site_artifacts_details';
 			case 'war':					return 'bm2_site_war_view';
+			case 'newsedition':		return 'bm2_site_news_read';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
