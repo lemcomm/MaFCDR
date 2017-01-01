@@ -85,6 +85,7 @@ class LinksExtension extends \Twig_Extension {
 				case 'war':
 					$type = 'War';
 					break;
+				case 'n':
 				case 'news':
 				case 'newspaper':
 				case 'newsedition':
@@ -97,11 +98,15 @@ class LinksExtension extends \Twig_Extension {
 			}
 			$entity = $this->em->getRepository('BM2SiteBundle:'.$type)->find($id);
 			if ($entity) {
-				$url = $this->generator->generate($this->getLink($type), array('id' => $id));
-				if ($type == 'NewsEdition') {
-					$name = $entity->getPaper()->getName();
+				if ($type != 'NewsEdition') {
+					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
 				} else {
+					$url = $this->generator->generate($this->getLink($type), array('edition' => $id));
+				}
+				if ($type != 'NewsEdition') {
 					$name = $entity->getName();
+				} else {
+					$name = $entity->getPaper()->getName();
 				}
 				$link .= '<a href="'.$url.'">'.$name.'</a>';
 			} else {
@@ -215,6 +220,10 @@ class LinksExtension extends \Twig_Extension {
 			case 'War':
 				$id = $entity->getId();
 				$name = $entity->getSummary();
+				break;
+			case 'NewsEdition':
+				$id = $entity->getId();
+				$name = $entity->getPaper->getName();
 				break;
 			default:
 				$id = $entity->getId();
