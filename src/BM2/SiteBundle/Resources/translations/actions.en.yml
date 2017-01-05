@@ -127,7 +127,9 @@ location:
  exit:
   name:         Exit the Settlement
   description:  Peacefully exit this settlement.
-  result:       You have passed the gates and are now outside %settlement%.  
+  result:
+   left:        You have passed the gates and are now outside %settlement%.
+   denied:      You cannot presently leave this settlement.
  quests:
   name:         Local Quests
   description:  Check out current and past quests from this region.
