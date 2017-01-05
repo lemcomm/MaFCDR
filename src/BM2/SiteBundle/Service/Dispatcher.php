@@ -116,6 +116,12 @@ class Dispatcher {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
+		if ($this->getLeaveableSettlementTest()) {
+			$actions[] = $this->locationLeaveTest(true);
+		} else {
+			$actions[] = array("name"=>"location.leave.name", "description"=>"unavaiable.nosettlement");
+		}
+
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
 
@@ -500,6 +506,30 @@ class Dispatcher {
 			return $this->action("location.enter", "bm2_site_actions_enter");
 		}
 
+	}
+	
+	public function locationLeaveTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests() !== true) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.outside");
+		}
+		if (!$place = $this->getActionableSettlement()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.exit')) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.prisoner");
+			}
+		} else {
+			return $this->action("location.exit", "bm2_site_actions_exit");
+		}
 	}
 
 	public function locationQuestsTest() {
@@ -1517,6 +1547,12 @@ class Dispatcher {
 			}
 		}
 		return $this->actionableSettlement;
+	}
+
+	public function getLeaveableSettlement() {
+		if ($this->getCharacter()->getInsideSettlement()) {
+			return $this->getCharacter()->getInsideSettlement();
+		}
 	}
 
 	public function getActionableRegion() {
