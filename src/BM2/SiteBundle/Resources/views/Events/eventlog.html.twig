@@ -1,5 +1,10 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h2>{{ 'events.logtitle'|trans({'%subject%':link(log.subject)})|title|raw }}</h2>
 {% if log.realm or log.settlement %}
@@ -15,16 +20,24 @@
 	<input type="radio" id="filter_high" name="radio" /><label for="filter_high">{{ 'events.filter.high'|trans }}</label>
 	<input type="radio" id="filter_ultra" name="radio" /><label for="filter_ultra">{{ 'events.filter.ultra'|trans }}</label>
 </div>
-
+<table id="eventlog" cellpadding="0" cellspacing="0"><thead>
+	<tr>
+		<th>{{ 'events.time'|trans }}</th>
+		<th>{{ 'events.entry'|trans }}</th>
+	</tr>
+</thead>
+<tbody>
 {% include "BM2SiteBundle:Events:eventdata.html.twig" with { "log":log, "metas":metas, "research":true} %}
-
+</tbody></table>
 {% endblock %}
 
 {% block javascript %}
 $("#select_type").buttonset();
 
 $("#filter_all").change(function(){
-	$(".eventlog").children().show();
+	$(".prio_0").show();
+	$(".prio_10").show();
+	$(".prio_20").show();
 });
 $("#filter_medium").change(function(){
 	$(".prio_0").hide();
@@ -41,6 +54,12 @@ $("#filter_ultra").change(function(){
 	$(".prio_10").hide();
 	$(".prio_20").hide();
 });
+
+{% block jquery %}
+	$("#eventlog").tablesorter({
+		sortList: [[0,1],[1,0]],
+	});
+{% endblock %}
 
 $("#allread").click(function(){
 	$.post("{{ path('bm2_site_events_allread', {"log":log.id}) }}", function() {
