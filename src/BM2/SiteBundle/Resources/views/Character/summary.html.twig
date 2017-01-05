@@ -45,7 +45,7 @@
 
 <h3>{{ 'summary.events'|trans|title }}</h3>
 {% set has_events = false %}
-<table class="eventlog">
+<table id="eventlog" class="eventlog">
 	<thead></thead>
 	<tbody>
 	{% for event in events %}
@@ -249,25 +249,29 @@
 {% endblock %}
 
 {% block jquery %}
-$("#fullread").click(function(){
-	$.post("{{ path('bm2_site_events_fullread', {"which":"me"}) }}", function() {
-		$("#fullread").replaceWith('<div class="success">{{ "events.alldone2"|trans }}</div>');
-	});
-});
-$("#fullread2").click(function(){
-	$.post("{{ path('bm2_site_events_fullread', {"which":"all"}) }}", function() {
-		$("#fullread_wrapper").replaceWith('<div class="success">{{ "events.alldone"|trans }}</div>');
-	});
-});
-
-$("#expandscouting").click(function(){
-	$("#expandscouting").parent().after('<img src="{{ asset('bundles/bm2site/images/loader.png') }}"/>');
-	$("#expandscouting").remove();
-	$.get("{{ path('bm2_scouting') }}", function(data) {
-		$("#nearbyothers").replaceWith(data);
-		$("#scouting").tablesorter({
-			sortList: [[0,0]],
+	$("#fullread").click(function(){
+		$.post("{{ path('bm2_site_events_fullread', {"which":"me"}) }}", function() {
+			$("#fullread").replaceWith('<div class="success">{{ "events.alldone2"|trans }}</div>');
 		});
 	});
-});
+	$("#fullread2").click(function(){
+		$.post("{{ path('bm2_site_events_fullread', {"which":"all"}) }}", function() {
+			$("#fullread_wrapper").replaceWith('<div class="success">{{ "events.alldone"|trans }}</div>');
+		});
+	});
+
+	$("#expandscouting").click(function(){
+		$("#expandscouting").parent().after('<img src="{{ asset('bundles/bm2site/images/loader.png') }}"/>');
+		$("#expandscouting").remove();
+		$.get("{{ path('bm2_scouting') }}", function(data) {
+			$("#nearbyothers").replaceWith(data);
+			$("#scouting").tablesorter({
+				sortList: [[0,0]],
+			});
+		});
+	});
+
+	$("#eventlog").tablesorter({
+		sortList: [[1,0,0], [0,0,0]],
+	});
 {% endblock %}
