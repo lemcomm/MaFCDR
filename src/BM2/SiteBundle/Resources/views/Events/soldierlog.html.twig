@@ -15,6 +15,7 @@
 	</tr>
 </thead><tbody>
 {% for event in soldier.events %}
+	<tr>
 		<td>{{ event.cycle|gametime('short') }}</td>
 		<td>{{ event|logtranslate }}</td>
 	</tr>
