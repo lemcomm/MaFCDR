@@ -184,7 +184,7 @@ class ActionsController extends Controller {
 	  * @Template
 	  */
 	public function exitAction() {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('locationExitTest', true, true);
+		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
 
 		$result = null;
 		if ($this->get('interactions')->characterLeaveSettlement($character)) {
