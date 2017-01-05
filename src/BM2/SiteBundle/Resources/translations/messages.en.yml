@@ -1400,8 +1400,9 @@ unavailable:
  regrouping:    Your troops are regrouping, you cannot attack until they are ready again.
  atsea:         You are travelling at sea.
  nosettlement:  You are not near any settlement.
- notinside:     You are not inside the settlement.
+ notinside:     You are not inside a settlement.
  inside:        You are inside the settlement.
+ outside:       You are not currently inside a settlement.
  noregion:      You are not in an inhabited area.
  nodock:        There are no docks nearby.
  noship:        You do not have a ship nearby.
