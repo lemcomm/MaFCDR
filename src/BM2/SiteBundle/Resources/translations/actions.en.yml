@@ -124,6 +124,10 @@ location:
   result:
    entered:     You have passed the gates and are now inside %settlement%.
    denied:      Guards at the gates of %settlement% deny you entry. You can force your way in by attacking the settlement, of course.
+ exit:
+  name:         Exit the Settlement
+  description:  Peacefully exit this settlement.
+  result:       You have passed the gates and are now outside %settlement%.  
  quests:
   name:         Local Quests
   description:  Check out current and past quests from this region.
