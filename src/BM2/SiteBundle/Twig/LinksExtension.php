@@ -93,6 +93,13 @@ class LinksExtension extends \Twig_Extension {
 				case 'pub':
 				case 'publication':
 					$type = 'NewsEdition';
+					break;
+				case 'pos':
+				case 'position':
+				case 'realmpos':
+				case 'realmposition':
+					$type = 'RealmPosition';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
