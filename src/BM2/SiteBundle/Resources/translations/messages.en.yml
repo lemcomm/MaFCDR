@@ -1402,6 +1402,7 @@ unavailable:
  nosettlement:  You are not near any settlement.
  notinside:     You are not inside the settlement.
  inside:        You are inside the settlement.
+ outside:       You are not currently inside a settlement.
  noregion:      You are not in an inhabited area.
  nodock:        There are no docks nearby.
  noship:        You do not have a ship nearby.
