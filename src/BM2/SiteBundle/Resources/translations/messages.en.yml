@@ -1035,6 +1035,10 @@ events:
   medium:   only interesting
   high:     only important
   ultra:    only very important
+ soldierlog: 
+  title:     Soldier Log for link-soldier-name
+ entry:      Log Entries
+ time:       Date
 
 interaction:
  message:
