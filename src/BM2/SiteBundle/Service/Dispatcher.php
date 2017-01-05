@@ -119,7 +119,7 @@ class Dispatcher {
 		if ($this->getLeaveableSettlementTest()) {
 			$actions[] = $this->locationLeaveTest(true);
 		} else {
-			$actions[] = array("name"=>"location.leave.name", "description"=>"unavaiable.nosettlement");
+			$actions[] = array("name"=>"location.exit.name", "description"=>"unavailable.inside");
 		}
 
 		$actions[] = $this->locationQuestsTest();
