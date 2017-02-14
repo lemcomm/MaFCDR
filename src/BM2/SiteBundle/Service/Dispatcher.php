@@ -509,7 +509,7 @@ class Dispatcher {
 	}
 	
 	public function locationLeaveTest($check_duplicate=false) {
-		if (($check = $this->interActionsGenericTests() !== true) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->getCharacter()->getInsideSettlement()) {
@@ -526,7 +526,6 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.prisoner");
-			}
 		} else {
 			return $this->action("location.exit", "bm2_site_actions_exit");
 		}
