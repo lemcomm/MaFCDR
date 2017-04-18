@@ -11,7 +11,7 @@
 <h2>{{ 'realm.manage.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
 <p>{{ 'realm.manage.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
 
-<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_manage', {'realm':realm.id}) }}" method="post" {{ form_enctype(form) }}>
+<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_manage', {'realm':realm.id}) }}" method="post" {{ form_start(form) }}>
 	{{ form_widget(form) }}
 </form>
 
