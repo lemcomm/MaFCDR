@@ -21,7 +21,7 @@
 {% endfor %}
 </div>
 
-<form action="{{ path('bm2_site_payment_subscription') }}" method="post" {{ form_enctype(form) }}>
+<form action="{{ path('bm2_site_payment_subscription') }}" method="post" {{ form_start(form) }}>
 	<span class="hidden">{{ form_widget(form) }}</span>
 	<button>{{ 'account.sub.submit'|trans }}</button>
 </form>
