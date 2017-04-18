@@ -28,7 +28,7 @@
         "doctrine/doctrine-fixtures-bundle": "dev-master",
         "friendsofsymfony/user-bundle": "~2.0@dev",
         "creof/doctrine2-spatial": "dev-master",
-        "knplabs/knp-markdown-bundle": "1.2.*@dev",
+        "knplabs/knp-markdown-bundle": "1.4.*@dev",
         "codeception/codeception": "*",
         "paypal/merchant-sdk-php":"*"
     },
