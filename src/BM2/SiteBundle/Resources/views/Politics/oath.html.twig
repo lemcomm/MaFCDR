@@ -26,7 +26,7 @@
 	{% if nobody is defined %}
 		{{ "oath.nobody"|trans({},"politics") }}
 	{% else %}
-		<form class="wide" action="{{ path('bm2_site_politics_oath') }}" method="post" {{ form_enctype(form) }}>
+		<form class="wide" action="{{ path('bm2_site_politics_oath') }}" method="post" {{ form_start(form) }}>
 			{{ form_widget(form) }}		
 			<button type="submit">{{ "oath.submit"|trans({},"politics") }}</button>
 		</form>

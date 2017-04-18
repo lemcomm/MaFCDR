@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Twig;
 use BM2\SiteBundle\Service\Dispatcher;
 
 
-class DispatcherExtension extends \Twig_Extension {
+class DispatcherExtension extends \Twig_Extension implements \Twig_Extension_GlobalsInterface {
     protected $dispatcher;
 
     public function __construct(Dispatcher $dispatcher) {

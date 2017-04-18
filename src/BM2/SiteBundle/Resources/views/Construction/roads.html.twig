@@ -19,7 +19,7 @@
 	<div id="over20" class="warning hidden">{{ 'economy.build.warning.over20percent'|trans({}, "actions") }}</div>
 	<div id="over50" class="warning hidden">{{ 'economy.build.warning.over50percent'|trans({}, "actions") }}</div>
 	<div id="over100" class="error hidden">{{ 'economy.build.unavailable.over100percent'|trans({}, "actions") }}</div>
-	<form class="wide" action="{{ path('bm2_site_construction_roads') }}" method="post" {{ form_enctype(form) }}>
+	<form class="wide" action="{{ path('bm2_site_construction_roads') }}" method="post" {{ form_start(form) }}>
 	{{ form_widget(form._token) }}
 	{% if roadsdata is not empty %}
 	<table>

@@ -26,7 +26,7 @@
 		{{ macros.permission_row(form.permissions.vars.prototype) }}
 	</tr>
 	</table>
-	<form class="wide" action="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}" method="post" {{ form_enctype(form) }}>
+	<form class="wide" action="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}" method="post" {{ form_start(form) }}>
 		{{ form_errors(form) }}
 		{{ form_widget(form._token) }}
 		<h3>{{ "control.permissions.general"|trans({},"actions")|title }}</h3>
