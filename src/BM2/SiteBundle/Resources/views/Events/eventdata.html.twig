@@ -39,7 +39,7 @@
 		{% endif %}
 	{% endif %}
 	{% if form %}
-		<form class="wide" action="{{ path('bm2_eventlog', {'id':log.id}) }}" method="post" {{ form_enctype(form) }}>
+		<form class="wide" action="{{ path('bm2_eventlog', {'id':log.id}) }}" method="post" {{ form_start(form) }}>
 			{{ form_widget(form) }}
 			<button name="submit">{{ 'entourage.assign.submit'|trans({},"actions") }}</button>
 		</form>
