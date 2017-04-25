@@ -66,8 +66,12 @@ class BattleRunner {
 		$sortie = false;
 		$some_inside = false;
 		$some_outside = false;
+		$no_rewards = false;
 		foreach ($battle->getGroups() as $group) {
 			foreach ($group->getCharacters() as $char) {
+				if ($char->getSlumbering() == true) {
+					$no_rewards = true;
+				}
 				if ($char->getInsideSettlement()) {
 					if ($battle->getSettlement()) {
 						$some_inside = true;
@@ -83,6 +87,7 @@ class BattleRunner {
 		if ($some_outside && $some_inside) {
 			$assault = true;
 		}
+		
 
 		$this->report = new BattleReport;
 		$this->report->setCycle($cycle);
@@ -222,10 +227,12 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getSoldiers() as $soldier) {
-				if ($soldier->getExperience()<=5) {
-					$soldier->gainExperience(2);
-				} else {
-					$soldier->gainExperience(1);					
+				if (!$no_rewards) {
+					if ($soldier->getExperience()<=5) {
+						$soldier->gainExperience(2);
+					} else {
+						$soldier->gainExperience(1);					
+					}
 				}
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -370,7 +377,9 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getActiveSoldiers() as $soldier) {
-				$soldier->gainExperience(2);
+				if (!$no_rewards) {
+					$soldier->gainExperience(2);
+				}
 
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -859,7 +868,9 @@ class BattleRunner {
 	// TODO: attacks on mounted soldiers could kill the horse instead
 
 	private function MeleeAttack(Soldier $soldier, Soldier $target, $round) {
-		$soldier->gainExperience(1);
+		if (!$no_rewards) {
+			$soldier->gainExperience(1);
+		}
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -877,7 +888,9 @@ class BattleRunner {
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'melee');
-			$soldier->gainExperience($result=='kill'?2:1);
+			if (!$no_rewards) {
+				$soldier->gainExperience($result=='kill'?2:1);
+			}
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -890,7 +903,9 @@ class BattleRunner {
 	}
 
 	private function RangedHit(Soldier $soldier, Soldier $target, $phase='ranged') {
-		$soldier->gainExperience(1);
+		if (!$no_rewards) {
+			$soldier->gainExperience(1);
+		}	   
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -999,7 +1014,9 @@ class BattleRunner {
 			$target->wound(rand(max(1, round($power/10)), $power));
 			$this->history->addToSoldierLog($target, 'wounded.'.$phase);
 			$result='wound';
-			$target->gainExperience(1); // it hurts, but it is a teaching experience...
+			if (!$no_rewards) {
+				$target->gainExperience(1); // it hurts, but it is a teaching experience...
+			}
 		}
 		
 		$soldier->addCasualty();
