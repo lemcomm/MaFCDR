@@ -566,10 +566,13 @@ class GameRunner {
 		if ($last==='complete') return true;
         $last=(int)$last;
 		$this->logger->info("realms...");
-
-		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete < :timeout) GROUP BY p');
+		
+		# This is just me being picky, but I like to define everything I need before I need it, even if it's not connected to the query yet.
 		$timeout = new \DateTime("now");
 		$timeout->sub(new \DateInterval("P15D")); // hardcoded to 15 day intervals between election attempts
+		
+		# Fixing a bug here that 
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete < :timeout) GROUP BY p');
 		$query->setParameter('timeout', $timeout);
 		$result = $query->getResult();
 		foreach ($result as $position) {
