@@ -1,18 +1,20 @@
 Announcements
 --------------
 
-### New Message System Experiment ###
-You will find a third column under "messages" that leads to a new, experimental message system as discussed on the forum.
-This is *for testing only* and will be shut down again after a few days. But please play with it and give feedback.
+### New Server ###
+If you're seeing this, congrats, you're not viewing the game on the old server!
 
+### Game Updates ###
+* Slumbering FO's no longer grant experience
+* You can now exit a settlement
+* Realm elections will trigger for absent rulers
+* Link to wiki exists
+* You can now link to Publications and Positions in messages. Linking to "items" no longer breaks the game.
+* You can no longer view economic security at a distance (unless you're the lord)
+* Dungeons no longer present framework errors
+* Dungeons now know what languages they can speak
+* Realm info can be viewed without being logged in
+* Most tables are now sortable
 
-### Recent Changes ###
-* Evasion chances have been reduced. The base chance has been lowered from 60% to 40% and the high cap was lowered from 90% to 80%.
-* On successful evade, enemies now get a 60 minute regroup timer to prevent immediate re-engages.q
-
-
-### New / Experimental Features ###
-* Knight offers can now contain lordship of the settlement. Use with care.
-* Experimental preview version of war declarations has gone live for testing. Find it under Politics.
-* Artifacts have gone live - create unique items with their own history. Limited to paying accounts and one per account, so yes, artifacts will be really rare.
-* Some progress on local quests, try it out, even if it's not complete, yet.
+### System Updates ###
+* MarkDown Syntax and Twig versions have been updated to modernity
