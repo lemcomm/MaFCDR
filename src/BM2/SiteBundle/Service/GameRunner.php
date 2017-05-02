@@ -171,18 +171,10 @@ class GameRunner {
 		if ($last==='complete') return true;
 		$this->logger->info("npcs update...");
 
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
-		foreach ($query->getResult() as $npc) {
-			if ($npc->isAlive()) {
-				$this->npc->checkTroops($npc);
-			}
-			$this->npc->checkTimeouts($npc);
-		}
-
 		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
 		$players = $query->getSingleScalarResult();
 		$want = ceil($players/8);
-
+		
 		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
 
 		$this->logger->info("we want $want NPCs for $players players, we have $active_npcs");
@@ -205,6 +197,15 @@ class GameRunner {
 				} else {
 					$this->logger->info("Bandit population is now within acceptable parameters.");
 				}				
+		}
+		
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
+		foreach ($query->getResult() as $npc) {
+			if ($npc->isAlive()) {
+				$this->npc->checkTroops($npc);
+			}
+			if ($active_npcs <= $want) {
+				$this->npc->checkTimeouts($npc);
 		}
 
 		$query = $this->em->createQuery('SELECT s as soldier, c as character FROM BM2SiteBundle:Soldier s JOIN s.character c JOIN s.home h JOIN h.geo_data g WHERE c.npc = true AND s.alive = true AND s.distance_home > :okdistance');
