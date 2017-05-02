@@ -190,6 +190,22 @@ class GameRunner {
 			$npc = $this->npc->createNPC();
 			$this->logger->info("created NPC ".$npc->getName());
 		}
+		# Ugh, too many extra bandits. Lets get rid of a few, no? --Andrew 20170502
+		if ($active_npcs - $want > 2) {
+			# The greater than 2 is there to keep this from happening every single turn. We don't care about a couple extra.
+			$cullcount = $active_npcs - $want;
+			$culled = 0;
+			$this->logger->info("Too many NPCs, culling ".$cullcount" NPCs . . .");
+			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND user.id = NULL');
+			foreach ($query as $potentialculling) {
+				if ($cullcount > $culled) {
+					$potentialculling->setAlive('FALSE');
+					$culled++;
+					$this->logger->info("NPC ".$potentialculling->getName()" has been culled");
+				} else {
+					$this->logger->info("Bandit population is now within acceptable parameters.");
+				}				
+		}
 
 		$query = $this->em->createQuery('SELECT s as soldier, c as character FROM BM2SiteBundle:Soldier s JOIN s.character c JOIN s.home h JOIN h.geo_data g WHERE c.npc = true AND s.alive = true AND s.distance_home > :okdistance');
 		$query->setParameter('okdistance', $this->bandits_ok_distance);
