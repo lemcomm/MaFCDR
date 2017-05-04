@@ -35,7 +35,7 @@ class NpcManager {
 
 
 	public function getAvailableNPCs() {
-		return $this->em->getRepository('BM2SiteBundle:Character')->findBy(array('npc'=>true, 'alive'=>false, 'user'=>null));
+		return $this->em->getRepository('BM2SiteBundle:Character')->findBy(array('npc'=>true, 'alive'=>true, 'user'=>null));
 	}
 
 	public function createNPC() {
