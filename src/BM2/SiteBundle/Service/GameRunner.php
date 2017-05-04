@@ -171,24 +171,45 @@ class GameRunner {
 		if ($last==='complete') return true;
 		$this->logger->info("npcs update...");
 
+		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
+		$players = $query->getSingleScalarResult();
+		$want = ceil($players/8);
+		
+		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
+		
+		$this->logger->info("we want $want NPCs for $players players, we have $active_npcs");
+		if ($active_npcs < $want) {
+			$npc = $this->npc->createNPC();
+			$this->logger->info("created NPC ".$npc->getName());
+		} else if ($active_npcs > $want) {
+			# The greater than 2 is there to keep this from happening every single turn. We don't care about a couple extra.
+			$cullcount = $active_npcs - $want;
+			$culled = 0;
+			$this->logger->info("Too many NPCs, attempting to cull ".$cullcount" NPCs . . .");
+			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.")
+			
+			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
+			foreach ($query->getResult() as $potentialculling) {
+				if ($cullcount > $culled) {
+					$potentialculling->setAlive('FALSE');
+					$culled++;
+					$this->logger->info("NPC ".$potentialculling->getName()" has been culled");
+				}
+				if ($cullcount = $culled) {
+					$this->logger->info("Bandit population is within acceptable levels. ".$potentialculling->getName()." lives to see another day.");
+				}
+			}
+		}
+		
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
 		foreach ($query->getResult() as $npc) {
 			if ($npc->isAlive()) {
 				$this->npc->checkTroops($npc);
 			}
-			$this->npc->checkTimeouts($npc);
-		}
-
-		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
-		$players = $query->getSingleScalarResult();
-		$want = ceil($players/8);
-
-		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
-
-		$this->logger->info("we want $want NPCs for $players players, we have $active_npcs");
-		if ($active_npcs < $want) {
-			$npc = $this->npc->createNPC();
-			$this->logger->info("created NPC ".$npc->getName());
+			# This used to run all the time, but we don't care about resetting them if we already have too many.
+			if ($active_npcs <= $want) {
+				$this->npc->checkTimeouts($npc);
+			}
 		}
 
 		$query = $this->em->createQuery('SELECT s as soldier, c as character FROM BM2SiteBundle:Soldier s JOIN s.character c JOIN s.home h JOIN h.geo_data g WHERE c.npc = true AND s.alive = true AND s.distance_home > :okdistance');
