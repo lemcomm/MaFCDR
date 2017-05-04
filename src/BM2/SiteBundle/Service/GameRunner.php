@@ -186,16 +186,17 @@ class GameRunner {
 			$cullcount = $active_npcs - $want;
 			$culled = 0;
 			$this->logger->info("Too many NPCs, attempting to cull ".$cullcount" NPCs . . .");
+			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.")
+			
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
 			foreach ($query->getResult() as $potentialculling) {
 				if ($cullcount > $culled) {
 					$potentialculling->setAlive('FALSE');
 					$culled++;
 					$this->logger->info("NPC ".$potentialculling->getName()" has been culled");
-				} 
-				if ($cullcount = $culled) {
-					$this->logger->info("Bandit population is now within acceptable parameters.");
-					break;
+					if ($cullcount = $culled) {
+						$this->logger->info("Bandit population is within acceptable levels. ".$potentialculling->getName()." lives to see another day.");
+					}
 				}
 			}
 		}
@@ -205,6 +206,7 @@ class GameRunner {
 			if ($npc->isAlive()) {
 				$this->npc->checkTroops($npc);
 			}
+			# This used to run all the time, but we don't care about resetting them if we already have too many.
 			if ($active_npcs <= $want) {
 				$this->npc->checkTimeouts($npc);
 			}
