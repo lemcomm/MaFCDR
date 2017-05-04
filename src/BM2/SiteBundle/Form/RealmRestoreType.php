@@ -24,7 +24,6 @@ class RealmRestoreType extends AbstractType {
     }
 
     /* 
-    FIXME: Find out what the random numbers after "realmrestore_" are (above) and what they mean!
     Since I've not gotten a response after about a week of waiting, I guess I'll just submit this and be told what breaks. -- Andrew 
     */
 
@@ -39,7 +38,8 @@ class RealmRestoreType extends AbstractType {
             'choice_label'=>'name'
             'query_builder'=>function(EntityRepository $er) use ($realm) {
                 $qb = $er->createQueryBuilder('r');
-                $qb->where('e.realm = :realm')->setParameters(array('superior' => $realm, 'active' => false);
+                $qb->where('e.realm = :realm');
+                $qb->setParameters('realms', $realm);
                 $qb->orderBy('r.name', 'ASC');
                 return $qb;
             }
