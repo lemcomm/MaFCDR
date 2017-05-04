@@ -606,14 +606,15 @@ class RealmController extends Controller {
 	public function restoreAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyRestoreTest');
 		
-		$form = $this->createForm(new RealmRestoreType($realm));
+		$realms = $realm->findDeadInferiors();
+		$form = $this->createForm(new RealmRestoreType($realms));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$fail = false;
 
 			if (!$fail) {
-                		$this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
+                		$this->get('realm_manager')->restoreSubRealm($realm, $data, $character);
             		}
 
 			$em = $this->getDoctrine()->getManager();
@@ -621,6 +622,12 @@ class RealmController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
 			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
 		}
+		
+		return array(
+			'realm' => $realm,
+			'realms' => $realms,
+			'form' => $form->createView()
+		)
 	}
 
 	/**
