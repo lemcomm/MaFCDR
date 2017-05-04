@@ -572,7 +572,7 @@ class GameRunner {
 		$timeout->sub(new \DateInterval("P15D")); // hardcoded to 15 day intervals between election attempts
 		
 		# Fixing a bug here that prevented ruler elections from happening after the psotions went vacant. --Andrew
-		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete < :timeout) GROUP BY p');
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
 		$query->setParameter('timeout', $timeout);
 		$result = $query->getResult();
 		foreach ($result as $position) {
