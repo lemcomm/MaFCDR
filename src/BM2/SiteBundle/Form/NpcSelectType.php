@@ -35,7 +35,7 @@ class NpcSelectType extends AbstractType {
 			'required' => true,
 			'class'=>'BM2SiteBundle:Character', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($characters) {
 				$qb = $er->createQueryBuilder('c');
-				$qb->where('c IN (:characters) AND c.alive = TRUE');
+				$qb->where('c IN (:characters)');
 				$qb->setParameter('characters', $characters);
 				return $qb;
 			},
