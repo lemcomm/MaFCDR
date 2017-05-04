@@ -28,18 +28,22 @@ class RealmRestoreType extends AbstractType {
     */
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        $realm = $this->realm;
+        $realms = $this->realm;
+        $subrealms = array();
+        foreach ($realms as $realm) {
+            $subrealms[] = $realm->getID();
+        }
 
-        $builder->add('type', 'entity', array(
+        $builder->add('name', 'entity', array(
             'required'=>true,
             'placeholder'=>'diplomacy.restore.empty',
             'label'=>'realm.deadrealm',
             'class'=>'BM2SiteBundle:Realm',
             'choice_label'=>'name'
-            'query_builder'=>function(EntityRepository $er) use ($realm) {
+            'query_builder'=>function(EntityRepository $er) use ($subrealms) {
                 $qb = $er->createQueryBuilder('r');
-                $qb->where('e.realm = :realm');
-                $qb->setParameters('realms', $realm);
+                $qb->where('e.realm = :realms');
+                $qb->setParameters('realms', $subrealms);
                 $qb->orderBy('r.name', 'ASC');
                 return $qb;
             }
