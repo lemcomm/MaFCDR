@@ -1459,7 +1459,7 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.$check");
 		}
-		if ($this->realm->getInferiors()->count() > 0) {
+		if ($this->realm->getInferiors()->count() <= 0) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.nosubrealms");
 		}
 		if ($this->realm->findDeadInferiors()->count() == 0) {
