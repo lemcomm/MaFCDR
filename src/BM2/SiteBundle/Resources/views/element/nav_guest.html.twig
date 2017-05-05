@@ -5,6 +5,7 @@
 	<li><a href="{{ path('bm2_fiction') }}">{{ 'menu.fiction'|trans }}</a></li>
 	<li><a href="{{ path('bm2_vips') }}">{{ 'menu.vips'|trans }}</a></li>
 	<li><a href="http://forum.mightandfealty.com">{{ 'menu.community'|trans }}</a></li>
+	<li><a href="http://wiki.maffans.org">{{ 'menu.wiki'|trans }}</a></li>
 	{% if not simple or biglogo is defined %}
 		{% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
 			<li><a href="{{ path('fos_user_profile_show') }}">{{ 'menu.profile'|trans }}</a></li>

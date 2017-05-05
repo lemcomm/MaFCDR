@@ -37,7 +37,7 @@
 	{{ macros.member_row(form.members.vars.prototype) }}
 </tr>
 </table>
-<form class="wide" action="{{ path('bm2_site_politics_list', {'id':listing.id?listing.id:0}) }}" method="post" {{ form_enctype(form) }}>
+<form class="wide" action="{{ path('bm2_site_politics_list', {'id':listing.id?listing.id:0}) }}" method="post" {{ form_start(form) }}>
 	{{ form_widget(form._token) }}
 	{{ form_row(form.name) }}
 	{{ form_row(form.public) }}

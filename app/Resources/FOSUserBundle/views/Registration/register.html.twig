@@ -8,7 +8,7 @@
 <div id="direct_register">
 	<p>{{ 'registration.direct'|trans|raw }}</p>
 	<br />
-	<form action="{{ path('fos_user_registration_register') }}" {{ form_enctype(form) }} method="POST" class="wide fos_user_registration_register">
+	<form action="{{ path('fos_user_registration_register') }}" {{ form_start(form) }} method="POST" class="wide fos_user_registration_register">
 		{{ form_widget(form) }}
 		<div id="feedback" class="warning" style="display:none"></div>
 		<button name="register_submit">{{ 'registration.submit'|trans({}, 'FOSUserBundle') }}</button>

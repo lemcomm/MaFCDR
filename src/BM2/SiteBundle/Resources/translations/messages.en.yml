@@ -25,6 +25,7 @@ menu:
  credits:   credits
  contact:   contact
  forum:     forum
+ wiki:      wiki
  bugs:      bugtracker
  about:     about
  manual:    manual
@@ -985,7 +986,7 @@ soldier:
  medium infantry:  medium infantry|medium infantry
  heavy infantry:   heavy infantry|heavy infantry
  archer:           archer|archers
- armoured archer:  armored archer|armored archer
+ armoured archer:  armored archer|armored archers
  mounted archer:   mounted archer|mounted archers
  cavalry:          cavalry|cavalry
  light cavalry:    light cavalry|light cavalry
@@ -1040,6 +1041,10 @@ events:
   medium:   only interesting
   high:     only important
   ultra:    only very important
+ soldierlog: 
+  title:     Soldier Log for link-soldier-name
+ entry:      Log Entries
+ time:       Date
 
 interaction:
  message:
@@ -1401,8 +1406,9 @@ unavailable:
  regrouping:    Your troops are regrouping, you cannot attack until they are ready again.
  atsea:         You are travelling at sea.
  nosettlement:  You are not near any settlement.
- notinside:     You are not inside the settlement.
+ notinside:     You are not inside a settlement.
  inside:        You are inside the settlement.
+ outside:       You are not currently inside a settlement.
  noregion:      You are not in an inhabited area.
  nodock:        There are no docks nearby.
  noship:        You do not have a ship nearby.

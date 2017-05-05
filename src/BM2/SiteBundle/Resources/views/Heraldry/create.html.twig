@@ -81,7 +81,7 @@
 
 {{ form_errors(form) }}
 
-<form class="wide" action="{{ path('bm2_site_heraldry_create') }}" method="post" {{ form_enctype(form) }}>
+<form class="wide" action="{{ path('bm2_site_heraldry_create') }}" method="post" {{ form_start(form) }}>
 	{{ form_widget(form) }}
 
 	<div id="thebuttons">

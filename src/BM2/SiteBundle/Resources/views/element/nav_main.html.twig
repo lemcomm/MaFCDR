@@ -96,6 +96,11 @@
 					</ul>
 				</li>
 				{% endif %}
+				{% set check = dispatcher.locationLeaveTest() %}
+				{% if check.url is defined %}
+					<h3>{{ 'location.title'|trans({},"actions") }}</h3>
+					<a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a>
+				{% endif %}
 				{% if character.insidesettlement and character.insidesettlement.owner == character %}
 				<li class="part">
 					<h3>{{ 'menu.economy'|trans|title }}</h3>

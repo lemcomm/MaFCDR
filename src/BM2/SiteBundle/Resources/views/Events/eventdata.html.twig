@@ -1,4 +1,3 @@
-<dl class="eventlog">
 {% set gap = false %}
 {% set shown = 0 %}
 {% for event in log.events %}
@@ -16,16 +15,19 @@
 	{% if visible %}
 		{% set shown = shown + 1 %}
 		{% set gap = false %}
-{# TODO: being able to use the History:: consts here would be really cool #}
-		<dt class="prio_{{ event.priority }}">{{ event.cycle|gametime('short') }}</dt>
-		<dd class="prio_{{ event.priority }}">{{ event|eventtranslate }}</dd>
+		{# TODO: being able to use the History:: consts here would be really cool #}
+		<tr class="prio_{{ event.priority }}">
+			<td>{{ event.cycle|gametime('short') }}</td>
+			<td>{{ event|eventtranslate }}</td>
+		</tr>
 	{% elseif gap == false %}
 		{% set gap = true %}
-		<dt>...</dt>
-		<dd>...</dd>
+		<tr>
+			<td>0-0-0</td>
+			<td>{{ 'events.research.intro'|trans }}</td>
+		</tr>
 	{% endif %}
 {% endfor %}
-</dl>
 
 {% if log.events|length > shown %}
 	{% if research is defined and research.assignedEntourage is defined %}
@@ -37,7 +39,7 @@
 		{% endif %}
 	{% endif %}
 	{% if form %}
-		<form class="wide" action="{{ path('bm2_eventlog', {'id':log.id}) }}" method="post" {{ form_enctype(form) }}>
+		<form class="wide" action="{{ path('bm2_eventlog', {'id':log.id}) }}" method="post" {{ form_start(form) }}>
 			{{ form_widget(form) }}
 			<button name="submit">{{ 'entourage.assign.submit'|trans({},"actions") }}</button>
 		</form>
