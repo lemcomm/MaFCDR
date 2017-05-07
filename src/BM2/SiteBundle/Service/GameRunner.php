@@ -195,7 +195,7 @@ class GameRunner {
 					$culled++;
 					$this->logger->info("NPC ".$potentialculling->getName()." has been culled");
 				}
-				if ($cullcount = $culled) {
+				if ($cullcount == $culled) {
 					$this->logger->info("Bandit population is within acceptable levels. ".$potentialculling->getName()." lives to see another day.");
 				}
 			}
