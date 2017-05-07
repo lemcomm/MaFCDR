@@ -185,8 +185,8 @@ class GameRunner {
 			# The greater than 2 is there to keep this from happening every single turn. We don't care about a couple extra.
 			$cullcount = $active_npcs - $want;
 			$culled = 0;
-			$this->logger->info("Too many NPCs, attempting to cull ".$cullcount" NPCs");
-			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.")
+			$this->logger->info("Too many NPCs, attempting to cull ".$cullcount." NPCs");
+			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.");
 			
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
 			foreach ($query->getResult() as $potentialculling) {
