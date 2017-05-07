@@ -1,6 +1,6 @@
 <?php
 
-/* There's no reason we should be using this command again, so I'm going to cmment this all out now.
+/* There's no reason we should be using this command again, so I'm going to comment this all out now.
 For those cuious down the line, this was the original command Tom used to send out the credits for the indiegogo campaign.
 --Andrew 20170507
 
