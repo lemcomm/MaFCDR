@@ -124,7 +124,7 @@ class CharacterManager {
 
 		// FIXME: apparently, sometimes this return an empty string? HOW ?
 		if ($genome == '' || $genome == '  ') {
-			throw new \Exception("Please report this error to tom@mightandfealty.com: u:".$user->getId()."/f:".($father?$father->getId():'0')."/m:".($mother?$mother->getId():'0')."/g:".$genome."/");
+			throw new \Exception("Please report this error to mafteam@lemuriacommunity.org: u:".$user->getId()."/f:".($father?$father->getId():'0')."/m:".($mother?$mother->getId():'0')."/g:".$genome."/");
 		}
 
 		return $genome;

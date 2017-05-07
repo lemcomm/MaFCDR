@@ -374,7 +374,7 @@ class PaymentController extends Controller {
 			$text = $this->get('translator')->trans('account.gift.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
 			$message = \Swift_Message::newInstance()
 				->setSubject($this->get('translator')->trans('account.gift.mail.subject', array()))
-				->setFrom(array('notifications@mightandfealty.com' => $this->get('translator')->trans('mail.sender', array(), "communication")))
+				->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
 				->setTo($data['email'])
 				->setCc($user->getEmail())
 				->setBody($text, 'text/html')
@@ -411,7 +411,7 @@ class PaymentController extends Controller {
 			$text = $this->get('translator')->trans('account.invite.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
 			$message = \Swift_Message::newInstance()
 				->setSubject($this->get('translator')->trans('account.invite.mail.subject', array()))
-				->setFrom(array('notifications@mightandfealty.com' => $this->get('translator')->trans('mail.sender', array(), "communication")))
+				->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
 				->setTo($data['email'])
 				->setCc($user->getEmail())
 				->setBody($text, 'text/html')

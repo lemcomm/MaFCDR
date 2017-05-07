@@ -26,8 +26,8 @@ monolog:
             handler:    swift
         swift:
             type:       swift_mailer
-            from_email: server@mightandfealty.com
-            to_email:   tom@lemuria.org
+            from_email: mafserver@lemuriacommunity.org
+            to_email:   mafteam@lemuriacommunity.org
             subject:    "Might & Fealty Error"
             level:      error
         payment:

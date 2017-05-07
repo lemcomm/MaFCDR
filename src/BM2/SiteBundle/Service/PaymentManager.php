@@ -123,8 +123,8 @@ class PaymentManager {
 
 		$message = \Swift_Message::newInstance()
 			->setSubject($subject)
-			->setFrom('server@mightandfealty.com')
-			->setReplyTo('tom@mightandfealty.com')
+			->setFrom('mafserver@lemuriacommunity.org')
+			->setReplyTo('mafteam@lemuriacommunity.org')
 			->setTo($user->getEmail())
 			->setBody(strip_tags($content))
 			->addPart($content, 'text/html');
@@ -232,7 +232,8 @@ class PaymentManager {
 				$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
 				$message = \Swift_Message::newInstance()
 					->setSubject($this->translator->trans('account.invite.mail2.subject', array()))
-					->setFrom(array('notifications@mightandfealty.com' => $this->translator->trans('mail.sender', array(), "communication")))
+					->setFrom(array('mafserver@lemuriacommunity.org' => $this->translator->trans('mail.sender', array(), "communication")))
+					->setReplyTo('mafteam@lemuriacommunity.org')
 					->setTo($sender->getEmail())
 					->setBody(strip_tags($text))
 					->addPart($text, 'text/html')
