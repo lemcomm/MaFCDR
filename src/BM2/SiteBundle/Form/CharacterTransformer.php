@@ -26,15 +26,12 @@ class CharacterTransformer implements DataTransformerInterface {
 		if (!$name) {
 			return null;
 		}
-		$characters = $this->em->createQueryBuilder();
-		$characters->select('c')
-			->from('BM2SiteBundle:Character', 'c')
-			->where('c.name LIKE :name')
-			->andWhere('c.alive = TRUE')
-			->orderBy('c.id', 'ASC')
-			->setMaxResults(1);
 		
-		$character = $characters->getOneOrNullResult();	
+		$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
+		
+		if (!$character) {
+			return null;
+		}
 		
 		if (null === $character) {
 			throw new TransformationFailedException(sprintf(
