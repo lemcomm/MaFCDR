@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
