@@ -75,7 +75,7 @@ class CharacterManager {
 		if ($mother) {
 			$mother->addChild($character);
 			if ($mother->getGeneration() >= $character->getGeneration()) {
-                $character->setGeneration($mother->getGeneration() + 1);
+         			$character->setGeneration($mother->getGeneration() + 1);
             		}
 			if ($mother->getHouse > 0) {
 				$motherhouse = $mother->getHouse();
@@ -318,7 +318,7 @@ class CharacterManager {
 		// inheritance
 		if ($forcekiller) {
 			$heir = null;
-            $via = null;
+			$via = null;
 		} else {
 			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
@@ -340,7 +340,7 @@ class CharacterManager {
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
-			if ($character->getHouse() == $character->getHouse()->getHead()) {
+			if ($character->getHeir() == $character->getHouse()->getSuccessor()) {
 				$this->transferHouseToHeir($character, $heir);
 			}
 		} else {
@@ -350,7 +350,7 @@ class CharacterManager {
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
 			}
-			if ($character->getHouse() == $character->getHouse()->getHead()) {
+			if ($character->getHeir() != $character->getHouse()->getSuccessor()) {
 				$this->transferHouseNoHeir($character);
 			}
 		}
@@ -666,21 +666,23 @@ class CharacterManager {
 		);
 	}
 	public function transferHouseNoHeir (Character $character)
-		$oldest = 0;
-		$best;
 		$house = $character->getHouse();
-		foreach ($house->getMembers() as $option) {
-			if ($option->DaysInGame > $best) {
-				$best = $option;
+		if ($house->getSuccessor) {
+			$house->setHead($house->getSuccessor());
+		} else {
+			$oldest = 0;
+			foreach ($house->getMembers() as $option) {
+				if ($option->DaysInGame > $best) {
+					$best = $option;
+				}
 			}
+			$house->setHead($best);
+			$this->history->logEvent(
+				$heir,
+				'event.character.house.newhead',
+				array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
+				HISTORY::ULTRA, true
+			);
 		}
-		$house->setHead($best);
-		$this->history->logEvent(
-			$heir,
-			'event.character.house.newhead',
-			array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
-			HISTORY::ULTRA, true
-		);
-		}
-
+	}
 }
