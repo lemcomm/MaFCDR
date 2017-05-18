@@ -51,13 +51,12 @@ class HouseController extends Controller {
 	
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$house = $id;
 		$em = $this->getDoctrine()->getManager();
 		$location = null;
 		$inside = null;
 		$crest = $character->getCrest();
-		if ($character->isInside()) {
-			$inside = true;
+		if ($character->getInsideSettlement()) {
+			$settlement = $character->getInsideSettlement();
 		} else {
 			$location = $character->getLocation();
 		}
@@ -71,7 +70,10 @@ class HouseController extends Controller {
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
-			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private_description'], $data['secret_description'], $crest, $location, $settlement, $character);
+			if ($character->getCrest()); {
+				$crest = $character->getCrest();
+			}
+			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private_description'], $data['secret_description'], null, $location, $settlement, $crest, $character);
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
 		}
@@ -92,7 +94,7 @@ class HouseController extends Controller {
 
 		$form = $this->createForm(new HouseBackgroundType($house);
 		$form->handleRequest($request);
-		if ($character->getHouse()->getHead() !== $house->getHead()) {
+		if ($character != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
 		if ($form->isValid()) {
@@ -118,10 +120,10 @@ class HouseController extends Controller {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		
 		$em = $this->getDoctrine()->getManager();
-		if ($character->isInside()->getHouses() !== $house) {
+		if ($character->getInsideSettlement()->getHouses() != $house) {
 			throw createNotFoundException('error.notfound.nohouse');
 		} 
-		if ($character->isInside()) {
+		if ($character->getInsideSettlement()) {
 			$form = $this->createForm(new HouseJoinType($house);
 			$form->handleRequest($request);
 		} else {
