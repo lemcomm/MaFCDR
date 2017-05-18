@@ -17,7 +17,7 @@
 {% endfor %}
 
 {{ form_errors(form) }}
-{{ form_start(form) }}
+<form action="" method="post" {{ form_start(form) }}
 {{ form_widget(form._token) }}
 
 <table>
