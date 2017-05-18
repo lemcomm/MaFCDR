@@ -75,8 +75,8 @@ class HouseManager {
 		return $house;
 	}
 
-	private function _create($name, $formalname, $type, $ruler) {
-		$house = new Realm;
+	private function _create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $location = null, $settlement = null, $crest = null, Character $founder,) {
+		$house = new House;
 		$house->setName($name);
 		$house->setDescription($description);
 		$house->setPrivateDescription($private_description);
@@ -90,7 +90,7 @@ class HouseManager {
 		$this->em->persist($house);
 		$this->em->flush($house);
 
-		return $realm;
+		return $house;
 	}
 	
 }
