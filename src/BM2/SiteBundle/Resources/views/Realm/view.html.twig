@@ -26,6 +26,13 @@
 
 <h2>{{ realm.formalname }}</h2>
 
+{% if restorable %}
+	<div id="restore_wrapper">
+		{{ 'diplomacy.restore.description'|trans({}, "politics") }}
+		<button id="restorerealm">{{ 'diplomacy.restore.link'|trans({},"politics") }}</button>
+	</div>
+{% endif %}
+
 <dl>
 	<dt>{{ 'realm.name'|trans({},"politics") }}</dt>
 	<dd>{{ realm.name }}</dd>
@@ -148,6 +155,11 @@
 {% endblock %}
 
 {% block jquery %}
+	$("#restorerealm").click(function(){
+		$.post("{{ path('bm2_site_realm_restore', {"id":realm.id}) }}", function() {
+			$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
+		});
+	});
 	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}

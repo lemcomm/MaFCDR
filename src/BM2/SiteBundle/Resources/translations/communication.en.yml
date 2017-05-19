@@ -216,6 +216,7 @@ event:
   abdicated2:   %character% has abdicated without a successor.
   deserted:     Vanished into history with no members remaining.
   restored:     %character% of %realm%, has revived the realm, becoming it's new ruler.
+  restorer:     Revived the realm of %realm%, becoming it's new ruler.
   war:
    declared:    Declared war "%war%".
    received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
