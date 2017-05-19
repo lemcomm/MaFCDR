@@ -1,0 +1,70 @@
+{% set participantscount = conversation.metadata.count %}
+{% macro general(meta, conversation, participantscount) %}
+	<div class="cmsg_general">
+		<button class="topicreply cmsg_button" data-id="{{ meta.id }}">{{ 'conversation.reply.label'|trans({}, "MsgBundle")|title }}</button>
+
+		<a href="{{ path('cmsg_participants', {'meta':meta.id}) }}"{% if participantscount < 5 %}
+		 class="tt" title="{% for m in conversation.metadata %}{{ m.user.name }}{% if loop.last == false %}, {% endif %}{% endfor %}" 
+		 {% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participantscount}, "MsgBundle") }}</button></a>
+
+		{% if conversation.appreference is null %}
+			<button class="convo_leave cmsg_button" data-id="{{ meta.id }}" title="{{ 'conversation.leave.help'|trans({}, "MsgBundle") }}">{{ 'conversation.leave.label'|trans({}, "MsgBundle") }}</button>
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{% import _self as macros %}
+
+<div class="cmsg_conversation">
+	<h3>{{ conversation.topic }}</h3>
+
+	{{ macros.general(meta, conversation, participantscount) }}
+	{% if conversation.parent %}
+		{{ 'conversation.parent.reference'|trans({}, "MsgBundle") }}
+		{% set topmeta = conversation.parent.findmeta(meta.user) %}
+		<a href="{{ path('cmsg_conversation', {'meta':topmeta.id}) }}">{{ conversation.parent.topic }}</a> ({{ 'conversation.messages'|trans({'%total%':conversation.parent.messages.count, '%unread%':topmeta.unread}, "MsgBundle") }})
+	{% endif %}
+
+	{% if conversation.children is not empty %}
+		{% if inlineview is defined %}
+			{% for conv in conversation.children %}
+				{# define the above variable if you want sub-conversations to be included in a conversation #}
+				{% set submeta = conv.findmeta(meta.user) %}
+				{% include "MsgBundle:Read:one_conversation.html.twig" with {"meta":submeta, "conversation":conv} only %}
+			{% endfor %}
+		{% else %}
+			{{ 'conversation.child.reference'|trans({}, "MsgBundle") }}
+			<ul>
+			{% for conv in conversation.children %}
+				{% set submeta = conv.findmeta(meta.user) %}
+				{% if submeta %}
+					<li><a href="{{ path('cmsg_conversation', {'meta':submeta.id}) }}">{{ conv.topic }}</a> ({{ 'conversation.messages'|trans({'%total%':conv.messages.count, '%unread%':submeta.unread}, "MsgBundle") }})</li>
+				{% else %}
+					<li>{{ conv.topic }} ({{ 'conversation.notmember'|trans({},"MsgBundle") }})</li>
+				{% endif %}
+			{% endfor %}
+			</ul>
+		{% endif %}
+	{% endif %}
+	{% set in_hidden = false %}
+	{% for msg in conversation.messages %}
+		{% if in_hidden == false and msg.ts < veryold %}
+			<button id="hidetoggle" class="cmsg_button">{{ 'conversation.old.show'|trans({},"MsgBundle") }}</button>
+			<div id="oldmessages">
+			{% set in_hidden = true %}
+		{% elseif in_hidden == true and msg.ts > veryold %}
+			</div>
+			{% set in_hidden = false %}
+		{% endif %}
+		{% include "MsgBundle:Read:one_message.html.twig" with {"last":last, "message":msg, "meta":msg.findmeta(meta.user)} only %}
+	{% endfor %}
+	{% if in_hidden == true %}
+		</div>
+	{% endif %}
+
+	{# FIXME: this only counts top-level messages, for some reason #}
+	{% if conversation.messages.count > 5 %}
+	<br/>
+	{{ macros.general(meta, conversation, participantscount) }}
+	{% endif %}
+</div>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="Calitarus\MessagingBundle\Entity\Right" table="cmsg_right">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name='name' type='string'/>
+
+	</entity>
+</doctrine-mapping>

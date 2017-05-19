@@ -1,0 +1,123 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% macro conversationrow(meta, depth) %}
+<tr data-id="{{ meta.id }}">
+	<td style="padding-left: {{ depth}}em">{% if depth > 0 %}<span class="icon-forward"></span>{% endif %}<a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a></td>
+	<td align="right">{{ meta.conversation.messages.count }}</td>
+	<td align="right">{{ meta.unread }}</td>
+	<td align="right">{{ meta.conversation.metadata.count }}</td>
+	<td align="right">
+		{% set msg = meta.conversation.messages.first %}
+		{% if msg %}
+			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender.appuser):'-', "%day%":msg.cycle|gametime("short")}, "MsgBundle")|raw }}
+		{% endif %}
+	</td>
+	<td align="right">
+		{% set msg = meta.conversation.messages.last %}
+		{% if msg %}
+			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender.appuser):'-', "%day%":msg.cycle|gametime("short")}, "MsgBundle")|raw }}
+		{% endif %}
+	</td>
+	<td>
+		{% if meta.conversation.appreference is null %}
+			<button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "MsgBundle") }}">{{ 'conversation.leave.label'|trans({}, "MsgBundle") }}</button>
+		{% endif %}
+	</td>
+</tr>
+{% for conv in meta.conversation.children %}
+	{% set submeta = conv.findmeta(meta.user) %}
+	{% if submeta %}
+		{{ _self.conversationrow(submeta, depth+1) }}
+	{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'index.title'|trans({}, "MsgBundle")|title }}</h2>
+
+<div id="ajax_errors"></div>
+{% set group = null %}
+{% set first = true %}
+{% for metadata in conversations %}
+	{% if metadata.conversation.appreference != group or first %}
+		{% set first = false %}
+		{% if group == null %}
+			</tbody></table>
+		{% endif %}
+		<table class="cmsg_table topmargin">
+			<thead>
+				<tr>
+					<td colspan="7" class="cmsg_header">
+						{% if metadata.conversation.appreference %}
+							{{ "index.ref"|trans({"%ref%":link(metadata.conversation.appreference)}, "MsgBundle")|raw }}
+							<a href="{{ path("cmsg_new_conversation_in_group", {"realm":metadata.conversation.appreference.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "MsgBundle") }}</button></a>
+						{% else %}
+							{{ 'index.ref2'|trans({}, "MsgBundle") }}
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{ 'index.topic'|trans({}, "MsgBundle") }}</th>
+					<th>{{ 'index.messages'|trans({}, "MsgBundle") }}</th>
+					<th>{{ 'index.unread'|trans({}, "MsgBundle") }}</th>
+					<th>{{ 'index.participants'|trans({}, "MsgBundle") }}</th>
+					<th>{{ 'index.first'|trans({}, "MsgBundle") }}</th>
+					<th>{{ 'index.last'|trans({}, "MsgBundle") }}</th>
+					<th style="width:12em" data-sorter="false"></th>{# FIXME: this is a kludge to prevent the buttons from wrapping #}
+				</tr>
+			</thead>
+			<tbody>
+		{% set group = metadata.conversation.appreference %}
+	{% endif %}
+	{{ macros.conversationrow(metadata, 0) }}
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
+
+{% block jquery %}
+$(".cmsg_table").tablesorter();
+$(".cmsg_table").bind("sortStart",function() {
+	$(".icon-forward").remove();
+});
+
+var request;
+$("button.convo_leave").click(function(){
+	var id = $(this).closest("tr").data('id');
+
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+
+	var target = $(this).parent();
+	// fire off the request
+	request = $.ajax({
+		url: "{{ path('cmsg_leave') }}",
+		type: "post",
+		data: { 'id': id },
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		for (var key in response) {
+			$('tr[data-id="'+response[key]+'"]').remove();
+		}
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		$("#ajax_errors").html(textStatus);
+	});
+
+});
+{% endblock %}
+
+

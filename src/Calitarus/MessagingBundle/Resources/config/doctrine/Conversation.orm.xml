@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="Calitarus\MessagingBundle\Entity\Conversation" table="cmsg_conversation">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="topic" type="string"/>
+
+		<one-to-many field="messages" target-entity="Message" mapped-by="conversation" on-delete="CASCADE">
+			<order-by>
+				<order-by-field name="ts" direction="ASC" />
+			</order-by>
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+
+		<many-to-one field="parent" target-entity="Conversation" inversed-by="children"/>
+		<one-to-many field="children" target-entity="Conversation" mapped-by="parent"/>
+
+		<one-to-many field="metadata" target-entity="ConversationMetadata" mapped-by="conversation" on-delete="CASCADE">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+
+		<many-to-one field="app_reference" target-entity="BM2\SiteBundle\Entity\Realm" inversed-by="conversations"/>
+
+	</entity>
+</doctrine-mapping>
