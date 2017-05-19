@@ -891,6 +891,16 @@ class CharacterController extends Controller {
 		foreach ($character->getUser()->getCrests() as $crest) {
 			$available[] = $crest->getId();
 		}
+		foreach ($character->getParents() as $parent) {
+			$available[] = $parent->getCrest()->getId();
+		}
+		foreach ($character->getPartnerships() as $partnership() {
+			if ($partnership->getPartnerMayUseCrest()) {
+				foreach ($partnership->getCharacters() as $partner) {
+					$available[] = $partner->getCrest()->getId();
+				}
+			}
+		}				
 
 		if (empty($available)) {
 			return array('nocrests'=>true);
