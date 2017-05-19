@@ -1440,7 +1440,8 @@ unavailable:
  novassals:     You do not have any vassals (your own characters don't count).
  fewestates:    A new realm needs to have at least two estates.
  notvassal:     You are not a vassal.
- tooalive:      Your realm has no subrealms that have been abandoned.
+ tooalive:      This realm does not appear to be dead.
+ notsuperruler: You are not the ruler of this realm's superior.
  nosubrealms:   Your realm has no subrealms.
  toolow:        Your realm is of the lowest designation and thus cannot have subrealms.
  toosmall:      Your realm needs to have at least two estates to split one (or more) off into a subrealm.
