@@ -211,21 +211,7 @@ class RealmManager {
 		$this->removeRulerLiege($realm, $newruler);
 	}
 	
-	public function restoreSubRealm(Realm $deadrealm, Character $newruler) {
-		//this will allow superior realms to restore dead sub-realms --Andrew
-		if ($deadrealm->getActive() == false && in_array($newruler, $deadrealm->getSuperior->findRulers())) {
-			$this->makeRuler($deadrealm, $newruler);
-			$deadrealm->setActive(true);
-			$this->history->logEvent(
-				$deadrealm,
-				'event.realm.restored',
-				array('%link-realm%'=>$deadrealm->getSuperior->getID(), '%link-character%'=>$newruler->getId()),
-				History::ULTRA, true
-			);
-		}
-	}
-
-
+	
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
