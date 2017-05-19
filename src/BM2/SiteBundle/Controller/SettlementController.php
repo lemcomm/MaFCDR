@@ -253,7 +253,10 @@ class SettlementController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
-
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
+		
 		$original_permissions = clone $settlement->getPermissions();
 
 		$form = $this->createForm(new SettlementPermissionsSetType($character, $this->getDoctrine()->getManager()), $settlement);

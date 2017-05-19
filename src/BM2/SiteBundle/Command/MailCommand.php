@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/* It may be worthwhile to actually update this into a full fledged command for including files to use as content to send in custom emails.
+Shouldn't be too hard to do. --Andrew 20170507 */
 
 class MailCommand extends ContainerAwareCommand {
 
@@ -57,8 +59,8 @@ Tom
 
 			$message = \Swift_Message::newInstance()
 				 ->setSubject($this->subject)
-				 ->setFrom('server@mightandfealty.com')
-				 ->setReplyTo('tom@mightandfealty.com')
+				 ->setFrom('mafserver@lemuriacommunity.org')
+				 ->setReplyTo('mafteam@lemuriacommunity.org')
 				 ->setTo($mail)
 				 ->setBody($text);
 			$mailer->send($message);

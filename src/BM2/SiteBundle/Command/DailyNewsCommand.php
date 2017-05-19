@@ -82,8 +82,8 @@ class DailyNewsCommand extends ContainerAwareCommand {
 
 				$message = \Swift_Message::newInstance()
 					->setSubject($subject)
-					->setFrom('server@mightandfealty.com')
-					->setReplyTo('tom@mightandfealty.com')
+					->setFrom('mafserver@lemuriacommunity.org')
+					->setReplyTo('mafteam@lemuriacommunity.org')
 					->setTo($user->getEmail())
 					->setBody(strip_tags($content))
 					->addPart($content, 'text/html');
