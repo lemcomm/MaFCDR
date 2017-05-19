@@ -1,8 +1,8 @@
 {% extends "MsgBundle::layout.html.twig" %}
 
-{% macro conversationrow(meta, depth) %}
+{% macro conversationrow(meta) %}
 <tr data-id="{{ meta.id }}">
-	<td style="padding-left: {{ depth}}em">{% if depth > 0 %}<span class="icon-forward"></span>{% endif %}<a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a></td>
+	<td style="padding-left: {{ meta.conversation.depth }}em">{% if meta.conversation.depth > 0 %}<span class="icon-forward"></span>{% endif %}<a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a></td>
 	<td align="right">{{ meta.conversation.messages.count }}</td>
 	<td align="right">{{ meta.unread }}</td>
 	<td align="right">{{ meta.conversation.metadata.count }}</td>
@@ -24,12 +24,7 @@
 		{% endif %}
 	</td>
 </tr>
-{% for conv in meta.conversation.children %}
-	{% set submeta = conv.findmeta(meta.user) %}
-	{% if submeta %}
-		{{ _self.conversationrow(submeta, depth+1) }}
-	{% endif %}
-{% endfor %}
+
 {% endmacro %}
 
 {% import _self as macros %}
@@ -76,7 +71,7 @@
 			<tbody>
 		{% set group = metadata.conversation.appreference %}
 	{% endif %}
-	{{ macros.conversationrow(metadata, 0) }}
+	{{ macros.conversationrow(metadata) }}
 {% endfor %}
 </tbody></table>
 
@@ -119,5 +114,4 @@ $("button.convo_leave").click(function(){
 
 });
 {% endblock %}
-
 
