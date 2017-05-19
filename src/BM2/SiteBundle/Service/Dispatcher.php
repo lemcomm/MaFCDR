@@ -1459,13 +1459,10 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.$check");
 		}
-		if ($this->realm->getInferiors()->count() <= 0) {
-			return array("name"=>"diplomacy.restore", "description"=>"unavailable.nosubrealms");
-		}
-		if ($this->realm->findDeadInferiors()->count() == 0) {
+		if ($this->realm->getAlive != FALSE) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.tooalive");
 		}
-		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+		if (!$this->realm->getSuperior->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.notleader");
 		}
 		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()));
