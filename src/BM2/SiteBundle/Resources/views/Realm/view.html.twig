@@ -26,6 +26,11 @@
 
 <h2>{{ realm.formalname }}</h2>
 
+{% if restorable %}
+	{{ 'diplomacy.restore.description'|trans({}, "politics") }}
+	<a href="{{ path('bm2_site_realm_restore', {'id':realm.id}) }}">{{ 'diplomacy.restore.link'|trans({},"politics") }}</a>
+{% end if %}
+
 <dl>
 	<dt>{{ 'realm.name'|trans({},"politics") }}</dt>
 	<dd>{{ realm.name }}</dd>
