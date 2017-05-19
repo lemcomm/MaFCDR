@@ -628,6 +628,7 @@ class RealmController extends Controller {
 				
 		return array(
 			'realm' => $realm,
+			'super' => $realm->getSuperior(),
 			'form' => $form->createView()
 		)
 		
