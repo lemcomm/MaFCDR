@@ -1,0 +1,223 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'conversation.title'|trans({}, "MsgBundle")|title }}</h2>
+
+{% include "MsgBundle:Read:one_conversation.html.twig" with {"meta": meta, "conversation":data[0]} %}
+
+{% if unread is not empty %}
+	<hr />
+	<h2>{{ 'unread.title'|trans({}, "MsgBundle")|title }}</h2>
+	<ul>
+	{% for cmeta in unread %}
+		<li>
+			<a href="{{ path('cmsg_conversation', {'meta':cmeta.id}) }}">{{ cmeta.conversation.topic }}</a>
+			<br />
+			<small>{{ 'summary.new2'|trans({"%new%":cmeta.unread}, "MsgBundle") }}</small>
+		</li>
+	{% endfor %}
+	</ul>
+{% endif %}
+
+<div id="replydialog" title="{{ 'message.reply.title'|trans({}, "MsgBundle")|title }}">
+	<button id="syntaxhelp" class="cmsg_button">syntax help</button>
+	<div id="help" style="display:none">
+		You can use <a href="http://daringfireball.net/projects/markdown/syntax">markdown syntax</a>:
+		<ul class="simple">
+			<li># Huge Header</li>
+			<li>## Large Header</li>
+			<li>### Header</li>
+			<li><em>*emphasis*</em></li>
+			<li><strong>**strong emphasis**</strong></li>
+			<li><strong><em>***extra strong emphasis***</em></strong></li>
+			<li>make unordered lists by beginning each line with a single *<li>
+			<li>second-level sub unordered lists can be done with a space and then a * at the beginning of the line</li>
+			<li>...or numbered lists by using 1. 2. 3.<li>
+			<li>...but maybe you don't want a list, so add a \ after the number and before the period like this: 2015\.</li>
+			<li>you can also blockquote a paragraph like this by leading with a ></li>
+			<li>...or even double or triple indent by adding more > symbols.</li>
+			<li>...or even add numbered or unordered lists in that block quote!</li>
+		</ul>
+	</div>
+	{{ render(controller('MsgBundle:Write:reply')) }}
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+var request;
+$("button.convo_leave").click(function(){
+	var id = $(this).data('id');
+
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+
+	var target = $(this).parent();
+	// fire off the request
+	request = $.ajax({
+		url: "{{ path('cmsg_leave') }}",
+		type: "post",
+		data: { 'id': id },
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		window.location = "{{ path('cmsg_index') }}";
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		$("#ajax_errors").html(textStatus);
+	});
+
+});
+
+realmselect($("#realmsearch"), realmchange);
+settlementselect($("#settlementsearch"), settlementchange);
+charselect($("#charactersearch"), characterchange);
+
+{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("message_reply_content").selectionStart;
+	var textAreaTxt = $("#message_reply_content").val();
+	$("#message_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+}
+
+function realmchange(id, name) {
+	search_insert("[r:"+id+"]");
+}
+function settlementchange(id, name) {
+	search_insert("[s:"+id+"]");
+}
+function characterchange(id, name) {
+	search_insert("[c:"+id+"]");
+}
+
+var unread = $(".cmsg_message:not(.cmsg_old)").first();
+if (unread.length) {
+	$("html, body").scrollTop(unread.offset().top);
+}
+
+$("#syntaxhelp").click(function(){
+	$("#help").toggle();
+});
+
+var redirect = false;
+var insert = null;
+
+$("#replydialog").dialog({
+	autoOpen: false,
+	width: "65%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+
+$(".cmsg_conversation").on("click", "button.topicreply", function(){
+	insert = $(this).closest('.cmsg_conversation').children('.cmsg_general').first();
+	var id = $(this).data('id');
+	redirect = false;
+	replyform("{{ 'conversation.reply.title'|trans({}, "MsgBundle")|title }}", id, 0);
+});
+
+$(".cmsg_conversation").on("click", "button.reply", function(){
+	insert = $(this).closest('.cmsg_conversation').children('.cmsg_general').first();
+	var id = $(this).closest('.cmsg_message').data('id');
+	redirect = false;
+	replyform("{{ 'message.reply.title'|trans({}, "MsgBundle")|title }}", {{ meta.id }}, id);
+});
+
+$(".cmsg_conversation").on("click", "button.split", function(){
+	insert = $(this).closest('.cmsg_conversation').children('.cmsg_general').first();
+	var id = $(this).closest('.cmsg_message').data('id');
+	redirect = true;
+	replyform("{{ 'message.reply.title'|trans({}, "MsgBundle")|title }}", 0, id);
+	$("#message_reply_topic").parent().show();
+	$("#message_reply_topic").attr("required", "required");
+});
+
+function replyform(title, conversation, reply_to) {
+	$("#replydialog").dialog("option", "title", title);
+	$("#message_reply_topic").parent().hide();
+	$("#replydialog").dialog("open");
+	$("#message_reply_conversation").val(conversation);
+	$("#message_reply_reply_to").val(reply_to);
+
+	$("#replydialog form").attr('action', '{{ path('cmsg_reply') }}');
+}
+
+$("#replydialog form").ajaxForm(function(response){
+	if (redirect) {
+		window.location.replace(response);
+	} else {
+		console.log(insert);
+		insert.after(response);
+		$("#message_reply_content").val("");
+		$("#replydialog").dialog("close");
+	}
+});
+
+var request;
+var target;
+$(".cmsg_conversation").on("click", "button.show", function(){
+	var id = $(this).closest('.cmsg_message').data('id');
+	var type = $(this).data('type');
+
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+
+	var target = $(this).parent();
+	// fire off the request
+	request = $.ajax({
+		url: "{{ path('cmsg_related', {'meta':meta.id}) }}",
+		type: "get",
+		data: { 'id': id, 'type': type },
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		target.html(response);
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		target.html(textStatus);
+	});
+});
+
+
+
+$(".cmsg_flags").on("click", "button.cmsg_icon", function(){
+	var button = $(this);
+	var id = button.data("msg");
+	var flag = button.data("flag");
+
+	button.addClass("working");
+	$.post("{{ path('cmsg_flags')}}", {'message':id, 'flag':flag}, function(result) {
+		button.removeClass("working");
+		if (result == 'added') {
+			button.addClass("active");
+		} else if (result == 'removed') {
+			button.removeClass("active");
+		}
+	});
+});
+
+$("#oldmessages").hide();
+var old_visible = false;
+$("#hidetoggle").click(function(){
+	if (old_visible) {
+		$("#hidetoggle").html("{{ 'conversation.old.show'|trans({},"MsgBundle") }}");
+		$("#oldmessages").hide("blind", 1200);
+		old_visible = false;
+	} else {
+		$("#hidetoggle").html("{{ 'conversation.old.hide'|trans({},"MsgBundle") }}");
+		$("#oldmessages").show("blind", 1200);
+		old_visible = true;
+	}
+});
+{% endblock %}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="Calitarus\MessagingBundle\Entity\MessageMetadata" table="cmsg_message_meta">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name='score' type='smallint'/>
+		<field name='tags' type='array'/>
+
+		<many-to-one field="message" target-entity="Message" inversed-by="metadata">
+			<join-column name="message_id" referenced-column-name="id" on-delete="CASCADE"/>
+		</many-to-one>
+		<many-to-one field="user" target-entity="User" inversed-by="messages_metadata" />
+
+		<many-to-many field="flags" target-entity="Flag"/>
+
+	</entity>
+</doctrine-mapping>

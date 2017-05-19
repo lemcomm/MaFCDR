@@ -1,0 +1,3 @@
+{% for msg in messages %}
+	{% include "MsgBundle:Read:one_message.html.twig" with {"meta":msg.findmeta(user), "message":msg, "hide":hide} only %}
+{% endfor %}
