@@ -73,6 +73,7 @@ class RealmController extends Controller {
 
 		if ($realm->getSuperior()) {
 			$parentpoly =	$this->get('geography')->findRealmPolygon($realm->getSuperior());
+			$superrulers[] = $realm->getSuperior->findRulers();
 		} else {
 			$parentpoly = null;
 		}
@@ -100,6 +101,10 @@ class RealmController extends Controller {
 			}
 			$diplomacy[$index][$side] = $relation->getStatus();
 		}
+		
+		if (!$realm->getActive && in_array($character, $superrulers)) {
+			$restorable = TRUE;
+		}
 
 		return array(
 			'realm' =>		$realm,
@@ -110,10 +115,11 @@ class RealmController extends Controller {
 			'population'=>	$population,
 			'area' =>		$this->get('geography')->calculateRealmArea($realm),
 			'nobles' =>		$realm->findMembers()->count(),
-			'diplomacy' =>	$diplomacy
+			'diplomacy' =>	$diplomacy,
+			'restorable' => $restorable
 		);
 	}
-
+	
 	/**
 	  * @Route("/new")
 	  * @Template
@@ -599,14 +605,34 @@ class RealmController extends Controller {
 	}
 
 	/**
-	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Route("/{id}/restore", requirements={"id"="\d+"})
 	  * @Template
 	  */
 
 	public function restoreAction(Realm $realm, Request $request) {
+		$realm = $id;
 		$character = $this->gateway($realm, 'diplomacyRestoreTest');
 		
-		$realms = $realm->findDeadInferiors();
+		$form = $this->CreateFormBuilder()
+			->add('submit', 'submit', array('label'=>trans('realm.restore.submit', array(), 'politics')))
+			->getForm();
+		
+		$form->handleRequest($request);
+		
+		if ($form->isSubmitted) {
+			$this->get('realm_manager')->restoreSubRealm($realm, $character);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
+			return $this->redirectToRoute('bm2_site_realm', array('id'=>$realm->getId()));
+		}
+				
+		return array(
+			'realm' => $realm,
+			'form' => $form->createView()
+		)
+		
+		/* We don't need the old, non-functional code anymore, but maybe we can adapt it for something else later.
+		
 		$form = $this->createForm(new RealmRestoreType($realms));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -614,7 +640,7 @@ class RealmController extends Controller {
 			$fail = false;
 
 			if (!$fail) {
-                		$this->get('realm_manager')->restoreSubRealm($realm, $data, $character);
+                		$this->get('realm_manager')->restoreSubRealm($realm, $character);
             		}
 
 			$em = $this->getDoctrine()->getManager();
@@ -627,9 +653,10 @@ class RealmController extends Controller {
 			'realm' => $realm,
 			'realms' => $realms,
 			'form' => $form->createView()
-		)
+		) 
+		*/
 	}
-
+	
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
 	  * @Template
