@@ -1,9 +1,5 @@
 <?php
 
-/* There's no reason we should be using this command again, so I'm going to comment this all out now.
-For those cuious down the line, this was the original command Tom used to send out the credits for the indiegogo campaign.
---Andrew 20170507
-
 namespace BM2\SiteBundle\Command;
 
 use BM2\SiteBundle\Entity\Code;
@@ -27,6 +23,7 @@ class CodeGeneratorCommand extends ContainerAwareCommand {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
+
 		$file = $input->getArgument('file');
 		$credits = $input->getArgument('credits');
 		$vip = $input->getArgument('vip');
@@ -74,4 +71,3 @@ class CodeGeneratorCommand extends ContainerAwareCommand {
 
 }
 
-*/
