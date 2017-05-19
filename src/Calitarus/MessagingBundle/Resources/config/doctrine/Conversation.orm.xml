@@ -15,6 +15,7 @@
 
 		<many-to-one field="parent" target-entity="Conversation" inversed-by="children"/>
 		<one-to-many field="children" target-entity="Conversation" mapped-by="parent"/>
+		<field name="depth" type="integer" nullable="true"/>
 
 		<one-to-many field="metadata" target-entity="ConversationMetadata" mapped-by="conversation" on-delete="CASCADE">
 			<cascade><cascade-remove /></cascade>
