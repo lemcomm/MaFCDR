@@ -28,9 +28,6 @@ services:
     geography:
         class:      BM2\SiteBundle\Service\Geography
         arguments:  [@doctrine.orm.entity_manager, @appstate]
-    communication:
-        class:      BM2\SiteBundle\Service\Communication
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  [@doctrine.orm.entity_manager, @appstate, @event_dispatcher]
