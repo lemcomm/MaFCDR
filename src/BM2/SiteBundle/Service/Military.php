@@ -19,7 +19,6 @@ class Military {
 	private $em;
 	private $history;
 	private $pm;
-	private $communication;
 	private $appstate;
 
 	private $group_assign=0;
@@ -27,13 +26,52 @@ class Military {
 	private $group_soldier=0;
 	private $max_group=25; // a=0 ... z=25
 	
-	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, Communication $communication, AppState $appstate) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, AppState $appstate) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
 		$this->pm = $pm;
-		$this->communication = $communication;
 		$this->appstate = $appstate;
+	}
+
+
+	public function joinBattle(Character $character, BattleGroup $group) {
+		$battle = $group->getBattle();
+		$soldiers = count($character->getActiveSoldiers());
+
+		// make sure we are only on one side, and send messages to others involved in this battle
+		foreach ($battle->getGroups() as $mygroup) {
+			$mygroup->removeCharacter($character);
+
+			foreach ($mygroup->getCharacters() as $char) {
+				$this->history->logEvent(
+					$char,
+					'event.military.battlejoin',
+					array('%soldiers%'=>$soldiers, '%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 12
+				);
+			}
+		}
+		$group->addCharacter($character);
+
+		$action = new Action;
+		$action->setBlockTravel(true);
+		$action->setType('military.battle')->setCharacter($character)->setTargetBattlegroup($group)->setCanCancel(false)->setHidden(false);
+//		FIXME: this would be better, but impossible due to circular injections:
+//		$result = $this->get('action_resolution')->queue($action);
+		$action->setStarted(new \DateTime("now"));
+		$max=0;
+		foreach ($character->getActions() as $act) {
+			if ($act->getPriority()>$max) {
+				$max=$act->getPriority();
+			}
+		}
+		$action->setPriority($max+1);
+		$this->em->persist($action);
+
+		$character->setTravelLocked(true);
+
+		$this->recalculateBattleTimer($battle);
 	}
 
 	public function recalculateBattleTimer(Battle $battle) {
