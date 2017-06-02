@@ -809,7 +809,7 @@ class WarController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			if (isset($data['group'])) {
-				$this->get('action_resolution')->joinBattle($character, $data['group']);
+				$this->get('military')->joinBattle($character, $data['group']);
 				$this->getDoctrine()->getManager()->flush();
 				$success = $data['group']->getBattle();
 			}
