@@ -205,10 +205,6 @@ class Dispatcher {
 		if (isset($has['url'])) { 
 			$actions[] = $has;
 		}
-		$has = $this->locationLendanTowerTest();
-		if (isset($has['url'])) {
-			$actions[] = $this->action("building.lendantower", "bm2_site_building_lendantower");
-		}
 
 		return array("name"=>"building.title", "elements"=>$actions);
 	}
@@ -218,7 +214,6 @@ class Dispatcher {
 	public function locationLibraryTest() { return $this->locationHasBuildingTest("Library"); }
 	public function locationTempleTest() { return $this->locationHasBuildingTest("Temple"); }
 	public function locationBarracksTest() { return $this->locationHasBuildingTest("Barracks"); }
-	public function locationLendanTowerTest() { return $this->locationHasBuildingTest("Inn"); } // FIXME: set right
 
 	public function locationHasBuildingTest($name) {
 		$lname = strtolower($name);
