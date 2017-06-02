@@ -14,6 +14,8 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * You can now exit a settlement
 
 ### New Fixes ###
+* Lendan Towers & the new Communication systems have been removed until they can be completed. 
+* As such, battles should now be startable.
 * Bandits won't be quite as numermous anymore (once we get some turns going anyways).
 * Slumbering FO's no longer grant experience
 * Most forms know how to close themselves (that means there shouldn't be any extra '>' floating about.) If you find one, report it!
@@ -28,5 +30,5 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * MarkDown Syntax and Twig versions have been updated to modernity
 
 ### Current Build ###
-M&F Version 1.0.1.2 - "Community Takeover Build"
-Pending Work: Fixing or Shelving Lendan Towers (these are responsible for a number of errors).
+M&F Version 1.0.2.0 - "Community Takeover Build"
+Pending Work: Getting some turns running, sharing heraldry, abandoning settlements, and probably seneschals.
