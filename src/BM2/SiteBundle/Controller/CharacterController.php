@@ -360,13 +360,6 @@ class CharacterController extends Controller {
 				$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
 				list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
 				$this->get('message_manager')->setAllUnread($msg_user);
-
-				// new knight setup for new message system
-				// FIXME: what if it doesn't have a tower?
-				$this->get('communication')->createTowerLink($character, $startlocation);
-				$msg = $this->get('communication')->NewMessage($liege, $content, array('knightoffer'), $character);
-				$this->get('communication')->addLink($character, $msg, false);
-				$this->get('communication')->addLink($liege, $msg, false);
 			}
 
 			$form_existing->bind($request);

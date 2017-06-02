@@ -132,9 +132,6 @@ function mapinit(divname, showswitcher, mode, keepsquare){
 			addroads();
 			addoffers();
 			break;
-		case 'network':
-			addsettlements()
-			break;
 		case 'featureconstruction':
 		case 'setmarker':
 			addsettlements();
@@ -146,7 +143,6 @@ function mapinit(divname, showswitcher, mode, keepsquare){
 		default:
 			addsettlements();
 			addrealms();
-			addcultures();
 			addroads();
 			addfeatures();
 			addmarkers();
@@ -599,9 +595,9 @@ function addsettlements(mode) {
 		width: "25em",
 		position: { my: 'right bottom', at: 'right bottom', of: $('#sd_anchor') }
 	});
-}
 
-function addcultures() {
+
+	// cultures
 
 	var style = new OpenLayers.Style({
 		strokeWidth: 0.5,

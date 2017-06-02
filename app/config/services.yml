@@ -28,9 +28,6 @@ services:
     geography:
         class:      BM2\SiteBundle\Service\Geography
         arguments:  [@doctrine.orm.entity_manager, @appstate]
-    communication:
-        class:      BM2\SiteBundle\Service\Communication
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  [@doctrine.orm.entity_manager, @appstate, @event_dispatcher]
@@ -48,7 +45,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @geography, @history, @permission_manager, @logger]
     military:
         class:      BM2\SiteBundle\Service\Military
-        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @communication, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @appstate]
     generator:
         class:      BM2\SiteBundle\Service\Generator
         arguments:  [@doctrine.orm.entity_manager, @military]
@@ -82,7 +79,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @appstate, @geography]
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
-        arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @communication, @politics, @military, @permission_manager, @twig.extension.gametime]
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @politics, @military, @permission_manager, @twig.extension.gametime]
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
         arguments:  [@doctrine.orm.entity_manager, @logger, @history, @military, @geography, @character_manager, @npc_manager, @action_resolution, @interactions]
@@ -90,7 +87,7 @@ services:
             - { name: monolog.logger, channel: turn }
     game_runner:
         class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  [@doctrine.orm.entity_manager, @appstate, @logger, @action_resolution, @economy, @politics, @history, @military, @battle_runner, @interactions, @geography, @generator, @realm_manager, @message_manager, @permission_manager, @npc_manager, @communication]
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @logger, @action_resolution, @economy, @politics, @history, @military, @battle_runner, @interactions, @geography, @generator, @realm_manager, @message_manager, @permission_manager, @npc_manager]
         tags:
             - { name: monolog.logger, channel: turn }
 

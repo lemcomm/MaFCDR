@@ -3,11 +3,8 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Service\Geography;
-use BM2\SiteBundle\Service\Communication;
-use BM2\SiteBundle\Form\MessageGroupType;
 use BM2\SiteBundle\Entity\Action;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -203,51 +200,5 @@ class BuildingController extends Controller {
 		}
 		return array('settlement'=>$settlement, 'data'=>$data);
 	}
-
-	/**
-	  * @Route("/lendantower")
-	  * @Template
-	  */
-	public function lendantowerAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLendanTowerTest', true);
-
-		$em = $this->getDoctrine()->getManager();
-
-		$group_form = $this->createForm(new MessageGroupType);
-		$group_form->handleRequest($request);	
-		if ($group_form->isValid()) {
-			$data = $group_form->getData();
-
-			$this->get('communication')->CreateMessageGroup($data['name'], $data['open'], $character, $settlement);
-			$em->flush();
-		}
-
-		// FIXME: filter out groups I am already a member in
-		$query = $em->createQuery('SELECT g FROM BM2SiteBundle:MessageGroup g JOIN g.towers t WHERE t = :here AND g.open = true');
-		$query->setParameter('here', $settlement);
-		$open_groups = $query->getResult();
-
-		$query = $em->createQuery('SELECT g FROM BM2SiteBundle:MessageGroup g JOIN g.towers t JOIN g.owners o WHERE t = :here AND o = :me');
-		$query->setParameters(array('here'=>$settlement, 'me'=>$character));
-		$owned_groups = $query->getResult();
-
-		$linked_towers = new ArrayCollection($this->get('communication')->linkedTowers($character));
-		if ($linked_towers->count() < Communication::MAX_LINKS && !$linked_towers->contains($settlement)) {
-			$can_link = true;
-		} else {
-			$can_link = false;
-		}
-
-		return array(
-			'settlement'=>$settlement,
-			'linked_towers'=>$linked_towers,
-			'can_link'=>$can_link,
-			'max_links'=>Communication::MAX_LINKS,
-			'open_groups'=>$open_groups,
-			'owned_groups'=>$owned_groups,
-			'group_form'=>$group_form->createView()
-		);
-	}
-
 
 }
