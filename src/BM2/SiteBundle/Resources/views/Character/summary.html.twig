@@ -54,7 +54,7 @@
 			<td>{{ event.cycle|gametime('short') }}</td>
 			<td>{{ link(event.log) }}</td>
 			<td>{{ event|eventtranslate }}</td>
-		</td>
+		</tr>
 	{% else %}
 		<tr><td colspan="3">{{ 'summary.nothing'|trans }}</td></tr>
 	{% endfor %}
