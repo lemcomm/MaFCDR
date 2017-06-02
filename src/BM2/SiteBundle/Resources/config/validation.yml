@@ -5,16 +5,16 @@ BM2\SiteBundle\Entity\User:
       email:
          - Email: ~
 
-# doesn't work - is enforced on road construction, but not on feature construction
-#BM2\SiteBundle\Entity\GeoFeature:
-#   properties:
-#      name:
-#         - NotBlank: ~
-#         - Length:
-#            min: 3
+# May not work, according to an old comment this is enforced on road construction, but not on feature construction?
+BM2\SiteBundle\Entity\GeoFeature:
+   properties:
+      name:
+         - NotBlank: ~
+         - Length:
+            min: 3
 
 BM2\SiteBundle\Entity\SettlementPermission:
    properties:
       value:
          - LessThan:
-            value: 10000000
+            value: 1000000000
