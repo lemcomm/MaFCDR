@@ -45,7 +45,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @geography, @history, @permission_manager, @logger]
     military:
         class:      BM2\SiteBundle\Service\Military
-        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @communication, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @appstate]
     generator:
         class:      BM2\SiteBundle\Service\Generator
         arguments:  [@doctrine.orm.entity_manager, @military]
