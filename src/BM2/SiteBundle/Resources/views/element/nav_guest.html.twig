@@ -1,4 +1,7 @@
 <ul>
+	{% if is_granted('ROLE_ADMIN') %}
+		<li><a href="{{ path('bm2_game') }}">{{ 'menu.game'|trans}}</a></li>
+	{% endif %}
 	<li><a href="{{ path('bm2_map') }}">{{ 'menu.map'|trans }}</a></li>
 	<li><a href="{{ path('bm2_about') }}">{{ 'menu.about'|trans }}</a></li>
 	<li><a href="{{ path('bm2_manual') }}">{{ 'menu.manual'|trans }}</a></li>
