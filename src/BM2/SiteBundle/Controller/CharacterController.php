@@ -881,8 +881,30 @@ class CharacterController extends Controller {
 		$character = $this->get('dispatcher')->gateway('metaHeraldryTest');
 
 		$available = array();
+		
+		# Get all crests for the current user.
 		foreach ($character->getUser()->getCrests() as $crest) {
 			$available[] = $crest->getId();
+		}
+		
+		# Check for parents having different crests.
+		foreach ($character->getParents() as $parent) {
+			$parentcrest = $parent->getCrest()->getId();
+			if (!in_array($parentcrest, $available)) {
+				$available[] = $parentcrest;
+			}
+		}
+		
+		# Check for partners having different crests.
+		foreach ($character->getPartnerships() as $partnership) {
+			if ($partnership->getPartnerMayUseCrest()==TRUE) {
+				foreach ($partnership->getPartners() as $partners) {
+					$partnercrest = $partners->getCrest()->getId();
+					if (!in_array($partnercrest, $available)) {
+						$available[] = $partnercrest;
+					}
+				}
+			}
 		}
 
 		if (empty($available)) {
