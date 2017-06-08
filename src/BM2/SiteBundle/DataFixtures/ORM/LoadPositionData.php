@@ -22,7 +22,7 @@ class LoadPositionData extends AbstractFixture implements OrderedFixtureInterfac
 		'legislative'		=> array('hidden' => false),
 		'military'		=> array('hidden' => false),
 		'revenue'		=> array('hidden' => false),
-		'other'			=> array('hidden' => false)
+		'other'			=> array('hidden' => true)
 	);
 	
 	/**
