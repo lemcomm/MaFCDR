@@ -8,6 +8,7 @@ If you're seeing this, congrats, you're viewing the M&F Live Test Server, codena
 Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,6026.0.html">here!</a>
 
 ### New Features ###
+* Heraldry is now shared between partnerships (as appropriate) and by parent(s) to children. **Heraldry is no longer account specific.**
 * You can now restore inactive Subrealms!
 * Realm info can be viewed without being logged in
 * Link to wiki exists
@@ -30,5 +31,5 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * MarkDown Syntax and Twig versions have been updated to modernity
 
 ### Current Build ###
-M&F Version 1.0.2.0 - "Community Takeover Build"
-Pending Work: Getting some turns running, sharing heraldry, abandoning settlements, and probably seneschals.
+M&F Version 1.0.2.1 - "Community Takeover Build"
+Pending Work: Weird event bug, abandoning settlements, and probably seneschals.
