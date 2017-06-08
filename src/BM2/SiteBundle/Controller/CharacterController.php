@@ -897,18 +897,18 @@ class CharacterController extends Controller {
 		# Check for parents having different crests.
 		foreach ($character->getParents() as $parent) {
 			$parentcrest = $parent->getCrest()->getId();
-			if (!in_array($parentcrest, $available) {
+			if (!in_array($parentcrest, $available)) {
 				$available[] = $parentcrest;
 			}
 		}
 		
 		# Check for partners having different crests.
-		foreach ($character->getPartnerships() as $partnership() {
-			if ($partnership->getPartnerMayUseCrest()) {
-				foreach ($partnership->getCharacters() as $partner) {
-					$partnercrest = $partnert->getCrest()->getId();
-					if (!in_array($partnercrest, $available) {
-						$available[] = $partner->getCrest()->getId();
+		foreach ($character->getPartnerships() as $partnership) {
+			if ($partnership->getPartnerMayUseCrest()==TRUE) {
+				foreach ($partnership->getPartners() as $partners) {
+					$partnercrest = $partners->getCrest()->getId();
+					if (!in_array($partnercrest, $available)) {
+						$available[] = $partnercrest;
 					}
 				}
 			}
