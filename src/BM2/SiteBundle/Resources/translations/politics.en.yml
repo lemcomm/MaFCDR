@@ -209,6 +209,8 @@ relation:
  with:        with
  sex:         includes sex
  nosex:       without sex
+ heraldry:    shares heraldry
+ noheraldry:  without heraldry
  crest:       share heraldry
 
  choice:
