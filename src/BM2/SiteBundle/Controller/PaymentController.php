@@ -5,8 +5,6 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\GiftType;
 use BM2\SiteBundle\Form\SubscriptionType;
-#use Calitarus\BitPayBundle\Form\DonationType;
-#use Calitarus\BitPayBundle\Form\ItemType;
 use PayPal;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
