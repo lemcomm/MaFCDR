@@ -144,7 +144,7 @@ class BuildingController extends Controller {
 			if (gethostname() == 'Ghost.local') {
 				readfile("/Users/Tom/Documents/BM2/$map");
 			} else {
-				readfile("/home/maf/qgis/maps/$map");
+				readfile("/var/www/qgis/maps/$map");
 			}
 		} else {
 			echo "invalid map";
