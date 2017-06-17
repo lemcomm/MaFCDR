@@ -5,8 +5,6 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\GiftType;
 use BM2\SiteBundle\Form\SubscriptionType;
-use Calitarus\BitPayBundle\Form\DonationType;
-use Calitarus\BitPayBundle\Form\ItemType;
 use PayPal;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -24,18 +22,6 @@ class PaymentController extends Controller {
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
 
 	// FIXME: the secrets, etc. should probably not be in here, but in a safe place
-
-	// BitPay
-	private $bitpay_apikey = "hPEcH5b5ZqLdd32pct1isv5AsKvA5YxDFjB9938";
-	private $bitpay_donation = "XdezXZUktL9Y8zzTDGcM4+OCYk88WECctXkkCg/f5yjAZxotXlJTKNVb3Ax4N/3KT5Ks+C+3zsJpbOh6xnOAzQBrobm78R1JB1PXNv5d6EkVHcEFIA0qARfjH9sQGfbnfFykiZGzHs7jJ/XTLNqbzrbNBbI4FxoWxT01U4IQ/jJ5jZbvoCWmj6Rb+VhgwqHY+F4W1Bbo5KHfBcoexhm3z1LRtLSH34mSZ4IZB3h70/1daRL5E1jlG2CHCOQ6Q0mnSGNRtJ/H5kWOQa3HIdKIXKCxvsCvzZvBR7iJQPE6rMZ4//fh450RBSxGHIlCiFb/";
-	private $bitpay_items = array(
-		'5 €uro' => '4YjgZMrnTDenLetcpiyX1W',
-		'10 €uro' => '5JjtgbL3FHJTrYPe4Fmh8y',
-		'20 €uro' => 'QU6p9DPJTeMoCL5fvtkkos',
-		'30 €uro' => 'L7PhvLK8tB18RnQoCSXvQt',
-		'50 €uro' => 'UTu56tAH1WUkeHe8WKJzQU',
-	);
-
 
 	// PayPal
 /*
@@ -59,11 +45,6 @@ class PaymentController extends Controller {
      */
 	public function paymentAction(Request $request) {
 		$user = $this->getUser();
-
-		$bitpay = array();
-		foreach ($this->bitpay_items as $key=>$code) {
-			$bitpay[$key] = $this->createForm(new ItemType($code, $user, $key))->createView();
-		}
 
 		$form = $this->createFormBuilder()
 			->add('hash', 'text', array(
@@ -90,8 +71,7 @@ class PaymentController extends Controller {
 
 		return array(
 			'form' => $form->createView(),
-			'redeemed' => $redeemed,
-			'bitpay' => $bitpay
+			'redeemed' => $redeemed
 		);
 	}
 
@@ -219,16 +199,6 @@ class PaymentController extends Controller {
 		$paymentDetails->Custom = $custom;
 
 		return $paymentDetails;
-	}
-
-
-	/**
-	  * @Route("/bitpay")
-	  */
-	public function bitpayAction(Request $request) {
-		$data = $this->get('bitpay')->bpVerifyNotification($request, $this->bitpay_apikey);
-
-		return new Response();
 	}
 
 	/**
