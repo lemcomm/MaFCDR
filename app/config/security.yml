@@ -41,7 +41,6 @@ security:
         - { path: ^/(../)?account, roles: ROLE_USER }
         - { path: ^/(../)?heraldry, roles: ROLE_USER }
         - { path: ^/(../)?payment/google$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/(../)?payment/bitpay$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment/paypal_success$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment/paypal_cancel$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment, roles: ROLE_USER }
