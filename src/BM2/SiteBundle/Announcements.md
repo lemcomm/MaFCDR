@@ -15,6 +15,8 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * You can now exit a settlement
 
 ### New Fixes ###
+* Non-functional BitPay functionality has been removed.
+* Library maps are now generating properly.
 * Map loadlist no longer appears on realm pages, which will improve page usability for smaller displays.
 * Lendan Towers & the new Communication systems have been removed until they can be completed. 
 * As such, battles should now be startable.
@@ -32,5 +34,5 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * MarkDown Syntax and Twig versions have been updated to modernity
 
 ### Current Build ###
-M&F Version 1.0.2.2 - "Community Takeover Build"
+M&F Version 1.0.2.4 - "Community Takeover Build"
 Pending Work: Weird event bug, abandoning settlements, and probably seneschals.
