@@ -85,11 +85,15 @@ class MessageManager {
 		return $query->getResult();
 	}
 
-	public function getToplevelConversationsMeta(User $user=null) {
+	public function getConversationsMeta(User $user=null, $children=null) {
 		if (!$user) { $user=$this->getCurrentUser(); }
 
 		/* TODO: this should be sorted by the last message posted to the conversation */
-		$query = $this->em->createQuery('SELECT m,c FROM MsgBundle:ConversationMetadata m JOIN m.conversation c WHERE m.user = :me AND c.parent IS NULL ORDER BY c.app_reference ASC');
+		if (!$children) {
+			$query = $this->em->createQuery('SELECT m,c FROM MsgBundle:ConversationMetadata m JOIN m.conversation c WHERE m.user = :me AND c.parent IS NULL ORDER BY c.app_reference ASC');
+		} else { 
+			$query = $this->em->createQuery('SELECT m,c FROM MsgBundle:ConversationMetadata m JOIN m.conversation c WHERE m.user = :me ORDER BY c.app_reference ASC, c.id DESC, c.parent');
+		}
 		$query->setParameter('me', $user);
 		return $query->getResult();
 	}
@@ -228,6 +232,7 @@ class MessageManager {
 		$conversation->setTopic($topic);
 		if ($parent) {
 			$conversation->setParent($parent);
+			$conversation->setDepth($parent->getDepth()+1);
 			$parent->addChild($conversation);
 		}
 		if ($realm) {
