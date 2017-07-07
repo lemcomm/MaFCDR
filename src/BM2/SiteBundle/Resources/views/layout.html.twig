@@ -13,7 +13,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>{% block title %}Might &amp; Fealty{% endblock %}</title>
+	<title>{% block title %}{% if 'mightandfealty.com' in app.request.host %}Might &amp; Fealty{% elseif 'valengard' in app.request.host %}Valengard Test Server{% else %}M&amp;F Dev Build{% endif %}{% endblock %}</title>
 	<link rel="icon" sizes="16x16" href="/favicon.ico" />
 	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 	<link rel="icon" type="image/png" sizes="129x129" href="/apple-touch-icon.png">
