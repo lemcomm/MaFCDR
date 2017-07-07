@@ -513,6 +513,7 @@ character:
  status:  Status of %name%
  history: character history
  inactive:  this character has not been played in a while
+ banned:    This user has been banned.
  newplayer: This character is being played by a player who is new to the game. Please act accordingly.
  notstarted:
   title:    Rumours
@@ -917,6 +918,9 @@ error:
   location:     This character does not have a location, select a start location first.
   soul:         This character is dead and cannot affect the world of the living anymore.
   user:         You are not logged in or your session has expired. Please log in (again).
+  
+ banned:
+  multi:        The account you're logged into has been banned for using multiple free accounts.
 
  payment:
   already:      This code has already been redeemed, maybe automatically as you logged in. Check your credit history, please. If you believe this to be an error, please contact tom@mightandfealty.com for details.
