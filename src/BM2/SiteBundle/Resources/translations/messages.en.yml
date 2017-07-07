@@ -190,7 +190,9 @@ account:
   0: locked
   10: casual
   20: basic
+  21: volunteer
   40: intense
+  41: developer
   50: ultimate
   name: account level
   limit: character limit
