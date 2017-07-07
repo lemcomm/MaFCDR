@@ -30,10 +30,12 @@ class PaymentManager {
 
 	public function getPaymentLevels() {
 		return array(
-			 0 =>	array('name' => 'storage',		'characters' =>    0, 'fee' =>   0, 'selectable' => false),
-			10 =>	array('name' => 'trial',		'characters' =>    4, 'fee' =>   0, 'selectable' => true),
-			20 =>	array('name' => 'basic',		'characters' =>   10, 'fee' => 200, 'selectable' => true),
-			40 =>	array('name' => 'intense',		'characters' =>   25, 'fee' => 300, 'selectable' => true),
+			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false),
+			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true),
+			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true),
+			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false),
+			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true),
+			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false),
 			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true),
 		);
 	}
