@@ -34,4 +34,3 @@ If you're seeing this, it looks like you've successfully found the new Might & F
 
 ### Current Build ###
 M&F Version 1.0.2.5 - "Community Takeover Build"
-Pending Work: Abandoning settlements, and probably seneschals.
