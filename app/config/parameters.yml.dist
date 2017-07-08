@@ -7,10 +7,10 @@ parameters:
     database_password: ~
 
     mailer_transport:  smtp
-    mailer_host:       127.0.0.1
-    mailer_port:       465
-    mailer_authmode:   cram-md5
-    mailer_encryption: ssl
+    mailer_host:       ~
+    mailer_port:       25
+    mailer_authmode:   login
+    mailer_encryption: none
     mailer_user:       ~
     mailer_password:   ~
     mailer_disable:    false
