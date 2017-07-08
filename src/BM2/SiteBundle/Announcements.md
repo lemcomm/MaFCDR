@@ -2,10 +2,7 @@ Announcements
 --------------
 
 ### New Server ###
-If you're seeing this, congrats, you're viewing the M&F Live Test Server, codenamed "Valengard".
-
-### Reporting Bugs ###
-Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,6026.0.html">here!</a>
+If you're seeing this, it looks like you've successfully found the new Might & Fealty server!
 
 ### New Features ###
 * Heraldry is now shared between partnerships (as appropriate) and by parent(s) to children. **Heraldry is no longer account specific.**
@@ -15,6 +12,8 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * You can now exit a settlement
 
 ### New Fixes ###
+* A tool exists for the banishment of cheaters.
+* The game is smart enough to know what server it's running on.
 * Non-functional BitPay functionality has been removed.
 * Library maps are now generating properly.
 * Map loadlist no longer appears on realm pages, which will improve page usability for smaller displays.
@@ -34,5 +33,5 @@ Please report all bugs <a href="http://forum.mightandfealty.com/index.php/topic,
 * MarkDown Syntax and Twig versions have been updated to modernity
 
 ### Current Build ###
-M&F Version 1.0.2.4 - "Community Takeover Build"
-Pending Work: Weird event bug, abandoning settlements, and probably seneschals.
+M&F Version 1.0.2.5 - "Community Takeover Build"
+Pending Work: Abandoning settlements, and probably seneschals.
