@@ -2,14 +2,15 @@ parameters:
     database_driver:   pdo_pgsql
     database_host:     127.0.0.1
     database_port:     5432
-    database_name:     symfony
+    database_name:     maf
     database_user:     root
     database_password: ~
 
     mailer_transport:  smtp
     mailer_host:       127.0.0.1
-    mailer_port:       25
-    mailer_authmode:   login
+    mailer_port:       465
+    mailer_authmode:   cram-md5
+    mailer_encryption: ssl
     mailer_user:       ~
     mailer_password:   ~
     mailer_disable:    false
