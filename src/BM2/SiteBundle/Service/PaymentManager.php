@@ -80,14 +80,24 @@ class PaymentManager {
 	}
 
 	public function paymentCycle() {
-		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
-		$query->setParameters(array('now'=>new \DateTime("now")));
-
 		$free = 0;
 		$active = 0;
 		$expired = 0;
 		$storage = 0;
 		$credits = 0;
+		$bannedcount = 0;
+		$bannedquery = $this->em->createQuery("SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.roles LIKE '%ROLE_BANNED%'");
+		foreach ($bannedquery->getResult() as $banned) {
+			$bannedcount++;
+			$this->changeSubscription($banned, 0);
+			$banned->setNotifications(FALSE);
+			$banned->setNewsletter(FALSE);
+			$bannedusername = $banned->getUsername();
+			$this->logger->info("$bannedusername has been banned, and email notifications have been disabled.");
+			$this->em->flush();
+		}
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
+		$query->setParameters(array('now'=>new \DateTime("now")));
 		foreach ($query->getResult() as $user) {
 			$myfee = $this->calculateUserFee($user);
 			if ($myfee > 0) {
@@ -116,7 +126,7 @@ class PaymentManager {
 				}
 			}
 		}
-		return array($free, $active, $credits, $expired, $storage);
+		return array($free, $active, $credits, $expired, $storage, $bannedcount);
 	}
 
 	private function ChangeNotification(User $user, $subject, $text) {
