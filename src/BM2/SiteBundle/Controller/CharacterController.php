@@ -418,6 +418,7 @@ class CharacterController extends Controller {
 	public function viewAction(Character $id) {
 		$char = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$banned = false;
 		if ($character) {
 			$details = $this->get('interactions')->characterViewDetails($character, $char);
 		} else {
@@ -430,11 +431,15 @@ class CharacterController extends Controller {
 			$entourage = null;
 			$soldiers = null;
 		}
+		if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+			$banned = true;
+		}
 		return array(
 			'char'		=> $char,
 			'details'	=> $details,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
+			'banned'	=> $banned,
 		);
 	}
 
