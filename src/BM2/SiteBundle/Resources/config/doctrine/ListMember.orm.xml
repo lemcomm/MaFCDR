@@ -12,5 +12,6 @@
 
 		<many-to-one field="target_realm" target-entity="Realm"/>
 		<many-to-one field="target_character" target-entity="Character"/>
+		<many-to-one field="target_position" target-entity="RealmPosition"/>
 	</entity>
 </doctrine-mapping>
