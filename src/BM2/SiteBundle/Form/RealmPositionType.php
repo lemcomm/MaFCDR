@@ -56,10 +56,21 @@ class RealmPositionType extends AbstractType {
 				'attr' => array('title'=>'position.help.elected'),
 			));
 		}
+		$builder->add('rank', 'number', array(
+			'label'=>'position.inherit',
+			'required' => false,
+			'empty_data' => '1',
+			'attr' => array('title'=>'position.help.inherit'),
+		));
 		$builder->add('inherit', 'checkbox', array(
 			'label'=>'position.inherit',
 			'required' => false,
 			'attr' => array('title'=>'position.help.inherit'),
+		));
+		$builder->add('retired', 'checkbox', array(
+			'label'=>'position.retired',
+			'required' => false,
+			'attr' => array('title'=>'position.help.retired'),
 		));
 		$builder->add('term', 'choice', array(
 			'label'=>'position.term',
