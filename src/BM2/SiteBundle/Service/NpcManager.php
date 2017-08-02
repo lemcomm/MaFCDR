@@ -86,6 +86,17 @@ class NpcManager {
 			return false;
 		}
 		$npc->setLocation(new Point($x, $y));
+		if ($geo->findMyRegion($npc)->getBiome()->getName()=='snow') {
+			$this->logger->error("by some fluke, bandit ".$npc->getId()" has been placed in snow. Trying again.")
+			list($x, $y, $geodata) = $this->geo->findRandomPoint();
+			if ($x===false) {
+				// can't find a valid random point
+				$this->logger->error("cannot find valid point for new NPC");
+				return false;
+			}
+			$npc->setLocation(new Point($x, $y));
+			// Statistically, the chances of this happening twice are stupidly low. I'm not sure it's worth coding for it, given it took, what, 2 years for it to happen once?
+		}
 		$npc->setInsideSettlement(null);
 		$npc->setProgress(null)->setSpeed(null)->setTravel(null);
 
