@@ -799,8 +799,17 @@ none:         none
 yes:          yes
 no:           no
 techtree:     Technology Tree
-inbattle:     battle
-travelling:   travel
+charstatus:
+ inbattle:     battle
+ travelling:   travel
+ annexing:     annex
+ supporting:   support
+ opposing:     oppose
+ looting:      loot
+ blocking:     block
+ granting:     grant
+ renaming:     rename
+ reclaiming:   reclaim
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 inside:       inside %place%
