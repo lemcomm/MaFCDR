@@ -36,21 +36,21 @@
 		<td>
 			{% if character.inbattle %}
 				{{ 'charstatus.inbattle'|trans }}
-			{% elseif status = 'annexing' %}
+			{% elseif character.annexing %}
 				{{ 'charstatus.annexing'|trans }}
-			{% elseif status = 'supporting' %}
+			{% elseif character.supporting %}
 				{{ 'charstatus.supporting'|trans }}
-			{% elseif status = 'opposing' %}
+			{% elseif character.opposing %}
 				{{ 'charstatus.opposing'|trans }}
-			{% elseif status = 'looting' %}
+			{% elseif character.looting %}
 				{{ 'charstatus.looting'|trans }}
-			{% elseif status = 'blocking' %}
+			{% elseif character.blocking %}
 				{{ 'charstatus.blocking'|trans }}
-			{% elseif status = 'granting' %}
+			{% elseif character.granting %}
 				{{ 'charstatus.granting'|trans }}
-			{% elseif status = 'renaming' %}
+			{% elseif character.renaming %}
 				{{ 'charstatus.renaming'|trans }}
-			{% elseif status = 'reclaiming' %}
+			{% elseif character.reclaiming %}
 				{{ 'charstatus.reclaiming'|trans }}
 			{% else %}{% if character.travel %}
 					{# So, this nested if is done so that if nothing else, this field ends up blank. --Andrew #}
