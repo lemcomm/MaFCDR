@@ -35,9 +35,26 @@
 		</td>
 		<td>
 			{% if character.inbattle %}
-				{{ 'inbattle'|trans }}
-				{% else %}{% if character.travel %}
-					{{ 'travelling'|trans }}
+				{{ 'charstatus.inbattle'|trans }}
+			{% elseif character.annexing %}
+				{{ 'charstatus.annexing'|trans }}
+			{% elseif character.supporting %}
+				{{ 'charstatus.supporting'|trans }}
+			{% elseif character.opposing %}
+				{{ 'charstatus.opposing'|trans }}
+			{% elseif character.looting %}
+				{{ 'charstatus.looting'|trans }}
+			{% elseif character.blocking %}
+				{{ 'charstatus.blocking'|trans }}
+			{% elseif character.granting %}
+				{{ 'charstatus.granting'|trans }}
+			{% elseif character.renaming %}
+				{{ 'charstatus.renaming'|trans }}
+			{% elseif character.reclaiming %}
+				{{ 'charstatus.reclaiming'|trans }}
+			{% else %}{% if character.travel %}
+					{# So, this nested if is done so that if nothing else, this field ends up blank. --Andrew #}
+					{{ 'charstatus.travelling'|trans }}
 				{% endif %}
 			{% endif %}
 		</td>
