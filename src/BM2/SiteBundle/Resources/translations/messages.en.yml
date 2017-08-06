@@ -190,7 +190,9 @@ account:
   0: locked
   10: casual
   20: basic
+  21: volunteer
   40: intense
+  41: developer
   50: ultimate
   name: account level
   limit: character limit
@@ -511,6 +513,7 @@ character:
  status:  Status of %name%
  history: character history
  inactive:  this character has not been played in a while
+ banned:    This user has been banned.
  newplayer: This character is being played by a player who is new to the game. Please act accordingly.
  notstarted:
   title:    Rumours
@@ -796,8 +799,17 @@ none:         none
 yes:          yes
 no:           no
 techtree:     Technology Tree
-inbattle:     battle
-travelling:   travel
+charstatus:
+ inbattle:     battle
+ travelling:   travel
+ annexing:     annex
+ supporting:   support
+ opposing:     oppose
+ looting:      loot
+ blocking:     block
+ granting:     grant
+ renaming:     rename
+ reclaiming:   reclaim
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 inside:       inside %place%
@@ -915,6 +927,9 @@ error:
   location:     This character does not have a location, select a start location first.
   soul:         This character is dead and cannot affect the world of the living anymore.
   user:         You are not logged in or your session has expired. Please log in (again).
+  
+ banned:
+  multi:        The account you're logged into has been banned for using multiple free accounts.
 
  payment:
   already:      This code has already been redeemed, maybe automatically as you logged in. Check your credit history, please. If you believe this to be an error, please contact tom@mightandfealty.com for details.
