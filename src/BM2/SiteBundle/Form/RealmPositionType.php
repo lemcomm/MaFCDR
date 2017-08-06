@@ -38,7 +38,7 @@ class RealmPositionType extends AbstractType {
 			'required'=>true,
 		));
 		if (!$is_ruler) {
-			$builder->add('permissions', 'entity', array(
+			/*$builder->add('permissions', 'entity', array(
 				'label'=>'position.permissions',
 				'required' => false,
 				'multiple' => true,
@@ -49,23 +49,42 @@ class RealmPositionType extends AbstractType {
 				'query_builder'=>function(EntityRepository $er) {
 					return $er->createQueryBuilder('p')->where('p.class = :class')->setParameter('class', 'realm');
 				}
+			));*/
+			$builder->add('type', 'entity', array(
+				'label' => 'position.type',
+				'required' => false,
+				'placeholder' => 'position.help.none',
+				'attr' => array('title'=>'position.help.type'),
+				'class' => 'BM2SiteBundle:PositionType',
+				'choice_translation_domain' => true,
+				'choice_label' => 'name',
+				'query_builder' => function(EntityRepository $er) {
+					return $er->createQueryBuilder('p')->where('p.id > 0')->orderBy('p.name');
+				}
 			));
+
 			$builder->add('elected', 'checkbox', array(
 				'label'=>'position.elected',
 				'required' => false,
 				'attr' => array('title'=>'position.help.elected'),
 			));
 			$builder->add('rank', 'number', array(
-				'label'=>'position.inherit',
+				'label'=>'position.rank',
 				'required' => false,
 				'empty_data' => '1',
-				'attr' => array('title'=>'position.help.inherit'),
+				'attr' => array('title'=>'position.help.rank'),
 			));
 			$builder->add('retired', 'checkbox', array(
 				'label'=>'position.retired',
 				'data'=> false,
 				'required' => false,
 				'attr' => array('title'=>'position.help.retired'),
+			));
+			$builder->add('keeponslumber', 'checkbox', array(
+				'label'=>'position.keeponslumber',
+				'data'=> false,
+				'required' => false,
+				'attr' => array('title'=>'position.help.keeponslumber'),
 			));
 		}
 		$builder->add('inherit', 'checkbox', array(
@@ -89,4 +108,5 @@ class RealmPositionType extends AbstractType {
 	public function getName() {
 		return 'realmposition';
 	}
+			
 }
