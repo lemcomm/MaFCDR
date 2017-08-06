@@ -109,15 +109,6 @@ class AccountController extends Controller {
 		$characters = array(); 
 		$npcs = array();
 		
-		//building our list of character statuses --Andrew
-		$annexing = false;
-		$supporting = false;
-		$opposing = false;
-		$looting = false;
-		$blocking = false;
-		$granting = false;
-		$reclaiming = false;
-		
 		foreach ($user->getCharacters() as $character) {
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
@@ -138,29 +129,42 @@ class AccountController extends Controller {
 			}
 			
 			// This adds in functionality for detecting character actions on this page. --Andrew
+			$status = ''; // Since them each being their own variable didn't work, we're using a blank string now. --Andrew
 			if ($character->hasAction) {
 				foreach ($character->getActions as $actions) {
 					switch($actions) {
 						case 'settlement.take':
-							$annexing = true;
+							$status = 'annexing';
 							break;
 						case 'support':
-							$supporting = true;
+							if (!$status = 'annexing') {
+								$status = 'supporting'
+							}
 							break;
 						case 'oppose':
-							$opposing = true;
+							if (!$status = ('annexing' || 'support')) {
+								$status = 'opposing';
+							}
 							break;
 						case 'settlement.loot':
-							$looting = true;
+							if (!$status = ('annexing' || 'support' || 'oppose')) {
+								$status = 'looting';
+							}
 							break;
 						case 'military.block':
-							$blocking = true;
+							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting')) {
+								$status = 'blocking';
+							}
 							break;
 						case 'settlement.grant':
-							$granting = true;
+							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting' || 'blocking')) {
+								$status = 'granting';
+							}
 							break;
 						case 'military.reclaim':
-							$reclaiming = true;
+							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting' || 'blocking' || 'granting')) {
+								$status = 'reclaiming';
+							}
 							break;
 					}
 				}
@@ -180,13 +184,7 @@ class AccountController extends Controller {
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
 				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
-				'annexing' => $annexing,
-				'supporting' => $supporting,
-				'opposing' => $opposing,
-				'looting' => $looting,
-				'blocking' => $blocking,
-				'granting' => $granting,
-				'reclaiming' => $reclaiming,
+				'status' => $status,
 				'unread' => $unread,
 				'events' => $events
 			);
