@@ -114,7 +114,7 @@ class RealmController extends Controller {
 		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
 			$restorable = TRUE;
 			echo $restorable;
-		}*/
+		}*/	
 
 		return array(
 			'realm' =>		$realm,
