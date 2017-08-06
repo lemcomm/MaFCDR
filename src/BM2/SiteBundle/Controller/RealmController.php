@@ -293,7 +293,6 @@ class RealmController extends Controller {
 			$position = new RealmPosition;
 			$position->setRealm($realm);
 			$position->setRuler(false);
-			$position->setDescription("");
 		} else {
 			$is_new = false;
 			if ($position->getRealm() != $realm) {
