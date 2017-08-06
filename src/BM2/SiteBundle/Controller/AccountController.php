@@ -106,7 +106,18 @@ class AccountController extends Controller {
 		$user->setCurrentCharacter(null);
 		$this->getDoctrine()->getManager()->flush();
 
-		$characters = array(); $npcs = array();
+		$characters = array(); 
+		$npcs = array();
+		
+		//building our list of character statuses --Andrew
+		$annexing = false;
+		$supporting = false;
+		$opposing = false;
+		$looting = false;
+		$blocking = false;
+		$granting = false;
+		$reclaiming = false;
+		
 		foreach ($user->getCharacters() as $character) {
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
@@ -125,7 +136,35 @@ class AccountController extends Controller {
 				$unread = 0;
 				$events = 0;
 			}
-
+			
+			// This adds in functionality for detecting character actions on this page. --Andrew
+			if ($character->hasAction) {
+				foreach ($character->getActions as $actions) {
+					switch($actions) {
+						case 'settlement.take':
+							$annexing = true;
+							break;
+						case 'support':
+							$supporting = true;
+							break;
+						case 'oppose':
+							$opposing = true;
+							break;
+						case 'settlement.loot':
+							$looting = true;
+							break;
+						case 'military.block':
+							$blocking = true;
+							break;
+						case 'settlement.grant':
+							$granting = true;
+							break;
+						case 'military.reclaim':
+							$reclaiming = true;
+							break;
+					}
+				}
+			}
 
 			$data = array(
 				'id' => $character->getId(),
@@ -141,6 +180,13 @@ class AccountController extends Controller {
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
 				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'annexing' => $annexing,
+				'supporting' => $supporting,
+				'opposing' => $opposing,
+				'looting' => $looting,
+				'blocking' => $blocking,
+				'granting' => $granting,
+				'reclaiming' => $reclaiming,
 				'unread' => $unread,
 				'events' => $events
 			);
