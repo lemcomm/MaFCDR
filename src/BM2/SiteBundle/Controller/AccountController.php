@@ -108,8 +108,17 @@ class AccountController extends Controller {
 
 		$characters = array(); 
 		$npcs = array();
-		
+				
 		foreach ($user->getCharacters() as $character) {
+			//building our list of character statuses --Andrew
+			$annexing = false;
+			$supporting = false;
+			$opposing = false;
+			$looting = false;
+			$blocking = false;
+			$granting = false;
+			$renaming = false;
+			$reclaiming = false;
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
@@ -129,42 +138,32 @@ class AccountController extends Controller {
 			}
 			
 			// This adds in functionality for detecting character actions on this page. --Andrew
-			$status = ''; // Since them each being their own variable didn't work, we're using a blank string now. --Andrew
-			if ($character->hasAction) {
-				foreach ($character->getActions as $actions) {
-					switch($actions) {
+			if ($character->getActions()) {
+				foreach ($character->getActions() as $actions) {
+					switch($actions->getType()) {
 						case 'settlement.take':
-							$status = 'annexing';
+							$annexing = true;
 							break;
 						case 'support':
-							if (!$status = 'annexing') {
-								$status = 'supporting'
-							}
+							$supporting = true;
 							break;
 						case 'oppose':
-							if (!$status = ('annexing' || 'support')) {
-								$status = 'opposing';
-							}
+							$opposing = true;
 							break;
 						case 'settlement.loot':
-							if (!$status = ('annexing' || 'support' || 'oppose')) {
-								$status = 'looting';
-							}
+							$looting = true;
 							break;
 						case 'military.block':
-							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting')) {
-								$status = 'blocking';
-							}
+							$blocking = true;
 							break;
 						case 'settlement.grant':
-							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting' || 'blocking')) {
-								$status = 'granting';
-							}
+							$granting = true;
+							break;
+						case 'settlement.rename':
+							$renaming = true;
 							break;
 						case 'military.reclaim':
-							if (!$status = ('annexing' || 'support' || 'oppose' || 'looting' || 'blocking' || 'granting')) {
-								$status = 'reclaiming';
-							}
+							$reclaiming = true;
 							break;
 					}
 				}
@@ -184,7 +183,14 @@ class AccountController extends Controller {
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
 				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
-				'status' => $status,
+				'annexing' => $annexing,
+				'supporting' => $supporting,
+				'opposing' => $opposing,
+				'looting' => $looting,
+				'blocking' => $blocking,
+				'granting' => $granting,
+				'renaming' => $renaming,
+				'reclaiming' => $reclaiming,
 				'unread' => $unread,
 				'events' => $events
 			);
