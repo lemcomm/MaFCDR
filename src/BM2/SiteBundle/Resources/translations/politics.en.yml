@@ -355,6 +355,19 @@ position:
   submit:       announce changes
   done:         Your changes have been completed and announced.
   nodemoruler:  Rulers cannot be demoted, this change has been ignored.
+ types:
+  advisory:     advisory
+  executive:    executive
+  family:       family
+  foreign affairs: foreign affairs
+  history:      history
+  intelligence: intelligence
+  interior:     interior
+  judicial:     judicial
+  legislative:  legistlative
+  military:     military
+  revenue:      revenue
+  other:        other
 
 war:
  name:          Declare War
