@@ -10,7 +10,7 @@ parameters:
     mailer_host:       ~
     mailer_port:       25
     mailer_authmode:   login
-    mailer_encryption: none
+    mailer_encryption: null
     mailer_user:       ~
     mailer_password:   ~
     mailer_disable:    false
