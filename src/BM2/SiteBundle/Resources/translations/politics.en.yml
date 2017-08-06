@@ -319,22 +319,31 @@ realm:
    7: empress
 
 position:
- name:        title
- description: formal description
- elected:     is elected
- inherit:     can be inherited
- term:        term length
+ name:          title
+ description:   formal description
+ elected:       is elected
+ inherit:       can be inherited
+ rank:		rank
+ type:          type of position
+ keepslumber:   keep on slumber
+ term:          term length
  terms:
-  0:          for life
-  365:        four years (1 year real time)
-  90:         one year (3 months real time)
-  30:         one quarter (30 days real time)
- permissions: permissions
- submit:      edit position
- remove:      remove position
+  0:            for life
+  365:          four years (1 year real time)
+  90:           one year (3 months real time)
+  30:           one quarter (30 days real time)
+ permissions:   permissions
+ submit:        edit position
+ remove:        remove position
+ keeponslumber: kept on slumber
+ retired:       retired
  help:
-  elected:    Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.
-  inherit:    Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.
+  elected:      Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.
+  inherit:      Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.
+  type:         Select the type of position this is. New types can be suggested on the forum.
+  none:         none
+  rank:         Please input a number to determine ordering of positions when part of a list. Lower numbers are listed first.
+  keeponslumber: Check this box to make this a position that is kept when a character slumbers. If left unchecked, position will be lost if a character slumbers.
  appoint:
   intro: >
     You can appoint and discharge officials from this position at any time for any reason. They will, of course, be informed about your decision immediately
@@ -342,9 +351,9 @@ position:
   intro2: >
     You can appoint new rulers for this realm at any time for any reason. <b>Keep in mind that you cannot demote them again</b>. Once they are
     appointed, they are your equals in power and neither of you can remove the other from it.
-  candidates: candidates
-  submit:     announce changes
-  done:       Your changes have been completed and announced.
+  candidates:  candidates
+  submit:       announce changes
+  done:         Your changes have been completed and announced.
   nodemoruler:  Rulers cannot be demoted, this change has been ignored.
 
 war:
