@@ -212,6 +212,16 @@ class RealmManager {
 	}
 	
 	
+	public function makePositionHolder(RealmPosition $position, Character $newholder, $ignore_position=false) {
+		if (!$ignore_position) {
+			if (!$position->getHolders()->contains($newholder)) {
+				$position->addHolder($newholder);
+				$newholder->addPosition($position);
+			}
+		}
+	}
+	
+	
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
