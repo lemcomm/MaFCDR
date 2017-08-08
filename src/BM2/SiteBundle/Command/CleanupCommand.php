@@ -52,7 +52,7 @@ class CleanupCommand extends ContainerAwareCommand {
 		return array(false, false);
 	}
 
-	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null) {
+	public function inheritRealmDeath(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makeRuler($realm, $heir);
 		// Note that this CAN leave a character in charge of a realm he was not a member of
 		if ($from == $via || $via == null) {
@@ -70,22 +70,78 @@ class CleanupCommand extends ContainerAwareCommand {
 				History::HIGH, true
 			);
 		}
-		$this->history->logEvent(
-			$realm, 'event.realm.inherited',
-			array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheriteddeath',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+				);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheritedslumber',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+			);
+		}
+	}
+
+	private function failInheritRealmDeath(Character $character, Realm $realm, $why = 'death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifaildeath',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifailslumber',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		}
+	}
+	
+	public function inheritPosition(RealmPosition $position, Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
+		$this->realmmanager->makePositionHolder($position, $heir);
+		// Note that this CAN leave a character in charge of a realm he was not a member of
+		if ($from == $via || $via == null) {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inherit.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character%'=>$from->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inheritvia.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				History::HIGH, true
+			);
+		}
+		if ($why == 'death') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.death',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
 			History::HIGH, true
-		);
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.slumber',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+			History::HIGH, true
+			);
+		}
 	}
-
-	private function failInheritRealm(Character $character, Realm $realm) {
+	
+	private function failInheritPosition(Character $character, RealmPosition $position) {
 		$this->history->logEvent(
-			$realm, 'event.realm.inherifail',
-			array('%link-character%'=>$character->getId()),
-			HISTORY::HIGH, true
+			$position->getRealm(), 
+			'event.position.inactive',
+			array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+			History::LOW, true
 		);
-
 	}
-
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$em = $this->getContainer()->get('doctrine')->getManager();
@@ -98,36 +154,77 @@ class CleanupCommand extends ContainerAwareCommand {
 
 		$output->writeln("checking for dead characters with positions...");
 		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.positions p WHERE c.alive = false OR c.slumbering = true');
-		$dead = $query->getResult();
-		foreach ($dead as $character) {
+		$results = $query->getResult();
+		$dead = [];
+		$slumbered = [];
+		foreach ($results as $character) {			
 			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
-
-			$output->writeln($character->getName()." is dead or inactive, heir: ".($heir?$heir->getName():"(nobody)"));
+			if ($character->isAlive == FALSE) {
+				$dead[] = $character;
+			} else if ($character->isSlumbering == TRUE) {
+				$slumbered[] = $character;
+			}
+		}
+		foreach ($dead as $character) {
+			$output->writeln($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
 			foreach ($character->getPositions() as $position) {
 				if ($position->getRuler()) {
 					if ($heir) {
-						$this->inheritRealm($position->getRealm(), $heir, $character, $via);
+						$this->inheritRealmDeath($position->getRealm(), $heir, $character, $via, 'death');
 					} else {
-						$this->failInheritRealm($character, $position->getRealm());
+						$this->failInheritRealmDeath($character, $position->getRealm());
 					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else if ($position->getInherit()) {
+					if ($heir) {
+						$this->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
+					} else {
+						$this->failInheritPosition($character, $position);
+					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
 				} else {
-					// FIXME: wrong message for inactive characters!
-					if (!$character->isAlive()) {
-						$msg = 'event.position.death';
-					} else {
-						$msg = 'event.position.inactive';
-					}
 					$this->history->logEvent(
-						$position->getRealm(), $msg,
+						$position->getRealm(), 
+						'event.position.death',
 						array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 						History::LOW, true
 					);
+					$position->removeHolder($character);
+					$character->removePosition($position);
 				}
-				$position->removeHolder($character);
-				$character->removePosition($position);
 			}
 		}
+		foreach ($slumbered as $character) {			
+			$output->writeln($character->getName()." is inactive, heir: ".($heir?$heir->getName():"(nobody)"));
+			foreach ($character->getPositions() as $position) {
+				if ($position->getRuler()) {
+					if ($heir) {
+						$this->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
+					} else {
+						$this->failInheritRealm($character, $position->getRealm());
+					}
+				} else if (!$position->getKeepOnSlumber && $position->getInherit) {
+					if ($heir) {
+						$this->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
+					} else {
+						$this->failInheritPosition($character, $position);
+					}
+				} else if (!$position->getKeepOnSlumber) {
+					$this->failInheritPosition($character, $position->getRealm());
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else {
+					$this->history->logEvent(
+						$position->getRealm(),
+						'event.position.inactivekept',
+						array('%link-character%'=>$character->getId(), '%link-position%'=>$position->getId()),
+						History::LOW, true
+					);
+				}
+			
 		$em->flush();
 
 		$output->writeln("checking for realms without a ruler...");
