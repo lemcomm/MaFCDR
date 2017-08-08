@@ -134,13 +134,22 @@ class CleanupCommand extends ContainerAwareCommand {
 		}
 	}
 	
-	private function failInheritPosition(Character $character, RealmPosition $position) {
-		$this->history->logEvent(
-			$position->getRealm(), 
-			'event.position.inactive',
-			array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
-			History::LOW, true
-		);
+	private function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.inactive',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.death',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		}
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -173,7 +182,7 @@ class CleanupCommand extends ContainerAwareCommand {
 					if ($heir) {
 						$this->inheritRealmDeath($position->getRealm(), $heir, $character, $via, 'death');
 					} else {
-						$this->failInheritRealmDeath($character, $position->getRealm());
+						$this->failInheritRealmDeath($character, $position->getRealm(), 'death');
 					}
 					$position->removeHolder($character);
 					$character->removePosition($position);
@@ -181,7 +190,7 @@ class CleanupCommand extends ContainerAwareCommand {
 					if ($heir) {
 						$this->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
 					} else {
-						$this->failInheritPosition($character, $position);
+						$this->failInheritPosition($character, $position, 'death');
 					}
 					$position->removeHolder($character);
 					$character->removePosition($position);
@@ -204,16 +213,20 @@ class CleanupCommand extends ContainerAwareCommand {
 					if ($heir) {
 						$this->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
 					} else {
-						$this->failInheritRealm($character, $position->getRealm());
+						$this->failInheritRealm($character, $position->getRealm(), 'slumber');
 					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
 				} else if (!$position->getKeepOnSlumber && $position->getInherit) {
 					if ($heir) {
 						$this->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 					} else {
-						$this->failInheritPosition($character, $position);
+						$this->failInheritPosition($character, $position, 'slumber');
 					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
 				} else if (!$position->getKeepOnSlumber) {
-					$this->failInheritPosition($character, $position->getRealm());
+					$this->failInheritPosition($character, $position->getRealm(), 'slumber');
 					$position->removeHolder($character);
 					$character->removePosition($position);
 				} else {
