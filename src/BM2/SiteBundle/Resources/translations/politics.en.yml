@@ -321,29 +321,30 @@ realm:
    7: empress
 
 position:
- name:          title
- description:   formal description
- elected:       is elected
- inherit:       can be inherited
- rank:		rank
- type:          type of position
- keepslumber:   keep on slumber
- term:          term length
+ name:          Title:
+ description:   Formal Description
+ elected:       Position is elected?
+ inherit:       Position is inherited?
+ rank:          In what order should this position appear on lists?
+ type:          Type of Position
+ keepslumber:   Position kept on slumber?
+ term:          Length of Position Term:
  terms:
-  0:            for life
-  365:          four years (1 year real time)
-  90:           one year (3 months real time)
-  30:           one quarter (30 days real time)
- permissions:   permissions
- submit:        edit position
- remove:        remove position
- keeponslumber: kept on slumber
- retired:       retired
+  0:            For Life
+  365:          Four Game Years (1 Year Real Time)
+  90:           One Game Year (3 Months)
+  30:           One Quarter (30 Days Real Time)
+ permissions:   What Permissions should this position hold?
+ submit:        Edit Position
+ remove:        Remove Position
+ keeponslumber: Position kept on slumber?
+ retired:       Retire this position?
  help:
   elected:      Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.
   inherit:      Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.
   type:         Select the type of position this is. New types can be suggested on the forum.
   none:         none
+  retired:      Check this box if this position is no longer considered active, or if it's no longer in use. This will remove it from locations where it is listed publicly, but it's holders will still hold the position.
   rank:         Please input a number to determine ordering of positions when part of a list. Lower numbers are listed first.
   keeponslumber: Check this box to make this a position that is kept when a character slumbers. If left unchecked, position will be lost if a character slumbers.
  appoint:
