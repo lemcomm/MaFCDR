@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CleanupCommand extends ContainerAwareCommand {
 
+	# TODO: Put this someplace that makes more sense, rather than a command called Cleanup. Maybe the Realm Cycle of GameRunner? --Andrew
 	private $seen;
 	private $history;
 	private $realmmanager;
@@ -54,7 +55,7 @@ class CleanupCommand extends ContainerAwareCommand {
 
 	public function inheritRealmDeath(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makeRuler($realm, $heir);
-		// Note that this CAN leave a character in charge of a realm he was not a member of
+		// NOTE: This can leave someone ruling a realm they weren't originally part of!
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
@@ -103,7 +104,7 @@ class CleanupCommand extends ContainerAwareCommand {
 	
 	public function inheritPosition(RealmPosition $position, Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makePositionHolder($position, $heir);
-		// Note that this CAN leave a character in charge of a realm he was not a member of
+		// NOTE: This can add characters to realms they weren't already in!
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
@@ -237,20 +238,10 @@ class CleanupCommand extends ContainerAwareCommand {
 						History::LOW, true
 					);
 				}
-			
-		$em->flush();
-
-		$output->writeln("checking for realms without a ruler...");
-		$query = $em->createQuery('SELECT r FROM BM2SiteBundle:Realm r LEFT JOIN r.positions p LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h IS NULL');
-		foreach ($query->getResult() as $realm) {
-			if ($realm->findMembers()->count() > 0) {
-				// FIXME: do we have an election? shouldn't we trigger one if not?
-				//$output->writeln($realm->getName().' => no ruler');
-			} else {
-				// FIXME: shouldn't we go to dead?
-				//$output->writeln('('.$realm->getName().')');
 			}
 		}
+		$em->flush();
+	
 	}
 
 
