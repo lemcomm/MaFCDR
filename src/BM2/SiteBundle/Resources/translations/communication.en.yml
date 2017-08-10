@@ -202,7 +202,9 @@ event:
   settlement:   Attack on %settlement% started.
 
  realm:
-  founded:      Founded by %character%.
+  founded:      Founded by %character%.  
+  inherited:    Rulership passed to %character-2% upon the death of %character-1%.
+  inherifail:   Rulership disputed after the death of %character%, who left no heir.
   inheriteddeath:    Rulership passed to %character-2% upon the death of %character-1%.
   inherifaildeath:   Rulership disputed after the death of %character%, who left no heir.
   inheritedslumber:  Rulership passed to %character-2% upon the slumbering of %character-1%
