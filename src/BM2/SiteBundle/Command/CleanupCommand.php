@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Command;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GeoData;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\RegionFamiliarity;
 use BM2\SiteBundle\Service\History;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -53,7 +54,7 @@ class CleanupCommand extends ContainerAwareCommand {
 		return array(false, false);
 	}
 
-	public function inheritRealmDeath(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
+	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makeRuler($realm, $heir);
 		// NOTE: This can leave someone ruling a realm they weren't originally part of!
 		if ($from == $via || $via == null) {
@@ -86,7 +87,7 @@ class CleanupCommand extends ContainerAwareCommand {
 		}
 	}
 
-	private function failInheritRealmDeath(Character $character, Realm $realm, $why = 'death') {
+	public function failInheritRealm(Character $character, Realm $realm, $why = 'death') {
 		if ($why == 'death') {
 			$this->history->logEvent(
 				$realm, 'event.realm.inherifaildeath',
@@ -158,32 +159,47 @@ class CleanupCommand extends ContainerAwareCommand {
 		$this->history = $this->getContainer()->get('history');
 		$this->realmmanager = $this->getContainer()->get('realm_manager');
 
-		// remove dead characters from map
+		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.alive=false');
+		$deadcount = count($query->getResult());
+		$output->writeln("Removing $deadcount dead from the map...");
 		$query = $em->createQuery('UPDATE BM2SiteBundle:Character c SET c.location=null WHERE c.alive=false');
 		$query->execute();
 
-		$output->writeln("checking for dead characters with positions...");
+		$output->writeln("checking for dead and slumbering characters with positions...");
 		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.positions p WHERE c.alive = false OR c.slumbering = true');
-		$results = $query->getResult();
+		$result = $query->getResult();
+		if (count($result) > 0) {
+			$output->writeln("Sorting the dead from the slumbering...");
+		} else {
+			$output->writeln("No dead or slumbering found!");
+		}
 		$dead = [];
 		$slumbered = [];
-		foreach ($results as $character) {			
+		$deadcount = 0;
+		$slumbercount = 0;
+		$keeponslumbercount = 0;
+		foreach ($result as $character) {
 			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
-			if ($character->isAlive == FALSE) {
+			if ($character->isAlive() == FALSE) {
+				$deadcount++;
 				$dead[] = $character;
-			} else if ($character->isSlumbering == TRUE) {
+			} else if ($character->getSlumbering() == TRUE) {
+				$slumbercount++;
 				$slumbered[] = $character;
 			}
+		}
+		if (count($deadcount)+count($slumbercount) != 0) {
+			$output->writeln("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
 			$output->writeln($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
 			foreach ($character->getPositions() as $position) {
 				if ($position->getRuler()) {
 					if ($heir) {
-						$this->inheritRealmDeath($position->getRealm(), $heir, $character, $via, 'death');
+						$this->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
 					} else {
-						$this->failInheritRealmDeath($character, $position->getRealm(), 'death');
+						$this->failInheritRealm($character, $position->getRealm(), 'death');
 					}
 					$position->removeHolder($character);
 					$character->removePosition($position);
@@ -218,7 +234,7 @@ class CleanupCommand extends ContainerAwareCommand {
 					}
 					$position->removeHolder($character);
 					$character->removePosition($position);
-				} else if (!$position->getKeepOnSlumber && $position->getInherit) {
+				} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
 					if ($heir) {
 						$this->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 					} else {
@@ -226,8 +242,8 @@ class CleanupCommand extends ContainerAwareCommand {
 					}
 					$position->removeHolder($character);
 					$character->removePosition($position);
-				} else if (!$position->getKeepOnSlumber) {
-					$this->failInheritPosition($character, $position->getRealm(), 'slumber');
+				} else if (!$position->getKeepOnSlumber()) {
+					$this->failInheritPosition($character, $position, 'slumber');
 					$position->removeHolder($character);
 					$character->removePosition($position);
 				} else {
@@ -237,13 +253,14 @@ class CleanupCommand extends ContainerAwareCommand {
 						array('%link-character%'=>$character->getId(), '%link-position%'=>$position->getId()),
 						History::LOW, true
 					);
+					$keeponslumbercount++;
 				}
 			}
 		}
+		$output->writeln("$keeponslumbercount positions kept on slumber!");
 		$em->flush();
 	
 	}
 
 
 }
-
