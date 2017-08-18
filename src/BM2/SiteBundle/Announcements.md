@@ -33,5 +33,5 @@ If you're seeing this, we are pleased to welcome you to the new Might & Fealty C
 M&F Version 1.0.2.5 - "Community Takeover Build"
 
 ### Upcoming ###
-Version 1.0.2.6: a couple small fixes for bandit spawning.
+Version 1.0.2.6: a couple small fixes for bandit spawning.  
 Version 1.0.3.0: "To Your Positions" - Numerous fixes and expansions of positions and how they work.
