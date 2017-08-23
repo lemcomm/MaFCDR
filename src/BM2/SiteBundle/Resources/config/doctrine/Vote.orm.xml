@@ -5,7 +5,6 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="vote" type="smallint"/>
-		<field name="weight" type="integer"/>
 
 		<many-to-one field="character" target-entity="Character" inversed-by="votes"/>
 		<many-to-one field="election" target-entity="Election" inversed-by="votes"/>
