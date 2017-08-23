@@ -5,12 +5,16 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<field name="rank" type="integer" nullable="true"/>
 		<field name="description" type="text"/>
+		<many-to-one field="type" target-entity="PositionType" inversed-by="positions" nullable="true"/>
 		<field name="ruler" type="boolean"/>
 		<field name="elected" type="boolean"/>
 		<field name="inherit" type="boolean"/>
 		<field name="term" type="smallint"/>
 		<field name="current_term_ends" type="datetime" nullable="true"/>
+		<field name="retired" type="boolean" nullable="true"/>
+		<field name="keeponslumber" type="boolean" nullable="true"/>
 
 		<many-to-one field="realm" target-entity="Realm" inversed-by="positions"/>
 		<many-to-many field="permissions" target-entity="Permission"/>
