@@ -30,7 +30,7 @@ class DungeonEventFilterExtension extends \Twig_Extension {
 
 	public function getFilters() {
 		return array(
-			'dungeoneventfilter' => new \Twig_SimpleFilter('dungeonEventFilter', array($this, 'dungeonEventFileter'), array('is_safe' => array('html'))),
+			'dungeoneventfilter' => new \Twig_SimpleFilter('dungeonEventFilter', array($this, 'dungeonEventFilter'), array('is_safe' => array('html'))),
 		);
 	}
 
