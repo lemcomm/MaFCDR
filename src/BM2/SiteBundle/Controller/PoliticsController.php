@@ -495,6 +495,7 @@ class PoliticsController extends Controller {
 			$is_new = false;
 		} else {
 			$listing = new Listing;
+			$listing->setName('new list'); // this prevents SQL errors below, somehow the required for name doesn't catch
 			$can_delete = false;
 			$locked_reasons = array();
 			$is_new = true;

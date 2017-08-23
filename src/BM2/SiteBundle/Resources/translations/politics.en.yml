@@ -209,6 +209,8 @@ relation:
  with:        with
  sex:         includes sex
  nosex:       without sex
+ heraldry:    shares heraldry
+ noheraldry:  without heraldry
  crest:       share heraldry
 
  choice:
@@ -404,15 +406,13 @@ diplomacy:
   done:         You have successfully submitted to the superior power of %target% and made your %realm% a part of it.
 
  restore:
-  name:         Restore Subrealm
-  description:  Use your position as ruler of a realm to restore one if its abandoned subrealms.
+  name:         Restore %name%
+  link:         Restore this Subrealm
+  description:  Use your position as ruler of this realm's superior to bring this realm back into existence.
   intro: >
-    As the ruler of %name%, you can use your authority to bring back into existence any of it's abandoned subrealms.
-    All you need to do is determine which subrealm you wish to restore, and you will be made it's new ruler, allowing you to then give that position to another.
-  restore:      -- choose --
-  submit:       revive realm
-  invalid:
-   realm:       in order to restore a realm, you must select the realm to revive.
+    As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself it's ruler in the process.
+    All you need to do is confirm that this is an action you want to take by clicking the button below.
+  submit:       Revive Realm
   success:      You have successfully restored the subrealm.
 
  subrealm:

@@ -360,13 +360,6 @@ class CharacterController extends Controller {
 				$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
 				list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
 				$this->get('message_manager')->setAllUnread($msg_user);
-
-				// new knight setup for new message system
-				// FIXME: what if it doesn't have a tower?
-				$this->get('communication')->createTowerLink($character, $startlocation);
-				$msg = $this->get('communication')->NewMessage($liege, $content, array('knightoffer'), $character);
-				$this->get('communication')->addLink($character, $msg, false);
-				$this->get('communication')->addLink($liege, $msg, false);
 			}
 
 			$form_existing->bind($request);
@@ -425,6 +418,7 @@ class CharacterController extends Controller {
 	public function viewAction(Character $id) {
 		$char = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$banned = false;
 		if ($character) {
 			$details = $this->get('interactions')->characterViewDetails($character, $char);
 		} else {
@@ -437,11 +431,15 @@ class CharacterController extends Controller {
 			$entourage = null;
 			$soldiers = null;
 		}
+		if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+			$banned = true;
+		}
 		return array(
 			'char'		=> $char,
 			'details'	=> $details,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
+			'banned'	=> $banned,
 		);
 	}
 
@@ -888,9 +886,35 @@ class CharacterController extends Controller {
 		$character = $this->get('dispatcher')->gateway('metaHeraldryTest');
 
 		$available = array();
+		
+		# Get all crests for the current user.
 		foreach ($character->getUser()->getCrests() as $crest) {
 			$available[] = $crest->getId();
 		}
+		
+                # Check for parents having different crests.
+                foreach ($character->getParents() as $parent) {
+                        if ($parent->getCrest()) {
+                                $parentcrest = $parent->getCrest()->getId();
+                                if (!in_array($parentcrest, $available)) {
+                                        $available[] = $parentcrest;
+                                }
+                        }
+                }
+
+                # Check for partners having different crests.
+                foreach ($character->getPartnerships() as $partnership) {
+                        if ($partnership->getPartnerMayUseCrest()==TRUE) {
+                                foreach ($partnership->getPartners() as $partners) {
+                                        if ($partners->getCrest()) {
+                                                $partnercrest = $partners->getCrest()->getId();
+                                                if (!in_array($partnercrest, $available)) {
+                                                        $available[] = $partnercrest;
+                                                }
+                                        }
+                                }
+                        }
+                }
 
 		if (empty($available)) {
 			return array('nocrests'=>true);

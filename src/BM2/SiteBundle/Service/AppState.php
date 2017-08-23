@@ -35,7 +35,6 @@ class AppState {
 		return $this->languages;
 	}
 
-
 	public function getCharacter($required=true, $ok_if_dead=false, $ok_if_notstarted=false) {
 		// check if we have a user first
 		$token = $this->securitycontext->getToken();
@@ -45,6 +44,11 @@ class AppState {
 		$user = $token->getUser();
 		if (!$user || ! $user instanceof UserInterface) {
 			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.user'); }
+		}
+
+		# Let the ban checks begin...
+		if ($this->securitycontext->isGranted('ROLE_BANNED_MULTI')) {
+			if (!$required) { return null; } else { throw new AccessDeniedException('error.banned.multi'); }
 		}
 
 		// FIXME: these also redirect to the login page, which is bullshit, they should redirect to the characters page

@@ -66,8 +66,13 @@ class BattleRunner {
 		$sortie = false;
 		$some_inside = false;
 		$some_outside = false;
+		$no_rewards = false;
 		foreach ($battle->getGroups() as $group) {
 			foreach ($group->getCharacters() as $char) {
+				if ($char->getSlumbering() == true) {
+					$no_rewards = true;
+					$this->log(3, "No rewards flag set.\n");
+				}
 				if ($char->getInsideSettlement()) {
 					if ($battle->getSettlement()) {
 						$some_inside = true;
@@ -83,6 +88,7 @@ class BattleRunner {
 		if ($some_outside && $some_inside) {
 			$assault = true;
 		}
+		
 
 		$this->report = new BattleReport;
 		$this->report->setCycle($cycle);
@@ -138,7 +144,7 @@ class BattleRunner {
 		}
 
 		$this->log(15, "preparing...\n");
-		if ($this->prepare($battle)) {
+		if ($this->prepare($battle, $no_rewards)) {
 			foreach ($battle->getGroups() as $group) {
 				foreach ($group->getCharacters() as $char) {
 					$me = new BattleParticipant;
@@ -152,7 +158,7 @@ class BattleRunner {
 			}
 			// the main call to actually run the battle:
 			$this->log(15, "resolving...\n");
-			$this->resolveBattle();
+			$this->resolveBattle($no_rewards);
 		} else {
 			// if there are no soldiers in the battle
 			$this->log(1, "failed battle\n");
@@ -211,7 +217,7 @@ class BattleRunner {
 
 	// FIXME: apparently, if you fight someone with no troops, you fight your own soldiers?
 
-	private function prepare(Battle $battle) {
+	private function prepare(Battle $battle, $no_rewards) {
 		$starting=array();
 		$combatworthygroups = 0;
 		$enemy=null;
@@ -222,10 +228,12 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getSoldiers() as $soldier) {
-				if ($soldier->getExperience()<=5) {
-					$soldier->gainExperience(2);
-				} else {
-					$soldier->gainExperience(1);					
+				if (!$no_rewards) {
+					if ($soldier->getExperience()<=5) {
+						$soldier->gainExperience(2);
+					} else {
+						$soldier->gainExperience(1);					
+					}
 				}
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -344,17 +352,17 @@ class BattleRunner {
 
 
 
-	private function resolveBattle() {
+	private function resolveBattle($no_rewards) {
 		// TODO: Siege battles (attacks on fortifications) should give 2 or even 3 (depending on towers, especially) ranged rounds,
 		//			but this requires changes to the battle report format as well, and backwards compatability is a bitch...
 		$this->log(20, "...ranged phase...\n");
-		$ranged = $this->resolveRangedPhase();
+		$ranged = $this->resolveRangedPhase($no_rewards);
 		$this->log(20, "...melee phase...\n");
-		$melee = $this->resolveMeleePhase();
+		$melee = $this->resolveMeleePhase($no_rewards);
 		$this->report->setCombat(array('ranged'=>$ranged, 'melee'=>$melee));
 
 		$this->log(20, "...pursuit phase...\n");
-		$hunt = $this->resolvePursuitPhase();
+		$hunt = $this->resolvePursuitPhase($no_rewards);
 		$this->report->setHunt($hunt);
 
 		$this->log(3, "survivors:\n");
@@ -370,7 +378,9 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getActiveSoldiers() as $soldier) {
-				$soldier->gainExperience(2);
+				if (!$no_rewards) {
+					$soldier->gainExperience(2);
+				}
 
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -475,7 +485,7 @@ class BattleRunner {
 		$this->em->flush();
 	}
 
-	private function resolveRangedPhase() {	
+	private function resolveRangedPhase($no_rewards) {	
 		// ranged combat:
 		$ranged=array();
 		$extras=array();
@@ -498,7 +508,7 @@ class BattleRunner {
 						if (rand(0,100)<min(95,$soldier->RangedPower()+$bonus)) {
 							// target hit
 							$hits++;
-							$result = $this->RangedHit($soldier, $target);
+							$result = $this->RangedHit($soldier, $target, $no_rewards);
 							if (isset($results[$result])) {
 								$results[$result]++;
 							} else {
@@ -578,7 +588,7 @@ class BattleRunner {
 		return $ranged;
 	}
 
-	private function resolveMeleePhase() {
+	private function resolveMeleePhase($no_rewards) {
 		// melee combat (several rounds)
 		$round=0;
 		$melee=array();
@@ -608,7 +618,7 @@ class BattleRunner {
 							// hit someone
 							$target = $this->getRandomSoldier($enemy_collection);
 							if ($target) {
-								$result = $this->RangedHit($soldier, $target, 'melee');
+								$result = $this->RangedHit($soldier, $target, $no_rewards, 'melee');
 							} else {
 								// no more targets
 								$this->log(10, "no more targets\n");
@@ -622,7 +632,7 @@ class BattleRunner {
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemy_collection);
 						if ($target) {
-							$result = $this->MeleeAttack($soldier, $target, $round);
+							$result = $this->MeleeAttack($soldier, $target, $no_rewards, $round);
 						} else {
 							// no more targets
 							$this->log(10, "but finds no target\n");
@@ -723,7 +733,7 @@ class BattleRunner {
 	}
 
 
-	private function resolvePursuitPhase() {
+	private function resolvePursuitPhase($no_rewards) {
 		// hunting down retreating enemies
 		$this->log(5, "\nhunting them down:\n");
 		$hunt=array();
@@ -778,7 +788,7 @@ class BattleRunner {
 						// hit someone!
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") caught up with ".$target->getName()." (".$target->getType().") - ");
 						if (rand(0,$power) > rand(0,$target->DefensePower())) {
-							$result = $this->resolveDamage($soldier, $target, $power, 'escape');
+							$result = $this->resolveDamage($soldier, $target, $no_rewards, $power, 'escape');
 							if ($result) {
 								$hunt[$group->getLocalId()]['killed']++;
 								if ($result == 'killed') {
@@ -858,8 +868,10 @@ class BattleRunner {
 
 	// TODO: attacks on mounted soldiers could kill the horse instead
 
-	private function MeleeAttack(Soldier $soldier, Soldier $target, $round) {
-		$soldier->gainExperience(1);
+	private function MeleeAttack(Soldier $soldier, Soldier $target, $no_rewards, $round) {
+		if (!$no_rewards) {
+			$soldier->gainExperience(1);
+		}
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -876,8 +888,10 @@ class BattleRunner {
 		$this->log(15, (round($attack*10)/10)." vs. ".(round($defense*10)/10)." - ");
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($soldier, $target, $attack, 'melee');
-			$soldier->gainExperience($result=='kill'?2:1);
+			$result = $this->resolveDamage($soldier, $target, $no_rewards, $attack, 'melee');
+			if (!$no_rewards) {
+				$soldier->gainExperience($result=='kill'?2:1);
+			}
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -889,8 +903,10 @@ class BattleRunner {
 		return $result;
 	}
 
-	private function RangedHit(Soldier $soldier, Soldier $target, $phase='ranged') {
-		$soldier->gainExperience(1);
+	private function RangedHit(Soldier $soldier, Soldier $target, $no_rewards, $phase='ranged') {
+		if (!$no_rewards) {
+			$soldier->gainExperience(1);
+		}	   
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -911,7 +927,7 @@ class BattleRunner {
 		$this->log(10, "hits ".$target->getName()." (".$target->getType().") - (".round($attack)." vs. ".round($defense).") = ");
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($soldier, $target, $attack, 'ranged');
+			$result = $this->resolveDamage($soldier, $target, $no_rewards, $attack, 'ranged');
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -964,7 +980,7 @@ class BattleRunner {
 		}
 	}
 
-	private function resolveDamage(Soldier $soldier, Soldier $target, $power, $phase) {
+	private function resolveDamage(Soldier $soldier, Soldier $target, $no_rewards, $power, $phase) {
 		// this checks for penetration again AND low-damage weapons have lower lethality AND wounded targets die more easily
 		if (rand(0,$power) > rand(0,max(1,$target->DefensePower() - $target->getWounded(true)))) {
 			// penetrated again = kill
@@ -972,7 +988,7 @@ class BattleRunner {
 				case 'ranged':	$surrender = 60; break;
 				case 'hunt':	$surrender = 85; break;
 				case 'melee':	
-				default:			$surrender = 75; break;
+				default:	$surrender = 75; break;
 			}
 			// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
 			if ($target->isNoble() && !$target->getCharacter()->isNPC() && rand(0,100) < $surrender && $soldier->getCharacter()) {
@@ -999,7 +1015,9 @@ class BattleRunner {
 			$target->wound(rand(max(1, round($power/10)), $power));
 			$this->history->addToSoldierLog($target, 'wounded.'.$phase);
 			$result='wound';
-			$target->gainExperience(1); // it hurts, but it is a teaching experience...
+			if (!$no_rewards) {
+				$target->gainExperience(1); // it hurts, but it is a teaching experience...
+			}
 		}
 		
 		$soldier->addCasualty();

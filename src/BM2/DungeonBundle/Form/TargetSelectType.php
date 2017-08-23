@@ -4,7 +4,7 @@ namespace BM2\DungeonBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 class TargetSelectType extends AbstractType {
@@ -23,7 +23,7 @@ class TargetSelectType extends AbstractType {
 		return 'target_'.$this->type;
 	}
 
-	public function configureOptions(OptionsResolverInterface $resolver) {
+	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'targetselect_513',
 			'translation_domain' => 'dungeons',

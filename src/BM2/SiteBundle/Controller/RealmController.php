@@ -24,7 +24,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 	FIXME: some of this stuff should be moved to the new realm manager service
@@ -64,18 +64,22 @@ class RealmController extends Controller {
 	public function viewAction(Realm $id) {
 		$realm = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$superrulers = array();
 
 		$territory = $realm->findTerritory();
 		$population = 0;
+		$restorable = FALSE;
 		foreach ($territory as $estate) {
 			$population += $estate->getPopulation() + $estate->getThralls();
 		}
 
 		if ($realm->getSuperior()) {
 			$parentpoly =	$this->get('geography')->findRealmPolygon($realm->getSuperior());
+			$superrulers = $realm->getSuperior()->findRulers();
 		} else {
 			$parentpoly = null;
 		}
+
 		$subpolygons = array();
 		foreach ($realm->getInferiors() as $child) {
 			$subpolygons[] = $this->get('geography')->findRealmPolygon($child);
@@ -100,6 +104,17 @@ class RealmController extends Controller {
 			}
 			$diplomacy[$index][$side] = $relation->getStatus();
 		}
+		 foreach ($superrulers as $superruler) {
+			if ($superruler == $character) {
+				if (!$realm->getActive()) {
+					$restorable = TRUE;
+				}
+			}
+		} 
+		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
+			$restorable = TRUE;
+			echo $restorable;
+		}*/
 
 		return array(
 			'realm' =>		$realm,
@@ -110,10 +125,11 @@ class RealmController extends Controller {
 			'population'=>	$population,
 			'area' =>		$this->get('geography')->calculateRealmArea($realm),
 			'nobles' =>		$realm->findMembers()->count(),
-			'diplomacy' =>	$diplomacy
+			'diplomacy' =>	$diplomacy,
+			'restorable' => $restorable
 		);
 	}
-
+	
 	/**
 	  * @Route("/new")
 	  * @Template
@@ -598,31 +614,37 @@ class RealmController extends Controller {
 		);
 	}
 
-#	/**
-#	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
-#	  * @Template
-#	  */
-#
-#	public function restoreAction(Realm $realm, Request $request) {
-#		$character = $this->gateway($realm, 'diplomacyRestoreTest');
-#		
-#		$form = $this->createForm(new RealmRestoreType($realm));
-#		$form->handleRequest($request);
-#		if ($form->isValid()) {
-#		    $data = $form->getData();
-#           $fail = false;
-#
-#            if (!$fail) {
-#                $this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
-#            }
-#
-#			$em = $this->getDoctrine()->getManager();
-#			$em->flush();
-#			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
-#			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
-#		}
-#	}
+	/**
+	  * @Route("/{id}/restore", requirements={"id"="\d+"})
+	  * @Template
+	  */
 
+	public function restoreAction(Realm $id) {
+		$realm = $id;
+		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+
+		$em = $this->getDoctrine()->getManager();
+		
+		$this->get('realm_manager')->makeRuler($realm, $character);
+		$realm->setActive(TRUE);
+		$this->get('history')->logEvent(
+			$realm,
+			'event.realm.restored',
+			array('%link-realm%'=>$realm->getSuperior()->getID(), '%link-character%'=>$character->getId()),
+			History::ULTRA, true
+		);
+		$this->get('history')->logEvent(
+			$character,
+			'event.realm.restorer',
+			array('%link-realm%'=>$realm->getID()),
+			History::HIGH, true
+		);
+		$em->flush();
+
+		return new Response();
+		
+	}
+	
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
 	  * @Template

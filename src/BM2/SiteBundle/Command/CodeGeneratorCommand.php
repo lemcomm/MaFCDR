@@ -23,6 +23,7 @@ class CodeGeneratorCommand extends ContainerAwareCommand {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
+
 		$file = $input->getArgument('file');
 		$credits = $input->getArgument('credits');
 		$vip = $input->getArgument('vip');
@@ -69,3 +70,4 @@ class CodeGeneratorCommand extends ContainerAwareCommand {
 	}
 
 }
+

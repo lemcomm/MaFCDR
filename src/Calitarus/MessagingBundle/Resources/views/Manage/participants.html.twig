@@ -1,0 +1,49 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'participants.title'|trans({}, "MsgBundle")|title }}</h2>
+{% if metas.first.conversation.appreference %}
+	<p>{{ 'participants.managed'|trans({"%reference%":link(metas.first.conversation.appreference)}, "MsgBundle")|raw }}</p>
+{% endif %}
+<table>
+	<thead>
+		<tr>
+			<th></th>
+			{% for right in rights %}
+				<th>{{ ('right.'~right.name)|trans({}, "MsgBundle") }}</th>
+			{% endfor %}			
+		</tr>
+	</thead>
+	<tbody>
+	{% for meta in metas %}
+		<tr>
+			<td>{{ link(meta.user.appuser) }}</td>
+			{% for right in rights %}
+				<td align="center">
+				{% if meta.hasright(right) %}
+					<span class="cmsg_on icon-checkmark">&nbsp;</span>
+				{% else %}
+					<span class="cmsg_off icon-blocked">&nbsp;</span>
+				{% endif %}
+				</td>
+			{% endfor %}
+			{% if my_meta.hasRightByName("owner") or my_meta.hasRightByName("remove") %}
+				<td align="center">
+					<button class="action_remove" data-id="{{ meta.user.id }}">{{ ('participants.do.remove')|trans({}, "MsgBundle") }}</button>
+				</td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
+{% block jquery %}
+$(".action_remove").click(function(){
+	var id = $(this).data("id");
+	$.post('{{ path('cmsg_participant_remove') }}', { "meta": {{ my_meta.id }}, "id": id }, function(){
+		console.log($(this).closest("tr"));
+		$(this).closest("tr").remove();
+	});
+});
+{% endblock %}

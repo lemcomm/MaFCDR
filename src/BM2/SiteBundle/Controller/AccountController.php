@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * @Route("/account")
@@ -48,6 +50,9 @@ class AccountController extends Controller {
      * @Template("BM2SiteBundle:Account:account.html.twig")
      */
 	public function indexAction() {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		// clean out character id so we have a clear slate (especially for the template)
@@ -68,6 +73,9 @@ class AccountController extends Controller {
      * @Template
      */
    public function dataAction(Request $request) {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
    	$form = $this->createForm(new UserDataType(), $user);
 
@@ -89,14 +97,28 @@ class AccountController extends Controller {
      * @Template
      */
 	public function charactersAction() {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 		$this->getDoctrine()->getManager()->flush();
 
-		$characters = array(); $npcs = array();
+		$characters = array(); 
+		$npcs = array();
+				
 		foreach ($user->getCharacters() as $character) {
+			//building our list of character statuses --Andrew
+			$annexing = false;
+			$supporting = false;
+			$opposing = false;
+			$looting = false;
+			$blocking = false;
+			$granting = false;
+			$renaming = false;
+			$reclaiming = false;
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
@@ -114,7 +136,38 @@ class AccountController extends Controller {
 				$unread = 0;
 				$events = 0;
 			}
-
+			
+			// This adds in functionality for detecting character actions on this page. --Andrew
+			if ($character->getActions()) {
+				foreach ($character->getActions() as $actions) {
+					switch($actions->getType()) {
+						case 'settlement.take':
+							$annexing = true;
+							break;
+						case 'support':
+							$supporting = true;
+							break;
+						case 'oppose':
+							$opposing = true;
+							break;
+						case 'settlement.loot':
+							$looting = true;
+							break;
+						case 'military.block':
+							$blocking = true;
+							break;
+						case 'settlement.grant':
+							$granting = true;
+							break;
+						case 'settlement.rename':
+							$renaming = true;
+							break;
+						case 'military.reclaim':
+							$reclaiming = true;
+							break;
+					}
+				}
+			}
 
 			$data = array(
 				'id' => $character->getId(),
@@ -130,6 +183,14 @@ class AccountController extends Controller {
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
 				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'annexing' => $annexing,
+				'supporting' => $supporting,
+				'opposing' => $opposing,
+				'looting' => $looting,
+				'blocking' => $blocking,
+				'granting' => $granting,
+				'renaming' => $renaming,
+				'reclaiming' => $reclaiming,
 				'unread' => $unread,
 				'events' => $events
 			);
@@ -204,6 +265,9 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:overview.html.twig")
 	  */
 	public function overviewAction() {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		$characters = array();
@@ -239,6 +303,9 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:charactercreation.html.twig")
 	  */
 	public function newcharAction(Request $request) {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 		$form = $this->createForm(new CharacterCreationType($user, $user->getNewCharsLimit()>0));
 
@@ -397,6 +464,9 @@ class AccountController extends Controller {
 	  * @Template
 	  */
 	public function settingsAction(Request $request) {
+		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 		$languages = $this->get('appstate')->availableTranslations();
 		$form = $this->createForm(new SettingsType($user, $languages));

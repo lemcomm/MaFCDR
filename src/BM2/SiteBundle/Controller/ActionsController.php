@@ -179,6 +179,24 @@ class ActionsController extends Controller {
 		return array('settlement'=>$settlement, 'result'=>$result);
 	}
 
+	/**
+	  * @Route("/exit")
+	  * @Template
+	  */
+	public function exitAction() {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
+
+		$result = null;
+		if ($this->get('interactions')->characterLeaveSettlement($character)) {
+			$result = 'left';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('settlement'=>$settlement, 'result'=>$result);
+	}
+
    /**
      * @Route("/embark")
      * @Template

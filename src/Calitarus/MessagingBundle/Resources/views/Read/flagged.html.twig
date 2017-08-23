@@ -1,0 +1,32 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'flagged.title'|trans({}, "MsgBundle")|title }}</h2>
+
+{# TODO: buttons to show only messages flagged with a specific flag #}
+
+<div class="cmsg_conversation">
+{% for msg in flagged %}
+	{% include "MsgBundle:Read:one_message.html.twig" with {"last":null, "message":msg, "meta":msg.findmeta(user), "show_conversation":true} only %}
+{% endfor %}
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+$(".cmsg_flags").on("click", "button.cmsg_icon", function(){
+	var button = $(this);
+	var id = button.data("msg");
+	var flag = button.data("flag");
+
+	button.addClass("working");
+	$.post("{{ path('cmsg_flags')}}", {'message':id, 'flag':flag}, function(result) {
+		button.removeClass("working");
+		if (result == 'added') {
+			button.addClass("active");
+		} else if (result == 'removed') {
+			button.removeClass("active");
+		}
+	});
+});
+{% endblock %}

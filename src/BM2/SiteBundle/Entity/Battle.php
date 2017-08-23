@@ -44,6 +44,7 @@ class Battle {
 			}
 		}
 		return $name;
+		return "battle"; // TODO: something better? this is used for links
 	}
 
 	public function getAttacker() {

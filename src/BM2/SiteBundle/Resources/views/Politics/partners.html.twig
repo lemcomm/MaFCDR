@@ -33,6 +33,7 @@
 				<td>{{ ("relation.choice."~partnership.type)|trans({},"politics") }}</td>
 				<td>{{ 'relation.with'|trans({},"politics") }}</td>
 				<td>{{ link(partnership.otherpartner(character)) }}</td>
+				<td>{% if partnership.partnermayusecrest %}{{ 'relation.heraldry'|trans({},"politics") }}{% else %}{{ 'relation.noheraldry'|trans({},"politics") }}{% endif %}</td>
 				<td>{% if partnership.withsex %}{{ 'relation.sex'|trans({},"politics") }}{% else %}{{ 'relation.nosex'|trans({},"politics") }}{% endif %}</td>
 				<td>{{ form_widget(form_old.partnership[partnership.id]) }}</td>
 			</tr>

@@ -12,7 +12,7 @@
 		</p>
 	{% else %}
 	<p>{{ "meta.rename.intro"|trans({},"actions")|raw }}</p>
-	<form class="wide" action="{{ path('bm2_site_character_rename') }}" method="post" {{ form_enctype(form) }}>
+	<form class="wide" action="{{ path('bm2_site_character_rename') }}" method="post" {{ form_start(form) }}>
 		{{ form_widget(form) }}
 		<button type="submit" name="submit">{{ "meta.rename.submit"|trans({},"actions") }}</button>
 	</form>

@@ -68,7 +68,11 @@ class LoadDungeonCards extends AbstractFixture implements OrderedFixtureInterfac
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->cards as $name=>$data) {
-			$type = new DungeonCardType;
+			$type = $manager->getRepository('DungeonBundle:DungeonCardType')->findOneByName($name);
+			if (!$type) {
+				$type = new DungeonCardType;
+				$manager->persist($type);
+			}
 			$type->setName($name);
 			$type->setRarity($data['rarity']);
 			$type->setMonsterClass($data['monsterclass']);

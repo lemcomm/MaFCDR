@@ -18,13 +18,20 @@
 </div>
 
 <div style="float:right">
-	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+{#	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul> #}
 	<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
 </div>
 <div id="sd_anchor" style="margin-right:1em;height:30em;float:right"></div>
 <div id="sd" class="hidden" title="dummy"></div>
 
 <h2>{{ realm.formalname }}</h2>
+
+{% if restorable %}
+	<div id="restore_wrapper">
+		{{ 'diplomacy.restore.description'|trans({}, "politics") }}
+		<button id="restorerealm">{{ 'diplomacy.restore.link'|trans({},"politics") }}</button>
+	</div>
+{% endif %}
 
 <dl>
 	<dt>{{ 'realm.name'|trans({},"politics") }}</dt>
@@ -148,6 +155,11 @@
 {% endblock %}
 
 {% block jquery %}
+	$("#restorerealm").click(function(){
+		$.post("{{ path('bm2_site_realm_restore', {"id":realm.id}) }}", function() {
+			$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
+		});
+	});
 	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}

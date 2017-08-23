@@ -1,0 +1,12 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'contacts.title'|trans({}, "MsgBundle")|title }}</h2>
+
+<ul>
+{% for contact in contacts %}
+	<li>{{ link(contact.appuser) }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
