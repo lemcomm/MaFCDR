@@ -294,7 +294,7 @@ class RealmManager {
 				$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
 			}
 			$candidates[$c]['votes'] += $vote->getVote();
-			$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $character);
+			$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $vote->getCharacter());
 		}
 
 		$winner = null;
