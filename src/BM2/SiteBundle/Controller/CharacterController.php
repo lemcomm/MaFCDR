@@ -892,25 +892,29 @@ class CharacterController extends Controller {
 			$available[] = $crest->getId();
 		}
 		
-		# Check for parents having different crests.
-		foreach ($character->getParents() as $parent) {
-			$parentcrest = $parent->getCrest()->getId();
-			if (!in_array($parentcrest, $available)) {
-				$available[] = $parentcrest;
-			}
-		}
-		
-		# Check for partners having different crests.
-		foreach ($character->getPartnerships() as $partnership) {
-			if ($partnership->getPartnerMayUseCrest()==TRUE) {
-				foreach ($partnership->getPartners() as $partners) {
-					$partnercrest = $partners->getCrest()->getId();
-					if (!in_array($partnercrest, $available)) {
-						$available[] = $partnercrest;
-					}
-				}
-			}
-		}
+                # Check for parents having different crests.
+                foreach ($character->getParents() as $parent) {
+                        if ($parent->getCrest()) {
+                                $parentcrest = $parent->getCrest()->getId();
+                                if (!in_array($parentcrest, $available)) {
+                                        $available[] = $parentcrest;
+                                }
+                        }
+                }
+
+                # Check for partners having different crests.
+                foreach ($character->getPartnerships() as $partnership) {
+                        if ($partnership->getPartnerMayUseCrest()==TRUE) {
+                                foreach ($partnership->getPartners() as $partners) {
+                                        if ($partners->getCrest()) {
+                                                $partnercrest = $partners->getCrest()->getId();
+                                                if (!in_array($partnercrest, $available)) {
+                                                        $available[] = $partnercrest;
+                                                }
+                                        }
+                                }
+                        }
+                }
 
 		if (empty($available)) {
 			return array('nocrests'=>true);
