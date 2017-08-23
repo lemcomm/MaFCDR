@@ -196,11 +196,13 @@ class CleanupCommand extends ContainerAwareCommand {
 			$output->writeln($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
 			foreach ($character->getPositions() as $position) {
 				if ($position->getRuler()) {
-					if ($heir) {
-						$this->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
-					} else {
-						$this->failInheritRealm($character, $position->getRealm(), 'death');
-					}
+                                        if ($position->getInherit()) {
+                                                if ($heir) {
+                                                        $this->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
+                                                } else {
+                                                        $this->failInheritRealm($character, $position->getRealm(), 'death');
+                                                }
+                                        }
 					$position->removeHolder($character);
 					$character->removePosition($position);
 				} else if ($position->getInherit()) {
@@ -227,11 +229,13 @@ class CleanupCommand extends ContainerAwareCommand {
 			$output->writeln($character->getName()." is inactive, heir: ".($heir?$heir->getName():"(nobody)"));
 			foreach ($character->getPositions() as $position) {
 				if ($position->getRuler()) {
-					if ($heir) {
-						$this->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
-					} else {
-						$this->failInheritRealm($character, $position->getRealm(), 'slumber');
-					}
+                                        if ($position->getInherit()) {
+                                                if ($heir) {
+                                                        $this->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
+                                                } else {
+                                                        $this->failInheritRealm($character, $position->getRealm(), 'death');
+                                                }
+                                        }
 					$position->removeHolder($character);
 					$character->removePosition($position);
 				} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
