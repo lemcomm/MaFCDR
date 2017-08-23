@@ -114,7 +114,7 @@ class RealmController extends Controller {
 		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
 			$restorable = TRUE;
 			echo $restorable;
-		}*/
+		}*/	
 
 		return array(
 			'realm' =>		$realm,
@@ -293,7 +293,6 @@ class RealmController extends Controller {
 			$position = new RealmPosition;
 			$position->setRealm($realm);
 			$position->setRuler(false);
-			$position->setDescription("");
 		} else {
 			$is_new = false;
 			if ($position->getRealm() != $realm) {
@@ -1020,7 +1019,7 @@ class RealmController extends Controller {
 
 		$votes = $this->getVotes($election);
 
-		$my_weight = $election->getWeight($character);
+		$my_weight = $this->get('realm_manager')->getVoteWeight($election, $character);
 
 		return array(
 			'election' => $election,
@@ -1034,7 +1033,6 @@ class RealmController extends Controller {
 
 	private function getVotes(Election $election) {
 		$votes = array();
-		$voter = $vote->getCharacter();
 		foreach ($election->getVotes() as $vote) {
 			$id = $vote->getTargetCharacter()->getId();
 			if (!isset($votes[$id])) {
@@ -1044,7 +1042,7 @@ class RealmController extends Controller {
 					'contra' => array()
 				);
 			}
-			$weight = $election->getWeight($voter);
+			$weight = $this->get('realm_manager')->getVoteWeight($election, $vote->getCharacter());
 			if ($vote->getVote() < 0) {
 				$votes[$id]['contra'][] = array('voter'=>$vote->getCharacter(), 'votes'=>$weight);
 			} else {
