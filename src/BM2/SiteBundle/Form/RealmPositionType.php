@@ -62,29 +62,33 @@ class RealmPositionType extends AbstractType {
 					return $er->createQueryBuilder('p')->where('p.id > 0')->orderBy('p.name');
 				}
 			));
-
-			$builder->add('elected', 'checkbox', array(
-				'label'=>'position.elected',
-				'required' => false,
-				'attr' => array('title'=>'position.help.elected'),
-			));
 			/*$builder->add('rank', 'number', array(
 				'label'=>'position.rank',
 				'required' => false,
 				'empty_data' => '1',
 				'attr' => array('title'=>'position.help.rank'),
 			));*/
-			$builder->add('retired', 'checkbox', array(
-				'label'=>'position.retired',
-				'required' => false,
-				'attr' => array('title'=>'position.help.retired'),
-			));
-			$builder->add('keeponslumber', 'checkbox', array(
-				'label'=>'position.keeponslumber',
-				'required' => false,
-				'attr' => array('title'=>'position.help.keeponslumber'),
-			));
 		}
+		$builder->add('elected', 'checkbox', array(
+			'label'=>'position.elected',
+			'required' => false,
+			'attr' => array('title'=>'position.help.elected'),
+		));
+		$builder->add('electiontype', 'choice', array(
+			'label'=>'elections.method.name',
+			'placeholder'=>'elections.method.empty',
+			'choice_translation_domain' => true,
+			'choices' => array(
+				'banner' => 'elections.method.banner',
+				'spears' => 'elections.method.spears',
+				'swords' => 'elections.method.swords',
+				'land'	=> 'elections.method.land',
+				'realmland' => 'elections.method.realmland',
+				'castles' => 'elections.method.castles',
+				'realmcastles' => 'elections.method.realmcastles',
+				'heads'	=> 'elections.method.heads',
+			)
+		));
 		$builder->add('inherit', 'checkbox', array(
 			'label'=>'position.inherit',
 			'required' => false,
@@ -99,7 +103,18 @@ class RealmPositionType extends AbstractType {
 				30 => 'position.terms.30',
 			)
 		));
-
+		if (!$is_ruler) {
+			$builder->add('retired', 'checkbox', array(
+				'label'=>'position.retired',
+				'required' => false,
+				'attr' => array('title'=>'position.help.retired'),
+			));
+			$builder->add('keeponslumber', 'checkbox', array(
+				'label'=>'position.keeponslumber',
+				'required' => false,
+				'attr' => array('title'=>'position.help.keeponslumber'),
+			));
+		}
 		$builder->add('submit', 'submit', array('label'=>'position.submit'));
 	}
 
