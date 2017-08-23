@@ -71,7 +71,10 @@ elections:
   banner:       by banner (per noble)
   spears:       by spears (per soldier)
   swords:       by swords (per weighted soldier)
+  realmland:    by land (per estate in realm)
   land:         by land (per estate)
+  realmcastles: by fortifications (per estate defenses in realm)
+  castles:      by fortifications (per estate defenses)
   heads:        by heads (per peasant)
  submit:        create election
 
