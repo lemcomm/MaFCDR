@@ -15,6 +15,7 @@
 		<field name="current_term_ends" type="datetime" nullable="true"/>
 		<field name="retired" type="boolean" nullable="true"/>
 		<field name="keeponslumber" type="boolean" nullable="true"/>
+		<field name="minholders" type="integer" nullable="true"/>
 
 		<many-to-one field="realm" target-entity="Realm" inversed-by="positions"/>
 		<many-to-many field="permissions" target-entity="Permission"/>
