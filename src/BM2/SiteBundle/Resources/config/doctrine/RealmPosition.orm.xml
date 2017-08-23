@@ -10,6 +10,7 @@
 		<many-to-one field="type" target-entity="PositionType" inversed-by="positions" nullable="true"/>
 		<field name="ruler" type="boolean"/>
 		<field name="elected" type="boolean"/>
+		<field name="electiontype" type="string"/>
 		<field name="inherit" type="boolean"/>
 		<field name="term" type="smallint"/>
 		<field name="current_term_ends" type="datetime" nullable="true"/>
