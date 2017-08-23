@@ -429,12 +429,14 @@ class Economy {
 		//			we could code this by checking for the surplus storage
 		$growth = sqrt(1-exp(-pow($shortage,2)))*$sign;
 		$popchange = $sign*round(pow(abs($growth) * $settlement->getPopulation(),0.666));
-		if ($popchange > 0) {
-			$goods = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('goods'));
-			$wealth = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('wealth'));
-			$mod = min($goods->getSupply(), $wealth->getSupply());
-			echo "growth of ".$settlement->getName()." limited by $mod\n";
-		}
+                /* Commenting this out to bring code in line with Tom's Server. It doesn't actually do anything. -- Andrew
+                if ($popchange > 0) {
+                        $goods = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('goods'));
+                        $wealth = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('money'));
+                        $mod = min($goods->getSupply(), $wealth->getSupply());
+                        echo "growth of ".$settlement->getName()." limited by $mod\n";
+                }
+                */
 		$settlement->setPopulation($settlement->getPopulation() + $popchange);
 
 		// thralls drop faster and rise slower
