@@ -585,7 +585,7 @@ class GameRunner {
 	public function runRealmsCycle() {
 		$last = $this->appstate->getGlobal('cycle.realm', 0);
 		if ($last==='complete') return true;
-        $last=(int)$last;
+        	$last=(int)$last;
 		$this->logger->info("realms...");
 		
 		# This is just me being picky, but I like to define everything I need before I need it, even if it's not connected to the query yet. --Andrew
@@ -593,11 +593,12 @@ class GameRunner {
 		$timeout->sub(new \DateInterval("P15D")); // hardcoded to 15 day intervals between election attempts
 		
 		# Fixing a bug here that prevented ruler elections from happening after the psotions went vacant. --Andrew
+		$this->logger->notice("Beginning realm inactivity and ruler checks . . .");
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
 		$query->setParameter('timeout', $timeout);
 		$result = $query->getResult();
 		foreach ($result as $position) {
-			$this->logger->notice("empty ruler position for realm ".$position->getRealm()->getName());
+			$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 			$members = $position->getRealm()->findMembers();
 			if ($members->isEmpty()) {
 				$this->logger->notice("-- realm deserted, making inactive.");
@@ -608,6 +609,11 @@ class GameRunner {
 				$election = new Election;
 				$election->setRealm($position->getRealm());
 				$election->setPosition($position);
+				if ($position->getElectiontype) {
+					$election->setMethod($position->getElectiontype());
+				} else {
+					$election->setMethod('banner');
+				}
 				$election->setOwner(null);
 				$election->setClosed(false);
 
@@ -617,15 +623,96 @@ class GameRunner {
 
 				// TODO: translate strings here?
 				$election->setName('Ruler Election');
-				$election->setDescription('The realm has been found to be without ruler and an election has automatically been triggered.');
-
-				// TODO: this should be stored in the position (and editable)
-				$election->setMethod('banner');					
+				$election->setDescription('The realm has been found to be without a ruler and an election has automatically been triggered.');
+		
 				$this->em->persist($election);
 				$this->em->flush(); // must flush because we need the ID below
 
 				// message to the realm channel
 				$msg = "An automatic election has been triggered for the ruler position. You are invited to vote - [vote:".$election->getId()."].";
+				// FIXME: this posts to all realm conversations! how do we find the "main" ??
+				$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+				$query->setParameter('realm', $position->getRealm());
+				foreach ($query->getResult() as $conversation) {
+					$this->mm->writeMessage($conversation, null, $msg);
+				}
+			}
+		}
+
+		# And now, we do it for every OTHER position! --Andrew
+		$this->logger->notice("Beginning vacant elected position checks . . .");
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = false AND p.elected = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
+		$query->setParameter('timeout', $timeout);
+		$result = $query->getResult();
+		foreach ($result as $position) {
+			$this->logger->notice("Empty realm position of ".$position->getName()" for realm ".$position->getRealm()->getName());
+			$members = $position->getRealm()->findMembers();
+
+			$this->logger->notice("-- election triggered.");
+			$election = new Election;
+			$election->setRealm($position->getRealm());
+			$election->setPosition($position);
+			$election->setOwner(null);
+			$election->setClosed(false);
+			if ($position->getElectiontype) {
+				$election->setMethod($position->getElectiontype());
+			} else {
+				$election->setMethod('banner');
+			}
+			$complete = new \DateTime("now");
+			$complete->add(new \DateInterval("P3D"));
+			$election->setComplete($complete);
+
+			// TODO: translate strings here?
+			$election->setName("Election for ".$position->getName());
+			$election->setDescription('This elected position has been found to be empty, so an automated election has been triggered.');
+
+			$this->em->persist($election);
+			$this->em->flush(); // must flush because we need the ID below
+				// message to the realm channel
+			$msg = "An automatic election has been triggered for the elected position of ".$position->getName()". You are invited to vote - [vote:".$election->getId()."].";
+			// FIXME: this posts to all realm conversations! how do we find the "main" ??
+			$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+			$query->setParameter('realm', $position->getRealm());
+			foreach ($query->getResult() as $conversation) {
+				$this->mm->writeMessage($conversation, null, $msg);
+			}
+		}
+
+		# Here we start checking for positions that have a minholder value set above 1. --Andrew
+		# TODO: There's probably a better way to do this. --Andrew
+		$this->logger->notice("Beginning checks for positions with more than 1 minholder . . .");
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND p.minholder > 1 AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
+		$query->setParameter('timeout', $timeout);
+		$result = $query->getResult();
+		foreach ($result as $position) {
+			if ($position->getHolders()->count() < $position->getMinholders()) {
+				$this->logger->notice("Realm position of ".$position->getName()" for realm ".$position->getRealm()->getName()" needs more holders.");
+				$members = $position->getRealm()->findMembers();
+
+				$election = new Election;
+				$election->setRealm($position->getRealm());
+				$election->setPosition($position);
+				$election->setOwner(null);
+				$election->setClosed(false);
+				if ($position->getElectiontype) {
+					$election->setMethod($position->getElectiontype());
+				} else {
+					$election->setMethod('banner');
+				}
+				$complete = new \DateTime("now");
+				$complete->add(new \DateInterval("P3D"));
+				$election->setComplete($complete);
+				$this->logger->notice("-- election triggered.");
+
+				// TODO: translate strings here?
+				$election->setName("Election for ".$position->getName());
+				$election->setDescription('This elected position has been found to be missing atleast 1 holder, so an automated election has been triggered.');
+	
+				$this->em->persist($election);
+				$this->em->flush(); // must flush because we need the ID below
+					// message to the realm channel
+				$msg = "An automatic election has been triggered for the elected position of ".$position->getName()". You are invited to vote - [vote:".$election->getId()."].";
 				// FIXME: this posts to all realm conversations! how do we find the "main" ??
 				$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
 				$query->setParameter('realm', $position->getRealm());
