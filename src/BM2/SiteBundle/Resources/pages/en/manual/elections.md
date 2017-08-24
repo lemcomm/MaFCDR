@@ -37,7 +37,14 @@ by swords
 by land
 : This excludes the landless knights and gives votes only to those who hold estates, with one vote given per estate.
 
+by land in realm
+: Very similar to a vote by land, but only counts lands in the realm that the election is being held (to include subrealms).
+
+by fortifications
+: This excludes the landless knights and favors those lords that have more developed castles.
+
+by foritifactions in realm
+: Very similar to by fortifications, but will only count fortifications that exist in the realm the election is in (to include subrealms).
+
 by heads
 : Here, the size of estates matters and one vote is counted per peasant in each estate, given larger settlements more weight.
-
-
