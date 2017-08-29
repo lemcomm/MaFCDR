@@ -1,7 +1,7 @@
 #!/bin/sh
 
-BACKUPDIR="/var/www/maf/app/backups"
-LOGDIR="/var/www/maf/app/logs"
+BACKUPDIR="/var/maf/backups"
+LOGDIR="/var/maf/logs"
 APP="/var/www/maf/app/console"
 DAY=`date +%a%H`
 DATE=`date +%y%m%d%H`
@@ -26,9 +26,9 @@ echo "----- turn done -----" >> $LOGDIR/turn-$DAY.log
 php $APP maf:stats:turn --env=prod -d 2>&1 > $LOGDIR/stats.log
 
 # map generation and legacy map storage
- cp /var/www/qgis/maps/allrealms.png /var/www/maf/qgis/history/allrealms-$DATE.png
- cp /var/www/qgis/maps/2ndrealms.png /var/www/maf/qgis/history/2ndrealms-$DATE.png
- cp /var/www/qgis/maps/majorrealms.png /var/www/maf/wgis/history/majorrealms-$DATE.png
+ cp /var/www/qgis/maps/allrealms.png /var/www/qgis/maps/history/allrealms-$DATE.png
+ cp /var/www/qgis/maps/2ndrealms.png /var/www/qgis/maps/history/2ndrealms-$DATE.png
+ cp /var/www/qgis/maps/majorrealms.png /var/www/qgis/maps/history/majorrealms-$DATE.png
  curl -so /var/www/qgis/maps/allrealms.png "http://maps.mightandfealty.com/qgis?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=0,0,512000,512000&CRS=EPSG:4326&WIDTH=2048&HEIGHT=2048&LAYERS=water,blocked,AllRealms&FORMAT=image/png&map=MapWithRealms.qgs"
  curl -so /var/www/qgis/maps/2ndrealms.png "http://maps.mightandfealty.com/qgis?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=0,0,512000,512000&CRS=EPSG:4326&WIDTH=2048&HEIGHT=2048&LAYERS=water,blocked,2ndLevelRealms&FORMAT=image/png&map=MapWithRealms.qgs"
  curl -so /var/www/qgis/maps/majorrealms.png "http://maps.mightandfealty.com/qgis?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=0,0,512000,512000&CRS=EPSG:4326&WIDTH=2048&HEIGHT=2048&LAYERS=water,blocked,MajorRealms&FORMAT=image/png&map=MapWithRealms.qgs"
