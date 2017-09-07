@@ -1,7 +1,7 @@
 services:
     appstate:
         class:      BM2\SiteBundle\Service\AppState
-        arguments:  [@doctrine.orm.entity_manager, @security.context, @session]
+        arguments:  [@doctrine.orm.entity_manager, @security.token_storage, @security.authorization_checker, @session]
     pagereader:
         class:      BM2\SiteBundle\Service\PageReader
     twig.extension.geography:
@@ -135,4 +135,3 @@ services:
         class: Symfony\Bridge\Monolog\Formatter\ConsoleFormatter
         arguments:
             - "%%start_tag%%%%message%%%%end_tag%%\n"
-
