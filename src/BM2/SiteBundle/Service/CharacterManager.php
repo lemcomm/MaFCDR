@@ -24,7 +24,6 @@ class CharacterManager {
 	protected $messagemanager;
 	protected $dm;
 
-	private $seen;
 
 	public function __construct(EntityManager $em, AppState $appstate, History $history, Military $military, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm) {
 		$this->em = $em;
@@ -409,26 +408,6 @@ class CharacterManager {
 		$character->setInsideSettlement($captor->getInsideSettlement());
 	}
 
-	public function findHeir(Character $character, Character $from=null) {
-		if (!$from) { $from = $character; }
-
-		if ($this->seen->contains($character)) {
-			// loops back to someone we've already checked
-			return array(false, false);
-		} else {
-			$this->seen->add($character);
-		}
-
-		if ($heir = $character->getSuccessor()) {
-			if ($heir->isAlive()) {
-				return array($heir, $from);
-			} else {
-				return $this->findHeir($heir, $from);
-			}
-		}
-		return array(false, false);
-	}
-
 	public function bequeathEstate(Settlement $estate, Character $heir, Character $from, Character $via=null) {
 		$this->politics->changeSettlementOwner($estate, $heir);
 
@@ -473,9 +452,32 @@ class CharacterManager {
 		// TODO - quite a bit here, the new lord could be a different realm and all
 	}
 
-	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null) {
+	public function findHeir(Character $character, Character $from=null) {
+		// NOTE: This should match the implemenation on GameRunner.php
+		if (!$from) { 
+			$from = $character; 
+		}
+
+		if ($this->seen->contains($character)) {
+			// loops back to someone we've already checked
+			return array(false, false);
+		} else {
+			$this->seen->add($character);
+		}
+
+		if ($heir = $character->getSuccessor()) {
+			if ($heir->isAlive() && !$heir->getSlumbering()) {
+				return array($heir, $from);
+			} else {
+				return $this->findHeir($heir, $from);
+			}
+		}
+		return array(false, false);
+	}
+
+	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makeRuler($realm, $heir);
-		// Note that this CAN leave a character in charge of a realm he was not a member of
+		// NOTE: This can leave someone ruling a realm they weren't originally part of!
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
@@ -491,22 +493,87 @@ class CharacterManager {
 				History::HIGH, true
 			);
 		}
-		$this->history->logEvent(
-			$realm, 'event.realm.inherited',
-			array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheriteddeath',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+				);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheritedslumber',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+			);
+		}
+	}
+
+	public function failInheritRealm(Character $character, Realm $realm, $why = 'death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifaildeath',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifailslumber',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		}
+	}
+
+	public function inheritPosition(RealmPosition $position, Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
+		$this->realmmanager->makePositionHolder($position, $heir);
+		// NOTE: This can add characters to realms they weren't already in!
+		if ($from == $via || $via == null) {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inherit.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character%'=>$from->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inheritvia.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				History::HIGH, true
+			);
+		}
+		if ($why == 'death') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.death',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
 			History::HIGH, true
-		);
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.slumber',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+			History::HIGH, true
+			);
+		}
 	}
-
-	private function failInheritRealm(Character $character, Realm $realm) {
-		$this->history->logEvent(
-			$realm, 'event.realm.inherifail',
-			array('%link-character%'=>$character->getId()),
-			HISTORY::HIGH, true
-		);
-
+	
+	private function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.inactive',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.death',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		}
 	}
-
 
 	public function findEvents(Character $character) {
 		$query = $this->em->createQuery('SELECT e, l, m FROM BM2SiteBundle:Event e JOIN e.log l JOIN l.metadatas m WHERE m.reader = :me AND e.ts > m.last_access AND (m.access_until IS NULL OR e.cycle <= m.access_until) AND (m.access_from IS NULL OR e.cycle >= m.access_from) ORDER BY e.ts DESC');
