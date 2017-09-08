@@ -30,14 +30,14 @@
 		<dt>{{ 'diplomacy.status.name'|trans({},"politics") }}</dt>
 		<dd>{{ ('diplomacy.status.'~they_to_us.status)|trans({},"politics") }}</dd>
 		<dt>{{ 'diplomacy.relations.public'|trans({},"politics") }}</dt>
-		<dd>{{ they_to_us.public|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
+		<dd>{{ they_to_us.public|markdown }}</dd>
 		{% if member_of_target %}
 			<dt>{{ 'diplomacy.relations.internal'|trans({},"politics") }}</dt>
-			<dd>{{ they_to_us.internal|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
+			<dd>{{ they_to_us.internal|markdown }}</dd>
 		{% endif %}
 		{% if member_of_source %}
 			<dt>{{ 'diplomacy.relations.delivered'|trans({},"politics") }}</dt>
-			<dd>{{ they_to_us.delivered|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
+			<dd>{{ they_to_us.delivered|markdown }}</dd>
 		{% endif %}
 	</dl>
 {% else %}
