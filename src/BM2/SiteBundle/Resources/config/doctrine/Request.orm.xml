@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Request">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="type" type="string"/>
+		<field name="created" type="datetime" nullable="true"/>
+		<field name="expires" type="datetime" nullable="true"/>
+		<field name="number_value" type="float" nullable="true"/>
+		<field name="string_value" type="string" nullable="true"/>
+		<field name="subject" type="string" nullable="true"/>
+		<field name="text" type="text" nullable="true"/>
+
+		<many-to-one field="from_character" target-entity="Character" inversed-by="requests"/>
+		<many-to-one field="from_settlement" target-entity="Settlement" inversed-by="requests"/>
+		<many-to-one field="from_realm" target-entity="Realm" inversed-by="requests"/>
+		<many-to-one field="from_house" target-entity="House" inversed-by="requests"/>
+
+		<many-to-one field="to_character" target-entity="Character" inversed-by="related_requests"/>
+		<many-to-one field="to_settlement" target-entity="Settlement" inversed-by="related_requests"/>
+		<many-to-one field="to_realm" target-entity="Realm" inversed-by="related_requests"/>
+		<many-to-one field="to_house" target-entity="House" inversed-by="related_requests"/>
+		
+		<many-to-one field="include_character" target-entity="Character" inversed-by="part_of_requests"/>
+		<many-to-one field="include_settlement" target-entity="Settlement" inversed-by="part_of_requests"/>
+		<many-to-one field="include_realm" target-entity="Realm" inversed-by="part_of_requests"/>
+		<many-to-one field="include_house" target-entity="House" inversed-by="part_of_requests"/>
+		<many-to-many field="include_soldiers" target-entity="Soldier" inversed-by="part_of_requests">
+			<join-table name="requests_soldiers">
+				<join-columns>
+					<join-column name="request_id"/>
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="soldier_id"/>
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+		<many-to-many field="equipment" target-entity="EquipmentType">
+			<join-table name="requests_equipment">
+				<join-columns>
+					<join-column name="request_id"/>
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="equipmenttype_id"/>
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+		
+		<lifecycle-callbacks>
+			<lifecycle-callback type="preRemove" method="onPreRemove" />
+		</lifecycle-callbacks>
+
+	</entity>
+</doctrine-mapping>
