@@ -212,16 +212,6 @@ class RealmManager {
 	}
 	
 	
-	public function makePositionHolder(RealmPosition $position, Character $newholder, $ignore_position=false) {
-		if (!$ignore_position) {
-			if (!$position->getHolders()->contains($newholder)) {
-				$position->addHolder($newholder);
-				$newholder->addPosition($position);
-			}
-		}
-	}
-	
-	
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
@@ -338,6 +328,17 @@ class RealmManager {
 				if ($election->getPosition()->getRuler()) {
 					$this->removeRulerLiege($election->getRealm(), $winner);
 				}
+			}
+		}
+	}
+
+	public function dropIncumbents(Election $election) {
+		if ($election->getRoutine()) {
+			$position = $election->getPosition();
+			$holders = $position->getHolders();
+			foreach ($holders as $character) {		
+				$position->removeHolder($character);
+				$character->removePosition($position);
 			}
 		}
 	}
