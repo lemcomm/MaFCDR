@@ -75,8 +75,10 @@ class RunCommand extends ContainerAwareCommand {
 			 ->setFrom('mafserver@lemuriacommunity.org')
 			 ->setTo("mafteam@lemuriacommunity.org")
 			 ->setBody($text);
-		$mailer->send($message, $failed);
-		$spool->flushQueue($transport);
+		$mailer->send($message, $failed);		
+		if ($spool) {
+			$spool->flushQueue($transport);
+		}
 	}
 
 }
