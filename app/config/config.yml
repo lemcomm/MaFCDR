@@ -133,6 +133,14 @@ fos_user:
     registration:
         confirmation:
             enabled:    true
+            from_email:
+                address:        mafserver@lemuriacommunity.org
+                sender_name:    Might & Fealty Server
+    resetting:
+        email:
+            from_email:
+                address:        mafserver@lemuriacommunity.org
+                sender_name:    Might & Fealty Server
     from_email:
-        address:        noreply@mightandfealty.com
+        address:        mafserver@lemuriacommunity.org
         sender_name:    Might & Fealty Server
