@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 /**
  * @Route("/payment")
@@ -45,7 +45,7 @@ class PaymentController extends Controller {
      * @Template("BM2SiteBundle:Payment:payment.html.twig")
      */
 	public function paymentAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -84,7 +84,7 @@ class PaymentController extends Controller {
 	  * @Route("/paypal/{amount}", name="bm2_paypal", requirements={"amount"="\d+"})
 	  */
 	public function paypalAction($amount, Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -235,7 +235,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function creditsAction() {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization.checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -252,7 +252,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function subscriptionAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -287,7 +287,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function cultureAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$em = $this->getDoctrine()->getManager();
@@ -334,7 +334,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function giftAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -383,7 +383,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function inviteAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
