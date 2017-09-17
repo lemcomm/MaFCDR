@@ -7,14 +7,16 @@ use BM2\SiteBundle\Entity\Setting;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
 class AppState {
 
 	protected $em;
-	protected $securitycontext;
+	protected $tokenStorage;
+	protected $authorizationCheckerInterface;
 	protected $session;
 
 	private $languages = array(
@@ -25,9 +27,10 @@ class AppState {
 		'it' => 'italiano'
 		);
 
-	public function __construct(EntityManager $em, SecurityContext $securitycontext, Session $session) {
+	public function __construct(EntityManager $em, TokenStorageInterface $tokenStorage, AuthorizationChecker $authorizationChecker, Session $session) {
 		$this->em = $em;
-		$this->securitycontext = $securitycontext;
+		$this->tokenStorage = $tokenStorage;
+		$this->authorizationChecker = $authorizationChecker;
 		$this->session = $session;
 	}
 
@@ -37,7 +40,7 @@ class AppState {
 
 	public function getCharacter($required=true, $ok_if_dead=false, $ok_if_notstarted=false) {
 		// check if we have a user first
-		$token = $this->securitycontext->getToken();
+		$token = $this->tokenStorage->getToken();
 		if (!$token) {
 			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.token'); }
 		}
@@ -47,7 +50,7 @@ class AppState {
 		}
 
 		# Let the ban checks begin...
-		if ($this->securitycontext->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->authorizationChecker->isGranted('ROLE_BANNED_MULTI')) {
 			if (!$required) { return null; } else { throw new AccessDeniedException('error.banned.multi'); }
 		}
 
@@ -140,3 +143,4 @@ class AppState {
 
 
 }
+
