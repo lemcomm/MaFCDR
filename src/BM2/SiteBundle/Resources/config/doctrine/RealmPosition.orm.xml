@@ -7,7 +7,7 @@
 		<field name="name" type="string"/>
 		<field name="rank" type="integer" nullable="true"/>
 		<field name="description" type="text"/>
-		<many-to-one field="type" target-entity="PositionType" inversed-by="positions" nullable="true"/>
+		<many-to-one field="type" target-entity="PositionType" nullable="true"/>
 		<field name="ruler" type="boolean"/>
 		<field name="elected" type="boolean"/>
 		<field name="electiontype" type="string" nullable="true"/>
