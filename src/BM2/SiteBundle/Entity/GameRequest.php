@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Entity;
 class Request {
 
 	public function __toString() {
-		return "action {$this->id} - {$this->type}";
+		return "request {$this->id} - {$this->type}";
 	}
 
 
