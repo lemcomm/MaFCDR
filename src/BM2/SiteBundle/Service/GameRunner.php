@@ -606,7 +606,7 @@ class GameRunner {
 	public function runResupplyCycle() {
 		$last = $this->appstate->getGlobal('cycle.resupply', 0);
 		if ($last==='complete') return true;
-        $last=(int)$last;
+        	$last=(int)$last;
 		$this->logger->info("resupply...");
 
 		$max_supply = $this->appstate->getGlobal('supply.max_value', 800);
@@ -693,17 +693,26 @@ class GameRunner {
 		$timeout = new \DateTime("now");
 		$timeout->sub(new \DateInterval("P7D"));
 		
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
+		$result = $this->getResult();
+		$this->logger->notice("Validating Realm memberships...");
+		foreach ($result as $realm) {
+			$realm->findAllMembers(true, true);
+		}
+		
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false) GROUP BY p');
 		$result = $query->getResult();
+		$this->logger->notice("Checking for inactive realms...");
 		foreach ($result as $position) {
-			$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 			$members = $position->getRealm()->findMembers();
 			if ($members->isEmpty()) {
+				$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 				$this->logger->notice("-- realm deserted, making inactive.");
 				$realm = $position->getRealm();
 				$this->rm->abandon($realm);
 			} 
 		}
+		$this->logger->notice("Checking for missing realm conversations...");
 
 		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r LEFT JOIN r.conversations c WHERE r.active = true AND c.id IS NULL');
 		$result = $query->getResult();
