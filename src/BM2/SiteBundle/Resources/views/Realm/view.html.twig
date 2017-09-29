@@ -92,25 +92,29 @@
 <h3>{{ 'realm.positions.name'|trans({},"politics")|title }}</h3>
 <dl>
 	{% for position in realm.positions %}
-	<dt>
-		{% if position.ruler %}
-			{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
-		{% else %}
-			{{ position.name }}
-		{% endif %}
-	</dt>
-	<dd>
-		{{ position.description }}
-		<br />
-		{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
-		<ul class="shortlist" style="display:inline">
-			{% for holder in position.holders %}
-				<li>{{ link(holder) }}</li>
+		{% if not position.retired %}
+		<dt>
+			{% if position.ruler %}
+				{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
 			{% else %}
-				<li>{{ 'nobody'|trans }}</li>
-			{% endfor %}
-		</ul>
-	</dd>
+				{{ position.name }}
+			{% endif %}
+		</dt>
+		<dd>	
+			{{ position.description }}
+			<br />
+			{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+			<ul class="shortlist" style="display:inline">
+				{% for holder in position.holders %}
+					<li>{{ link(holder) }}</li>
+				{% else %}
+					<li>{{ 'nobody'|trans }}</li>
+				{% endfor %}
+			</ul>
+			<br />
+			{% if position.type %}{{ 'position.type'|trans({},"politics") }}: {{ ('position.types.'~position.type.name)|trans({},"politics") }}{% endif %}
+		</dd>
+		{% endif %}
 	{% endfor %}
 </dl>
 

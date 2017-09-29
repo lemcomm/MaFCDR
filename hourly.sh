@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOGDIR="/var/www/maf/app/logs"
+LOGDIR="/var/maf/logs"
 APP="/var/www/maf/app/console"
 
 #LOGDIR="/tmp"

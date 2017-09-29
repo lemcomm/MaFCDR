@@ -7,12 +7,17 @@
 	<dt>{{ 'position.description'|trans({}, "politics") }}</dt>
 	<dd>{{ position.description }}</dd>
 
-	<dt>{{ 'position.permissions'|trans({}, "politics") }}</dt>
+	{# <dt>{{ 'position.permissions'|trans({}, "politics") }}</dt>
 	<dd><ul class="shortlist">
 		{% for perm in position.permissions %}
 			{{ perm.translationstring|trans({},"politics") }}
 		{% endfor %}
-	</ul>&nbsp;</dd>
+	</ul>&nbsp;</dd> #}
+
+	{% if position.type %}
+	<dt>{{ 'position.type'|trans({}, "politics") }}</dt>
+	<dd>{{ ('position.types.'~position.type.name)|trans({},"politics") }}</dd>
+	{% endif %}
 
 	<dt>{{ 'position.elected'|trans({}, "politics") }}</dt>
 	<dd>{% if position.elected %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
@@ -20,6 +25,12 @@
 	<dt>{{ 'position.inherit'|trans({}, "politics") }}</dt>
 	<dd>{% if position.inherit %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
 
+	<dt>{{ 'position.retired'|trans({}, "politics") }}</dt>
+	<dd>{% if position.retired %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
+	
+	<dt>{{ 'position.keeponslumber'|trans({}, "politics") }}</dt>
+	<dd>{% if position.keeponslumber %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
+	
 	<dt>{{ 'position.term'|trans({}, "politics") }}</dt>
 	<dd>
 		{{ ('position.terms.'~position.term)|trans({}, "politics") }}

@@ -2,8 +2,6 @@
 
 namespace BM2\SiteBundle\Entity;
 
+class PositionType {
 
-class RealmPosition {
-
-        
 }

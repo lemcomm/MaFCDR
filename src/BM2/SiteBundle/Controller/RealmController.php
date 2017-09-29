@@ -17,6 +17,7 @@ use BM2\SiteBundle\Form\RealmRelationType;
 use BM2\SiteBundle\Form\RealmRestoreType;
 use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SubrealmType;
+use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -114,7 +115,7 @@ class RealmController extends Controller {
 		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
 			$restorable = TRUE;
 			echo $restorable;
-		}*/
+		}*/	
 
 		return array(
 			'realm' =>		$realm,
@@ -287,13 +288,14 @@ class RealmController extends Controller {
 	public function positionAction(Realm $realm, Request $request, RealmPosition $position=null) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
 		$em = $this->getDoctrine()->getManager();
+		$cycle = $this->get('appstate')->getCycle();
 
 		if ($position == null) {
 			$is_new = true;
 			$position = new RealmPosition;
 			$position->setRealm($realm);
 			$position->setRuler(false);
-			$position->setDescription("");
+
 		} else {
 			$is_new = false;
 			if ($position->getRealm() != $realm) {
@@ -302,27 +304,41 @@ class RealmController extends Controller {
 		}
 
 		$original_permissions = clone $position->getPermissions();
-
 		$form = $this->createForm(new RealmPositionType(), $position);
 		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$fail = false;
 			$data = $form->getData();
+			$year = $data->getYear();
+			$week = $data->getWeek();
+			$elected = $data->getElected();
+			if ($week < 1 OR $week > 60) {
+				$fail = true;
+			}
 
-			foreach ($position->getPermissions() as $permission) {
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			if (!$fail) {
+				foreach ($position->getPermissions() as $permission) {
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$position->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$position->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
+				if ($is_new) {
+					$em->persist($position);
+				}
+				if ($year AND $week) {
+					$position->setCycle((($year-1)*360)+(($week-1)*6));
+				}
+				if ($elected) {
+					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 			}
-			if ($is_new) {
-				$em->persist($position);
-			}
-			$em->flush();
-			return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 		}
 
 		return array(
@@ -831,13 +847,19 @@ class RealmController extends Controller {
 	public function electionsAction(Realm $realm) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
 
+		/* 
+		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
+		And yes, you're reading this right, elections only used to be counted when someone was viewing the list of elections in a realm.
+		--Andrew 20170918
+
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
 		foreach ($query->getResult() as $election) {
 			$this->get('realm_manager')->countElection($election);
 		}
-		$em->flush();
+		$em->flush(); 
+		*/
 
 		return array(
 			'realm'=>$realm,
@@ -1020,7 +1042,7 @@ class RealmController extends Controller {
 
 		$votes = $this->getVotes($election);
 
-		$my_weight = 1; // TODO: different voting mechanism
+		$my_weight = $this->get('realm_manager')->getVoteWeight($election, $character);
 
 		return array(
 			'election' => $election,
@@ -1043,7 +1065,7 @@ class RealmController extends Controller {
 					'contra' => array()
 				);
 			}
-			$weight = 1; // TODO: different voting mechanism
+			$weight = $this->get('realm_manager')->getVoteWeight($election, $vote->getCharacter());
 			if ($vote->getVote() < 0) {
 				$votes[$id]['contra'][] = array('voter'=>$vote->getCharacter(), 'votes'=>$weight);
 			} else {

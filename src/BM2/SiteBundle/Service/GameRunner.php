@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Building;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\GeoData;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Ship;
@@ -38,6 +39,7 @@ class GameRunner {
 	private $mm;
 	private $pm;
 	private $npc;
+	private $cm;
 
 	private $cycle=0;
 	private $output=false;
@@ -45,8 +47,9 @@ class GameRunner {
 	private $limited=false;
 
 	private $bandits_ok_distance = 50000;
+	private $seen;
 
-	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, Military $military, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc) {
+	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, Military $military, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->logger = $logger;
@@ -63,6 +66,7 @@ class GameRunner {
 		$this->mm = $mm;
 		$this->pm = $pm;
 		$this->npc = $npc;
+		$this->cm = $cm;
 
 		$this->cycle = $this->appstate->getCycle();
 		$this->speedmod = (float)$this->appstate->getGlobal('travel.speedmod', 1.0);
@@ -131,7 +135,7 @@ class GameRunner {
 	public function runCharactersUpdatesCycle() {
 		$last = $this->appstate->getGlobal('cycle.characters', 0);
 		if ($last==='complete') return true;
-		$this->logger->info("characters update...");
+		$this->logger->info("Characters Cycle...");
 
 		// healing
 		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Character c SET c.wounded=0 WHERE c.wounded <= 10');
@@ -160,6 +164,105 @@ class GameRunner {
 			}
 		}
 
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.alive=false');
+		$deadcount = count($query->getResult());
+		$this->logger->info("Removing $deadcount dead from the map...");
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Character c SET c.location=null WHERE c.alive=false');
+		$query->execute();
+
+		$this->logger->info("checking for dead and slumbering characters with positions...");
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.positions p WHERE c.alive = false OR c.slumbering = true');
+		$result = $query->getResult();
+		if (count($result) > 0) {
+			$this->logger->info("Sorting the dead from the slumbering...");
+		} else {
+			$this->logger->info("No dead or slumbering found!");
+		}
+		$dead = [];
+		$slumbered = [];
+		$slumbercount = 0;
+		$keeponslumbercount = 0;
+		$this->seen = new ArrayCollection;
+		foreach ($result as $character) {
+			list($heir, $via) = $this->findHeir($character);
+			if ($character->isAlive() == FALSE) {
+				$deadcount++;
+				$dead[] = $character;
+			} else if ($character->getSlumbering() == TRUE) {
+				$slumbercount++;
+				$slumbered[] = $character;
+			}
+		}
+		if (count($deadcount)+count($slumbercount) != 0) {
+			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
+		}
+		foreach ($dead as $character) {
+			$this->logger->info($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
+			foreach ($character->getPositions() as $position) {
+				if ($position->getRuler()) {
+					if ($heir) {
+						$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
+					} else {
+						$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
+					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else if ($position->getInherit()) {
+					if ($heir) {
+						$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
+					} else {
+						$this->cm->failInheritPosition($character, $position, 'death');
+					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else {
+					$this->history->logEvent(
+						$position->getRealm(), 
+						'event.position.death',
+						array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+						History::LOW, true
+					);
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				}
+			}
+		}
+		foreach ($slumbered as $character) {			
+			$this->logger->info($character->getName()." is inactive, heir: ".($heir?$heir->getName():"(nobody)"));
+			foreach ($character->getPositions() as $position) {
+				if ($position->getRuler()) {
+					if ($heir) {
+						$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
+					} else {
+						$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
+					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
+					if ($heir) {
+						$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
+					} else {
+						$this->cm->failInheritPosition($character, $position, 'slumber');
+					}
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else if (!$position->getKeepOnSlumber()) {
+					$this->cm->failInheritPosition($character, $position, 'slumber');
+					$position->removeHolder($character);
+					$character->removePosition($position);
+				} else {
+					$this->history->logEvent(
+						$position->getRealm(),
+						'event.position.inactivekept',
+						array('%link-character%'=>$character->getId(), '%link-position%'=>$position->getId()),
+						History::LOW, true
+					);
+					$keeponslumbercount++;
+				}
+			}
+		}
+		$this->logger->info("$keeponslumbercount positions kept on slumber!");
+
 		$this->appstate->setGlobal('cycle.characters', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -169,7 +272,7 @@ class GameRunner {
 	public function runNPCCycle() {
 		$last = $this->appstate->getGlobal('cycle.npcs', 0);
 		if ($last==='complete') return true;
-		$this->logger->info("npcs update...");
+		$this->logger->info("NPC Cycle...");
 
 		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
 		$players = $query->getSingleScalarResult();
@@ -504,7 +607,7 @@ class GameRunner {
 	public function runResupplyCycle() {
 		$last = $this->appstate->getGlobal('cycle.resupply', 0);
 		if ($last==='complete') return true;
-        $last=(int)$last;
+        	$last=(int)$last;
 		$this->logger->info("resupply...");
 
 		$max_supply = $this->appstate->getGlobal('supply.max_value', 800);
@@ -585,83 +688,90 @@ class GameRunner {
 	public function runRealmsCycle() {
 		$last = $this->appstate->getGlobal('cycle.realm', 0);
 		if ($last==='complete') return true;
-        $last=(int)$last;
-		$this->logger->info("realms...");
+        	$last=(int)$last;
+		$this->logger->info("Realms Cycle...");
 		
-		# This is just me being picky, but I like to define everything I need before I need it, even if it's not connected to the query yet. --Andrew
 		$timeout = new \DateTime("now");
-		$timeout->sub(new \DateInterval("P15D")); // hardcoded to 15 day intervals between election attempts
+		$timeout->sub(new \DateInterval("P7D"));
 		
-		# Fixing a bug here that prevented ruler elections from happening after the psotions went vacant. --Andrew
-		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
-		$query->setParameter('timeout', $timeout);
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false) GROUP BY p');
 		$result = $query->getResult();
+		$this->logger->notice("Checking for inactive realms...");
+		# This one checks for realms that don't have rulers, while the next query checks for conversations.
+		# Since they can both result in different situations that reveal abandoned realms, we check twice.
 		foreach ($result as $position) {
-			$this->logger->notice("empty ruler position for realm ".$position->getRealm()->getName());
-			$members = $position->getRealm()->findMembers();
+			$members = $position->getRealm()->findMembers(true, true);
 			if ($members->isEmpty()) {
+				$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 				$this->logger->notice("-- realm deserted, making inactive.");
 				$realm = $position->getRealm();
 				$this->rm->abandon($realm);
-			} else {
-				$this->logger->notice("-- election triggered.");
-				$election = new Election;
-				$election->setRealm($position->getRealm());
-				$election->setPosition($position);
-				$election->setOwner(null);
-				$election->setClosed(false);
-
-				$complete = new \DateTime("now");
-				$complete->add(new \DateInterval("P3D"));
-				$election->setComplete($complete);
-
-				// TODO: translate strings here?
-				$election->setName('Ruler Election');
-				$election->setDescription('The realm has been found to be without ruler and an election has automatically been triggered.');
-
-				// TODO: this should be stored in the position (and editable)
-				$election->setMethod('banner');					
-				$this->em->persist($election);
-				$this->em->flush(); // must flush because we need the ID below
-
-				// message to the realm channel
-				$msg = "An automatic election has been triggered for the ruler position. You are invited to vote - [vote:".$election->getId()."].";
-				// FIXME: this posts to all realm conversations! how do we find the "main" ??
-				$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
-				$query->setParameter('realm', $position->getRealm());
-				foreach ($query->getResult() as $conversation) {
-					$this->mm->writeMessage($conversation, null, $msg);
+			} 
+		}
+		$this->logger->info("Checking for missing realm conversations...");
+		
+		$realmquery = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
+		$realms = $realmquery->getResult();
+		foreach ($realms as $realm) {
+			$convoquery = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+			$convoquery->setParameter('realm', $realm);
+			$convos = $convoquery->getResult();
+			$announcements = false;
+			$general = false;
+			$deserted = false;
+			if ($convos) {
+				foreach ($convos as $convo) {
+					if ($convo->getSystem() == 'announcements') {
+						$announcements = true;
+					}
+					if ($convo->getSystem() == 'general') {
+						$general = true;
+					}
 				}
 			}
-		}
-
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r LEFT JOIN r.conversations c WHERE r.active = true AND c.id IS NULL');
-		$result = $query->getResult();
-		foreach ($result as $realm) {
-			$this->logger->notice("missing realm conversation for ".$realm->getName());
-
-			// usually the ruler is the conversation owner, but if we don't have one, just pick the first realm member
-			$rulers = $realm->findRulers();
-			if (!$rulers->isEmpty()) {
-				$msguser = $this->mm->getMsgUser($rulers->first());
-			} else {
-				$members = $realm->findMembers(true);
-				if (!$members->isEmpty()) {
-					$msguser = $this->mm->getMsgUser($members->first());
+			if (!$announcements) {
+				$rulers = $realm->findRulers();
+				if (!$rulers->isEmpty()) {
+					$msguser = $this->mm->getMsgUser($rulers->first());
 				} else {
-					$this->logger->notice("-- realm deserted, making inactive.");
-					$this->rm->abandon($realm);
-					$msguser = false;
+					$members = $realm->findMembers(true);
+					if (!$members->isEmpty()) {
+						$msguser = $this->mm->getMsgUser($members->first());
+					} else {
+						$this->logger->notice($realm->getName()." deserted, making inactive.");
+						$deserted = true;
+						$this->rm->abandon($realm);
+						$msguser = false;
+					}
+				}
+				$topic = $realm->getName().' Announcements';
+				if ($msguser) {
+					list($meta,$conversation) = $this->mm->createConversation($msguser, $topic, null, $realm);
+					$this->em->flush(); // because the below needs this flushed
+					$this->mm->updateMembers($conversation);
+					$conversation->setSystem('announcements');
+					$this->logger->notice($realm->getName()." announcements created");
 				}
 			}
-			if ($msguser) {
-				list($meta,$conversation) = $this->mm->createConversation($msguser, $realm->getFormalName(), null, $realm);
-				$this->em->flush(); // because the below needs this flushed
-				$this->mm->updateMembers($conversation);
-				$this->logger->notice("-- created");
+			if (!$general && !$deserted) {
+				$rulers = $realm->findRulers();
+				if (!$rulers->isEmpty()) {
+					$msguser = $this->mm->getMsgUser($rulers->first());
+				} else {
+					$members = $realm->findMembers(true);
+					if (!$members->isEmpty()) {
+						$msguser = $this->mm->getMsgUser($members->first());
+					}
+				}
+				if ($msguser) {
+					list($meta,$conversation) = $this->mm->createConversation($msguser, $realm->getFormalName(), null, $realm);
+					$this->em->flush(); // because the below needs this flushed
+					$this->mm->updateMembers($conversation);
+					$conversation->setSystem('general');
+					$this->logger->notice($realm->getName()." discussion created");
+				}
 			}
 		}
-
 
 		$this->appstate->setGlobal('cycle.realm', 'complete');
 		$this->em->flush();
@@ -670,70 +780,250 @@ class GameRunner {
 		return true;
 	}
 
+    public function runPositionsCycle() {
+		$last = $this->appstate->getGlobal('cycle.positions', 0);
+		if ($last==='complete') return true;
+        	$last=(int)$last;
+		$this->logger->info("Positions Cycle...");
 
-	public function runSeaFoodCycle() {
-			$last = $this->appstate->getGlobal('cycle.seafood', 0);
-			if ($last==='complete') return true;
-			$last=(int)$last;
-			$this->logger->info("sea food...");
+		$this->logger->info("Processing Finished Elections...");
+		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
+		$query->setParameter('now', new \DateTime("now"));
+		$seenelections = [];
+		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections, 
+		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old. 
+		Mind you, this will only drop holders if the election has $routine = true set. 
+		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
+		foreach ($query->getResult() as $election) {
+			# dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
+			$seenelections[] = $election->getId();
+			if(!in_array($election->getId(), $seenelections)) {
+				$this->rm->dropIncumbents($election);
+			}
+		}
+		foreach ($query->getResult() as $election) {
+			$this->rm->countElection($election);
+		}
+		$this->em->flush();
+		
+		$timeout = new \DateTime("now");
+		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
 
-			$query = $this->em->createQuery("SELECT c FROM BM2SiteBundle:Character c, BM2SiteBundle:GeoData g JOIN g.biome b WHERE c.id > :last AND ST_Contains(g.poly, c.location) = true AND b.name IN ('ocean', 'water') ORDER BY c.id");
-			$query->setParameter('last', 0);
-			$iterableResult = $query->iterate();
-
-			$time_start = microtime(true);
-			$done = false;
-			$complete = false;
-			while (!$done) {
-				$row = $iterableResult->next();
-				if ($row===false) {
-					$done=true;
-					$complete=true;
-					break;
-				}
-
-				$character = $row[0];
-				$soldiers = $character->getSoldiers()->count();
-				$entourage = $character->getEntourage()->count();
-
-				//	a) troops eat food from camp followers
-				// b) small chance of shipwreck and landing at nearby random beach (to prevent the eternal hiding at sea exploit I use myself)
-				if (rand(0,100) == 25) {
-					// shipwrecked !
-					list($land_location, $ship_location) = $this->geography->findLandPoint($character->getLocation());
-					if ($land_location) {
-						$near = $this->geography->findNearestSettlementToPoint(new Point($land_location->getX(), $land_location->getY()));
-						if ($near) {
-							// FIXME: this can land me in ocean sometimes? Or simply doesn't work at all sometimes?
-							echo $character->getName()." has been shipwrecked, landing near ".$near[0]->getName()." at ".$land_location->getX()." / ".$land_location->getY()."\n";
-							$character->setLocation($land_location);
-							$character->setTravel(null)->setProgress(null)->setSpeed(null)->setTravelAtSea(false)->setTravelDisembark(false);
-							$this->history->logEvent(
-								$character,
-								'event.travel.wreck',
-								array('%link-settlement%'=>$near[0]->getId()),
-								History::MEDIUM, false, 20
-							);
-						}
+		/* The bulk of the following code does the following:
+			1. Ensure all active realms have a ruler.
+			2. Ensure all vacant AND elected positions have a holder.
+			3. Ensure all positions that should have more than one holder do.
+		These things will only happen if there is not already an election running for a given position though. */
+		$this->logger->info("Checking realm rulers, vacant electeds, and minholders...");
+		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
+		$query->setParameter('timeout', $timeout);
+		$result = $query->getResult();
+		foreach ($result as $position) {
+			$members = $position->getRealm()->findMembers();
+			if ($position->getRuler() && $position->getHolders()->count() == 0) {
+				$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
+				if (!$members->isEmpty()) {
+					$electionsneeded = 1;
+					$counter = 0;
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
+					}
+					while ($electionsneeded > 0) {
+						$this->logger->notice("-- election triggered.");
+						$electiontype = 'noruler';
+						$election = $this->setupElection($position, $electiontype, false, $counter);
+			
+						$msg = "Automatic election number ".$counter." has been triggered for the position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
+						$electionsneeded--;
 					}
 				}
-				if ($character->getTravelAtSea()) {
-					// we are still at sea, so let's eat some fish
-					$this->economy->feedSoldiers($character, 2);
+			}
+			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired()) {
+				if (!$members->isEmpty()) {
+					$this->logger->notice("Empty realm position of ".$position->getName()." for realm ".$position->getRealm()->getName());
+					$electionsneeded = 1;
+					$counter = 0;
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
+					}
+					while ($electionsneeded > 0) {
+						$members = $position->getRealm()->findMembers();
+
+						$this->logger->notice("-- election triggered.");
+						$electiontype = 'vacantelected';
+						$election = $this->setupElection($position, $electiontype, false, $counter);
+
+						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
+						$electionsneeded--;
+					}
 				}
 			}
+			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired()) {
+				if (!$members->isEmpty()) {
+					$this->logger->notice("Realm position of ".$position->getName()." for realm ".$position->getRealm()->getName()." needs more holders.");
+					$electionsneeded = 1;
+					$counter = 0;
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
+					}
+					while ($electionsneeded > 0) {
+						$members = $position->getRealm()->findMembers();
+						$counter++;
+						$electiontype = 'shortholders';
+						$election = $this->setupElection($position, $electiontype, false, $counter);
+						$this->logger->notice("-- election ".$counter." triggered.");
 
-			if ($complete) {
-				$this->appstate->setGlobal('cycle.seafood', 'complete');
-			} else {
-				$this->appstate->setGlobal('cycle.seafood', $lastid);
+						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
+						$electionsneeded--;
+					}
+				}
 			}
+		}
+		$this->em->flush();
 
-			$this->em->flush();
-			$this->em->clear();
-			return $complete;
+		$this->logger->info("Checking for routine elections...");
+		$cycle = $this->appstate->getCycle();
+		$query = $this->em->createQuery("SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND p.cycle <= :cycle AND h.id IS NOT NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p");
+		$query->setParameter('timeout', $timeout);
+		$query->setParameter('cycle', $cycle);
+		foreach ($query->getResult() as $position) {
+			if ($position->getCycle() == $cycle && !$position->getRetired()) {
+				switch ($position->getTerm()) {
+					case '30':
+						$position->setCycle($cycle+120);
+						break;
+					case '90':
+						$position->setCycle($cycle+360);
+						break;
+					case '365':
+						$position->setCycle($cycle+1440);
+						break;
+					case '0':
+					default:
+						$position->setYear(null);
+						$position->setWeek(null);
+						$position->setCycle(null);
+						break;
+				}
+			}
+			$members = $position->getRealm()->findMembers();
+			$this->logger->notice("Calling election for ".$position->getName()." for realm ".$position->getRealm()->getName());
+			$electionsneeded = 1;
+			$counter = 0;
+			$firstelection = true;
+			if ($position->getMinholders()) {
+				$electionsneeded = $position->getMinholders();
+			}
+			while ($electionsneeded > 0) {
+				$counter++;
+				$electiontype = 'routine';
+				$election = $this->setupElection($position, $electiontype, true, $counter);
+				$this->logger->notice("-- election '.$counter.' triggered.");
+				$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+				$systemflag = 'announcements';
+				$this->postToRealm($position, $systemflag, $msg);
+				$electionsneeded--;
+			}
+		}
+
+		$this->appstate->setGlobal('cycle.positions', 'complete');
+		$this->em->flush();
+		$this->em->clear();
+
+		return true;
 	}
 
+	public function runSeaFoodCycle() {
+		$last = $this->appstate->getGlobal('cycle.seafood', 0);
+		if ($last==='complete') return true;
+		$last=(int)$last;
+		$this->logger->info("sea food...");
+
+		$query = $this->em->createQuery("SELECT c FROM BM2SiteBundle:Character c, BM2SiteBundle:GeoData g JOIN g.biome b WHERE c.id > :last AND ST_Contains(g.poly, c.location) = true AND b.name IN ('ocean', 'water') ORDER BY c.id");
+		$query->setParameter('last', 0);
+		$iterableResult = $query->iterate();
+
+		$time_start = microtime(true);
+		$done = false;
+		$complete = false;
+		while (!$done) {
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				$complete=true;
+				break;
+			}
+
+			$character = $row[0];
+			$soldiers = $character->getSoldiers()->count();
+			$entourage = $character->getEntourage()->count();
+
+			//	a) troops eat food from camp followers
+			// b) small chance of shipwreck and landing at nearby random beach (to prevent the eternal hiding at sea exploit I use myself)
+			if (rand(0,100) == 25) {
+				// shipwrecked !
+				list($land_location, $ship_location) = $this->geography->findLandPoint($character->getLocation());
+				if ($land_location) {
+					$near = $this->geography->findNearestSettlementToPoint(new Point($land_location->getX(), $land_location->getY()));
+					if ($near) {
+						// FIXME: this can land me in ocean sometimes? Or simply doesn't work at all sometimes?
+						echo $character->getName()." has been shipwrecked, landing near ".$near[0]->getName()." at ".$land_location->getX()." / ".$land_location->getY()."\n";
+						$character->setLocation($land_location);
+						$character->setTravel(null)->setProgress(null)->setSpeed(null)->setTravelAtSea(false)->setTravelDisembark(false);
+						$this->history->logEvent(
+							$character,
+							'event.travel.wreck',
+							array('%link-settlement%'=>$near[0]->getId()),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+			if ($character->getTravelAtSea()) {
+				// we are still at sea, so let's eat some fish
+				$this->economy->feedSoldiers($character, 2);
+			}
+		}
+
+		if ($complete) {
+			$this->appstate->setGlobal('cycle.seafood', 'complete');
+		} else {
+			$this->appstate->setGlobal('cycle.seafood', $lastid);
+		}
+
+		$this->em->flush();
+		$this->em->clear();
+		return $complete;
+	}
+
+	public function findHeir(Character $character, Character $from=null) {
+		// NOTE: This should match the implemenation on CharacterManager.php
+		if (!$from) { 
+			$from = $character; 
+		}
+
+		if ($this->seen) { 
+			// loops back to someone we've already checked
+			return array(false, false);
+		} else {
+			$this->seen->add($character);
+		}
+
+		if ($heir = $character->getSuccessor()) {
+			if ($heir->isAlive() && !$heir->getSlumbering()) {
+				return array($heir, $from);
+			} else {
+				return $this->findHeir($heir, $from);
+			}
+		}
+		return array(false, false);
+	}
 
 	public function eventNewYear() {
 		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s ORDER BY s.id ASC');
@@ -777,6 +1067,60 @@ class GameRunner {
 		$week = floor($this->cycle%360/6)+1;
 		$day = ($this->cycle%6)+1;
 		return array('year'=>$year, 'week'=>$week, 'day'=>$day);
+	}
+
+	public function postToRealm(RealmPosition $position, $systemflag, $msg) {
+		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm AND c.system = :system');
+		switch ($systemflag) {
+			case 'announcements':
+				$query->setParameter('system', 'announcements');
+				break;
+			case 'general':
+				$query->setParameter('system', 'general');
+				break;
+		}				
+		$query->setParameter('realm', $position->getRealm());
+		$targetconvo = $query->getResult();
+
+		foreach ($targetconvo as $topic) {
+			$this->mm->writeMessage($topic, null, $msg);
+		}
+
+	}
+
+	public function setupElection(RealmPosition $position, $electiontype=null, $routine=false, $counter=null) {
+		$election = new Election;				
+		$election->setRealm($position->getRealm());
+		$election->setPosition($position);
+		$election->setOwner(null);
+		$election->setRoutine($routine);
+		$election->setClosed(false);
+		if ($position->getElectiontype()) {
+			$election->setMethod($position->getElectiontype());
+		} else {
+			$election->setMethod('banner');
+		}
+		$complete = new \DateTime("now");
+		$complete->add(new \DateInterval("P3D"));
+		$election->setComplete($complete);
+		$election->setName("Election number ".$counter." for ".$position->getName());
+		switch ($electiontype) {
+			case 'noruler':
+				$election->setDescription('The realm has been found to be without a ruler and an election has automatically been triggered.');
+				break;
+			case 'vacantelected':
+				$election->setDescription('This elected position has been found to have no holders so an election has been called to correct this. Please be aware that multiple elections may have been called for this election, and that each election determines a different position holder.');
+				break;
+			case 'shortholders':
+				$election->setDescription('This elected position has been found to have an inadequate number of holders and an election has been called. Please be aware that multiple elections may have been called for this election, and that each election determines a different position holder.');
+				break;
+			case 'routine':
+				$election->setDescription('The previous term for this position has come to a close, so an election has been called to determine who will hold it next. Please be aware that multiple elections may have been called for this election, and that each election determines a different position holder.');
+				break;
+		}
+		$this->em->persist($election);
+		$this->em->flush();
+		return $election;
 	}
 
 	public function Progress($part) {

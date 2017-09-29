@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 /**
  * @Route("/account")
@@ -50,7 +50,7 @@ class AccountController extends Controller {
      * @Template("BM2SiteBundle:Account:account.html.twig")
      */
 	public function indexAction() {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -73,7 +73,7 @@ class AccountController extends Controller {
      * @Template
      */
    public function dataAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -97,7 +97,7 @@ class AccountController extends Controller {
      * @Template
      */
 	public function charactersAction() {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -265,7 +265,7 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:overview.html.twig")
 	  */
 	public function overviewAction() {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -303,7 +303,7 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:charactercreation.html.twig")
 	  */
 	public function newcharAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -464,7 +464,7 @@ class AccountController extends Controller {
 	  * @Template
 	  */
 	public function settingsAction(Request $request) {
-		if ($this->get('security.context')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
@@ -561,6 +561,9 @@ class AccountController extends Controller {
 	  * @Route("/play/{id}", name="bm2_play", requirements={"id"="\d+"})
 	  */
 	public function playAction($id) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		$em = $this->getDoctrine()->getManager();
