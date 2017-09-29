@@ -106,9 +106,11 @@ event:
   child:        Had a child, %character%.
   inherit:
    estate:      Inherited the settlement %settlement% from %character%.
+   position:    Inherited the position of %position% from %character%.
    realm:       Inherited the realm %realm% from %character%.
   inheritvia:
    estate:      Inherited the settlement %settlement% from %character-1% (via %character-2%).
+   position:    Inherited the position of %position% from %character-1% (via %character-2%).
    realm:       Inherited the realm %realm% from %character-1% (via %character-2%).
   wasgranted:   Was granted ownership of %settlement% by %character%.
   wasgranted2:  Was granted the fief of %settlement% by %character%.
@@ -200,9 +202,13 @@ event:
   settlement:   Attack on %settlement% started.
 
  realm:
-  founded:      Founded by %character%.
+  founded:      Founded by %character%.  
   inherited:    Rulership passed to %character-2% upon the death of %character-1%.
   inherifail:   Rulership disputed after the death of %character%, who left no heir.
+  inheriteddeath:    Rulership passed to %character-2% upon the death of %character-1%.
+  inherifaildeath:   Rulership disputed after the death of %character%, who left no heir.
+  inheritedslumber:  Rulership passed to %character-2% upon the slumbering of %character-1%
+  inherifailslumber: Rulership disputed after the slumbering of %character%, who left no heir.
   elected:      %character% was elected as ruler.
   joined:       Became a part of %realm%.
   wasjoined:    Acquired control of %realm%.
@@ -216,6 +222,7 @@ event:
   abdicated2:   %character% has abdicated without a successor.
   deserted:     Vanished into history with no members remaining.
   restored:     %character% of %realm%, has revived the realm, becoming it's new ruler.
+  restorer:     Revived the realm of %realm%, becoming it's new ruler.
   war:
    declared:    Declared war "%war%".
    received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
@@ -223,6 +230,10 @@ event:
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
+  inactivekept: The holder of %position%, %character%, has succumb to the slumber.
+  inherited:
+   slumber:     The position of %position% has been inherited by %character-2% after the slumbering of %character-1%.
+   death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
 

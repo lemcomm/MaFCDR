@@ -27,7 +27,7 @@ class LoadDungeonCards extends AbstractFixture implements OrderedFixtureInterfac
 		'fight.strong'		=> array('rarity' =>  500, 'monsterclass'=> '', 'target'=>array('monster'=>true, 'treasure'=>false, 'dungeoneer'=>false)),
 		'fight.hit'		=> array('rarity' =>  500, 'monsterclass'=> '', 'target'=>array('monster'=>true, 'treasure'=>false, 'dungeoneer'=>false)),
 		'fight.weak'		=> array('rarity' =>  650, 'monsterclass'=> '', 'target'=>array('monster'=>true, 'treasure'=>false, 'dungeoneer'=>false)),
-		'fight.slime'		=> array('rarity' =>  550, 'monsterclass'=> 'slime', 'target'=>array('monster'=>true, 'treasure'=>false, 'dungeoneer'=>false))
+		'fight.slime'		=> array('rarity' =>  550, 'monsterclass'=> 'slime', 'target'=>array('monster'=>true, 'treasure'=>false, 'dungeoneer'=>false)),
 
 
 		// uncommon cards
@@ -68,7 +68,11 @@ class LoadDungeonCards extends AbstractFixture implements OrderedFixtureInterfac
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->cards as $name=>$data) {
-			$type = new DungeonCardType;
+			$type = $manager->getRepository('DungeonBundle:DungeonCardType')->findOneByName($name);
+			if (!$type) {
+				$type = new DungeonCardType;
+				$manager->persist($type);
+			}
 			$type->setName($name);
 			$type->setRarity($data['rarity']);
 			$type->setMonsterClass($data['monsterclass']);

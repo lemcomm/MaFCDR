@@ -41,7 +41,7 @@ class NewsController extends Controller {
 	}
 
 	/**
-	  * @Route("/read/{edition}", requirements={"edition"="\d+"})
+	  * @Route("/read/{edition}", name="bm2_site_news_read", requirements={"edition"="\d+"})
 	  * @Template
 	  */
 	public function readAction(NewsEdition $edition, Request $request) {

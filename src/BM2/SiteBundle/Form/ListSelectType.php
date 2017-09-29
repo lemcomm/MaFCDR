@@ -34,7 +34,6 @@ class ListSelectType extends AbstractType {
 			'label'=>'character.list.select',
 			'expanded'=>true,
 			'required'=>true,
-			'empty_data'=>1,
 			'choices'=>$groups
 		));
 		$builder->add('submit', 'submit', array('label'=>'character.list.submit'));

@@ -211,20 +211,7 @@ class RealmManager {
 		$this->removeRulerLiege($realm, $newruler);
 	}
 	
-	public function restoreSubRealm(Realm $realm, Realm $deadrealm, Character $newruler) {
-		//this will allow superior realms to restore dead sub-realms --Andrew
-		if ($deadrealm->getActive() == false && $deadrealm->getSuperior()==$realm) {
-			$this->makeRuler($deadrealm, $newruler);
-			$deadrealm->setActive(true);
-			$this->history->logEvent(
-				$deadrealm,
-				'event.realm.restored',
-				array('%link-realm%'=>$realm->getID(), '%link-character%'=>$newruler->getId()),
-				History::ULTRA, true
-			);
-		}
-	}
-
+	
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
@@ -238,6 +225,64 @@ class RealmManager {
 		}		
 	}
 
+	public function getVoteWeight(Election $election, Character $character) {
+		switch ($election->getMethod()) {
+			case 'spears':
+				return $character->getActiveSoldiers()->count();
+			case 'swords':
+				return $character->getVisualSize();
+			case 'land':
+				return $character->getEstates()->count();
+			case 'realmland':
+				$land = 0;
+				$realms = $election->getRealm()->findAllInferiors(true);
+				$realmids = [];
+				foreach ($realms as $realm) {
+					$realmids[] = $realm->getId();
+					}
+				foreach ($character->getEstates() as $e) {
+					if (in_array($e->getRealm()->getId(), $realmids)) {
+						$land++;
+					}
+				}
+				return $land;
+			case 'heads':
+				$pop = 0;
+				foreach ($character->getEstates() as $e) {
+					$pop += $e->getPopulation();
+				}
+				return $pop;
+			case 'realmcastles':
+				$castles = 0;
+				$realms = [];
+				foreach ($election->getRealm()->findAllInferiors(true) as $realm) {
+					$realms[] = $realm->getId();
+				}
+				foreach ($character->getEstates() as $estate) {
+					if (in_array($estate->getRealm()->getId(), $realms)) {
+						foreach ($estate->getBuildings() as $b) {
+							if ($b->getType()->getDefenses() > 0) {
+								$castles += $b->getType()->getDefenses()/10;
+							}
+						}
+					}
+				}
+				return $castles;
+			case 'castles':
+				$castles = 0;
+				foreach ($character->getEstates() as $estate) {
+					foreach ($estate->getBuildings() as $b) {
+						if ($b->getType()->getDefenses() > 0) {
+							$castles += $b->getType()->getDefenses()/10;
+						}
+					}
+				}
+				return $castles;
+			case 'banner':
+			default:
+				return 1;
+		}
+	}
 
 	public function countElection(Election $election) {
 		$election->setClosed(true);
@@ -249,7 +294,7 @@ class RealmManager {
 				$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
 			}
 			$candidates[$c]['votes'] += $vote->getVote();
-			$candidates[$c]['weight'] += $vote->getVote() * $vote->getWeight();
+			$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $vote->getCharacter());
 		}
 
 		$winner = null;
@@ -283,6 +328,17 @@ class RealmManager {
 				if ($election->getPosition()->getRuler()) {
 					$this->removeRulerLiege($election->getRealm(), $winner);
 				}
+			}
+		}
+	}
+
+	public function dropIncumbents(Election $election) {
+		if ($election->getRoutine()) {
+			$position = $election->getPosition();
+			$holders = $position->getHolders();
+			foreach ($holders as $character) {		
+				$position->removeHolder($character);
+				$character->removePosition($position);
 			}
 		}
 	}

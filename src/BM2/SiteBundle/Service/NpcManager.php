@@ -35,7 +35,7 @@ class NpcManager {
 
 
 	public function getAvailableNPCs() {
-		return $this->em->getRepository('BM2SiteBundle:Character')->findBy(array('npc'=>true, 'user'=>null));
+		return $this->em->getRepository('BM2SiteBundle:Character')->findBy(array('npc'=>true, 'alive'=>true, 'user'=>null));
 	}
 
 	public function createNPC() {
@@ -79,6 +79,7 @@ class NpcManager {
 
 	public function spawnNPC(Character $npc) {
 		// find a place to spawn him
+		// You may notice we duplicate this again below in case we spawn him trapped in a region. --Andrew
 		list($x, $y, $geodata) = $this->geo->findRandomPoint();
 		if ($x===false) {
 			// can't find a valid random point
@@ -86,6 +87,18 @@ class NpcManager {
 			return false;
 		}
 		$npc->setLocation(new Point($x, $y));
+		$this->em->flush();
+		// We have to flush here because if we don't, we can't actually check where this bandit is, because it hasn't been committed to the database yet. --Andrew
+		if ($this->geo->findMyRegion($npc)->getBiome()->getName()=='snow') {
+			$this->logger->error("by some fluke, bandit '$npc' has been placed in snow. Trying again.");
+			list($x, $y, $geodata) = $this->geo->findRandomPoint();
+			if ($x===false) {
+				$this->logger->error("cannot find valid point for new NPC");
+				return false;
+			}
+			$npc->setLocation(new Point($x, $y));
+			// Statistically, the chances of this happening twice are stupidly low. I'm not sure it's worth coding for it, given it took, what, 2 years for it to happen once? --Andrew
+		}
 		$npc->setInsideSettlement(null);
 		$npc->setProgress(null)->setSpeed(null)->setTravel(null);
 
@@ -101,18 +114,18 @@ class NpcManager {
 		$group = 1;
 
 		while ($total_visual_size > 0) {
-			$weapon = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'weapon'")
+			$weapon = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'weapon' and e.resupply_cost <= 200")
 						->setFirstResult(rand(0, $weapons-1))->setMaxResults(1)->getSingleResult();
 			if (rand(0,10)==0) {
 				$armour = null;
 			} else {
-				$armour = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'armour'")
+				$armour = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'armour' and e.resupply_cost <= 200")
 							->setFirstResult(rand(0, $armours-1))->setMaxResults(1)->getSingleResult();
 			}
 			if (rand(0,10)<6) {
 				$item = null;
 			} else {
-				$item = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'equipment'")
+				$item = $this->em->createQuery("SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.type = 'equipment' and e.resupply_cost <= 300")
 							->setFirstResult(rand(0, $items-1))->setMaxResults(1)->getSingleResult();
 			}
 

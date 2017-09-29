@@ -116,6 +116,12 @@ class Dispatcher {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
+		if ($this->getLeaveableSettlement()) {
+			$actions[] = $this->locationLeaveTest(true);
+		} else {
+			$actions[] = array("name"=>"location.exit.name", "description"=>"unavailable.inside");
+		}
+
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
 
@@ -199,10 +205,6 @@ class Dispatcher {
 		if (isset($has['url'])) { 
 			$actions[] = $has;
 		}
-		$has = $this->locationLendanTowerTest();
-		if (isset($has['url'])) {
-			$actions[] = $this->action("building.lendantower", "bm2_site_building_lendantower");
-		}
 
 		return array("name"=>"building.title", "elements"=>$actions);
 	}
@@ -212,7 +214,6 @@ class Dispatcher {
 	public function locationLibraryTest() { return $this->locationHasBuildingTest("Library"); }
 	public function locationTempleTest() { return $this->locationHasBuildingTest("Temple"); }
 	public function locationBarracksTest() { return $this->locationHasBuildingTest("Barracks"); }
-	public function locationLendanTowerTest() { return $this->locationHasBuildingTest("Inn"); } // FIXME: set right
 
 	public function locationHasBuildingTest($name) {
 		$lname = strtolower($name);
@@ -425,6 +426,7 @@ class Dispatcher {
 		$actions[] = $this->diplomacyHierarchyTest();
 		$actions[] = $this->diplomacySubrealmTest();
 		$actions[] = $this->diplomacyBreakHierarchyTest();
+		$actions[] = $this->diplomacyRestoreTest();
 
 		return array("name"=>"diplomacy", "elements"=>$actions);
 	}
@@ -499,6 +501,29 @@ class Dispatcher {
 			return $this->action("location.enter", "bm2_site_actions_enter");
 		}
 
+	}
+	
+	public function locationLeaveTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.outside");
+		}
+		if (!$place = $this->getActionableSettlement()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.exit')) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.prisoner");
+		} else {
+			return $this->action("location.exit", "bm2_site_actions_exit");
+		}
 	}
 
 	public function locationQuestsTest() {
@@ -1429,16 +1454,13 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.$check");
 		}
-		if ($this->realm->findInferiors()->count() > 0) {
-			return array("name"=>"diplomacy.restore", "description"=>"unavailable.nosubrealms");
-		}
-		if ($this->realm->findDeadInferiors()->count() = 0) {
+		if ($this->realm->getActive() != FALSE) {
 			return array("name"=>"diplomacy.restore", "description"=>"unavailable.tooalive");
 		}
-		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
-			return array("name"=>"diplomacy.restore", "description"=>"unavailable.notleader");
+		if (!$this->realm->getSuperior()->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"diplomacy.restore", "description"=>"unavailable.notsuperruler");
 		}
-		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()))
+		return $this->action("diplomacy.restore", "bm2_site_realm_restore", true, array('realm'=>$this->realm->getId()));
 	}
 
 	public function diplomacyBreakHierarchyTest() {
@@ -1516,6 +1538,12 @@ class Dispatcher {
 			}
 		}
 		return $this->actionableSettlement;
+	}
+
+	public function getLeaveableSettlement() {
+		if ($this->getCharacter()->getInsideSettlement()) {
+			return $this->getCharacter()->getInsideSettlement();
+		}
 	}
 
 	public function getActionableRegion() {

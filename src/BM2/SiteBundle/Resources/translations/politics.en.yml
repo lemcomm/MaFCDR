@@ -66,12 +66,15 @@ elections:
   7:            one week
   10:           10 days
  method:
-  name:         voting method
+  name:         Voting Method
   empty:        -- choose --
   banner:       by banner (per noble)
   spears:       by spears (per soldier)
   swords:       by swords (per weighted soldier)
+  realmland:    by land in realm (per estate)
   land:         by land (per estate)
+  realmcastles: by fortifications in realm (per estate defenses)
+  castles:      by fortifications (per estate defenses)
   heads:        by heads (per peasant)
  submit:        create election
 
@@ -209,6 +212,8 @@ relation:
  with:        with
  sex:         includes sex
  nosex:       without sex
+ heraldry:    shares heraldry
+ noheraldry:  without heraldry
  crest:       share heraldry
 
  choice:
@@ -319,22 +324,41 @@ realm:
    7: empress
 
 position:
- name:        title
- description: formal description
- elected:     is elected
- inherit:     can be inherited
- term:        term length
+ name:          Title:
+ description:   Formal Description
+ elected:       Position is elected?
+ inherit:       Position is inherited?
+ rank:          In what order should this position appear on lists?
+ type:          Type of Position
+ keepslumber:   Position kept on slumber?
+ term:          Length of Position Term:
  terms:
-  0:          for life
-  365:        four years (1 year real time)
-  90:         one year (3 months real time)
-  30:         one quarter (30 days real time)
- permissions: permissions
- submit:      edit position
- remove:      remove position
+  0:            For Life
+  365:          Four Game Years (1 Year Real Time)
+  90:           One Game Year (3 Months)
+  30:           One Quarter (30 Days Real Time)
+ permissions:   What Permissions should this position hold?
+ submit:        Edit Position
+ remove:        Remove Position
+ keeponslumber: Position kept on slumber?
+ retired:       Retire this position?
+ year:          Next election year?
+ week:          Next election week?
+ minholders:    Minimum number of holders?
  help:
-  elected:    Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.
-  inherit:    Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.
+  elected:      Check this box to make this a position that is elected whenever it is free. If you leave the box unchecked, the position must be appointed by the ruler or someone with the "positions" permission.
+  electiontype: Which method of election should be used to determine the next holder of this position?
+  inherit:      Check this box to make this position inheritable. If checked, the office holder will inherit the position upon his death. If unchecked, the position will become free if its holder dies.
+  year:         In what year should the next election be held? This is combined with the week input, to figure out when the game will call an election. If the date has already passed, an election will be called next turn.
+  week:         In what week should the next election be held? Elections are always held on day 1 of a week.
+  type:         Select the type of position this is. New types can be suggested on the forum.
+  none:         none
+  term:         This will change how long this position will be held.
+  retired:      Check this box if this position is no longer considered active, or if it's no longer in use. This will remove it from locations where it is listed publicly, but it's holders will still hold the position.
+  rank:         Please input a number to determine ordering of positions when part of a list. Lower numbers are listed first.
+  keeponslumber: Check this box to make this a position that is kept when a character slumbers. If left unchecked, position will be lost if a character slumbers.
+  minholders:   Select the number of minimum holders this position should have.
+  
  appoint:
   intro: >
     You can appoint and discharge officials from this position at any time for any reason. They will, of course, be informed about your decision immediately
@@ -342,10 +366,23 @@ position:
   intro2: >
     You can appoint new rulers for this realm at any time for any reason. <b>Keep in mind that you cannot demote them again</b>. Once they are
     appointed, they are your equals in power and neither of you can remove the other from it.
-  candidates: candidates
-  submit:     announce changes
-  done:       Your changes have been completed and announced.
+  candidates:  candidates
+  submit:       announce changes
+  done:         Your changes have been completed and announced.
   nodemoruler:  Rulers cannot be demoted, this change has been ignored.
+ types:
+  advisory:     advisory
+  executive:    executive
+  family:       family
+  foreign affairs: foreign affairs
+  history:      history
+  intelligence: intelligence
+  interior:     interior
+  judicial:     judicial
+  legislative:  legistlative
+  military:     military
+  revenue:      revenue
+  other:        other
 
 war:
  name:          Declare War
@@ -404,15 +441,13 @@ diplomacy:
   done:         You have successfully submitted to the superior power of %target% and made your %realm% a part of it.
 
  restore:
-  name:         Restore Subrealm
-  description:  Use your position as ruler of a realm to restore one if its abandoned subrealms.
+  name:         Restore %name%
+  link:         Restore this Subrealm
+  description:  Use your position as ruler of this realm's superior to bring this realm back into existence.
   intro: >
-    As the ruler of %name%, you can use your authority to bring back into existence any of it's abandoned subrealms.
-    All you need to do is determine which subrealm you wish to restore, and you will be made it's new ruler, allowing you to then give that position to another.
-  restore:      -- choose --
-  submit:       revive realm
-  invalid:
-   realm:       in order to restore a realm, you must select the realm to revive.
+    As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself it's ruler in the process.
+    All you need to do is confirm that this is an action you want to take by clicking the button below.
+  submit:       Revive Realm
   success:      You have successfully restored the subrealm.
 
  subrealm:

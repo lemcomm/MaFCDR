@@ -61,7 +61,8 @@ class NotificationEventListener {
 
 			$message = \Swift_Message::newInstance()
 				->setSubject($this->translator->trans('mail.subject', array(), "communication"))
-				->setFrom(array('notifications@mightandfealty.com' => $this->translator->trans('mail.sender', array(), "communication")))
+				->setFrom(array('mafserver@lemuriacommunity.org' => $this->translator->trans('mail.sender', array(), "communication")))
+				->setReplyTo('mafteam@lemuriacommunity.org')
 				->setTo($user->getEmail())
 				->setBody(strip_tags($text))
 				->addPart($text, 'text/html')

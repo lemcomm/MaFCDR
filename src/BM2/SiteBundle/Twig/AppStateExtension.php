@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Twig;
 use BM2\SiteBundle\Service\AppState;
 
 
-class AppStateExtension extends \Twig_Extension {
+class AppStateExtension extends \Twig_Extension implements \Twig_Extension_GlobalsInterface {
 	protected $appState;
 
 	public function __construct(AppState $appState) {

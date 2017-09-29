@@ -30,10 +30,12 @@ class PaymentManager {
 
 	public function getPaymentLevels() {
 		return array(
-			 0 =>	array('name' => 'storage',		'characters' =>    0, 'fee' =>   0, 'selectable' => false),
-			10 =>	array('name' => 'trial',		'characters' =>    4, 'fee' =>   0, 'selectable' => true),
-			20 =>	array('name' => 'basic',		'characters' =>   10, 'fee' => 200, 'selectable' => true),
-			40 =>	array('name' => 'intense',		'characters' =>   25, 'fee' => 300, 'selectable' => true),
+			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false),
+			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true),
+			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true),
+			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false),
+			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true),
+			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false),
 			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true),
 		);
 	}
@@ -78,14 +80,24 @@ class PaymentManager {
 	}
 
 	public function paymentCycle() {
-		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
-		$query->setParameters(array('now'=>new \DateTime("now")));
-
 		$free = 0;
 		$active = 0;
 		$expired = 0;
 		$storage = 0;
 		$credits = 0;
+		$bannedcount = 0;
+		$bannedquery = $this->em->createQuery("SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.roles LIKE '%ROLE_BANNED%'");
+		foreach ($bannedquery->getResult() as $banned) {
+			$bannedcount++;
+			$this->changeSubscription($banned, 0);
+			$banned->setNotifications(FALSE);
+			$banned->setNewsletter(FALSE);
+			$bannedusername = $banned->getUsername();
+			$this->logger->info("$bannedusername has been banned, and email notifications have been disabled.");
+			$this->em->flush();
+		}
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
+		$query->setParameters(array('now'=>new \DateTime("now")));
 		foreach ($query->getResult() as $user) {
 			$myfee = $this->calculateUserFee($user);
 			if ($myfee > 0) {
@@ -114,7 +126,7 @@ class PaymentManager {
 				}
 			}
 		}
-		return array($free, $active, $credits, $expired, $storage);
+		return array($free, $active, $credits, $expired, $storage, $bannedcount);
 	}
 
 	private function ChangeNotification(User $user, $subject, $text) {
@@ -123,8 +135,8 @@ class PaymentManager {
 
 		$message = \Swift_Message::newInstance()
 			->setSubject($subject)
-			->setFrom('server@mightandfealty.com')
-			->setReplyTo('tom@mightandfealty.com')
+			->setFrom('mafserver@lemuriacommunity.org')
+			->setReplyTo('mafteam@lemuriacommunity.org')
 			->setTo($user->getEmail())
 			->setBody(strip_tags($content))
 			->addPart($content, 'text/html');
@@ -232,7 +244,8 @@ class PaymentManager {
 				$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
 				$message = \Swift_Message::newInstance()
 					->setSubject($this->translator->trans('account.invite.mail2.subject', array()))
-					->setFrom(array('notifications@mightandfealty.com' => $this->translator->trans('mail.sender', array(), "communication")))
+					->setFrom(array('mafserver@lemuriacommunity.org' => $this->translator->trans('mail.sender', array(), "communication")))
+					->setReplyTo('mafteam@lemuriacommunity.org')
 					->setTo($sender->getEmail())
 					->setBody(strip_tags($text))
 					->addPart($text, 'text/html')

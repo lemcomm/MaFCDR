@@ -16,7 +16,7 @@
 	<div id="sd" class="hidden" title="dummy"></div>
 	<h2>{{ settlement.name }}</h2>
 	{% if details.startme is defined %}
-		<form id="form_map" action="{{ path('bm2_site_character_start') }}" method="post" {{ form_enctype(details.startme) }}>
+		<form id="form_map" action="{{ path('bm2_site_character_start') }}" method="post" {{ form_start(details.startme) }}>
 			{{ form_widget(details.startme) }}
 			<button>{{ 'character.start.submit'|trans|title }}</button>
 		</form>
@@ -62,7 +62,7 @@
 		{% if familiarity %}<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>{% endif %}
 		<li>{{ area|area }}</li>
 		<li>{{ density|number_format }} {{ 'popdensity'|trans }}</li>
-		{% if true or details.spot or isowner %}
+		{% if details.spot or isowner %}
 			<li class="tt_botleft" title="{{ ('settlement.security.tt')|trans }}">{{ ('settlement.security.'~security)|trans }}</li>
 		{% endif %}
 		{% if isowner %}

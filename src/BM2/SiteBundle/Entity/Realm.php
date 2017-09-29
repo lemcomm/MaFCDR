@@ -63,8 +63,8 @@ class Realm {
 		return $this->rulers;
 	}
 
-	public function findMembers($with_subs=true) {
-		if ($this->all_characters) return $this->all_characters;
+	public function findMembers($with_subs=true, $forceupdate = false) {
+		if ($this->all_characters && $forceupdate == false) return $this->all_characters;
 		$this->all_characters = new ArrayCollection;
 
 		foreach ($this->findTerritory(false) as $estate) {
@@ -123,9 +123,8 @@ class Realm {
 	
 	public function findDeadInferiors() {
 		$all = new ArrayCollection;
-		$this->getInferiors() as $subrealms
-		foreach ($subrealms = $subrealm) {
-			if ($subrealm->getActive = false) {
+		foreach ($this->getInferiors() as $subrealm) {
+			if (!$subrealm->getActive()) {
 			$all->add($subrealm);
 			}
 		}

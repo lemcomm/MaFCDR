@@ -253,6 +253,9 @@ class SettlementController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
 
 		$original_permissions = clone $settlement->getPermissions();
 
@@ -300,7 +303,9 @@ class SettlementController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
-
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
 		return array('settlement'=>$settlement, 'quests'=>$settlement->getQuests());
 	}
 

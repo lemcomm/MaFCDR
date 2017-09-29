@@ -5,4 +5,5 @@ namespace BM2\SiteBundle\Entity;
 
 class RealmPosition {
 
+        
 }

@@ -90,6 +90,11 @@
 	<img src="{{ asset('bundles/bm2site/images/zzz.png') }}" alt="{{ 'inactive'|trans }}" height="16px" align="bottom" />
 </p>
 {% endif %}
+{% if banned %}
+<p class="inactive">
+	{{ 'character.banned'|trans }}
+</p>
+{% endif %}
 {% if char.prisoner %}
 <p class="inactive">
 	<img src="{{ asset('bundles/bm2site/images/nicubunu_chain.svg') }}" alt="{{ 'prisoner'|transchoice(1) }}" height="16px" align="bottom" />

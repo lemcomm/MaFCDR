@@ -4,7 +4,7 @@ namespace BM2\DungeonBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 class CardSelectType extends AbstractType {
@@ -13,7 +13,7 @@ class CardSelectType extends AbstractType {
 		return 'cardselect';
 	}
 
-	public function configureOptions(OptionsResolverInterface $resolver) {
+	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'cardselect_136',
 			'translation_domain' => 'dungeons'

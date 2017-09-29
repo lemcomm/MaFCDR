@@ -37,6 +37,9 @@ class ElectionType extends AbstractType {
 				'spears' => 'elections.method.spears',
 				'swords' => 'elections.method.swords',
 				'land'	=> 'elections.method.land',
+				'realmland' => 'elections.method.realmland',
+				'castles' => 'elections.method.castles',
+				'realmcastles' => 'elections.method.realmcastles',
 				'heads'	=> 'elections.method.heads',
 			)
 		));

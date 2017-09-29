@@ -17,6 +17,7 @@ use BM2\SiteBundle\Form\RealmRelationType;
 use BM2\SiteBundle\Form\RealmRestoreType;
 use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SubrealmType;
+use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,7 +25,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 	FIXME: some of this stuff should be moved to the new realm manager service
@@ -63,19 +64,23 @@ class RealmController extends Controller {
 	  */
 	public function viewAction(Realm $id) {
 		$realm = $id;
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$superrulers = array();
 
 		$territory = $realm->findTerritory();
 		$population = 0;
+		$restorable = FALSE;
 		foreach ($territory as $estate) {
 			$population += $estate->getPopulation() + $estate->getThralls();
 		}
 
 		if ($realm->getSuperior()) {
 			$parentpoly =	$this->get('geography')->findRealmPolygon($realm->getSuperior());
+			$superrulers = $realm->getSuperior()->findRulers();
 		} else {
 			$parentpoly = null;
 		}
+
 		$subpolygons = array();
 		foreach ($realm->getInferiors() as $child) {
 			$subpolygons[] = $this->get('geography')->findRealmPolygon($child);
@@ -100,6 +105,17 @@ class RealmController extends Controller {
 			}
 			$diplomacy[$index][$side] = $relation->getStatus();
 		}
+		 foreach ($superrulers as $superruler) {
+			if ($superruler == $character) {
+				if (!$realm->getActive()) {
+					$restorable = TRUE;
+				}
+			}
+		} 
+		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
+			$restorable = TRUE;
+			echo $restorable;
+		}*/	
 
 		return array(
 			'realm' =>		$realm,
@@ -110,10 +126,11 @@ class RealmController extends Controller {
 			'population'=>	$population,
 			'area' =>		$this->get('geography')->calculateRealmArea($realm),
 			'nobles' =>		$realm->findMembers()->count(),
-			'diplomacy' =>	$diplomacy
+			'diplomacy' =>	$diplomacy,
+			'restorable' => $restorable
 		);
 	}
-
+	
 	/**
 	  * @Route("/new")
 	  * @Template
@@ -271,13 +288,14 @@ class RealmController extends Controller {
 	public function positionAction(Realm $realm, Request $request, RealmPosition $position=null) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
 		$em = $this->getDoctrine()->getManager();
+		$cycle = $this->get('appstate')->getCycle();
 
 		if ($position == null) {
 			$is_new = true;
 			$position = new RealmPosition;
 			$position->setRealm($realm);
 			$position->setRuler(false);
-			$position->setDescription("");
+
 		} else {
 			$is_new = false;
 			if ($position->getRealm() != $realm) {
@@ -286,27 +304,41 @@ class RealmController extends Controller {
 		}
 
 		$original_permissions = clone $position->getPermissions();
-
 		$form = $this->createForm(new RealmPositionType(), $position);
 		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$fail = false;
 			$data = $form->getData();
+			$year = $data->getYear();
+			$week = $data->getWeek();
+			$elected = $data->getElected();
+			if ($week < 1 OR $week > 60) {
+				$fail = true;
+			}
 
-			foreach ($position->getPermissions() as $permission) {
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			if (!$fail) {
+				foreach ($position->getPermissions() as $permission) {
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$position->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$position->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
+				if ($is_new) {
+					$em->persist($position);
+				}
+				if ($year AND $week) {
+					$position->setCycle((($year-1)*360)+(($week-1)*6));
+				}
+				if ($elected) {
+					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 			}
-			if ($is_new) {
-				$em->persist($position);
-			}
-			$em->flush();
-			return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 		}
 
 		return array(
@@ -599,30 +631,36 @@ class RealmController extends Controller {
 	}
 
 	/**
-	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Route("/{id}/restore", requirements={"id"="\d+"})
 	  * @Template
 	  */
 
-	public function restoreAction(Realm $realm, Request $request) {
+	public function restoreAction(Realm $id) {
+		$realm = $id;
 		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+
+		$em = $this->getDoctrine()->getManager();
 		
-		$form = $this->createForm(new RestoreType($realm));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-		    $data = $form->getData();
-            $fail = false;
+		$this->get('realm_manager')->makeRuler($realm, $character);
+		$realm->setActive(TRUE);
+		$this->get('history')->logEvent(
+			$realm,
+			'event.realm.restored',
+			array('%link-realm%'=>$realm->getSuperior()->getID(), '%link-character%'=>$character->getId()),
+			History::ULTRA, true
+		);
+		$this->get('history')->logEvent(
+			$character,
+			'event.realm.restorer',
+			array('%link-realm%'=>$realm->getID()),
+			History::HIGH, true
+		);
+		$em->flush();
 
-            if (!$fail) {
-                $this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
-            }
-
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
-			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
-		}
+		return new Response();
+		
 	}
-
+	
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
 	  * @Template
@@ -809,13 +847,19 @@ class RealmController extends Controller {
 	public function electionsAction(Realm $realm) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
 
+		/* 
+		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
+		And yes, you're reading this right, elections only used to be counted when someone was viewing the list of elections in a realm.
+		--Andrew 20170918
+
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
 		foreach ($query->getResult() as $election) {
 			$this->get('realm_manager')->countElection($election);
 		}
-		$em->flush();
+		$em->flush(); 
+		*/
 
 		return array(
 			'realm'=>$realm,
@@ -998,7 +1042,7 @@ class RealmController extends Controller {
 
 		$votes = $this->getVotes($election);
 
-		$my_weight = 1; // TODO: different voting mechanism
+		$my_weight = $this->get('realm_manager')->getVoteWeight($election, $character);
 
 		return array(
 			'election' => $election,
@@ -1021,7 +1065,7 @@ class RealmController extends Controller {
 					'contra' => array()
 				);
 			}
-			$weight = 1; // TODO: different voting mechanism
+			$weight = $this->get('realm_manager')->getVoteWeight($election, $vote->getCharacter());
 			if ($vote->getVote() < 0) {
 				$votes[$id]['contra'][] = array('voter'=>$vote->getCharacter(), 'votes'=>$weight);
 			} else {

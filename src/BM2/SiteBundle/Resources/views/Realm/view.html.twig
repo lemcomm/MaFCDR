@@ -18,13 +18,20 @@
 </div>
 
 <div style="float:right">
-	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+{#	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul> #}
 	<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
 </div>
 <div id="sd_anchor" style="margin-right:1em;height:30em;float:right"></div>
 <div id="sd" class="hidden" title="dummy"></div>
 
 <h2>{{ realm.formalname }}</h2>
+
+{% if restorable %}
+	<div id="restore_wrapper">
+		{{ 'diplomacy.restore.description'|trans({}, "politics") }}
+		<button id="restorerealm">{{ 'diplomacy.restore.link'|trans({},"politics") }}</button>
+	</div>
+{% endif %}
 
 <dl>
 	<dt>{{ 'realm.name'|trans({},"politics") }}</dt>
@@ -85,25 +92,29 @@
 <h3>{{ 'realm.positions.name'|trans({},"politics")|title }}</h3>
 <dl>
 	{% for position in realm.positions %}
-	<dt>
-		{% if position.ruler %}
-			{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
-		{% else %}
-			{{ position.name }}
-		{% endif %}
-	</dt>
-	<dd>
-		{{ position.description }}
-		<br />
-		{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
-		<ul class="shortlist" style="display:inline">
-			{% for holder in position.holders %}
-				<li>{{ link(holder) }}</li>
+		{% if not position.retired %}
+		<dt>
+			{% if position.ruler %}
+				{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
 			{% else %}
-				<li>{{ 'nobody'|trans }}</li>
-			{% endfor %}
-		</ul>
-	</dd>
+				{{ position.name }}
+			{% endif %}
+		</dt>
+		<dd>	
+			{{ position.description }}
+			<br />
+			{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+			<ul class="shortlist" style="display:inline">
+				{% for holder in position.holders %}
+					<li>{{ link(holder) }}</li>
+				{% else %}
+					<li>{{ 'nobody'|trans }}</li>
+				{% endfor %}
+			</ul>
+			<br />
+			{% if position.type %}{{ 'position.type'|trans({},"politics") }}: {{ ('position.types.'~position.type.name)|trans({},"politics") }}{% endif %}
+		</dd>
+		{% endif %}
 	{% endfor %}
 </dl>
 
@@ -129,7 +140,11 @@
 			-
 		{% endif %}
 	</td>
-	<td><a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a></td>
+	<td>
+		{% if character %}
+			<a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a>
+		{% endif %}
+	</td>
 </tr>
 {% endfor %}
 </tbody>
@@ -144,6 +159,11 @@
 {% endblock %}
 
 {% block jquery %}
+	$("#restorerealm").click(function(){
+		$.post("{{ path('bm2_site_realm_restore', {"id":realm.id}) }}", function() {
+			$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
+		});
+	});
 	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}
