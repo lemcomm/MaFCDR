@@ -2,10 +2,10 @@
 
 namespace BM2\SiteBundle\Entity;
 
-class PoI {
+class Exhibit {
 
 
-	public function startPoIConstruction($workers) {
+	public function startExhibitConstruction($workers) {
 		$this->setActive(false);
 		$this->setWorkers($workers);
 		$this->setCondition(-$this->getType()->getBuildHours()); // negative value - if we reach 0 the construction is complete
@@ -26,14 +26,14 @@ class PoI {
 	}
 	
 	public function getNametrans() {
-		return 'PoI.'.$this->getName();
+		return 'Exhibit.'.$this->getName();
 	}
 	
 	public function getWhere() {
 		if ($this->getSettlement() != false) {
 			return $this->getSettlement()
 		} else {
-			return 'PoI.near.'.$this->getSettlement()
+			return 'Exhibit.near.'.$this->getSettlement()
 		}
 	}
 }
