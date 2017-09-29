@@ -7,7 +7,16 @@
 		<field name="active" type="boolean"/>
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
-		<many-to-one field="capital" target-entity="Settlement" inversed-by="capital_of"/>
+		<many-to-many field="capital" target-entity="Settlement" inversed-by="capital_of">
+		    <join-table name="capitals">
+			<join-columns>
+			    <join-column name="realm_id" referenced-column-name="id" />
+			</join-columns>
+			<inverse-join-columns>
+			    <join-column name="settlement_id" referenced-column-name="id" />
+			</inverse-join-columns>
+		    </join-table>
+		</many-to-many>
 		<field name="type" type="smallint"/>
 		<field name="colour_hex" type="string"/>
 		<field name="colour_rgb" type="string"/>
