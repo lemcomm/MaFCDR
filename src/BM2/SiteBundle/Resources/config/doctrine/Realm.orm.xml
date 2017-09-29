@@ -7,6 +7,7 @@
 		<field name="active" type="boolean"/>
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
+		<many-to-one field="capital" target-entity="Settlement" inversed-by="capital_of"/>
 		<field name="type" type="smallint"/>
 		<field name="colour_hex" type="string"/>
 		<field name="colour_rgb" type="string"/>
