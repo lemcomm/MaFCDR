@@ -840,7 +840,7 @@ class GameRunner {
 					}
 				}
 			}
-			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected()) {
+			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired()) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("Empty realm position of ".$position->getName()." for realm ".$position->getRealm()->getName());
 					$electionsneeded = 1;
@@ -862,7 +862,7 @@ class GameRunner {
 					}
 				}
 			}
-			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected()) {
+			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired()) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("Realm position of ".$position->getName()." for realm ".$position->getRealm()->getName()." needs more holders.");
 					$electionsneeded = 1;
@@ -893,7 +893,7 @@ class GameRunner {
 		$query->setParameter('timeout', $timeout);
 		$query->setParameter('cycle', $cycle);
 		foreach ($query->getResult() as $position) {
-			if ($position->getCycle() == $cycle) {
+			if ($position->getCycle() == $cycle && !$position->getRetired()) {
 				switch ($position->getTerm()) {
 					case '30':
 						$position->setCycle($cycle+120);
