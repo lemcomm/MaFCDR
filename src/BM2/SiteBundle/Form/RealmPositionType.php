@@ -68,12 +68,31 @@ class RealmPositionType extends AbstractType {
 				'empty_data' => '1',
 				'attr' => array('title'=>'position.help.rank'),
 			));*/
+			$builder->add('retired', 'checkbox', array(
+				'label'=>'position.retired',
+				'required' => false,
+				'attr' => array('title'=>'position.help.retired'),
+			));
 		}
-		$builder->add('elected', 'checkbox', array(
-			'label'=>'position.elected',
+		$builder->add('minholders', 'integer', array(
+			'label'=>'position.minholders',
+			'scale'=>0,
 			'required' => false,
-			'attr' => array('title'=>'position.help.elected'),
+			'empty_data' => '1',
+			'attr' => array('title'=>'position.help.minholders'),
 		));
+		$builder->add('inherit', 'checkbox', array(
+			'label'=>'position.inherit',
+			'required' => false,
+			'attr' => array('title'=>'position.help.inherit'),
+		));
+		if (!$is_ruler) {
+			$builder->add('elected', 'checkbox', array(
+				'label'=>'position.elected',
+				'required' => false,
+				'attr' => array('title'=>'position.help.elected'),
+			));
+		}
 		$builder->add('electiontype', 'choice', array(
 			'label'=>'elections.method.name',
 			'placeholder'=>'elections.method.empty',
@@ -115,24 +134,7 @@ class RealmPositionType extends AbstractType {
 			'empty_data' => '1',
 			'attr' => array('title'=>'position.help.week'),
 		));
-		$builder->add('minholders', 'integer', array(
-			'label'=>'position.minholders',
-			'scale'=>0,
-			'required' => false,
-			'empty_data' => '1',
-			'attr' => array('title'=>'position.help.minholders'),
-		));
-		$builder->add('inherit', 'checkbox', array(
-			'label'=>'position.inherit',
-			'required' => false,
-			'attr' => array('title'=>'position.help.inherit'),
-		));
 		if (!$is_ruler) {
-			$builder->add('retired', 'checkbox', array(
-				'label'=>'position.retired',
-				'required' => false,
-				'attr' => array('title'=>'position.help.retired'),
-			));
 			$builder->add('keeponslumber', 'checkbox', array(
 				'label'=>'position.keeponslumber',
 				'required' => false,
