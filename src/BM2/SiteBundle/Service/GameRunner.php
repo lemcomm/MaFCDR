@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Building;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\GeoData;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Ship;
@@ -693,18 +694,13 @@ class GameRunner {
 		$timeout = new \DateTime("now");
 		$timeout->sub(new \DateInterval("P7D"));
 		
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
-		$result = $this->getResult();
-		$this->logger->notice("Validating Realm memberships...");
-		foreach ($result as $realm) {
-			$realm->findAllMembers(true, true);
-		}
-		
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false) GROUP BY p');
 		$result = $query->getResult();
 		$this->logger->notice("Checking for inactive realms...");
+		# This one checks for realms that don't have rulers, while the next query checks for conversations.
+		# Since they can both result in different situations that reveal abandoned realms, we check twice.
 		foreach ($result as $position) {
-			$members = $position->getRealm()->findMembers();
+			$members = $position->getRealm()->findMembers(true, true);
 			if ($members->isEmpty()) {
 				$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 				$this->logger->notice("-- realm deserted, making inactive.");
@@ -712,32 +708,68 @@ class GameRunner {
 				$this->rm->abandon($realm);
 			} 
 		}
-		$this->logger->notice("Checking for missing realm conversations...");
-
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r LEFT JOIN r.conversations c WHERE r.active = true AND c.id IS NULL');
-		$result = $query->getResult();
-		foreach ($result as $realm) {
-			$this->logger->notice("missing realm conversation for ".$realm->getName());
-
-			// usually the ruler is the conversation owner, but if we don't have one, just pick the first realm member
-			$rulers = $realm->findRulers();
-			if (!$rulers->isEmpty()) {
-				$msguser = $this->mm->getMsgUser($rulers->first());
-			} else {
-				$members = $realm->findMembers(true);
-				if (!$members->isEmpty()) {
-					$msguser = $this->mm->getMsgUser($members->first());
-				} else {
-					$this->logger->notice("-- realm deserted, making inactive.");
-					$this->rm->abandon($realm);
-					$msguser = false;
+		$this->logger->info("Checking for missing realm conversations...");
+		
+		$realmquery = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
+		$realms = $realmquery->getResult();
+		foreach ($realms as $realm) {
+			$convoquery = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+			$convoquery->setParameter('realm', $realm);
+			$convos = $convoquery->getResult();
+			$announcements = false;
+			$general = false;
+			$deserted = false;
+			if ($convos) {
+				foreach ($convos as $convo) {
+					if ($convo->getSystem() == 'announcements') {
+						$announcements = true;
+					}
+					if ($convo->getSystem() == 'general') {
+						$general = true;
+					}
 				}
 			}
-			if ($msguser) {
-				list($meta,$conversation) = $this->mm->createConversation($msguser, $realm->getFormalName(), null, $realm);
-				$this->em->flush(); // because the below needs this flushed
-				$this->mm->updateMembers($conversation);
-				$this->logger->notice("-- created");
+			if (!$announcements) {
+				$rulers = $realm->findRulers();
+				if (!$rulers->isEmpty()) {
+					$msguser = $this->mm->getMsgUser($rulers->first());
+				} else {
+					$members = $realm->findMembers(true);
+					if (!$members->isEmpty()) {
+						$msguser = $this->mm->getMsgUser($members->first());
+					} else {
+						$this->logger->notice($realm->getName()." deserted, making inactive.");
+						$deserted = true;
+						$this->rm->abandon($realm);
+						$msguser = false;
+					}
+				}
+				$topic = $realm->getName().' Announcements';
+				if ($msguser) {
+					list($meta,$conversation) = $this->mm->createConversation($msguser, $topic, null, $realm);
+					$this->em->flush(); // because the below needs this flushed
+					$this->mm->updateMembers($conversation);
+					$conversation->setSystem('announcements');
+					$this->logger->notice($realm->getName()." announcements created");
+				}
+			}
+			if (!$general && !$deserted) {
+				$rulers = $realm->findRulers();
+				if (!$rulers->isEmpty()) {
+					$msguser = $this->mm->getMsgUser($rulers->first());
+				} else {
+					$members = $realm->findMembers(true);
+					if (!$members->isEmpty()) {
+						$msguser = $this->mm->getMsgUser($members->first());
+					}
+				}
+				if ($msguser) {
+					list($meta,$conversation) = $this->mm->createConversation($msguser, $realm->getFormalName(), null, $realm);
+					$this->em->flush(); // because the below needs this flushed
+					$this->mm->updateMembers($conversation);
+					$conversation->setSystem('general');
+					$this->logger->notice($realm->getName()." discussion created");
+				}
 			}
 		}
 
@@ -748,9 +780,6 @@ class GameRunner {
 		return true;
 	}
 
-    /**
-     * @return bool
-     */
     public function runPositionsCycle() {
 		$last = $this->appstate->getGlobal('cycle.positions', 0);
 		if ($last==='complete') return true;
@@ -796,18 +825,17 @@ class GameRunner {
 				if (!$members->isEmpty()) {
 					$electionsneeded = 1;
 					$counter = 0;
-					if ($position->getMinholders) {
-						$electionsneeded = $position->getMinholders - $position->getHolders()->count();
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
 						$this->logger->notice("-- election triggered.");
 						$electiontype = 'noruler';
-						$election = $this->setupElection($position, $electiontype);
+						$election = $this->setupElection($position, $electiontype, false, $counter);
 			
 						$msg = "Automatic election number ".$counter." has been triggered for the position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
-						$title = $position->getRealm()->getName().' Announcements';
-						$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm AND c.title like :title');
-						$this->postToRealm($position, $title, $msg);
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
 					}
 				}
@@ -817,19 +845,19 @@ class GameRunner {
 					$this->logger->notice("Empty realm position of ".$position->getName()." for realm ".$position->getRealm()->getName());
 					$electionsneeded = 1;
 					$counter = 0;
-					if ($position->getMinholders) {
-						$electionsneeded = $position->getMinholders - $position->getHolders()->count();
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
 						$members = $position->getRealm()->findMembers();
 
 						$this->logger->notice("-- election triggered.");
 						$electiontype = 'vacantelected';
-						$election = $this->setupElection($position, $electiontype);
+						$election = $this->setupElection($position, $electiontype, false, $counter);
 
 						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
-						$title = $position->getRealm()->getName().' Announcements';
-						$this->postToRealm($position, $title, $msg);
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
 					}
 				}
@@ -839,19 +867,19 @@ class GameRunner {
 					$this->logger->notice("Realm position of ".$position->getName()." for realm ".$position->getRealm()->getName()." needs more holders.");
 					$electionsneeded = 1;
 					$counter = 0;
-					if ($position->getMinholders) {
-						$electionsneeded = $position->getMinholders - $position->getHolders()->count();
+					if ($position->getMinholders()) {
+						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
 						$members = $position->getRealm()->findMembers();
 						$counter++;
 						$electiontype = 'shortholders';
-						$election = $this->setupElection($position, $electiontype);
+						$election = $this->setupElection($position, $electiontype, false, $counter);
 						$this->logger->notice("-- election ".$counter." triggered.");
 
 						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
-						$title = $position->getRealm()->getName().' Announcements';
-						$this->postToRealm($position, $title, $msg);
+						$systemflag = 'announcements';
+						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
 					}
 				}
@@ -889,17 +917,17 @@ class GameRunner {
 			$electionsneeded = 1;
 			$counter = 0;
 			$firstelection = true;
-			if ($position->getMinholders) {
-				$electionsneeded = $position->getMinholders;
+			if ($position->getMinholders()) {
+				$electionsneeded = $position->getMinholders();
 			}
 			while ($electionsneeded > 0) {
 				$counter++;
 				$electiontype = 'routine';
-				$election = $this->setupElection($position, $electiontype, true);
+				$election = $this->setupElection($position, $electiontype, true, $counter);
 				$this->logger->notice("-- election '.$counter.' triggered.");
 				$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
-				$title = $position->getRealm()->getName().' Announcements';
-				$this->postToRealm($position, $title, $msg);
+				$systemflag = 'announcements';
+				$this->postToRealm($position, $systemflag, $msg);
 				$electionsneeded--;
 			}
 		}
@@ -1041,35 +1069,26 @@ class GameRunner {
 		return array('year'=>$year, 'week'=>$week, 'day'=>$day);
 	}
 
-	public function postToRealm(RealmPosition $position, $title, $msg) {
-		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm AND c.title like :title');
+	public function postToRealm(RealmPosition $position, $systemflag, $msg) {
+		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm AND c.system = :system');
+		switch ($systemflag) {
+			case 'announcements':
+				$query->setParameter('system', 'announcements');
+				break;
+			case 'general':
+				$query->setParameter('system', 'general');
+				break;
+		}				
 		$query->setParameter('realm', $position->getRealm());
-		$query->setParameter('title', '%'.$title.'%');
 		$targetconvo = $query->getResult();
-		if ($query->getResult()->count() < 1) {
-			$rulers = $position->getRealm()->findRulers();
-			if (!$rulers->isEmpty()) {
-				$msguser = $this->mm->getMsgUser($rulers->first());
-			} else {
-				$members = $realm->findMembers(true);
-				if (!$members->isEmpty()) {
-					$msguser = $this->mm->getMsgUser($members->first());
-				}
-			}
-			if ($msguser) {
-				list($meta,$conversation) = $this->mm->createConversation($msguser, $title, null, $realm);
-				$this->em->flush(); // because the below needs this flushed
-				$this->mm->updateMembers($conversation);
-				$this->logger->notice($title." created");
-			}
-			$targetconvo = $conversation;
-			foreach ($targetconvo as $topic) {
-     				$this->mm->writeMessage($topic, null, $msg);
- 			}
+
+		foreach ($targetconvo as $topic) {
+			$this->mm->writeMessage($topic, null, $msg);
 		}
+
 	}
 
-	public function setupElection(RealmPosition $position, $electiontype=null, $routine=false) {
+	public function setupElection(RealmPosition $position, $electiontype=null, $routine=false, $counter=null) {
 		$election = new Election;				
 		$election->setRealm($position->getRealm());
 		$election->setPosition($position);
