@@ -431,8 +431,10 @@ class CharacterController extends Controller {
 			$entourage = null;
 			$soldiers = null;
 		}
-		if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
-			$banned = true;
+		if ($char->getUser()) {
+			if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+				$banned = true;
+			}
 		}
 		return array(
 			'char'		=> $char,
