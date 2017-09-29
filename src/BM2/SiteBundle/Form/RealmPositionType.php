@@ -105,18 +105,21 @@ class RealmPositionType extends AbstractType {
 			'label'=>'position.year',
 			'scale'=>0,
 			'required' => false,
+			'empty_data' => '1',
 			'attr' => array('title'=>'position.help.year'),
 		));
 		$builder->add('week', 'integer', array(
 			'label'=>'position.week',
 			'scale'=>0,
 			'required' => false,
+			'empty_data' => '1',
 			'attr' => array('title'=>'position.help.week'),
 		));
 		$builder->add('minholders', 'integer', array(
 			'label'=>'position.minholders',
 			'scale'=>0,
-			'required' => true,
+			'required' => false,
+			'empty_data' => '1',
 			'attr' => array('title'=>'position.help.minholders'),
 		));
 		$builder->add('inherit', 'checkbox', array(
