@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\BuildingType" table="types.settlementtype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="defenses" type="integer"/>
+		<field name="special_conditions" type="boolean"/>
+	</entity>
+</doctrine-mapping>
