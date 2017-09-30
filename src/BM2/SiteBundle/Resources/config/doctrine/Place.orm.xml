@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Place">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="description" type="text"/>
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
+		<many-to-one field="updater" target-entity="Character" inversed-by="updated_places"/>
+		<field name="updated_on" type="datetime"/>
+		<one-to-one field="inventory" target-entity="Inventory" inversed-by="contents"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
+
+	</entity>
+</doctrine-mapping>
