@@ -93,6 +93,7 @@
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
+		<one-to-many field="updated_places" target-entity="Place" mapped-by="updater"/>
 
 	</entity>
 </doctrine-mapping>
