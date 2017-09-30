@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ItemType" table="types.itemtype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="description" type="text"/>
+		<field name="icon" type="string" nullable="true"/>
+		<field name="tradeable" type="boolean"/>
+		<field name="allow_characters" type="boolean" nullable="true"/>
+		<field name="allow_places" type="boolean" nullable="true"/>
+		<field name="allow_settlements" type="boolean" nullable="true"/>
+	</entity>
+</doctrine-mapping>
