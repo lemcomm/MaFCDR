@@ -5,7 +5,5 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
-		<field name="defenses" type="integer"/>
-		<field name="special_conditions" type="boolean"/>
 	</entity>
 </doctrine-mapping>
