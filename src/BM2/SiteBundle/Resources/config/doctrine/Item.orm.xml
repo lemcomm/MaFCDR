@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Item">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field name="type" target-entity="ItemType" inversed-by="items"/>
+		<field name="quality" type="integer"/>
+		<field name="ts" type="datetime"/>
+
+		<many-to-one field="inventory" target-entity="Inventory" inversed-by="items"/>
+
+	</entity>
+</doctrine-mapping>
