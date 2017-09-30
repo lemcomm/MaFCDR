@@ -5,7 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
-		<any-to-one field="type" target-entity="SettlementType" inversed-by="settlements"/>
+		<many-to-one field="type" target-entity="SettlementType"/>
 		<field name="population" type="integer"/>
 		<field name="thralls" type="integer"/>
 		<field name="recruited" type="integer"/>
