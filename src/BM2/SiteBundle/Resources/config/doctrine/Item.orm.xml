@@ -4,7 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<many-to-one field name="type" target-entity="ItemType" inversed-by="items"/>
+		<many-to-one field name="type" target-entity="ItemType"/>
 		<field name="quality" type="integer"/>
 		<field name="ts" type="datetime"/>
 
