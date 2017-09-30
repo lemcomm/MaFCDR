@@ -43,6 +43,7 @@
 		<one-to-many field="permissions" target-entity="SettlementPermission" mapped-by="settlement" fetch="EXTRA_LAZY"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="settlement"/>
+		<one-to-one field="inventory" target-entity="Inventory" inversed-by="settlement"/>
 
 	</entity>
 </doctrine-mapping>
