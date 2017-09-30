@@ -8,6 +8,7 @@
 		<field name="description" type="text"/>
 		<field name="icon" type="string" nullable="true"/>
 		<field name="tradeable" type="boolean"/>
+		<field name="degrades" type="boolean"/>
 		<field name="allow_characters" type="boolean" nullable="true"/>
 		<field name="allow_places" type="boolean" nullable="true"/>
 		<field name="allow_settlements" type="boolean" nullable="true"/>
