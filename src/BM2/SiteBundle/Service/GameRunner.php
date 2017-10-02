@@ -824,15 +824,17 @@ class GameRunner {
 		$result = $query->getResult();
 		foreach ($result as $position) {
 			$members = $position->getRealm()->findMembers();
+			$disablefurtherelections = false;
+			$electionsneeded = 1;
+			$counter = 0;
 			if ($position->getRuler() && $position->getHolders()->count() == 0) {
 				$this->logger->notice("Empty ruler position for realm ".$position->getRealm()->getName());
 				if (!$members->isEmpty()) {
-					$electionsneeded = 1;
-					$counter = 0;
 					if ($position->getMinholders()) {
 						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
+						$counter++;
 						$this->logger->notice("-- election triggered.");
 						$electiontype = 'noruler';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
@@ -842,20 +844,18 @@ class GameRunner {
 						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
 					}
+					$disablefurtherelections = true;
 				}
 			}
-			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired()) {
+			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired() && !$disablefurtherelections) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("Empty realm position of ".$position->getName()." for realm ".$position->getRealm()->getName());
-					$electionsneeded = 1;
-					$counter = 0;
 					if ($position->getMinholders()) {
 						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
-						$members = $position->getRealm()->findMembers();
-
-						$this->logger->notice("-- election triggered.");
+						$counter++;
+						$this->logger->notice("-- election ".$counter." triggered.");
 						$electiontype = 'vacantelected';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
 
@@ -864,18 +864,16 @@ class GameRunner {
 						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
 					}
+					$disablefurtherelections = true;
 				}
 			}
-			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired()) {
+			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired() && !$disablefurtherelections) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("Realm position of ".$position->getName()." for realm ".$position->getRealm()->getName()." needs more holders.");
-					$electionsneeded = 1;
-					$counter = 0;
 					if ($position->getMinholders()) {
 						$electionsneeded = $position->getMinholders() - $position->getHolders()->count();
 					}
 					while ($electionsneeded > 0) {
-						$members = $position->getRealm()->findMembers();
 						$counter++;
 						$electiontype = 'shortholders';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
