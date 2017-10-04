@@ -5,5 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<field name="subtype" type="string"/>
+		<many-to-one field="upgrades" target-entity="FeatureType" inversed-by="upgrades_to"/>
 	</entity>
 </doctrine-mapping>
