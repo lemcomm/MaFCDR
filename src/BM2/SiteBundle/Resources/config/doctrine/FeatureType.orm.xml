@@ -9,6 +9,6 @@
 		<field name="icon" type="string" nullable="true"/>
 		<field name="icon_under_construction" type="string" nullable="true"/>
 		<field name="build_hours" type="integer"/>
-		<one-to-one field="item_needed" target-entity="itemtype" inversed-by="allows_feature"/>
+		<one-to-many field="upgrades_to" target-entity="settlementype" mapped-by="upgrades"/>
 	</entity>
 </doctrine-mapping>
