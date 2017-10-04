@@ -19,7 +19,6 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 		'signpost'      => array('hidden'=>false,   'work'=>60,    'icon'=>'rpg_map/sign_crossroad.svg',   'icon_uc'=>'rpg_map/sign_crossroad_outline.svg'),
 		'docks'         => array('hidden'=>false,   'work'=>10000, 'icon'=>'rpg_map/docks.svg',            'icon_uc'=>'rpg_map/docks_outline.svg'),
 		'fort'		=> array('hidden'=>false,   'work'=>20000, 'icon'=>'rpg_map/fortress.svg',         'icon_uc'=>'rpg_map/fortress_outline.svg'),
-		'palace'	=> array('hidden'=>false,   'work'=>200,   'icon'=>'rpg_map/fountain.svg',         'icon_uc'=>'rpg_map/fountain_outline.svg'),
 		'tournament'	=> array('hidden'=>false,   'work'=>200,   'icon'=>'rpg_map/fort.svg',             'icon_uc'=>'rpg_map/fort_outline.svg'),
 		'parade'	=> array('hidden'=>false,   'work'=>10000, 'icon'=>'rpg_map/arch.svg',             'icon_uc'=>'rpg_map/arch_outline.svg'),
 		'graveyard'	=> array('hidden'=>false,   'work'=>2000,  'icon'=>'rpg_map/graveyard.svg',        'icon_uc'=>'rpg_map/graveyard_outline.svg'),
