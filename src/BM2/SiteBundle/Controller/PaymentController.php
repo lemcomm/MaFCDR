@@ -235,7 +235,7 @@ class PaymentController extends Controller {
      * @Template
      */
 	public function creditsAction() {
-		if ($this->get('security.authorization.checker')->isGranted('ROLE_BANNED_MULTI')) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
