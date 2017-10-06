@@ -63,7 +63,7 @@ event:
   setback:      Due to ongoing food shortages, workers are leaving construction projects to take care of their families instead.
   hunger:       Food shortages and hunger are becoming a problem.
   starvation:   Starvation has reached serious levels.
-  crash:        Production and construction has come to a halt due there being too few local workers. Buildings are closing down and falling into disrepair.
+  crash:        Production and construction has come to a halt due to there being too few local workers. Buildings are closing down and falling into disrepair.
   disrepair:    The %buildingtype% has broken down beyond repair and must be considered lost.
   burned:       The %buildingtype% has been damaged by enemy forces.
   burned2:      The %buildingtype% has been burned down by enemy forces.
@@ -85,7 +85,7 @@ event:
    added:       %character% has announced a claim to this settlement.
    cancelled:   %character% has withdrawn their claim to this settlement.
   charstart:    A new First One named %character% has appeared here.
-  newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% civilians coming of age.
+  newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% children coming of age.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -156,11 +156,11 @@ event:
    free:        Set free from imprisonment.
    free2:       Freed from imprisonment through the death of %character%.
    kill:
-    behead:     While imprisoned by %character%, was executed by beheading.
-    hang:       While imprisoned by %character%, was executed by hanging.
-    burn:       While imprisoned by %character%, was burned alive.
-    quarter:    While imprisoned by %character%, was brutally killed by quartering.
-    impale:     While imprisoned by %character%, was slaughtered by impaling.
+    behead:     Executed by hanging while imprisoned by %character%.
+    hang:       Executed by hanging while imprisoned by %character%.
+    burn:       Burned alive while imprisoned by %character%.
+    quarter:    Brutally killed by quartering while imprisoned by %character%.
+    impale:     Slaughtered by impaling while imprisoned by %character%.
    killer:
     behead:     Beheaded %character%.
     hang:       Executed %character% by hanging.
