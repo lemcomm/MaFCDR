@@ -195,7 +195,8 @@ class GameRunner {
 			$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
 			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 			$this->logger->info("Dead; removed from the map.");
-			if ($captor = $character->getPrisonerOf()) {
+			$captor = $character->getPrisonerOf()
+			if ($captor) {
 				$this->logger->info("Captive. The dead are captive no more.");
 				$character->setPrisonerOf(null);
 				$captor->removePrisoner($character);
@@ -837,7 +838,9 @@ class GameRunner {
 		Mind you, this will only drop holders if the election has $routine = true set. 
 		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
 		foreach ($query->getResult() as $election) {
-			# dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
+			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
+			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
+			Which you can see if you go look at the method in the realm manager. */
 			$seenelections[] = $election->getId();
 			if(!in_array($election->getId(), $seenelections)) {
 				$this->rm->dropIncumbents($election);
