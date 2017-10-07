@@ -164,14 +164,8 @@ class GameRunner {
 			}
 		}
 
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.alive=false');
-		$deadcount = count($query->getResult());
-		$this->logger->info("Removing $deadcount dead from the map...");
-		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Character c SET c.location=null WHERE c.alive=false');
-		$query->execute();
-
-		$this->logger->info("checking for dead and slumbering characters with positions...");
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.positions p WHERE c.alive = false OR c.slumbering = true');
+		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL) OR (c.alive = true and c.slumbering = true)');
 		$result = $query->getResult();
 		if (count($result) > 0) {
 			$this->logger->info("Sorting the dead from the slumbering...");
@@ -197,26 +191,45 @@ class GameRunner {
 			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
-			$this->logger->info($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
+			$this->logger->info($character->getName()." is under review.");
+			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+			$this->logger->info("Dead; removed from the map.");
+			if ($captor = $character->getPrisonerOf()) {
+				$this->logger->info("Captive. The dead are captive no more.");
+				$character->setPrisonerOf(null);
+				$captor->removePrisoner($character);
+			}
+			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
 			if ($character->getPositions()) {
+				$this->logger->info("Positions detected");
 				foreach ($character->getPositions() as $position) {
 					if ($position->getRuler()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
+							$this->logger->info("No one inherits ".$position->getRealm());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
 						}
+						$this->logger->info("Removing them from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if ($position->getInherit()) {
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
 							$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
+							$this->logger->info("No one inherits ".$position->getName());
 							$this->cm->failInheritPosition($character, $position, 'death');
 						}
+						$this->logger->info("Removing them from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else {
+						$this->logger->info("No inheritance. Removing them from ".$position->getName());
 						$this->history->logEvent(
 							$position->getRealm(), 
 							'event.position.death',
@@ -225,35 +238,55 @@ class GameRunner {
 						);
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					}
 				}
 			}
+			if ($character->getEstates()) {
+				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+			}
 		}
-		foreach ($slumbered as $character) {			
-			$this->logger->info($character->getName()." is inactive, heir: ".($heir?$heir->getName():"(nobody)"));
+		foreach ($slumbered as $character) {		
+			$this->logger->info($character->getName()." is under review.");	
+			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
 			if ($character->getPositions()) {			
 				foreach ($character->getPositions() as $position) {
 					if ($position->getRuler()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
+							$this->logger->info("No one inherits ".$position->getRealm());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
 						}
+						$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
 							$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
+							$this->logger->info("No one inherits ".$position->getName());
 							$this->cm->failInheritPosition($character, $position, 'slumber');
 						}
+						$this->logger->info("Removing ".$character->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if (!$position->getKeepOnSlumber()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
+						$this->logger->info("Removing ".$character->getName());
 						$this->cm->failInheritPosition($character, $position, 'slumber');
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler position.");
+						$this->logger->info($position->getName()." is set to keep on slumber.");
 						$this->history->logEvent(
 							$position->getRealm(),
 							'event.position.inactivekept',
@@ -264,9 +297,13 @@ class GameRunner {
 					}
 				}
 			}
+			if ($character->getEstates()) {
+				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+			}
 		}
-		$this->logger->info("$keeponslumbercount positions kept on slumber!");
-
+		if ($keeponslumbercount > 0) {
+			$this->logger->info("$keeponslumbercount positions kept on slumber!");
+		}
 		$this->appstate->setGlobal('cycle.characters', 'complete');
 		$this->em->flush();
 		$this->em->clear();
