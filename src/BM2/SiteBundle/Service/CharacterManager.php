@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\User;
 use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
