@@ -192,7 +192,7 @@ class GameRunner {
 			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
-			$this->logger->info($character->getName()." is under review.");
+			$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
 			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 			$this->logger->info("Dead; removed from the map.");
 			if ($captor = $character->getPrisonerOf()) {
@@ -248,7 +248,7 @@ class GameRunner {
 			}
 		}
 		foreach ($slumbered as $character) {		
-			$this->logger->info($character->getName()." is under review.");	
+			$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
 			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
 			if ($character->getPositions()) {			
 				foreach ($character->getPositions() as $position) {
