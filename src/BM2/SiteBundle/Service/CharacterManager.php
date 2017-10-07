@@ -532,18 +532,18 @@ class CharacterManager {
 		}
 	}
 	
-	private function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
+	public function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
 		if ($why == 'death') {
 			$this->history->logEvent(
 				$position->getRealm(), 
-				'event.position.inactive',
+				'event.position.death',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);
 		} else if ($why == 'slumber') {
 			$this->history->logEvent(
 				$position->getRealm(), 
-				'event.position.death',
+				'event.position.inactive',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);
