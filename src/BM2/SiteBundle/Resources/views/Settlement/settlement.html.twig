@@ -34,10 +34,9 @@
 			<br />({{ settlement.population }} {{ 'settlement.civilians'|trans }}
 			{% if settlement.soldiers|length > 0 %}, {{ settlement.soldiers|length }} {{ 'settlement.militia2'|trans }}{% endif %}
 			{% if settlement.thralls > 0 %}, {{ settlement.thralls }} {{ 'settlement.thralls'|trans }}{% endif %})</li>
-		{% else %}
-			<li>{{ 'settlement.population'|trans }}: {{ settlement.population + settlement.thralls }}</li>
 		{% endif %}
 		{% if isowner %}
+		<li>{{ 'settlement.population'|trans }}: {{ settlement.population + settlement.thralls }}</li>
 		<li>{{ 'settlement.pop.change'|trans }}:
 			{% if popchange/settlement.population > 0.1 %}
 				{{ ('settlement.pop.grow.3')|trans }}
@@ -61,7 +60,9 @@
 		<li>{% if settlement.allowthralls %}{{ 'settlement.allowthralls.yes'|trans }}{% else %}{{ 'settlement.allowthralls.no'|trans }}{% endif %}</li>
 		{% if familiarity %}<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>{% endif %}
 		<li>{{ area|area }}</li>
+		{% if isowner %}
 		<li>{{ density|number_format }} {{ 'popdensity'|trans }}</li>
+		{% endif %}
 		{% if details.spot or isowner %}
 			<li class="tt_botleft" title="{{ ('settlement.security.tt')|trans }}">{{ ('settlement.security.'~security)|trans }}</li>
 		{% endif %}
