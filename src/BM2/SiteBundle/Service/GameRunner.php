@@ -174,6 +174,7 @@ class GameRunner {
 		}
 		$dead = [];
 		$slumbered = [];
+		$deadcount = 0;
 		$slumbercount = 0;
 		$keeponslumbercount = 0;
 		$this->seen = new ArrayCollection;
