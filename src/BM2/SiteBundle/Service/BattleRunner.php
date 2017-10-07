@@ -543,7 +543,7 @@ class BattleRunner {
 							$this->log(10, "missed\n");
 						}
 						if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
-							if (!$soldier->getWeapon()->getName() == 'longbow') {
+							if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
 								// one-shot weapon, that only longbowmen will use by default in this phase
 								// TODO: Better logic that determines this, for when we add new weapons.
 								$soldier->dropEquipment();
