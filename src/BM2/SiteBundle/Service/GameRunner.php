@@ -195,7 +195,7 @@ class GameRunner {
 			$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
 			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 			$this->logger->info("Dead; removed from the map.");
-			$captor = $character->getPrisonerOf()
+			$captor = $character->getPrisonerOf();
 			if ($captor) {
 				$this->logger->info("Captive. The dead are captive no more.");
 				$character->setPrisonerOf(null);
