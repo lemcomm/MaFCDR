@@ -15,6 +15,17 @@
 
 		<one-to-many field="resources" target-entity="BuildingResource" mapped-by="building_type"/>
 
+		<many-to-many filed="built_in" target-entity="SettlementType" inversed-by="allows">
+			<join-table name="types.settlement_building">
+				<join-columns>
+					<join-column name="buildingtype_id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="settlementype_id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+		
 		<many-to-many field="requires" target-entity="BuildingType" inversed-by="enables">
 			<join-table name="types.building_requires">
 				<join-columns>
