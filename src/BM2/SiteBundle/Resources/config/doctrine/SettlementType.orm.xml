@@ -6,6 +6,8 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="subtype" type="string"/>
+		
+		<many-to-many field="allows" target-entity="BuildingType" mapped-by="built_in"/>
 		<many-to-one field="upgrades" target-entity="FeatureType" inversed-by="upgrades_to"/>
 	</entity>
 </doctrine-mapping>
