@@ -320,8 +320,8 @@ class RealmManager {
 				);
 				$this->history->logEvent(
 					$election->getRealm(),
-					'event.realm.elected',
-					array('%link-character%'=>$winner->getId()),
+					'event.realm.elected2',
+					array('%link-character%'=>$winner->getId(), '%link-position%'=>$election->getPosition()->getId()),
 					History::MEDIUM, true
 				);
 
