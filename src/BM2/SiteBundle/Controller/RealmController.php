@@ -340,6 +340,7 @@ class RealmController extends Controller {
 					$position->setCycle(null);
 					$position->setWeek(null);
 					$position->setYear(null);
+				}
 				if ($elected) {
 					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);
 				}
