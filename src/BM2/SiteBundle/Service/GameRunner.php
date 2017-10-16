@@ -841,10 +841,10 @@ class GameRunner {
 			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
 			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
 			Which you can see if you go look at the method in the realm manager. */
-			$seenelections[] = $election->getId();
 			if(!in_array($election->getId(), $seenelections)) {
 				$this->rm->dropIncumbents($election);
 			}
+			$seenelections[] = $election->getId();
 		}
 		foreach ($query->getResult() as $election) {
 			$this->rm->countElection($election);
