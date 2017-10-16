@@ -311,8 +311,9 @@ class RealmController extends Controller {
 			$data = $form->getData();
 			$year = $data->getYear();
 			$week = $data->getWeek();
+			$term = $data->getTerm();
 			$elected = $data->getElected();
-			if ($week < 1 OR $week > 60) {
+			if ($week < 0 OR $week > 60) {
 				$fail = true;
 			}
 
@@ -330,9 +331,15 @@ class RealmController extends Controller {
 				if ($is_new) {
 					$em->persist($position);
 				}
-				if ($year AND $week) {
+				if ($year > 1 AND $week > 1 AND $term != 0) {
 					$position->setCycle((($year-1)*360)+(($week-1)*6));
+					$position->setWeek($week);
+					$position->setYear($year);
 				}
+				if ($term == 0 OR $year < 2) {
+					$position->setCycle(null);
+					$position->setWeek(null);
+					$position->setYear(null);
 				if ($elected) {
 					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);
 				}
