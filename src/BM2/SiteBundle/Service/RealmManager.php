@@ -233,6 +233,14 @@ class RealmManager {
 				return $character->getVisualSize();
 			case 'land':
 				return $character->getEstates()->count();
+			case 'horses':
+				$weight = 0;
+				foreach ($character->getActiveSoldiers() as $soldier) {
+					if ($soldier->getEquipment()->getName()=='horse' || $soldier->getEquipment()->getName()=='war horse') {
+						$weight++;
+					}
+				}
+				return $weight;
 			case 'realmland':
 				$land = 0;
 				$realms = $election->getRealm()->findAllInferiors(true);
