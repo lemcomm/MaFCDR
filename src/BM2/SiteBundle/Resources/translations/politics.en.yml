@@ -71,6 +71,7 @@ elections:
   banner:       by banner (per noble)
   spears:       by spears (per soldier)
   swords:       by swords (per weighted soldier)
+  horses:       by horses (per mounted soldier)
   realmland:    by land in realm (per estate)
   land:         by land (per estate)
   realmcastles: by fortifications in realm (per estate defenses)
