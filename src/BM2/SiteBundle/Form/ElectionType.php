@@ -36,6 +36,7 @@ class ElectionType extends AbstractType {
 				'banner' => 'elections.method.banner',
 				'spears' => 'elections.method.spears',
 				'swords' => 'elections.method.swords',
+				'horses' => 'elections.method.horses',
 				'land'	=> 'elections.method.land',
 				'realmland' => 'elections.method.realmland',
 				'castles' => 'elections.method.castles',
