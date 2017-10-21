@@ -35,7 +35,7 @@ by swords
 : This is a more refined method of the military count, it prevents inflation of votes through cheap troops as it makes heavier troops count for more.
 
 by horses
-: This method is very similar to by spear, in that it only counts soldiers, but it only counts those soldiers that are mounted.
+: This method is very similar to by spear, in that it counts solders, but only those that are mounted. Each mounted soldier is worth a single vote.
 
 by land
 : This excludes the landless knights and gives votes only to those who hold estates, with one vote given per estate.
