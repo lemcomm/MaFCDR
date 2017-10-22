@@ -31,9 +31,21 @@ class KnightOfferType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$settlement = $this->settlement;
+		$welcomers = $this->welcomers;
 		$builder->add('givesettlement', 'checkbox', array(
 			'label' => 'recruit.offers.givesettlement',
 			'required' => false
+		));
+		$builder->add('welcomers', 'entity', array(
+			'label'=>'recruit.offers.welcomer',
+			'required'=>false,
+			'placeholder'=>'recruit.offers.nowelcomer',
+			'choices'=>$welcomers,
+			'class'=>'BM2SiteBundle:RealmPosition',
+			'choice_label'=>'name',
+			'group_by' => function($val, $key, $index) {
+				return $val->getRealm()->getName();
+			}
 		));
 		$builder->add('soldiers', 'entity', array(
 			'label'=>'recruit.offers.soldiers',
@@ -42,19 +54,6 @@ class KnightOfferType extends AbstractType {
 			'class'=>'BM2SiteBundle:Soldier', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($settlement) {
 				return $er->createQueryBuilder('s')->where('s.base = :here')->andWhere('s.offered_as is null')->andWhere('s.training_required <= 0')->orderBy('s.name')->setParameters(array('here'=>$settlement));
 		}));
-		if (!empty($welcomers)) {
-			$builder->add('welcomers', 'entity', array(
-				'label'=>'recruit.offers.welcomer',
-				'required'=>false,
-				'placeholder'=>'recruit.offers.nowelcomer',
-				'choices'=>$welcomers
-				'class'=>'BM2SiteBundle:RealmPosition',
-				'choice_lable'=>'name'
-				'group_by' => function($val, $key, $index) {
-					return $val->getRealm()->getName();
-				}
-			));
-		}
 		$builder->add('intro', 'textarea', array(
 			'label'=>'recruit.offers.offertext',
 			'max_length'=>500,
