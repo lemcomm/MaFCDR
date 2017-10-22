@@ -856,10 +856,8 @@ class ActionsController extends Controller {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
 		$em = $this->getDoctrine()->getManager();
 		$depth = 1;
-		echo $settlement->getRealm()->getName();
 		if ($settlement->getRealm()->getSuperior()) {
 			$depth = 2;
-			echo $settlement->getRealm()->getSuperior()->getName();
 			if (($settlement->getRealm()->findUltimate() != $settlement->getRealm()) AND ($settlement->getRealm()->findUltimate() != $settlement->getRealm()->getSuperior())) {
 				$depth = 3;
 			}
