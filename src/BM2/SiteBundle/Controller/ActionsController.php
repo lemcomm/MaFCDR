@@ -854,8 +854,19 @@ class ActionsController extends Controller {
      */
 	public function offersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		$welcomers = [];
+		
+		if ($character->findRealms()) {
+			foreach ($character->findRealms() as $realm) {
+				foreach ($realm->getPositions() as $position) {
+					if ($position->isWelcomer()) {
+						$weclomers[] = $position;
+					}
+				}
+			}
+		}			
 
-		$form = $this->createForm(new KnightOfferType($settlement));
+		$form = $this->createForm(new KnightOfferType($settlement, $welcomers));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
