@@ -772,8 +772,8 @@ recruit:
     anyways. This is a risky option that you only want if getting rid of the estate is important to you. Giving an estate
     in this way always retains you an enforceable claim on the settlement.<br />
     <br />
-    Also, you may be able to opt to attach one you Realm(s) Welcomer Positions on the offer, so that they also get the new knight
-    messages and can assist you in helping the new arrival transition to your realm.
+    Also, you may be able to opt to attach one your realm(s) Welcomer Positions on the offer, so that the holders of that
+    position also receive the new knight arrival messages, and can assist you with their welcoming.
   givesettlement: Give settlement?
   soldiers:     Soldiers to assign
   offertext:    A short text to accompany the offer
