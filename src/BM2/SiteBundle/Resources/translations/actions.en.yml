@@ -775,6 +775,8 @@ recruit:
     Also, you may be able to opt to attach one your realm(s) Welcomer Positions on the offer, so that the holders of that
     position also receive the new knight arrival messages, and can assist you with their welcoming.
   givesettlement: Give settlement?
+  welcomer:     Which Welcomer should we include?
+  nowelcomer:   (None)
   soldiers:     Soldiers to assign
   offertext:    A short text to accompany the offer
   submit:       publish offer

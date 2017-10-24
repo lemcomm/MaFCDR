@@ -1430,6 +1430,7 @@ unavailable:
  nomilitia:     There are no soldiers available here.
  nobattles:     There are no battles nearby
  nooffers:      No soldiers or existing offers available.
+ norealm:       This settlement must be part a realm if you wish to take on knights here.
  noassigned:    You have no soldiers assigned.
  nospies:       You don't have any spies in your employ.
  inbattle:      You are already involved in a battle.

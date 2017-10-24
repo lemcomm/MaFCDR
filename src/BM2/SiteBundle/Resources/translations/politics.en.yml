@@ -342,7 +342,8 @@ position:
  submit:        Edit Position
  remove:        Remove Position
  keeponslumber: Position kept on slumber?
- retired:       Retire this position?
+ retired:       Position is retired?
+ welcomer:      Position is a Welcomer?
  year:          Next election year?
  week:          Next election week?
  minholders:    Minimum number of holders?
@@ -359,6 +360,7 @@ position:
   rank:         Please input a number to determine ordering of positions when part of a list. Lower numbers are listed first.
   keeponslumber: Check this box to make this a position that is kept when a character slumbers. If left unchecked, position will be lost if a character slumbers.
   minholders:   Select the number of minimum holders this position should have.
+  welcomer:     Select this to allow lords of the realm to include holders of this position on new player conversations--it is highly recommended that every realm have AT LEAST one position flagged as such!
   
  appoint:
   intro: >
