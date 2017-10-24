@@ -208,10 +208,10 @@ class GameRunner {
 					if ($position->getRuler()) {
 						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
-							$this->logger->info("No one inherits ".$position->getRealm());
+							$this->logger->info("No one inherits ".$position->getRealm()->getName());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
 						}
 						$this->logger->info("Removing them from ".$position->getName());
@@ -220,7 +220,7 @@ class GameRunner {
 						$this->logger->info("Removed.");
 					} else if ($position->getInherit()) {
 						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
 							$this->logger->info("No one inherits ".$position->getName());
@@ -256,10 +256,10 @@ class GameRunner {
 					if ($position->getRuler()) {
 						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
-							$this->logger->info("No one inherits ".$position->getRealm());
+							$this->logger->info("No one inherits ".$position->getRealm()->getName());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
 						}
 						$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
@@ -269,7 +269,7 @@ class GameRunner {
 					} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
 						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
 						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm());
+							$this->logger->info($heir->getName()." inherits ".$position->getName());
 							$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
 							$this->logger->info("No one inherits ".$position->getName());
@@ -832,7 +832,7 @@ class GameRunner {
 		$this->logger->info("Processing Finished Elections...");
 		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
-		$seenelections = [];
+		$seenpositions = [];
 		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections, 
 		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old. 
 		Mind you, this will only drop holders if the election has $routine = true set. 
@@ -841,10 +841,10 @@ class GameRunner {
 			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
 			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
 			Which you can see if you go look at the method in the realm manager. */
-			if(!in_array($election->getId(), $seenelections)) {
+			if(!in_array($election->getPosition()->getId(), $seenpositions)) {
 				$this->rm->dropIncumbents($election);
 			}
-			$seenelections[] = $election->getId();
+			$seenpositions[] = $election->getPosition()->getId();
 		}
 		foreach ($query->getResult() as $election) {
 			$this->rm->countElection($election);
