@@ -345,16 +345,32 @@ class Settlement {
 		$total;
 		# $include_me set to true will include the settlement we're looking at. 
 		if ($include_me) {
-			$total += $this->getBuildingWorkers();
+			$total += round($this->getBuildingWorkers() * $this->getPopulation());
 			foreach ($settlement->getInferiors() as $minor) {
-				$total += $minor->getBuildingWorkers();
+				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
 			}
 		} else {
 			foreach ($settlement->getInferiors() as $minor) {
-				$total += $minor->getBuildingWorkers();
+				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
+			}
+		}
+		return $total;
+	}
+	
+	public function getMinorSettlementWorkersPercent($include_me=true) {
+		$total;
+		if ($include_me) {
+			$total += $this->getBuildingWorkersPercent();
+			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
+				$total =+ $minor->getBuildingWorkersPercent();
+			}
+		} else {
+			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
+				$total =+ $minor->getBuildingWorkersPercent();
 			}
 		}
 		return $total;
 	}
 
+	
 }
