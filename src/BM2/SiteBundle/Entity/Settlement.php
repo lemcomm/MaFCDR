@@ -300,7 +300,7 @@ class Settlement {
 	}
 	public function getBuildingWorkers() {
 		return round($this->getBuildingWorkersPercent() * $this->getPopulation());
-	}
+	}	
 	public function getFeatureWorkersPercent($force_recalc=false) {
 		if ($force_recalc) $this->assignedFeatures=-1;
 		if ($this->assignedFeatures==-1) {
@@ -339,6 +339,22 @@ class Settlement {
 	public function isDefended() {
 		if ($this->countDefenders()>0) return true;
 		return false;
+	}
+
+	public function getMinorSettlementWorkers($include_me=true) {
+		$total;
+		# $include_me set to true will include the settlement we're looking at. 
+		if ($include_me) {
+			$total += $this->getBuildingWorkers();
+			foreach ($settlement->getInferiors() as $minor) {
+				$total += $minor->getBuildingWorkers();
+			}
+		} else {
+			foreach ($settlement->getInferiors() as $minor) {
+				$total += $minor->getBuildingWorkers();
+			}
+		}
+		return $total;
 	}
 
 }
