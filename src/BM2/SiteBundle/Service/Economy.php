@@ -240,6 +240,27 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'local seat': // only if lord is ruler of realm
+			case 'regional seat': // only if lord is ruler of realm
+			case 'royal seat': // only if lord is ruler of realm
+			case 'imperial seat': // only if lord is ruler of realm
+				if (!$settlement->getCapitalOf()) {
+					return false;
+				}
+				if (!in_array($settlement->getLord(), $settlement->getRealm()->findRulers())) {
+					return false;
+				}
+				break;
+			case 'dockyard': // only at ocean
+				if ($settlement->getGeoData()->getCoast() == false) {
+					return false;
+				}
+				break;
+			case 'filled moat': // only at a region that has water
+				if ($settlement->getGeoData()->getCoast() == false && $settlement->getGeoData()->getLake() == false && $settlement->getGeoData()->getRiver() == false) {
+					return false;
+				}
+				break;
 		}
 		return true;
 	}
