@@ -363,14 +363,20 @@ class CharacterController extends Controller {
 				// create a conversation with my new liege
 				// TODO: this should be configurable
 				$topic = 'Welcome from '.$liege->getName().' to '.$character->getName();
-				$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
+				if (!$welcomingcommittee) {
+					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
+				} else {
+					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm().'], will let you know what you can do to earn your stay.';
+				}
 				if (!$welcomingcommittee) {
 					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
 				} else {
 					$recipients = array();
 					$recipients[] = $this->get('message_manager')->getMsgUser($liege);
 					foreach($welcomers->getHolders() as $welcomechar) {
-						$recipients[] = $this->get('message_manager')->getMsgUser($welcomechar);
+						if ($welcomechar != $liege) {
+							$recipients[] = $this->get('message_manager')->getMsgUser($welcomechar);
+						}
 					}
 					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, $topic, $content);
 				}
