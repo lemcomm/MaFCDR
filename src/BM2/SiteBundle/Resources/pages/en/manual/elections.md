@@ -11,8 +11,8 @@ The voting process itself is quite simple: Every person gets a voting sheet wher
 
 
 
-Informal Referendums
---------------------
+Informal Referendums (TODO)
+---------------------------
 These are basically opinion polls and consist of a number of free-text options that can be voted up or down in the same way. They have no game-mechanical effect, but of course they can be used as the basis for decisions that do. For example, a poll about whether or not to go to war with some neighbouring realm will end with a result, but it is then up to the ruler to turn that result into action.
 
 
