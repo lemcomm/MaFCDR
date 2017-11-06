@@ -932,28 +932,31 @@ class GameRunner {
 
 		$this->logger->info("Checking for routine elections...");
 		$cycle = $this->appstate->getCycle();
-		$query = $this->em->createQuery("SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND p.cycle <= :cycle AND p.cycle IS NOT NULL AND h.id IS NOT NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p");
+		$query = $this->em->createQuery("SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND (p.retired = false OR p.retired IS NULL) AND p.cycle <= :cycle AND p.cycle IS NOT NULL AND h.id IS NOT NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p");
 		$query->setParameter('timeout', $timeout);
 		$query->setParameter('cycle', $cycle);
 		foreach ($query->getResult() as $position) {
-			if ($position->getCycle() == $cycle && !$position->getRetired()) {
-				switch ($position->getTerm()) {
-					case '30':
-						$position->setCycle($cycle+120);
-						break;
-					case '90':
-						$position->setCycle($cycle+360);
-						break;
-					case '365':
-						$position->setCycle($cycle+1440);
-						break;
-					case '0':
-					default:
-						$position->setYear(null);
-						$position->setWeek(null);
-						$position->setCycle(null);
-						break;
-				}
+			$this->logger->info("Updating ".$position->getName()." cycle count.");
+			switch ($position->getTerm()) {
+				case '30':
+					$this->logger->info("Term 30 set, updating $cycle by 120.");
+					$position->setCycle($cycle+120);
+					break;
+				case '90':
+					$this->logger->info("Term 90 set, updating $cycle by 360.");
+					$position->setCycle($cycle+360);
+					break;
+				case '365':
+					$this->logger->info("Term 365 set, updating $cycle by 1440.");
+					$position->setCycle($cycle+1440);
+					break;
+				case '0':
+				default:
+					$this->logger->info("Term 0 set, updating cycle, year, and week to NULL.");
+					$position->setYear(null);
+					$position->setWeek(null);
+					$position->setCycle(null);
+					break;
 			}
 			$members = $position->getRealm()->findMembers();
 			$this->logger->notice("Calling election for ".$position->getName()." for realm ".$position->getRealm()->getName());
