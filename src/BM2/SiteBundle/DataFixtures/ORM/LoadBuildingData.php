@@ -71,9 +71,9 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Irrigation Ditches'    => array('auto' =>   3000, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith'), 'conditions'=>true),
 
 		'Local Seat'		=> array('auto' =>	0, 'min' =>    100, 'work' =>   5000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Carpenter','Dirt Streets','Wood Wall'), 'conditions'=>true),
-		'Regional Seat'		=> array('auto' =>	0, 'min' =>   1000, 'work' => 500000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 10, 'requires' => array('Local Seat','Mason','Blacksmith','Paved Streets','Inn','School','Town Hall','Guardhouse','Wood Castle'), 'conditions'=>true),
-		'Royal Seat'		=> array('auto' =>	0, 'min' =>   5000, 'work' =>1000000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 15, 'requires' => array('Regional Seat','Stone Castle','Library','Saddler','Barracks','Bank'), 'conditions'=>true),
-		'Imperial Seat'		=> array('auto' =>	0, 'min' =>  10000, 'work' =>2000000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 20, 'requires' => array('Royal Seat','Fortress','Master Mason','Academy'), 'conditions'=>true),
+		'Regional Seat'		=> array('auto' =>	0, 'min' =>   1000, 'work' => 500000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Local Seat','Mason','Blacksmith','Paved Streets','Inn','School','Town Hall','Guardhouse','Wood Castle'), 'conditions'=>true),
+		'Royal Seat'		=> array('auto' =>	0, 'min' =>   5000, 'work' =>1000000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Regional Seat','Stone Castle','Library','Saddler','Barracks','Bank'), 'conditions'=>true),
+		'Imperial Seat'		=> array('auto' =>	0, 'min' =>  10000, 'work' =>2000000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Royal Seat','Fortress','Master Mason','Academy'), 'conditions'=>true),
 
 		'Apothecary'            => array('auto' =>   2000, 'min' =>    500, 'work' =>   6000, 'ratio' =>  5000, 'builtin' => array('city','fort','port'), 'defenses' => 5),
 		'Guild District'	=> array('auto' =>  60000, 'min' =>   3000, 'work' =>  25000, 'ratio' =>  1200, 'builtin' => array('city'), 'requires' => array('Paved Streets','Fairground','Guild Square','Warehouse','Tailor','Library','Inn')),
@@ -141,13 +141,12 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'               => array('wood'=>array('construction'=>800), 'metal'=>array('construction'=>100), 'goods'=>array('construction'=>50), 'food'=>array('provides'=>50, 'bonus'=>5)),
 		'Lumber Yard'           => array('wood'=>array('construction'=>500, 'bonus'=>4), 'metal'=>array('construction'=>100, 'operation'=>1)),
 		'Irrigation Ditches'    => array('wood'=>array('construction'=>600), 'metal'=>array('construction'=>25), 'goods'=>array('construction'=>20), 'food'=>array('provides'=>100, 'bonus'=>1)),
-		
-		'Local Seat'		=> array('wood'=>array('construction'=>2000), 'metal'=>array('construction'=>300), 'money'=>array('construction'=>100, 'provides'=>2, 'bonus'=>1), 'food'=>array('bonus'=>3)),
-		'Regional Seat'		=> array('wood'=>array('construction'=>8000), 'metal'=>array('construction'=>1000), 'money'=>array('construction'=>1000, 'provides'=>2, 'bonus'=>3), 'food'=>array('bonus'=>6)),
-		'Royal Seat'		=> array('wood'=>array('construction'=>14000), 'metal'=>array('construction'=>1750), 'money'=>array('construction'=>1750, 'operation'=>5, 'provides'=>2, 'bonus'=>6), 'food'=>array('bonus'=>10)),
-		'Imperial Seat'		=> array('wood'=>array('construction'=>20000), 'metal'=>array('construction'=>2500), 'money'=>array('construction'=>2500, 'operation'=>10, 'provides'=>2, 'bonus'=>12), 'food'=>array('bonus'=>20)),
-		
-		
+
+		'Local Seat'		=> array('wood'=>array('construction'=>2000, 'operation'=>10), 'metal'=>array('construction'=>300), 'money'=>array('construction'=>100, 'provides'=>2, 'bonus'=>1), 'food'=>array('bonus'=>3)),
+		'Regional Seat'		=> array('wood'=>array('construction'=>8000, 'operation'=>20), 'metal'=>array('construction'=>1000, 'bonus'=>5), 'money'=>array('construction'=>1000, 'provides'=>2, 'bonus'=>3), 'food'=>array('bonus'=>3)),
+		'Royal Seat'		=> array('wood'=>array('construction'=>14000, 'operation'=>70), 'metal'=>array('construction'=>1750, 'bonus'=>10), 'money'=>array('construction'=>1750, 'operation'=>3, 'bonus'=>6), 'food'=>array('bonus'=>4)),
+		'Imperial Seat'		=> array('wood'=>array('construction'=>20000, 'operation'=>100), 'metal'=>array('construction'=>2500, 'bonus'=>15), 'money'=>array('construction'=>2500, 'operation'=>7, 'bonus'=>12), 'food'=>array('bonus'=>10)),
+
 		'Apothecary'            => array('wood'=>array('construction'=>1250), 'metal'=>array('construction'=>250), 'goods'=>array('construction'=>50, 'operation'=>2, 'bonus'=>3), 'money'=>array('construction'=>100, 'operation'=>2, 'bonus'=>1)),
 		'Guild District'	=> array('wood'=>array('construction'=>3500), 'goods'=>array('construction'=>400, 'provides'=>10, 'bonus'=>10), 'money'=>array('construction'=>200, 'provides'=>20, 'bonus'=>12)),
 		'Warehouse'		=> array('wood'=>array('construction'=>2000), 'metal'=>array('construction'=>100), 'goods'=>array('construction'=>25, 'bonus'=>10), 'money'=>array('operation'=>5, 'bonus'=>3), 'food'=>array('bonus'=>2)),
