@@ -9,7 +9,6 @@
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
 		<many-to-one field="updater" target-entity="Character" inversed-by="updated_places"/>
 		<field name="updated_on" type="datetime"/>
-		<one-to-one field="inventory" target-entity="Inventory" inversed-by="contents"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
 
