@@ -3,20 +3,20 @@
 # Author: Tom Vogt <tom@mightandfealty.com>
 rss:
  desc:        Might & Fealty Event Log Summary
- feed:        get event updates via RSS
+ feed:        Get event updates via RSS
 
 event:
  artifact:
-  created:      created
+  created:      Created
   assigned:     Assigned to %character%.
   spawned:      Spawned in the area of %area%.
-  given:        %character-1% gave it to %character-2%.
+  given:        Given to %character-2% by %character-1%.
   killer:       Taken by %character-1% through the killing of %character-2%.
   lost:         Lost upon the death of %character%.
  feature:
-  damaged:      %character% has damaged the %featuretype% %name%. It will deteriorate further if no workers are assigned for repair.
-  disabled:     %character% has damaged the %featuretype% %name% so badly, it has become inoperative. It will deteriorate further if no workers are assigned for repair.
-  destroyed:    %character% has destroyed the %featuretype% %name% to rubble.
+  damaged:      %character% has damaged the %featuretype% %name%. It will deteriorate further if no workers are assigned to repair.
+  disabled:     %character% has damaged the %featuretype% %name% so badly, it has become inoperative. It will deteriorate further if no workers are assigned to repair.
+  destroyed:    %character% has completely destroyed the %featuretype% %name%.
  spot:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
@@ -56,20 +56,20 @@ event:
   addconstruction: >
     Demand for %buildingtype% has caused the peasants to volunteer to speed up the construction work.
     The worker amount on the project has been raised to %workers%.
-  tradefail:    Outgoing trade of %amount% %resource% for %settlement% had to be stopped due to insufficient amounts available.
-  tradereduce:  Insufficient resources for outgoing trade of %amount% %resource% for %settlement%. Trade volume has been reduced to %newamount%.
+  tradefail:    Outgoing trade of %amount% %resource% to %settlement% had to be stopped due to a lack of available resources.
+  tradereduce:  The outgoing trade of %resource% to %settlement% has been reduced from %amount% to %newamount% due to a lack of resources.
   tradestop:    The trade of %amount% %resource% from %settlement% has ceased.
   tradereduced: The trade of %resource% from %settlement% has dropped in volume. Instead of the previous %amount% units, it is now %newamount% units.
   setback:      Due to ongoing food shortages, workers are leaving construction projects to take care of their families instead.
   hunger:       Food shortages and hunger are becoming a problem.
   starvation:   Starvation has reached serious levels.
-  crash:        Production and construction has come to a stop due to insufficient workforce. Buildings are closing down and falling into disrepair.
+  crash:        Production and construction has come to a halt due to there being too few local workers. Buildings are closing down and falling into disrepair.
   disrepair:    The %buildingtype% has broken down beyond repair and must be considered lost.
   burned:       The %buildingtype% has been damaged by enemy forces.
   burned2:      The %buildingtype% has been burned down by enemy forces.
   thrallstaken: %amount% peasants have been abducted and sold into slavery.
   thrallstaken2: %amount% peasants have been taken and sold as slaves. According to rumours, they have been sent to %settlement%.
-  resourcestaken2: Resources have been plundered from warehouses. According to rumours, they were sent to %settlement%.
+  resourcestaken2: Resources have been plundered from the local warehouses. According to rumours, they were sent to %settlement%.
   attacked:     The settlement is being attacked by troops of %character%.
   battle:       %battle% was fought.
   entered:      %character% has entered the settlement.
@@ -83,9 +83,9 @@ event:
   spot3:        The watchtower "%tower%" spotted %character% in the vicinity, with %count% soldiers.
   claim:
    added:       %character% has announced a claim to this settlement.
-   cancelled:   %character% has withdrawn the claim to this settlement.
+   cancelled:   %character% has withdrawn their claim to this settlement.
   charstart:    A new First One named %character% has appeared here.
-  newyear:      New Year celebrations, festive atmosphere and alcoholic drinks resulted in a predictable additional %babies% babies being born.
+  newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% children coming of age.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -131,7 +131,7 @@ event:
   gotship:      You were given a ship by %character%. The ship made landfall nearby %remain% days ago.
   gotgold:      A messenger brought you a bag with %amount% gold from %character%.
   gotartifact:  You have received the %artifact% from %character%.
-  surrender:    %character% has thrown down the sword, bent the knee, and surrendered to your mercy.
+  surrender:    %character% has surrendered through the ancient geas of binding and is now at your mercy.
   surrenderto:  Has surrendered to %character% and become a prisoner.
   proposed:
    marriage:    You have received a marriage proposal from %character%. Accept or decline it on the relations page.
@@ -156,11 +156,11 @@ event:
    free:        Set free from imprisonment.
    free2:       Freed from imprisonment through the death of %character%.
    kill:
-    behead:     Beheaded by %character% as a prisoner.
-    hang:       While imprisoned by %character%, executed by hanging.
-    burn:       Burned alive by %character% as a prisoner.
-    quarter:    Brutally killed by quartering while a prisoner of %character%.
-    impale:     Slaughtered by impaling while a prisoner of %character%.
+    behead:     Executed by hanging while imprisoned by %character%.
+    hang:       Executed by hanging while imprisoned by %character%.
+    burn:       Burned alive while imprisoned by %character%.
+    quarter:    Brutally killed by quartering while imprisoned by %character%.
+    impale:     Slaughtered by impaling while imprisoned by %character%.
    killer:
     behead:     Beheaded %character%.
     hang:       Executed %character% by hanging.
@@ -173,16 +173,16 @@ event:
    received2:   The slaying of %character-1% has given you %character-2% as a prisoner.
   dungeon:
    progress:    Your <a href="%url%">dungeon expedition</a> has made progress.
-   newcard1:    You improved the action %card% in the dungeon and can now do it more often.
+   newcard1:    You improved the action %card% in the dungeon and can now use it more frequently.
    newcard2:    You learned a new action while in the dungeon: %card%
    gold:        Your plunder from the dungeon came to a total of %gold% gold.
    closed:      Rumours have it that a nearby dungeon has been completely explored and is no longer interesting.
   inactive:
-   prisoner:    Your captor %character% has not been seen for a long time. Maybe slumberblight got him? In any case, escaping should now be much easier.
+   prisoner:    Your captor %character% has not been seen for a long time, and can be assumed to be a victim of slumberblight. It will now be easier to escape.
    vassal:      Your vassal %character% has not been seen for a long time and rumors have it that he has contracted slumberblight.
-   liege:       Your liege, %character%, has not been heard of for some time. Some say, he has been affected by slumberblight.
-   partner:     Your partner %character% seems to have vanished, or maybe it is slumberblight?
-   position:    The %realmposition% %character% has not been seen for a long time and must be assumed a victim of slumberblight.
+   liege:       Your liege, %character%, has not been heard of for some time. Some say he has been affected by slumberblight.
+   partner:     Your partner %character% seems to have succumbed to slumberblight.
+   position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -222,8 +222,8 @@ event:
   abdicated:    %character-1% has abdicated and handed control of the realm to %character-2%.
   abdicated2:   %character% has abdicated without a successor.
   deserted:     Vanished into history with no members remaining.
-  restored:     %character% of %realm%, has revived the realm, becoming it's new ruler.
-  restorer:     Revived the realm of %realm%, becoming it's new ruler.
+  restored:     %character% of %realm%, has revived the realm, becoming its new ruler.
+  restorer:     Revived the realm of %realm%, becoming its new ruler.
   war:
    declared:    Declared war "%war%".
    received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
@@ -231,7 +231,7 @@ event:
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
-  inactivekept: The holder of %position%, %character%, has succumb to the slumber.
+  inactivekept: The holder of %position%, %character%, has succumbed to the slumber.
   inherited:
    slumber:     The position of %position% has been inherited by %character-2% after the slumbering of %character-1%.
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
@@ -254,7 +254,7 @@ soldier:
  traincomplete: Training completed.
  retrain:       Retrained in %settlement% to use %item-1%/%item-2%/%item-3%.
  militia:       Set up as militia in %settlement%.
- mobilize:      Mobilized by %character%.
+ mobilize:      Mobilised by %character%.
  assign:        Assigned to %character%.
  battle:        Participated in %battle%.
  routed:
@@ -277,7 +277,7 @@ politics:
   offer2:     %character% has accepted your knight offer in %settlement% and become your knight.
   taken:      Has appeared as a knight of %character% at %settlement%.
   taken2:     Has appeared as a vassal of %character% and received lordship of %settlement%.
-  broken:     %character% has broken the oath of fealty to you and become a rogue.
+  broken:     %character% has broken their oath of fealty to you and become a rogue.
   disowned:   Oath of fealty dissolved by your liege, %character%.
   nowruler:   %character% has become ruler of %realm% and is thus no longer a vassal.
   changed:    %character-1% has broken the oath of fealty to you and sworn an oath to %character-2% instead.
@@ -286,10 +286,10 @@ politics:
   mynew:      Has sworn an oath of fealty to %character-2%.
   mynew2:     Has broken the oath of fealty to %character-3% and sworn an oath to %character-2% instead.
  successor:
-  set:        Has set %character% as successor.
-  changed:    Has changed the successor, instead of %character-1% it will now be %character-2%.
+  set:        Has set %character% as their successor.
+  changed:    Has declared a new successor, instead of %character-1% it will now be %character-2%.
   new:				You have been declared as the successor of %character%.
-  removed:    %character% has removed you as successor.
+  removed:    %character% has removed you as their successor.
 
 
 resolution:
@@ -355,37 +355,37 @@ news:
  readers:   %count% subscriber|%count% subscribers
  collection:  articles collection
  create:
-  title:    create publication
+  title:    Create publication
   intro:    Here you can create a new publication, which can serve as a newspaper, a realm announcement service, strategy manual, law book or anything else you might want to put it to use for.<br />You will automatically become the first owner, editor, author and publisher, but you can add others later.
-  newname:  pick a unique name
-  submit:   create publication
+  newname:  Pick a unique name
+  submit:   Create publication
   unpublished:  unpublished
- member:    you are a member of:
- members:   members of this publication:
- reader:    publications you are reading:
- local:     locally published:
- local2:    local publications
- owner:     owner
- editor:    editor
- author:    author
- publisher: publisher
+ member:    You are a member of:
+ members:   Members of this publication:
+ reader:    Publications you are reading:
+ local:     Locally published:
+ local2:    Local publications
+ owner:     Owner
+ editor:    Editor
+ author:    Author
+ publisher: Publisher
  layout:
-  edit:     edit
+  edit:     Edit
   delete:   del
-  update:   update layout
-  updating: updating...
-  done:     layout updated
+  update:   Update layout
+  updating: Updating...
+  done:     Layout updated
  publish:
-  do:       publish this edition
-  updating: publishing...
-  done:     edition published
+  do:       Publish this edition
+  updating: Publishing...
+  done:     Edition published
  article:
-  title:    title
+  title:    Title
   author:   by %name%
-  content:  content
-  new:      new article
-  create:   create article
-  edit:     update article
+  content:  Content
+  new:      New article
+  create:   Create article
+  edit:     Update article
  change:    change
  delmember: If you remove all privileges from a member, it will be removed as a member. The entry will remain on this page so you can undo mistakes, but it will be gone at the next reload.
  save:      save changes
@@ -411,12 +411,12 @@ news:
   title3:     Resize Me
   content3:   You can change the size of an article by clicking on the "1x1" (or whatever the current size is) button and choosing a new size.
  subscribe:
-  title:      subscribe
+  title:      Subscribe
   intro: >
     If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the 
     edition to your readers list and you will be able to access it in the future. If the publication is set up as a periodical, you will also
     receive a notification and a copy of future editions.
-  submit:     subscribe now
+  submit:     Subscribe now
   done:       You have now subscribed to the "%paper%".
 
 trans:
