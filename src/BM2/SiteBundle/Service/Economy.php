@@ -252,12 +252,20 @@ class Economy {
 				}
 				break;
 			case 'dockyard': // only at ocean
+				/* TODO: We need a better way to do this before allowing these to be built.
 				if ($settlement->getGeoData()->getCoast() == false) {
 					return false;
 				}
+				*/
+				return false;
 				break;
 			case 'filled moat': // only at a region that has water
 				if ($settlement->getGeoData()->getCoast() == false && $settlement->getGeoData()->getLake() == false && $settlement->getGeoData()->getRiver() == false) {
+					return false;
+				}
+				break;
+			case 'quarry': //only at hills, scrublands, or mountains
+				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
 					return false;
 				}
 				break;
