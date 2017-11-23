@@ -13,7 +13,7 @@
 		<field name="defenses" type="integer"/>
 		<field name="special_conditions" type="boolean"/>
 		
-		<field name="built_in" type="string" nullable="true"/>
+		<field name="built_in" type="simple_array" nullable="true"/>
 
 		<one-to-many field="resources" target-entity="BuildingResource" mapped-by="building_type"/>
 		
