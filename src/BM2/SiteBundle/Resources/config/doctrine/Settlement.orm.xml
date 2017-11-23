@@ -16,7 +16,7 @@
 		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
 		
-		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="settlement"/>
 
 		<many-to-one field="culture" target-entity="Culture"/>
 		<one-to-many field="places" target-entity="Place" inversed-by="settlement"/>
