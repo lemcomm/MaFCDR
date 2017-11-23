@@ -340,7 +340,12 @@ class Settlement {
 		if ($this->countDefenders()>0) return true;
 		return false;
 	}
-
+	/* Leftover code from when we were planning to make settlements subordinate to each other.
+	Doing this would make calculating region resources and the like a literal pain, as we'd have to add a bunch of conditions
+	that help the game determine if the settlement is supposed to have resources or not.
+	
+	The better idea is to make places entirely NOT settlements, and have them operate on separate code.
+	
 	public function getMinorSettlementWorkers($include_me=true) {
 		$total;
 		# $include_me set to true will include the settlement we're looking at. 
@@ -371,6 +376,8 @@ class Settlement {
 		}
 		return $total;
 	}
+	
+	*/
 
 	
 }
