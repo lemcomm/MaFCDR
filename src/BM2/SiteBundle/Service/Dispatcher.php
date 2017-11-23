@@ -1028,7 +1028,7 @@ class Dispatcher {
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.defend')) {
 			return array("name"=>"military.place.defend.name", "description"=>"unavailable.already");
 		}
-		if (!$place = $this->getCharacter()->getInsideSettlement()) {
+		if (!$place = $this->getCharacter()->getInsidePlace()) {
 			return array("name"=>"military.place.defend.name", "description"=>"unavailable.notinside");
 		}
 		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
