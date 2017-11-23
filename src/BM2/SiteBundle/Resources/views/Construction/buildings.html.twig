@@ -98,14 +98,8 @@
 					</tr>
 				{% endfor %}
 				</tbody>
-			{% if roadworkers > 0 or featureworkers > 0 or minorsettlementworkers > 0%}
+			{% if roadworkers > 0 or featureworkers > 0 %}
 			<tfoot>
-				{% if minorsettlementworkers > 0 %}
-				<tr><td colspan="3">{{ "economy.minorworkers"|trans({}, "actions") }}</td>
-						<td align="center">{{ minorsettlementworkers*100 }} %</td>
-						<td align="right">{{ (minorsettlementworkers*settlement.population)|number_format }} {{ 'minorsettlement.workers'|trans }}</td>
-				</tr>
-				{% endif %}
 				{% if roadworkers > 0 %}
 				<tr><td colspan="3">{{ "economy.roadworkers"|trans({"%url%":path('bm2_site_construction_roads')}, "actions")|raw }}</td>
 						<td align="center">{{ roadworkers*100 }} %</td>
