@@ -112,14 +112,18 @@ class Dispatcher {
 		$actions=array();
 		if ($place = $this->getActionableSettlement()) {
 			$actions[] = $this->locationEnterTest(true);
+		} else if ($place = $this->getLeaveableSettlement()) {
+			$actions[] = $this->locationLeaveTest(true);
 		} else {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
-		if ($this->getLeaveableSettlement()) {
-			$actions[] = $this->locationLeaveTest(true);
+		if ($places = $this->getActionablePlace()) {
+			$actions[] = $this->placeEnterTest(true);
+		} else if ($place = $this->getLeaveablePlace()) {
+			$actions[] = $this->placeLeaveTest(true);
 		} else {
-			$actions[] = array("name"=>"location.exit.name", "description"=>"unavailable.inside");
+			$actions[] = array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
 
 		$actions[] = $this->locationQuestsTest();
@@ -294,6 +298,12 @@ class Dispatcher {
 			$actions[] = $this->militaryDefendSettlementTest(true);
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
+		}
+		if ($place = $this->getActionablePlace()) {
+			$actions[] = $this->militaryAttackPlaceTest(true);
+			$actions[] = $this->militaryDefendPlaceTest(true);
+		} else {
+			$actions[] = array("name"=>"military.other", "description"=>"unavailable.noplace");
 		}
 
 		return array("name"=>"military.name", "elements"=>$actions);
@@ -523,6 +533,58 @@ class Dispatcher {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.prisoner");
 		} else {
 			return $this->action("location.exit", "bm2_site_actions_exit");
+		}
+	}
+
+	public function placeEnterTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
+		}
+		if (!$place = $this->getActionablePlace()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.inbattle");
+		}
+
+		if ($this->getCharacter()->isPrisoner()) {
+			if ($place->getOwner() == $this->getCharacter()) {
+				return array("name"=>"place.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"location.enter.description2");
+			} else {
+				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
+			}
+		} else {
+			return $this->action("place.enter", "bm2_site_actions_enter");
+		}
+
+	}
+	
+	public function placeLeaveTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->getCharacter()->getInsidePlace()) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.outside");
+		}
+		if (!$place = $this->getActionablePlace()) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.noplace");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.exit')) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"place.exit.name", "description"=>"unavailable.prisoner");
+		} else {
+			return $this->action("place.exit", "bm2_site_actions_exit");
 		}
 	}
 
@@ -957,6 +1019,68 @@ class Dispatcher {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.fresh");
 		}
 		return $this->action("military.settlement.attack", "bm2_site_war_attacksettlement");
+	}
+	
+		public function militaryDefendPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.defend')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.already");
+		}
+		if (!$place = $this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.notinside");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.inbattle");			
+		}
+		return $this->action("military.place.defend", "bm2_site_war_defendplace");
+	}
+
+	public function militaryAttackPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if (!$place = $this->getActionablePlace()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.noplace");
+		}
+		if ($place->getOwner() == $this->getCharacter()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.yours");
+		}
+		if (!$place->isDefended()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.nodefenders");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.inbattle");			
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.place.attack", "bm2_site_war_attackplace");
 	}
 
 	public function militaryDamageFeatureTest($check_duplicate=false) {
@@ -1543,6 +1667,30 @@ class Dispatcher {
 	public function getLeaveableSettlement() {
 		if ($this->getCharacter()->getInsideSettlement()) {
 			return $this->getCharacter()->getInsideSettlement();
+		}
+	}
+	
+	public function getActionablePlace() {
+		if (is_object($this->actionablePlace) || $this->actionablePlace===null) return $this->actionablePlace;
+
+		$this->actionablePlace=null;
+		if ($this->getCharacter()) {
+			if ($this->getCharacter()->getInsidePlace()) {
+				$this->actionablePlace = $this->getCharacter()->getInsidePlace();
+			} else if ($location=$this->getCharacter()->getLocation()) {
+				$nearest = $this->geography->findNearestPlace($this->getCharacter());
+				$place=array_shift($nearest);
+				if ($nearest['distance'] < $this->geography->calculateActionDistance($place)) {
+					$this->actionablePlace=$place;
+				}
+			}
+		}
+		return $this->actionablePlace;
+	}
+
+	public function getLeaveablePlace() {
+		if ($this->getCharacter()->getInsidePlace()) {
+			return $this->getCharacter()->getInsidePlace();
 		}
 	}
 
