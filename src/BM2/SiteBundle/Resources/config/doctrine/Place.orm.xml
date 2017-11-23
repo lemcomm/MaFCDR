@@ -5,10 +5,12 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<many-to-one field="type" target-entity="PlaceType"/>
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
 		<one-to-many field="buildings" target-entity="Building" mapped-by="place"/>
 		<one-to-many field="characters_present" target-entity="Character" mapped-by="inside_place"/>
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="base" index-by="id" fetch="EXTRA_LAZY"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
