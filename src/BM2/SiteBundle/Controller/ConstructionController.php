@@ -424,7 +424,6 @@ class ConstructionController extends Controller {
 			'unavailable'=>$unavailable,
 			'roadworkers'=>$settlement->getRoadWorkersPercent(),
 			'featureworkers'=>$settlement->getFeatureWorkersPercent(),
-			'minorsettlementworkers'=>$settlement->getMinorSettlementWorkersPercent(false),
 			'otherworkers'=>1.0-$settlement->getAvailableWorkforcePercent()+$settlement->getBuildingWorkersPercent(),
 			'form'=>$form->createView()
 		);
