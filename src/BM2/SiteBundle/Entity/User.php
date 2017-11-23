@@ -76,5 +76,14 @@ class User extends BaseUser {
 			return false;
 		}
 	}
+	
+	public function isVeryNewPlayer() {
+		$days = $this->getCreated()->diff(new \DateTime("now"), true)->days;
+		if ($days < 7) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
