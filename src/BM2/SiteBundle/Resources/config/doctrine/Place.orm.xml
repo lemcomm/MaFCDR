@@ -5,10 +5,9 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
 		<one-to-many field="buildings" target-entity="Building" mapped-by="place"/>
-		<many-to-one field="updater" target-entity="Character" inversed-by="updated_places"/>
-		<field name="updated_on" type="datetime"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
