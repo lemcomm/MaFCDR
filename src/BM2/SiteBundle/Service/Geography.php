@@ -283,7 +283,7 @@ class Geography {
 	}
 	
 	public function findNearestPlace(Character $character) {
-		$query = $this->em->createQuery('SELECT s, ST_Distance(g.center, c.location) AS distance FROM BM2SiteBundle:Place p JOIN p.geo_data g, BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
+		$query = $this->em->createQuery('SELECT s, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
 		$query->setParameter('char', $character);
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
