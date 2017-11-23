@@ -85,6 +85,7 @@
 		<many-to-many field="positions" target-entity="RealmPosition" mapped-by="holders"/>
 
 		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="characters_present"/>
+		<many-to-one field="inside_place" target-entity="Place" inversed-by="characters_present"/>
 		<many-to-many field="battlegroups" target-entity="BattleGroup" mapped-by="characters"/>
 
 		<one-to-many field="entourage" target-entity="Entourage" mapped-by="character" index-by="id"/>
@@ -93,7 +94,8 @@
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
-		<one-to-many field="updated_places" target-entity="Place" mapped-by="updater"/>
+		
+		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
 
 	</entity>
 </doctrine-mapping>
