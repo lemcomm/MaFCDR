@@ -22,8 +22,12 @@
 
 		<many-to-one field="culture" target-entity="Culture"/>
 		<one-to-many field="places" target-entity="Place" inversed-by="settlement"/>
+		
+		<!-- Old code from when we were going to make settlements subordinate to each other.
 		<many-to-one field="superior" target-entity="Settlement" inversed-by="inferiors"/>
 		<one-to-many field="inferiors" target-entity="Settlement" mapped-by="superior"/>
+		-->
+		
 		<many-to-one field="owner" target-entity="Character" inversed-by="estates"/>
 		<many-to-one field="realm" target-entity="Realm" inversed-by="estates"/>
 		<many-to-many field="capital_of" target-entity="Realm" mapped-by="capital"/>
