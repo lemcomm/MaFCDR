@@ -178,6 +178,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 			$type->setName($name);
 			$type->setBuildHours($data['work']);
 			$type->setAutoPopulation($data['auto'])->setMinPopulation($data['min']);
+			$type->setBuiltIn($data['builtin']);
 			$type->setPerPeople($data['ratio']);
 			$type->setDefenses(isset($data['defenses'])?$data['defenses']:0);
 			$type->setSpecialConditions(isset($data['conditions'])?true:false);
@@ -233,6 +234,8 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 				}
 			}
 		}
+		/* Old code for when we wanted to have buildings buildable in multiple settlement types.
+		Might be usable later, so it remains. --Andrew, 20171123
 		foreach ($this->buildings as $name=>$data) {
 			if (isset($data['builtin'])) {
 				$me = $all->filter(function($type) use ($name) {
@@ -255,6 +258,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 				}
 			}
 		}
+		*/
 		$manager->flush();
 	}
 
