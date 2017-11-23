@@ -18,6 +18,8 @@
 
 		<one-to-many field="roads" target-entity="Road" mapped-by="geo_data"/>
 		<one-to-many field="features" target-entity="GeoFeature" mapped-by="geo_data"/>
+		<one-to-many field="places" target-entity="Place" mapped-by="geo_data"/>
+		
 		<one-to-one field="settlement" target-entity="Settlement" mapped-by="geo_data"/>
 
 	</entity>
