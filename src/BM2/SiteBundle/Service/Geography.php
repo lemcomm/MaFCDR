@@ -217,7 +217,7 @@ class Geography {
 		$query->setMaxResults(1);
 		$result = $query->getSingleResult();
 
-        $coast = json_decode($result['coast']);
+		$coast = json_decode($result['coast']);
 		if ($result['distance'] == 0) {
 			// damn... not sure if this works...
 			$x_off = 0; $y_off = 0;
@@ -277,6 +277,13 @@ class Geography {
 
 	public function findNearestSettlement(Character $character) {
 		$query = $this->em->createQuery('SELECT s, ST_Distance(g.center, c.location) AS distance FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
+		$query->setParameter('char', $character);
+		$query->setMaxResults(1);
+		return $query->getSingleResult();
+	}
+	
+	public function findNearestPlace(Character $character) {
+		$query = $this->em->createQuery('SELECT s, ST_Distance(g.center, c.location) AS distance FROM BM2SiteBundle:Place p JOIN p.geo_data g, BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
 		$query->setParameter('char', $character);
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
@@ -397,7 +404,6 @@ class Geography {
 		return $query->getResult();
 	}
 
-
 	public function findBattlesNearMe(Character $character, $maxdistance) {
 		$query = $this->em->createQuery('SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance');
 		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
@@ -407,6 +413,7 @@ class Geography {
 	public function findBattlesInSpotRange(Character $character) {
 		return $this->findBattlesNearMe($character, $this->calculateSpottingDistance($character));
 	}
+	
 	public function findBattlesInActionRange($character) {
 		return $this->findBattlesNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -422,9 +429,11 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
+	
 	public function findDungeonsInSpotRange(Character $character) {
 		return $this->findDungeonsNearMe($character, $this->calculateSpottingDistance($character));
 	}
+	
 	public function findDungeonsInActionRange($character) {
 		return $this->findDungeonsNearMe($character, $this->calculateInteractionDistance($character));
 	}
