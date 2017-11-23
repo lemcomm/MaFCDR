@@ -16,9 +16,7 @@
 		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
 		
-		<field name="description" type="text" nullable="true"/>
-		<many-to-one field="updater" target-entity="Character" inversed-by="updated_settlements"/>
-		<field name="updated_on" type="datetime" nullable="true"/>
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
 
 		<many-to-one field="culture" target-entity="Culture"/>
 		<one-to-many field="places" target-entity="Place" inversed-by="settlement"/>
