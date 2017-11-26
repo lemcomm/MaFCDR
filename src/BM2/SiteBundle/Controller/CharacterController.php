@@ -366,7 +366,7 @@ class CharacterController extends Controller {
 				if (!$welcomingcommittee) {
 					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
 				} else {
-					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm().'], will let you know what you can do to earn your stay.';
+					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm()->getId().'], will let you know what you can do to earn your stay.';
 				}
 				if (!$welcomingcommittee) {
 					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
