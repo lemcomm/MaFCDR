@@ -833,33 +833,38 @@ class GameRunner {
 		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
 		$seenpositions = [];
+	    
 		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections, 
 		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old. 
 		Mind you, this will only drop holders if the election has $routine = true set. 
 		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
+	    
 		foreach ($query->getResult() as $election) {
+			
 			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
 			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
 			Which you can see if you go look at the method in the realm manager. */
-			if(!in_array($election->getPosition()->getId(), $seenpositions)) {
-				$this->rm->dropIncumbents($election);
+			
+			if($election->getPosition()) {
+				if(!in_array($election->getPosition()->getId(), $seenpositions)) {
+					$this->rm->dropIncumbents($election);
+				}
 			}
 			$seenpositions[] = $election->getPosition()->getId();
-		}
-		foreach ($query->getResult() as $election) {
 			$this->rm->countElection($election);
 		}
+		$this->logger->info("Flushing Finished Elections...");
 		$this->em->flush();
-		
-		$timeout = new \DateTime("now");
-		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
 
 		/* The bulk of the following code does the following:
 			1. Ensure all active realms have a ruler.
 			2. Ensure all vacant AND elected positions have a holder.
 			3. Ensure all positions that should have more than one holder do.
 		These things will only happen if there is not already an election running for a given position though. */
+	    
 		$this->logger->info("Checking realm rulers, vacant electeds, and minholders...");
+		$timeout = new \DateTime("now");
+		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
 		$query->setParameter('timeout', $timeout);
 		$result = $query->getResult();
