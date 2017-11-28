@@ -840,18 +840,24 @@ class GameRunner {
 		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
 	    
 		foreach ($query->getResult() as $election) {
+			$this->logger->info("-Reviewing election ".$election->getId());
 			
 			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
 			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
 			Which you can see if you go look at the method in the realm manager. */
 			
 			if($election->getPosition()) {
+				$this->logger->info("--Position detected");
 				if(!in_array($election->getPosition()->getId(), $seenpositions)) {
 					$this->rm->dropIncumbents($election);
+					$seenpositions[] = $election->getPosition()->getId();
+                                        $this->logger->info("---Dropped and tracked");
+				} else {
+                                        $this->logger->info("---Already saw it");
 				}
 			}
-			$seenpositions[] = $election->getPosition()->getId();
 			$this->rm->countElection($election);
+                        $this->logger->info("--Counted.");
 		}
 		$this->logger->info("Flushing Finished Elections...");
 		$this->em->flush();
