@@ -401,7 +401,7 @@ class BattleRunner {
 
 		$noblefates=array();
 		$allnobles=array();
-		$this->log(2, "fate of nobles:\n");
+		$this->log(2, "Fate of First Ones:\n");
 		foreach ($this->battle->getGroups() as $group) {
 			$noblegroup=array();
 			$my_survivors = $group->getActiveSoldiers()->filter(
