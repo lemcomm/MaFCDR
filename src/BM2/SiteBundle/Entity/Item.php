@@ -2,7 +2,7 @@
 
 namespace BM2\SiteBundle\Entity;
 
-class Place {
+class Item {
 
 # Nothing to see here, civilian. Move along.
 
