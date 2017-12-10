@@ -159,7 +159,7 @@ location:
   description:  Give your ship to someone else.
   longdesc:     Grant control of your ship to someone else, allowing that person to use it, but losing the ship for yourself.
   intro: >
-    You can give your ship to someone else, so that noble can use it, instead of you. Because once you have given your ship
+    You can give your ship to someone else, so that First One can use it, instead of you. Because once you have given your ship
     away, you can not use it yourself anymore.<br />
     Giving a ship away does not extend the time the captain will wait, it is still 30 days after you landed.
   success:      You have given control of your ship to %newowner% now.
@@ -188,7 +188,7 @@ building:
     Peasants from here an nearby settlements gather in the tavern. You can send someone to the tavern to gather rumours from
     the immediate area, learning this and that about nearby settlements.
   slumber:      The lord of %settlement% has not been seen for a long time, and is apparently slumbering.
-  nobles:       High-ranking nobles that the peasants are speaking about:
+  nobles:       Local First Ones that the peasants are speaking about:
   in:           was seen in %settlement%.
  inn:
   name:         Visit Inn
@@ -276,7 +276,7 @@ control:
   others:
    title:       Other Control attempts
    intro: >
-     The following nobles are also currently trying to take control of this settlement. Without diplomacy or battle, this will likely result in
+     The following First Ones are also currently trying to take control of this settlement. Without diplomacy or battle, this will likely result in
      a mess of conflicting claims resolving over time. If you want to take control yourself, you will almost certainly have to make them all stop,
      either by convincing them or by attacking them.<br />
      Your other alternative is supporting someone else, which will speed up their process of taking the settlement.
@@ -286,7 +286,7 @@ control:
     There are no defending forces at this settlement, making it very easy and quick to take control.
   realm:        in the name of
   submit:       take control
-  success:      You are now in the process of taking control of this settlement. The process will take an estimated %time%, though this estimate will change with the support or opposition of other nobles.
+  success:      You are now in the process of taking control of this settlement. The process will take an estimated %time%, though this estimate will change with the support or opposition of other First Ones.
  takeX:
   name:         defend against taking
   description:  Your estate is currently being claimed by others, oppose them.
@@ -308,7 +308,7 @@ control:
    same:        The settlement already belongs to this realm.
  grant:
   name:         grant control
-  description:  Hand over control over these people to another noble.
+  description:  Hand over control over these people to another First One.
   intro: >
     Settlements you control can be handed off to someone else.<br />
     Note that this does <em>not</em> make the recipient your vassal automatically. This action merely hands
@@ -378,7 +378,7 @@ control:
     do not or are not allowed to enter the settlement itself.<br />
     Quests should also contain a reward. This as well can be anything. Quests can be completed once or many times, as you wish. In
     essence, quests are entirely free-form and you determine everything, including if you will give out the promised reward or betray
-    the knight you finished your quest.<br />
+    the First One that finished your quest.<br />
     Quests are public knowledge, so other people can see all past and current quests, who has taken them up, if they think the quest
     was completed, if you agree and if they consider the reward to be received or not.
   new:          Create New Quest
@@ -444,7 +444,7 @@ military:
      Order your soldiers to attack %settlement%.<br />
      There will be a battle between your forces as well as any other attackers, against the settlement militia
      and anyone choosing to defend. If you are victorious, you have forced your way into the settlement, and actions such as taking control of the
-     settlement for yourself or attacking nobles inside will appear.<br />
+     settlement for yourself or attacking First Ones inside will appear.<br />
      <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>
    war:         war that this attack supports:
    submit:      attack!
@@ -475,7 +475,7 @@ military:
  battles:
   initiate:
    name:        initiate battle
-   description: prepare for battle with other nobles.
+   description: prepare for battle with other First Ones.
    intro: >
      Face your enemies in battle by positioning your troops so they cannot easily retreat, forcing them into an encounter.<br />
      By declaring one or more primary targets, you decide who to engage. However, everyone within reach of the battle can join
@@ -485,7 +485,7 @@ military:
      Battle preparations take time depending on the size of the involved forces, so both you and your target(s) have a short time to call
      in allies for support.<br />
      If you are inside a settlement, you can only attack others who are also inside (but you can leave to attack those outside). If you are
-     outside a settlement, you cannot attack nobles inside a settlement, you will have to attack the settlement to get inside.<br />
+     outside a settlement, you cannot attack First Ones inside a settlement, you will have to attack the settlement to get inside.<br />
      <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>
    success: >
      You are now engaging the enemy and battle prepartions are being made on both sides, estimated time until the battle will commence is %time%,
@@ -506,13 +506,13 @@ military:
    submit:        engage
  aid:
   name:          military aid
-  description:   support other nobles in future battles.
+  description:   support other First Ones in future battles.
   intro: >
-    You can choose to always support other nobles in their battles. This will make you automatically join any battles
+    You can choose to always support other First Ones in their battles. This will make you automatically join any battles
     they are involved in, if they are in your interaction range.<br />
     The most common use for this is when you see an ally involved in a battle nearby to set travel there and also this
     action, so you immediately join after arriving at the battle, even if you are not online at that time. You can also
-    use this action to defend a nearby noble, much like the <b>defend settlement</b> action.<br />
+    use this action to defend a nearby First Ones, much like the <b>defend settlement</b> action.<br />
     To protect you from unintended consequences, this action always has a time limit. You can choose one of three
     durations below. It will also always end once you have entered a battle. If your target is involved in multiple
     simultaneous battles, you will aid them in all.<br />
@@ -532,7 +532,7 @@ military:
     You cannot move while blocking. Your army will camp in the area and send patrols around. This allows you to automatically
     engage your targets at twice your normal interaction range.<br />
     Target selection uses the <a href="%listsurl%">lists system</a> in order to allow you to create sophisticated orders.
-    Slumbering nobles, however, will never be engaged. You can attack them normally, but for block area they will be ignored.<br />
+    Slumbering First Ones, however, will never be engaged. You can attack them normally, but for block area they will be ignored.<br />
     Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself 
     in battle with a vastly superior enemy if you are not careful.<br />
     Blocking area can be cancelled at any time from your actions queue.
@@ -793,9 +793,9 @@ recruit:
   delete:       retract offer
  assigned:
   name:         assigned soldiers
-  description:  Review and reclaim soldiers assigned to knights.
+  description:  Review and reclaim soldiers assigned to First Ones or settlements
   intro: >
-    Soldiers you recently assigned to knights or settlements can be reclaimed as their loyalty still lies with you.<br />
+    Soldiers you recently assigned to First Ones or settlements can be reclaimed as their loyalty still lies with you.<br />
     This option will only last for a limited time as the soldiers will form a bond with their new commander after a while,
     but it means you can be trusting with new knights, for example, because you can take your men back if they turn out
     to be cowards or traitors.<br />
