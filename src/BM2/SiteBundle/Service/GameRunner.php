@@ -319,7 +319,8 @@ class GameRunner {
 
 		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
 		$players = $query->getSingleScalarResult();
-		$want = ceil($players/8);
+		# $want = ceil($players/8);
+		$want = 0;
 		
 		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
 		
