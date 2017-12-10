@@ -1,4 +1,4 @@
-Anything happening inside a realm is considered politics in this chapter. What happens between realms is [diplomacy], the next chapter.
+Anything happening inside a realm is considered politics in this chapter. What happens between realms is [diplomacy], a later chapter.
 
 When a realm is founded, those within the realm and especially its ruler get additional options. Realms, remember, are groups of estates and characters united under a common name and (ideally) purpose.
 
@@ -19,7 +19,7 @@ Since realms can contain other realms, a nice hierarchy tree is available to mak
 
 Realm Positions
 ---------------
-The ruler can create positions within the realm, for real or for representative purposes. Some realm positions have actual power (TODO: This is not yet implemented), while others have a nice title and that's it. Positions are very useful to defining the government style of the realm.
+The ruler can create [positions] within the realm, for real or for representative purposes. Some realm positions have actual power (TODO: This is not yet implemented), while others have a nice title and that's it. Positions are very useful to defining the government style of the realm, and there are a number of options to customize them in order to automate realm management.
 
 
 Realm Laws

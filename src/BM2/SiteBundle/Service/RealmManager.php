@@ -233,6 +233,14 @@ class RealmManager {
 				return $character->getVisualSize();
 			case 'land':
 				return $character->getEstates()->count();
+			case 'horses':
+				$weight = 0;
+				foreach ($character->getActiveSoldiers() as $soldier) {
+					if ($soldier->getEquipment()->getName()=='horse' || $soldier->getEquipment()->getName()=='war horse') {
+						$weight++;
+					}
+				}
+				return $weight;
 			case 'realmland':
 				$land = 0;
 				$realms = $election->getRealm()->findAllInferiors(true);
@@ -320,8 +328,8 @@ class RealmManager {
 				);
 				$this->history->logEvent(
 					$election->getRealm(),
-					'event.realm.elected',
-					array('%link-character%'=>$winner->getId()),
+					'event.realm.elected2',
+					array('%link-character%'=>$winner->getId(), '%link-position%'=>$election->getPosition()->getId()),
 					History::MEDIUM, true
 				);
 

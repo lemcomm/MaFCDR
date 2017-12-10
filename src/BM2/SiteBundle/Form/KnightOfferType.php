@@ -11,9 +11,11 @@ use Doctrine\ORM\EntityRepository;
 class KnightOfferType extends AbstractType {
 
 	private $settlement;
+	private $welcomers;
 
-	public function __construct($settlement) {
+	public function __construct($settlement, $welcomers) {
 		$this->settlement = $settlement;
+		$this->welcomers = $welcomers;
 	}
 
 	public function getName() {
@@ -29,9 +31,21 @@ class KnightOfferType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$settlement = $this->settlement;
+		$welcomers = $this->welcomers;
 		$builder->add('givesettlement', 'checkbox', array(
 			'label' => 'recruit.offers.givesettlement',
 			'required' => false
+		));
+		$builder->add('welcomers', 'entity', array(
+			'label'=>'recruit.offers.welcomer',
+			'required'=>false,
+			'placeholder'=>'recruit.offers.nowelcomer',
+			'choices'=>$welcomers,
+			'class'=>'BM2SiteBundle:RealmPosition',
+			'choice_label'=>'name',
+			'group_by' => function($val, $key, $index) {
+				return $val->getRealm()->getName();
+			}
 		));
 		$builder->add('soldiers', 'entity', array(
 			'label'=>'recruit.offers.soldiers',
@@ -42,9 +56,9 @@ class KnightOfferType extends AbstractType {
 		}));
 		$builder->add('intro', 'textarea', array(
 			'label'=>'recruit.offers.offertext',
-			'max_length'=>240,
+			'max_length'=>500,
 			'trim'=>true,
-			'required'=>true,
+			'required'=>true
 		));
 
 	}

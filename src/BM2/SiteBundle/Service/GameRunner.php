@@ -164,14 +164,8 @@ class GameRunner {
 			}
 		}
 
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.alive=false');
-		$deadcount = count($query->getResult());
-		$this->logger->info("Removing $deadcount dead from the map...");
-		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Character c SET c.location=null WHERE c.alive=false');
-		$query->execute();
-
-		$this->logger->info("checking for dead and slumbering characters with positions...");
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.positions p WHERE c.alive = false OR c.slumbering = true');
+		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL) OR (c.alive = true and c.slumbering = true)');
 		$result = $query->getResult();
 		if (count($result) > 0) {
 			$this->logger->info("Sorting the dead from the slumbering...");
@@ -180,6 +174,7 @@ class GameRunner {
 		}
 		$dead = [];
 		$slumbered = [];
+		$deadcount = 0;
 		$slumbercount = 0;
 		$keeponslumbercount = 0;
 		$this->seen = new ArrayCollection;
@@ -197,26 +192,46 @@ class GameRunner {
 			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
-			$this->logger->info($character->getName()." is dead, heir: ".($heir?$heir->getName():"(nobody)"));
+			$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
+			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+			$this->logger->info("Dead; removed from the map.");
+			$captor = $character->getPrisonerOf();
+			if ($captor) {
+				$this->logger->info("Captive. The dead are captive no more.");
+				$character->setPrisonerOf(null);
+				$captor->removePrisoner($character);
+			}
+			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
 			if ($character->getPositions()) {
+				$this->logger->info("Positions detected");
 				foreach ($character->getPositions() as $position) {
 					if ($position->getRuler()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
+							$this->logger->info("No one inherits ".$position->getRealm()->getName());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
 						}
+						$this->logger->info("Removing them from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if ($position->getInherit()) {
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
 						} else {
+							$this->logger->info("No one inherits ".$position->getName());
 							$this->cm->failInheritPosition($character, $position, 'death');
 						}
+						$this->logger->info("Removing them from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else {
+						$this->logger->info("No inheritance. Removing them from ".$position->getName());
 						$this->history->logEvent(
 							$position->getRealm(), 
 							'event.position.death',
@@ -225,35 +240,55 @@ class GameRunner {
 						);
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					}
 				}
 			}
+			if ($character->getEstates()) {
+				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+			}
 		}
-		foreach ($slumbered as $character) {			
-			$this->logger->info($character->getName()." is inactive, heir: ".($heir?$heir->getName():"(nobody)"));
+		foreach ($slumbered as $character) {		
+			$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
+			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
 			if ($character->getPositions()) {			
 				foreach ($character->getPositions() as $position) {
 					if ($position->getRuler()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
 							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
+							$this->logger->info("No one inherits ".$position->getRealm()->getName());
 							$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
 						}
+						$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
 						if ($heir) {
+							$this->logger->info($heir->getName()." inherits ".$position->getName());
 							$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 						} else {
+							$this->logger->info("No one inherits ".$position->getName());
 							$this->cm->failInheritPosition($character, $position, 'slumber');
 						}
+						$this->logger->info("Removing ".$character->getName());
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else if (!$position->getKeepOnSlumber()) {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
+						$this->logger->info("Removing ".$character->getName());
 						$this->cm->failInheritPosition($character, $position, 'slumber');
 						$position->removeHolder($character);
 						$character->removePosition($position);
+						$this->logger->info("Removed.");
 					} else {
+						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler position.");
+						$this->logger->info($position->getName()." is set to keep on slumber.");
 						$this->history->logEvent(
 							$position->getRealm(),
 							'event.position.inactivekept',
@@ -264,9 +299,13 @@ class GameRunner {
 					}
 				}
 			}
+			if ($character->getEstates()) {
+				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+			}
 		}
-		$this->logger->info("$keeponslumbercount positions kept on slumber!");
-
+		if ($keeponslumbercount > 0) {
+			$this->logger->info("$keeponslumbercount positions kept on slumber!");
+		}
 		$this->appstate->setGlobal('cycle.characters', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -793,32 +832,45 @@ class GameRunner {
 		$this->logger->info("Processing Finished Elections...");
 		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
-		$seenelections = [];
+		$seenpositions = [];
+	    
 		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections, 
 		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old. 
 		Mind you, this will only drop holders if the election has $routine = true set. 
 		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
+	    
 		foreach ($query->getResult() as $election) {
-			# dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
-			$seenelections[] = $election->getId();
-			if(!in_array($election->getId(), $seenelections)) {
-				$this->rm->dropIncumbents($election);
+			$this->logger->info("-Reviewing election ".$election->getId());
+			
+			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
+			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
+			Which you can see if you go look at the method in the realm manager. */
+			
+			if($election->getPosition()) {
+				$this->logger->info("--Position detected");
+				if(!in_array($election->getPosition()->getId(), $seenpositions)) {
+					$this->rm->dropIncumbents($election);
+					$seenpositions[] = $election->getPosition()->getId();
+                                        $this->logger->info("---Dropped and tracked");
+				} else {
+                                        $this->logger->info("---Already saw it");
+				}
 			}
-		}
-		foreach ($query->getResult() as $election) {
 			$this->rm->countElection($election);
+                        $this->logger->info("--Counted.");
 		}
+		$this->logger->info("Flushing Finished Elections...");
 		$this->em->flush();
-		
-		$timeout = new \DateTime("now");
-		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
 
 		/* The bulk of the following code does the following:
 			1. Ensure all active realms have a ruler.
 			2. Ensure all vacant AND elected positions have a holder.
 			3. Ensure all positions that should have more than one holder do.
 		These things will only happen if there is not already an election running for a given position though. */
+	    
 		$this->logger->info("Checking realm rulers, vacant electeds, and minholders...");
+		$timeout = new \DateTime("now");
+		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p');
 		$query->setParameter('timeout', $timeout);
 		$result = $query->getResult();
@@ -891,28 +943,31 @@ class GameRunner {
 
 		$this->logger->info("Checking for routine elections...");
 		$cycle = $this->appstate->getCycle();
-		$query = $this->em->createQuery("SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND p.cycle <= :cycle AND h.id IS NOT NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p");
+		$query = $this->em->createQuery("SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.elected = true AND (p.retired = false OR p.retired IS NULL) AND p.cycle <= :cycle AND p.cycle IS NOT NULL AND h.id IS NOT NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false OR x.complete > :timeout) GROUP BY p");
 		$query->setParameter('timeout', $timeout);
 		$query->setParameter('cycle', $cycle);
 		foreach ($query->getResult() as $position) {
-			if ($position->getCycle() == $cycle && !$position->getRetired()) {
-				switch ($position->getTerm()) {
-					case '30':
-						$position->setCycle($cycle+120);
-						break;
-					case '90':
-						$position->setCycle($cycle+360);
-						break;
-					case '365':
-						$position->setCycle($cycle+1440);
-						break;
-					case '0':
-					default:
-						$position->setYear(null);
-						$position->setWeek(null);
-						$position->setCycle(null);
-						break;
-				}
+			$this->logger->info("Updating ".$position->getName()." cycle count.");
+			switch ($position->getTerm()) {
+				case '30':
+					$this->logger->info("Term 30 set, updating $cycle by 120.");
+					$position->setCycle($cycle+120);
+					break;
+				case '90':
+					$this->logger->info("Term 90 set, updating $cycle by 360.");
+					$position->setCycle($cycle+360);
+					break;
+				case '365':
+					$this->logger->info("Term 365 set, updating $cycle by 1440.");
+					$position->setCycle($cycle+1440);
+					break;
+				case '0':
+				default:
+					$this->logger->info("Term 0 set, updating cycle, year, and week to NULL.");
+					$position->setYear(null);
+					$position->setWeek(null);
+					$position->setCycle(null);
+					break;
 			}
 			$members = $position->getRealm()->findMembers();
 			$this->logger->notice("Calling election for ".$position->getName()." for realm ".$position->getRealm()->getName());

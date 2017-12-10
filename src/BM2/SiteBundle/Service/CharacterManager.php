@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\User;
 use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -143,7 +144,6 @@ class CharacterManager {
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// remove from map
-		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 		// remove from hierarchy
 		$character->setLiege(null);
 
@@ -259,10 +259,6 @@ class CharacterManager {
 		}
 
 		// dead men are free - TODO: but a notice to the captor would be in order - unless he is the killer (no need for redundancy)
-		if ($captor = $character->getPrisonerOf()) {
-			$character->setPrisonerOf(null);
-			$captor->removePrisoner($character);
-		}
 
 		foreach ($character->getVassals() as $vassal) {
 			if ($vassal->getEstates() || $vassal->getPositions()) {
@@ -304,7 +300,7 @@ class CharacterManager {
 		// inheritance
 		if ($forcekiller) {
 			$heir = null;
-            $via = null;
+          		$via = null;
 		} else {
 			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
@@ -335,26 +331,6 @@ class CharacterManager {
 				$this->failInheritRealm($character, $realm);
 			}
 		}
-
-		// TODO: inherit inheritable positions
-		foreach ($character->getPositions() as $position) {
-			if ($position->getRuler()) {
-				if ($heir) {
-					$this->inheritRealm($position->getRealm(), $heir, $character, $via);
-				} else {
-					$this->failInheritRealm($character, $position->getRealm());
-				}
-			} else {
-				$position->removeHolder($character);
-				$character->removePosition($position);
-				$this->history->logEvent(
-					$position->getRealm(), 'event.position.death',
-					array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
-					History::LOW, true
-				);
-			}
-		}
-
 
 		// close all logs except my personal one
 		foreach ($character->getReadableLogs() as $log) {
@@ -557,18 +533,18 @@ class CharacterManager {
 		}
 	}
 	
-	private function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
+	public function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
 		if ($why == 'death') {
 			$this->history->logEvent(
 				$position->getRealm(), 
-				'event.position.inactive',
+				'event.position.death',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);
 		} else if ($why == 'slumber') {
 			$this->history->logEvent(
 				$position->getRealm(), 
-				'event.position.death',
+				'event.position.inactive',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);

@@ -1166,6 +1166,9 @@ class Dispatcher {
 		if ($place->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
 		}
+		if (!$place->getRealm()) {
+			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
+		}
 
 		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$place->getID()));
 	}
