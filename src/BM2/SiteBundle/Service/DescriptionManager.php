@@ -25,6 +25,13 @@ class DescriptionManager {
 		$this->history = $history;
 	}
 	
+	#TODO: Move this getClassName method, and similar get_class_name methods, into a single HelperService file.
+	private function getClassName($entity) {
+		$classname = get_class($entity);
+		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+		return $pos;
+	}
+	
 	public function newDescription($entity, $text, Character $character=null) {
 		// First, check to see if there's already one.
 		$olddesc = $this->findDescription($entity)
@@ -39,7 +46,7 @@ class DescriptionManager {
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
-		switch(get_class($entity)) {
+		switch(getClassName($entity)) {
 			case 'Artifact':
 				$this->history->logEvent(
 					$entity,
@@ -80,7 +87,7 @@ class DescriptionManager {
 		if ($entity->getDescription()) {
 			return $entity->getDescription();
 		}
-		switch(get_class($entity)) {
+		switch(getClassName($entity)) {
 			case 'Artifact':
 				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by ts desc");
 				break;
