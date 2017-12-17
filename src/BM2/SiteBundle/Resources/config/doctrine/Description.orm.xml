@@ -6,6 +6,9 @@
 		</id>
 		
 		<many-to-one field="artifact" target-entity="Artifact" inversed-by="descriptions"/>
+		<!-- Someday, we'll add this, probably.
+		<many-to-one field="item" target-entity="Item" inversed-by="descriptions"/>
+		-->
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="descriptions"/>
 		<many-to-one field="place" target-entity="Place" inversed-b=y"descriptions"/>
 		
