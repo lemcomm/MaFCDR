@@ -332,6 +332,16 @@ class Geography {
 		return $query->getSingleScalarResult();
 	}
 
+	public function calculateDistanceToPlace(Character $a, Place $b) {
+		if ($b->getLocation()) {
+			$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Place b WHERE a=:a and b=:b');
+			$query->setParameters(array('a'=>$a, 'b'=>$b));
+			return $query->getSingleScalarResult();
+		} else {
+			return $this->calculateDistanceToSettlement($a, $b->getSettlement());
+		}
+	}
+	
 	public function calculateDistanceToCharacter(Character $a, Character $b) {
 		$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Character b WHERE a=:a and b=:b');
 		$query->setParameters(array('a'=>$a, 'b'=>$b));
