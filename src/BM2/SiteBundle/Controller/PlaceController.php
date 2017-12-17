@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class PlaceController extends Controller {
 
-
-	private $slice_size = 500;
-
 	/**
 	  * @Route("/{id}", name="bm2_place", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:Place:place.html.twig")
@@ -31,22 +28,72 @@ class PlaceController extends Controller {
 		$place = $id; // we use $id because it's hardcoded in the linkhelper
 
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		
 		if ($character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
 		}
+		
 		$details = $this->get('interactions')->characterViewPlace($character, $place);
-
+		
+		if ($details['spy'] || $place->getOwner() == $character) {
+			$militia = $place->getActiveMilitiaByType();
+		} else {
+			$militia = null;
+		}
+		
 		return array(
 			'place' => $place,
 			'details' => $details,
+			'militia' => $militia,
 			'heralds' => $heralds
 		);
 	}
 
-
 	/**
-	  * @Route("/{id}/enter", requirements={"id"="\d+", "start"="\d+"}, defaults={"start"=0})
+	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
 	  * @Template
 	  */
+	public function permissionsAction($id, Request $request) {
+		$character = $this->get('dispatcher')->gateway();
+		$em = $this->getDoctrine()->getManager();
+		$place = $em->getRepository('BM2SiteBundle:Place')->find($id);
+			throw $this->createNotFoundException('error.notfound.place');
+		}
+		if ($place->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.place');
+		}
+
+		$original_permissions = clone $place->getPermissions();
+
+		$form = $this->createForm(new PlacePermissionsSetType($character, $this->getDoctrine()->getManager()), $place);
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+
+			foreach ($place->getPermissions() as $permission) {
+				$permission->setValueRemaining($permission->getValue());
+				if (!$permission->getId()) {
+					$em->persist($permission);
+				}
+			}
+			foreach ($original_permissions as $orig) {
+				if (!$place->getPermissions()->contains($orig)) {
+					$em->remove($orig);
+				}
+			}
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.permissions.success', array(), 'actions'));
+			return $this->redirect($request->getUri());
+		}
+
+		return array(
+			'place' => $place,
+			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('place'),
+			'form' => $form->createView()
+		);
+	}	
+
+}
