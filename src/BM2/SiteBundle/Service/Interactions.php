@@ -154,9 +154,11 @@ class Interactions {
 		return true;
 	}
 
-	private function get_class_name($classname) {
-	    if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
-	    return $pos;
+	#TODO: Move this getClassName method, and it's siblings in other files, into a single HelperService file.
+	private function getClassName($entity) {
+		$classname = get_class($entity);
+		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+		return $pos;
 	}
 
 	// no type-hinting because target can be either a settlement or a character
@@ -170,7 +172,7 @@ class Interactions {
 			return $details;
 		}
 		// FIXME: This does NOT take watchtowers into account - I should probably create a checkSpotted() method or something
-		switch ($this->get_class_name(get_class($target))) {
+		switch ($this->getClassName($target))) {
 			case 'Settlement':
 				$distance = $this->geo->calculateDistanceToSettlement($character, $target);
 				$spot = $this->geo->calculateSpottingDistance($character);
