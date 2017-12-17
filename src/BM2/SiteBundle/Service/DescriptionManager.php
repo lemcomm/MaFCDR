@@ -25,7 +25,7 @@ class DescriptionManager {
 		$this->history = $history;
 	}
 	
-	#TODO: Move this getClassName method, and similar get_class_name methods, into a single HelperService file.
+	#TODO: Move this getClassName method, and similar methods, into a single HelperService file.
 	private function getClassName($entity) {
 		$classname = get_class($entity);
 		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
