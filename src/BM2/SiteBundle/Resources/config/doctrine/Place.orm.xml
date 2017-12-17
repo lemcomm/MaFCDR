@@ -16,6 +16,7 @@
 		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="place" index-by="id" fetch="EXTRA_LAZY"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
+		<one-to-many field="permissions" target-entity="PlacePermission" mapped-by="place" fetch="EXTRA_LAZY"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
 
 	</entity>
