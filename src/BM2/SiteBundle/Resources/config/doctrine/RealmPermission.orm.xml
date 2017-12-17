@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\RealmPermission">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="value" type="integer" nullable="true"/>
+		<field name="value_remaining" type="integer" nullable="true"/>
+		<field name="reserve" type="integer" nullable="true"/>
+
+		<many-to-one field="permission" target-entity="Permission"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="permissions"/>
+		<many-to-one field="listing" target-entity="Listing"/>
+	</entity>
+</doctrine-mapping>
