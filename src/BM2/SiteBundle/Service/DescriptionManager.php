@@ -39,7 +39,7 @@ class DescriptionManager {
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
-		switch(get_class($entity)) {
+		switch(get_class_name(get_class($entity))) {
 			case 'Artifact':
 				$this->history->logEvent(
 					$entity,
