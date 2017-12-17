@@ -125,9 +125,15 @@ class Military {
 		}
 	}
 
+	#TODO: Move this getClassName method, and it's siblings in other files, into a single HelperService file.
+	private function getClassName($entity) {
+		$classname = get_class($entity);
+		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+		return $pos;
+	}
 
 	public function findAvailableEquipment($entity, $with_trainers) {
-		switch(get_class_name(get_class($entity))) {
+		switch($this->getClassName($entity))) {
 			case 'Settlement':
 				if ($with_trainers) {
 					$query = $this->em->createQuery('SELECT e as item, ba.resupply FROM BM2SiteBundle:EquipmentType e LEFT JOIN e.provider p LEFT JOIN p.buildings ba LEFT JOIN ba.settlement sa LEFT JOIN e.trainer t LEFT JOIN t.buildings bb LEFT JOIN bb.settlement sb WHERE sa = :location AND ba.active = true AND sb = :location AND bb.active = true ORDER BY t.name ASC, e.name ASC');
