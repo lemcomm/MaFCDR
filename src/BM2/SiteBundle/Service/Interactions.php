@@ -197,6 +197,17 @@ class Interactions {
 					}
 				}
 				break;
+			case 'Place':
+				$distance = $this->geo->calculateDistanceToPlace($character, $target);
+				$spot = $this->geo->calculateSpottingDistance($character);
+				$action = $this->geo->calculateActionDistance($target);
+				if ($distance < $spot+$action) {
+					$details['spot'] = true;
+					if ($distance < max($spot, $action)) {
+						$details['spotmore'] = true;
+					}
+				}
+				break;
 		}
 		$number = $character->getAvailableEntourageOfType('Merchant')->count();
 		if ($number>0) $details['merchant']=true;
