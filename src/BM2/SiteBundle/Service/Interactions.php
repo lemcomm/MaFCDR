@@ -202,7 +202,11 @@ class Interactions {
 			case 'Place':
 				$distance = $this->geo->calculateDistanceToPlace($character, $target);
 				$spot = $this->geo->calculateSpottingDistance($character);
-				$action = $this->geo->calculateActionDistance($target);
+				if ($target->getSettlement()) {
+					$action = $this->geo->calculateActionDistance($target->getSettlement());
+				} else {
+					$action = 0;
+				}
 				if ($distance < $spot+$action) {
 					$details['spot'] = true;
 					if ($distance < max($spot, $action)) {
