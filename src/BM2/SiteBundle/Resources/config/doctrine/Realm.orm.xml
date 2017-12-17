@@ -29,6 +29,7 @@
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="realm" fetch="EXTRA_LAZY"/>
 
+		<one-to-many field="permissions" target-entity="RealmPermission" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="laws" target-entity="RealmLaw" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="positions" target-entity="RealmPosition" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="elections" target-entity="Election" mapped-by="realm"/>
