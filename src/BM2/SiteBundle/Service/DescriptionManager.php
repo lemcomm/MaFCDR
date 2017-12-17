@@ -39,7 +39,7 @@ class DescriptionManager {
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
-		switch(get_class_name(get_class($entity))) {
+		switch(get_class($entity)) {
 			case 'Artifact':
 				$this->history->logEvent(
 					$entity,
@@ -80,7 +80,7 @@ class DescriptionManager {
 		if ($entity->getDescription()) {
 			return $entity->getDescription();
 		}
-		switch(get_class_name(get_class($entity))) {
+		switch(get_class($entity)) {
 			case 'Artifact':
 				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by ts desc");
 				break;
