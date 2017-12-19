@@ -55,7 +55,7 @@ class PlaceController extends Controller {
 	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
 	  * @Template
 	  */
-	public function permissionsAction($id, Request $request) {
+	public function permissionsAction(Place $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
 		$em = $this->getDoctrine()->getManager();
 		$place = $em->getRepository('BM2SiteBundle:Place')->find($id);
@@ -88,12 +88,52 @@ class PlaceController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('control.permissions.success', array(), 'actions'));
 			return $this->redirect($request->getUri());
 		}
-
+	
 		return array(
 			'place' => $place,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('place'),
 			'form' => $form->createView()
 		);
-	}	
+	}
+
+	/**
+	  * @Route("/{id}/manage", requirements={"id"="\d+"})
+	  * @Template
+	  */
+	public function manageAction(Place $place, Request $request) {
+		$character = $this->gateway($place, 'hierarchyManagePlaceTest');
+
+		$form = $this->createForm(new PlaceManageType(), $place);
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$fail = $this->checkPlaceNames($form, $data->getName(), $data->getFormalName(), $place);
+			if (!$fail) {
+				$this->get('description_manager')->newDescription($place, $data->getDescription(), $character);
+				$this->getDoctrine()->getManager()->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('place.manage.success', array(), 'politics'));
+			}
+		}
+		return array('place'=>$place, 'form'=>$form->createView());
+	}
+
+	#TODO: Combine this and checkRealmNames into a single thing in a HelperService.
+	private function checkPlaceNames($form, $name, $formalname, $me=null) {
+		$fail = false;
+		$em = $this->getDoctrine()->getManager();
+		$allplaces = $em->getRepository('BM2SiteBundle:Place')->findAll();
+		foreach ($allplaces as $other) {
+			if ($other == $me) continue;
+			if (levenshtein($name, $other->getName()) < min(3, min(strlen($name), strlen($other->getName()))*0.75)) {
+				$form->addError(new FormError($this->get('translator')->trans("place.new.toosimilar.name"), null, array('%other%'=>$other->getName())));
+				$fail=true;
+			}
+			if (levenshtein($formalname, $other->getFormalName()) <  min(5, min(strlen($formalname), strlen($other->getFormalName()))*0.75)) {
+				$form->addError(new FormError($this->get('translator')->trans("place.new.toosimilar.formalname"), null, array('%other%'=>$other->getFormalName())));
+				$fail=true;
+			}
+		}
+		return $fail;
+	}
 
 }
