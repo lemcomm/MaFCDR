@@ -3,6 +3,6 @@
 namespace BM2\SiteBundle\Entity;
 
 
-class CharacterSetting {
+class CharacterSettings {
 
 }
