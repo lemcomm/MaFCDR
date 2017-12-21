@@ -299,17 +299,23 @@ class MessageManager {
 		// now increment the unread counter for everyone except the author
 		foreach ($conversation->getMetadata() as $reader) {
 			if ($reader->getUser() != $author) {
-				// We check for AppReference in order to see if this conversation is a realm conversation
 				if ($conversation->getAppReference()) {
-					// If it is a realm converation, we check for individual character settings for each character.
-					foreach ($reader->getUser()->getAppUser()->getSettings() as $setting) {
-						// Then we check to see if AutoReadRealms is false or null. If it is, increment unread counter.
-						if (!$setting->getAutoReadRealms()) {
-							$reader->setUnread($reader->getUnread()+1);
+					// We check for AppReference in order to see if this conversation is a realm conversation
+					if ($reader->getUser()->getAppUser()->getSettings()) {
+						// If it is, we check for individual character settings for each character.
+						foreach ($reader->getUser()->getAppUser()->getSettings() as $setting) {
+							// When this was added, there was just 1 setting, but the plan is to expand as needed, so we need to find a specific one.
+							if (!$setting->getAutoReadRealms()) {
+								// Then we check to see if AutoReadRealms is false or null. If it is, increment unread counter.
+								$reader->setUnread($reader->getUnread()+1);
+							}
 						}
+					} else {
+						// No settings? +1 unread.
+						$reader->setUnread($reader->getUnread()+1);
 					}
 				} else {
-					// Of course, if it's not a realm conversation, we just incrememnt the counter.
+					// Of course, if it's not a realm conversation, we just increment the counter.
 					$reader->setUnread($reader->getUnread()+1);
 				}
 			}
@@ -317,7 +323,7 @@ class MessageManager {
 
 		return $msg;
 	}
-		
+	
 	public function writeReply(Message $source, User $author, $content) {
 		$msg = $this->writeMessage($source->getConversation(), $author, $content, $source->getDepth()+1);
 
