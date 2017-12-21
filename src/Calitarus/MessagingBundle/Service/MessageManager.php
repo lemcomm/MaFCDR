@@ -299,13 +299,21 @@ class MessageManager {
 		// now increment the unread counter for everyone except the author
 		foreach ($conversation->getMetadata() as $reader) {
 			if ($reader->getUser() != $author) {
-				$reader->setUnread($reader->getUnread()+1);
+				if ($conversation->getAppReference()) {
+					foreach ($reader->getUser()->getAppUser()->getSettings() as $setting) {
+						if (!$setting->getAutoReadRealms()) {
+							$reader->setUnread($reader->getUnread()+1);
+						}
+					}
+				} else {
+					$reader->setUnread($reader->getUnread()+1);
+				}
 			}
 		}
 
 		return $msg;
 	}
-
+		
 	public function writeReply(Message $source, User $author, $content) {
 		$msg = $this->writeMessage($source->getConversation(), $author, $content, $source->getDepth()+1);
 
