@@ -7,7 +7,6 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
-use BM2\SiteBundle\Entity\CharacterSettings;
 
 use BM2\SiteBundle\Form\CharacterBackgroundType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
@@ -757,20 +756,20 @@ class CharacterController extends Controller {
      */
 	public function settingsAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
-		
-		if (!$character->getSettings()) {
-			$settings = new CharacterSettings;
-			$character->setSettings($settings);
-			$settings->setCharacter($character);
-			$em->persist($settings);
-		}
-		$form = $this->createForm(new CharacterSettingsType(), $character->getSettings());
+		$em = $this->getDoctrine()->getManager();
+
+		$form = $this->createForm(new CharacterSettingsType(), $character);
 		$form->handleRequest($request);
+
 		if ($form->isValid()) {
-			$em = $this->getDoctrine()->getManager();
+			$data = $form->getData();
+#			$character->setAutoReadRealms($data->getAutoReadRealms());
 			$em->flush();
 			
-			return array('result'=>array('success'=>true));
+
+			$this->addFlash('notice', $this->get('translator')->trans('update.success', array(), 'settings'));
+
+			return $this->redirectToRoute('bm2_recent');
 		}
 			
 		return array('form'=>$form->createView());
