@@ -5,16 +5,15 @@ namespace BM2\SiteBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\EntityRepository;
 
+use BM2\SiteBundle\Entity\CharacterSettings;
 
-class RealmPositionType extends AbstractType {
+class CharacterSettingsType extends AbstractType {
 
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'charactersettings_671',
 			'translation_domain' => 'settings',
-			'data_class'			=> 'BM2\SiteBundle\Entity\CharacterSettings',
 		));
 	}
 
