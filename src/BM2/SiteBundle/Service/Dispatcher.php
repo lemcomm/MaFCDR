@@ -449,7 +449,6 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			$actions[] = $this->metaKillTest();
 		} else {
-			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
 			$actions[] = $this->metaRenameTest();
 			$actions[] = $this->metaKillTest();
@@ -1506,13 +1505,6 @@ class Dispatcher {
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
 		}
 		return array("name"=>"meta.rename.name", "url"=>"bm2_site_character_rename", "description"=>"meta.rename.description");
-	}
-	
-	public function metaSettingsTest() {
-		if ($this->getCharacter()->isNPC()) {
-			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
-		}
-		return array("name"=>"meta.settings.name", "url"=>"bm2_site_character_settings", "description"=>"meta.settings.description");
 	}
 	
 	public function metaKillTest() {
