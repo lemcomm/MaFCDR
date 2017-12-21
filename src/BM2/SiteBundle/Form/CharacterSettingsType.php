@@ -14,7 +14,7 @@ class RealmPositionType extends AbstractType {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'charactersettings_671',
 			'translation_domain' => 'settings',
-			'data_class'			=> 'BM2\SiteBundle\Entity\CharacterSetting',
+			'data_class'			=> 'BM2\SiteBundle\Entity\CharacterSettings',
 		));
 	}
 
@@ -27,7 +27,7 @@ class RealmPositionType extends AbstractType {
 	}
 
 	public function getName() {
-		return 'charactersetting';
+		return 'charactersettings';
 	}
 			
 }
