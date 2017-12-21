@@ -1,0 +1,11 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'char.title'|trans({},"settings")|title }}</h2>
+	<p>{{ 'char.title.description'|trans({},"settings")|raw }}</p>
+	
+<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_manage', {'realm':realm.id}) }}" method="post" {{ form_start(form) }}
+	{{ form_widget(form) }}
+</form>
+
+{% endblock %}
