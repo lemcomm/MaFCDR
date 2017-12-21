@@ -1,0 +1,12 @@
+# Might & Fealty
+# Text translation strings for system settings (not in-character stuff)
+# Author: Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
+
+buttons:
+ submit: Submit
+ 
+character:
+ description: Using this menu you can choose to enable or disable different character level settings aimed at making your gameplay more enjoyable. One example of this is the ability to automatically set new realm messages as read for your character.
+ auto:
+  readrealms: Automatically mark realm messages as read?
