@@ -301,17 +301,8 @@ class MessageManager {
 			if ($reader->getUser() != $author) {
 				if ($conversation->getAppReference()) {
 					// We check for AppReference in order to see if this conversation is a realm conversation
-					if ($reader->getUser()->getAppUser()->getSettings()) {
-						// If it is, we check for individual character settings for each character.
-						foreach ($reader->getUser()->getAppUser()->getSettings() as $setting) {
-							// When this was added, there was just 1 setting, but the plan is to expand as needed, so we need to find a specific one.
-							if (!$setting->getAutoReadRealms()) {
-								// Then we check to see if AutoReadRealms is false or null. If it is, increment unread counter.
-								$reader->setUnread($reader->getUnread()+1);
-							}
-						}
-					} else {
-						// No settings? +1 unread.
+					if (!$reader->getUser()->getAppUser()->getAutoReadRealms()) {
+						// If it is, we check each user to see if they care about realm messages. If they don't, +1 unread.
 						$reader->setUnread($reader->getUnread()+1);
 					}
 				} else {
