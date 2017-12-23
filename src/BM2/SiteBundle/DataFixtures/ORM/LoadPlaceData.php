@@ -11,20 +11,20 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
-		'academy'	=> array('requires' => 'lord'),
-		'arena'		=> array('requires' => 'lord'),
-		'capital'	=> array('requires' => 'ruler'),
-		'castle'	=> array('requires' => 'lord'),
-		'cave',
-		'fort'		=> array('requires' => 'fort'),
-		'home'		=> array('requires' => 'dynasty head'),
-		'inn',
-		'library',
-		'monument',
-		'plaza'		=> array('requires' => 'lord'),
-		'portal' 	=> array('requires' => 'magic'),
-		'passage'	=> array('requires' => 'warren'),
-		'tavern'
+		'academy'	=> array('requires' => 'lord', 'visible' => false),
+		'arena'		=> array('requires' => 'lord', 'visible' => true),
+		'capital'	=> array('requires' => 'ruler', 'visible' => true),
+		'castle'	=> array('requires' => 'lord', 'visible' => true),
+		'cave'		=> array('visible' => false),
+		'fort'		=> array('requires' => 'fort', 'visible' => true),
+		'home'		=> array('requires' => 'dynasty head', 'visible' => false),
+		'inn'		=> array('visible' => true),
+		'library'	=> array('visible' => false),
+		'monument'	=> array('visible' => true),
+		'plaza'		=> array('requires' => 'lord', 'visible' => true),
+		'portal' 	=> array('requires' => 'magic', 'visible' => false),
+		'passage'	=> array('requires' => 'warren', 'visible' => false),
+		'tavern'	=> array('visible' => false)
 	);
 	
 	/**
@@ -48,6 +48,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 			if ($data['requires']) {
 				$type->setRequires($data['requires']);
 			}
+			$type->setVisible(data['visible']);
 			$manager->persist($type);
 		}
 		$manager->flush();
