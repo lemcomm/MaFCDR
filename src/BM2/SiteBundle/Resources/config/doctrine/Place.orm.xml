@@ -6,6 +6,7 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
+		<field name="visible" type="boolean"/>
 		<many-to-one field="type" target-entity="PlaceType"/>
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
