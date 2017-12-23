@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityRepository;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Place;
 
-class SettlementPermissionsType extends AbstractType {
+class PlacePermissionsType extends AbstractType {
 
 	private $place;
 	private $me;
