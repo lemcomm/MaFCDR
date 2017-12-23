@@ -196,11 +196,56 @@ class ActionsController extends Controller {
 		$this->getDoctrine()->getManager()->flush();
 		return array('settlement'=>$settlement, 'result'=>$result);
 	}
+	
+	/**
+	  * @Route("/places")
+	  * @Template
+	  */
+	public function placesAction() {
+		$this->get('dispatcher')->gateway();
+		
+		return array();
+	}
+	
+	/**
+	  * @Route("/place/{id}")
+	  * @Template
+	  */
+	public function enterPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
 
-   /**
-     * @Route("/embark")
-     * @Template
-     */
+		$result = null;
+		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
+			$result = 'entered';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/place/exit")
+	  * @Template
+	  */
+	public function exitPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+
+		$result = null;
+		if ($this->get('interactions')->characterLeavePlace($character)) {
+			$result = 'left';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+	   /**
+	     * @Route("/embark")
+	     * @Template
+	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
 
