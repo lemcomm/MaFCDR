@@ -20,7 +20,9 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 			'mobilize'	=> array('use_value'=>true, 'use_reserve'=>true),
 			'construct'	=> array('use_value'=>false, 'use_reserve'=>true),
 			'recruit'	=> array('use_value'=>true, 'use_reserve'=>false),
-			'trade'    	=> array('use_value'=>false, 'use_reserve'=>false)
+			'trade'    	=> array('use_value'=>false, 'use_reserve'=>false),
+			'placeinside'	=> array('use_value'=>false, 'use_reserve'=>false),
+			'placeoutside'	=> array('use_value'=>false, 'use_reserve'=>false)
 		),
 		'realm' => array(
 			'expel'   	=> array('use_value'=>false, 'use_reserve'=>false),
@@ -31,6 +33,7 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 			'wars'		=> array('use_value'=>false, 'use_reserve'=>false)
 		),
 		'place' => array(
+			'see'		=> array('use_value'=>false, 'use_reserve'=>false),
 			'visit'		=> array('use_value'=>false, 'user_reserve'=>false),
 			'docks'		=> array('use_value'=>false, 'user_reserve'=>false),
 			'describe'	=> array('use_value'=>false, 'user_reserve'=>false),
