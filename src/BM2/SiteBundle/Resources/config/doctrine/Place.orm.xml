@@ -6,11 +6,12 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
-		<field name="visible" type="boolean"/>
+		<field name="visible" type="boolean" nullable="true"/>
+		<field name="allow_spawn" type="boolean" nullable="true"/>
 		<many-to-one field="type" target-entity="PlaceType"/>
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
-		<field name="location" type="point" nullable="true"/>
+		<field name="location" type="point" nullable="true" nullable="true"/>
 		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="places"/>
 		<field name="short_description" type="text" nullable="true"/>
 		<one-to-one field="description" target-entity="Description"/>
