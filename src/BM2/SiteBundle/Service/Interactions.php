@@ -161,7 +161,7 @@ class Interactions {
 		return $pos;
 	}
 
-	// no type-hinting because target can be either a settlement or a character
+	// no type-hinting because target can be either a settlement, character, or place
 	public function characterViewDetails(Character $character=null, $target=null) {
 		$details=array('spot'=>false, 'spotmore'=>false, 'merchant'=>false, 'prospector'=>false, 'spy'=>false);
 		if (!$character) return $details;
@@ -228,5 +228,145 @@ class Interactions {
 
 		return $details;
 	}
+	
+	public function characterEnterPlace(Character $character, Place $place, $force = false) {
+		if ($character->getInsidePlace() == $place) {
+			return true; // we are already inside
+		}
+		
+		if (!$this->permission_manager->checkSettlementPermission($place, $character, 'visit')) {
+				return false;
+		}
 
+		/* Leaving this here for when we make Places defensible.
+		if (!$force) {
+			// check if we are allowed inside - but only for fortified settlements
+			if ($settlement->isFortified() && !$this->permission_manager->checkSettlementPermission($settlement, $character, 'visit')) {
+				return false;
+			}
+
+			// if we are currently engaged in battle, we can't enter
+			if ($character->isInBattle()) {
+				return false;
+			}
+		}
+		*/
+
+		// TODO: check if settlement in action range
+		$character->setInsidePlace($place);
+		$place->addCharactersPresent($character);
+
+		// If the Place is in a Settlement, set us in it, otherwise, set us to the place's location.
+		if ($place->getSettlement()) {
+			$center_radius = $this->geo->calculateActionDistance($settlement) / 2;
+			$passable = false;
+			$loc = $character->getLocation();
+			while (!$passable) {
+				// random polar coordinates within this circle:
+				$theta = rand(0,359);
+				$r = rand(0,$center_radius);
+				// convert to cartesian
+				$x = $r * cos($theta);
+				$y = $r * sin($theta);
+
+				// place character
+				$center = $settlement->getGeoData()->getCenter();
+				$loc = new Point($center->getX() + $x, $center->getY() + $y);
+				// make sure this doesn't put us into the ocean in coastal settlements!
+				$query = $this->em->createQuery('SELECT g.passable FROM BM2SiteBundle:GeoData g WHERE ST_Contains(g.poly, ST_Point(:x,:y))=true')->setParameters(array('x'=>$loc->getX(), 'y'=>$loc->getY()));
+				$passable = $query->getSingleScalarResult();
+			}
+		} else {
+			$loc = $place->getLocation();
+		}
+		$character->setLocation($loc);
+		$character->setTravel(null)->setProgress(null)->setSpeed(null);
+
+		// open history log
+		if ($place->getOwner() != $character) {
+			$this->history->visitLog($place, $character);
+		}
+
+		/* Leaving this here for when we make places defensible.
+		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
+		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
+		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
+			$this->history->logEvent(
+				$settlement,
+				$force?'event.settlement.forceentered2':'event.settlement.entered2',
+				array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
+				History::LOW, true, 10
+			);
+		} else {
+			$this->history->logEvent(
+				$settlement,
+				$force?'event.settlement.forceentered':'event.settlement.entered',
+				array('%link-character%'=>$character->getId()),
+				History::LOW, true, 10
+			);
+		}
+		*/
+
+		// bring your prisoners with you 
+		foreach ($character->getPrisoners() as $prisoner) {
+			$prisoner->setInsidePlace($place);
+			$prisoner->setLocation($loc);
+			$place->addCharactersPresent($prisoner);
+			if ($place->getOwner() != $prisoner) {
+				$this->history->visitLog($place, $prisoner);
+			}
+		}
+		
+		// if you're a prisoner yourself, bring your captor with you
+		if ($captor = $character->getPrisonerOf()) {
+			$captor->setInsideSettlement($place);
+			$captor->setLocation($loc);
+			$place->addCharactersPresent($captor);
+			if ($place->getOwner() != $captor) {
+				$this->history->visitLog($place, $captor);
+			}
+		}
+
+		return true;
+	}
+
+	public function characterLeavePlace(Character $character, $force = false) {
+		$place = $character->getInsidePlace();
+		if (!$place) return false;
+
+		/* Leaving this for when Places are defensible.
+		if ($force && (!$settlement->isFortified() || $this->permission_manager->checkSettlementPermission($settlement, $character, 'visit'))) {
+			// people with visiting permission cannot be forced out
+			return false;
+		}
+		*/
+
+		// don't ask me why, but the below two lines work in this order and FAIL if reversed. Yeah. Fuck Doctrine.
+		// $settlement->removeCharactersPresent($character); => Symfony 2.7 turns this into a DELETE - WTF ???
+		$character->setInsidePlace(null);
+
+		// close history log
+		if ($place->getOwner() != $character) {
+			$this->history->closeLog($place, $character);
+		}
+
+		$this->history->logEvent(
+			$place,
+			$force?'event.place.forceleft':'event.place.left',
+			array('%link-character%'=>$character->getId()),
+			History::LOW, true, 10
+		);
+
+		// bring your prisoners with you 
+		foreach ($character->getPrisoners() as $prisoner) {
+			$prisoner->setInsidePlace(null);
+			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???
+			if ($place->getOwner() != $prisoner) {
+				$this->history->closeLog($place, $prisoner);
+			}
+		}
+		// if you're a prisoner yourself, your captor can stay, sorry, you don't get to define his location...
+
+		return true;
+	}
 }
