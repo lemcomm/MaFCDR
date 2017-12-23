@@ -247,7 +247,10 @@ class Economy {
 				if (!$settlement->getCapitalOf()) {
 					return false;
 				}
-				if (!in_array($settlement->getLord(), $settlement->getRealm()->findRulers())) {
+				if (!$settlement->getRealm()) {
+					return false;
+				}
+				if (!in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
 					return false;
 				}
 				break;
@@ -265,9 +268,12 @@ class Economy {
 				}
 				break;
 			case 'quarry': //only at hills, scrublands, or mountains
+				/* TODO: I don't think I want these implemented quite yet.
 				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
 					return false;
-				}
+				} 
+				*/
+				return false;
 				break;
 		}
 		return true;
