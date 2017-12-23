@@ -40,8 +40,9 @@ class Geography {
 		'y_max' => 512000,
 	);
 
-	public function __construct(EntityManager $em, AppState $appstate) {
+	public function __construct(EntityManager $em, PermissionManager $pm, AppState $appstate) {
 		$this->em = $em;
+		$this->pm = $pm;
 		$this->appstate = $appstate;
 	}
 
@@ -412,6 +413,26 @@ class Geography {
 		}
 		$query = $qb->getQuery();
 		return $query->getResult();
+	}
+	
+	public function findPlacesNearMe(Character $character, $maxdistance) {
+		$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
+		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
+		$places = [];
+		foreach ($query->getResult() as $result) {
+			if($this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible() OR $result->getOwner == $character) {
+				$places[] = $result;
+			}
+		}
+		return $places;
+	}
+
+	public function findPlacesInSpotRange(Character $character) {
+		return $this->findPlacesNearMe($character, $this->calculateSpottingDistance($character));
+	}
+	
+	public function findPlacesInActionRange($character) {
+		return $this->findPlacesNearMe($character, $this->calculateInteractionDistance($character));
 	}
 
 	public function findBattlesNearMe(Character $character, $maxdistance) {
