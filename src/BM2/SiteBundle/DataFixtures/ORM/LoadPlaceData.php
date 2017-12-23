@@ -11,10 +11,10 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
-		'academy'	=> array('requires' => 'lord', 'visible' => false),
+		'academy'	=> array('requires' => 'academy', 'visible' => false),
 		'arena'		=> array('requires' => 'lord', 'visible' => true),
 		'capital'	=> array('requires' => 'ruler', 'visible' => true),
-		'castle'	=> array('requires' => 'lord', 'visible' => true),
+		'castle'	=> array('requires' => 'castle', 'visible' => true),
 		'cave'		=> array('visible' => false),
 		'fort'		=> array('requires' => 'fort', 'visible' => true),
 		'home'		=> array('requires' => 'dynasty head', 'visible' => false),
