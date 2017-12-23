@@ -32,7 +32,7 @@ class PlacePermissionsType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$s = $this->settlement;
+		$p = $this->place;
 		$builder->add('place', 'entity', array(
 			'required' => true,
 			'class'=>'BM2SiteBundle:Place', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($p) {
