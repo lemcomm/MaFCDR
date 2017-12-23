@@ -11,12 +11,20 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
-		'capital',
-		'tavern',
-		'home',
-		'fort',
+		'academy'	=> array('requires' => 'lord'),
+		'arena'		=> array('requires' => 'lord'),
+		'capital'	=> array('requires' => 'ruler'),
+		'castle'	=> array('requires' => 'lord'),
+		'cave',
+		'fort'		=> array('requires' => 'fort'),
+		'home'		=> array('requires' => 'dynasty head'),
+		'inn',
+		'library',
+		'monument',
+		'plaza'		=> array('requires' => 'lord'),
 		'portal' 	=> array('requires' => 'magic'),
-		'passage'	=> array('requires' => 'warren')
+		'passage'	=> array('requires' => 'warren'),
+		'tavern'
 	);
 	
 	/**
@@ -37,7 +45,9 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 				$manager->persist($type);
 			}
 			$type->setName($name);
-			$type->setRequires($data['requires']);
+			if ($data['requires']) {
+				$type->setRequires($data['requires']);
+			}
 			$manager->persist($type);
 		}
 		$manager->flush();
