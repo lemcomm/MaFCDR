@@ -27,7 +27,7 @@ services:
 
     geography:
         class:      BM2\SiteBundle\Service\Geography
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @permission_manager, @appstate]
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  [@doctrine.orm.entity_manager, @appstate, @event_dispatcher]
