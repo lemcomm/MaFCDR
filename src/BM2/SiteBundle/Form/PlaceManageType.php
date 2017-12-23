@@ -8,10 +8,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PlaceManageType extends AbstractType {
 
-	public function __construct($types, $description, $new) {
+	public function __construct($types, $description, $new, $isowner=false) {
 		$this->types = $types;
 		$this->description = $description;
 		$this->new = $new;
+		$this->isowner = $isowner;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -22,22 +23,24 @@ class PlaceManageType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$builder->add('name', 'text', array(
-			'label'=>'names.name', 
-			'required'=>true, 
-			'attr' => array(
-				'size'=>20, 
-				'maxlength'=>40
-			)
-		));
-		$builder->add('formal_name', 'text', array(
-			'label'=>'names.formalname', 
-			'required'=>true, 
-			'attr' => array(
-				'size'=>40, 
-				'maxlength'=>160
-			)
-		));
+		if ($isowner) {
+			$builder->add('name', 'text', array(
+				'label'=>'names.name', 
+				'required'=>true, 
+				'attr' => array(
+					'size'=>20, 
+					'maxlength'=>40
+				)
+			));
+			$builder->add('formal_name', 'text', array(
+				'label'=>'names.formalname', 
+				'required'=>true, 
+				'attr' => array(
+					'size'=>40, 
+					'maxlength'=>160
+				)
+			));
+		}
 		if ($new) {
 			$builder->add('type', 'choice', array(
 				'label'=>'type.label',
