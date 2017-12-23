@@ -48,6 +48,10 @@ class PlaceManageType extends AbstractType {
 				'choice_label'=>'name'
 			));
 		}
+		$builder->add('short_description', 'textarea', array(
+			'label'=>'description.short',
+			'required'=>true,
+		));
 		$builder->add('description', 'textarea', array(
 			'label'=>'description.full',
 			'class'=> NULL,
