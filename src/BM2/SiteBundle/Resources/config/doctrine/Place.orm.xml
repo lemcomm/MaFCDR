@@ -12,6 +12,8 @@
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
 		<field name="location" type="point" nullable="true"/>
 		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="places"/>
+		<field name="short_description" type="text" nullable="true"/>
+		<one-to-one field="description" target-entity="Description"/>
 		
 		<one-to-many field="buildings" target-entity="Building" mapped-by="place"/>
 		<one-to-many field="characters_present" target-entity="Character" mapped-by="inside_place"/>
