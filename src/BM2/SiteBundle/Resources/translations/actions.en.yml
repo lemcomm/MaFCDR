@@ -36,15 +36,15 @@ z: z
 
 support:
  name:          Supporting an action
- submit:        support
- already:       you are currently supporting this action
+ submit:        Support
+ already:       You are currently supporting this action
  success:
   settlement:
    take:        You are now supporting the attempt of %character% to take control of %target%.
 oppose:
  name:          Opposing an action
- submit:        oppose
- already:       you are currently opposing this action
+ submit:        Oppose
+ already:       You are currently opposing this action
  success:
   settlement:
    take: >
@@ -116,7 +116,7 @@ location:
  all:           all local interactions
  marker:
   name:         Map Markers
-  description:  set and remove map markers.
+  description:  Set and remove map markers.
  enter:
   name:         Enter settlement
   description:  Peacefully enter the settlement so you have access to its facilities.
@@ -209,9 +209,9 @@ building:
     <i>(for maximum usefulness, when you click on the maps you get a full-size image. Use your browsers "back" button to return to this page.)</i>
   maps:
    name:        Maps
-   allrealms:   all realms of the world
-   2ndrealms:   second-level realms
-   majorrealms: sovereign realms of the world
+   allrealms:   All realms of the world
+   2ndrealms:   Second-level realms
+   majorrealms: Sovereign realms of the world
   top:
    name:        World Rumours
    realms:      The scholars have gathered rumours and travel reports and are listing the largest realms of the known world as follows:
@@ -221,7 +221,7 @@ building:
   description:  Visit the local temple and its priests.
   intro: >
     The local temple of %settlement% keeps a record of births and deaths, allowing you to trace back
-    the settlements development into time.<br />
+    the settlement's development through time.<br />
     The priests have prepared a nice graph for you. As they explain, the height of the line shows the population, and the
     far right is yesterday, while the line further to the left goes into the past, with the number at the bottom showing how
     many days into the past.
@@ -240,13 +240,13 @@ nearby:
   name:         Spy on an estate
   description:  Send a spy to the nearest settlement.
   intro: >
-    You can leave one of your spies behind in this settlement, and he will keep you updated about everything that is going on,
+    You can leave one of your spies behind in this settlement, and they will keep you updated about everything that is going on,
     supplying you with access to the settlements event log and local details, just as if you were there yourself.<br />
     Over time, the spy might be discovered, or disappear.
   intro2: >
-    You can send one of your spies to infiltrate this settlement. There is a reasonable chance that he will make it inside, but
-    he could also be captured during the attempt. If he makes it, he will keep you updated about everything that is going on,
-    supplying you with access to the settlements event log and local details, just as if you were there yourself.<br />
+    You can send one of your spies to infiltrate this settlement. There is a reasonable chance that they will make it inside, but
+    they could also be captured during the attempt. If he makes it, they will keep you updated about everything that is going on,
+    supplying you with access to the settlement's event log and local details, just as if you were there yourself.<br />
     Over time, the spy might be discovered, or disappear.
 
 control:
@@ -267,7 +267,7 @@ control:
     Your character is new in the game and could easily <i>be killed</i> in retaliation.<br />
     Unless you are certain and know what you are doing, talking to the settlement owner via the <a href="%url%">messages tab</a>
     is very likely a much better idea.
-  limit:      With a free account, you can control at most three estates. Keep that in mind and select carefully, or support the game with a subscription.
+  limit:      With a free account, you can control at most three estates with each character. Keep that in mind and select carefully, or support the game with a subscription.
   long: >
     You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead, 
     we won't stop you, but probably you should bring more troops, reduce the militia by attacking first or gain the support
@@ -300,14 +300,14 @@ control:
     the allegiance of a settlement can result in you leaving a realm if it is your only estate within.
   current:      %settlement% is currently a part of %realm%.
   nocurrent:    %settlement% is not considered part of any realm at this time.
-  realm:        change to realm
-  submit:       change allegiance
+  realm:        Change to realm
+  submit:       Change allegiance
   success:      You have successfully changed the allegiance of this settlement to %newrealm%.
   leftrealm:    Since you now hold no estates within %oldrealm% anymore, you are no longer a member of that realm.
   fail:
    same:        The settlement already belongs to this realm.
  grant:
-  name:         grant control
+  name:         Grant control
   description:  Hand over control over these people to another First One.
   intro: >
     Settlements you control can be handed off to someone else.<br />
@@ -317,19 +317,19 @@ control:
     You can grant a settlement "with its realm", meaning you make the new lord a member of the realm the settlement
     belongs to. Alternatively, you can grant without, which makes the settlement independent before granting it and
     is useful to giving settlements away to other realms.
-  to:           grant control to
-  withrealm:    with realm?
+  to:           Grant control to
+  withrealm:    With realm?
   withrealm2:   If you grant an estate "with realm", the estate will stay in its current realm and the new lord will join that realm if he is not already a member.
-  keepclaim:    keep claim?
+  keepclaim:    Keep claim?
   keepclaim2:   If you keep a claim to the estate, you grant it "in fief", but you continue to consider it your property. The claim will allow you to take it back easily.
   success:      You have now given control over this settlement to %newowner%.
   queued:       You will soon be meeting with %newowner% and arrange the details of the transfer, as well as informing the settlement leaders.
  rename:
-  name:         rename settlement
+  name:         Rename settlement
   description:  Change the name of this settlement.
   intro:        As the lord of this %type%, you can change its name to make it easier to distinguish, or to placate your ego.
-  newname:      new name
-  submit:       change name
+  newname:      New name
+  submit:       Change name
   tooshort:     Settlement names should be at least 3 characters long.
   success: >
     You have now declared that this place shall be known as "%newname%".<br />
@@ -346,7 +346,7 @@ control:
     This should be used sparingly, as it would be unrealistic to change all the time. It also makes a lot more sense to
     communicate with your neighors and set up cultural areas.<br />
     <br />
-    The central european is available to everyone. Additional cultures can be bought on your account page (Credits and Gifts).
+    The central european culture is available to everyone. Additional cultures can be bought on your account page (Credits and Gifts).
     If you conquer a settlement belonging to a culture you do not own, it will retain its culture, but you can only change
     settlements to cultures you own.
   newculture:   new culture
@@ -356,17 +356,17 @@ control:
     The settlement leaders have been instructed to adapt to a %culture% culture.<br />
     You will see the change completed soon.
  permissions:
-  name:         manage permissions
+  name:         Manage permissions
   description:  Set and change permissions for others
   intro: >
     As lord of %settlement%, you can determine how the settlement officials should treat others, if they should allow them
     into the settlement at all, if they can use the resources of the settlement to resupply or even pick up recruits.<br />
     To make everything more accessible, this system uses the <a href="%listsurl%">lists system</a> to define permission owners.
-  general:      general permissions
-  specific:     specific permissions
-  spawn:        allow new characters to spawn here?
-  thralls:      allow slavery (thralls) ?
-  submit:       set new permissions
+  general:      General permissions
+  specific:     Specific permissions
+  spawn:        Allow new characters to spawn here?
+  thralls:      Allow slavery (thralls) ?
+  submit:       Set new permissions
   success:      Your new permissions have been saved.
  quests:
   name:         manage quests
@@ -407,52 +407,52 @@ military:
     You are being attacked, and you may or may not be looking forward to this battle. As the enemy is still maneuvering to engage you,
     you can also still escape. With your current unit size, it will take %time% to pack up everything and leave, at which point you
     will find out if you succeed in making a run for it, or are already surrounded.
-  battles:      choose the battle(s) you want to disengage from
-  submit:       avoid battle
+  battles:      Choose the battle(s) you want to disengage from
+  submit:       Avoid battle
   success:      You have instructed your troops to pack up and avoid the upcoming battle. You might want to also travel away or you will probably be engaged again.
  evade:
   name:         Evade
-  description:  evade enemy forces.
+  description:  Evade enemy forces.
   longdesc:     Instruct your troops to automatically attempt to disengage from any battles you are forced into.
   intro: >
     You can instruct your troops to avoid any battles you are forced into. While this might sound like something you want to do all the time, also
-    keep in mind that if you are travelling with a larger army of realm mates, it might mean some of you evade the battle and others don't, splitting
+    keep in mind that if you are travelling with a larger army of realm mates or allies, it might mean some of you evade the battle and others don't, splitting
     forces up.<br />
     This action will remain in effect until you cancel it and apply to any and all battles that you do not voluntarily join.<br />
     <br />
     Since enemy troops could enage you again after a successful evade, it is strongly recommended that you also set travel away from your
     enemy in order to avoid being re-engaged.
-  submit:       evade all battles
+  submit:       Evade all battles
   success:      Your troops are now instructed to immediately disengage if a battle is forced upon you.
  settlement:
-  all:          all military actions on settlements
+  all:          All military actions on settlements
   defend:
-   name:        defend settlement
-   description: set your troops up to defend this settlement, should it get attacked.
+   name:        Defend settlement
+   description: Set your troops up to defend this settlement, should it get attacked.
    intro: >
      Order your soldiers to defend %settlement%.<br />
      They will set up defenses, making use of any fortifications available, and defend the settlement against
      anyone ordering an attack.
-   submit:      set up defenses
+   submit:      Set up defenses
    queued: >
      Your soldiers are now preparing for an attack, and are ready to defend.
 
   attack:
-   name:        attack settlement
-   description: invade this settlement in order to kill or drive away its defenders.
+   name:        Attack settlement
+   description: Assault this settlement in order to kill or drive away its defenders.
    intro: >
      Order your soldiers to attack %settlement%.<br />
      There will be a battle between your forces as well as any other attackers, against the settlement militia
-     and anyone choosing to defend. If you are victorious, you have forced your way into the settlement, and actions such as taking control of the
+     and anyone choosing to defend, who will benefit from local fortifications. If you are victorious, you have forced your way into the settlement, and actions such as taking control of the
      settlement for yourself or attacking First Ones inside will appear.<br />
      <i>Once initiated, battles cannot be cancelled. Once you are committed, you are committed. Decide wisely.</i>
-   war:         war that this attack supports:
-   submit:      attack!
+   war:         War that this attack supports:
+   submit:      Attack!
    success:     Your soldiers are preparing for the attack and will commence battle shortly.
    reminder:    Remember that in order to not just attack, but also take control of the settlement, you need to issue a <a href="%url%">%take%</a> action as well.
   loot:
-   name:        loot settlement
-   description: plunder this settlement for valuables and resources.
+   name:        Loot settlement
+   description: Plunder this settlement for valuables and resources.
    intro: >
      Looting enemy settlements allows you to take resources or thralls by force and transfer them to any estate of your choice (preferably yours, typically).<br /<
      You can also loot for personal profit or raid the workshops for supply, or simply burn the place down.<br />
@@ -462,14 +462,14 @@ military:
    owner:       As you are the lord of this settlement, you can <i>steal wealth</i> very effectively with no negative effects. You will call this an unscheduled tax collection.
    outside:     As you are outside the settlement, you can only loot the countryside, which offers fewer targets. Fight, bribe or trick your way inside the settlement for more effective looting.
    time:        The selected looting options will take <span id="time">4</span> hours to complete.
-   target:      send plunder to
-   options:     loot actions
+   target:      Send plunder to
+   options:     Loot actions
    option:
-    thralls:    take thralls
-    resources:  take resources
-    supply:     steal supply
-    food:       steal food
-    wealth:     steal wealth
+    thralls:    Take thralls
+    resources:  Take resources
+    supply:     Steal supply
+    food:       Steal food
+    wealth:     Steal wealth
     burn:       burn down buildings
    submit:      begin looting
  battles:
