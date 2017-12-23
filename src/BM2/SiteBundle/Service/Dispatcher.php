@@ -544,7 +544,7 @@ class Dispatcher {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
 		}
 		if (!$place = $this->getActionablePlace()) {
-			return array("name"=>"place.enter.name", "description"=>"unavailable.nosettlement");
+			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.already");
@@ -560,7 +560,7 @@ class Dispatcher {
 				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
 			}
 		} else {
-			return $this->action("place.enter", "bm2_site_actions_enter");
+			return $this->action("place.enter", "bm2_site_actions_places");
 		}
 
 	}
@@ -584,7 +584,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"place.exit.name", "description"=>"unavailable.prisoner");
 		} else {
-			return $this->action("place.exit", "bm2_site_actions_exit");
+			return $this->action("place.exit", "bm2_site_actions_place_exit");
 		}
 	}
 
@@ -1177,7 +1177,6 @@ class Dispatcher {
 		return $this->action("military.aid", "bm2_site_war_aid");
 	}
 
-
 	public function militaryJoinBattleTest() {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"military.battles.join.name", "description"=>"unavailable.prisoner");
@@ -1196,7 +1195,6 @@ class Dispatcher {
 		}
 		return $this->action("military.battles.join", "bm2_site_war_battlejoin");
 	}
-
 
 	/* ========== Personal Actions ========== */
 
@@ -1242,8 +1240,6 @@ class Dispatcher {
 
 		return $this->action("escape", "bm2_site_character_escape");
 	}
-
-
 
 	public function personalEntourageTest() {
 		$place = $this->getCharacter()->getInsideSettlement();
@@ -1462,7 +1458,6 @@ class Dispatcher {
 		}
 	}
 
-
 	public function hierarchyRealmPositionsTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"realm.positions.name", "description"=>"unavailable.$check");
@@ -1490,7 +1485,6 @@ class Dispatcher {
 			);
 		}
 	}
-
 
 	public function hierarchyDiplomacyTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
