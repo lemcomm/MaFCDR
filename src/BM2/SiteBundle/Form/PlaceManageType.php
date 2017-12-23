@@ -8,8 +8,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PlaceManageType extends AbstractType {
 
-	public function __construct($types) {
+	public function __construct($types, $description, $new) {
 		$this->types = $types;
+		$this->description = $description;
+		$this->new = $new;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -36,26 +38,19 @@ class PlaceManageType extends AbstractType {
 				'maxlength'=>160
 			)
 		));
-		$builder->add('type', 'choice', array(
-			'label'=>'type.label',
-			'required'=>true,
-			'placeholder'=>'type.empty',
-			'choices' => $types,
-			'class' =>'BM2SiteBundle:PlaceType',
-			'choice_label'=>'name'
-		));
-		$builder->add('short_description', 'textarea', array(
-			'label'=>'description.short',
-			'class'=>'BM2SiteBundle:Description',
-			'placeholder'=>$description,
-			'required'=>true,
-			'attr'=>array(
-				'maxlength'=>500
-			)
-		));
+		if ($new) {
+			$builder->add('type', 'choice', array(
+				'label'=>'type.label',
+				'required'=>true,
+				'placeholder'=>'type.empty',
+				'choices' => $types,
+				'class' =>'BM2SiteBundle:PlaceType',
+				'choice_label'=>'name'
+			));
+		}
 		$builder->add('description', 'textarea', array(
 			'label'=>'description.full',
-			'class'=>'BM2SiteBundle:Description',
+			'class'=> NULL,
 			'placeholder'=>$description,
 			'required'=>true,
 		));
