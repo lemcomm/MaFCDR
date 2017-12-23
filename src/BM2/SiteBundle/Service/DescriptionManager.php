@@ -32,7 +32,7 @@ class DescriptionManager {
 		return $pos;
 	}
 	
-	public function newDescription($entity, $text, Character $character=null) {
+	public function newDescription($entity, $text, Character $character=null, $new=false) {
 		// First, check to see if there's already one.
 		$olddesc = $this->findDescription($entity)
 
@@ -46,39 +46,42 @@ class DescriptionManager {
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
-		switch($this->getClassName($entity)) {
-			case 'Artifact':
-				$this->history->logEvent(
-					$entity,
-					'event.description.updated.artifact',
-					null,
-					History::LOW
-				);
-				break;
-			case 'Item':
-				$this->history->logEvent(
-					$entity,
-					'event.description.updated.item',
-					null,
-					History::LOW
-				);
-				break;
-			case 'Place':
-				$this->history->logEvent(
-					$entity,
-					'event.description.updated.place',
-					array('%character%'=>$character->getId(), %place%=>$entity->getId()),
-					History::LOW
-				);
-				break;
-			case 'Settlement':
-				$this->history->logEvent(
-					$entity,
-					'event.description.updated.settlement',
-					array('%character%'=>$entity->getOwner()->getId(), %settlement%=>$entity->getId()),
-					History::LOW
-				);
-				break;
+		if (!$new) {
+			/* No need to tell the people that just made the thing that they updated the descriptions. */
+			switch($this->getClassName($entity)) {
+				case 'Artifact':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.artifact',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Item':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.item',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Place':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.place',
+						array('%character%'=>$character->getId(), %place%=>$entity->getId()),
+						History::LOW
+					);
+					break;
+				case 'Settlement':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.settlement',
+						array('%character%'=>$entity->getOwner()->getId(), %settlement%=>$entity->getId()),
+						History::LOW
+					);
+					break;
+			}
 		}
 		return $desc;
 	}
