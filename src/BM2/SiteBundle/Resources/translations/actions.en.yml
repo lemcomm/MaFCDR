@@ -817,7 +817,7 @@ entourage:
 meta:
  name:          Character meta actions
  background:
-  name:         Nackground
+  name:         Background
   description:  Edit descriptions
   descdeath:    Edit descriptions and death cause
   intro: >
@@ -875,7 +875,7 @@ meta:
   submit:       Rename character
   success:      Your character has been renamed.
  kill:
-  name:         Lill
+  name:         Kill
   description:  Make character dead
   intro: >
     You can kill your character at any time.<br />
