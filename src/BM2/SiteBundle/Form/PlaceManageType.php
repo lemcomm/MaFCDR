@@ -6,9 +6,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use BM2\SiteBundle\Entity\PlaceType;
+
 class PlaceManageType extends AbstractType {
 
-	public function __construct($types, $description, $new, $isowner=false) {
+	public function __construct($types, $description, $new, $isowner) {
 		$this->types = $types;
 		$this->description = $description;
 		$this->new = $new;
@@ -23,7 +25,7 @@ class PlaceManageType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		if ($isowner) {
+		if ($this->isowner OR $this->new) {
 			$builder->add('name', 'text', array(
 				'label'=>'names.name', 
 				'required'=>true, 
@@ -41,14 +43,19 @@ class PlaceManageType extends AbstractType {
 				)
 			));
 		}
-		if ($new) {
-			$builder->add('type', 'choice', array(
+		if ($this->new) {
+			# This isn't going to work. Prep the list in teh Controller, submit it through the form, then reapply it on the other side.
+			$builder->add('type', 'entity', array(
 				'label'=>'type.label',
 				'required'=>true,
-				'placeholder'=>'type.empty',
-				'choices' => $types,
-				'class' =>'BM2SiteBundle:PlaceType',
-				'choice_label'=>'name'
+				'placeholder' => 'type.empty',
+				'attr' => array('title'=>'place.help.type'),
+				'class' => 'BM2SiteBundle:PlaceType',
+				'choice_translation_domain' => true,
+				'choice_label' => 'name',
+				'query_builder' => function(EntityRepository $er) {
+					return $er->createQueryBuilder('p')->where('p.requires in :types')->setParameter('types', $this->types);
+				}
 			));
 		}
 		$builder->add('short_description', 'textarea', array(
@@ -57,8 +64,7 @@ class PlaceManageType extends AbstractType {
 		));
 		$builder->add('description', 'textarea', array(
 			'label'=>'description.full',
-			'class'=> NULL,
-			'placeholder'=>$description,
+			'data_class'=> NULL,
 			'required'=>true,
 		));
 	}
