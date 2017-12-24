@@ -26,7 +26,7 @@ First of all, votes are always open and public. Everyone can see who voted how, 
 Second, depending on the election, not everyone may be able to vote. There are several defined vote counting methods that should satisfy every realm and culture:
 
 by banner
-: "This method gives voting rights to all banner carriers of the realm, or every First One of the realm. They each have one vote."
+: This method gives voting rights to all banner carriers of the realm, or every First One of the realm. They each have one vote.
 
 by spears
 : This method gives power to the warriors and military. One vote is counted for every soldier under your command, either in your army or stationed at one of your estates.
