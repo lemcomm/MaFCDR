@@ -16,7 +16,7 @@ Wounded characters have reduced options and travel slower, they will also be les
 
 
 ### Imprisoned ###
-When a First One yields in combat to another, he is taken as prisoner. As a noble, these prisoners are valuable and will move around with whoever captured them. They cannot travel on their own, and most actions are blocked, but they can talk and interact with other nobles encountered.
+When a First One yields in combat to another, he is taken as prisoner. As a First One, these prisoners are valuable and will move around with whoever captured them. They cannot travel on their own, and most actions are blocked, but they can talk and interact with other First Ones encountered.
 
 Prisoners can be executed or set free at any time.
 

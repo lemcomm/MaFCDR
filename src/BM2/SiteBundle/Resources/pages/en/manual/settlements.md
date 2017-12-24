@@ -16,13 +16,13 @@ Finally, the biome type also determines travel speed through the area.
 
 Politics
 --------
-A settlement under control of a noble is called an **estate**.
+A settlement under control of a First One is called an **estate**.
 
 Estates can be conquered or granted to others, and they can be part of one (and only one) of the [realms]. A settlement can only belong to any realm that its lord belongs to. When granting estates, it is also possible to keep a title to it, granting it *in fief* to a vassal to manage it, but retaining the ability to take it back quickly.
 
 Within the settlement, the lord can use the [permissions] to grant rights to other characters, including whole groups. For example, a military center would want to allow all members of its realm to resupply there.
 
-In addition to actual control, nobles can also hold [claims] to settlements.
+In addition to actual control, First Ones can also hold [claims] to settlements.
 
 
 Economy

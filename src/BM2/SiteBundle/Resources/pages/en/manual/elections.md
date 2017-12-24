@@ -19,14 +19,14 @@ These are basically opinion polls and consist of a number of free-text options t
 
 Election Principles
 -------------------
-This is not an age of democracy, so while there are votes, they are neither free nor equal nor secret.
+This is not an age of democracy, so while there are votes, they are neither free, nor equal, nor secret.
 
 First of all, votes are always open and public. Everyone can see who voted how, both during and after the election.
 
-Second, depending on the election, not everyone may be able to vote. There are several defined vote count methods that should satisfy every realm and culture:
+Second, depending on the election, not everyone may be able to vote. There are several defined vote counting methods that should satisfy every realm and culture:
 
 by banner
-: This method gives voting rights to the nobility, those who have the right to carry a banner. Every noble has one vote.
+: This method gives voting rights to all banner carriers of the realm, or every First One of the realm. They each have one vote.
 
 by spears
 : This method gives power to the warriors and military. One vote is counted for every soldier under your command, either in your army or stationed at one of your estates.
