@@ -416,9 +416,10 @@ class WarController extends Controller {
 	 						$steal = rand(0, ceil($settlement->getGold() * $ratio));
 							$drop = ceil(rand(40,60) * $settlement->getGold() / 100);
  						}
- 						$result['gold'] = ceil($steal * 0.75); // your soldiers will pocket some (and we just want to make it less effective)
- 						$character->setGold($character->getGold() + $steal);
- 						$settlement->setGold($settlement->getGold() - $drop);
+						$steal = ceil($steal * 0.75); // your soldiers will pocket some (and we just want to make it less effective)
+ 						$result['gold'] = $steal; // send result to page for display
+ 						$character->setGold($character->getGold() + $steal); //add gold to characters purse
+ 						$settlement->setGold($settlement->getGold() - $drop); //remove gold from settlement ?Why do we remove a different amount of gold from the settlement?
  						break;
 					case 'burn':
 						$targets = min(5, floor(sqrt($my_soldiers/5)));

@@ -29,39 +29,37 @@
 	<ul class="simple">
 		<li>{% if settlement.fortified %}{{ 'settlement.fortified'|trans }} {% endif %}{{ settlement.type|trans }}, {{ ('biome.'~settlement.geodata.biome.name)|trans }}</li>
 		<li>{{ 'settlement.culture'|trans }}: {{ ('culture.'~settlement.culture.name)|trans }}</li>
-		{% if (details.spot or isowner) %}
+		{% if isowner %}
 			<li class="tt_botleft">{{ 'settlement.population'|trans }}: {{ settlement.fullpopulation }}
 			<br />({{ settlement.population }} {{ 'settlement.civilians'|trans }}
 			{% if settlement.soldiers|length > 0 %}, {{ settlement.soldiers|length }} {{ 'settlement.militia2'|trans }}{% endif %}
 			{% if settlement.thralls > 0 %}, {{ settlement.thralls }} {{ 'settlement.thralls'|trans }}{% endif %})</li>
-		{% else %}
-			<li>{{ 'settlement.population'|trans }}: {{ settlement.population + settlement.thralls }}</li>
-		{% endif %}
-		{% if isowner %}
-		<li>{{ 'settlement.pop.change'|trans }}:
-			{% if popchange/settlement.population > 0.1 %}
-				{{ ('settlement.pop.grow.3')|trans }}
-			{% elseif popchange/settlement.population > 0.05 %}
-				{{ ('settlement.pop.grow.2')|trans }}
-			{% elseif popchange/settlement.population > 0.01 %}
-				{{ ('settlement.pop.grow.1')|trans }}
-			{% elseif popchange/settlement.population < - 0.1 %}
-				{{ ('settlement.pop.shrink.4')|trans }}
-			{% elseif popchange/settlement.population < - 0.05 %}
-				{{ ('settlement.pop.shrink.3')|trans }}
-			{% elseif popchange/settlement.population < - 0.02 %}
-				{{ ('settlement.pop.shrink.2')|trans }}
-			{% elseif popchange/settlement.population < - 0.01 %}
-				{{ ('settlement.pop.shrink.1')|trans }}
-			{% else %}
-				{{ ('settlement.pop.stable')|trans }}
-			{% endif %}
-		</li>
+			<li>{{ 'settlement.pop.change'|trans }}:
+				{% if popchange/settlement.population > 0.1 %}
+					{{ ('settlement.pop.grow.3')|trans }}
+				{% elseif popchange/settlement.population > 0.05 %}
+					{{ ('settlement.pop.grow.2')|trans }}
+				{% elseif popchange/settlement.population > 0.01 %}
+					{{ ('settlement.pop.grow.1')|trans }}
+				{% elseif popchange/settlement.population < - 0.1 %}
+					{{ ('settlement.pop.shrink.4')|trans }}
+				{% elseif popchange/settlement.population < - 0.05 %}
+					{{ ('settlement.pop.shrink.3')|trans }}
+				{% elseif popchange/settlement.population < - 0.02 %}
+					{{ ('settlement.pop.shrink.2')|trans }}
+				{% elseif popchange/settlement.population < - 0.01 %}
+					{{ ('settlement.pop.shrink.1')|trans }}
+				{% else %}
+					{{ ('settlement.pop.stable')|trans }}
+				{% endif %}
+			</li>
 		{% endif %}
 		<li>{% if settlement.allowthralls %}{{ 'settlement.allowthralls.yes'|trans }}{% else %}{{ 'settlement.allowthralls.no'|trans }}{% endif %}</li>
 		{% if familiarity %}<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>{% endif %}
 		<li>{{ area|area }}</li>
+		{% if isowner %}
 		<li>{{ density|number_format }} {{ 'popdensity'|trans }}</li>
+		{% endif %}
 		{% if details.spot or isowner %}
 			<li class="tt_botleft" title="{{ ('settlement.security.tt')|trans }}">{{ ('settlement.security.'~security)|trans }}</li>
 		{% endif %}

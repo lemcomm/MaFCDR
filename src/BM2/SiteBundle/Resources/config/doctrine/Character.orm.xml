@@ -35,6 +35,8 @@
 		<field name="spotting_distance" type="integer"/>
 		<field name="visibility" type="integer"/>
 
+		<field name="auto_read_realms" type="boolean" nullable="true"/>
+		
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
 

@@ -899,8 +899,33 @@ class ActionsController extends Controller {
      */
 	public function offersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		$em = $this->getDoctrine()->getManager();
+		$depth = 1;
+		if ($settlement->getRealm()->getSuperior()) {
+			$depth = 2;
+			if (($settlement->getRealm()->findUltimate() != $settlement->getRealm()) AND ($settlement->getRealm()->findUltimate() != $settlement->getRealm()->getSuperior())) {
+				$depth = 3;
+			}
+		}
+		switch ($depth) {
+			case 3:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true) OR (p.realm = :ultimate AND p.welcomer = true)');
+				$query->setParameter('realm', $settlement->getRealm());
+				$query->setParameter('superior', $settlement->getRealm()->getSuperior());
+				$query->setParameter('ultimate', $settlement->getRealm()->findUltimate());
+				break;
+			case 2:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true)');
+				$query->setParameter('realm', $settlement->getRealm());
+				$query->setParameter('superior', $settlement->getRealm()->findUltimate());
+				break;
+			case 1:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE p.realm = :realm AND p.welcomer = true');
+				$query->setParameter('realm', $settlement->getRealm());
+				break;
+		}
 
-		$form = $this->createForm(new KnightOfferType($settlement));
+		$form = $this->createForm(new KnightOfferType($settlement, $query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -928,6 +953,7 @@ class ActionsController extends Controller {
 					$offer->setSettlement($settlement);
 					$offer->setDescription($data['intro']);
 					$offer->setGiveSettlement($data['givesettlement']);
+					$offer->setWelcomers($data['welcomers']);
 					$em->persist($offer);
 					if ($data['givesettlement'] == false) {
 						foreach ($data['soldiers'] as $soldier) {

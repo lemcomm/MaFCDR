@@ -67,7 +67,10 @@ class RunCommand extends ContainerAwareCommand {
 
 	private function sendNotification($text, $which, $code) {
 		$mailer = $this->getContainer()->get('mailer');
-		$spool = $mailer->getTransport()->getSpool();
+		$spool = NULL;
+		if ($mailer->getTransport()->getSpool()) {
+			$spool = $mailer->getTransport()->getSpool();
+		}
 		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 
 		$message = \Swift_Message::newInstance()

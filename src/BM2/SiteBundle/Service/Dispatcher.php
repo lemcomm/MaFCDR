@@ -478,6 +478,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			$actions[] = $this->metaKillTest();
 		} else {
+			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
 			$actions[] = $this->metaRenameTest();
 			$actions[] = $this->metaKillTest();
@@ -1253,6 +1254,9 @@ class Dispatcher {
 		if ($estate->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
 		}
+		if (!$place->getRealm()) {
+			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
+		}
 
 		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$estate->getID()));
 	}
@@ -1716,6 +1720,13 @@ class Dispatcher {
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
 		}
 		return array("name"=>"meta.rename.name", "url"=>"bm2_site_character_rename", "description"=>"meta.rename.description");
+	}
+
+	public function metaSettingsTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
+		}
+		return array("name"=>"meta.settings.name", "url"=>"bm2_site_character_settings", "description"=>"meta.settings.description");
 	}
 
 	public function metaKillTest() {

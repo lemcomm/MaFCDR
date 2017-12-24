@@ -311,8 +311,9 @@ class RealmController extends Controller {
 			$data = $form->getData();
 			$year = $data->getYear();
 			$week = $data->getWeek();
+			$term = $data->getTerm();
 			$elected = $data->getElected();
-			if ($week < 1 OR $week > 60) {
+			if ($week < 0 OR $week > 60) {
 				$fail = true;
 			}
 
@@ -330,8 +331,22 @@ class RealmController extends Controller {
 				if ($is_new) {
 					$em->persist($position);
 				}
-				if ($year AND $week) {
+				if ($year > 1 AND $week > 1 AND $term != 0) {
+					/* This is explained a bit better below, BUT, we set week and year manually here just in case
+					the game decides to do something wonky. Also, if the term is anything other than lifetime,
+					which is what 0 equates to, then we care about election years n stuff. */
 					$position->setCycle((($year-1)*360)+(($week-1)*6));
+					$position->setWeek($week);
+					$position->setYear($year);
+				}
+				if ($term == 0 OR $year < 2) {
+					/* This sounds kind of dumb, but basically, on null inputs the form builder submits a 1.
+					So, when we get a 1 for the year, or anything less than 2 really, we assume that this is
+					actually a null input done by the formbuilder, and set cycle, week, and year to null.
+					This is because the formbuilder doesn't accept null integers on it's own. */
+					$position->setCycle(null);
+					$position->setWeek(null);
+					$position->setYear(null);
 				}
 				if ($elected) {
 					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);

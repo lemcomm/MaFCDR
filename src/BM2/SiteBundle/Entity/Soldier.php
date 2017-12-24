@@ -260,7 +260,9 @@ class Soldier extends NPC {
 			$power += $this->getWeapon()->getRanged();
 		}
 		if ($this->getEquipment()) {
-			$power += $this->getEquipment()->getRanged();
+			if ($this->getEquipment()->getRanged() > $power) {
+				$power = $this->getEquipment()->getRanged();
+			}
 		}
 
 		// all the below only adds if we have some ranged power to start with

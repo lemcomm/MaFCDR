@@ -11,6 +11,7 @@ use BM2\SiteBundle\Entity\CharacterRatingVote;
 use BM2\SiteBundle\Form\CharacterBackgroundType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
 use BM2\SiteBundle\Form\CharacterRatingType;
+use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
@@ -282,6 +283,10 @@ class CharacterController extends Controller {
 
 				$startlocation = $data['offer']->getSettlement();
 				$liege = $startlocation->getOwner();
+				$welcomingcommittee = false;
+				if ($data['offer']->getWelcomers()) {
+					$welcomingcommittee = true;
+				}
 				if (!$liege) {
 					// invalid offer, should never happen, but catch it anyways
 					throw $this->createNotFoundException('error.notfound.newliege');
@@ -334,7 +339,9 @@ class CharacterController extends Controller {
 					array('%link-character%'=>$character->getId(), '%link-settlement%'=>$startlocation->getId()),
 					History::HIGH
 				);
+				$welcomers = $data['offer']->getWelcomers();
 				$em->remove($data['offer']);
+				echo $welcomers;
 
 				$em->flush(); // because some DQL below needs it, probably
 
@@ -357,9 +364,25 @@ class CharacterController extends Controller {
 				// create a conversation with my new liege
 				// TODO: this should be configurable
 				$topic = 'Welcome from '.$liege->getName().' to '.$character->getName();
-				$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
-				list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
+				if (!$welcomingcommittee) {
+					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
+				} else {
+					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm()->getId().'], will let you know what you can do to earn your stay.';
+				}
+				if (!$welcomingcommittee) {
+					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
+				} else {
+					$recipients = array();
+					$recipients[] = $this->get('message_manager')->getMsgUser($liege);
+					foreach($welcomers->getHolders() as $welcomechar) {
+						if ($welcomechar != $liege) {
+							$recipients[] = $this->get('message_manager')->getMsgUser($welcomechar);
+						}
+					}
+					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, $topic, $content);
+				}
 				$this->get('message_manager')->setAllUnread($msg_user);
+
 			}
 
 			$form_existing->bind($request);
@@ -431,8 +454,10 @@ class CharacterController extends Controller {
 			$entourage = null;
 			$soldiers = null;
 		}
-		if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
-			$banned = true;
+		if ($char->getUser()) {
+			if ($char->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+				$banned = true;
+			}
 		}
 		return array(
 			'char'		=> $char,
@@ -724,7 +749,32 @@ class CharacterController extends Controller {
 
 		return array('form'=>$form->createView());
 	}
+	
+   /**
+     * @Route("/settings")
+     * @Template
+     */
+	public function settingsAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		$em = $this->getDoctrine()->getManager();
 
+		$form = $this->createForm(new CharacterSettingsType(), $character);
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$data = $form->getData();
+#			$character->setAutoReadRealms($data->getAutoReadRealms());
+			$em->flush();
+			
+
+			$this->addFlash('notice', $this->get('translator')->trans('update.success', array(), 'settings'));
+
+			return $this->redirectToRoute('bm2_recent');
+		}
+			
+		return array('form'=>$form->createView());
+	}
+	
    /**
      * @Route("/kill")
      * @Template
