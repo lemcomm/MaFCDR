@@ -15,16 +15,16 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'arena'		=> array('requires' => 'lord', 'visible' => true),
 		'capital'	=> array('requires' => 'ruler', 'visible' => true),
 		'castle'	=> array('requires' => 'castle', 'visible' => true),
-		'cave'		=> array('visible' => false),
+		'cave'		=> array('requires' => '', 'visible' => false),
 		'fort'		=> array('requires' => 'fort', 'visible' => true),
 		'home'		=> array('requires' => 'dynasty head', 'visible' => false),
-		'inn'		=> array('visible' => true),
-		'library'	=> array('visible' => false),
-		'monument'	=> array('visible' => true),
+		'inn'		=> array('requires' => '', 'visible' => true),
+		'library'	=> array('requires' => '', 'visible' => false),
+		'monument'	=> array('requires' => '', 'visible' => true),
 		'plaza'		=> array('requires' => 'lord', 'visible' => true),
 		'portal' 	=> array('requires' => 'magic', 'visible' => false),
 		'passage'	=> array('requires' => 'warren', 'visible' => false),
-		'tavern'	=> array('visible' => false)
+		'tavern'	=> array('requires' => '', 'visible' => false)
 	);
 	
 	/**
@@ -48,7 +48,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 			if ($data['requires']) {
 				$type->setRequires($data['requires']);
 			}
-			$type->setVisible(data['visible']);
+			$type->setVisible($data['visible']);
 			$manager->persist($type);
 		}
 		$manager->flush();
