@@ -250,7 +250,11 @@ class Economy {
 				if (!$settlement->getRealm()) {
 					return false;
 				}
-				if (!in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
+				if (is_array($settlement->getRealm()->findRulers())) {
+					if (!in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
+						return false;
+					}
+				} else if ($settlement->getRealm()->findRulers() != $settlement->getOwner()) {
 					return false;
 				}
 				break;
