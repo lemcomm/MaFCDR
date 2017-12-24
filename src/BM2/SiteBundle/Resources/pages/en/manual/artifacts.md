@@ -12,9 +12,9 @@ Once created, you can spawn the artifact into the world. You can give it to any 
 
 Possession
 ----------
-Artifacts are property of the character who owns them. They can change owner in one of two ways: Voluntarily and forced. The first one is obvious: If you have an artifact, you can give it to someone else nearby. The second is also straightforward: If a character holding an artifact gets killed, whoever killed him will get the artifact. If he dies in other circumstances (suicide, or killed on the battlefield by a mortal soldier) the artifact will be lost.
+Artifacts are property of the character who owns them. They can change owner in one of two ways: Voluntarily and forced. The first way is obvious: If you have an artifact, you can give it to someone else nearby. The second is also straightforward: If a character holding an artifact gets killed, whoever killed them will get the artifact. If they die in other circumstances (suicide, or killed on the battlefield by a mortal soldier) the artifact will be lost.
 
 
 Lost Artifacts
 --------------
-At the moment, lost artifacts return to their creator and can be given to another character of his. In the future, they will drop into the game world and can be found, just like an artifact spawned into a region.
+At the moment, lost artifacts return to their creator and can be given to another character of theirs. In the future, they will drop into the game world and can be found, just like an artifact spawned into a region.
