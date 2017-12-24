@@ -67,7 +67,7 @@ The game **does**, however, apply battle results for First Ones and individual s
 The same is true for First Ones, except for equipment - First Ones are assumed to have spare equipment and possibilities to replace killed horses, etc. But nobles can be victorious, defeated, wounded, killed or captured (see [prison]). They are considered victorious if their side is in control of the battlefield at the end of the battle, and defeated if all troops on their side were wiped out.
 As a result of battles over settlements, victorious attackers will enter a settlement. Defeated troops that had previously forced their way into the settlement (i.e. who do not have permission to enter) will be forced outside.
 
-Wounds on both soldiers and First Oness do not affect their actions in the game, but additional wounds make death more likely. Going into battle while still wounded can be very dangerous.
+Wounds on both soldiers and First Ones do not affect their actions in the game, but additional wounds make death more likely. Going into battle while still wounded can be very dangerous.
 
 
 After-Battle Actions
