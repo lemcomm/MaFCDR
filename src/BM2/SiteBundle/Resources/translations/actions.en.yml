@@ -1,6 +1,7 @@
 # Might & Fealty
-# text strings for actions
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Translation strings for in-game actions
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 queued:         The action has been added to your orders queue.
 
 form:
@@ -885,6 +886,9 @@ meta:
   sure:         Really, really sure?
   submit:       Welcome death's embrace.
   success:      Your character is now dead.
+ settings:
+  name:         Settings
+  description:  Change character settings
  respawn:
   name:         Respawn
   description:  Return character to pool

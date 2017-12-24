@@ -11,6 +11,7 @@ use BM2\SiteBundle\Entity\CharacterRatingVote;
 use BM2\SiteBundle\Form\CharacterBackgroundType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
 use BM2\SiteBundle\Form\CharacterRatingType;
+use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
@@ -748,7 +749,32 @@ class CharacterController extends Controller {
 
 		return array('form'=>$form->createView());
 	}
+	
+   /**
+     * @Route("/settings")
+     * @Template
+     */
+	public function settingsAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		$em = $this->getDoctrine()->getManager();
 
+		$form = $this->createForm(new CharacterSettingsType(), $character);
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$data = $form->getData();
+#			$character->setAutoReadRealms($data->getAutoReadRealms());
+			$em->flush();
+			
+
+			$this->addFlash('notice', $this->get('translator')->trans('update.success', array(), 'settings'));
+
+			return $this->redirectToRoute('bm2_recent');
+		}
+			
+		return array('form'=>$form->createView());
+	}
+	
    /**
      * @Route("/kill")
      * @Template

@@ -299,13 +299,22 @@ class MessageManager {
 		// now increment the unread counter for everyone except the author
 		foreach ($conversation->getMetadata() as $reader) {
 			if ($reader->getUser() != $author) {
-				$reader->setUnread($reader->getUnread()+1);
+				if ($conversation->getAppReference()) {
+					// We check for AppReference in order to see if this conversation is a realm conversation
+					if (!$reader->getUser()->getAppUser()->getAutoReadRealms()) {
+						// If it is, we check each user to see if they care about realm messages. If they don't, +1 unread.
+						$reader->setUnread($reader->getUnread()+1);
+					}
+				} else {
+					// Of course, if it's not a realm conversation, we just increment the counter.
+					$reader->setUnread($reader->getUnread()+1);
+				}
 			}
 		}
 
 		return $msg;
 	}
-
+	
 	public function writeReply(Message $source, User $author, $content) {
 		$msg = $this->writeMessage($source->getConversation(), $author, $content, $source->getDepth()+1);
 
