@@ -172,7 +172,7 @@ class Interactions {
 			return $details;
 		}
 		// FIXME: This does NOT take watchtowers into account - I should probably create a checkSpotted() method or something
-		switch ($this->getClassName($target))) {
+		switch ($this->getClassName($target)) {
 			case 'Settlement':
 				$distance = $this->geo->calculateDistanceToSettlement($character, $target);
 				$spot = $this->geo->calculateSpottingDistance($character);
