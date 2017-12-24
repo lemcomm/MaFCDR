@@ -28,6 +28,7 @@ class Dispatcher {
 
 	// test results to store because they are expensive to calculate
 	private $actionableSettlement=false;
+	private $actionablePlace=false;
 	private $actionableRegion=false;
 	private $actionableDock=false;
 	private $actionableShip=false;
@@ -110,20 +111,23 @@ class Dispatcher {
 		}
 
 		$actions=array();
-		if ($estate = $this->getActionableSettlement()) {
-			$actions[] = $this->locationEnterTest(true);
-		} else if ($this->getLeaveableSettlement()) {
+		if ($this->getLeaveableSettlement()) {
 			$actions[] = $this->locationLeaveTest(true);
+		} else if ($estate = $this->getActionableSettlement()) {
+			$actions[] = $this->locationEnterTest(true);
 		} else {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
 		if ($actionableplace = $this->getActionablePlace()) {
-			$actions[] = array("name"=>"places.actionable.name". "description"=>"places.actionable.description");
+			$actions[] = array("name"=>"places.actionable.name", "description"=>"places.actionable.description");
 		} else if ($this->getLeaveablePlace()) {
 			$actions[] = $this->placeLeaveTest(true);
 		} else {
 			$actions[] = array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
+		}
+		if ($newplace = $this->placeCreateTest(true)) {
+			$actions[] = $newplace;
 		}
 
 		$actions[] = $this->locationQuestsTest();
@@ -463,11 +467,23 @@ class Dispatcher {
 			$this->setPlace($place);
 			$actions[] = array("title"=>$place->getFormalName());
 			$actions[] = array("name"=>"place.view.name", "url"=>"bm2_site_place_view", "parameters"=>array("id"=>$place->getId()), "description"=>"place.view.description", "long"=>"place.view.longdesc");
+			$actions[] = $this->placeCreateTest();
 			$actions[] = $this->placeManageTest();
 			$actions[] = $this->placeEnterTest();
 		}
 		
 		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
+	}
+
+	private function placeActionsGenericTests(Place $place=null) {
+		if ($this->getCharacter()->getUser()->getRestricted()) {
+			return 'restricted';
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return 'npc';
+		}
+
+		return $this->veryGenericTests();
 	}
 
 	/* ========== Meta Dispatchers ========== */
@@ -1254,7 +1270,7 @@ class Dispatcher {
 		if ($estate->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
 		}
-		if (!$place->getRealm()) {
+		if (!$estate->getRealm()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
 		}
 
@@ -1374,52 +1390,30 @@ class Dispatcher {
 	
 	public function placeEnterTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
-			return array("name"=>"place.enter.name", 
-				     "description"=>"unavailable.$check"
-				    );
+			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
 		}
 		if ($this->getCharacter()->isNPC()) {
-			return array("name"=>"place.enter.name", 
-				     "description"=>"unavailable.npc"
-				    );
+			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
 		}
 		if ($this->place != $this->getActionablePlace()) {
-			return array("name"=>"place.enter.name", 
-				     "description"=>"unavailable.noplace"
-				    );
+			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
-			return array("name"=>"place.enter.name", 
-				     "description"=>"unavailable.already"
-				    );
+			return array("name"=>"place.enter.name", "description"=>"unavailable.already");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"place.enter.name", 
-				     "description"=>"unavailable.inbattle"
-				    );
+			return array("name"=>"place.enter.name", "description"=>"unavailable.inbattle");
 		}
 
 		if ($this->getCharacter()->isPrisoner()) {
 			if ($place->getOwner() == $this->getCharacter()) {
-				return array("name"=>"place.enter.name", 
-					     "url"=>"bm2_site_actions_enter", 
-					     "description"=>"place.enter.description2");
+				return array("name"=>"place.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"place.enter.description2");
 			} else {
-				return array("name"=>"place.enter.name", 
-					     "description"=>"unavailable.enter.notyours");
+				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
 			}
 		} else {
-			return $this->action("place.enter", 
-					     "bm2_site_actions_place", 
-					     "parameters"=>array(
-						     "id", $place->getId(), 
-						     array(
-							     "%name%"=>$this->place->getName(), 
-							     "%formalname%"=>$this->place->getFormalName()
-							  )
-					     );
+			return $this->action("place.enter", "bm2_site_actions_place", false, array('id'=>$place->getId()));
 		}
-
 	}
 	
 	public function placeLeaveTest($check_duplicate=false) {
@@ -1780,9 +1774,11 @@ class Dispatcher {
 				$this->actionablePlace = $this->getCharacter()->getInsidePlace();
 			} else if ($location=$this->getCharacter()->getLocation()) {
 				$nearest = $this->geography->findNearestPlace($this->getCharacter());
-				$place=array_shift($nearest);
-				if ($nearest['distance'] < $this->geography->calculateActionDistance($place)) {
-					$this->actionablePlace=$place;
+				if ($nearest) {
+					$place=array_shift($nearest);
+					if ($nearest['distance'] < $this->geography->calculateActionDistance($place)) {
+						$this->actionablePlace=$place;
+					}
 				}
 			}
 		}
