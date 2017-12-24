@@ -32,7 +32,7 @@ You can station soldiers at your estates or you can have them follow you around 
 
 Militia (soldiers stationed at estates) will always automatically defend a settlement when it is being attacked. Mobile forces only defend settlements they are at automatically if they have the "defend settlement" action set. Otherwise they need to explicitly join the battle.
 
-As the world we simulate does not have professional standing armies, stationed militia continues to work their old jobs for half of the day and thus contributes to the local economy and resource production. They cannot, however, be used for construction work. Recruits in training need all their time for training and do not contribute to the local economy.
+As the world we simulate does not have professional standing armies, stationed militia continue to work their old jobs for half of the day and thus contributes to the local economy and resource production. They cannot, however, be used for construction work. Recruits in training need all their time for training and do not contribute to the local economy.
 
 
 Assigning and Reclaiming
