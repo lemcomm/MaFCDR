@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
+use BM2\SiteBundle\Form\PlaceManageType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -111,20 +112,25 @@ class PlaceController extends Controller {
 	  * @Template
 	  */
 	public function newAction(Request $request) {
-		$character = $this->gateway($place, 'placeCreateTest');
+		$character = $this->get('dispatcher')->gateway('placeCreateTest');
 		
 		# Build the list of requirements we have.
 		$rights = [];
 		$settlement = $character->getInsideSettlement();
-		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside') {
+		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside')) {
 			if ($settlement == $settlement->getOwner()) {
 				$rights[] = 'lord';
 				if ($settlement->hasBuildingNamed('Wood Castle')) {
 					$rights[] = 'castle';
 				}
 			}
-			if ($settlement->getCapitalOf() && $settlement->getRealm() && in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
-				$rights[] = 'ruler';
+			$realm = $settlement->getRealm();
+			if ($settlement->getCapitalOf() && $realm) {
+				if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
+					$rights[] = 'ruler';
+				} else if (!is_array($realm->findRulers()) && $character == $realm->findRulers()) {
+					$rights[] = 'ruler';
+				}
 			}
 			if ($settlement->hasBuildingNamed('Library')) {
 				$rights[] = 'library';
@@ -143,7 +149,7 @@ class PlaceController extends Controller {
 		*/
 		
 		#Now generate the list of things we can build!
-		$types[] = $this->getDoctrine->getManager->getRepository('BM2SiteBundle:PlaceType')->findBy(array('requires' => array($rights)));
+		$types[] = $this->getDoctrine()->getManager()->getRepository('BM2SiteBundle:PlaceType')->findBy(array('requires' => $rights));
 		
 		$form = $this->createForm(new PlaceManageType($types, NULL, true, false));
 		$form->handleRequest($request);
@@ -201,6 +207,9 @@ class PlaceController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
 		}
+		return array(
+			'form' => $form->createView()
+		);
 	}
 
 	/**
@@ -209,7 +218,7 @@ class PlaceController extends Controller {
 	  */
 	public function manageAction(Place $place, Request $request) {
 		$place = $id;
-		$character = $this->gateway($place, 'placeManageTest');
+		$character = $this->get('dispatcher')->gateway($place, 'placeManageTest');
 		
 		$new = false;
 		$olddescription = $place->getDescription()->getText();
