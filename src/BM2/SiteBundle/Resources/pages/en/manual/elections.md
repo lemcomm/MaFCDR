@@ -1,13 +1,13 @@
-While democracy is unknown in the world of Might & Fealty, elections do happen. Mostly, among the lords of a realm. There are two kinds of votings in this game, formal votes and informal referendums.
+While democracy is unknown in the world of Might & Fealty, elections do happen. Mostly, among the lords of a realm. There are two kinds of voting in this game, formal votes and informal referendums.
 
 
 Proper Elections
 ----------------
 Normally only called by the realm's internal bureaucrats, these are elections with actual game-mechanics consequences. The most common cause is when a realm ruler dies without an heir. Somehow, a new ruler needs to be decided, and an election is how this is done. In addition, realm positions can also be made into elected positions and even given a limited term.
 
-An election allows every person of the realm to give his support to any other person of the realm for the available position. In addition to this formal process, everyone can also announce they are interested in the position and run a campaign, if they want to.
+An election allows every person of the realm to give their support to any other person of the realm for the available position. In addition to this formal process, everyone can also announce they are interested in the position and run a campaign, if they want to.
 
-The voting process itself is quite simple: Every person gets a voting sheet where he can vote in favor, neutral, or opposed to every other person. These votes can also be changed at any time, until the election is over, at which point the scores are tallied, positive and negative votes added up and the winner announced. In case of a draw, the lord with the most votes in favor wins. If that is still a draw, the winner is decided by a random draw.
+The voting process itself is quite simple: Every person gets a voting sheet where he can vote in favor, neutral, or opposed to every other person. These votes can also be changed at any time, until the election is over, at which point the scores are tallied, positive and negative votes added up and the winner announced. In case of a draw, the First One with the most votes in favor wins. If that is still a draw, the winner is decided by a random draw.
 
 
 
@@ -50,4 +50,4 @@ by foritifactions in realm
 : Very similar to by fortifications, but will only count fortifications that exist in the realm the election is in (to include subrealms).
 
 by heads
-: Here, the size of estates matters and one vote is counted per peasant in each estate, given larger settlements more weight.
+: Here, the sizes of estates matter and one vote is counted per peasant in each estate, giving larger settlements more weight.
