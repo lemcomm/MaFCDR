@@ -13,8 +13,8 @@
 {% import _self as macros %}
 
 {% block content %}
-	<h2>{{ "control.permissions.name"|trans({},"places")|title }}</h2>
-	<p>{{ "control.permissions.intro"|trans({"%place%":link(place), "%listsurl%":path('bm2_lists')},"places")|raw }}</p>
+	<h2>{{ "place.permissions.name"|trans({},"places")|title }}</h2>
+	<p>{{ "place.permissions.intro"|trans({"%place%":link(place), "%listsurl%":path('bm2_lists')},"places")|raw }}</p>
 
 	<div class="warning">
 		{# TODO: remove warning when permissions are done #}
@@ -29,7 +29,7 @@
 	<form class="wide" action="{{ path('bm2_site_place_permissions', {'id':place.id}) }}" method="post" {{ form_start(form) }}
 		{{ form_errors(form) }}
 		{{ form_widget(form._token) }}
-		<h3>{{ "control.permissions"|trans({},"places")|title }}</h3>
+		<h3>{{ "place.permissions.manage"|trans({},"places")|title }}</h3>
 		<table class="permissions">
 			<thead><tr>
 				<th>{{ 'perm.name'|trans({}, "politics") }}</th>
@@ -46,15 +46,15 @@
 		
 		<br /><br />
 
-		<button type="submit" name="submit">{{ "control.permissions.submit"|trans({},"places") }}</button>
+		<button type="submit" name="submit">{{ "buttons.submit"|trans({},"places") }}</button>
 	</form>
 
 	<hr />
 	<h2>{{ "perm.desc.title"|trans({},"places")|title }}</h2>
 	<dl class="wide">
 		{% for perm in permissions %}
-			<dt>{{ perm.translationstring|trans({},"places") }}</dt>
-			<dd>{{ ('perm.desc.'~perm.name)|trans({},"places")|raw }}</dd>
+			<dt>{{ perm.translationstring|trans({},"politics") }}</dt>
+			<dd>{{ ('perm.desc.'~perm.name)|trans({},"politics")|raw }}</dd>
 		{% endfor %}
 	</dl>
 
