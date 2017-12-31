@@ -12,17 +12,17 @@ list:
  title:		Your Existing Crests
 
 form:
- choose:		-- choose --
+ choose:		-- Choose --
 design:
  title:		Heraldry Designer
- link:		open the heraldry designer
- busy:		updating and validating your design...
- update:		update and check design
- random:		generate randomly
- save:		save design
+ link:		Open the heraldry designer
+ busy:		Updating and validating your design...
+ update:		Update and check design
+ random:		Generate randomly
+ save:		Save design
  issues:		There are one or more problems with your design:
  ok:			Your design is valid.
- saving:		creating and saving your design, this can take a short moment. This page will automatically refresh when everything is finished.
+ saving:		Creating and saving your design, this can take a short moment. This page will automatically refresh when everything is finished.
  saved:		Your new banner design has been saved.
  payment:	Saving a crest for use on your account will remove %crestfee% credits from your account.
  poor:		Unfortunately, you only have %amount% credits left in your account.
@@ -40,129 +40,129 @@ warning:
  taken:		This design has already been choosen by someone else.
 
 
-badge: badge 
-french: french 
-german: german 
-italian: italian 
-polish: polish 
-spanish: spanish 
-swiss: swiss 
+badge: Badge 
+french: French 
+german: German 
+italian: Italian 
+polish: Polish 
+spanish: Spanish 
+swiss: Swiss 
 
-base: base 
-bend: bend 
-bend_sinister: bend sinister 
-chevron: chevron 
-chief: chief 
-cross: cross 
-fess: fess 
-flaunches: flaunches 
-gryon: gryon 
-pale: pale 
-per_bend: per bend 
-per_bend_sinister: per bend sinister 
-per_chevron: per chevron 
-per_fess: per fess 
-per_pale: per pale 
-per_saltire: per saltire 
-pile: pile 
-quarterly: quarterly 
-saltire: saltire 
-shakefork: shakefork 
+base: Base 
+bend: Bend 
+bend_sinister: Bend sinister 
+chevron: Chevron 
+chief: Chief 
+cross: Cross 
+fess: Fess 
+flaunches: Flaunches 
+gryon: Gryon 
+pale: Pale 
+per_bend: Per bend 
+per_bend_sinister: Per bend sinister 
+per_chevron: Per chevron 
+per_fess: Per fess 
+per_pale: Per pale 
+per_saltire: Per saltire 
+pile: Pile 
+quarterly: Quarterly 
+saltire: Saltire 
+shakefork: Shakefork 
 
-beasts: beasts
-objects: objects
-arm_cubit_habited: arm cubit habited
-arm_cubit_in_armor: arm cubit in armor
-arm_embowed_in_armor: arm embowed in armor
-battle_axe: battle axe
-bear_head_couped: bear head couped
-bear_head_erased: bear head erased
-bear_head_muzzled: bear head muzzled
-bear_passant: bear passant
-bear_rampant: bear rampant
-bear_sejant_erect: bear sejant erect
-bear_statant: bear statant
-boar_head_couped: boar head couped
-boar_head_erased: boar head erased
-boar_passant: boar passant
-boar_rampant: boar rampant
-boar_statant: boar statant
-broad_arrow: broad arrow
-buck_head_couped: buck head couped
-caltrap: caltrap
-catamount_passant_guardant: catamount passant guardant
-catamount_sejant_guardant: catamount sejant guardant
-catamount_sejant_guardant_erect: catamount sejant guardant erect
-chess_rook: chess rook
-chevalier_on_horseback: chevalier on horseback
-church_bell: church bell
-coney: coney
-crescent: crescent
-decrescent: decrescent
-dragon_passant: dragon passant
-dragon_rampant: dragon rampant
-dragon_statant: dragon statant
-eagle_displayed: eagle displayed
-falcon: falcon
-fluer_de_lis: fluer de lis
-fox_mask: fox mask
-fox_passant: fox passant
-fox_sejant: fox sejant
-hind: hind
-horse_courant: horse courant
-horse_passant: horse passant
-horse_rampant: horse rampant
-javelin: javelin
-lion_rampant: lion rampant
-lynx_coward: lynx coward
-martlet_volant: martlet volant
-pegasus_passant: pegasus passant
-reindeer: reindeer
-scymitar: scymitar
-serpent_nowed: serpent nowed
-squirrel_sejant_erect: squirrel sejant erect
-stag-atgaze: stag at gaze
-stag-lodged: stag lodged
-stag-springing: stag springing
-stag-statant: stag statant
-stag-trippant: stag trippant
-stagshead-caboshed: stags head caboshed
-stagshead-erased: stags head erased
-sun_in_splendor: sun in splendor
-sword: sword
-unicorn_rampant: unicorn rampant
-winged_stag_rampant: winged stag rampant
-wolf_courant: wolf courant
-wolf_passant: wolf passant
-wolf_rampant: wolf rampant
-wolf_salient: wolf salient
-wolf_statant: wolf statant
+beasts: Beasts
+objects: Objects
+arm_cubit_habited: Arm cubit habited
+arm_cubit_in_armor: Arm cubit in armor
+arm_embowed_in_armor: Arm embowed in armor
+battle_axe: Battle axe
+bear_head_couped: Bear head couped
+bear_head_erased: Bear head erased
+bear_head_muzzled: Bear head muzzled
+bear_passant: Bear passant
+bear_rampant: Bear rampant
+bear_sejant_erect: Bear sejant erect
+bear_statant: Bear statant
+boar_head_couped: Boar head couped
+boar_head_erased: Boar head erased
+boar_passant: Boar passant
+boar_rampant: Boar rampant
+boar_statant: Boar statant
+broad_arrow: Broad arrow
+buck_head_couped: Buck head couped
+caltrap: Caltrap
+catamount_passant_guardant: Catamount passant guardant
+catamount_sejant_guardant: Catamount sejant guardant
+catamount_sejant_guardant_erect: Catamount sejant guardant erect
+chess_rook: Chess rook
+chevalier_on_horseback: Chevalier on horseback
+church_bell: Church bell
+coney: Coney
+crescent: Crescent
+decrescent: Decrescent
+dragon_passant: Dragon passant
+dragon_rampant: Dragon rampant
+dragon_statant: Dragon statant
+eagle_displayed: Eagle displayed
+falcon: Falcon
+fluer_de_lis: Fleur de lis
+fox_mask: Fox mask
+fox_passant: Fox passant
+fox_sejant: Fox sejant
+hind: Hind
+horse_courant: Horse courant
+horse_passant: Horse passant
+horse_rampant: Horse rampant
+javelin: Javelin
+lion_rampant: Lion rampant
+lynx_coward: Lynx coward
+martlet_volant: Martlet volant
+pegasus_passant: Pegasus passant
+reindeer: Reindeer
+scymitar: Scimitar
+serpent_nowed: Serpent nowed
+squirrel_sejant_erect: Squirrel sejant erect
+stag-atgaze: Stag at gaze
+stag-lodged: Stag lodged
+stag-springing: Stag springing
+stag-statant: Stag statant
+stag-trippant: Stag trippant
+stagshead-caboshed: Stag's head caboshed
+stagshead-erased: Stag's head erased
+sun_in_splendor: Sun in splendor
+sword: Sword
+unicorn_rampant: Unicorn rampant
+winged_stag_rampant: Winged stag rampant
+wolf_courant: Wolf courant
+wolf_passant: Wolf passant
+wolf_rampant: Wolf rampant
+wolf_salient: Wolf salient
+wolf_statant: Wolf statant
 
 label:
- name:		name
- shield:		shield
- shieldc:	shield color
- pattern:	pattern
- patternc:	pattern color
- charge:		charge
- chargec:	charge color
- shading:	shading
+ name:		Name
+ shield:		Shield
+ shieldc:	Shield color
+ pattern:	Pattern
+ patternc:	Pattern color
+ charge:		Charge
+ chargec:	Charge color
+ shading:	Shading
 
-metal:			metals
-colours:			colors
-argent:			argent
-or:				or
-copper:			copper
-azure:			azure
-blue celeste:	blue celeste
-gules:			gules
-murrey:			murrey
-purpure:			purpure
-sable:			sable
-sanguine:		sanguine
-tenne:			tenne
-vert:				vert
-cendree:			cendrée
+metal:			Metals
+colours:			Colors
+argent:			Argent
+or:				Or
+copper:			Copper
+azure:			Azure
+blue celeste:	Blue celeste
+gules:			Gules
+murrey:			Murrey
+purpure:			Purpure
+sable:			Sable
+sanguine:		Sanguine
+tenne:			Tenne
+vert:				Tert
+cendree:			Cendrée
 
 blazon:
  and:			and
