@@ -151,7 +151,7 @@ map:
  newroute:  Your new route has been set. It will take you about %duration% days to complete.
  disembark: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% days considers the route until that point. Red lines show the invalid travel section.</small>
  crossings:
-  title:    river crossings
+  title:    River crossings
   river:    The %river% at the bridge "%bridge%" near %nearby%.
  cleared:   Route cleared.
  error:
@@ -180,11 +180,11 @@ account:
    or reduced the number of living characters, actions and travel on all your characters will be severely limited. You can write
    messages and check your characters in order to decide which to retire and do so in a proper way, but you will not be able to
    really play them.
- list:          click to move this character to a different list
- created:       created: %date%
- lastlogin:     last login: %date%
+ list:          Click to move this character to a different list
+ created:       Created: %date%
+ lastlogin:     Last login: %date%
  identities:    Authentication
- authmail:      username/email and password
+ authmail:      Username/email and password
  locked:        Your characters are currently locked because you have run out of game-time. Please renew your subscription on the profile page.
  level:
   0: Locked
@@ -203,12 +203,12 @@ account:
   title:  Personal Data
   saved:  Your personal data has been updated.
  settings:
-  link:   edit settings
+  link:   Edit settings
   title:  Settings
   language:    Your language
   notifications: E-Mail notifications
   newsletter: Occasional newsletter
-  submit: update
+  submit: Update
   saved:  Your settings have been updated.
  autologin:
   title:    Auto-Login
@@ -254,10 +254,10 @@ account:
      adding additional credits and choosing a subscription level.<br />
      To do so, simply log in and go to your profile page.</p>
  code:
-  title:    redeem code
+  title:    Redeem Code
   intro:    If you have a code from a friend or the crowdfunding campaign, you can redeem it here.
-  label:    code:
-  submit:   redeem
+  label:    Code:
+  submit:   Redeem
   redeemed:   A code for %credits% game credits was found for your e-mail and automatically redeemed.
   redeemed2:  A code was found for your e-mail and automatically redeemed into %credits% game credits and a VIP status of "%vip%".
   redeemed3:  The code you have entered is valid and has been redeemed for %credits% game credits.
@@ -296,7 +296,7 @@ account:
   description3: >
     The price for 100 credits is 1 &euro; or the <a href="http://www.xe.com/currency/eur-euro">equivalent in your local currency</a> (our payment providers will automatically convert currencies for you).
   link:      Change subscription level
-  submit:    change subscription
+  submit:    Change subscription
   remaining: Your new subscription will start today, the first month subscription fee will automatically be reduced by %refund% credits remaining from your current subscription.
   changed:   Your subscription level has been changed.
  play: Play
@@ -318,21 +318,21 @@ account:
   link:     Culture
   title:    Culture
   intro: >
-    The core culture that Might & Fealty represents is central european. You can buy access to other cultures and decide for each of
+    The core culture that Might & Fealty represents is Central European. You can buy access to other cultures and decide for each of
     the settlements controlled by your characters which culture they belong to. Depending on the particular set, this always includes the
     names of soldiers and entourage recruited there and can also include visuals such as buildings, troops and entourage.<br />
     Once unlocked, a culture is yours forever and can be used by all of your characters as often as you like. You will also automatically get
     any updates to a culture pack (such as added graphics).
   owned:    Culture Packs you own
   buyable:  Culture Packs you can buy
-  buy:      buy
-  name:     culture
-  cost:     cost
-  contains: contains
+  buy:      Buy
+  name:     Culture
+  cost:     Cost
+  contains: Contains
   contents:
-   names:   names
-  submit:   buy selected culture pack(s)
-  change:   change culture
+   names:   Names
+  submit:   Buy selected culture pack(s)
+  change:   Change culture
   upgrades: >
     Culture packs are occasionally updated and extended, so a pack that does not contain graphics, for example, may
     get them added in the future. If you by a culture pack, you will always get all updates for free.
@@ -407,7 +407,7 @@ account:
 
 newcharacter:
  title: Create Character
- description: create a new character or ancestor
+ description: Create a new character or ancestor
  intro: >
    Enter the vital details of your new character below. Of these, only the name can later be changed, so pick carefully.<br />
    Please note that the character name should be a full name, including a surname. Characters of the same family
@@ -432,7 +432,7 @@ newcharacter:
   mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the latter case, the father will have to be the (or one of the) mother's partner(s).
   partner:   If you want to start a character as married to another of your own characters. Marriages with characters of other players have to be secured in-game.
   dead:      You can create characters who have died already in order to complete your family tree. You will, obviously, not be able to play a dead character.
- submit: create
+ submit: Create
 
 
 summary:
