@@ -68,15 +68,15 @@ elections:
  method:
   name:         Voting Method
   empty:        -- Choose --
-  banner:       by banner (per First One)
-  spears:       by spears (per soldier)
-  swords:       by swords (per weighted soldier)
-  horses:       by horses (per mounted soldier)
-  realmland:    by land in realm (per estate)
-  land:         by land (per estate)
-  realmcastles: by fortifications in realm (per estate defenses)
-  castles:      by fortifications (per estate defenses)
-  heads:        by heads (per peasant)
+  banner:       by Banner (per First One)
+  spears:       by Spears (per soldier)
+  swords:       by Swords (per weighted soldier)
+  horses:       by Horses (per mounted soldier)
+  realmland:    by Land in realm (per estate)
+  land:         by Land (per estate)
+  realmcastles: by Fortifications in realm (per estate defenses)
+  castles:      by Fortifications (per estate defenses)
+  heads:        by Heads (per peasant)
  submit:        Create election
 
 votes:
@@ -208,8 +208,8 @@ relation:
  liason:      Having a liason with
  proposedto:  proposed
  proposedyou: your proposed
- public:      Public
- secret:      Secret
+ public:      public
+ secret:      secret
  with:        with
  sex:         Includes sex
  nosex:       Without sex
@@ -253,8 +253,8 @@ realm:
     In fact, it is entirely up to you what to call your new realm. The only thing stopping you from calling three
     villages an empire is the ridicule of your peers. The proper mixture of ambition and modesty might be advisable.<br />
     You can change the designation of your realm later on.<br />
-  choose:     -- choose --
-  submit:     announce new realm
+  choose:     -- Choose --
+  submit:     Announce new realm
  manage:
   name:         Manage Realm
   description:  Change realm name, color and other details.
@@ -297,32 +297,32 @@ realm:
  details:     Realm Details
  size:        Size
  type:
-  1: barony
-  2: county
-  3: march
-  4: duchy
-  5: principality
-  6: kingdom
-  7: empire
+  1: Barony
+  2: County
+  3: March
+  4: Duchy
+  5: Principality
+  6: Kingdom
+  7: Empire
  title:
   male:
-   0: knight
-   1: baron
-   2: count
-   3: marquess
-   4: duke
-   5: prince
-   6: king
-   7: emperor
+   0: Knight
+   1: Baron
+   2: Count
+   3: Marquess
+   4: Duke
+   5: Prince
+   6: King
+   7: Emperor
   female:
-   0: dame
-   1: baroness
-   2: countess
-   3: marquise
-   4: duchess
-   5: princess
-   6: queen
-   7: empress
+   0: Dame
+   1: Baroness
+   2: Countess
+   3: Marquise
+   4: Duchess
+   5: Princess
+   6: Queen
+   7: Empress
 
 position:
  name:          Title:
@@ -354,7 +354,7 @@ position:
   year:         In what year should the next election be held? This is combined with the week input, to figure out when the game will call an election. If the date has already passed, an election will be called next turn.
   week:         In what week should the next election be held? Elections are always held on day 1 of a week.
   type:         Select the type of position this is. New types can be suggested on the forum.
-  none:         none
+  none:         None
   term:         This will change how long this position will be held.
   retired:      Check this box if this position is no longer considered active, or if it's no longer in use. This will remove it from locations where it is listed publicly, but it's holders will still hold the position.
   rank:         Please input a number to determine ordering of positions when part of a list. Lower numbers are listed first.
@@ -369,23 +369,23 @@ position:
   intro2: >
     You can appoint new rulers for this realm at any time for any reason. <b>Keep in mind that you cannot demote them again</b>. Once they are
     appointed, they are your equals in power and neither of you can remove the other from it.
-  candidates:  candidates
-  submit:       announce changes
+  candidates:  Candidates
+  submit:       Announce changes
   done:         Your changes have been completed and announced.
   nodemoruler:  Rulers cannot be demoted, this change has been ignored.
  types:
-  advisory:     advisory
-  executive:    executive
-  family:       family
-  foreign affairs: foreign affairs
-  history:      history
-  intelligence: intelligence
-  interior:     interior
-  judicial:     judicial
-  legislative:  legistlative
-  military:     military
-  revenue:      revenue
-  other:        other
+  advisory:     Advisory
+  executive:    Executive
+  family:       Family
+  foreign affairs: Foreign affairs
+  history:      History
+  intelligence: Intelligence
+  interior:     Interior
+  judicial:     Judicial
+  legislative:  Legistlative
+  military:     Military
+  revenue:      Revenue
+  other:        Other
 
 war:
  name:          Declare War
@@ -394,24 +394,24 @@ war:
 
 diplomacy:
  name:         Diplomacy
- other:        diplomatic relations to other realms
+ other:        Diplomatic relations to other realms
  description:  Manage the realms dependencies and formal diplomacy.
  longdesc:     Relations of %formalname% to other realms determine if %name% is independent or part of a larger realm. You can also break allegiance or create sub-realms here.
  status:
-  name:      relation status
-  nemesis:   nemesis
-  war:       war
-  peace:     peace
-  friend:    friend
-  ally:      ally
+  name:      Relation status
+  nemesis:   Nemesis
+  war:       War
+  peace:     Peace
+  friend:    Friend
+  ally:      Ally
  report:
-  myrealm:     relations with %myrealm%
-  we:          we see them as %status%
-  they:        they see us as %status%
-  link:        view details
+  myrealm:     Relations with %myrealm%
+  we:          We see them as %status%
+  they:        They see us as %status%
+  link:        View details
   between:     Diplomatic relations between %myrealm% and %targetrealm%
-  position:    diplomatic positon of %realm%
-  undefined:   (no diplomatic position defined)
+  position:    Diplomatic positon of %realm%
+  undefined:   (No diplomatic position defined)
  change:
   name:         Change Realm
   description: >
@@ -433,9 +433,9 @@ diplomacy:
     Also note that you can only join realms with a higher designation than your own realm has, so a kingdom,
     for example, cannot become a part of a barony.
   label:        Realm to join
-  empty:        -- choose --
-  via:          available via
-  submit:       join realm
+  empty:        -- Choose --
+  via:          Available via
+  submit:       Join realm
   noothers:     No realms to join available.
   unavailable:  Realms that have nobles nearby but are not available to join, and the reasons why:
   unavail:
@@ -448,7 +448,7 @@ diplomacy:
   link:         Restore this Subrealm
   description:  Use your position as ruler of this realm's superior to bring this realm back into existence.
   intro: >
-    As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself it's ruler in the process.
+    As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself its ruler in the process.
     All you need to do is confirm that this is an action you want to take by clicking the button below.
   submit:       Revive Realm
   success:      You have successfully restored the subrealm.
@@ -461,14 +461,14 @@ diplomacy:
     Simply select the estates that you want to be part of the new sub-realm below, then give it a name, a designation and pick one of the lords of the 
     new realm as its ruler.<br />
     Your new sub-realm must have at least one estate and at least one estate must remain with your main realm.
-  estates:      estates joining the new realm
-  newname:      name of the new realm
-  ruler:        ruler of the new realm
-  empty:        -- choose --
-  submit:       create realm
+  estates:      Estates joining the new realm
+  newname:      Name of the new realm
+  ruler:        Ruler of the new realm
+  empty:        -- Choose --
+  submit:       Create realm
   invalid:
-   ruler:       your selected ruler is not the lord of any of the estates you picked to join the new subrealm.
-   size:        the subrealm must contain at least one estate, and at least one must remain with your main realm.
+   ruler:       Your selected ruler is not the lord of any of the estates you picked to join the new subrealm.
+   size:        The subrealm must contain at least one estate, and at least one must remain with your main realm.
   success:      Your subrealm has been created.
 
  break:
@@ -478,7 +478,7 @@ diplomacy:
     While %realm% is a part of %parent% at this time, you can always declare that relation null and void and make
     %realm% an independent %type%.<br />
     Of course, you should make sure you are willing to handle the possible repercussions of this step.
-  submit:       declare independence
+  submit:       Declare independence
   done:         %realm% is now an independent %type%.
 
  relations:
@@ -487,41 +487,41 @@ diplomacy:
   description: >
     The diplomatic relations of your realm define how you view and treat other realms and gives both your people and
     theirs information about the diplomatic status between the realms.
-  they:       target realm
-  ourstatus:  our status
-  theirstatus: their status
+  they:       Target realm
+  ourstatus:  Our status
+  theirstatus: Their status
   new:
    title:     New Relation
    intro:     To create a diplomatic relation with a realm, follow this link:
-   link:      create new relation
-  edit:       edit relation
-  delete:     remove our relation
-  target:     target realm
-  public:     public statement
-  internal:   internal statement
-  delivered:  delivered statement
-  emptytarget: -- choose realm --
-  emptystatus: -- choose summary --
-  submit:     announce new diplomatic status
-  success:    diplomatic relations have been updated and the changes announced
+   link:      Create new relation
+  edit:       Edit relation
+  delete:     Remove our relation
+  target:     Target realm
+  public:     Public statement
+  internal:   Internal statement
+  delivered:  Delivered statement
+  emptytarget: -- Choose realm --
+  emptystatus: -- Choose summary --
+  submit:     Announce new diplomatic status
+  success:    Diplomatic relations have been updated and the changes announced
 
  prisoners:
   name:         Prisoners
   description:  Manage, execute or release prisoners.
   intro: >
-    These nobles are currently bound to you as prisoners. They will accompany you anywhere you are going and have only a very limited
+    These First Ones are currently bound to you as prisoners. They will accompany you anywhere you are going and have only a very limited
     set of actions they can do while imprisoned by you. However, you can set them free at any time, or alternatively remove them of the
     burden of their head. You can also transfer your prisoners to other nobles.
-  free:         set free
-  execute:      execute
-  assign:       assign to...
-  choose:       -- choose --
+  free:         Set free
+  execute:      Execute
+  assign:       Assign to...
+  choose:       -- Choose --
   kill:
-   behead:      by beheading
-   hang:        by hanging
-   burn:        by burning
-   quarter:     by quartering
-   impale:      by impaling
+   behead:      by Beheading
+   hang:        by Hanging
+   burn:        by Burning
+   quarter:     by Quartering
+   impale:      by Impaling
   done:
    free:        %prisoner% has been set free.
    execute:     %prisoner% has been executed.
@@ -541,60 +541,60 @@ lists:
    Defining lists of realms and people you consider allies, friends, enemies, etc. makes it easier to make targeted actions.<br />
    These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others, 
    but not all.<br />
-   You can define <i>realms</i> or <i>nobles</i> as list members, in both cases with or without subservients (i.e. sub-realms or vassals).<br />
+   You can define <i>realms</i> or <i>First Ones</i> as list members, in both cases with or without subservients (i.e. sub-realms or vassals).<br />
    Permissions will be evaluated in order (top-down) until the first match, so you can allow something to an
    entire realm, except one person - or vice versa. Your rules can be as complicated or simple as you want.<br />
    To include your vassals, add yourself and include subs. You cannot "lock yourself out" using lists.
- creator:   created by %character%
- new:           create new list
+ creator:   Created by %character%
+ new:           Create new list
  members:       Members of this list
  member:
-  allowed:   allowed?
-  realm:     realm
-  character: noble
-  subs:      with subs?
-  add:       add new member
-  del:       remove
-  none:      no members defined
-  inherited: inherited rules:
- submit:     update list
+  allowed:   Allowed?
+  realm:     Realm
+  character: Noble
+  subs:      With subs?
+  add:       Add new member
+  del:       Remove
+  none:      No members defined
+  inherited: Inherited rules:
+ submit:     Update list
  updated:    The list has been updated.
  searchinfo: >
    Enter parts of the name to get a list of matches for realms and characters. For realm names, your input will be matched
-   against both the short and the formal name of the realm.
+   against both the short and the formal name of the realm. For characters, your input will only be matched by their formal name, and <i>not</i> by nicknames.
  changes:     You have unsaved changes.
  delete:
-  submit:       delete this list
+  submit:       Delete this list
   locked:       You cannot delete this list at this time, because:
-  used:         it is used in settlement permissions.
-  descendants:  other lists inherit from it.
+  used:         It is used in settlement permissions.
+  descendants:  Other lists inherit from it.
   done:         The list "%name%" has been deleted.
- usedby:     used by
+ usedby:     Used by
 
 perm:
- name:      permission
- value:     amount
- reserve:   reserve
- add:       add new permission
- del:       remove
- none:      no permissions defined
- listing:   grant to
- choose:    -- choose --
- visit:     enter settlement
- docks:     embark at docks
- resupply:  resupply
- mobilize:  mobilize troops
- construct: manage constructions
- recruit:   manage recruitment
- trade:     manage trade
- positions: manage positions
- expel:     expel estates
- diplomacy: manage diplomacy
- laws:      change laws
+ name:      Permission
+ value:     Amount
+ reserve:   Reserve
+ add:       Add new permission
+ del:       Remove
+ none:      No permissions defined
+ listing:   Grant to
+ choose:    -- Choose --
+ visit:     Enter settlement
+ docks:     Embark at docks
+ resupply:  Resupply
+ mobilize:  Mobilize troops
+ construct: Manage constructions
+ recruit:   Manage recruitment
+ trade:     Manage trade
+ positions: Manage positions
+ expel:     Expel estates
+ diplomacy: Manage diplomacy
+ laws:      Change laws
  desc:
   title:    Description of permissions
   visit: >
-    Allow others to enter the settlement, precondition for most other actions as well as interactions with nobles inside.
+    Allow others to enter the settlement, a precondition for most other actions as well as interactions with First Ones inside.
   resupply: >
     Allows others to resupply their soldiers at your settlement, up to a number of items per day that you can 
     limit with the <em>amount</em> value. This amount is shared by everyone on the list.
@@ -631,32 +631,32 @@ perm:
 
 law:
  header:
-  name:     name
-  desc:     description
-  current:  current law
+  name:     Name
+  desc:     Description
+  current:  Current law
  label:
-  succession:       succession by heir
-  ruler_election:   ruler election method
-  estates:          estates inheritance
+  succession:       Succession by heir
+  ruler_election:   Ruler election method
+  estates:          Estates inheritance
  desc:
-  succession:       Determines whether the rulers successor can inherit the realm or not. If not, the rulers death or resignation will always trigger an election.
+  succession:       Determines whether the ruler's successor can inherit the realm or not. If not, the ruler's death or resignation will always trigger an election.
   ruler_election:   How a new ruler is elected whenever such is necessary.
   estates:          If estates can be inherited, or who they fall to in case of death of the lord.
 # these are defined in the RealmManager
  value:
-  enabled:    enabled
-  disabled:   disabled
+  enabled:    Enabled
+  disabled:   Disabled
   name:
-   banner:    by banner
-   spears:    by spears
-   swords:    by swords
-   land:      by land
-   heads:     by heads
+   banner:    by Banner
+   spears:    by Spears
+   swords:    by Swords
+   land:      by Land
+   heads:     by Heads
    inherit:   inherit
    liege:     liege
    ruler:     ruler
   desc: 
-   banner:    one vote per noble
+   banner:    one vote per First One
    spears:    one vote per warrior commanded
    swords:    one vote per vassal
    land:      one vote per estate
@@ -666,10 +666,10 @@ law:
    ruler:     fall to the ruler
 
 claim:
- title:       claims
- none:        no current claims
- add:         announce a claim
- cancel:      withdraw your claim
+ title:       Claims
+ none:        No current claims
+ add:         Announce a claim
+ cancel:      Withdraw your claim
  cost:        Announcing a claim will send a herald to the settlement, removing him from your entourage.
  already:     You already hold a claim to this settlement.
  noherald:    You need a herald to announce a claim to a settlement.
