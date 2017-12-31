@@ -1242,9 +1242,9 @@ fiction:
 manual:
  title:       Game Manual
  intro:       Introduction
- background:  Nackground
- videos:      Bideos
- basics:      Nasic concepts
+ background:  Background
+ videos:      Videos
+ basics:      Basic concepts
  knight:      Playing a knight
  lord:        Playing a lord
  ruler:       Playing a ruler
