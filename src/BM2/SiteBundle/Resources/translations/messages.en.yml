@@ -1383,7 +1383,7 @@ trait:
 
 rating:
  title:     reputation
- intro:     Every noble has a reputation that follows him or her. Reputation is built by other nobles, through gossip.
+ intro:     Every person has a reputation that follows him or her. Reputation is built by other people, through gossip.
  empty:     There is no gossip about this character... yet.
  edit:      Update gossip
  write:     Add gossip
@@ -1397,11 +1397,11 @@ rating:
  honor:
   label:    Honourable
   help:     Does this noble act honourably, with grace in victory and decency in defeat?
- none:      (no opinion)
- yes:       yes
- no:        no
- submit:    submit gossip
- votes:     votes
+ none:      (No opinion)
+ yes:       Yes
+ no:        No
+ submit:    Submit gossip
+ votes:     Votes
 
 unavailable:
  intro:         Sorry, but this action is not currently available, because:
