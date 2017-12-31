@@ -96,11 +96,11 @@ login:
  intro: Provide the username or e-mail you used to register below to log in:
 
 pager:
- showing:       showing %from% to %to%, %total% total
- prev:          previous
- next:          next
+ showing:       Showing %from% to %to%, %total% total
+ prev:          Previous
+ next:          Next
 
-togglelist:     toggle list style
+togglelist:     Toggle list style
 
 map:
  title:
@@ -194,10 +194,10 @@ account:
   40: Intense
   41: Developer
   50: Ultimate
-  name: account level
-  limit: character limit
-  cpm: credits/month
-  firstmonth: first month
+  name: Account level
+  limit: Character limit
+  cpm: Credits/month
+  firstmonth: First month
  data:
   link:   Edit Data
   title:  Personal Data
@@ -356,7 +356,7 @@ account:
   gift:     Make this gift
   success: >
     Your gift of %credits% credits has been sent to your friends account, and an e-mail with the text you
-    entered should be in his mailbox in some moments. We will also send a copy to your e-mail address.
+    entered should be in their mailbox in some moments. We will also send a copy to your e-mail address.
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
    notarget:  No user with this e-mail address found.
@@ -401,7 +401,7 @@ account:
   mail2:
    subject:   Might & Fealty Friend Subscription
    body: >
-     <p>Your friend with the e-mail address %mail% has made his first subscription. Since your invite helped win this new player to the game,
+     <p>Your friend with the e-mail address %mail% has made their first subscription. Since your invite helped win this new player to the game,
      we have credited your account with %credits% credits, as promised.<p>
      <p>Thank you so much for helping the game become bigger and better.</p>
 
@@ -493,7 +493,7 @@ first:
 
 character:
  name:    Name
- knownas: known as "%name%"
+ knownas: Known as "%name%"
  gender:  Gender
  gold:    Gold: %gold% gold
  health:
@@ -506,13 +506,13 @@ character:
  father:  Father
  mother:  Mother
  married: Married to
- partner: partner|partners
+ partner: Partner|Partners
  none:    (no character)
- child:   child|children
+ child:   Child|Children
  resupply: Resupply from camp followers:
  status:  Status of %name%
- history: character history
- inactive:  this character has not been played in a while
+ history: Character history
+ inactive:  This character has not been played in a while
  banned:    This user has been banned.
  newplayer: This character is being played by a player who is new to the game. Please act accordingly.
  notstarted:
@@ -521,10 +521,10 @@ character:
  prisoner:  this character is currently a captive of %captor%.
  prisoner2: You are currently a captive of %captor%.
  captorinactive: Your captor has not been seen in quite a while. You should <a href="%url%">try to escape</a>.
- full:    view full details
+ full:    View full details
  list:
   select:   Move character to:
-  submit:   set new list
+  submit:   Set new list
   updated:  just updated, change will be visible on next page load
   1:  Main Characters
   2:  Secondary Characters
@@ -559,7 +559,7 @@ character:
   offersummary2: %name%, lordship
   family:     Place with Family
   existing: >
-    Your new character can begin the game in the estate of any of your existing characters, and get helped to start his career by relatives.
+    Your new character can begin the game in the estate of any of your existing characters, and get helped to start their career by relatives.
   estate:     Starting Estate
   submit:     Start here
   selection:  Place on Map
@@ -607,21 +607,21 @@ form:
  email:       E-Mail
  password:    Password
  password_confirmation: Repeat password
- browser:     (browser setting)
- choose:      -- choose --
- none:        (none)
+ browser:     (Browser setting)
+ choose:      -- Choose --
+ none:        (None)
  submit:      Submit
  help:
   displayname:  The name shown in public lists such as the VIP players list
 
 settlement:
- name:  settlement
+ name:  Settlement
  title: %type% of %name%
  details: Settlement Details
  dummy:   Click a settlement on the map to show its details here.
  area:  %name% area
- type:  type
- fortified: fortified
+ type:  Type
+ fortified: Fortified
  size:
   name: size
   1:		Hamlet
@@ -678,8 +678,8 @@ settlement:
   1:  Minor shortage of %resource%
   2:  Shortage of %resource%
   3:  Dramatic shortage of %resource%
-  effect:   production and construction requiring this resource are slowed down.|production and construction requiring these resources are slowed down.
-  none:     all resource demands are satisfied.
+  effect:   Production and construction requiring this resource are slowed down.|Production and construction requiring these resources are slowed down.
+  none:     All resource demands are satisfied.
  security:
   tt: How protected the settlement is against forces of nature and bandits. Can be improved with defensive buildings, militia, etc.
   0:  Struggling for economic security
@@ -723,7 +723,7 @@ settlement:
   atbuildings:  %number% assigned to building construction
   atfeatures:   %number% assigned to features construction
   employed:     %number% employed in various buildings
-  available:    %number% available for farming and local economy
+  available:    %number% available for farming and the local economy
 
 road:
  quality:
@@ -1126,7 +1126,7 @@ battle:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
   entkilled:    %i% enemy entourage member was killed during the rout.|%i% enemy entourage members were killed during the rout.
-  dropped:      %i% soldier dropped his equipment to run away faster.|%i% soldiers dropped their equipment to run faster.
+  dropped:      %i% soldier dropped their equipment to run away faster.|%i% soldiers dropped their equipment to run faster.
  extras:
   noble:
    kill:        %who% was killed by %by%.
@@ -1148,7 +1148,7 @@ battle:
 description:
  scout: >
    Usually a fleet-footed peasant with good eyes, the scout will search the nearby area for anything
-   unusual, notifying his noble of any finds.<br />
+   unusual, notifying their liege of any finds.<br />
    Scouts increase your spotting range. The more scouts you have, the farther away you notice details of
    the land and other characters.
  prospector: >
@@ -1178,7 +1178,7 @@ description:
  scholar: >
    Trained in the arts of reading and writing, documentation and a dozen other arts and techniques that a proper
    noble cares little about, the scholar can at times be useful to gather and sort information and old documents.<br />
-   His main use is to discover more about the history of people and places.
+   Their main use is to discover more about the history of people and places.
  follower: >
    Camp followers are people following the soldiers in your army. They can be professionals, such as smiths, cooks
    or whores, or they can be relatives and family members of the soldiers. Camp followers allow your army to carry
