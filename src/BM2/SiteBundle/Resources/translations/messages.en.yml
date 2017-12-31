@@ -17,39 +17,39 @@ menu:
  your:      Your...
  economy:   Economy
  recruitment: Recruitment
- playing:   playing %name%
- profile:   profile
- characters:  characters
- homepage:  homepage
- terms:     terms
- credits:   credits
- contact:   contact
- forum:     forum
- wiki:      wiki
- bugs:      bugtracker
- about:     about
- manual:    manual
+ playing:   Playing %name%
+ profile:   Profile
+ characters:  Characters
+ homepage:  Homepage
+ terms:     Terms
+ credits:   Credits
+ contact:   Contact
+ forum:     Forum
+ wiki:      Wiki
+ bugs:      Bugtracker
+ about:     About
+ manual:    Manual
  vips:      VIPs
- fiction:   fiction
- community: community
- translator:  translations
- register:  register
- map:       map
- travel:    map & travel
- status:    status
- recent:    summary
+ fiction:   Fiction
+ community: Community
+ translator:  Translations
+ register:  Register
+ map:       Map
+ travel:    Map & travel
+ status:    Status
+ recent:    Summary
  rss:       RSS feed
- events:    events
- messages:  messages
- news:      publications
- relations: relations
- politics:  politics
- quests:    quests
- actions:   actions
- allactions: all actions
+ events:    Events
+ messages:  Messages
+ news:      Publications
+ relations: Relations
+ politics:  Politics
+ quests:    Quests
+ actions:   Actions
+ allactions: All actions
  character:
-  background: character background
-  start:    character placement
+  background: Character background
+  start:    Character placement
  dungeon:   dungeon
 
 contact:
@@ -104,50 +104,50 @@ togglelist:     toggle list style
 
 map:
  title:
-  map:         map
-  both:        map and travel
- layers:       layers
- map:          abstract map
- graphical:    graphical map
- search:       search for settlement
- searching:    searching...
- settlements:  settlements
- realms:       sovereign realms
- cultures:     cultures
- towers:       towers
- features:     structures
- markers:      markers
+  map:         Map
+  both:        Map and travel
+ layers:       Layers
+ map:          Abstract map
+ graphical:    Graphical map
+ search:       Search for settlement
+ searching:    Searching...
+ settlements:  Settlements
+ realms:       Sovereign realms
+ cultures:     Cultures
+ towers:       Towers
+ features:     Structures
+ markers:      Markers
  placer:       placer
- roads:        roads
- chars:        characters
- route:        route plot
- invalid:      invalid route
- usedroads:    road travel
- offers:       knight offers
+ roads:        Roads
+ chars:        Characters
+ route:        Route plot
+ invalid:      Invalid route
+ usedroads:    Road travel
+ offers:       Knight offers
  poi:          POI
- you:          your location
- area:         local area
+ you:          Your location
+ area:         Local area
  howto: >
     You can see and set your travel right on the map. Choose "travel" on the right and then simply click to set waypoints.<br />
     Your route can be as direct or elaborate as you want. Keep in mind that you need to be near a
     settlement to interact with it, rivers can only be crossed at bridges and cliffs cannot be crossed at all.
- legend:    legend
- yourchars: your other characters
- others:    foreign characters
- past:      outdated spottings
- ownedplace: owned settlements
- indyplace: independent settlements
- spot:      your spotting distance
- act:       your interaction distance
+ legend:    Legend
+ yourchars: Your other characters
+ others:    Foreign characters
+ past:      Outdated spottings
+ ownedplace: Owned settlements
+ indyplace: Independent settlements
+ spot:      Your spotting distance
+ act:       Your interaction distance
  clickselect: Click a settlement or character flag to get details.
  travel:    Travel
  locked:    You are currently prevented from travelling (due to battle or other actions). You can set a travel route, but you will not start travelling until this condition has resolved.
  traveldetails: Travel Details
  draw:      Click on the map to set waypoints.
- submit:    set route
- rmlast:    remove last
- enter:     enter destination
- clear:     clear
+ submit:    Set route
+ rmlast:    Remove last
+ enter:     Enter destination
+ clear:     Clear
  newroute:  Your new route has been set. It will take you about %duration% days to complete.
  disembark: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% days considers the route until that point. Red lines show the invalid travel section.</small>
  crossings:
@@ -187,13 +187,13 @@ account:
  authmail:      username/email and password
  locked:        Your characters are currently locked because you have run out of game-time. Please renew your subscription on the profile page.
  level:
-  0: locked
-  10: casual
-  20: basic
-  21: volunteer
-  40: intense
-  41: developer
-  50: ultimate
+  0: Locked
+  10: Casual
+  20: Basic
+  21: Volunteer
+  40: Intense
+  41: Developer
+  50: Ultimate
   name: account level
   limit: character limit
   cpm: credits/month
@@ -209,7 +209,7 @@ account:
   notifications: E-Mail notifications
   newsletter: Occasional newsletter
   submit: update
-  saved:  your settings have been updated.
+  saved:  Your settings have been updated.
  autologin:
   title:    Auto-Login
   intro: >
@@ -349,11 +349,11 @@ account:
     or any of the other payment options, or for whatever other reason you have.<br />
     You need to know your friends e-mail address for this. We will generate a code and send it to both you and your friend. If your friend
     doesn't want the gift, you can simply use the code yourself to take it back.
-  email:    send to e-mail
-  credits:  amount of credits
-  text:     text to include in e-mail
-  invite:   invite your friend
-  gift:     make this gift
+  email:    Send to e-mail
+  credits:  Amount of credits
+  text:     Text to include in e-mail
+  invite:   Invite your friend
+  gift:     Make this gift
   success: >
     Your gift of %credits% credits has been sent to your friends account, and an e-mail with the text you
     entered should be in his mailbox in some moments. We will also send a copy to your e-mail address.
@@ -388,7 +388,7 @@ account:
    subject:   Might & Fealty Friend Invite
    body: >
      <p>Your friend (cc'ed in this e-mail) has invited you to play Might & Fealty. And to sweeten the deal, or maybe as a 
-     bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. He also sent this message:</p>
+     bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. They also sent this message:</p>
      <hr /><p>%message%</p><hr />
      <p>Join your friend in creating history, check out the game here:</p>
      <p><a href="http://mightandfealty.com/">Might & Fealty</a></p>
@@ -418,9 +418,9 @@ newcharacter:
    frown upon silly names and diplomacy would be much harder. So please, proper names only.<br />
    Choosing a father and mother is optional, if you leave it empty then one or both of the parents will simply be
    people that don't exist as characters in the game. If you want to create a family tree, make sure to start
-   with the older generations.<br />
+   with the oldest generations.<br />
    All characters are <a href="%firstoneurl%">First Ones</a> and begin the game as fully trained and equipped knights.
- limit:     You can create %limit% more living character today.|You can create %limit% more living characters today.
+ limit:     You can create %limit% more living characters today.|You can create %limit% more living characters today.
  limited:   You cannot create new living characters anymore today. You will get more available character slots every real-life day.
  spawnlimit:  You currently have several unspawned characters. Please start playing them first, before you create more characters.
  accountlimit:  You are currently playing %active% of %limit% possible characters.
@@ -428,8 +428,8 @@ newcharacter:
  help:
   name:      The full name of your character, including given and family name, but not including any titles. required
   gender:    required
-  father:    Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the later case, the mother will have to be the (or one of the) fathers partner(s).
-  mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the later case, the father will have to be the (or one of the) mothers partner(s).
+  father:    Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the latter case, the mother will have to be the (or one of the) father's partner(s).
+  mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the latter case, the father will have to be the (or one of the) mother's partner(s).
   partner:   If you want to start a character as married to another of your own characters. Marriages with characters of other players have to be secured in-game.
   dead:      You can create characters who have died already in order to complete your family tree. You will, obviously, not be able to play a dead character.
  submit: create
@@ -438,41 +438,41 @@ newcharacter:
 summary:
  title:     Recent Events & Messages
  events:    Recent Events
- nothing:   no recent events
- fullread:  mark all as read
- fullread2: mark all as read for all my characters
+ nothing:   No recent events
+ fullread:  Mark all as read
+ fullread2: Mark all as read for all my characters
  soldiers:
-  title:    soldiers status warnings
+  title:    Soldiers' status warnings
   starving:
-   1:       some of your soldiers are starving.
-   2:       many of your soldiers are starving.
-   3:       most of your soldiers are starving.
+   1:       Some of your soldiers are starving.
+   2:       Many of your soldiers are starving.
+   3:       Most of your soldiers are starving.
   hungry:
-   1:       some of your soldiers are hungry.
-   2:       many of your soldiers are hungry.
-   3:       most of your soldiers are hungry.
+   1:       Some of your soldiers are hungry.
+   2:       Many of your soldiers are hungry.
+   3:       Most of your soldiers are hungry.
   dead:
-   1:       your troops carry around many dead bodies, slowing down travel.
-   2:       your army has become a funeral march, and the vast number of dead slows you down a lot.
+   1:       Your troops carry around many dead bodies, slowing down travel.
+   2:       Your army has become a funeral march, and the vast number of dead slows you down a lot.
   wounded:
-   1:       some of your soldiers are wounded.
-   2:       many of your soldiers are wounded.
-   3:       most of your soldiers are wounded.
+   1:       Some of your soldiers are wounded.
+   2:       Many of your soldiers are wounded.
+   3:       Most of your soldiers are wounded.
   lost:
-   1:       some of your soldiers have lost equipment.
-   2:       many of your soldiers have lost equipment.
-   3:       most of your soldiers have lost equipment.
+   1:       Some of your soldiers have lost equipment.
+   2:       Many of your soldiers have lost equipment.
+   3:       Most of your soldiers have lost equipment.
   distance:
-   0:       the soldiers are motivated to defend their homes.
-   1:       there is a little bit of unrest among the soldiers about being away from home.
-   2:       there is unrest among the soldiers about being far away from home.
-   3:       the soldiers are very unhappy about being so very far away from home.
- manageprisoners: manage (free, execute, exchange) prisoners
+   0:       The soldiers are motivated to defend their homes.
+   1:       There is a little bit of unrest among the soldiers about being away from home.
+   2:       There is unrest among the soldiers about being far away from home.
+   3:       The soldiers are very unhappy about being so very far away from home.
+ manageprisoners: Manage (free, execute, exchange) prisoners
 
 first:
  title:     Welcome to Might & Fealty
  liege: >
-   You have accepted the knight offer of %liege% and are now his vassal. This settlement belongs to %liege%, so you are in
+   You have accepted the knight offer of %liege% and are now their vassal. This settlement belongs to %liege%, so you are in
    friendly territory at this time.<br />
    If your knight offer included soldiers, they are being assigned to you already. If your knight offer included lordship 
    of the settlement itself, the local steward is already drawing up the documents. Both of these will take a short time
