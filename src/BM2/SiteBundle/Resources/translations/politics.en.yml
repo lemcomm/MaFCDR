@@ -29,16 +29,16 @@ status:
 
 relations:
  name:        Relations
- all:         all relations actions
+ all:         All relations actions
  intro: >
    Manage your personal and feudal relations to other characters here.
 politics:
  name:        Politics
- all:         all political actions
+ all:         All political actions
  intro: >
    Manage your realm(s) and political relations here.
 
-inheritance:  inheritance
+inheritance:  Inheritance
 
 elections:
  name:          Elections
@@ -52,23 +52,23 @@ elections:
    Handling of elections is done by priests, and creating a new election will remove one priest from your entourage.
  nopriest:      As you have no priest with you, you cannot create a new election.
  current:       Current Elections
- title:         title
- complete:      complete
- votes:         votes
- new:           start a new election
- desc:          descriptive text for this election
+ title:         Title
+ complete:      Complete
+ votes:         Votes
+ new:           Start a new election
+ desc:          Descriptive text for this election
  duration:
-  name:         duration (real time)
-  empty:        -- choose --
-  1:            one day
+  name:         Duration (real time)
+  empty:        -- Choose --
+  1:            One day
   3:            3 days
   5:            5 days
-  7:            one week
+  7:            One week
   10:           10 days
  method:
   name:         Voting Method
-  empty:        -- choose --
-  banner:       by banner (per noble)
+  empty:        -- Choose --
+  banner:       by banner (per First One)
   spears:       by spears (per soldier)
   swords:       by swords (per weighted soldier)
   horses:       by horses (per mounted soldier)
@@ -77,11 +77,11 @@ elections:
   realmcastles: by fortifications in realm (per estate defenses)
   castles:      by fortifications (per estate defenses)
   heads:        by heads (per peasant)
- submit:        create election
+ submit:        Create election
 
 votes:
- link:          cast/view votes
- link2:         view votes
+ link:          Cast/view votes
+ link2:         View votes
  name:          Election "%name%"
  intro:         This election within %realm% will end on %complete%. Votes are counted %type%.
  intro2:        This election within %realm% has been closed. Votes have been counted %type%. The winner was %winner%.
@@ -90,17 +90,17 @@ votes:
  forposition2:  This election has granted the position of %position% to the winner.
  list:          Candidates & Votes
  howto:         Add your vote into the appropriate rows and columns below. You can vote for or against as many candidates as you want.
- candidate:     candidate
- pro:           in favor
- contra:        opposed
- sum:           vote count
+ candidate:     Candidate
+ pro:           In favor
+ contra:        Opposed
+ sum:           Vote count
  add:
   name:         Add candidate
-  label:        new candidate
-  procontra:    your vote
-  submit:       add
+  label:        New candidate
+  procontra:    Vour vote
+  submit:       Add
   done:         Your candidate has been added.
- remove:        remove vote
+ remove:        Remove vote
  updated:       Your votes have been updated.
 
 oath:
@@ -121,22 +121,22 @@ oath:
    This action will mean the end of your realm as an independent entity.
  hasliege: >
    Your current oath will automatically be dissolved and your current liege, %liege%, will be notified.
- current:   current oath
- swear:     swear a new oath
+ current:   Current oath
+ swear:     Swear a new oath
  swearintro: Since a lord can hold estates in or be ruler of different realms, some lords may appear multiple times with different realms, and you get to choose which of their realms to join.
  nobody:    There are no eligible new lords within your action range.
- newliege:	new liege
- choose:		-- choose liege --
- norealm:   independent
- swearto:   swear oath to...
- submit:		swear oath
+ newliege:	New liege
+ choose:		-- Choose liege --
+ norealm:   Independent
+ swearto:   Swear oath to...
+ submit:		Swear oath
  fail:
   vassal:	You cannot swear an oath to your own vassals (or their vassals).
  success:	Swearing an oath of fealty, you are now a vassal of %newliege%.
  unavailable: Nobles unavailable as lords
  reason:
-  liege:   already is your current liege
-  vassal:  is your vassal or a vassal of one of your vassals
+  liege:   Already is your current liege
+  vassal:  Is your vassal or a vassal of one of your vassals
 
 vassals:
  view:          
@@ -144,14 +144,14 @@ vassals:
   description:  Review and manage your vassals
   longdesc:     View details on your vassals and manage them, including disowning them.
  disown:
-  link:         disown
+  link:         Disown
   title:        Disown Vassal
   desc: >
     If %name% has been disloyal to you, broken the oaths of fealty or otherwise justified this serious action,
     you can dissolve the fealty relationship below.<br />
-    This is a serious action and will be marked in your vassals history. You should also use the opportunity 
-    to visit the character page - %name% and leave a reputation comment.
-  submit:       disown
+    This is a serious action and will be marked in your vassal's history. You should also use the opportunity 
+    to visit their character page - %name% and leave a reputation comment.
+  submit:       Disown
   success: >
     %name% is no longer your vassal.<br />
     You should also visit the character page and leave a reputation comment to indicate what caused you to
@@ -165,25 +165,25 @@ rogue:
    You can break your oath of fealty at any time, declaring yourself independent, a rogue noble without realm or lord.<br />
    This step is not to be taken lightly, as other nobles can and will hunt you and your vassals for fame and fortune. Having no lord also
    means having no protection, both militarily and politically. Make sure you know what you are doing.
- submit:      become a rogue noble
+ submit:      Become a rogue noble
  success:     You are now an independent noble, or a rogue as your fellow nobles will consider you to be.
 
 successor:
- name:      your successor
- you:       you are successor to
+ name:      Your successor
+ you:       You are successor to
  intro: >
    Death being a part of life, it is important for every noble to assign a successor to his or her titles and holdings.<br />
    You can select any character nearby enough to exchange documents, or anyone of your characters (as they are assumed to be
    from the same family or dynasty) irrespective of distance. Note that your estates, titles, etc. will leave your control 
    if they are inherited by a character that does not belong to you.
- set:       assign a new successor
- choose:    -- choose successor --
- submit:    set successor
+ set:       Assign a new successor
+ choose:    -- Choose successor --
+ submit:    Set successor
  success:   You have now chosen %successor% as your new successor.
  hasone:    You have currently declared %successor% as your successor.
 
 partners:
- name:      manage partners
+ name:      Manage partners
  intro: >
    Relationships with other characters can take many forms. Their details are subject to roleplaying, the game mechanics only
    cover those aspects that decide upon available options.<br />
@@ -192,50 +192,50 @@ partners:
  none:      You do not have any partnerships (such as a marriage or a liason) at this time.
  several:   You have several partnerships going at this time, namely:
  new:
-  name:     new relationships
+  name:     New relationships
   intro:    You can propose a new relation to any nearby character. He or she will have to accept in order for the relation to become active.
   none:     There are no potential partners within your action range.
  old:
-  name:     existing relationships
+  name:     Existing relationships
   intro:    You can break up with existing partners or make a few unilateral changes to the relationship. Which, of course, might result in them breaking up with you.
 
 relation:
  text:        You are %type% %partner%.
  proposed:    %partner% has proposed a %type% to you.
  proposed2:   You proposed a %type% to %partner%.
- engagement:  engaged to
- marriage:    married to
- liason:      having a liason with
+ engagement:  Engaged to
+ marriage:    Married to
+ liason:      Having a liason with
  proposedto:  proposed
  proposedyou: your proposed
- public:      public
- secret:      secret
+ public:      Public
+ secret:      Secret
  with:        with
- sex:         includes sex
- nosex:       without sex
- heraldry:    shares heraldry
- noheraldry:  without heraldry
- crest:       share heraldry
+ sex:         Includes sex
+ nosex:       Without sex
+ heraldry:    Shares heraldry
+ noheraldry:  Without heraldry
+ crest:       Share heraldry
 
  choice:
-  choose:     -- choose --
+  choose:     -- Choose --
   type:       Propose a
   partner:    to
-  engagement: engagement
-  marriage:   marriage
-  liason:     liason
+  engagement: Engagement
+  marriage:   Marriage
+  liason:     Liason
   public:     Should this relationship be public?
   sex:        Will it be a sexual relationship, so that it might result in children?
-  submitnew:  propose
-  nochange:   no change
-  makepublic: make public
-  refusesex:  refuse sex
-  cancel:     break up
-  withdraw:   withdraw proposal
-  accept:     accept proposal
-  reject:     reject proposal
-  submitchange: commit to changes
-  crest:      allow partner to bear your crest?
+  submitnew:  Propose
+  nochange:   No change
+  makepublic: Make public
+  refusesex:  Refuse sex
+  cancel:     Break up
+  withdraw:   Withdraw proposal
+  accept:     Accept proposal
+  reject:     Reject proposal
+  submitchange: Commit to changes
+  crest:      Allow partner to bear your crest?
 
 realm:
  view:
@@ -263,7 +263,7 @@ realm:
     As the ruler of %name%, you can change the realm's details at any time. Please note that realistically, these
     details almost never change, so make sure you have a good reason.<br />
     The designation of your realm must always stay above that of all inferior realms, limiting your choices.
-  submit:       announce changes
+  submit:       Announce changes
   success:      Realm details have been updated.
  abdicate:
   name:         Abdicate
@@ -277,25 +277,25 @@ realm:
   description:  Define and appoint/revoke positions.
   longdesc:     Lesser positions within %name% can be defined, appointed and revoked by you.
   empty:        The realm does not have any positions defined at this time.
-  new:          create a new position
-  holder:       holder|holders
-  manage:       manage position
-  appoint:      appoint officials
+  new:          Create a new position
+  holder:       Holder|Holders
+  manage:       Manage position
+  appoint:      Appoint officials
  laws:
   name:         Realm Laws
   description:  Declare and change realm laws.
   longdesc:     Laws and regulations for %name% can be declared by you. Most are optional, but some are mandatory and set to default values on realm creation.
 
- name:        name
- formalname:  formal name
- colour:      official colour
- language:    official language
- description: description
- designation: designation
- ruler:       ruler|rulers
- history:     realm history
+ name:        Name
+ formalname:  Formal name
+ colour:      Official colour
+ language:    Official language
+ description: Description
+ designation: Designation
+ ruler:       Ruler|Rulers
+ history:     Realm History
  details:     Realm Details
- size:        size
+ size:        Size
  type:
   1: barony
   2: county
