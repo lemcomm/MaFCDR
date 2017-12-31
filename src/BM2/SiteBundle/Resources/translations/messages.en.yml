@@ -505,7 +505,7 @@ character:
  family:  Family
  father:  Father
  mother:  Mother
- married: married to
+ married: Married to
  partner: partner|partners
  none:    (no character)
  child:   child|children
@@ -523,7 +523,7 @@ character:
  captorinactive: Your captor has not been seen in quite a while. You should <a href="%url%">try to escape</a>.
  full:    view full details
  list:
-  select:   move character to:
+  select:   Move character to:
   submit:   set new list
   updated:  just updated, change will be visible on next page load
   1:  Main Characters
@@ -542,9 +542,9 @@ character:
   46:  Explorers
   47:  Troublemakers
   71:  Assorted Characters
-  99: recently deceased
-  100: historic
-  150: ancestors
+  99:  Recently deceased
+  100: Historic
+  150: Ancestors
  start:
   title:      Character Placement
   intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
@@ -561,7 +561,7 @@ character:
   existing: >
     Your new character can begin the game in the estate of any of your existing characters, and get helped to start his career by relatives.
   estate:     Starting Estate
-  submit:     start here
+  submit:     Start here
   selection:  Place on Map
   mapintro: >
     You can also select any non-independent settlement from the map below, and negotiate with its lords to get soldiers or how else
@@ -741,10 +741,10 @@ direction:
   east:       East
   south:      South
   west:       West
-  northeast:  North-east
-  northwest:  North-west
-  southeast:  South-east
-  southwest:  South-west
+  northeast:  North-East
+  northwest:  North-West
+  southeast:  South-East
+  southwest:  South-West
  short:
   north:      N
   east:       E
@@ -766,35 +766,35 @@ culture:
  indian:      Indian
  asian:       Asian
 
-status:       tatus
-locked:       locked
-dead:         dead
-inactive:     inactive
-prisoner:     prisoner|prisoners
-wounded:      wounded
-hungry:       hungry
-veryhungry:   starving
-routed:       routed
-offered:      included in a knight offer
-assigned:     assigned from %from%, could still be reclaimed
-lastbattle:   last battle
-islocked:     currently being reassigned to you
+status:       Status
+locked:       Locked
+dead:         Dead
+inactive:     Inactive
+prisoner:     Prisoner|Prisoners
+wounded:      Wounded
+hungry:       Hungry
+veryhungry:   Starving
+routed:       Routed
+offered:      Included in a knight offer
+assigned:     Assigned from %from%, could still be reclaimed
+lastbattle:   Last battle
+islocked:     Currently being reassigned to you
 hour:         hour|hours
 minute:       minute|minutes
 untilturn:    %h% %hours%, %m% %minutes% until next day change
 untilturn2:   %m% %minutes% until next day change
 location:     location
 coordinates:  coordinates
-spotdistance: spotting distance
-actdistance:  interaction distance
-travelspeed:  travel speed
+spotdistance: Spotting distance
+actdistance:  Interaction distance
+travelspeed:  Travel speed
 travellocked: Your recent travel was blocked by local actions or battles.
 base:         (base: %distance%)
-nearest:      nearest settlement
-nothingnear:  no nearby settlement
+nearest:      Nearest settlement
+nothingnear:  No nearby settlement
 nearbyothers: Nearby First Ones
 nearbattles:  Nearby Battles
-viewdetails:  view details
+viewdetails:  View details
 none:         none
 yes:          yes
 no:           no
@@ -842,7 +842,7 @@ area:
  sqm:        %value% square mile|%value% square miles
  sql:        %value% square league|%value% square leagues
 metre_abr:   m
-popdensity:  people per square mile
+popdensity:  People per square mile
 day:         day|days
 today:       today
 
@@ -868,8 +868,8 @@ build:
 workforce:   workforce
 inheritance: inheritance
 nobody:      nobody
-underconstruction:  under construction
-finished:           finished
+underconstruction:  Under construction
+finished:           Finished
 
 biome:
  scrub:        Scrubland
@@ -894,33 +894,33 @@ error:
   character:   Character not found
   action:      Action not found
   settlement:  Settlement not found
-  buildingtype: no such building type
-  featuretype:  no such feature type
-  entouragetype: no such entourage type
-  equipmenttype: no such equipment type
-  log:          event journal does not exist
-  battle:       battle not found
-  battlereport: battle report not found
-  recruit:      recruit not found
-  listing:      list not found
-  paper:        publication not found
-  position:     realm position not found
-  realmrelation:  realm relation not found
-  election:     election not found
-  newliege:     settlement owner not found, please choose a different knight offer.
-  offer:        please select a knight offer.
+  buildingtype: No such building type
+  featuretype:  No such feature type
+  entouragetype: No such entourage type
+  equipmenttype: No such equipment type
+  log:          Event journal does not exist
+  battle:       Battle not found
+  battlereport: Battle report not found
+  recruit:      Recruit not found
+  listing:      List not found
+  paper:        Publication not found
+  position:     Realm position not found
+  realmrelation:  Realm relation not found
+  election:     Election not found
+  newliege:     Settlement owner not found, please choose a different knight offer.
+  offer:        Please select a knight offer.
  noaccess:
-  character:    character does not belong to you
-  vassal:       this character is not a vassal of yours.
-  busy:         this bandit has already been chosen by someone else.
-  notnpc:       this is not a bandit character.
-  log:          you do not have access to this log
-  settlement:   you do not have full access to this settlement
-  paper:        you are not a member of this publication
-  edition:      you do not have a copy of this edition
-  paperowner:   you are not an owner of this publication
-  library:      you cannot create new publications because none of your estates has a library
-  battlereport: you were not a participant in that battle, so you have to rely on eye witness reports for its details
+  character:    This character does not belong to you
+  vassal:       This character is not a vassal of yours.
+  busy:         This bandit has already been chosen by someone else.
+  notnpc:       This is not a bandit character.
+  log:          You do not have access to this log
+  settlement:   You do not have full access to this settlement
+  paper:        You are not a member of this publication
+  edition:      You do not have a copy of this edition
+  paperowner:   You are not an owner of this publication
+  library:      You cannot create new publications because none of your estates has a library
+  battlereport: You were not a participant in that battle, so you have to rely on eye witness reports for its details
 
  missing:
   character:    Character required, but missing. Please select a character from the character page or log in again.
@@ -986,20 +986,20 @@ soldier:
  groupby:
   intro:           re-group all soldiers
   type:            by type
-  type_desc:       sort soldiers into groups based on their classification (i.e. all light infantry into one group, all archers into one group, etc.)
+  type_desc:       Sort soldiers into groups based on their classification (i.e. all light infantry into one group, all archers into one group, etc.)
   items:           by details
-  items_desc:      sort soldiers into detailed groups so each set of equipment (weapon, armor, item) has its own group.
+  items_desc:      Sort soldiers into detailed groups so each set of equipment (weapon, armor, item) has its own group.
 
- rabble:           rabble|rabble
- light infantry:   light infantry|light infantry
- medium infantry:  medium infantry|medium infantry
- heavy infantry:   heavy infantry|heavy infantry
- archer:           archer|archers
- armoured archer:  armored archer|armored archers
- mounted archer:   mounted archer|mounted archers
- cavalry:          cavalry|cavalry
- light cavalry:    light cavalry|light cavalry
- heavy cavalry:    heavy cavalry|heavy cavalry
+ rabble:           Rabble|Rabble
+ light infantry:   Light Infantry|Light Infantry
+ medium infantry:  Medium Infantry|Medium Infantry
+ heavy infantry:   Heavy Infantry|Heavy Infantry
+ archer:           Archer|Archers
+ armoured archer:  Armored Archer|Armored Archers
+ mounted archer:   Mounted Archer|Mounted Archers
+ cavalry:          Cavalry|Cavalry
+ light cavalry:    Light Cavalry|Light Cavalry
+ heavy cavalry:    Heavy Cavalry|Heavy Cavalry
  noble:            First One|First Ones
 
 item:
@@ -1035,21 +1035,21 @@ events:
  logtitle:  Event Journal of %subject%
  from:      available from
  until:     available until
- events:    events
+ events:    Events
  new:       new
  read:      read
- allread:   mark as read for all my characters
- alldone:   marked as read for all your characters
- alldone2:  marked as read for this character
+ allread:   Mark as read for all my characters
+ alldone:   Marked as read for all your characters
+ alldone2:  Marked as read for this character
  research:
   ongoing:  A scholar of yours is currently researching older records in this journal.|%amount% of your scholars are currently researching older records in this journal.
   intro:    There are more events in older records, a scholar will be able to research them.
   can:      You have a scholar available for research work.|You have %amount% scholars available for research work.
  filter:
-  all:      all events
-  medium:   only interesting
-  high:     only important
-  ultra:    only very important
+  all:      All events
+  medium:   Only interesting
+  high:     Only important
+  ultra:    Only very important
  soldierlog: 
   title:     Soldier Log for link-soldier-name
  entry:      Log Entries
