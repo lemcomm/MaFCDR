@@ -1241,44 +1241,44 @@ fiction:
 
 manual:
  title:       Game Manual
- intro:       introduction
- background:  background
- videos:      videos
- basics:      basic concepts
- knight:      playing a knight
- lord:        playing a lord
- ruler:       playing a ruler
- others:      other roles
- location:    exploration
- characters:  characters
- economy:     economy
- battles:     battles
- relations:   marriage and relations
- fealty:      oaths of fealty
- soldiers:    soldiers
- entourage:   entourage
- settlements: settlements
- claims:      claims
- realms:      realms
- travel:      travel
- trade:       trade & tribute
- politics:    politics
- diplomacy:   diplomacy
- elections:   elections
- messages:    messages
- publications:  publications
- history:       history & events
- permissions:   permission system
- prison:        captivity
- bandits:       bandits
- looting:       looting
- spotting:      spotting
- quests:        quests
- artifacts:     artifacts
- supply:        army supply
- reference:     reference
- units:         units of measurement
- test:          test instance
+ intro:       Introduction
+ background:  Nackground
+ videos:      Bideos
+ basics:      Nasic concepts
+ knight:      Playing a knight
+ lord:        Playing a lord
+ ruler:       Playing a ruler
+ others:      Other roles
+ location:    Exploration
+ characters:  Characters
+ economy:     Economy
+ battles:     Battles
+ relations:   Marriage and relations
+ fealty:      Oaths of fealty
+ soldiers:    Soldiers
+ entourage:   Entourage
+ settlements: Settlements
+ claims:      Claims
+ realms:      Realms
+ travel:      Travel
+ trade:       Trade & tribute
+ politics:    Politics
+ diplomacy:   Diplomacy
+ elections:   Elections
+ messages:    Messages
+ publications:  Publications
+ history:       History & events
+ permissions:   Permission system
+ prison:        Captivity
+ bandits:       Bandits
+ looting:       Looting
+ spotting:      Spotting
+ quests:        Quests
+ artifacts:     Artifacts
+ supply:        Army supply
+ reference:     Reference
+ units:         Units of measurement
+ test:          Test instance
 
 list:
  buildingtypes:   list of all building types
@@ -1384,18 +1384,18 @@ trait:
 rating:
  title:     reputation
  intro:     Every noble has a reputation that follows him or her. Reputation is built by other nobles, through gossip.
- empty:     no gossip about this character... yet.
- edit:      update gossip
- write:     add gossip
- content:   words of gossip
+ empty:     There is no gossip about this character... yet.
+ edit:      Update gossip
+ write:     Add gossip
+ content:   Words of gossip
  respect:
-  label:    respectful
+  label:    Respectful
   help:     Does this noble display proper etiquette and shows respect to both friends and enemies?
  trust:
-  label:    trustworthy
+  label:    Trustworthy
   help:     Is this noble true to words given, and loyal to oaths and promises?
  honor:
-  label:    honourable
+  label:    Honourable
   help:     Does this noble act honourably, with grace in victory and decency in defeat?
  none:      (no opinion)
  yes:       yes
@@ -1466,7 +1466,7 @@ unavailable:
  both:          You cannot both attack and defend at the same time.
  evading:       You cannot conduct this action while evading or disengaging.
  enter:
-  notyours:     As a prisoner, you can only follow your captor or bring him into your own settlements.
+  notyours:     As a prisoner, you can only follow your captor or bring them into your own settlements.
  building:
   library:      This settlement does not have a library.
   temple:       This settlement does not have a temple.
@@ -1481,14 +1481,14 @@ unavailable:
   nooptions:    There are no possible trade/tribute deals you could make at this location.
 
 marker:
- name:      marker name
- type:      marker type
- owner:     owner
- realm:     visible for
+ name:      Marker name
+ type:      Marker type
+ owner:     Owner
+ realm:     Visible for
  limit:     Maximum marker amount placed. Remove old markers before you set new ones.
- submit:    set and share marker
- waypoint:  waypoint
- enemy:     enemy spotted
+ submit:    Set and share marker
+ waypoint:  Waypoint
+ enemy:     Enemy spotted
  set:
   name:     Create Map Marker
   intro: >
@@ -1525,7 +1525,7 @@ artifact:
     <em>Double-check everything you enter here, as you can not change it once the artifact is created.</em>
   name:         Name:
   description:  Description:
-  submit:       create artifact
+  submit:       Create artifact
  owned:
   title:    Artifacts you created
 
