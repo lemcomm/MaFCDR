@@ -1,20 +1,20 @@
 # Might & Fealty
 # text strings for economy and buildings
 # Author: Tom Vogt <tom@mightandfealty.com>
-req:        requires
-reqfor:     required for
-provides:   provides
-provider:   provided by %building%
-trainer:    trained at %building%
-trainingfor:   training for %item%
-bonus:      production bonus
-defbonus:   defensive bonus
+req:        Requires
+reqfor:     Required for
+provides:   Provides
+provider:   Provided by %building%
+trainer:    Trained at %building%
+trainingfor:   Training for %item%
+bonus:      Droduction bonus
+defbonus:   Defensive bonus
 minpop:     %pop% minimum population to construct
-optpop:     full efficiency requires %pop%+ population
+optpop:     Full efficiency requires %pop%+ population
 
 feature:
  name:         Name
- none:         (none)
+ none:         (None)
  bridge:       Bridge
  tower:        Watchtower
  borderpost:   Border Post
