@@ -22,7 +22,7 @@ class Interactions {
 		$this->em = $em;
 		$this->geo = $geo;
 		$this->history = $history;
-		$this->permission_manager = $pm;
+		$this->pm = $pm;
 		$this->logger = $logger;
 	}
 
