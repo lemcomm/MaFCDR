@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\RealmRelation;
 use BM2\SiteBundle\Entity\Vote;
+use BM2\SiteBundle\Form\CapitalType;
 use BM2\SiteBundle\Form\ElectionType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\RealmCreationType;
@@ -180,7 +181,7 @@ class RealmController extends Controller {
 
 
 	/**
-	  * @Route("/{realm}/manage", requirements={"realm"="\d+"})
+	  * @Route("/{realm}/manage", requirements={"realm"="\d+"}, name="bm2_site_realm_manage")
 	  * @Template
 	  */
 	public function manageAction(Realm $realm, Request $request) {
@@ -378,8 +379,11 @@ class RealmController extends Controller {
 
 		$original_holders = clone $position->getHolders();
 
-		/* FIXME: if elections can summon anyone, then so should appointment - or maybe we want to limit both to the contacts list? */
-		$candidates = $position->getRealm()->findMembers();
+		if ($position->getKeepOnSlumber()) {
+			$candidates = $position->getRealm()->findMembers();
+		} else {
+			$candidates = $position->getRealm()->findActiveMembers();
+		}
 		$form = $this->createForm(new RealmOfficialsType($candidates, $position->getHolders()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -635,6 +639,47 @@ class RealmController extends Controller {
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('diplomacy.subrealm.success', array(), 'politics'));
 				return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
+			}
+		}
+
+		return array(
+			'realm' => $realm,
+			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
+			'form' => $form->createView()
+		);
+	}
+
+	/**
+	  * @Route("/{realm}/capital", requirements={"realm"="\d+"})
+	  * @Template
+	  */
+	public function capitalAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchySelectCapitalTest');
+
+		$form = $this->createForm(new CapitalType($realm));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$fail = false;
+
+			if ($data['capital'] == $realm->getCapital()) {
+				$fail = true;
+				$form->addError(new FormError($this->get('translator')->trans("realm.capital.error.already", array(), 'politics')));
+			}
+			if (!$fail AND !$data['capital']) {
+				$fail = true;
+				$form->addError(new FormError($this->get('translator')->trans("realm.capital.error.none", array(), 'politics')));
+			}
+			if (!$fail) {
+				if ($realm->getCapital()) {
+					$realm->getCapital()->removeCapitalOf($realm);
+				}
+				$realm->setCapital($data['capital']);
+				$data['capital']->addCapitalOf($realm);
+				$this->getDoctrine()->getManager()->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('realm.capital.success', array(), 'politics'));
+				return $this->redirectToRoute('bm2_site_realm_capital', array('realm'=>$realm->getId()));
+				#return $this->redirectToRoute('bm2_politics');
 			}
 		}
 
