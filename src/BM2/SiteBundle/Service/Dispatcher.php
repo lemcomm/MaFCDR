@@ -417,6 +417,7 @@ class Dispatcher {
 			$actions[] = array("title"=>$realm->getFormalName());
 			$actions[] = array("name"=>"realm.view.name", "url"=>"bm2_site_realm_hierarchy", "parameters"=>array("realm"=>$realm->getId()), "description"=>"realm.view.description", "long"=>"realm.view.longdesc");
 			$actions[] = $this->hierarchyManageRealmTest();
+			$actions[] = $this->hierarchySelectCapitalTest();
 			$actions[] = $this->hierarchyAbdicateTest();
 			$actions[] = $this->hierarchyRealmPositionsTest();
 			$actions[] = $this->hierarchyRealmLawsTest();
@@ -1613,10 +1614,10 @@ class Dispatcher {
 			return array("name"=>"realm.capital.name1", "description"=>"unavailable.$check");
 		}
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
-			return array("name"=>"realm.positions.name", "description"=>"unavailable.notleader");
+			return array("name"=>"realm.capital.name1", "description"=>"unavailable.notleader");
 		}
 
-		return $this->action("capital", "bm2_site_realm_capital", false, 
+		return $this->action("realm.capital", "bm2_site_realm_capital", false, 
 			array('realm'=>$this->realm->getId()), 
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
