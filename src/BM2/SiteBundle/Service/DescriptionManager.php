@@ -42,11 +42,43 @@ class DescriptionManager {
 
 		$desc = new Description();
 		$this->em->persist($desc);
-		$entity->setDescription($desc);
-		if ($olddesc) {
-			$desc->setPrevious($olddesc);
+		switch($this->getClassName($entity)) {
+			case 'Artifact':
+				$desc->setActiveArtifact($entity);
+				$desc->setArtifact($entity);
+				if ($olddesc) {
+					$olddesc->setActiveArtifact(NULL);
+					$desc->setPrevious($olddesc);
+				}
+				break;
+			case 'Item':
+				$desc->setActiveItem($entity);
+				$desc->setItem($entity);
+				if ($olddesc) {
+					$olddesc->setActiveItem(NULL);
+					$desc->setPrevious($olddesc);
+				}
+				break;
+			case 'Place':
+				$desc->setActivePlace($entity);
+				$desc->setPlace($entity);
+				if ($olddesc) {
+					$olddesc->setActivePlace(NULL);
+					$desc->setPrevious($olddesc);
+				}
+				break;
+			case 'Settlement':
+				$desc->setActiveSettlement($entity);
+				$desc->setSettlement($entity);
+				if ($olddesc) {
+					$olddesc->setActiveSettlement(NULL);
+					$desc->setPrevious($olddesc);
+				}
+				break;
 		}
+		$entity->setDescription($desc);
 		$desc->setText($text);
+		$desc->setUpdater($character);
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
