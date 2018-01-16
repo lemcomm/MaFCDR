@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GeoData;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\MapPOI;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
@@ -300,6 +301,14 @@ class Geography {
 	public function calculateActionDistance(Settlement $settlement) {
 		// FIXME: ugly hardcoded crap
 		return 15*(10+sqrt($settlement->getFullPopulation()/5));
+	}
+
+	public function calculatePlaceActionDistance(Place $place) {
+		if ($place->getSettlement()) {
+			return $this->calculateActionDistance($place->getSettlement());
+		} else {
+			return 400;
+		}
 	}
 
 	public function findSettlementRoads(Settlement $settlement) {
