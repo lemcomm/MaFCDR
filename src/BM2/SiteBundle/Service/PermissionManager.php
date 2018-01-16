@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Listing;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Doctrine\ORM\EntityManager;
