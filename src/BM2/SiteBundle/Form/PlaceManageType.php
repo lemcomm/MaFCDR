@@ -13,8 +13,8 @@ class PlaceManageType extends AbstractType {
 	public function __construct($types, $description, $new, $isowner) {
 		$this->types = $types;
 		$this->description = $description;
-		$this->new = $new;
-		$this->isowner = $isowner;
+		$this->isNew = $new;
+		$this->isOwner = $isowner;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -25,7 +25,11 @@ class PlaceManageType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		if ($this->isowner OR $this->new) {
+		$types = $this->types;
+		$isNew = $this->isNew;
+		$isOwner = $this->isOwner;
+		$description = $this->description;
+		if ($this->isOwner OR $this->isNew) {
 			$builder->add('name', 'text', array(
 				'label'=>'names.name', 
 				'required'=>true, 
@@ -43,8 +47,8 @@ class PlaceManageType extends AbstractType {
 				)
 			));
 		}
-		if ($this->new) {
-			# This isn't going to work. Prep the list in teh Controller, submit it through the form, then reapply it on the other side.
+		if ($this->isNew) {
+			# This isn't going to work. Prep the list in the Controller, submit it through the form, then reapply it on the other side.
 			$builder->add('type', 'entity', array(
 				'label'=>'type.label',
 				'required'=>true,
@@ -53,20 +57,27 @@ class PlaceManageType extends AbstractType {
 				'class' => 'BM2SiteBundle:PlaceType',
 				'choice_translation_domain' => true,
 				'choice_label' => 'name',
-				'query_builder' => function(EntityRepository $er) {
-					return $er->createQueryBuilder('p')->where('p.requires in :types')->setParameter('types', $this->types);
-				}
+				'choices' => $types
 			));
 		}
 		$builder->add('short_description', 'textarea', array(
 			'label'=>'description.short',
 			'required'=>true,
 		));
-		$builder->add('description', 'textarea', array(
-			'label'=>'description.full',
-			'data_class'=> NULL,
-			'required'=>true,
-		));
+		if ($description) {
+			$builder->add('description', 'textarea', array(
+				'label'=>'description.full',
+				'data_class'=> NULL,
+				'required'=>true,
+			));
+		} else { 
+			$builder->add('description', 'textarea', array(
+				'label'=>'description.full',
+				'data'=>$description,
+				'data_class'=> NULL,
+				'required'=>true,
+			));
+		}
 	}
 
 	public function getName() {
