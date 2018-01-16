@@ -303,7 +303,7 @@ class Dispatcher {
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate = $this->getActionablePlace()) {
+		if ($estate = $this->getActionableSettlement()) {
 			$actions[] = $this->militaryAttackPlaceTest(true);
 			$actions[] = $this->militaryDefendPlaceTest(true);
 		} else {
@@ -1791,7 +1791,7 @@ class Dispatcher {
 				$nearest = $this->geography->findNearestPlace($this->getCharacter());
 				if ($nearest) {
 					$place=array_shift($nearest);
-					if ($nearest['distance'] < $this->geography->calculateActionDistance($place)) {
+					if ($nearest['distance'] < $this->geography->calculatePlaceActionDistance($place)) {
 						$this->actionablePlace=$place;
 					}
 				}
