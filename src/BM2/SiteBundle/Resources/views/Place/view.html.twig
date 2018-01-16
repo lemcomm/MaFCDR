@@ -26,11 +26,11 @@
 			{{ place.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 			{% endif %}
 		{% else %}
-			{% if place.short_description is not null %}
-			{{ place.short_description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+			{% if place.shortDescription is not null %}
+			{{ place.shortDescription|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 			{% endif %}
 		{% endif %}
 	{% else %}
-		<h2>{{ 'unknown'|trans({},"places"|title }}</h2>
+		<h2>{{ 'unknown'|trans({},"places")|title }}</h2>
 	{% endif %}
 {% endblock %}
