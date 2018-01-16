@@ -38,8 +38,8 @@
 	<dd>{{ realm.name }}</dd>
 	<dt>{{ 'realm.designation'|trans({},"politics") }}</dt>
 	<dd>{{ ('realm.type.'~realm.type)|trans({},"politics") }}</dd>
-	<dt>{{ 'realm.language'|trans({},"politics") }}</dt>
-	<dd>{% if realm.language %}{{ realm.language }}{% else %}-{% endif %}</dd>
+	<dt>{{ 'realm.capital.name0'|trans({},"politics") }}</dd>
+	<dd>{% if realm.capital %}{{ link(realm.capital) }}{% else %}-{% endif %}</dt>
 	<dt>{{ 'realm.ruler'|transchoice(realm.findrulers.count, {},"politics") }}</dt>
 	<dd><ul class="shortlist">
 		{% for ruler in realm.findrulers %}
@@ -48,6 +48,10 @@
 			<li>-</li>
 		{% endfor %}
 	</ul></dd>
+	{% if realm.language %}
+		<dt>{{ 'realm.language'|trans({},"politics") }}</dt>
+		<dd>{{ realm.language }}</dd>
+	{% endif %}
 </dl>
 
 {% if realm.ultimate %}
@@ -68,7 +72,7 @@
 	{{ 'status.realm.myinferiors'|trans({"%name%":link(realm)},"politics")|raw }}:
 	<ul class="shortlist">
 		{% for subrealm in realm.inferiors %}
-			<li{% if subrealm.active == false %} class="disabled"{% endif %}>{{ link(subrealm) }}</li>
+			{% if subrealm.active %}<li>{{ link(subrealm) }}</li>{% endif %}
 		{% endfor %}
 	</ul>
 {% endif %}
@@ -93,14 +97,14 @@
 <dl>
 	{% for position in realm.positions %}
 		{% if not position.retired %}
-		<dt>
+		<dt><b>
 			{% if position.ruler %}
 				{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
 			{% else %}
 				{{ position.name }}
 			{% endif %}
-		</dt>
-		<dd>	
+		</b></dt>
+		<dd>	<br />
 			{{ position.description }}
 			<br />
 			{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
@@ -124,28 +128,30 @@
 </thead>
 <tbody>
 {% for relation in diplomacy %}
-<tr>
-	<td>{{ link(relation.target) }}</td>
-	<td>
-		{% if relation.we %}
-			{{ ('diplomacy.status.'~relation.we)|trans({},"politics") }}
-		{% else %}
-			-
-		{% endif %}
-	</td>
-	<td>
-		{% if relation.they %}
-			{{ ('diplomacy.status.'~relation.they)|trans({},"politics") }}
-		{% else %}
-			-
-		{% endif %}
-	</td>
-	<td>
-		{% if character %}
-			<a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a>
-		{% endif %}
-	</td>
-</tr>
+	{% if relation.target.active %}
+		<tr>
+			<td>{{ link(relation.target) }}</td>
+			<td>
+				{% if relation.we %}
+					{{ ('diplomacy.status.'~relation.we)|trans({},"politics") }}
+				{% else %}
+					-
+				{% endif %}
+			</td>
+			<td>
+				{% if relation.they %}
+					{{ ('diplomacy.status.'~relation.they)|trans({},"politics") }}
+				{% else %}
+					-
+				{% endif %}
+			</td>
+			<td>
+				{% if character %}
+					<a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.target.id}) }}">{{ 'diplomacy.report.link'|trans({},"politics") }}</a>
+				{% endif %}
+			</td>
+		</tr>
+	{% endif %}
 {% endfor %}
 </tbody>
 </table>
