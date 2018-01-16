@@ -1608,6 +1608,20 @@ class Dispatcher {
 		);
 	}
 
+	public function hierarchySelectCapitalTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.capital.name1", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.positions.name", "description"=>"unavailable.notleader");
+		}
+
+		return $this->action("capital", "bm2_site_realm_capital", false, 
+			array('realm'=>$this->realm->getId()), 
+			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+		);
+	}
+
 	public function hierarchyIndependenceTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"rogue.name", "description"=>"unavailable.$check");
