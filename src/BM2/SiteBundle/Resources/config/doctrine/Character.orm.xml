@@ -36,6 +36,7 @@
 		<field name="visibility" type="integer"/>
 
 		<field name="auto_read_realms" type="boolean" nullable="true"/>
+		<field name="non_hetero_options" type="boolean" nullable="true"/>
 		
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
