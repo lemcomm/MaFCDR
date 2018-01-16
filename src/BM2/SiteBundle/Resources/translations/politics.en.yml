@@ -294,10 +294,12 @@ realm:
   description:  Declare and change realm laws.
   longdesc:     Laws and regulations for %name% can be declared by you. Most are optional, but some are mandatory and set to default values on realm creation.
  capital:
+  name:         Declare a Capital
   name0:        Capital
   name1:        Declare a Capital
   name2:        Delcare a New Capital
-  description:  From here you can determine, or redetermine, the capital of your realm, for whatever reason you so see fit. As to which region you can make your capital, well, you can determine ANY region of the realm to be your capital, though normally such a distinction is reserved for those cities that are either more developed or having of more significance. After all, if it's important to you, it's important to them, as well.
+  description:  Select a new settlement to be the capital of your realm.
+  longdesc:  From here you can determine, or redetermine, the capital of your realm, for whatever reason you so see fit. As to which region you can make your capital, well, you can determine ANY region of the realm to be your capital, though normally such a distinction is reserved for those cities that are either more developed or having of more significance. After all, if it's important to you, it's important to them, as well.
   estates:      Which estate shall be the capital of your realm?
   error:
    none:        To move or determine a capital, you need to select a region. Your advisors explain something about the critical nature of such a Seat of Power.
