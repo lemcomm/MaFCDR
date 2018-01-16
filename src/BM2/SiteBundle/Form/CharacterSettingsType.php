@@ -22,6 +22,10 @@ class CharacterSettingsType extends AbstractType {
 			'label'=>'character.auto.readrealms',
 			'required'=>false,
 		));
+		$builder->add('non_hetero_options', 'checkbox', array(
+			'label'=>'character.non_hetero_options',
+			'required'=>false,
+		));
 		$builder->add('submit', 'submit', array('label'=>'submit'));
 	}
 
