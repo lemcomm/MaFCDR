@@ -34,7 +34,11 @@ class DescriptionManager {
 	
 	public function newDescription($entity, $text, Character $character=null, $new=false) {
 		// First, check to see if there's already one.
-		$olddesc = $this->findDescription($entity)
+		if ($entity->getDescription()) {
+			$olddesc = $entity->getDescription();
+		} else {
+			$olddesc = NULL;
+		}
 
 		$desc = new Description();
 		$this->em->persist($desc);
@@ -69,7 +73,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.place',
-						array('%character%'=>$character->getId(), %place%=>$entity->getId()),
+						array('%character%'=>$character->getId(), '%place%'=>$entity->getId()),
 						History::LOW
 					);
 					break;
@@ -77,7 +81,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.settlement',
-						array('%character%'=>$entity->getOwner()->getId(), %settlement%=>$entity->getId()),
+						array('%character%'=>$entity->getOwner()->getId(), '%settlement%'=>$entity->getId()),
 						History::LOW
 					);
 					break;
@@ -92,16 +96,16 @@ class DescriptionManager {
 		}
 		switch($this->getClassName($entity)) {
 			case 'Artifact':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by ts desc");
+				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by d.ts desc");
 				break;
 			case 'Item':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.item = :entity order by ts desc");
+				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.item = :entity order by d.ts desc");
 				break;
 			case 'Place':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.place = :entity order by ts desc");
+				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.place = :entity order by d.ts desc");
 				break;
 			case 'Settlement':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.settlement = :entity order by ts desc");
+				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.settlement = :entity order by d.ts desc");
 				break;
 			default:
 				break;
@@ -115,3 +119,4 @@ class DescriptionManager {
 			return $desc;
 		}
 	}
+}
