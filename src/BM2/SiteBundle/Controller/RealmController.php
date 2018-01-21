@@ -244,6 +244,124 @@ class RealmController extends Controller {
 
 
 	/**
+	  * @Route("/{realm}/abolish", requirements={"realm"="\d+"})
+	  * @Template
+	  */
+	public function abolishAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyAbolishTest');
+		$form = $this->createFormBuilder()
+			->add('sure', 'checkbox', array(
+				'required'=>true,
+				'label'=>'realm.abolish.sure',
+				'translation_domain' => 'politics'
+				))
+			->getForm();
+		$form->handleRequest($request);
+
+		$success=false;
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$fail = false;
+			$data = $form->getData();
+			$em = $this->getDoctrine()->getManager();
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				$sovereign = false;
+				$inferiors = false;
+				if (!$realm->getSuperior()) {
+					$sovereign = true;
+				}
+				if ($realm->getInferiors()) {
+					$inferiors = true;
+				}
+				if ($sovereign && $inferiors) {
+					foreach ($realm->getInferiors() as $subrealm) {
+						$this->dismantleRealm($realm, $sovereign);
+						$this->get('history')->logEvent(
+							$subrealm,
+							'event.realm.abolished.sovereign.inferior.subrealm',
+							array('%link-realm%'=>$subrealm->getId(), '%link-superior%'=>$realm->getId()),
+							History::HIGH
+						);
+						$this->get('history')->logEvent(
+							$realm,
+							'event.realm.abolished.sovereign.inferior.realm',
+							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId(), '%link-subrealm%'=>$subrealm->getId()),
+							History::HIGH
+						);
+						$subrealm->setSuperior(null);
+						$realm->removeInferior($subrealm);
+						$realm->setActive(false);
+						$em->flush();
+					}
+				if ($sovereign && !$inferiors) {
+						$this->dismantleRealm($realm, $sovereign);
+						$this->get('history')->logEvent(
+							$realm,
+							'event.realm.abolished.sovereign.noinferior',
+							array('%link-character%'=>$character->getId()),
+							History::HIGH
+						);
+						$realm->setActive(false);
+						$em->flush();
+				$em->flush();
+
+			
+			return $this->redirectToRoute('bm2_politics');
+		}
+
+		return array('form'=>$form->createView());
+	}
+
+	private function dismantleRealm($realm, $sovereign=false) {
+		foreach ($realm->getEstates() as $estate) {
+			if ($sovereign) {
+				$this->get('history')->logEvent(
+					$realm,
+					'event.realm.abolished.sovereign.estate',
+					array('%link-realm%'=>$realm->getId()),
+					History::HIGH
+				);
+				$estate->setRealm(null);
+				$realm->removeEstate($estate);
+				$em->flush();
+			} else {
+				$this->get('history')->logEvent(
+					$realm,
+					'event.realm.abolished.notsovereign.estate',
+					array('%link-realm%'=>$realm->getId(), '%link-superior%'=>$realm->getSuperior()->getId()),
+					History::HIGH
+				);
+				$realm->removeEstate($estate);
+				$estate->setRealm($realm->getSuperior());
+				$realm->getSuperior()->addEstate($estate);
+				$em->flush();
+			}
+		}
+		foreach ($realm->getPositions() as $position) {
+			if ($position->getHolders()) {
+				foreach ($position->getHolders() as $holder)
+					if ($position->getRuler()) {
+						$this->get('realm_manager')->abdicate($realm, $character, $data['target']);
+					} else if (!$position->getRuler()) {
+						$position->removeHolder($holder);
+						$holder->removePosition($position);
+						$this->get('history')->logEvent(
+							$holder,
+							'event.character.position.abolished',
+							array('%link-realm%'=>$realm->getId(), '%link-realmposition%'=>$position->getId()),
+							History::MEDIUM
+						);
+					}
+					$em->flush();
+				}
+			}
+		}
+
+
+	/**
 	  * @Route("/{realm}/laws", requirements={"realm"="\d+"})
 	  * @Template
 	  */
@@ -1136,3 +1254,4 @@ class RealmController extends Controller {
 	}
 
 }
+			
