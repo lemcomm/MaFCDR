@@ -435,7 +435,7 @@ class CharacterController extends Controller {
 
 
 	/**
-	  * @Route("/view/{id}", requirements={"id"="\d+"})
+	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_character_view")
 	  * @Template
 	  */
 	public function viewAction(Character $id) {
@@ -782,6 +782,11 @@ class CharacterController extends Controller {
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		$form = $this->createFormBuilder()
+			->add('death', 'textbox', array(
+				'required'=>false,
+				'label'=>'meta.kill.death',
+				'translation_domain'=>'actions'
+				))
 			->add('sure', 'checkbox', array(
 				'required'=>true,
 				'label'=>'meta.kill.sure',
@@ -790,40 +795,47 @@ class CharacterController extends Controller {
 			->getForm();
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			// FIXME: validation - it only checks for the checkbox on the browser side so far
+			$fail = false;
+			$id = $character->getId();
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
-
-			// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
-			// TODO: we should somehow store that it was a suicide, to catch various exploits
-			$reclaimed = array();
-			foreach ($character->getSoldiers() as $soldier) {
-				if ($liege = $soldier->getLiege()) {
-					if (!isset($reclaimed[$liege->getId()])) {
-						$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
+				// TODO: we should somehow store that it was a suicide, to catch various exploits
+				$reclaimed = array();
+				foreach ($character->getSoldiers() as $soldier) {
+					if ($liege = $soldier->getLiege()) {
+						if (!isset($reclaimed[$liege->getId()])) {
+							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+						}
+						$reclaimed[$liege->getId()]['number']++;
+						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
+						$soldier->setCharacter($liege);
+						$soldier->setLiege(null)->setAssignedSince(null);
 					}
-					$reclaimed[$liege->getId()]['number']++;
-					// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-					$soldier->setCharacter($liege);
-					$soldier->setLiege(null)->setAssignedSince(null);
 				}
+				$em->flush();
+				if ($data['death']) {
+					$character->getBackground()->setDeath($data['death']);
+					$em->flush();
+				}
+				$this->get('character_manager')->kill($character);
+				foreach ($reclaimed as $rec) {
+					$this->get('history')->logEvent(
+						$rec['liege'],
+						'event.character.deathreclaim',
+						array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
+						History::MEDIUM
+					);
+				}
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('meta.kill.success', array(), 'actions'));
+				return $this->redirectToRoute('bm2_character_view', array('id'=>$id));
 			}
-			$em->flush();
-			$this->get('character_manager')->kill($character);
-			foreach ($reclaimed as $rec) {
-				$this->get('history')->logEvent(
-					$rec['liege'],
-					'event.character.deathreclaim',
-					array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
-					History::MEDIUM
-				);
-			}
-			$em->flush();
-
-			// TODO: this should bring up the background screen or something, to enter a death roleplay description
-			return array('result'=>array('success'=>true));
 		}
-
 		return array('form'=>$form->createView());
 	}
 
