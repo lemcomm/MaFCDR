@@ -11,20 +11,21 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
-		'academy'	=> array('requires' => 'academy', 'visible' => false),
-		'arena'		=> array('requires' => 'lord', 'visible' => true),
+		'academy'	=> array('requires' => 'building', 'visible' => false),
+		'arena'		=> array('requires' => 'building', 'visible' => true),
 		'capital'	=> array('requires' => 'ruler', 'visible' => true),
-		'castle'	=> array('requires' => 'castle', 'visible' => true),
-		'cave'		=> array('requires' => '', 'visible' => false),
+		'castle'	=> array('requires' => 'building', 'visible' => true),
+		'cave'		=> array('requires' => '', 'visible' => true),
 		'fort'		=> array('requires' => 'fort', 'visible' => true),
 		'home'		=> array('requires' => 'dynasty head', 'visible' => false),
-		'inn'		=> array('requires' => '', 'visible' => true),
-		'library'	=> array('requires' => '', 'visible' => false),
+		'inn'		=> array('requires' => 'building', 'visible' => true),
+		'library'	=> array('requires' => 'building', 'visible' => true),
 		'monument'	=> array('requires' => '', 'visible' => true),
 		'plaza'		=> array('requires' => 'lord', 'visible' => true),
 		'portal' 	=> array('requires' => 'magic', 'visible' => false),
 		'passage'	=> array('requires' => 'warren', 'visible' => false),
-		'tavern'	=> array('requires' => '', 'visible' => false)
+		'track'		=> array('requires' => 'building', 'visible' => true),
+		'tavern'	=> array('requires' => 'building', 'visible' => true)
 	);
 	
 	/**
