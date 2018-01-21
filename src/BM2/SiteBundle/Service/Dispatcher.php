@@ -423,6 +423,7 @@ class Dispatcher {
 			$actions[] = $this->hierarchyRealmLawsTest();
 			$actions[] = $this->hierarchyWarTest();
 			$actions[] = $this->hierarchyDiplomacyTest();
+			$actions[] = $this->hierarchyAbolishRealmTest();
 			$actions[] = $this->hierarchyElectionsTest();
 		}
 
@@ -1519,6 +1520,20 @@ class Dispatcher {
 			return array("name"=>"realm.manage.name", "description"=>"unavailable.notleader");
 		} else {
 			return $this->action("realm.manage", "bm2_site_realm_manage", true, 
+				array('realm'=>$this->realm->getId()),
+				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			);
+		}
+	}
+
+	public function hierarchyAbolishRealmTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.abolish.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.abolish.name", "description"=>"unavailable.notleader");
+		} else {
+			return $this->action("realm.abolish", "bm2_site_realm_abolish", true, 
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
