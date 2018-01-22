@@ -244,7 +244,7 @@ class RealmController extends Controller {
 
 
 	/**
-	  * @Route("/{realm}/abolish", requirements={"realm"="\d+"})
+	  * @Route("/{realm}/abolish", requirements={"realm"="\d+"}, name="bm2_site_realm_abolish")
 	  * @Template
 	  */
 	public function abolishAction(Realm $realm, Request $request) {
@@ -277,89 +277,77 @@ class RealmController extends Controller {
 					$inferiors = true;
 				}
 				if ($sovereign && $inferiors) {
+					$this->get('realm_manager')->dismantleRealm($character, $realm, $sovereign); # Free the esates, remove position holders.
 					foreach ($realm->getInferiors() as $subrealm) {
-						$this->dismantleRealm($realm, $sovereign);
 						$this->get('history')->logEvent(
 							$subrealm,
 							'event.realm.abolished.sovereign.inferior.subrealm',
-							array('%link-realm%'=>$subrealm->getId(), '%link-superior%'=>$realm->getId()),
+							array('%link-realm%'=>$realm->getId()),
 							History::HIGH
-						);
+						); # 'With the abolishment of %link-realm%, the realm has become autonomous.'
 						$this->get('history')->logEvent(
 							$realm,
 							'event.realm.abolished.sovereign.inferior.realm',
-							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId(), '%link-subrealm%'=>$subrealm->getId()),
+							array('%link-realm%'=>$subrealm->getId()),
 							History::HIGH
-						);
+						); # 'With the dismantling of the realm, the formal vassal of %link-realm% has gained it's autonomy.'
 						$subrealm->setSuperior(null);
 						$realm->removeInferior($subrealm);
 						$realm->setActive(false);
 						$em->flush();
 					}
+				}
 				if ($sovereign && !$inferiors) {
-						$this->dismantleRealm($realm, $sovereign);
-						$this->get('history')->logEvent(
-							$realm,
-							'event.realm.abolished.sovereign.noinferior',
-							array('%link-character%'=>$character->getId()),
-							History::HIGH
-						);
-						$realm->setActive(false);
-						$em->flush();
-				$em->flush();
-
-			
-			return $this->redirectToRoute('bm2_politics');
-		}
-
-		return array('form'=>$form->createView());
-	}
-
-	private function dismantleRealm($realm, $sovereign=false) {
-		foreach ($realm->getEstates() as $estate) {
-			if ($sovereign) {
-				$this->get('history')->logEvent(
-					$realm,
-					'event.realm.abolished.sovereign.estate',
-					array('%link-realm%'=>$realm->getId()),
-					History::HIGH
-				);
-				$estate->setRealm(null);
-				$realm->removeEstate($estate);
-				$em->flush();
-			} else {
-				$this->get('history')->logEvent(
-					$realm,
-					'event.realm.abolished.notsovereign.estate',
-					array('%link-realm%'=>$realm->getId(), '%link-superior%'=>$realm->getSuperior()->getId()),
-					History::HIGH
-				);
-				$realm->removeEstate($estate);
-				$estate->setRealm($realm->getSuperior());
-				$realm->getSuperior()->addEstate($estate);
-				$em->flush();
-			}
-		}
-		foreach ($realm->getPositions() as $position) {
-			if ($position->getHolders()) {
-				foreach ($position->getHolders() as $holder)
-					if ($position->getRuler()) {
-						$this->get('realm_manager')->abdicate($realm, $character, $data['target']);
-					} else if (!$position->getRuler()) {
-						$position->removeHolder($holder);
-						$holder->removePosition($position);
-						$this->get('history')->logEvent(
-							$holder,
-							'event.character.position.abolished',
-							array('%link-realm%'=>$realm->getId(), '%link-realmposition%'=>$position->getId()),
-							History::MEDIUM
-						);
-					}
+					$this->get('realm_manager')->dismantleRealm($character, $realm, $sovereign); # Free the esates, remove position holders.
+					$realm->setActive(false);
 					$em->flush();
 				}
+				if (!$sovereign && $inferiors) {
+					$this->get('realm_manager')->dismantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$superior = $realm->getSuperior();
+					foreach ($realm->getInferiors() as $subrealm) {
+						$this->get('history')->logEvent(
+							$subrealm,
+							'event.realm.abolished.notsovereign.inferior.subrealm',
+							array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$subrealm->getId(), '%link-realm-3%'=>$realm->getId()),
+							History::HIGH
+						); # 'With the abolishment of its superior realm, %link-realm-1%, %link-realm-2%'s superior is now %link-realm-3%.'
+						$this->get('history')->logEvent(
+							$realm,
+							'event.realm.abolished.notsovereign.inferior.realm',
+							array('%link-realm-1%'=>$superior->getId(), '%link-realm-2%'=>$subrealm->getId()),
+							History::HIGH
+						); # 'With the abolishment of the realm, %link-realm-1% assumes superiorship role over %link-realm-2%.'
+						$this->get('history')->logEvent(
+							$superior,
+							'event.realm.abolished.notsovereign.inferior.superior',
+							array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$subrealm->getId()),
+							History::HIGH
+						); # 'With the abolishment of its inferior realm, %link-realm-1%, the realm assumes superiorship over %link-realm-2%.'
+						$realm->removeInferior($subrealm); # Remove inferior from the abolished realm.
+						$superior->addInferior($subrealm); # Add inferior to next level up realm.
+						$subrealm->setSuperior($superior); # Set next level superior as direct superior of inferior realm.
+						$em->flush();
+					}
+					$realm->setActive(false);
+					$em->flush();
+				}
+				if (!$sovereign && !$inferiors) {
+					$this->get('realm_manager')->dimsantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$realm->setActive(false);
+					$em->flush();
+				}
+				$this->addFlash('notice', $this->get('translator')->trans('realm.abolish.done', array('%link-realm%'=>$realm->getId()), 'politics')); #'The realm of %link-realm% has been dismantled.
+				return $this->redirectToRoute('bm2_politics');
+			} else {
+				$this->addFlash('error', $this->get('translator')->trans('realm.abolish.fail', array(), 'politics')); # 'You have not validated your certainty.'
+				return array('realm'=>$realm, 'form'=>$form->createView());
 			}
+				
 		}
-
+		return array('realm'=>$realm,
+			     'form'=>$form->createView());
+	}
 
 	/**
 	  * @Route("/{realm}/laws", requirements={"realm"="\d+"})
@@ -1115,7 +1103,10 @@ class RealmController extends Controller {
 	  * @Template
 	  */
 	public function voteAction(Election $id, Request $request) {
-		$character = $this->gateway();
+		if ($id->getRealm()) {
+			$character = $this->gateway($id->getRealm(), 'hierarchyElectionsTest');
+		} # Because people were sneaking random outsiders into elections.
+		# This method will also allow us to setup alternative security checks later for this page, if it gets expanded.
 		$election = $id; // we use ID in the route because the links extension always uses id
 		$em = $this->getDoctrine()->getManager();
 
