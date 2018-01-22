@@ -351,7 +351,7 @@ class RealmManager {
 		}
 	}
 	
-	private function dismantleRealm(Character $character, Realm $realm, $sovereign=false) {
+	public function dismantleRealm(Character $character, Realm $realm, $sovereign=false) {
 		$this->get('history')->logEvent(
 			$realm,
 			'event.realm.abolished.realm',
