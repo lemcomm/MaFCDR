@@ -838,7 +838,69 @@ class CharacterController extends Controller {
 		}
 		return array('form'=>$form->createView());
 	}
-
+	
+   /**
+     * @Route("/retire")
+     * @Template
+     */
+	public function retireAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		$form = $this->createFormBuilder()
+			->add('retirement', 'textbox', array(
+				'required'=>false,
+				'label'=>'meta.retire.label',
+				'translation_domain'=>'actions'
+				))
+			->add('sure', 'checkbox', array(
+				'required'=>true,
+				'label'=>'meta.retire.sure',
+				'translation_domain' => 'actions'
+				))
+			->getForm();
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$fail = false;
+			$id = $character->getId();
+			$data = $form->getData();
+			$em = $this->getDoctrine()->getManager();
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				$reclaimed = array();
+				foreach ($character->getSoldiers() as $soldier) {
+					if ($liege = $soldier->getLiege()) {
+						if (!isset($reclaimed[$liege->getId()])) {
+							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+						}
+						$reclaimed[$liege->getId()]['number']++;
+						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
+						$soldier->setCharacter($liege);
+						$soldier->setLiege(null)->setAssignedSince(null);
+					}
+				}
+				$em->flush();
+				if ($data['retirement']) {
+					$character->getBackground()->setRetirement($data['retirement']);
+					$em->flush();
+				}
+				$this->get('character_manager')->retire($character);
+				foreach ($reclaimed as $rec) {
+					$this->get('history')->logEvent(
+						$rec['liege'],
+						'event.character.retirereclaim',
+						array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
+						History::MEDIUM
+					);
+				}
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
+				return $this->redirectToRoute('bm2_character_view', array('id'=>$id));
+			}
+		}
+		return array('form'=>$form->createView());
+	}
+	
    /**
      * @Route("/respawn")
      * @Template
