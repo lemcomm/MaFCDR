@@ -120,8 +120,17 @@ class PlaceController extends Controller {
 		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside')) {
 			if ($settlement == $settlement->getOwner()) {
 				$rights[] = 'lord';
+				if ($settlement->hasBuildingNamed('Academy')) {
+					$rights[] = 'academy';
+				}
+				if ($settlement->hasBuildingNamed('Arena')) {
+					$rights[] = 'arena';
+				}
 				if ($settlement->hasBuildingNamed('Wood Castle')) {
 					$rights[] = 'castle';
+				}
+				if ($settlement->hasBuildingNamed('Race Track')) {
+					$rights[] = 'track';
 				}
 			}
 			$realm = $settlement->getRealm();
@@ -131,12 +140,6 @@ class PlaceController extends Controller {
 				} else if (!is_array($realm->findRulers()) && $character == $realm->findRulers()) {
 					$rights[] = 'ruler';
 				}
-			}
-			if ($settlement->hasBuildingNamed('Library')) {
-				$rights[] = 'library';
-			}
-			if ($settlement->hasBuildingNamed('Academy')) {
-				$rights[] = 'academy';
 			}
 		}
 		if ($character->getMagic() > 0) {
@@ -149,6 +152,7 @@ class PlaceController extends Controller {
 		*/
 		
 		#Now generate the list of things we can build!
+		$rights[] = '';
 		$types[] = $this->getDoctrine()->getManager()->getRepository('BM2SiteBundle:PlaceType')->findBy(array('requires' => $rights));
 		
 		$form = $this->createForm(new PlaceManageType($types, NULL, true, false));
