@@ -749,12 +749,21 @@ class Geography {
 			$base_speed = $this->base_speed;
 		} else {
 			// on land, the base speed is modified by the size of our army
-			$men = $character->getSoldiers()->count() + ($character->getEntourage()->count()/2);
+			$prisonercount = 0;
+			if ($character->getPrisoners()) {
+				foreach ($character->getPrisoners() as $prisoner) {
+					$prisonercount += $prisoner->getSoldiers()->count() + ($prisoner->getEntourage()->count()/2);
+				}
+			}
+			$men = $character->getSoldiers()->count() + $prisonercount + ($character->getEntourage()->count()/2);
 			$base_speed = $this->base_speed / exp(sqrt($men/200));
+			if ($prisonercount > 0) {
+				$base_speed *= 0.9;
+			}
 		}
 		if ($character->isNPC()) {
 			// make bandits slower so they can't run away so much
-			$base_speed *= 0.9;
+			$base_speed *= 0.75;
 		}
 
 		// modify further if we are near/on a road:
