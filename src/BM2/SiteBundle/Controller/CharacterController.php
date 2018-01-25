@@ -435,7 +435,7 @@ class CharacterController extends Controller {
 
 
 	/**
-	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_character_view")
+	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_site_character_view")
 	  * @Template
 	  */
 	public function viewAction(Character $id) {
@@ -833,7 +833,7 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.kill.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
 			}
 		}
 		return array('form'=>$form->createView());
@@ -895,7 +895,7 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
 			}
 		}
 		return array('form'=>$form->createView());
