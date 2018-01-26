@@ -8,6 +8,8 @@
 		<dd>{{ ('biome.'~settlement.geoData.biome.name)|trans }}</dd>
 		<dt>{{ 'settlement.owner'|trans|title }}</dt>
 		<dd>{% if settlement.owner %}{{ link(settlement.owner) }}{% else %}{{ 'settlement.unowned'|trans }}{% endif %}</dd>
+		<dt>{{ 'settlement.realm2'|trans|title }}</dt>
+		<dd>{% if settlement.realm %}{{ link(settlement.realm) }}{% else %}-{% endif %}</dd>
 	</dl>
 	<div class="clear" />
 	<div id="sd_details" class="sd_button"><a href="{{ path("bm2_settlement", {'id':settlement.id}) }}">{{ 'details'|trans|title }}</a></div>
