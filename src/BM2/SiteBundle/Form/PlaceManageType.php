@@ -7,14 +7,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use BM2\SiteBundle\Entity\PlaceType;
+use BM2\SiteBundle\Entity\Place;
 
 class PlaceManageType extends AbstractType {
 
-	public function __construct($types, $description, $new, $isowner) {
-		$this->types = $types;
+	public function __construct($description, $isowner, Place $me) {
 		$this->description = $description;
-		$this->isNew = $new;
 		$this->isOwner = $isowner;
+		$this->me = $me;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -25,14 +25,17 @@ class PlaceManageType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$types = $this->types;
-		$isNew = $this->isNew;
 		$isOwner = $this->isOwner;
+		$me = $this->me;
+		$name = $me->getName();
+		$formal = $me->getFormalName();
+		$short = $me->getShortDescription();
 		$description = $this->description;
-		if ($isOwner OR $isNew) {
+		if ($isOwner) {
 			$builder->add('name', 'text', array(
 				'label'=>'names.name', 
 				'required'=>true, 
+				'data'=>$name,
 				'attr' => array(
 					'size'=>20, 
 					'maxlength'=>40,
@@ -42,6 +45,7 @@ class PlaceManageType extends AbstractType {
 			$builder->add('formal_name', 'text', array(
 				'label'=>'names.formalname', 
 				'required'=>true, 
+				'data'=>$formal,
 				'attr' => array(
 					'size'=>40, 
 					'maxlength'=>160,
@@ -49,47 +53,18 @@ class PlaceManageType extends AbstractType {
 				)
 			));
 		}
-		if ($isNew) {
-			# This isn't going to work. Prep the list in the Controller, submit it through the form, then reapply it on the other side.
-			$builder->add('type', 'entity', array(
-				'label'=>'type.label',
-				'required'=>true,
-				'placeholder' => 'type.empty',
-				'attr' => array('title'=>'help.new.type'),
-				'class' => 'BM2SiteBundle:PlaceType',
-				'choice_translation_domain' => true,
-				'choice_label' => 'name',
-				'choices' => $types,
-				'group_by' => function($val, $key, $index) {
-					if ($val->getRequires() == NULL) { 
-						return 'by.none';
-					} else {
-						return 'by.'.$val->getRequires();
-					}
-				}
-			));
-		}
 		$builder->add('short_description', 'textarea', array(
 			'label'=>'description.short',
+			'data'=>$short,
 			'attr' => array('title'=>'help.new.shortdesc'),
 			'required'=>true,
 		));
-		if ($description) {
-			$builder->add('description', 'textarea', array(
-				'label'=>'description.full',
-				'attr' => array('title'=>'help.new.longdesc'),
-				'data_class'=> NULL,
-				'required'=>true,
-			));
-		} else { 
-			$builder->add('description', 'textarea', array(
-				'label'=>'description.full',
-				'attr' => array('title'=>'help.new.longdesc'),
-				'data'=>$description,
-				'data_class'=> NULL,
-				'required'=>true,
-			));
-		}
+		$builder->add('description', 'textarea', array(
+			'label'=>'description.full',
+			'attr' => array('title'=>'help.new.longdesc'),
+			'data'=>$description,
+			'required'=>true,
+		));
 	}
 
 	public function getName() {
