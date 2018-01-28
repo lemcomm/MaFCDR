@@ -34,10 +34,30 @@ class DescriptionManager {
 	
 	public function newDescription($entity, $text, Character $character=null, $new=false) {
 		// First, check to see if there's already one.
+		$olddesc = NULL;
 		if ($entity->getDescription()) {
 			$olddesc = $entity->getDescription();
-		} else {
-			$olddesc = NULL;
+		}
+		# If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones.
+		if ($olddesc) {
+			switch($this->getClassName($entity)) {
+				case 'Artifact':
+					$olddesc->setActiveArtifact(NULL);
+					$this->em->flush();
+					break;
+				case 'Item':
+					$olddesc->setActiveItem(NULL);
+					$this->em->flush();
+					break;
+				case 'Place':
+					$olddesc->setActivePlace(NULL);
+					$this->em->flush();
+					break;
+				case 'Settlement':
+					$olddesc->setActiveSettlement(NULL);
+					$this->em->flush();
+					break;
+			}
 		}
 
 		$desc = new Description();
@@ -46,37 +66,24 @@ class DescriptionManager {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
 				$desc->setArtifact($entity);
-				if ($olddesc) {
-					$olddesc->setActiveArtifact(NULL);
-					$desc->setPrevious($olddesc);
-				}
 				break;
 			case 'Item':
 				$desc->setActiveItem($entity);
 				$desc->setItem($entity);
-				if ($olddesc) {
-					$olddesc->setActiveItem(NULL);
-					$desc->setPrevious($olddesc);
-				}
 				break;
 			case 'Place':
 				$desc->setActivePlace($entity);
 				$desc->setPlace($entity);
-				if ($olddesc) {
-					$olddesc->setActivePlace(NULL);
-					$desc->setPrevious($olddesc);
-				}
 				break;
 			case 'Settlement':
 				$desc->setActiveSettlement($entity);
 				$desc->setSettlement($entity);
-				if ($olddesc) {
-					$olddesc->setActiveSettlement(NULL);
-					$desc->setPrevious($olddesc);
-				}
 				break;
 		}
 		$entity->setDescription($desc);
+		if ($olddesc) {
+			$desc->setPrevious($olddesc);
+		}
 		$desc->setText($text);
 		$desc->setUpdater($character);
 		$desc->setTs(new \DateTime("now"));
