@@ -2,15 +2,19 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
+use BM2\SiteBundle\Form\PlaceNewType;
+use BM2\SiteBundle\Service\History;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -24,7 +28,7 @@ class PlaceController extends Controller {
 	  * @Route("/{id}", name="bm2_place", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:Place:view.html.twig")
 	  */
-	public function indexAction(Settlement $id) {
+	public function indexAction(Place $id) {
 		$place = $id;
 		$em = $this->getDoctrine()->getManager();
 
@@ -38,12 +42,15 @@ class PlaceController extends Controller {
 		
 		# Check if we should be able to view any details on this place. A lot of places won't return much! :)
 		$details = $this->get('interactions')->characterViewDetails($character, $place);
-		
+
+		/* Leaving this here for later implementation...
 		if ($details['spy'] || $place->getOwner() == $character) {
 			$militia = $place->getActiveMilitiaByType();
 		} else {
 			$militia = null;
-		}
+		} 
+		When we add this, get rid of $militia below this. */
+		$militia = null;
 		
 		if ($character->getInsidePlace() == $place) {
 			$inside = true;
@@ -115,31 +122,31 @@ class PlaceController extends Controller {
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
 		
 		# Build the list of requirements we have.
-		$rights = [];
+		$rights[] = NULL;
 		$settlement = $character->getInsideSettlement();
 		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside')) {
-			if ($settlement == $settlement->getOwner()) {
+			if ($character == $settlement->getOwner()) {
 				$rights[] = 'lord';
-				if ($settlement->hasBuildingNamed('Academy')) {
-					$rights[] = 'academy';
-				}
-				if ($settlement->hasBuildingNamed('Arena')) {
-					$rights[] = 'arena';
-				}
 				if ($settlement->hasBuildingNamed('Wood Castle')) {
 					$rights[] = 'castle';
 				}
-				if ($settlement->hasBuildingNamed('Race Track')) {
-					$rights[] = 'track';
+				if ($settlement->getRealm()->findRulers()->contains($character)) {
+					$rights[] = 'ruler';
 				}
 			}
 			$realm = $settlement->getRealm();
-			if ($settlement->getCapitalOf() && $realm) {
+			if ($settlement->getCapitalOf() == $realm) {
 				if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
 					$rights[] = 'ruler';
-				} else if (!is_array($realm->findRulers()) && $character == $realm->findRulers()) {
+				} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
 					$rights[] = 'ruler';
 				}
+			}
+			if ($settlement->hasBuildingNamed('Library')) {
+				$rights[] = 'library';
+			}
+			if ($settlement->hasBuildingNamed('Academy')) {
+				$rights[] = 'academy';
 			}
 		}
 		if ($character->getMagic() > 0) {
@@ -152,19 +159,19 @@ class PlaceController extends Controller {
 		*/
 		
 		#Now generate the list of things we can build!
-		$rights[] = '';
-		$types[] = $this->getDoctrine()->getManager()->getRepository('BM2SiteBundle:PlaceType')->findBy(array('requires' => $rights));
+		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where r.requires in (:rights) OR r.requires IS NULL")->setParameter('rights', $rights);
 		
-		$form = $this->createForm(new PlaceManageType($types, NULL, true, false));
+		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
-			$fail = $this->checkPlaceNames($form, $data->getName(), $data->getFormalName(), $place);
+			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name']);
 			if (!$fail) {
 				$place = new Place();
-				$place->setName($data->getName());
-				$place->setFormalName($data->getFormalName());
-				$place->setShortDescription($data->getShortDescription());
+				$this->getDoctrine()->getManager()->persist($place);
+				$place->setName($data['name']);
+				$place->setFormalName($data['formal_name']);
+				$place->setShortDescription($data['short_description']);
 				$place->setOwner($character);
 				if ($settlement) {
 					$place->setSettlement($settlement);
@@ -173,8 +180,8 @@ class PlaceController extends Controller {
 					$place->setLocation($character->getLocation());
 					$place->setGeoData($this->get('geography')->findMyRegion($character));
 				}
-				$place->setVisible($data->getType()->getVisible());
-				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
+				$place->setVisible($data['type']->getVisible());
+				$this->getDoctrine()->getManager()->flush($place); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
 					$place, 
 					'event.place.formalized',
@@ -205,9 +212,8 @@ class PlaceController extends Controller {
 						false
 					);
 				}
-				$newdesc = $this->get('description_manager')->newDescription($place, $data->getDescription(), $character);
-				$place->setDescription($newdesc);
-				$this->getDoctrine()->getManager()->flush();
+				$newdesc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
+				$this->getDoctrine()->getManager()->flush($place);
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
 		}
@@ -220,33 +226,42 @@ class PlaceController extends Controller {
 	  * @Route("/{id}/manage", requirements={"id"="\d+"})
 	  * @Template
 	  */
-	public function manageAction(Place $place, Request $request) {
+	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('dispatcher')->gateway($place, 'placeManageTest');
+		$character = $this->get('appstate')->getCharacter(false, true, true);
 		
-		$new = false;
 		$olddescription = $place->getDescription()->getText();
 		if ($place->getOwner() == $character) {
 			$isowner = true;
 		} else {
 			$isowner = false;
 		}
-		$form = $this->createForm(new PlaceManageType($types, $olddescription, $new, $isowner), $place);
+		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $id));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
-			$fail = $this->checkPlaceNames($form, $data->getName(), $data->getFormalName(), $place);
+			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name'], $place);
 			if (!$fail) {
-				# The joy of this knowing it's looking at a place, is that we don't need that massive wall like we have above :)
-				if ($olddescription != $data->getDescription()) {
-					$desc = $this->get('description_manager')->newDescription($place, $data->getDescription(), $character);
-					$place->setDescription($desc);
+				if ($place->getName() != $data['name']) {
+					$place->setName($data['name']);
+				}
+				if ($place->getFormalName() != $data['formal_name']) {
+					$place->setFormalName($data['formal_name']);
+				}
+				if ($place->getShortDescription() != $data['short_description']) {
+					$place->setShortDescription($data['short_description']);
+				}
+				if ($olddescription != $data['description']) {
+					$desc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
 				}
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
 		}
-		return array('place'=>$place, 'form'=>$form->createView());
+		return array(
+			'place'=>$place, 
+			'form'=>$form->createView()
+		);
 	}
 
 	#TODO: Combine this and checkRealmNames into a single thing in a HelperService.
