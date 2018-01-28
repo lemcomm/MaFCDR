@@ -2,14 +2,12 @@
 
 namespace BM2\SiteBundle\Service;
 
-use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Artifact;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Item;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
-use BM2\SiteBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
@@ -33,13 +31,14 @@ class DescriptionManager {
 	}
 	
 	public function newDescription($entity, $text, Character $character=null, $new=false) {
-		// First, check to see if there's already one.
+		/* First, check to see if there's already one. */
 		$olddesc = NULL;
 		if ($entity->getDescription()) {
 			$olddesc = $entity->getDescription();
 		}
-		# If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones.
+		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
 		if ($olddesc) {
+			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
 			switch($this->getClassName($entity)) {
 				case 'Artifact':
 					$olddesc->setActiveArtifact(NULL);
@@ -62,6 +61,7 @@ class DescriptionManager {
 
 		$desc = new Description();
 		$this->em->persist($desc);
+		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
 		switch($this->getClassName($entity)) {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
@@ -130,6 +130,10 @@ class DescriptionManager {
 	}
 	
 	public function findDescription($entity) {
+		/* Originally, this was written to find you the current description, in an earlier version of this file and how the databse would work.
+		Now though, you just do $thing->getDescription() to get it, as a given $thing will have two associations to descriptions, 
+		one that is the active, and one that goes to all.
+		This could be extended though, to add $criteria to let you find one within so many days or something. */
 		if ($entity->getDescription()) {
 			return $entity->getDescription();
 		}
