@@ -34,7 +34,7 @@ class Interactions {
 
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->permission_manager->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
 				return false;
 			}
 
@@ -120,7 +120,7 @@ class Interactions {
 		$settlement = $character->getInsideSettlement();
 		if (!$settlement) return false;
 
-		if ($force && (!$settlement->isFortified() || $this->permission_manager->checkSettlementPermission($settlement, $character, 'visit'))) {
+		if ($force && (!$settlement->isFortified() || $this->pm->checkSettlementPermission($settlement, $character, 'visit'))) {
 			// people with visiting permission cannot be forced out
 			return false;
 		}
@@ -234,14 +234,14 @@ class Interactions {
 			return true; // we are already inside
 		}
 		
-		if (!$this->permission_manager->checkSettlementPermission($place, $character, 'visit')) {
+		if (!$this->pm->checkSettlementPermission($place, $character, 'visit')) {
 				return false;
 		}
 
 		/* Leaving this here for when we make Places defensible.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->permission_manager->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
 				return false;
 			}
 
@@ -335,7 +335,7 @@ class Interactions {
 		if (!$place) return false;
 
 		/* Leaving this for when Places are defensible.
-		if ($force && (!$settlement->isFortified() || $this->permission_manager->checkSettlementPermission($settlement, $character, 'visit'))) {
+		if ($force && (!$settlement->isFortified() || $this->pm->checkSettlementPermission($settlement, $character, 'visit'))) {
 			// people with visiting permission cannot be forced out
 			return false;
 		}
