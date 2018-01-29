@@ -159,7 +159,7 @@ class PlaceController extends Controller {
 		*/
 		
 		#Now generate the list of things we can build!
-		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where r.requires in (:rights) OR r.requires IS NULL")->setParameter('rights', $rights);
+		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where (r.requires in (:rights) OR r.requires IS NULL) AND r.visible = TRUE")->setParameter('rights', $rights);
 		
 		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
