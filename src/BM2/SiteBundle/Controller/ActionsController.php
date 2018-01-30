@@ -202,13 +202,22 @@ class ActionsController extends Controller {
 	  * @Template
 	  */
 	public function placesAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('appstate')->getCharacter(true, true, true); # Ensure user has a character selected.
 		
-		return array();
+		$places[] = $this->get('geography')->findPlacesNearMe($character); # Find nearby places that we can see.
+		
+		foreach ($places as $place) {
+			$visit = false; # Create place.visit variable for each place in the twig.
+			if ($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
+				$visit = true; # Set place.visit = true for twig.
+			}
+		}
+		
+		return array('places'=>$places); # Pass places array to the twig for display.
 	}
 	
 	/**
-	  * @Route("/place/{id}")
+	  * @Route("/place/{id}/enter")
 	  * @Template
 	  */
 	public function enterPlaceAction() {
