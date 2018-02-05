@@ -16,7 +16,11 @@
 {% import _self as macros %}
 
 <div class="cmsg_conversation">
+	{% if conversation.appReference %}
+	<h3>{{ conversation.appReference.name }}: {{ conversation.topic }}</h3>
+	{% else %} 
 	<h3>{{ conversation.topic }}</h3>
+	{% endif %}
 
 	{{ macros.general(meta, conversation, participantscount) }}
 	{% if conversation.parent %}
