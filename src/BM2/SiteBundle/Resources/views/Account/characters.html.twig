@@ -2,7 +2,7 @@
 
 {% macro characterrow(character, locked) %}
 <tr class="characterrow">
-	{% if character.alive and not character.npc %}
+	{% if character.alive and not character.npc and character.location and not character.retired %}
 		<td class="editable edit-list" data-id="{{ character.id }}" data-name="{{ character.name }}" data-list="{{ character.list }}"><img src="{{ asset('bundles/bm2site/images/nametag.svg') }}" title="{{ 'account.list'|trans }}"/></td>
 	{% else %}
 		<td></td>
@@ -12,7 +12,25 @@
 		<td colspan="6">
 			<img src="{{ asset('bundles/bm2site/images/lock.svg') }}" alt="{{ 'locked'|trans }}" title="{{ 'locked'|trans }}" height="20px" />
 		</td>
-	{% elseif character.alive %}
+	{% elseif character.location = FALSE AND character.alive and not character.retired %}
+		<td>
+		</td>
+		<td>
+			/* Location would normally be here. */
+		</td>
+		<td>
+			/* Status would normally be here. */
+		</td>
+		<td>
+			/* Unread message count would normally be here. */
+		</td>
+		<td>
+			/* Unread event count would normally be here. */
+		</td>
+		<td>
+			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.place'|trans }}</a>
+		</td>
+	{% elseif character.alive AND character.location = TRUE %}
 		<td>
 			{% if character.slumbering %}
 				<img src="{{ asset('bundles/bm2site/images/zzz.png') }}" alt="{{ 'inactive'|trans }}" title="{{ 'inactive'|trans }}" height="16px" />
@@ -66,6 +84,24 @@
 		</td>
 		<td>
 			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.play'|trans }}</a>
+		</td>
+	{% elseif character.location = FALSE AND character.alive and character.retired %}
+		<td>
+		</td>
+		<td>
+			/* Location would normally be here. */
+		</td>
+		<td>
+			/* Status would normally be here. */
+		</td>
+		<td>
+			/* Unread message count would normally be here. */
+		</td>
+		<td>
+			/* Unread event count would normally be here. */
+		</td>
+		<td>
+			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.place'|trans }}</a>
 		</td>
 	{% else %}
 		<td colspan="5">

@@ -1,6 +1,7 @@
 # Might & Fealty
 # text strings for politics, diplomacy and relations
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 status:
  self:
   landless:			You are a landless knight.
@@ -224,6 +225,7 @@ relation:
   engagement: engagement
   marriage:   marriage
   liason:     liason
+  paramour:   paramourship
   public:     Should this relationship be public?
   sex:        Will it be a sexual relationship, so that it might result in children?
   submitnew:  propose
@@ -277,52 +279,70 @@ realm:
   description:  Define and appoint/revoke positions.
   longdesc:     Lesser positions within %name% can be defined, appointed and revoked by you.
   empty:        The realm does not have any positions defined at this time.
-  new:          create a new position
+  new:          Create a New Position!
   holder:       holder|holders
   manage:       manage position
   appoint:      appoint officials
+  active:
+   title:       Active Realm Positions
+   description: From here you can manage the various positions of the realm that are still in use, or create new ones.
+  retired:
+   title:       Retired Realm Positions
+   description: These positions are those that you, or a predecessor, has retired from active use. You could change that though, if you so desire.
  laws:
   name:         Realm Laws
   description:  Declare and change realm laws.
   longdesc:     Laws and regulations for %name% can be declared by you. Most are optional, but some are mandatory and set to default values on realm creation.
+ capital:
+  name:         Declare a Capital
+  name0:        Capital
+  name1:        Declare a Capital
+  name2:        Delcare a New Capital
+  description:  Select a new settlement to be the capital of your realm.
+  longdesc:  From here you can determine, or redetermine, the capital of your realm, for whatever reason you so see fit. As to which region you can make your capital, well, you can determine ANY region of the realm to be your capital, though normally such a distinction is reserved for those cities that are either more developed or having of more significance. After all, if it's important to you, it's important to them, as well.
+  estates:      Which estate shall be the capital of your realm?
+  error:
+   none:        To move or determine a capital, you need to select a region. Your advisors explain something about the critical nature of such a Seat of Power.
+   already:     This region is already your capital. If you want to change it, you need to select a *different* region.
+  submit:       By My Command!
 
- name:        name
- formalname:  formal name
- colour:      official colour
- language:    official language
- description: description
- designation: designation
- ruler:       ruler|rulers
- history:     realm history
+ name:        Name
+ formalname:  Formal Name
+ colour:      Official Color
+ language:    Official Language
+ description: Description
+ designation: Designation
+ ruler:       Ruler|Rulers
+ history:     Realm History
  details:     Realm Details
- size:        size
+ size:        Size
  type:
-  1: barony
-  2: county
-  3: march
-  4: duchy
-  5: principality
-  6: kingdom
-  7: empire
+  1: Barony
+  2: County
+  3: March
+  4: Duchy
+  5: Principality
+  6: Kingdom
+  7: Empire
  title:
   male:
-   0: knight
-   1: baron
-   2: count
-   3: marquess
-   4: duke
-   5: prince
-   6: king
-   7: emperor
+   0: Knight
+   1: Baron
+   2: Count
+   3: Marquess
+   4: Duke
+   5: Prince
+   6: King
+   7: Emperor
   female:
-   0: dame
-   1: baroness
-   2: countess
-   3: marquise
-   4: duchess
-   5: princess
-   6: queen
-   7: empress
+   0: Dame
+   1: Baroness
+   2: Countess
+   3: Marquise
+   4: Duchess
+   5: Princess
+   6: Queen
+   7: Empress
 
 position:
  name:          Title:

@@ -12,9 +12,11 @@
 		<field name="per_people" type="integer"/>
 		<field name="defenses" type="integer"/>
 		<field name="special_conditions" type="boolean"/>
+		
+		<field name="built_in" type="simple_array" nullable="true"/>
 
 		<one-to-many field="resources" target-entity="BuildingResource" mapped-by="building_type"/>
-
+		
 		<many-to-many field="requires" target-entity="BuildingType" inversed-by="enables">
 			<join-table name="types.building_requires">
 				<join-columns>

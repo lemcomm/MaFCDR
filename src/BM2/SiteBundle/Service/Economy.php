@@ -240,6 +240,45 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'local seat': // only if lord is ruler of realm
+			case 'regional seat': // only if lord is ruler of realm
+			case 'royal seat': // only if lord is ruler of realm
+			case 'imperial seat': // only if lord is ruler of realm
+				if (!$settlement->getCapitalOf()) {
+					return false;
+				}
+				if (!$settlement->getRealm()) {
+					return false;
+				}
+				if (is_array($settlement->getRealm()->findRulers())) {
+					if (!in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
+						return false;
+					}
+				} else if ($settlement->getRealm()->findRulers() != $settlement->getOwner()) {
+					return false;
+				}
+				break;
+			case 'dockyard': // only at ocean
+				/* TODO: We need a better way to do this before allowing these to be built.
+				if ($settlement->getGeoData()->getCoast() == false) {
+					return false;
+				}
+				*/
+				return false;
+				break;
+			case 'filled moat': // only at a region that has water
+				if ($settlement->getGeoData()->getCoast() == false && $settlement->getGeoData()->getLake() == false && $settlement->getGeoData()->getRiver() == false) {
+					return false;
+				}
+				break;
+			case 'quarry': //only at hills, scrublands, or mountains
+				/* TODO: I don't think I want these implemented quite yet.
+				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
+					return false;
+				} 
+				*/
+				return false;
+				break;
 		}
 		return true;
 	}

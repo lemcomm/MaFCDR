@@ -9,6 +9,5 @@
 		<field name="icon" type="string" nullable="true"/>
 		<field name="icon_under_construction" type="string" nullable="true"/>
 		<field name="build_hours" type="integer"/>
-
 	</entity>
 </doctrine-mapping>

@@ -27,14 +27,14 @@ There are three main parameters to a relationship:
 * whether it is a sexual relationship or not
 * if it is public
 
-The relationship type is mostly flavor, but not entirely: Only marriages are included in the family tree, other partners will not appear on the family tree unless they are there for a different reason (say, as parents).
+The relationship type is mostly flavor, but not entirely: Only marriages are included in the family tree, other partners will not appear on the family tree unless they are there for a different reason (say, as parents). Generally, one should assume marriages are the most binding, followed by paramours, engagements, and liaisons, in that order. For the purposes of Might & Fealty, a "paramour" is similar to the medieval term of concubine, though not specifically female. 
 
 We did not include sex as an option to grab headlines. It serves a very simple and straighforward function: Only relationships that include sex can result in children as outlined above in parenthood. This also means the existence of a child is proof that the parents were in a sexual relationship, even if it is otherwise secret (see below).
 
 Public relationships will be displayed in various places by the game while secret relationships will not.
 
 
-### establishing a relationship ###
+### Establishing a Relationship ###
 You can propose a new relationship to any nearby character. Simply set up the kind of relationship you want and send the proposal. Off course you will almost always want to accompany it with some roleplaying to make sure step 2 goes the way you want it to.
 
 Rejecting or accepting is even more straightforward: Simply press the button of your choice.
@@ -47,7 +47,7 @@ Once a relationship is established, the options change, because there are a two 
 Other changes require the creation of a new relationship following the same two-step process.
 
 
-### multiple relationships ###
+### Multiple Relationships ###
 The game puts no limit on the kind and number of relationships your characters can have. Multiple marriages, half a dozen liasons, engagements to three princesses so you can pick the best later on - everything is possible. As long, and that is the real limit just like it is in real life, as long as the people important to your career, politics and power accept what you are doing.
 
 Your realm will most likely have an established culture that might have rules on things such as marriage, especially because marriages between nobles are more often driven by power than by love.

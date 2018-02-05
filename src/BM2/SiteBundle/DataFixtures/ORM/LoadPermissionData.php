@@ -13,19 +13,33 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 
 	private $permissions = array(
 		'settlement' => array(
-			'visit'    	=> array('use_value'=>false, 'use_reserve'=>false),
-			'docks'    	=> array('use_value'=>false, 'use_reserve'=>false),
-			'resupply'  => array('use_value'=>true, 'use_reserve'=>false),
-			'mobilize'  => array('use_value'=>true, 'use_reserve'=>true),
-			'construct' => array('use_value'=>false, 'use_reserve'=>true),
-			'recruit'   => array('use_value'=>true, 'use_reserve'=>false),
-			'trade'    	=> array('use_value'=>false, 'use_reserve'=>false),
+			'visit'    	=> array('use_value'=>false, 'reserve'=>false),
+			'docks'    	=> array('use_value'=>false, 'reserve'=>false),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false),
+			'resupply'	=> array('use_value'=>true, 'reserve'=>false),
+			'mobilize'	=> array('use_value'=>true, 'reserve'=>true),
+			'construct'	=> array('use_value'=>false, 'reserve'=>true),
+			'recruit'	=> array('use_value'=>true, 'reserve'=>false),
+			'trade'    	=> array('use_value'=>false, 'reserve'=>false),
+			'placeinside'	=> array('use_value'=>false, 'reserve'=>false),
+			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false)
 		),
 		'realm' => array(
-			'expel'   	=> array('use_value'=>false, 'use_reserve'=>false),
-			'diplomacy'	=> array('use_value'=>false, 'use_reserve'=>false),
-			'laws'		=> array('use_value'=>false, 'use_reserve'=>false),
-			'positions'	=> array('use_value'=>false, 'use_reserve'=>false),
+			'expel'   	=> array('use_value'=>false, 'reserve'=>false),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false),
+			'diplomacy'	=> array('use_value'=>false, 'reserve'=>false),
+			'laws'		=> array('use_value'=>false, 'reserve'=>false),
+			'positions'	=> array('use_value'=>false, 'reserve'=>false),
+			'wars'		=> array('use_value'=>false, 'reserve'=>false)
+		),
+		'place' => array(
+			'see'		=> array('use_value'=>false, 'reserve'=>false),
+			'visit'		=> array('use_value'=>false, 'reserve'=>false),
+			'docks'		=> array('use_value'=>false, 'reserve'=>false),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false),
+			'resupply'	=> array('use_value'=>true, 'reserve'=>false),
+			'mobilize'	=> array('use_value'=>true, 'reserve'=>true),
+			'construct'	=> array('use_value'=>false, 'reserve'=>true)
 		)
 	);
 
@@ -42,12 +56,16 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 	public function load(ObjectManager $manager) {
 		foreach ($this->permissions as $class=>$members) {
 			foreach ($members as $name=>$data) {
-				$perm = new Permission();
+				$perm = $manager->getRepository('BM2SiteBundle:Permission')->findOneBy(array('name'=>$name, 'class'=>$class));
+				if (!$perm) {
+					$perm = new Permission();
+					$manager->persist($perm);
+				}
 				$perm->setName($name);
 				$perm->setTranslationString('perm.'.$name);
 				$perm->setClass($class);
 				$perm->setUseValue($data['use_value']);
-				$perm->setUseReserve($data['use_reserve']);
+				$perm->setUseReserve($data['reserve']);
 				$manager->persist($perm);
 			}
 		}

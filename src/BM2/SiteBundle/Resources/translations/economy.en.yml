@@ -44,10 +44,12 @@ building:
  Great Temple: Great Temple
  Guardhouse: Guardhouse
  Heavy Armourer: Heavy Armorer
+ Imperial Seat: Imperial Seat
  Inn: Inn
  Irrigation Ditches: Irrigation Ditches
  Leather Tanner: Leather Tanner
  Library: Library
+ Local Seat: Local Seat
  Lumber Yard: Lumber Yard
  Market: Market
  Mason: Mason
@@ -57,6 +59,7 @@ building:
  Mine: Mine
  Palisade: Palisade
  Paved Streets: Paved Streets
+ Regional Seat: Regional Seat
  Royal Mews: Royal Mews
  Saddler: Saddler
  School: School

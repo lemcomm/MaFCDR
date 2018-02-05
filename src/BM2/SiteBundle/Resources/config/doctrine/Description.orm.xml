@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Description">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		
+		<many-to-one field="artifact" target-entity="Artifact" inversed-by="descriptions"/>
+		<one-to-one field="active_artifact" target-entity="Artifact" inversed-by="description"/>
+		<!-- Someday, we'll add this, probably.
+		<many-to-one field="item" target-entity="Item" inversed-by="descriptions"/>
+		-->
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="descriptions"/>
+		<one-to-one field="active_settlement" target-entity="Settlement" inversed-by="description"/>
+
+		<many-to-one field="place" target-entity="Place" inversed-by="descriptions"/>
+		<one-to-one field="active_place" target-entity="Place" inversed-by="description"/>
+		
+		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
+		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
+		<many-to-one field="updater" target-entity="Character" inversed-by="updated_descriptions"/>
+		<field name="ts" type="datetime"/>
+		<field name="cycle" type="integer"/>
+		
+		<field name="text" type="text"/>
+	</entity>
+</doctrine-mapping>

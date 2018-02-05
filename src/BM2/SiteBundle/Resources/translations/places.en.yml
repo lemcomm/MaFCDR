@@ -1,0 +1,68 @@
+# Might & Fealty
+# Text translation strings for system settings (not in-character stuff)
+# Author: Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
+
+buttons:
+ submit:     submit
+
+names:
+ name:       Short Name
+ formalname: Formal Name
+
+type:
+ label:      Place Type
+ empty:      (Select One)
+ 
+new:
+ name:       Formalize a New Place
+ intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.
+
+description:
+ generic:    Description
+ short:      Short, Externally Visible Description
+ full:       Longer, Internally Visible Description
+ 
+place:
+ owner:      Owner
+ name:       Name
+ manage:
+  name:      Place Details
+  intro:     While there's not much here right now, you can presently change the name and descriptions of your Place. In time, we plan to expand this menu greatly.
+ permissions:
+  name:      Place Permissions
+  intro:     From this screen you can manage the many aspects of this Place, from changing individual permissions (which are further detailed in the manual) to allowing those who know about this location to spawn here (TODO: soon ;) ).
+  manage:    Manage Your Permissions
+ history:    History
+
+by:
+ lord:    As the Lord...
+ castle:  From the Castle...
+ none:    As a First One...
+ magic:   As a Mage...
+ ruler:   As the Ruler...
+
+arena:    Arena
+capital:  Capital
+castle:   Castle
+cave:     Cave
+inn:      Inn
+library:  Library
+monument: Monument
+plaza:    Plaza
+portal:   Portal
+tavern:   Tavern
+
+ 
+
+help:
+ new:
+  name:       The short name of this place. It should be memorable, but also to the point.
+  formalname: The formal name of this place. Perhaps something ostentatious?
+  type:       Select the type of place this is. You can only choose this once, so choose carefully.
+  shortdesc:  This is the short description of this place, viewable by those outside of it.
+  longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it. Make it good!
+ 
+unknown:
+ title:      Unknown Place
+ place:      It seems this isn't a place that you know anything about.

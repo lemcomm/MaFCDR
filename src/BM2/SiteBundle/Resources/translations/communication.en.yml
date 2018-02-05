@@ -21,6 +21,13 @@ event:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
   estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
+ 
+ description:
+  updated:
+   artifact:    The description of this artifact has changed.
+   item:        The description of this item has changed.
+   place:       %character% has changed the description of %place%.
+   settlement:  %character% has updated the description of %settlement%.
 
  feature2:
   damaged:      The %featuretype% %name% is deteriorating. Workers should be assigned for repair.

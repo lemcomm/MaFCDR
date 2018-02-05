@@ -1,0 +1,7 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'realm.abolish.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+<p>{{ 'realm.abolish.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+
+{% endblock %}

@@ -7,6 +7,8 @@
 		<field name="active" type="boolean"/>
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
+		<many-to-one field="capital" target-entity="Settlement" inversed-by="capital_of"/>
+
 		<field name="type" type="smallint"/>
 		<field name="colour_hex" type="string"/>
 		<field name="colour_rgb" type="string"/>
@@ -19,6 +21,7 @@
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="realm" fetch="EXTRA_LAZY"/>
 
+		<one-to-many field="permissions" target-entity="RealmPermission" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="laws" target-entity="RealmLaw" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="positions" target-entity="RealmPosition" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="elections" target-entity="Election" mapped-by="realm"/>

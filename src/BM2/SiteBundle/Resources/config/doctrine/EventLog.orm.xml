@@ -17,6 +17,7 @@
 		<one-to-one field="quest" target-entity="Quest" mapped-by="log"/>
 		<one-to-one field="artifact" target-entity="Artifact" mapped-by="log"/>
 		<one-to-one field="war" target-entity="War" mapped-by="log"/>
+		<one-to-one field="place" target-entity="Place" mapped-by="log"/>
 
 	</entity>
 </doctrine-mapping>

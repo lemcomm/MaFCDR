@@ -39,6 +39,13 @@ Settlements also produce finished goods, but these do not depend on the region t
 
 Wealth, meanwhile, is an equally abstract term for jewellery, gold coins, luxury items and other money-equivalents. It will only be produced in towns and cities after some high-end buildings have been constructed.
 
+For roleplays sake, resource units are generally defined as:
+* Food: Enough food to provide for 3 average sized daily meals.
+* Wood: A single usable 2x4, no less than 5 foot in length.
+* Metal: A single 5 pound ingot.
+* Goods: One average sized (1-2 man carryable) crate of finished goods, i.e. clothes, trinkets, etc.
+* Wealth: One bag of coinage totaling 1 gold in value, in the local currency, or equivalent luxury goods (jewelry, for instance)
+
 
 Resource Demands
 ----------------
