@@ -12,7 +12,7 @@
 		<td colspan="6">
 			<img src="{{ asset('bundles/bm2site/images/lock.svg') }}" alt="{{ 'locked'|trans }}" title="{{ 'locked'|trans }}" height="20px" />
 		</td>
-	{% elseif character.location = FALSE AND character.alive and not character.retired %}
+	{% elseif not character.location and character.alive and not character.retired %}
 		<td>
 		</td>
 		<td>
@@ -30,7 +30,7 @@
 		<td>
 			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.place'|trans }}</a>
 		</td>
-	{% elseif character.alive AND character.location = TRUE %}
+	{% elseif character.alive and character.location %}
 		<td>
 			{% if character.slumbering %}
 				<img src="{{ asset('bundles/bm2site/images/zzz.png') }}" alt="{{ 'inactive'|trans }}" title="{{ 'inactive'|trans }}" height="16px" />
@@ -85,7 +85,7 @@
 		<td>
 			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.play'|trans }}</a>
 		</td>
-	{% elseif character.location = FALSE AND character.alive and character.retired %}
+	{% elseif not character.location and character.alive and character.retired %}
 		<td>
 		</td>
 		<td>
