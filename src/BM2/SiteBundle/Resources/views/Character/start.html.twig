@@ -41,7 +41,7 @@
 			{{ form_widget(form_existing) }}
 		</form>
 
-		{% if not char.user.isverynew %}
+		{% if not character.user.isverynew %}
 			<h3>{{ 'character.start.selection'|trans|title }}</h3>
 			<p>{{ 'character.start.mapintro'|trans|raw }}</p>
 
