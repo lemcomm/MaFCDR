@@ -11,7 +11,7 @@ Further down the road, as finances allow, there will be native clients for PC an
 Backend
 -------
 
-On the server-side, the game is built on the modern [Symfony 2](http://symfony.com) framework with a powerful [PostgreSQL](http://www.postgresql.org) database behind it.
+On the server-side, the game is built on the [Symfony 2](http://symfony.com) framework with a powerful [PostgreSQL](http://www.postgresql.org) database behind it.
 
 But that is just scratching the surface. The real power for many parts of the game comes from running the game world on a full-blown GIS dataset. In less technical terms, Might & Fealty does not use artifical gamey maps, but the same technology that Google Maps and other real-world mapping systems use. In fact, the screenshot on this page is from [Quantum GIS](http://www.qgis.org/), a software used by universities, land developers and public service departments to handle real-world geospatial data.
 
