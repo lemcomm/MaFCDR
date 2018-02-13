@@ -299,9 +299,12 @@ account:
   submit:    change subscription
   remaining: Your new subscription will start today, the first month subscription fee will automatically be reduced by %refund% credits remaining from your current subscription.
   changed:   Your subscription level has been changed.
- play: Play
- viewlog: View History
- familytree: Family Tree
+ play:        Play
+ place:       Place
+ unretire:    Unretire
+ edithistory: Edit Background
+ viewlog:     View History
+ familytree:  Family Tree
  famtreedesc: Inspect the family tree of your characters
  overview:
   link:     Overview
@@ -526,6 +529,7 @@ character:
   select:   move character to:
   submit:   set new list
   updated:  just updated, change will be visible on next page load
+  0:  New & Unplaced
   1:  Main Characters
   2:  Secondary Characters
   3:  Roleplaying Characters
@@ -542,9 +546,10 @@ character:
   46:  Explorers
   47:  Troublemakers
   71:  Assorted Characters
-  99: recently deceased
-  100: historic
-  150: ancestors
+  90:  Retired Characters
+  99:  Recently Deceased
+  100: Historic
+  150: Ancestors
  start:
   title:      Character Placement
   intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
@@ -664,7 +669,9 @@ settlement:
  ownedby:     This settlement is ruled by %owner%.
  realm:       This settlement is part of %realm%.
  realm2:      realm
+ sovereignty: sovereignty
  ultimate:    sovereign realm
+ localrealm:  local realm
  norealm:     This settlement does not belong to any realm.
  economy:     economy
  build:       currently building
@@ -893,6 +900,7 @@ error:
   page:        Page not found
   character:   Character not found
   action:      Action not found
+  playlogic:   Now really, I find this highly illogical.
   settlement:  Settlement not found
   buildingtype: no such building type
   featuretype:  no such feature type
@@ -966,6 +974,8 @@ npc:
  translator:   translator|translators
  scholar:      scholar|scholars
  soldier:      soldier|soldiers
+ soldiershere: soldiers present
+ intraining:   recruits in training
 
 soldier:
  type:             type
