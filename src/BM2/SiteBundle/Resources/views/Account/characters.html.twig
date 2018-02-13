@@ -1,5 +1,7 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
+{# This macro builds the table rows for each character on the list. If you want to change the rows, change the logic in the table. 
+Table headers are handled as translation strings from the character.list database entry. #}
 {% macro characterrow(character, locked) %}
 <tr class="characterrow">
 	{% if character.alive and not character.npc and character.location and not character.retired %}
@@ -12,23 +14,24 @@
 		<td colspan="6">
 			<img src="{{ asset('bundles/bm2site/images/lock.svg') }}" alt="{{ 'locked'|trans }}" title="{{ 'locked'|trans }}" height="20px" />
 		</td>
-	{% elseif not character.location and character.alive and not character.retired %}
+	{% elseif character.alive and not character.location and not character.retired %}
 		<td>
+			<!-- Status icon would normally be here. -->
 		</td>
 		<td>
-			/* Location would normally be here. */
+			<!-- Location would normally be here. -->
 		</td>
 		<td>
-			/* Status would normally be here. */
+			<!-- Status would normally be here. -->
 		</td>
 		<td>
-			/* Unread message count would normally be here. */
+			<!-- Unread message count would normally be here. -->
 		</td>
 		<td>
-			/* Unread event count would normally be here. */
+			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'newbackground'}) }}">{{ 'account.place'|trans }}</a>
 		</td>
 		<td>
-			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.place'|trans }}</a>
+			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'placenew'}) }}">{{ 'account.place'|trans }}</a>
 		</td>
 	{% elseif character.alive and character.location %}
 		<td>
@@ -83,33 +86,39 @@
 			{% if character.events > 0 %}{{ "newevents"|transchoice(character.events, {"%number%":character.events}) }}{% endif %}
 		</td>
 		<td>
-			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.play'|trans }}</a>
+			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'play'}) }}">{{ 'account.play'|trans }}</a>
 		</td>
 	{% elseif not character.location and character.alive and character.retired %}
 		<td>
+			<!-- Status icon would normally be here. -->
 		</td>
 		<td>
-			/* Location would normally be here. */
+			<!-- Location would normally be here. -->
 		</td>
 		<td>
-			/* Status would normally be here. */
+			<!-- Status would normally be here. -->
 		</td>
 		<td>
-			/* Unread message count would normally be here. */
+			<!-- Unread message count would normally be here. -->
 		</td>
 		<td>
-			/* Unread event count would normally be here. */
+			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'edithist'}) }}">{{ 'account.edithistory'|trans }}</a>
 		</td>
 		<td>
-			<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.place'|trans }}</a>
+			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'unretire'}) }}">{{ 'account.unretire'|trans }}</a>
 		</td>
 	{% else %}
-		<td colspan="5">
+		<td colspan="4">
 			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
 		</td>
 		<td>
 			{% if character.log %}
-				<a href="{{ path('bm2_play', {'id': character.id}) }}">{{ 'account.viewlog'|trans }}</a>
+				<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'edithist'}) }}">{{ 'account.edithistory'|trans }}</a>
+			{% endif %}
+		</td>
+		<td>
+			{% if character.log %}
+				<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'viewhist'}) }}">{{ 'account.viewlog'|trans }}</a>
 			{% endif %}
 		</td>
 	{% endif %}
@@ -175,7 +184,7 @@
 		<div class="warning leftmain">{{ 'fewoffers'|trans({"%count%":offers}) }}</div>
 	{% endif %}
 	<table class="leftmain">
-	{% set current_list = 0 %}
+	{% set current_list = 999999 %}
 	{% for character in characters %}
 		{% if character.list != current_list %}
 			<tr>
