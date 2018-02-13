@@ -352,7 +352,8 @@ class CharacterManager {
 
 	public function retire(Character $character) {
 		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
-		$character->setRetired(true)->setList(99)->setSlumbering(true);
+		// List is set to 90 as this sorts them to the retired listing on the account character list.
+		$character->setRetired(true)->setList(90)->setSlumbering(true);
 		// remove from map and hiearchy
 		$character->setLiege(null);
 
