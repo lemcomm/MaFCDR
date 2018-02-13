@@ -174,6 +174,7 @@ class AccountController extends Controller {
 				'name' => $character->getName(),
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
+				'retired' => $character->getRetired(),
 				'npc' => $character->isNPC(),
 				'slumbering' => $character->getSlumbering(),
 				'prisoner' => $character->getPrisonerOf(),
@@ -560,7 +561,7 @@ class AccountController extends Controller {
 	/**
 	  * @Route("/play/{id}", name="bm2_play", requirements={"id"="\d+"})
 	  */
-	public function playAction($id) {
+	public function playAction(Request $request, $id) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
@@ -581,30 +582,57 @@ class AccountController extends Controller {
 
 		$this->get('appstate')->setSessionData($character);
 
-		if ($character->isAlive()) {
-			$character->setLastAccess(new \DateTime("now"));
-			$character->setSlumbering(false);
-			$em->flush();
-			if ($character->getSpecial()) {
-				// special menu active - check for reasons
-				if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
-					return $this->redirectToRoute('bm2_dungeon_dungeon_index');
+		switch ($request->query->get('logic')) {
+			case 'play':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				$em->flush();
+				if ($character->getSpecial()) {
+					// special menu active - check for reasons
+					if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
+						return $this->redirectToRoute('bm2_dungeon_dungeon_index');
+					}
+				} 
+				return $this->redirectToRoute('bm2_recent');
+				break;
+			case 'placenew':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'new'));
+				break;
+			case 'viewhist':
+				if ($character->getList() < 100 ) {
+					// move to historic list now that we've looked at his final days
+					$character->setList(100);
 				}
-			} 
-			return $this->redirectToRoute('bm2_recent');
-		} else {
-			if ($character->getList() < 100 ) {
-				// move to historic list now that we've looked at his final days
-				$character->setList(100);
-			}
-			$em->flush();
-			return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
+				$em->flush();
+				return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
+				break;
+			case 'edithist':
+				$em->flush(); 
+				/* I don't have words for how stupid I think this is. 
+				Apparently, if you don't flush after setting session data, the game has no idea which character you're trying to edit the background of.
+				Which is super odd to me, because session data doesn't involve the database... --Andrew, 20180213 */
+				return $this->redirectToRoute('bm2_site_character_background');
+				break;
+			case 'unretire':
+				# This should look a lot like 'placenew' above, because it's a very similar process ;) --Andrew, 20180213
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
+				break;				
+			default:
+				throw $this->createAccessDeniedException('error.notfound.playlogic');
+				return $this->redirectToRoute('bm2_characters');
+				break;
 		}
 	}
 
 	/**
 	  * @Route("/choosebandit", name="bm2_choose_bandit")
-     * @Template("BM2SiteBundle:Account:characters.html.twig")
+	  * @Template("BM2SiteBundle:Account:characters.html.twig")
 	  */
 	public function choosebanditAction(Request $request) {
 		$user = $this->getUser();
