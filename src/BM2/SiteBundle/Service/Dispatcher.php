@@ -252,6 +252,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"control.all", "description"=>"unavailable.notinside");
 		} else {
 			$actions[] = $this->controlChangeRealmTest(true);
+			$actions[] = $this->controlSettlementDescriptionTest();
 			$actions[] = $this->controlGrantTest(true);
 			$actions[] = $this->controlRenameTest(true);
 			$actions[] = $this->controlCultureTest(true);
@@ -825,6 +826,21 @@ class Dispatcher {
 			return $this->action("control.rename", "bm2_site_actions_rename");
 		} else {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.notyours2");
+		}
+	}
+
+
+	public function controlSettlementDescriptionTest($check_duplicate=false) {
+		if (($check = $this->controlActionsGenericTests()) !== true) {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.$check");
+		}
+		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($estate->getOwner() == $this->getCharacter()) {
+			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$estate->getId()));
+		} else {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.notyours2");
 		}
 	}
 
