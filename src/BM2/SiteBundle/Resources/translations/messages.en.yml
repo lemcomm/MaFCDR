@@ -1,6 +1,7 @@
 # Might & Fealty
-# generic text strings
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Generic text strings for display, mostly on informational pages.
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 dateformat:   Y-m-d
 gametime:
  current:     It is year %year%, week %week%, day %day% in the world of Might & Fealty
@@ -731,6 +732,7 @@ settlement:
   atfeatures:   %number% assigned to features construction
   employed:     %number% employed in various buildings
   available:    %number% available for farming and local economy
+ description:   Settlement Description
 
 road:
  quality:
