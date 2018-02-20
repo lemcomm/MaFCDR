@@ -120,7 +120,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.settlement',
-						array('%character%'=>$entity->getOwner()->getId(), '%settlement%'=>$entity->getId()),
+						array('%character%'=>$character->getId(), '%settlement%'=>$entity->getId()),
 						History::LOW
 					);
 					break;
