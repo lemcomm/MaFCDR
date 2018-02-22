@@ -231,7 +231,7 @@ event:
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
-  inactivekept: The holder of %position%, %character%, has succumbed to the slumber.
+  inactivekept: The holder of %realmposition%, %character%, has succumbed to the slumber.
   inherited:
    slumber:     The position of %position% has been inherited by %character-2% after the slumbering of %character-1%.
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
