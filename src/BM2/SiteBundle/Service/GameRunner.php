@@ -292,7 +292,7 @@ class GameRunner {
 						$this->history->logEvent(
 							$position->getRealm(),
 							'event.position.inactivekept',
-							array('%link-character%'=>$character->getId(), '%link-position%'=>$position->getId()),
+							array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 							History::LOW, true
 						);
 						$keeponslumbercount++;
