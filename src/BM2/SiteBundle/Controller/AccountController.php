@@ -586,6 +586,9 @@ class AccountController extends Controller {
 			case 'play':
 				$character->setLastAccess(new \DateTime("now"));
 				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
 				$em->flush();
 				if ($character->getSpecial()) {
 					// special menu active - check for reasons
@@ -598,6 +601,9 @@ class AccountController extends Controller {
 			case 'placenew':
 				$character->setLastAccess(new \DateTime("now"));
 				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'new'));
 				break;
@@ -620,6 +626,9 @@ class AccountController extends Controller {
 				# This should look a lot like 'placenew' above, because it's a very similar process ;) --Andrew, 20180213
 				$character->setLastAccess(new \DateTime("now"));
 				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
 				break;				
