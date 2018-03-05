@@ -165,7 +165,8 @@ class GameRunner {
 		}
 
 		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL) OR (c.alive = true and c.slumbering = true)');
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND c.system <> :system) OR (c.alive = true and c.slumbering = true AND c.system <> :system)');
+		$query->setParameter('system' = 'procd_inactive');
 		$result = $query->getResult();
 		if (count($result) > 0) {
 			$this->logger->info("Sorting the dead from the slumbering...");
@@ -247,6 +248,7 @@ class GameRunner {
 			if ($character->getEstates()) {
 				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 			}
+			$character->setSystem('procd_inactive');
 		}
 		foreach ($slumbered as $character) {		
 			$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
@@ -302,6 +304,7 @@ class GameRunner {
 			if ($character->getEstates()) {
 				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 			}
+			$character->setSystem('procd_inactive');
 		}
 		if ($keeponslumbercount > 0) {
 			$this->logger->info("$keeponslumbercount positions kept on slumber!");
