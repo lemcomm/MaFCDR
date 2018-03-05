@@ -584,6 +584,9 @@ class AccountController extends Controller {
 		if ($character->isAlive()) {
 			$character->setLastAccess(new \DateTime("now"));
 			$character->setSlumbering(false);
+			if ($character->getSystem('procd_inactive') {
+				$character->setSystem(NULL);
+			}
 			$em->flush();
 			if ($character->getSpecial()) {
 				// special menu active - check for reasons
