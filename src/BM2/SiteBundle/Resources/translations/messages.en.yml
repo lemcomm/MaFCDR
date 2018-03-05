@@ -902,7 +902,7 @@ error:
   page:        Page not found
   character:   Character not found
   action:      Action not found
-  playlogic:   Now really, I find this highly illogical.
+  playlogic:   Now really, I find this highly illogical. (Bad logic passed to page.)
   settlement:  Settlement not found
   buildingtype: no such building type
   featuretype:  no such feature type
