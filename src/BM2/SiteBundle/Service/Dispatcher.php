@@ -119,6 +119,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
+		/* Code not yet ready for deployment!
 		if ($actionableplace = $this->getActionablePlace()) {
 			$actions[] = array("name"=>"places.actionable.name", "description"=>"places.actionable.description");
 		} else if ($this->getLeaveablePlace()) {
@@ -129,6 +130,7 @@ class Dispatcher {
 		if ($newplace = $this->placeCreateTest(true)) {
 			$actions[] = $newplace;
 		}
+		*/
 
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
@@ -457,7 +459,8 @@ class Dispatcher {
 	}
 
 	/* ========== Place Dispatchers ========= */
-	
+	/* Code not yet ready for deployment!	
+
 	public function PlacesActions() {
 		$actions=array();
 		if (($check = $this->placesActionsGenericTests()) !== true) {
@@ -488,6 +491,7 @@ class Dispatcher {
 
 		return $this->veryGenericTests();
 	}
+	*/
 
 	/* ========== Meta Dispatchers ========== */
 
@@ -500,6 +504,7 @@ class Dispatcher {
 			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
 			$actions[] = $this->metaRenameTest();
+			$actions[] = $this->metaRetireTest();
 			$actions[] = $this->metaKillTest();
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
@@ -1363,7 +1368,8 @@ class Dispatcher {
 	}
 
 	/* ========== Place Actions ============== */
-	
+	/* Code not yet ready for deployment!
+
 	public function placeCreateTest() {
 		if ($this->getCharacter()->isTrial()) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.free");
@@ -1470,6 +1476,7 @@ class Dispatcher {
 					    );
 		}
 	}
+	*/
 
 	/* ========== Political Actions ========== */
 
@@ -1769,11 +1776,22 @@ class Dispatcher {
 		return array("name"=>"meta.settings.name", "url"=>"bm2_site_character_settings", "description"=>"meta.settings.description");
 	}
 
+	public function metaRetireTest() {
+		if ($this->getCharacter()->isNPC()) {
+			// FIXME: respawn template doesn't exist.
+			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"meta.background.name", "description"=>"unavailble.prisoner");
+		}
+		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
+	}
+
 	public function metaKillTest() {
 		if ($this->getCharacter()->isNPC()) {
 			// FIXME: respawn template doesn't exist.
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
-			return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
+			# return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
 		}
 		return array("name"=>"meta.kill.name", "url"=>"bm2_site_character_kill", "description"=>"meta.kill.description");
 	}
