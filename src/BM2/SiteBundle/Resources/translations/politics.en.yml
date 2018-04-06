@@ -267,6 +267,25 @@ realm:
     The designation of your realm must always stay above that of all inferior realms, limiting your choices.
   submit:       announce changes
   success:      Realm details have been updated.
+ abolish:
+  name:         Dismantle Realm
+  description:  Tear down this realm.
+  longdesc:     As the ruler of %formalname%, it's within your authority to order it's complete and utter dismantling, if you so wish.
+  intro: > 
+    Using your authority as ruler of this realm, you can forcibly dismantle this realm and remove it from existence.<br />
+    If you're not absolutely certain that you wish to do this, you shouldn't even be looking at this. That's how serious this action is.<br />
+    It's also worth noting that you are only dismantling this realm, not it's subordinates, who will automatically gain independence.
+  sure:         You Absolutely Certain?
+  success:      For better or worse, the realm has been taken down.
+ description:
+  name:         Update Description
+  description:  Change the public words about the realm.
+  longdesc:     As you are the ruler of %formalname%, it is well within your powers to determine how the realm is described abroad, at least formally speaking, anyways.
+  intro: >
+    As the ruler of %name%, you can change the realm's formal description at any time. Please note that these descriptions are recorded
+    forever, and at some point, someone may be using your words to justify their war, long after your ruler is gone.
+  submit:       Announce Changes
+  success:      Realm details have been updated.
  abdicate:
   name:         Abdicate
   description:  Renounce rulership and hand it to someone else.
@@ -471,7 +490,7 @@ diplomacy:
     As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself it's ruler in the process.
     All you need to do is confirm that this is an action you want to take by clicking the button below.
   submit:       Revive Realm
-  success:      You have successfully restored the subrealm.
+  success:      You have successfully restored the subrealm.  
 
  subrealm:
   name:         Create Subrealm
