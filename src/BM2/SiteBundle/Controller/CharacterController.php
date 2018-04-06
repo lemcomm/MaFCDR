@@ -782,7 +782,7 @@ class CharacterController extends Controller {
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		$form = $this->createFormBuilder()
-			->add('death', 'textbox', array(
+			->add('death', 'textarea', array(
 				'required'=>false,
 				'label'=>'meta.kill.death',
 				'translation_domain'=>'actions'
