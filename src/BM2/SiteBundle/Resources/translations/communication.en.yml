@@ -132,6 +132,7 @@ event:
    appointed:    Appointed %realmposition% in %realm%.
    demoted:      Demoted from %realmposition% in %realm%.
    elected:      Elected %realmposition% in %realm%.
+   abolished:    Lost the position of %realmposition% due to the dismantling of %realm%.
   liegedied:    Your liege %character% has died. This dissolves your oath of fealty.
   liegedied2:   Your liege %character% has died. This dissolves your oath of fealty and has turned you into a wandering noble with no realm affiliation.
   spot:         Your scouts spotted %character% in the vicinity.
@@ -235,6 +236,21 @@ event:
   war:
    declared:    Declared war "%war%".
    received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
+  abolished:
+   realm:       By order of %character%, the realm has been dismantled.
+   superior:    By order of %character%, the realm's subrealm of %realm% has been dismantled.
+   character:   Ordered the dismantling of the realm of %realm%.
+   sovereign:
+    inferior:   
+     subrealm:  With the abolishment of %realm%, the realm has become autonomous.
+     realm:     With the dismantling of the realm, the formal vassal of %realm% has gained it's autonomy.
+    estate:     With the dismantling of %realm%, the estate is effectively rogue.
+   notsovereign:
+    inferior:
+     subrealm:  With the abolishment of its superior realm, %realm-1%, %realm-2%'s superior is now %realm-3%.
+     realm:     With the abolishment of the realm, %realm-1% assumes superiorship over %realm-2%.
+     superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
+    estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
 
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
