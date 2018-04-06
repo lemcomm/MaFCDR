@@ -156,10 +156,12 @@
 </tbody>
 </table>
 
-
-{% if realm.description is not null and realm.description != "" %}
+{% if realm.description is not null and realm.description.text is not null %}
 	<h3>{{ 'realm.description'|trans({},"politics")|title }}</h3>
-	{{ realm.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{{ realm.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+{% elseif realm.description is null and realm.oldDescription is not null %}
+	<h3>{{ 'realm.description'|trans({},"politics")|title }}</h3>
+	{{ realm.oldDescription|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 {% endif %}
 
 {% endblock %}
