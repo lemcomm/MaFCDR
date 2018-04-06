@@ -863,6 +863,11 @@ meta:
      character knows, as well as any ambitions and future plans. They are for you and in order to give meaning to
      your character.<br />
      <em>Secrets are just that, and visible only to you.</em>
+  retirement:
+   name:        Retirement
+   desc: >
+     Here you can explain why this character has decided to retire from the world, if you so desire.
+     <em>Visible to everyone.</em>
   death:
    name:        Death
    desc: >
@@ -892,9 +897,19 @@ meta:
   knownas:      Add a "known as"
   submit:       Rename character
   success:      Your character has been renamed.
+ retire:
+  name:         Retire
+  description:  Retire this character
+  intro: >
+   Your can decide to make your character retire from active life at any time they are not captive.<br />
+   This action will make your character lose all their titles, holdings, conversations, soldiers, and position on the map,
+   so it shouldn't be taken lightly. You will also have to wait, at a minimum, a few days to return them to activity.
+  sure:         Are you certain?
+  submit:       Leave the politics behind
+  success:      Your character has entered their retirement, successfully.
  kill:
   name:         Kill
-  description:  Make character dead
+  description:  Kill this character
   intro: >
     You can kill your character at any time.<br />
     This action will merely make your character dead without any reason given. You should roleplay an appropriate death
@@ -987,3 +1002,4 @@ quests:
  details:   Details
  current:   Current Quests
  past:      Past Quests
+ 
