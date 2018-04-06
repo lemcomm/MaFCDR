@@ -105,6 +105,7 @@ event:
   knownas2:     No longer known as "%oldname%".
   death:        Died.
   death2:       Died in battle.
+  retired:      Has retired from war and politics.
   npcdeath:     Without troops, disappeared and died.
   desertions:   %complaining% soldiers are complaining about being too far away from home. %gone% of them deserted.
   deathreclaim: %amount% soldiers returned to you upon the death of %character%, whom you had them assigned to.
