@@ -420,6 +420,7 @@ class Dispatcher {
 			$actions[] = array("title"=>$realm->getFormalName());
 			$actions[] = array("name"=>"realm.view.name", "url"=>"bm2_site_realm_hierarchy", "parameters"=>array("realm"=>$realm->getId()), "description"=>"realm.view.description", "long"=>"realm.view.longdesc");
 			$actions[] = $this->hierarchyManageRealmTest();
+			$actions[] = $this->hierarchyManageDescriptionTest();
 			$actions[] = $this->hierarchySelectCapitalTest();
 			$actions[] = $this->hierarchyAbdicateTest();
 			$actions[] = $this->hierarchyRealmPositionsTest();
@@ -1543,6 +1544,20 @@ class Dispatcher {
 			return array("name"=>"realm.manage.name", "description"=>"unavailable.notleader");
 		} else {
 			return $this->action("realm.manage", "bm2_site_realm_manage", true, 
+				array('realm'=>$this->realm->getId()),
+				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			);
+		}
+	}
+
+	public function hierarchyManageDescriptionTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.description.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.description.name", "description"=>"unavailable.notleader");
+		} else {
+			return $this->action("realm.description", "bm2_site_realm_description", true, 
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
