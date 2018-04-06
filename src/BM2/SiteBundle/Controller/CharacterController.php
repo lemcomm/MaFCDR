@@ -4,7 +4,6 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
 
@@ -264,6 +263,11 @@ class CharacterController extends Controller {
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
+		if ($request->query->get('logic') == 'retired') {
+			$retiree = true;
+		} else {
+			$retiree = false;
+		}
 
 		$form_offer = $this->createForm(new CharacterPlacementType('offer', $character));
 		$form_existing = $this->createForm(new CharacterPlacementType('family', $character));
@@ -404,6 +408,11 @@ class CharacterController extends Controller {
 			}
 
 			if ($startlocation) {
+				if ($character->getRetired()) {
+					# No idea why but we lose the $retiree we declared above...
+					$retiree = true;
+					$character->setRetired(false);
+				}
 				$character->setLocation($startlocation->getGeoData()->getCenter());
 				$character->setInsideSettlement($startlocation);
 				if (!$historydone) {
@@ -423,13 +432,19 @@ class CharacterController extends Controller {
 				$this->get('history')->visitLog($startlocation, $character);
 				$em->flush();
 
-				return $this->redirectToRoute('bm2_first');
+				if (!$retiree) {
+					return $this->redirectToRoute('bm2_first');
+				} else {
+					$this->addFlash('notice', $this->get('translator')->trans('character.start.returnsuccess', array(), 'messages'));
+					return $this->redirectToRoute('bm2_recent');
+				}
 			}
 		}
 		return array(
 			'form_offer'=>$form_offer->createView(),
 			'form_existing'=>$form_existing->createView(),
-			'form_map'=>$form_map->createView()
+			'form_map'=>$form_map->createView(),
+			'retiree'=>$retiree
 		);
 	}
 
@@ -645,10 +660,7 @@ class CharacterController extends Controller {
 
 		// dynamically create when needed
 		if (!$character->getBackground()) {
-			$background = new CharacterBackground;
-			$character->setBackground($background);
-			$background->setCharacter($character);
-			$em->persist($background);
+			$this->get('character_manager')->newBackground($character);
 		}
 		$form = $this->createForm(new CharacterBackgroundType($character->getAlive()), $character->getBackground());
 		$form->handleRequest($request);
@@ -781,6 +793,9 @@ class CharacterController extends Controller {
      */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if ($character->isPrisoner()) {
+			throw new AccessDeniedException('unvailable.prisoner');
+		}
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
 				'required'=>false,
@@ -819,6 +834,10 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				if ($data['death']) {
+					// dynamically create when needed
+					if (!$character->getBackground()) {
+						$this->get('character_manager')->newBackground($character);
+					}
 					$character->getBackground()->setDeath($data['death']);
 					$em->flush();
 				}
@@ -845,8 +864,11 @@ class CharacterController extends Controller {
      */
 	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if ($character->isPrisoner()) {
+			throw new AccessDeniedException('unvailable.prisoner');
+		}
 		$form = $this->createFormBuilder()
-			->add('retirement', 'textbox', array(
+			->add('retirement', 'textarea', array(
 				'required'=>false,
 				'label'=>'meta.retire.label',
 				'translation_domain'=>'actions'
@@ -881,6 +903,10 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				if ($data['retirement']) {
+					// dynamically create when needed
+					if (!$character->getBackground()) {
+						$this->get('character_manager')->newBackground($character);
+					}
 					$character->getBackground()->setRetirement($data['retirement']);
 					$em->flush();
 				}
@@ -900,34 +926,6 @@ class CharacterController extends Controller {
 		}
 		return array('form'=>$form->createView());
 	}
-	
-   /**
-     * @Route("/respawn")
-     * @Template
-     */
-	public function respawnAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
-		$form = $this->createFormBuilder()
-			->add('sure', 'checkbox', array(
-				'required'=>true,
-				'label'=>'meta.respawn.sure',
-				'translation_domain' => 'actions'
-				))
-			->getForm();
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			// FIXME: validation - it only checks for the checkbox on the browser side so far
-			$data = $form->getData();
-			$em = $this->getDoctrine()->getManager();
-
-			$this->get('character_manager')->respawn($character);
-			$em->flush();
-			return array('result'=>array('success'=>true));
-		}
-
-		return array('form'=>$form->createView());
-	}
-
 
 	/**
 	  * @Route("/surrender")
@@ -962,6 +960,7 @@ class CharacterController extends Controller {
 
 		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
 	}
+
 
 	/**
 	  * @Route("/escape")
