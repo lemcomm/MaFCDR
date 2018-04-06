@@ -160,8 +160,8 @@
 
 {% if char.retired or char.alive == false %}
 	{% if char.retired and char.background.retirement is defined %}
-		<h2>{{ 'meta.background.death.name'|trans({},"actions")|title }}</h2>
-		{{ char.background.death|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+		<h2>{{ 'meta.background.retirement.name'|trans({},"actions")|title }}</h2>
+		{{ char.background.retirement|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{% endif %}
 	{% if char.alive == false and char.background.death is defined %}
 		<h2>{{ 'meta.background.death.name'|trans({},"actions")|title }}</h2>
