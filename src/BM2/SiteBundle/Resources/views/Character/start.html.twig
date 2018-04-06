@@ -10,7 +10,11 @@
 {# overwrite because this is the one page where it's ok to have a character without a location #}
 {% set character = appstate.getCharacter(true,false,true) %}
 	<h2>{{ 'character.start.title'|trans|title }}</h2>
+	{% if not retiree %}
+	<p>{{ 'character.start.returnee'|trans({"%name%":character.name})|raw }}</p>
+	{% else %}
 	<p>{{ 'character.start.intro'|trans({"%name%":character.name})|raw }}</p>
+	{% endif %}
 
 		<h3>{{ 'character.start.offer'|trans|title }}</h3>
 		<p>{{ 'character.start.offerintro'|trans({"%he%":character.gender("he")|trans})|raw }}</p>
