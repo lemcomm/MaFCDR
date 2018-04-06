@@ -175,7 +175,9 @@ class GameRunner {
 		$dead = [];
 		$slumbered = [];
 		$deadcount = 0;
+		$knowndead = 0;
 		$slumbercount = 0;
+		$knownslumber = 0;
 		$keeponslumbercount = 0;
 		$this->seen = new ArrayCollection;
 		foreach ($result as $character) {
@@ -192,120 +194,135 @@ class GameRunner {
 			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
-			$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
-			$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
-			$this->logger->info("Dead; removed from the map.");
-			$captor = $character->getPrisonerOf();
-			if ($captor) {
-				$this->logger->info("Captive. The dead are captive no more.");
-				$character->setPrisonerOf(null);
-				$captor->removePrisoner($character);
-			}
-			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
-			if ($character->getPositions()) {
-				$this->logger->info("Positions detected");
-				foreach ($character->getPositions() as $position) {
-					if ($position->getRuler()) {
-						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
-						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
-							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
+			if ($character->getSystem() != 'procd_inactive') {
+				$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
+				$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+				$this->logger->info("Dead; removed from the map.");
+				$captor = $character->getPrisonerOf();
+				if ($captor) {
+					$this->logger->info("Captive. The dead are captive no more.");
+					$character->setPrisonerOf(null);
+					$captor->removePrisoner($character);
+				}
+				$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
+				if ($character->getPositions()) {
+					$this->logger->info("Positions detected");
+					foreach ($character->getPositions() as $position) {
+						if ($position->getRuler()) {
+							$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
+							if ($heir) {
+								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
+							} else {
+								$this->logger->info("No one inherits ".$position->getRealm()->getName());
+								$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
+							}
+							$this->logger->info("Removing them from ".$position->getName());
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
+						} else if ($position->getInherit()) {
+							if ($heir) {
+								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
+							} else {
+								$this->logger->info("No one inherits ".$position->getName());
+								$this->cm->failInheritPosition($character, $position, 'death');
+							}
+							$this->logger->info("Removing them from ".$position->getName());
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
 						} else {
-							$this->logger->info("No one inherits ".$position->getRealm()->getName());
-							$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
+							$this->logger->info("No inheritance. Removing them from ".$position->getName());
+							$this->history->logEvent(
+								$position->getRealm(), 
+								'event.position.death',
+								array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+								History::LOW, true
+							);
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
 						}
-						$this->logger->info("Removing them from ".$position->getName());
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
-					} else if ($position->getInherit()) {
-						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
-							$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
-						} else {
-							$this->logger->info("No one inherits ".$position->getName());
-							$this->cm->failInheritPosition($character, $position, 'death');
-						}
-						$this->logger->info("Removing them from ".$position->getName());
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
-					} else {
-						$this->logger->info("No inheritance. Removing them from ".$position->getName());
-						$this->history->logEvent(
-							$position->getRealm(), 
-							'event.position.death',
-							array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
-							History::LOW, true
-						);
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
 					}
 				}
-			}
-			if ($character->getEstates()) {
-				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				/* TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getEstates()) {
+				}
+				*/
+				$character->setSystem('procd_inactive');
+				$this->logger->info("Character set as known dead.");
+			} else {
+				$knowndead++;
 			}
 		}
-		foreach ($slumbered as $character) {		
-			$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
-			$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
-			if ($character->getPositions()) {			
-				foreach ($character->getPositions() as $position) {
-					if ($position->getRuler()) {
-						$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
-						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
-							$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
-						} else {
-							$this->logger->info("No one inherits ".$position->getRealm()->getName());
-							$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
-						}
-						$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
-					} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
-						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
-						if ($heir) {
-							$this->logger->info($heir->getName()." inherits ".$position->getName());
-							$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
-						} else {
-							$this->logger->info("No one inherits ".$position->getName());
+		foreach ($slumbered as $character) {
+			if ($character->getSystem() != 'procd_inactive') {
+				$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
+				$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
+				if ($character->getPositions()) {			
+					foreach ($character->getPositions() as $position) {
+						if ($position->getRuler()) {
+							$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
+							if ($heir) {
+								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
+							} else {
+								$this->logger->info("No one inherits ".$position->getRealm()->getName());
+								$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
+							}
+							$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
+						} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
+							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
+							if ($heir) {
+								$this->logger->info($heir->getName()." inherits ".$position->getName());
+								$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
+							} else {
+								$this->logger->info("No one inherits ".$position->getName());
+								$this->cm->failInheritPosition($character, $position, 'slumber');
+							}
+							$this->logger->info("Removing ".$character->getName());
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
+						} else if (!$position->getKeepOnSlumber()) {
+							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
+							$this->logger->info("Removing ".$character->getName());
 							$this->cm->failInheritPosition($character, $position, 'slumber');
+							$position->removeHolder($character);
+							$character->removePosition($position);
+							$this->logger->info("Removed.");
+						} else {
+							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler position.");
+							$this->logger->info($position->getName()." is set to keep on slumber.");
+							$this->history->logEvent(
+								$position->getRealm(),
+								'event.position.inactivekept',
+								array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+								History::LOW, true
+							);
+							$keeponslumbercount++;
 						}
-						$this->logger->info("Removing ".$character->getName());
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
-					} else if (!$position->getKeepOnSlumber()) {
-						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
-						$this->logger->info("Removing ".$character->getName());
-						$this->cm->failInheritPosition($character, $position, 'slumber');
-						$position->removeHolder($character);
-						$character->removePosition($position);
-						$this->logger->info("Removed.");
-					} else {
-						$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler position.");
-						$this->logger->info($position->getName()." is set to keep on slumber.");
-						$this->history->logEvent(
-							$position->getRealm(),
-							'event.position.inactivekept',
-							array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
-							History::LOW, true
-						);
-						$keeponslumbercount++;
 					}
 				}
-			}
-			if ($character->getEstates()) {
-				#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				/* TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getEstates()) {
+				}
+				*/
+				$character->setSystem('procd_inactive');
+				$this->logger->info("Character set as known slumber.");
+			} else {
+				$knownslumber++;
 			}
 		}
 		if ($keeponslumbercount > 0) {
 			$this->logger->info("$keeponslumbercount positions kept on slumber!");
 		}
+		$this->logger->info("Counted $knownslumber known slumberers and $knowndead known dead.");
 		$this->appstate->setGlobal('cycle.characters', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -317,88 +334,103 @@ class GameRunner {
 		if ($last==='complete') return true;
 		$this->logger->info("NPC Cycle...");
 
+		
 		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
 		$players = $query->getSingleScalarResult();
+		#NOTE: In order to remove bandits, we've commented out the following line to force a reduction in bandit numbers.
 		# $want = ceil($players/8);
-		$want = 0;
-		
+		$want = 0;		
 		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
+		$cullability = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true and c.user IS NULL')->getSingleScalarResult();
 		
 		$this->logger->info("we want $want NPCs for $players players, we have $active_npcs");
-		if ($active_npcs < $want) {
+		if (0 < $active_npcs AND $active_npcs < $want) {
 			$npc = $this->npc->createNPC();
 			$this->logger->info("created NPC ".$npc->getName());
-		} else if ($active_npcs > $want) {
+		} else if ($active_npcs > $want AND $cullability > 0) {
 			# The greater than 2 is there to keep this from happening every single turn. We don't care about a couple extra.
 			$cullcount = $active_npcs - $want;
 			$culled = 0;
 			$this->logger->info("Too many NPCs, attempting to cull $cullcount NPCs");
 			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.");
 			
-			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
-			foreach ($query->getResult() as $potentialculling) {
-				if ($cullcount > $culled) {
-					$potentialculling->setAlive('FALSE');
-					$culled++;
-					$this->logger->info("NPC ".$potentialculling->getName()." has been culled");
-				}
-				if ($cullcount == $culled) {
-					$this->logger->info("Bandit population is within acceptable levels. ".$potentialculling->getName()." lives to see another day.");
+			
+
+			while ($cullability > 0 AND $culled < $cullcount) {
+				$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
+				foreach ($query->getResult() as $potentialculling) {
+					if ($cullcount > $culled) {
+						$potentialculling->setAlive('FALSE');
+						$culled++;
+						$this->logger->info("NPC ".$potentialculling->getName()." has been culled");
+					}
+					if ($cullcount == $culled) {
+						$this->logger->info("Bandit population is within acceptable levels. ".$potentialculling->getName()." lives to see another day.");
+					}
 				}
 			}
-		}
-		
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
-		foreach ($query->getResult() as $npc) {
-			if ($npc->isAlive()) {
-				$this->npc->checkTroops($npc);
-			}
-			# This used to run all the time, but we don't care about resetting them if we already have too many.
-			if ($active_npcs <= $want) {
-				$this->npc->checkTimeouts($npc);
+			if ($cullability > 0 AND $culled > 0) {
+				$this->logger->info("It was not possible to conduct the needed cullings this turn.");
 			}
 		}
 
-		$query = $this->em->createQuery('SELECT s as soldier, c as character FROM BM2SiteBundle:Soldier s JOIN s.character c JOIN s.home h JOIN h.geo_data g WHERE c.npc = true AND s.alive = true AND s.distance_home > :okdistance');
-		$query->setParameter('okdistance', $this->bandits_ok_distance);
-		$this->logger->info(count($query->getResult())." bandit soldiers complaining");
-		$deserters = array();
-		foreach ($query->getResult() as $row) {
-			$index = $row['soldier']->getCharacter()->getId();
-			if (!isset($deserters[$index])) {
-				$deserters[$index] = array('character'=>$row['soldier']->getCharacter(), 'soldiers'=>$row['soldier']->getCharacter()->getLivingSoldiers()->count(), 'gone'=>0, 'complaining'=>0);
-			}
-
-			$deserters[$index]['complaining']++;
-			$chance = ($row['soldier']->getDistanceHome() - $this->bandits_ok_distance)/5000;
-			if ($row['soldier']->getDistanceHome() > $this->bandits_ok_distance*2) {
-				$chance += ($row['soldier']->getDistanceHome() - $this->bandits_ok_distance*2)/2000;
-			}
-			// TODO: set even lower for now until we fix the problem where soldiers seem to come from far away regions
-			//$chance = sqrt($chance); // because this runs every turn, leaving it high would lead to immediate loss
-			$chance = sqrt($chance/10); // because this runs every turn, leaving it high would lead to immediate loss
-			if (rand(0,100)<$chance) {
-				$this->military->disband($row['soldier'], $row['soldier']->getCharacter());
-				$deserters[$index]['gone']++;
-			}
-		}
-
-		foreach ($deserters as $des) {
-			if ($des['complaining'] > 0) {
-				if ($des['gone'] >= 10 || $des['gone'] > $des['soldiers']*0.1) {
-					$importance = HISTORY::HIGH;
-				} elseif ($des['gone'] > 0) {
-					$importance = HISTORY::MEDIUM;
-				} else {
-					$importance = HISTORY::LOW;
+		if ($active_npcs > 0) {
+			$this->logger->info("Proceeding to check for recyclable NPCs...");
+			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
+			foreach ($query->getResult() as $npc) {
+				if ($npc->isAlive()) {
+					$this->npc->checkTroops($npc);
 				}
-				$this->history->logEvent( 
-					$des['character'],
-					'event.character.desertions',
-					array('%complaining%'=>$des['complaining'], '%gone%'=>$des['gone']),
-					$importance, false, 15
-				);
+				# This used to run all the time, but we don't care about resetting them if we already have too many.
+				if ($active_npcs <= $want) {
+					$this->npc->checkTimeouts($npc);
+				}
 			}
+
+			$this->logger->info("Proceeding to check for complaining bandit solders...");
+			$query = $this->em->createQuery('SELECT s as soldier, c as character FROM BM2SiteBundle:Soldier s JOIN s.character c JOIN s.home h JOIN h.geo_data g WHERE c.npc = true AND s.alive = true AND s.distance_home > :okdistance');
+			$query->setParameter('okdistance', $this->bandits_ok_distance);
+			$this->logger->info(count($query->getResult())." bandit soldiers complaining");
+			$deserters = array();
+			foreach ($query->getResult() as $row) {
+				$index = $row['soldier']->getCharacter()->getId();
+				if (!isset($deserters[$index])) {
+					$deserters[$index] = array('character'=>$row['soldier']->getCharacter(), 'soldiers'=>$row['soldier']->getCharacter()->getLivingSoldiers()->count(), 'gone'=>0, 'complaining'=>0);
+				}
+
+				$deserters[$index]['complaining']++;
+				$chance = ($row['soldier']->getDistanceHome() - $this->bandits_ok_distance)/5000;
+				if ($row['soldier']->getDistanceHome() > $this->bandits_ok_distance*2) {
+					$chance += ($row['soldier']->getDistanceHome() - $this->bandits_ok_distance*2)/2000;
+				}
+				// TODO: set even lower for now until we fix the problem where soldiers seem to come from far away regions
+				//$chance = sqrt($chance); // because this runs every turn, leaving it high would lead to immediate loss
+				$chance = sqrt($chance/10); // because this runs every turn, leaving it high would lead to immediate loss
+				if (rand(0,100)<$chance) {
+					$this->military->disband($row['soldier'], $row['soldier']->getCharacter());
+					$deserters[$index]['gone']++;
+				}
+			}
+
+			foreach ($deserters as $des) {
+				if ($des['complaining'] > 0) {
+					if ($des['gone'] >= 10 || $des['gone'] > $des['soldiers']*0.1) {
+						$importance = HISTORY::HIGH;
+					} elseif ($des['gone'] > 0) {
+						$importance = HISTORY::MEDIUM;
+					} else {
+						$importance = HISTORY::LOW;
+					}
+					$this->history->logEvent( 
+						$des['character'],
+						'event.character.desertions',
+						array('%complaining%'=>$des['complaining'], '%gone%'=>$des['gone']),
+						$importance, false, 15
+					);
+				}
+			}
+		} else {
+			$this->logger->info("No active NPCs.");
 		}
 
 		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Mercenaries m SET m.wait = m.wait +1 WHERE m.active = true AND m.hired_by IS NULL');

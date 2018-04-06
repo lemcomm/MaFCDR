@@ -25,8 +25,8 @@
         "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
 
-        "doctrine/doctrine-fixtures-bundle": "dev-master",
-        "friendsofsymfony/user-bundle": "~2.0@dev",
+        "doctrine/doctrine-fixtures-bundle": "2.*",
+        "friendsofsymfony/user-bundle": "~2.0",
         "creof/doctrine2-spatial": "dev-master",
         "knplabs/knp-markdown-bundle": "1.4.*@dev",
         "codeception/codeception": "*",
