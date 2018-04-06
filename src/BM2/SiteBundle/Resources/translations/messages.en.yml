@@ -554,6 +554,7 @@ character:
  start:
   title:      Character Placement
   intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
+  returnee:   Select the restart location for %name%. As we're sure you're aware, this will affect your play experience.
   offer:      Accept fealty offer
   offerintro: >
     Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers
@@ -565,7 +566,7 @@ character:
   offersummary2: %name%, lordship
   family:     Place with Family
   existing: >
-    Your new character can begin the game in the estate of any of your existing characters, and get helped to start his career by relatives.
+    Your character can begin the game in the estate of any of your existing characters, and get helped to start their career from relatives.
   estate:     Starting Estate
   submit:     start here
   selection:  Place on Map
@@ -573,6 +574,7 @@ character:
     You can also select any non-independent settlement from the map below, and negotiate with its lords to get soldiers or how else
     to begin your quest. This is an advanced option only recommended if none of the above are available or you are looking for something
     special to start.
+  returnsuccess:  You have successfully restarted your career in this world of roles, politics, and warfare.
  details:
   realm:      realm(s)
   ultimate:   sovereign realm(s)
@@ -1457,6 +1459,7 @@ unavailable:
  noartifacts:   You don't have any artifacts.
  notprisoner:   You are not a prisoner.
  prisoner:      You are a prisoner and have only very limited actions available.
+ prisonershort: Not available to prisoners.
  notmember:     You are not a member of this realm.
  leader:        As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.
  notleader:     You are not the ruler of this realm.
@@ -1546,3 +1549,4 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
+  
