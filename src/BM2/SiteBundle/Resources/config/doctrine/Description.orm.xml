@@ -15,6 +15,9 @@
 
 		<many-to-one field="place" target-entity="Place" inversed-by="descriptions"/>
 		<one-to-one field="active_place" target-entity="Place" inversed-by="description"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="descriptions"/>
+		<one-to-one field="active_realm" target-entity="Realm" inversed-by="description"/>
 		
 		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
 		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
