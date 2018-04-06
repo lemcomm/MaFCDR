@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\Vote;
 use BM2\SiteBundle\Form\CapitalType;
 use BM2\SiteBundle\Form\ElectionType;
 use BM2\SiteBundle\Form\InteractionType;
+use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\RealmCreationType;
 use BM2\SiteBundle\Form\RealmManageType;
 use BM2\SiteBundle\Form\RealmOfficialsType;
@@ -218,6 +219,35 @@ class RealmController extends Controller {
 
 
 	/**
+	  * @Route("/{realm}/description", requirements={"realm"="\d+"}, name="bm2_site_realm_description")
+	  * @Template
+	  */
+	public function descriptionAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyManageDescriptionTest');
+
+		$desc = $realm->getDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else if ($realm->getOldDescription()) {
+			$text = $realm->getOldDescription();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newDescription($realm, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return array('realm'=>$realm, 'form'=>$form->createView());
+	}
+
+
+	/**
 	  * @Route("/{realm}/abdicate", requirements={"realm"="\d+"})
 	  * @Template
 	  */
@@ -248,7 +278,7 @@ class RealmController extends Controller {
 	  * @Template
 	  */
 	public function abolishAction(Realm $realm, Request $request) {
-		$character = $this->gateway($realm, 'hierarchyAbolishTest');
+		$character = $this->gateway($realm, 'hierarchyAbolishRealmTest');
 		$form = $this->createFormBuilder()
 			->add('sure', 'checkbox', array(
 				'required'=>true,
@@ -256,7 +286,6 @@ class RealmController extends Controller {
 				'translation_domain' => 'politics'
 				))
 			->getForm();
-		$form->handleRequest($request);
 
 		$success=false;
 		$form->handleRequest($request);
@@ -1105,7 +1134,8 @@ class RealmController extends Controller {
 	public function voteAction(Election $id, Request $request) {
 		if ($id->getRealm()) {
 			$character = $this->gateway($id->getRealm(), 'hierarchyElectionsTest');
-		} # Because people were sneaking random outsiders into elections.
+		}
+		# Because people were sneaking random outsiders into elections.
 		# This method will also allow us to setup alternative security checks later for this page, if it gets expanded.
 		$election = $id; // we use ID in the route because the links extension always uses id
 		$em = $this->getDoctrine()->getManager();
