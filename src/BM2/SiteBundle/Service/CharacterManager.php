@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -143,7 +144,7 @@ class CharacterManager {
 
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
-		// remove from map
+		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		// remove from hierarchy
 		$character->setLiege(null);
 
@@ -355,9 +356,10 @@ class CharacterManager {
 		// List is set to 90 as this sorts them to the retired listing on the account character list.
 		$character->setRetired(true)->setList(90)->setSlumbering(true);
 		// remove from map and hiearchy
+		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 		$character->setLiege(null);
 
-		$this->history->logEvent($character, 'event.character.retired', array(), History::ULTRA, true);
+		$this->history->logEvent($character, 'event.character.retired', array(), History::HIGH, true);
 
 		// reset account restriction, so it is recalculated - we do this very early so later failures don't impact it
 		if ($character->getUser()) {
@@ -828,6 +830,16 @@ class CharacterManager {
 		if ($trust['no'] > $threshold) { $rep[] = 'distrust'; }
 
 		return $rep;
+	}
+
+	public function newBackground(Character $character) {
+		if (!$character->getBackground()) {
+			$background = new CharacterBackground;
+			$character->setBackground($background);
+			$background->setCharacter($character);
+			$this->em->persist($background);
+			$this->em->flush();
+		}
 	}
 
 }
