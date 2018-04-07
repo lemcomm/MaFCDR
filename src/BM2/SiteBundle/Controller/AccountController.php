@@ -108,6 +108,9 @@ class AccountController extends Controller {
 
 		$characters = array(); 
 		$npcs = array();
+
+		$now = new \DateTime("now");
+		$a_week_ago = $now->sub(new \DateInterval("P7D"));
 				
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
@@ -119,6 +122,7 @@ class AccountController extends Controller {
 			$granting = false;
 			$renaming = false;
 			$reclaiming = false;
+			$unretirable = false;
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
@@ -168,6 +172,11 @@ class AccountController extends Controller {
 					}
 				}
 			}
+			if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
+				$unretirable = true;
+			} else {
+				$unretirable = false;
+			}
 
 			$data = array(
 				'id' => $character->getId(),
@@ -175,6 +184,7 @@ class AccountController extends Controller {
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
 				'retired' => $character->getRetired(),
+				'unretirable' => $unretirable,
 				'npc' => $character->isNPC(),
 				'slumbering' => $character->getSlumbering(),
 				'prisoner' => $character->getPrisonerOf(),
