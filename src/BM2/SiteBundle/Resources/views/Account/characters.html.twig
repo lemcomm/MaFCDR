@@ -104,9 +104,15 @@ Table headers are handled as translation strings from the character.list databas
 		<td>
 			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'edithist'}) }}">{{ 'account.edithistory'|trans }}</a>
 		</td>
-		<td>
-			<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'unretire'}) }}">{{ 'account.unretire'|trans }}</a>
-		</td>
+		{% if character.unretirable %}
+			<td>
+				<a href="{{ path('bm2_play', {'id': character.id, 'logic': 'unretire'}) }}">{{ 'account.unretire'|trans }}</a>
+			</td>
+		{% else %}
+			<td>
+				<!-- Play button would normally be here. -->
+			</td>
+		{% endif %}
 	{% else %}
 		<td colspan="4">
 			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
