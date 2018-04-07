@@ -7,10 +7,10 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\RealmRelation;
 use BM2\SiteBundle\Entity\Vote;
-use BM2\SiteBundle\Form\CapitalType;
 use BM2\SiteBundle\Form\ElectionType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\RealmCapitalType;
 use BM2\SiteBundle\Form\RealmCreationType;
 use BM2\SiteBundle\Form\RealmManageType;
 use BM2\SiteBundle\Form\RealmOfficialsType;
@@ -791,7 +791,7 @@ class RealmController extends Controller {
 	public function capitalAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchySelectCapitalTest');
 
-		$form = $this->createForm(new CapitalType($realm));
+		$form = $this->createForm(new RealmCapitalType($realm));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -811,6 +811,12 @@ class RealmController extends Controller {
 				}
 				$realm->setCapital($data['capital']);
 				$data['capital']->addCapitalOf($realm);
+				$this->get('history')->logEvent(
+					$realm,
+					'event.realm.capital',
+					array('%link-settlement%'=>$data['capital']->getId()),
+					History::HIGH
+				);
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('realm.capital.success', array(), 'politics'));
 				return $this->redirectToRoute('bm2_site_realm_capital', array('realm'=>$realm->getId()));
@@ -1275,4 +1281,3 @@ class RealmController extends Controller {
 	}
 
 }
-			
