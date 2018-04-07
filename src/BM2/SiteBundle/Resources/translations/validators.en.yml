@@ -1,6 +1,7 @@
 # Might & Fealty
 # validation text strings
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 password:
  old:			incorrect current password
  minlength:	'[0,Inf]your password must be at least 6 characters long'
