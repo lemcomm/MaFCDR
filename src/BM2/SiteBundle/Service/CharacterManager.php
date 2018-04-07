@@ -495,6 +495,7 @@ class CharacterManager {
 
 		// clean out dungeon stuff
 		$this->dm->retireDungeoneer($character);
+		$character->setRetiredOn(new \DateTime("now"));
 
 		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
 
