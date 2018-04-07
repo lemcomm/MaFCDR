@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
 
-class CapitalType extends AbstractType {
+class RealmCapitalType extends AbstractType {
 
 	private $realm;
 
@@ -24,15 +24,18 @@ class CapitalType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$realm = $this->realm;
-
+		$allrealms = $this->realm->findAllInferiors(true);
+		foreach ($allrealms as $realm) {
+			$realms[] = $realm->getId();
+		}
+		
 		$builder->add('capital', 'entity', array(
 			'label' => 'realm.capital.estates',
 			'multiple'=>false,
 			'expanded'=>false,
-			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($realm) {
+			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($realms) {
 				$qb = $er->createQueryBuilder('e');
-				$qb->where('e.realm = :realm')->setParameter('realm', $realm);
+				$qb->where($qb->expr()->in('e.realm', ':realms'))->setParameter('realms', $realms);
 				$qb->orderBy('e.name');
 				return $qb;
 			},
@@ -42,6 +45,6 @@ class CapitalType extends AbstractType {
 	}
 
 	public function getName() {
-		return 'capital';
+		return 'realmcapital';
 	}
 }
