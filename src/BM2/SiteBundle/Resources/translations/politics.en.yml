@@ -324,7 +324,7 @@ realm:
    none:        To move or determine a capital, you need to select a region. Your advisors explain something about the critical nature of such a Seat of Power.
    already:     This region is already your capital. If you want to change it, you need to select a *different* region.
   submit:       By My Command!
-
+  success:      Realm capital successfully changed.
  name:        Name
  formalname:  Formal Name
  colour:      Official Color
@@ -716,3 +716,4 @@ claim:
  cancelled:   You have withdrawn your claim.
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
+ 
