@@ -12,8 +12,12 @@
 		<tr>
 			<th>Username</th>
 			<th>Account Level</th>
+			<th>Credits</th>
+			<th>Created</th>
 			<th>Last Login</th>
 			<th>Characters</th>
+			<th>Retired</th>
+			<th>Dead</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -21,8 +25,12 @@
 		<tr>
 			<td>{{ u.name }}</td>
 			<td align="right">{{ u.level }}</td>
+			<td>{{ u.credits }}</td>
+			<td>{{ u.created|date }}</td>
 			<td>{{ u.last_login|date }}</td>
 			<td align="right">{{ u.characters }}</td>
+			<td align="right">{{ u.retired }}</td>
+			<td align="right">{{ u.dead }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
