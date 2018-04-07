@@ -27,6 +27,7 @@
 		{% set isowner = false %}
 	{% endif %}
 	<ul class="simple">
+		{% if settlement.capitalOf is not empty %}<li>{{ 'settlement.capital'|trans }}: {% for capitalOf in settlement.capitalOf %}<a href="{{ path('bm2_realm', {'id':capitalOf.id})}}">{{ capitalOf.name }}</a>{% endfor %}</li>{% endif %}
 		<li>{% if settlement.fortified %}{{ 'settlement.fortified'|trans }} {% endif %}{{ settlement.type|trans }}, {{ ('biome.'~settlement.geodata.biome.name)|trans }}</li>
 		<li>{{ 'settlement.culture'|trans }}: {{ ('culture.'~settlement.culture.name)|trans }}</li>
 		{% if isowner %}
