@@ -55,6 +55,31 @@ class User extends BaseUser {
 		);
 	}
 
+	public function getActiveCharacters() {
+		return $this->getCharacters()->filter(
+			function($entry) {
+				return ($entry->isAlive()==true && $entry->isNPC()==false && $entry->getRetired()==false);
+			}
+		);
+	}
+
+	public function getRetiredCharacters() {
+		return $this->getCharacters()->filter(
+			function($entry) {
+				return ($entry->isAlive()==true && $entry->isNPC()==false && $entry->getRetired()==true);
+			}
+		);
+	}
+
+	public function getDeadCharacters() {
+		return $this->getCharacters()->filter(
+			function($entry) {
+				return ($entry->isAlive()==false && $entry->isNPC()==false);
+			}
+		);
+	}
+
+
 	public function getNonNPCCharacters() {
 		return $this->getCharacters()->filter(
 			function($entry) {
