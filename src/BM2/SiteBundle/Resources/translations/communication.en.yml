@@ -1,6 +1,7 @@
 # Might & Fealty
-# text strings for events
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Text strings for events
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 rss:
  desc:        Might & Fealty Event Log Summary
  feed:        Get event updates via RSS
@@ -251,7 +252,7 @@ event:
      realm:     With the abolishment of the realm, %realm-1% assumes superiorship over %realm-2%.
      superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
     estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
-
+  capital:      Declared that its capital shall now be %settlement%.
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
@@ -487,3 +488,4 @@ trans:
    friend:        I am quite sorry, but I cannot accept your offer at this time.
    neutral:       I have to refuse your request.
    hostile:       You can have what is rightfully mine if you take it from my cold, dead hands.
+   
