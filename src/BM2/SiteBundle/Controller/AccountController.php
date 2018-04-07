@@ -447,7 +447,7 @@ class AccountController extends Controller {
 		$levels = $this->get('payment_manager')->getPaymentLevels();
 		$level = $levels[$user->getAccountLevel()];
 		$characters_allowed = $level['characters'];
-		$characters_active = $user->getLivingCharacters()->count();
+		$characters_active = $user->getActiveCharacters()->count();
 		if ($characters_active > $characters_allowed) {
 			if (!$user->getRestricted()) {
 				$user->setRestricted(true);
