@@ -10,6 +10,7 @@
 		<field name="male" type="boolean"/>
 		<field name="alive" type="boolean"/>
 		<field name="retired" type="boolean" nullable="true"/>
+		<field name="retired_on" type="datetime" nullable="true"/>
 		<field name="generation" type="smallint"/>
 		<field name="genome" type="string" length="2">
 			<options>
