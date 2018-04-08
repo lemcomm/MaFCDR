@@ -306,12 +306,14 @@ class Dispatcher {
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
+		/* Not ready yet!
 		if ($estate = $this->getActionableSettlement()) {
 			$actions[] = $this->militaryAttackPlaceTest(true);
 			$actions[] = $this->militaryDefendPlaceTest(true);
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.noplace");
 		}
+		*/
 
 		return array("name"=>"military.name", "elements"=>$actions);
 	}
