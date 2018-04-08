@@ -4,7 +4,6 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
 
@@ -264,6 +263,11 @@ class CharacterController extends Controller {
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
+		if ($request->query->get('logic') == 'retired') {
+			$retiree = true;
+		} else {
+			$retiree = false;
+		}
 
 		$form_offer = $this->createForm(new CharacterPlacementType('offer', $character));
 		$form_existing = $this->createForm(new CharacterPlacementType('family', $character));
@@ -404,6 +408,11 @@ class CharacterController extends Controller {
 			}
 
 			if ($startlocation) {
+				if ($character->getRetired()) {
+					# No idea why but we lose the $retiree we declared above...
+					$retiree = true;
+					$character->setRetired(false);
+				}
 				$character->setLocation($startlocation->getGeoData()->getCenter());
 				$character->setInsideSettlement($startlocation);
 				if (!$historydone) {
@@ -423,19 +432,25 @@ class CharacterController extends Controller {
 				$this->get('history')->visitLog($startlocation, $character);
 				$em->flush();
 
-				return $this->redirectToRoute('bm2_first');
+				if (!$retiree) {
+					return $this->redirectToRoute('bm2_first');
+				} else {
+					$this->addFlash('notice', $this->get('translator')->trans('character.start.returnsuccess', array(), 'messages'));
+					return $this->redirectToRoute('bm2_recent');
+				}
 			}
 		}
 		return array(
 			'form_offer'=>$form_offer->createView(),
 			'form_existing'=>$form_existing->createView(),
-			'form_map'=>$form_map->createView()
+			'form_map'=>$form_map->createView(),
+			'retiree'=>$retiree
 		);
 	}
 
 
 	/**
-	  * @Route("/view/{id}", requirements={"id"="\d+"})
+	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_site_character_view")
 	  * @Template
 	  */
 	public function viewAction(Character $id) {
@@ -645,10 +660,7 @@ class CharacterController extends Controller {
 
 		// dynamically create when needed
 		if (!$character->getBackground()) {
-			$background = new CharacterBackground;
-			$character->setBackground($background);
-			$background->setCharacter($character);
-			$em->persist($background);
+			$this->get('character_manager')->newBackground($character);
 		}
 		$form = $this->createForm(new CharacterBackgroundType($character->getAlive()), $character->getBackground());
 		$form->handleRequest($request);
@@ -781,7 +793,15 @@ class CharacterController extends Controller {
      */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if ($character->isPrisoner()) {
+			throw new AccessDeniedException('unvailable.prisoner');
+		}
 		$form = $this->createFormBuilder()
+			->add('death', 'textarea', array(
+				'required'=>false,
+				'label'=>'meta.kill.death',
+				'translation_domain'=>'actions'
+				))
 			->add('sure', 'checkbox', array(
 				'required'=>true,
 				'label'=>'meta.kill.sure',
@@ -790,70 +810,122 @@ class CharacterController extends Controller {
 			->getForm();
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			// FIXME: validation - it only checks for the checkbox on the browser side so far
+			$fail = false;
+			$id = $character->getId();
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
-
-			// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
-			// TODO: we should somehow store that it was a suicide, to catch various exploits
-			$reclaimed = array();
-			foreach ($character->getSoldiers() as $soldier) {
-				if ($liege = $soldier->getLiege()) {
-					if (!isset($reclaimed[$liege->getId()])) {
-						$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
+				// TODO: we should somehow store that it was a suicide, to catch various exploits
+				$reclaimed = array();
+				foreach ($character->getSoldiers() as $soldier) {
+					if ($liege = $soldier->getLiege()) {
+						if (!isset($reclaimed[$liege->getId()])) {
+							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+						}
+						$reclaimed[$liege->getId()]['number']++;
+						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
+						$soldier->setCharacter($liege);
+						$soldier->setLiege(null)->setAssignedSince(null);
 					}
-					$reclaimed[$liege->getId()]['number']++;
-					// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-					$soldier->setCharacter($liege);
-					$soldier->setLiege(null)->setAssignedSince(null);
 				}
+				$em->flush();
+				if ($data['death']) {
+					// dynamically create when needed
+					if (!$character->getBackground()) {
+						$this->get('character_manager')->newBackground($character);
+					}
+					$character->getBackground()->setDeath($data['death']);
+					$em->flush();
+				}
+				$this->get('character_manager')->kill($character);
+				foreach ($reclaimed as $rec) {
+					$this->get('history')->logEvent(
+						$rec['liege'],
+						'event.character.deathreclaim',
+						array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
+						History::MEDIUM
+					);
+				}
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('meta.kill.success', array(), 'actions'));
+				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
 			}
-			$em->flush();
-			$this->get('character_manager')->kill($character);
-			foreach ($reclaimed as $rec) {
-				$this->get('history')->logEvent(
-					$rec['liege'],
-					'event.character.deathreclaim',
-					array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
-					History::MEDIUM
-				);
-			}
-			$em->flush();
-
-			// TODO: this should bring up the background screen or something, to enter a death roleplay description
-			return array('result'=>array('success'=>true));
 		}
-
 		return array('form'=>$form->createView());
 	}
-
+	
    /**
-     * @Route("/respawn")
+     * @Route("/retire")
      * @Template
      */
-	public function respawnAction(Request $request) {
+	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if ($character->isPrisoner()) {
+			throw new AccessDeniedException('unvailable.prisoner');
+		}
 		$form = $this->createFormBuilder()
+			->add('retirement', 'textarea', array(
+				'required'=>false,
+				'label'=>'meta.retire.label',
+				'translation_domain'=>'actions'
+				))
 			->add('sure', 'checkbox', array(
 				'required'=>true,
-				'label'=>'meta.respawn.sure',
+				'label'=>'meta.retire.sure',
 				'translation_domain' => 'actions'
 				))
 			->getForm();
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			// FIXME: validation - it only checks for the checkbox on the browser side so far
+			$fail = false;
+			$id = $character->getId();
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
-
-			$this->get('character_manager')->respawn($character);
-			$em->flush();
-			return array('result'=>array('success'=>true));
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				$reclaimed = array();
+				foreach ($character->getSoldiers() as $soldier) {
+					if ($liege = $soldier->getLiege()) {
+						if (!isset($reclaimed[$liege->getId()])) {
+							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
+						}
+						$reclaimed[$liege->getId()]['number']++;
+						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
+						$soldier->setCharacter($liege);
+						$soldier->setLiege(null)->setAssignedSince(null);
+					}
+				}
+				$em->flush();
+				if ($data['retirement']) {
+					// dynamically create when needed
+					if (!$character->getBackground()) {
+						$this->get('character_manager')->newBackground($character);
+					}
+					$character->getBackground()->setRetirement($data['retirement']);
+					$em->flush();
+				}
+				$this->get('character_manager')->retire($character);
+				foreach ($reclaimed as $rec) {
+					$this->get('history')->logEvent(
+						$rec['liege'],
+						'event.character.retirereclaim',
+						array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
+						History::MEDIUM
+					);
+				}
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
+				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
+			}
 		}
-
 		return array('form'=>$form->createView());
 	}
-
 
 	/**
 	  * @Route("/surrender")
@@ -888,6 +960,7 @@ class CharacterController extends Controller {
 
 		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
 	}
+
 
 	/**
 	  * @Route("/escape")

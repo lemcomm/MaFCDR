@@ -350,4 +350,71 @@ class RealmManager {
 			}
 		}
 	}
+	
+	public function dismantleRealm(Character $character, Realm $realm, $sovereign=false) {
+		$this->history->logEvent(
+			$realm,
+			'event.realm.abolished.realm',
+			array('%link-character%'=>$character->getId()),
+			History::HIGH
+		); # 'By order of %link-character%, the realm has been dismantled.'
+		if (!$sovereign) {
+			$superior = $realm->getSuperior();
+			$this->history->logEvent(
+				$superior,
+				'event.realm.abolished.superior',
+				array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
+				History::HIGH
+			); # 'By order of %link-character%, the realm's subrealm of %link-realm% has been dismantled.'
+		}
+		$this->history->logEvent(
+			$character,
+			'event.realm.abolished.character',
+			array('%link-realm%'=>$realm->getId()),
+			History::HIGH
+		); # 'Ordered the dismantling of the realm of %link-realm%.'
+		foreach ($realm->getEstates() as $estate) {
+			if ($sovereign) {
+				$this->history->logEvent(
+					$estate,
+					'event.realm.abolished.sovereign.estate',
+					array('%link-realm%'=>$realm->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the estate is effectively rogue.'
+				$estate->setRealm(null);
+				$realm->removeEstate($estate);
+				$this->em->flush();
+			} else {
+				$this->history->logEvent(
+					$estate,
+					'event.realm.abolished.notsovereign.estate',
+					array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the estate now falls under %link-realm-2%.'
+				$realm->removeEstate($estate);
+				$estate->setRealm($superior);
+				$superior->addEstate($estate);
+				$this->em->flush();
+			}
+		}
+		foreach ($realm->getPositions() as $position) {
+			if ($position->getHolders()) {
+				foreach ($position->getHolders() as $holder) {
+					if ($position->getRuler()) {
+						$this->abdicate($realm, $holder);
+					} else if (!$position->getRuler()) {
+						$position->removeHolder($holder);
+						$holder->removePosition($position);
+						$this->history->logEvent(
+							$holder,
+							'event.character.position.abolished',
+							array('%link-realm%'=>$realm->getId(), '%link-realmposition%'=>$position->getId()),
+							History::MEDIUM
+						); # 'Lost the position of %link-realmposition% due to the dismantling of %link-realm%.'
+					}
+					$this->em->flush();
+				}
+			}
+		}
+	}
 }

@@ -326,12 +326,23 @@ class PoliticsController extends Controller {
 			// FIXME: shouldn't this be in the dispatcher?
 			$others = $this->get('dispatcher')->getActionableCharacters();
 			$choices=array();
+			if ($character->getPartnerships()) {
+				foreach ($character->getPartnerships() as $partnership) {
+					$existingpartners[] = $partnership->getOtherPartner($character);
+				}
+			}
 			foreach ($others as $other) {
 				$char = $other['character'];
-				// TODO: filter out existing partnerships
-				if (!$char->isNPC() && $char->getMale() != $character->getMale()) {
-					$choices[$char->getId()] = $char->getName();
+				if ($character->getNonHeteroOptions()) {
+					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners)) {
+						$choices[$char->getId()] = $char->getName();
+					}
+				} else {					
+					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners) && $char->getMale() != $character->getMale()) {
+						$choices[$char->getId()] = $char->getName();
+					}
 				}
+				// TODO: filter out existing partnerships
 			}
 			$form_new = $this->createForm(new PartnershipsType($character, true, $choices));
 			$form_new_view = $form_new->createView();

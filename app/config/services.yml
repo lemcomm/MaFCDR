@@ -27,7 +27,7 @@ services:
 
     geography:
         class:      BM2\SiteBundle\Service\Geography
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @permission_manager, @appstate]
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  [@doctrine.orm.entity_manager, @appstate, @event_dispatcher]
@@ -77,6 +77,9 @@ services:
     news_manager:
         class:      BM2\SiteBundle\Service\NewsManager
         arguments:  [@doctrine.orm.entity_manager, @appstate, @geography]
+    description_manager:
+        class:      BM2\SiteBundle\Service\DescriptionManager
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @history]
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
         arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @politics, @military, @permission_manager, @twig.extension.gametime]

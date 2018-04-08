@@ -2,12 +2,20 @@
 	<h2 id="sd_name">{{ settlement.name }}</h2>
 	<div id="sd_id" class="hidden">{{ settlement.id }}</div>
 	<dl>
-		<dt>{{ 'settlement.type'|trans|title }}</dt>
-		<dd>{{ settlement.type|trans }}</dd>
-		<dt>{{ 'settlement.biome'|trans|title }}</dt>
-		<dd>{{ ('biome.'~settlement.geoData.biome.name)|trans }}</dd>
 		<dt>{{ 'settlement.owner'|trans|title }}</dt>
 		<dd>{% if settlement.owner %}{{ link(settlement.owner) }}{% else %}{{ 'settlement.unowned'|trans }}{% endif %}</dd>
+		<dt>{{ 'settlement.type'|trans|title }}</dt>
+		<dd>{{ settlement.type|trans|title }}</dd>
+		<dt>{{ 'settlement.biome'|trans|title }}</dt>
+		<dd>{{ ('biome.'~settlement.geoData.biome.name)|trans|title }}</dd>
+		{% if settlement.realm %}
+			{% if settlement.realm != settlement.realm.findultimate %}
+				<dt>{{ 'settlement.localrealm'|trans|title }}</dt>
+				<dd>{% if settlement.realm %}{{ link(settlement.realm) }}{% else %}-{% endif %}</dd>
+			{% endif %}
+			<dt>{{ 'settlement.sovereignty'|trans|title }}</dt>
+			<dd>{% if settlement.realm %}{{ link(settlement.realm.findultimate) }}{% else %}-{% endif %}</dd>
+		{% endif %}
 	</dl>
 	<div class="clear" />
 	<div id="sd_details" class="sd_button"><a href="{{ path("bm2_settlement", {'id':settlement.id}) }}">{{ 'details'|trans|title }}</a></div>

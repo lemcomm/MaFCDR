@@ -1,6 +1,7 @@
 # Might & Fealty
-# generic text strings
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Generic text strings for display, mostly on informational pages.
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 dateformat:   Y-m-d
 gametime:
  current:     It is year %year%, week %week%, day %day% in the world of Might & Fealty
@@ -299,9 +300,12 @@ account:
   submit:    change subscription
   remaining: Your new subscription will start today, the first month subscription fee will automatically be reduced by %refund% credits remaining from your current subscription.
   changed:   Your subscription level has been changed.
- play: Play
- viewlog: View History
- familytree: Family Tree
+ play:        Play
+ place:       Place
+ unretire:    Unretire
+ edithistory: Edit Background
+ viewlog:     View History
+ familytree:  Family Tree
  famtreedesc: Inspect the family tree of your characters
  overview:
   link:     Overview
@@ -526,6 +530,7 @@ character:
   select:   move character to:
   submit:   set new list
   updated:  just updated, change will be visible on next page load
+  0:  New & Unplaced
   1:  Main Characters
   2:  Secondary Characters
   3:  Roleplaying Characters
@@ -542,12 +547,14 @@ character:
   46:  Explorers
   47:  Troublemakers
   71:  Assorted Characters
-  99: recently deceased
-  100: historic
-  150: ancestors
+  90:  Retired Characters
+  99:  Recently Deceased
+  100: Historic
+  150: Ancestors
  start:
   title:      Character Placement
   intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
+  returnee:   Select the restart location for %name%. As we're sure you're aware, this will affect your play experience.
   offer:      Accept fealty offer
   offerintro: >
     Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers
@@ -559,7 +566,7 @@ character:
   offersummary2: %name%, lordship
   family:     Place with Family
   existing: >
-    Your new character can begin the game in the estate of any of your existing characters, and get helped to start his career by relatives.
+    Your character can begin the game in the estate of any of your existing characters, and get helped to start their career from relatives.
   estate:     Starting Estate
   submit:     start here
   selection:  Place on Map
@@ -567,6 +574,7 @@ character:
     You can also select any non-independent settlement from the map below, and negotiate with its lords to get soldiers or how else
     to begin your quest. This is an advanced option only recommended if none of the above are available or you are looking for something
     special to start.
+  returnsuccess:  You have successfully restarted your career in this world of roles, politics, and warfare.
  details:
   realm:      realm(s)
   ultimate:   sovereign realm(s)
@@ -664,7 +672,9 @@ settlement:
  ownedby:     This settlement is ruled by %owner%.
  realm:       This settlement is part of %realm%.
  realm2:      realm
+ sovereignty: sovereignty
  ultimate:    sovereign realm
+ localrealm:  local realm
  norealm:     This settlement does not belong to any realm.
  economy:     economy
  build:       currently building
@@ -724,6 +734,7 @@ settlement:
   atfeatures:   %number% assigned to features construction
   employed:     %number% employed in various buildings
   available:    %number% available for farming and local economy
+ description:   Settlement Description
 
 road:
  quality:
@@ -893,6 +904,7 @@ error:
   page:        Page not found
   character:   Character not found
   action:      Action not found
+  playlogic:   Now really, I find this highly illogical. (Bad logic passed to page.)
   settlement:  Settlement not found
   buildingtype: no such building type
   featuretype:  no such feature type
@@ -966,6 +978,8 @@ npc:
  translator:   translator|translators
  scholar:      scholar|scholars
  soldier:      soldier|soldiers
+ soldiershere: soldiers present
+ intraining:   recruits in training
 
 soldier:
  type:             type
@@ -1445,6 +1459,7 @@ unavailable:
  noartifacts:   You don't have any artifacts.
  notprisoner:   You are not a prisoner.
  prisoner:      You are a prisoner and have only very limited actions available.
+ prisonershort: Not available to prisoners.
  notmember:     You are not a member of this realm.
  leader:        As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.
  notleader:     You are not the ruler of this realm.
@@ -1534,3 +1549,4 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
+  

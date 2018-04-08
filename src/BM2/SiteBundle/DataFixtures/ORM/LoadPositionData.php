@@ -37,7 +37,11 @@ class LoadPositionData extends AbstractFixture implements OrderedFixtureInterfac
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->positiontypes as $name=>$data) {
-			$type = new PositionType;
+			$type = $manager->getRepository('BM2SiteBundle:PositionType')->findOneByName($name);
+			if (!$type) {
+				$type = new PositionType();
+				$manager->persist($type);
+			}
 			$type->setName($name);
 			$type->setHidden($data['hidden']);
 			$manager->persist($type);

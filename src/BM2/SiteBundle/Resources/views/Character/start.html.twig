@@ -10,7 +10,11 @@
 {# overwrite because this is the one page where it's ok to have a character without a location #}
 {% set character = appstate.getCharacter(true,false,true) %}
 	<h2>{{ 'character.start.title'|trans|title }}</h2>
+	{% if not retiree %}
+	<p>{{ 'character.start.returnee'|trans({"%name%":character.name})|raw }}</p>
+	{% else %}
 	<p>{{ 'character.start.intro'|trans({"%name%":character.name})|raw }}</p>
+	{% endif %}
 
 		<h3>{{ 'character.start.offer'|trans|title }}</h3>
 		<p>{{ 'character.start.offerintro'|trans({"%he%":character.gender("he")|trans})|raw }}</p>
@@ -41,21 +45,22 @@
 			{{ form_widget(form_existing) }}
 		</form>
 
+		{% if not character.user.isverynewplayer %}
+			<h3>{{ 'character.start.selection'|trans|title }}</h3>
+			<p>{{ 'character.start.mapintro'|trans|raw }}</p>
 
-		<h3>{{ 'character.start.selection'|trans|title }}</h3>
-		<p>{{ 'character.start.mapintro'|trans|raw }}</p>
-
-		<div id="sd_viewer" style="float:right;width:30%">
-			<h3>{{ 'settlement.details'|trans|title }}</h3>
-			<p id="dummy">{{ 'settlement.dummy'|trans }}</p>
-			<form id="form_map" action="{{ path('bm2_site_character_start') }}" method="post">
-				{{ form_widget(form_map) }}
-			</form>
-			<br id="sd_anchor" />
-			<div id="sd"></div>
-		</div>
-		&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
-		<div id="map" style="min-width:30em;min-height:30em;width:65%"></div>
+			<div id="sd_viewer" style="float:right;width:30%">
+				<h3>{{ 'settlement.details'|trans|title }}</h3>
+				<p id="dummy">{{ 'settlement.dummy'|trans }}</p>
+				<form id="form_map" action="{{ path('bm2_site_character_start') }}" method="post">
+					{{ form_widget(form_map) }}
+				</form>
+				<br id="sd_anchor" />
+				<div id="sd"></div>
+			</div>
+			&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+			<div id="map" style="min-width:30em;min-height:30em;width:65%"></div>
+		{% endif %}
 
 {% endblock %}
 

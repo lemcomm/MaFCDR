@@ -47,7 +47,11 @@
 </p>
 <ul>
 {% for meta in unread %}
-	<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+	{% if meta.conversation.appReference %}
+		<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.appReference.name }}: {{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})
+	{% else %}
+		<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+	{% endif %}
 {% endfor %}
 </ul>
 
