@@ -7,6 +7,7 @@
 		<field name="version" type="integer" version="true"/>
 		<field name="name" type="string"/>
 		<field name="known_as" type="string" nullable="true"/>
+		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
 		<field name="alive" type="boolean"/>
 		<field name="retired" type="boolean" nullable="true"/>
