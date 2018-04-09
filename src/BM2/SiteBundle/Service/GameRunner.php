@@ -165,7 +165,8 @@ class GameRunner {
 		}
 
 		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL) OR (c.alive = true and c.slumbering = true)');
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND c.system <> :system) OR (c.alive = true and c.slumbering = true AND c.system <> :system)');
+		$query->setParameter('system' = 'procd_inactive');
 		$result = $query->getResult();
 		if (count($result) > 0) {
 			$this->logger->info("Sorting the dead from the slumbering...");
@@ -247,10 +248,9 @@ class GameRunner {
 						}
 					}
 				}
-				/* TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 				if ($character->getEstates()) {
+					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 				}
-				*/
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known dead.");
 			} else {
@@ -309,10 +309,9 @@ class GameRunner {
 						}
 					}
 				}
-				/* TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 				if ($character->getEstates()) {
+					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 				}
-				*/
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known slumber.");
 			} else {
@@ -334,12 +333,11 @@ class GameRunner {
 		if ($last==='complete') return true;
 		$this->logger->info("NPC Cycle...");
 
-		
 		$query = $this->em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
 		$players = $query->getSingleScalarResult();
-		#NOTE: In order to remove bandits, we've commented out the following line to force a reduction in bandit numbers.
 		# $want = ceil($players/8);
-		$want = 0;		
+		$want = 0;
+		
 		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
 		$cullability = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true and c.user IS NULL')->getSingleScalarResult();
 		
@@ -354,8 +352,6 @@ class GameRunner {
 			$this->logger->info("Too many NPCs, attempting to cull $cullcount NPCs");
 			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.");
 			
-			
-
 			while ($cullability > 0 AND $culled < $cullcount) {
 				$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
 				foreach ($query->getResult() as $potentialculling) {
@@ -374,7 +370,7 @@ class GameRunner {
 			}
 		}
 
-		if ($active_npcs > 0) {
+		if ($active_npcs > 0) {		
 			$this->logger->info("Proceeding to check for recyclable NPCs...");
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
 			foreach ($query->getResult() as $npc) {
