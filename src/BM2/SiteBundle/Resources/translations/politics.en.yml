@@ -611,25 +611,28 @@ lists:
  usedby:     used by
 
 perm:
- name:      permission
- value:     amount
- reserve:   reserve
- add:       add new permission
- del:       remove
- none:      no permissions defined
- listing:   grant to
+ name:      Permission
+ value:     Amount
+ reserve:   Reserve
+ add:       Add New Permission
+ del:       Remove
+ none:      No Permissions Defined
+ listing:   Grant to
  choose:    -- choose --
- visit:     enter settlement
- docks:     embark at docks
- resupply:  resupply
- mobilize:  mobilize troops
- construct: manage constructions
- recruit:   manage recruitment
- trade:     manage trade
- positions: manage positions
- expel:     expel estates
- diplomacy: manage diplomacy
- laws:      change laws
+ visit:     Enter Settlement
+ docks:     Embark at Docks
+ resupply:  Resupply
+ mobilize:  Mobilize Troops
+ construct: Manage Constructions
+ recruit:   Manage Recruitment
+ trade:     Manage Trade
+ positions: Manage Positions
+ expel:     Expel Estates
+ diplomacy: Manage Diplomacy
+ laws:      Change Laws
+ describe:  Update Description
+ placeinside: Construct Place Inside
+ placeoutside: Construct Place Outside
  desc:
   title:    Description of permissions
   visit: >
@@ -667,6 +670,12 @@ perm:
     Allows the negotiation and signing of treaties with other realms.
   laws: >
     Grants editorial access to the realms laws and regulations publication.
+  describe: >
+    Grants others the ability to describe your settlements, if that's not your thing.
+  placeinside: >
+    Grants others the ability to construct places within the gates of the settlement.
+  placeoutside: >
+    Grants others the ability to construct places outside, within the borders of the region, but not the settlement.
 
 law:
  header:
