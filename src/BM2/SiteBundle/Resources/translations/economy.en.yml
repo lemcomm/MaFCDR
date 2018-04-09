@@ -300,6 +300,9 @@ description:
  University: >
    The highest place of learning available to your people, the university is a center of knowledge and the foundation of some
    of the most rare and valuable experts.
+ Warehouse: >
+   Used to store goods and equipment of all kinds, it's best used for things that don't spoil. That said, it does provide a
+   slight benefit to the local food production industry, if not always directly.
  Weaponsmith: >
    A specialised craftsman forging weapons. While most of his work is similar to the blacksmith, he also handles some woodwork
    for handles and uses more advanced smelting and forging techniques to create weapons capable of withstanding a higher
