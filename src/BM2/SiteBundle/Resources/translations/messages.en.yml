@@ -625,6 +625,7 @@ form:
 settlement:
  name:  settlement
  title: %type% of %name%
+ capital: Local Capital(s)
  details: Settlement Details
  dummy:   Click a settlement on the map to show its details here.
  area:  %name% area
