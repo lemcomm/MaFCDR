@@ -556,7 +556,7 @@ class MapController extends Controller {
 			}
 			
 			// mix in places
-			foreach ($this->get('geography')->findPlacesInSpotRnage($character) as $place) {
+			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
 				$features[] = array(
 					'type' => 'Place',
 //					'id' => 'dungeon_'.$d['id'],
