@@ -166,7 +166,7 @@ class GameRunner {
 
 		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND c.system <> :system) OR (c.alive = true and c.slumbering = true AND c.system <> :system)');
-		$query->setParameter('system' = 'procd_inactive');
+		$query->setParameter('system', 'procd_inactive');
 		$result = $query->getResult();
 		if (count($result) > 0) {
 			$this->logger->info("Sorting the dead from the slumbering...");
