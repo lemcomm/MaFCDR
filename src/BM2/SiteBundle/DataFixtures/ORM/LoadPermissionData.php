@@ -13,33 +13,33 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 
 	private $permissions = array(
 		'settlement' => array(
-			'visit'    	=> array('use_value'=>false, 'reserve'=>false),
-			'docks'    	=> array('use_value'=>false, 'reserve'=>false),
-			'describe'	=> array('use_value'=>false, 'reserve'=>false),
-			'resupply'	=> array('use_value'=>true, 'reserve'=>false),
-			'mobilize'	=> array('use_value'=>true, 'reserve'=>true),
-			'construct'	=> array('use_value'=>false, 'reserve'=>true),
-			'recruit'	=> array('use_value'=>true, 'reserve'=>false),
-			'trade'    	=> array('use_value'=>false, 'reserve'=>false),
-			'placeinside'	=> array('use_value'=>false, 'reserve'=>false),
-			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false)
+			'visit'    	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.visit'),
+			'docks'    	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.docks'),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.describe'),
+			'resupply'	=> array('use_value'=>true, 'reserve'=>false, 'translation'=>'perm.resupply'),
+			'mobilize'	=> array('use_value'=>true, 'reserve'=>true, 'translation'=>'perm.mobilize'),
+			'construct'	=> array('use_value'=>false, 'reserve'=>true, 'translation'=>'perm.construct'),
+			'recruit'	=> array('use_value'=>true, 'reserve'=>false, 'translation'=>'perm.recruit'),
+			'trade'    	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.trade'),
+			'placeinside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeinside'),
+			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeoutside')
 		),
 		'realm' => array(
-			'expel'   	=> array('use_value'=>false, 'reserve'=>false),
-			'describe'	=> array('use_value'=>false, 'reserve'=>false),
-			'diplomacy'	=> array('use_value'=>false, 'reserve'=>false),
-			'laws'		=> array('use_value'=>false, 'reserve'=>false),
-			'positions'	=> array('use_value'=>false, 'reserve'=>false),
-			'wars'		=> array('use_value'=>false, 'reserve'=>false)
+			'expel'   	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.expel'),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.realmdescribe'),
+			'diplomacy'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.diplomacy'),
+			'laws'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.laws'),
+			'positions'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.positions'),
+			'wars'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.wars')
 		),
 		'place' => array(
-			'see'		=> array('use_value'=>false, 'reserve'=>false),
-			'visit'		=> array('use_value'=>false, 'reserve'=>false),
-			'docks'		=> array('use_value'=>false, 'reserve'=>false),
-			'describe'	=> array('use_value'=>false, 'reserve'=>false),
-			'resupply'	=> array('use_value'=>true, 'reserve'=>false),
-			'mobilize'	=> array('use_value'=>true, 'reserve'=>true),
-			'construct'	=> array('use_value'=>false, 'reserve'=>true)
+			'see'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.see'),
+			'visit'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placevisit'),
+			'docks'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placedocks'),
+			'describe'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placedescribe'),
+			'resupply'	=> array('use_value'=>true, 'reserve'=>false, 'translation'=>'perm.placeresupply'),
+			'mobilize'	=> array('use_value'=>true, 'reserve'=>true, 'translation'=>'perm.placemobilize'),
+			'construct'	=> array('use_value'=>false, 'reserve'=>true, 'translation'=>'perm.placeconstruct')
 		)
 	);
 
@@ -62,7 +62,7 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 					$manager->persist($perm);
 				}
 				$perm->setName($name);
-				$perm->setTranslationString('perm.'.$name);
+				$perm->setTranslationString($data['translation']);
 				$perm->setClass($class);
 				$perm->setUseValue($data['use_value']);
 				$perm->setUseReserve($data['reserve']);
