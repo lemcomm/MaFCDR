@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Item;
 use BM2\SiteBundle\Entity\Place;
+use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -52,6 +53,10 @@ class DescriptionManager {
 					$olddesc->setActivePlace(NULL);
 					$this->em->flush();
 					break;
+				case 'Realm':
+					$olddesc->setActiveRealm(NULL);
+					$this->em->flush();
+					break;
 				case 'Settlement':
 					$olddesc->setActiveSettlement(NULL);
 					$this->em->flush();
@@ -74,6 +79,10 @@ class DescriptionManager {
 			case 'Place':
 				$desc->setActivePlace($entity);
 				$desc->setPlace($entity);
+				break;
+			case 'Realm':
+				$desc->setActiveRealm($entity);
+				$desc->setRealm($entity);
 				break;
 			case 'Settlement':
 				$desc->setActiveSettlement($entity);
@@ -113,6 +122,14 @@ class DescriptionManager {
 						$entity,
 						'event.description.updated.place',
 						array('%character%'=>$character->getId(), '%place%'=>$entity->getId()),
+						History::LOW
+					);
+					break;
+				case 'Realm':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.realm',
+						array('%character%'=>$character->getId()),
 						History::LOW
 					);
 					break;
