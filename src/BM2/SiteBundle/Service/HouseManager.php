@@ -13,12 +13,13 @@ class HouseManager {
 	protected $em;
 	protected $history;
 
-	public function __construct(EntityManager $em, History $history) {
+	public function __construct(EntityManager $em, History $history, DescriptionManager $descman) {
 		$this->em = $em;
 		$this->history = $history;
+		$this->descman = $descman;
 	}
 
-	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $crest = null, $location=null, $settlement=null, Character $founder) {
+	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $crest = null, $settlement=null, Character $founder) {
 		$house = $this->_create($name, $description, $private_description, $secret_description, $crest, $location=null, $settlement=null, $founder);
 
 		$this->history->logEvent(
@@ -43,7 +44,7 @@ class HouseManager {
 		$secret_description = null;
 		$crest = $founder->getCrest();
 		
-		$house = $this->_create($name, $description, $private_description, $secret_description, $superior, $crest, $location, $settlement, $founder);
+		$house = $this->_create($name, $description, $private_description, $secret_description, $superior, $crest, $settlement, $founder);
 		# We wait to set this because it's not until after that function executes that we have an id to set for the superior/cadet relationship.
 		$house->setSuperior($id);
 		$id->addCadet($house);
@@ -75,20 +76,20 @@ class HouseManager {
 		return $house;
 	}
 
-	private function _create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $location = null, $settlement = null, $crest = null, Character $founder,) {
+	private function _create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement = null, $crest = null, Character $founder) {
 		$house = new House;
 		$house->setName($name);
-		$house->setDescription($description);
-		$house->setPrivateDescription($private_description);
-		$house->setSecretDescription($secret_description);
+		$house->setPrivate($private_description);
+		$house->setSecret($secret_description);
 		$house->setSuperior($superior);
-		$house->setGeoData($location);
 		$house->setInsideSettlement($settlement);
 		$house->setCrest($crest);
 		$house->setHead($founder);
 		$house->setMembers($founder);
+		$house->setGold(0);
 		$this->em->persist($house);
 		$this->em->flush($house);
+		$this->descman->newDescription($house, $description, $founder, TRUE);
 
 		return $house;
 	}
