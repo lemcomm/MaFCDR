@@ -619,7 +619,7 @@ perm:
  none:      No Permissions Defined
  listing:   Grant to
  choose:    -- choose --
- visit:     Enter Settlement
+ visit:     Enter Location
  docks:     Embark at Docks
  resupply:  Resupply
  mobilize:  Mobilize Troops
@@ -630,7 +630,9 @@ perm:
  expel:     Expel Estates
  diplomacy: Manage Diplomacy
  laws:      Change Laws
+ wars:      Manage Wars
  describe:  Update Description
+ realmdescribe: Update Description
  placeinside: Construct Place Inside
  placeoutside: Construct Place Outside
  desc:
@@ -659,6 +661,8 @@ perm:
     to your settlement. Only grant this to the most trusted people.
   docks: >
     Allow the use of the docks (if you have them) to embark on sea journeys.
+  describe: >
+    Grants others the ability to describe your settlements, if that's not your thing.
   positions: >
     Allows the management of non-rulership positions and their permissions within the realm. This is a very powerful position as the
     ability to grant or remove positions puts the holder above everyone, except the ruler(s).
@@ -670,12 +674,34 @@ perm:
     Allows the negotiation and signing of treaties with other realms.
   laws: >
     Grants editorial access to the realms laws and regulations publication.
-  describe: >
-    Grants others the ability to describe your settlements, if that's not your thing.
+  wars: >
+    Allows the management of the wars of the realm, both their creation and end.
+  realmdescribe: >
+    Allows those with this permission to edit the realm description.
   placeinside: >
     Grants others the ability to construct places within the gates of the settlement.
   placeoutside: >
     Grants others the ability to construct places outside, within the borders of the region, but not the settlement.
+  see: >
+    Allows individuals to know of this place's existence. Though there may be other ways to find if they suspect it's location.
+  placevisit: >
+    Allow others to enter the Place, precondition for most other actions as well as interactions with nobles inside.
+  placeresupply: >
+    Allows others to resupply their soldiers at your Place, up to a number of items per day that you can 
+    limit with the <em>amount</em> value. This amount is shared by everyone on the list.
+  placemobilize: >
+    Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of 
+    soldiers that can be mobilized per day is limited by the <em>amount</em> value, which is shared by everyone on the list.<br />
+    To prevent depletion of your defenses, you can also set a <em>reserve</em> value declaring that the reserve number of soldiers
+    always has to remain in the settlement.
+  placeconstruct: >
+    Allows others to initiate and manage construction projects in your Place.<br />
+    To prevent excessive building, you can define a <em>reserve</em> value, which is the percentage of peasants that must remain
+    in the workforce.
+  placedocks: >
+    Allow the use of the docks (if you have them) to embark on sea journeys.
+  placedescribe: >
+    Allows those with this permission to edit the description of this Place.
 
 law:
  header:
