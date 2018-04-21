@@ -26,12 +26,12 @@ class HouseCreationType extends AbstractType {
 			'trim'=>true,
 			'required'=>false
 		));
-		$builder->add('private_description', 'textarea', array(
+		$builder->add('private', 'textarea', array(
 			'label'=>'house.setup.private',
 			'trim'=>true,
 			'required'=>false
 		));
-		$builder->add('secret_description', 'textarea', array(
+		$builder->add('secret', 'textarea', array(
 			'label'=>'house.setup.secret',
 			'trim'=>true,
 			'required'=>false
