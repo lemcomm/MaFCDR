@@ -7,6 +7,7 @@
 		<field name="appearance" type="text" nullable="true"/>
 		<field name="personality" type="text" nullable="true"/>
 		<field name="secrets" type="text" nullable="true"/>
+		<field name="retirement" type="text" nullable="true"/>
 		<field name="death" type="text" nullable="true"/>
 
 		<one-to-one field="character" target-entity="Character" mapped-by="background"/>

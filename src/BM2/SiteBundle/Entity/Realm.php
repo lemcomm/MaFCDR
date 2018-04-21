@@ -9,6 +9,7 @@ class Realm {
 
 	protected $ultimate=false;
 	protected $all_characters=false;
+	protected $all_active_characters=false;
 	protected $rulers=false;
 
 
@@ -30,12 +31,17 @@ class Realm {
 		return false;
 	}
 
-	public function findTerritory($with_subs=true) {
+	public function findTerritory($with_subs=true, $all_subs=true) {
 		if (!$with_subs) return $this->getEstates();
 
 		$territory = new ArrayCollection;
 
-		$all = $this->findAllInferiors(true);
+		if ($all_subs==true) {
+			$all = $this->findAllInferiors(true);
+		} else {
+			$all[] = $this;
+			$all[] = $this->getInferiors();
+		}
 		foreach ($all as $realm) {
 			foreach ($realm->getEstates() as $estate) {
 				if (!$territory->contains($estate)) {
@@ -63,8 +69,8 @@ class Realm {
 		return $this->rulers;
 	}
 
-	public function findMembers($with_subs=true) {
-		if ($this->all_characters) return $this->all_characters;
+	public function findMembers($with_subs=true, $forceupdate = false) {
+		if ($this->all_characters && $forceupdate == false) return $this->all_characters;
 		$this->all_characters = new ArrayCollection;
 
 		foreach ($this->findTerritory(false) as $estate) {
@@ -91,6 +97,36 @@ class Realm {
 		return $this->all_characters;
 	}
 
+	public function findActiveMembers($with_subs=true, $forceupdate = false) {
+		if ($this->all_active_characters && $forceupdate == false) return $this->all_active_characters;
+		$this->all_active_characters = new ArrayCollection;
+
+		foreach ($this->findTerritory(false) as $estate) {
+			$owner = $estate->getOwner();
+			if ($owner AND $owner->isActive(true)) {
+				$this->addActiveRealmMember($owner);
+			}
+		}
+
+		foreach ($this->getPositions() as $pos) {
+			foreach ($pos->getHolders() as $official) {
+				if ($official->isActive(true)) {
+					$this->addActiveRealmMember($official);
+				}
+			}
+		}
+
+		if ($with_subs) {
+			foreach ($this->getInferiors() as $sub) {
+				foreach ($sub->findActiveMembers() as $submember) {
+					$this->addActiveRealmMember($submember);
+				}
+			}
+		}
+
+		return $this->all_active_characters;
+	}
+
 	private function addRealmMember(Character $char) {
 		if (!$this->all_characters->contains($char)) {
 			$this->all_characters->add($char);
@@ -98,6 +134,17 @@ class Realm {
 		foreach ($char->getVassals() as $vassal) {
 			if (!$this->all_characters->contains($vassal)) {
 				$this->all_characters->add($vassal);
+			}
+		}
+	}
+
+	private function addActiveRealmMember(Character $char) {
+		if (!$this->all_active_characters->contains($char)) {
+			$this->all_active_characters->add($char);
+		}
+		foreach ($char->getVassals() as $vassal) {
+			if (!$this->all_active_characters->contains($vassal)) {
+				$this->all_active_characters->add($vassal);
 			}
 		}
 	}

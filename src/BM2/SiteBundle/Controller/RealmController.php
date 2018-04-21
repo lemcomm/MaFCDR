@@ -9,6 +9,8 @@ use BM2\SiteBundle\Entity\RealmRelation;
 use BM2\SiteBundle\Entity\Vote;
 use BM2\SiteBundle\Form\ElectionType;
 use BM2\SiteBundle\Form\InteractionType;
+use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\RealmCapitalType;
 use BM2\SiteBundle\Form\RealmCreationType;
 use BM2\SiteBundle\Form\RealmManageType;
 use BM2\SiteBundle\Form\RealmOfficialsType;
@@ -17,6 +19,7 @@ use BM2\SiteBundle\Form\RealmRelationType;
 use BM2\SiteBundle\Form\RealmRestoreType;
 use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SubrealmType;
+use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -24,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 	FIXME: some of this stuff should be moved to the new realm manager service
@@ -64,18 +67,22 @@ class RealmController extends Controller {
 	public function viewAction(Realm $id) {
 		$realm = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$superrulers = array();
 
 		$territory = $realm->findTerritory();
 		$population = 0;
+		$restorable = FALSE;
 		foreach ($territory as $estate) {
 			$population += $estate->getPopulation() + $estate->getThralls();
 		}
 
 		if ($realm->getSuperior()) {
 			$parentpoly =	$this->get('geography')->findRealmPolygon($realm->getSuperior());
+			$superrulers = $realm->getSuperior()->findRulers();
 		} else {
 			$parentpoly = null;
 		}
+
 		$subpolygons = array();
 		foreach ($realm->getInferiors() as $child) {
 			$subpolygons[] = $this->get('geography')->findRealmPolygon($child);
@@ -100,6 +107,17 @@ class RealmController extends Controller {
 			}
 			$diplomacy[$index][$side] = $relation->getStatus();
 		}
+		 foreach ($superrulers as $superruler) {
+			if ($superruler == $character) {
+				if (!$realm->getActive()) {
+					$restorable = TRUE;
+				}
+			}
+		} 
+		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
+			$restorable = TRUE;
+			echo $restorable;
+		}*/	
 
 		return array(
 			'realm' =>		$realm,
@@ -110,10 +128,11 @@ class RealmController extends Controller {
 			'population'=>	$population,
 			'area' =>		$this->get('geography')->calculateRealmArea($realm),
 			'nobles' =>		$realm->findMembers()->count(),
-			'diplomacy' =>	$diplomacy
+			'diplomacy' =>	$diplomacy,
+			'restorable' => $restorable
 		);
 	}
-
+	
 	/**
 	  * @Route("/new")
 	  * @Template
@@ -163,7 +182,7 @@ class RealmController extends Controller {
 
 
 	/**
-	  * @Route("/{realm}/manage", requirements={"realm"="\d+"})
+	  * @Route("/{realm}/manage", requirements={"realm"="\d+"}, name="bm2_site_realm_manage")
 	  * @Template
 	  */
 	public function manageAction(Realm $realm, Request $request) {
@@ -200,6 +219,35 @@ class RealmController extends Controller {
 
 
 	/**
+	  * @Route("/{realm}/description", requirements={"realm"="\d+"}, name="bm2_site_realm_description")
+	  * @Template
+	  */
+	public function descriptionAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyManageDescriptionTest');
+
+		$desc = $realm->getDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else if ($realm->getOldDescription()) {
+			$text = $realm->getOldDescription();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newDescription($realm, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return array('realm'=>$realm, 'form'=>$form->createView());
+	}
+
+
+	/**
 	  * @Route("/{realm}/abdicate", requirements={"realm"="\d+"})
 	  * @Template
 	  */
@@ -224,6 +272,111 @@ class RealmController extends Controller {
 		return array('realm'=>$realm, 'form'=>$form->createView(), 'success'=>$success);
 	}
 
+
+	/**
+	  * @Route("/{realm}/abolish", requirements={"realm"="\d+"}, name="bm2_site_realm_abolish")
+	  * @Template
+	  */
+	public function abolishAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyAbolishRealmTest');
+		$form = $this->createFormBuilder()
+			->add('sure', 'checkbox', array(
+				'required'=>true,
+				'label'=>'realm.abolish.sure',
+				'translation_domain' => 'politics'
+				))
+			->getForm();
+
+		$success=false;
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$fail = false;
+			$data = $form->getData();
+			$em = $this->getDoctrine()->getManager();
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				$sovereign = false;
+				$inferiors = false;
+				if (!$realm->getSuperior()) {
+					$sovereign = true;
+				}
+				if ($realm->getInferiors()) {
+					$inferiors = true;
+				}
+				if ($sovereign && $inferiors) {
+					$this->get('realm_manager')->dismantleRealm($character, $realm, $sovereign); # Free the esates, remove position holders.
+					foreach ($realm->getInferiors() as $subrealm) {
+						$this->get('history')->logEvent(
+							$subrealm,
+							'event.realm.abolished.sovereign.inferior.subrealm',
+							array('%link-realm%'=>$realm->getId()),
+							History::HIGH
+						); # 'With the abolishment of %link-realm%, the realm has become autonomous.'
+						$this->get('history')->logEvent(
+							$realm,
+							'event.realm.abolished.sovereign.inferior.realm',
+							array('%link-realm%'=>$subrealm->getId()),
+							History::HIGH
+						); # 'With the dismantling of the realm, the formal vassal of %link-realm% has gained it's autonomy.'
+						$subrealm->setSuperior(null);
+						$realm->removeInferior($subrealm);
+						$realm->setActive(false);
+						$em->flush();
+					}
+				}
+				if ($sovereign && !$inferiors) {
+					$this->get('realm_manager')->dismantleRealm($character, $realm, $sovereign); # Free the esates, remove position holders.
+					$realm->setActive(false);
+					$em->flush();
+				}
+				if (!$sovereign && $inferiors) {
+					$this->get('realm_manager')->dismantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$superior = $realm->getSuperior();
+					foreach ($realm->getInferiors() as $subrealm) {
+						$this->get('history')->logEvent(
+							$subrealm,
+							'event.realm.abolished.notsovereign.inferior.subrealm',
+							array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$subrealm->getId(), '%link-realm-3%'=>$realm->getId()),
+							History::HIGH
+						); # 'With the abolishment of its superior realm, %link-realm-1%, %link-realm-2%'s superior is now %link-realm-3%.'
+						$this->get('history')->logEvent(
+							$realm,
+							'event.realm.abolished.notsovereign.inferior.realm',
+							array('%link-realm-1%'=>$superior->getId(), '%link-realm-2%'=>$subrealm->getId()),
+							History::HIGH
+						); # 'With the abolishment of the realm, %link-realm-1% assumes superiorship role over %link-realm-2%.'
+						$this->get('history')->logEvent(
+							$superior,
+							'event.realm.abolished.notsovereign.inferior.superior',
+							array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$subrealm->getId()),
+							History::HIGH
+						); # 'With the abolishment of its inferior realm, %link-realm-1%, the realm assumes superiorship over %link-realm-2%.'
+						$realm->removeInferior($subrealm); # Remove inferior from the abolished realm.
+						$superior->addInferior($subrealm); # Add inferior to next level up realm.
+						$subrealm->setSuperior($superior); # Set next level superior as direct superior of inferior realm.
+						$em->flush();
+					}
+					$realm->setActive(false);
+					$em->flush();
+				}
+				if (!$sovereign && !$inferiors) {
+					$this->get('realm_manager')->dimsantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$realm->setActive(false);
+					$em->flush();
+				}
+				$this->addFlash('notice', $this->get('translator')->trans('realm.abolish.done', array('%link-realm%'=>$realm->getId()), 'politics')); #'The realm of %link-realm% has been dismantled.
+				return $this->redirectToRoute('bm2_politics');
+			} else {
+				$this->addFlash('error', $this->get('translator')->trans('realm.abolish.fail', array(), 'politics')); # 'You have not validated your certainty.'
+				return array('realm'=>$realm, 'form'=>$form->createView());
+			}
+				
+		}
+		return array('realm'=>$realm,
+			     'form'=>$form->createView());
+	}
 
 	/**
 	  * @Route("/{realm}/laws", requirements={"realm"="\d+"})
@@ -271,13 +424,14 @@ class RealmController extends Controller {
 	public function positionAction(Realm $realm, Request $request, RealmPosition $position=null) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
 		$em = $this->getDoctrine()->getManager();
+		$cycle = $this->get('appstate')->getCycle();
 
 		if ($position == null) {
 			$is_new = true;
 			$position = new RealmPosition;
 			$position->setRealm($realm);
 			$position->setRuler(false);
-			$position->setDescription("");
+
 		} else {
 			$is_new = false;
 			if ($position->getRealm() != $realm) {
@@ -286,27 +440,56 @@ class RealmController extends Controller {
 		}
 
 		$original_permissions = clone $position->getPermissions();
-
 		$form = $this->createForm(new RealmPositionType(), $position);
 		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$fail = false;
 			$data = $form->getData();
+			$year = $data->getYear();
+			$week = $data->getWeek();
+			$term = $data->getTerm();
+			$elected = $data->getElected();
+			if ($week < 0 OR $week > 60) {
+				$fail = true;
+			}
 
-			foreach ($position->getPermissions() as $permission) {
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			if (!$fail) {
+				foreach ($position->getPermissions() as $permission) {
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$position->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$position->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
+				if ($is_new) {
+					$em->persist($position);
+				}
+				if ($year > 1 AND $week > 1 AND $term != 0) {
+					/* This is explained a bit better below, BUT, we set week and year manually here just in case
+					the game decides to do something wonky. Also, if the term is anything other than lifetime,
+					which is what 0 equates to, then we care about election years n stuff. */
+					$position->setCycle((($year-1)*360)+(($week-1)*6));
+					$position->setWeek($week);
+					$position->setYear($year);
+				}
+				if ($term == 0 OR $year < 2) {
+					/* This sounds kind of dumb, but basically, on null inputs the form builder submits a 1.
+					So, when we get a 1 for the year, or anything less than 2 really, we assume that this is
+					actually a null input done by the formbuilder, and set cycle, week, and year to null.
+					This is because the formbuilder doesn't accept null integers on it's own. */
+					$position->setCycle(null);
+					$position->setWeek(null);
+					$position->setYear(null);
+				}
+				if ($elected) {
+					$position->setDropCycle((($year-1)*360)+(($week-1)*6)+12);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 			}
-			if ($is_new) {
-				$em->persist($position);
-			}
-			$em->flush();
-			return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 		}
 
 		return array(
@@ -331,8 +514,11 @@ class RealmController extends Controller {
 
 		$original_holders = clone $position->getHolders();
 
-		/* FIXME: if elections can summon anyone, then so should appointment - or maybe we want to limit both to the contacts list? */
-		$candidates = $position->getRealm()->findMembers();
+		if ($position->getKeepOnSlumber()) {
+			$candidates = $position->getRealm()->findMembers();
+		} else {
+			$candidates = $position->getRealm()->findActiveMembers();
+		}
 		$form = $this->createForm(new RealmOfficialsType($candidates, $position->getHolders()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -599,30 +785,83 @@ class RealmController extends Controller {
 	}
 
 	/**
-	  * @Route("/{realm}/restore", requirements={"realm"="\d+"})
+	  * @Route("/{realm}/capital", requirements={"realm"="\d+"})
 	  * @Template
 	  */
+	public function capitalAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchySelectCapitalTest');
 
-	public function restoreAction(Realm $realm, Request $request) {
-		$character = $this->gateway($realm, 'diplomacyRestoreTest');
-		
-		$form = $this->createForm(new RealmRestoreType($realm));
+		$form = $this->createForm(new RealmCapitalType($realm));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$fail = false;
 
+			if ($data['capital'] == $realm->getCapital()) {
+				$fail = true;
+				$form->addError(new FormError($this->get('translator')->trans("realm.capital.error.already", array(), 'politics')));
+			}
+			if (!$fail AND !$data['capital']) {
+				$fail = true;
+				$form->addError(new FormError($this->get('translator')->trans("realm.capital.error.none", array(), 'politics')));
+			}
 			if (!$fail) {
-                		$this->get('realm_manager')->restoreSubRealm($realm, $deadrealm['deadrealm'], $character);
-            		}
-
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('diplomacy.restore.success', array(), 'politics'));
-			return $this->redirectToRoute('bm2_site_realm_diplomacy', array('realm'=>$realm->getId()));
+				if ($realm->getCapital()) {
+					$realm->getCapital()->removeCapitalOf($realm);
+				}
+				$realm->setCapital($data['capital']);
+				$data['capital']->addCapitalOf($realm);
+				$this->get('history')->logEvent(
+					$realm,
+					'event.realm.capital',
+					array('%link-settlement%'=>$data['capital']->getId()),
+					History::HIGH
+				);
+				$this->getDoctrine()->getManager()->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('realm.capital.success', array(), 'politics'));
+				return $this->redirectToRoute('bm2_site_realm_capital', array('realm'=>$realm->getId()));
+				#return $this->redirectToRoute('bm2_politics');
+			}
 		}
+
+		return array(
+			'realm' => $realm,
+			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
+			'form' => $form->createView()
+		);
 	}
 
+	/**
+	  * @Route("/{id}/restore", requirements={"id"="\d+"})
+	  * @Template
+	  */
+
+	public function restoreAction(Realm $id) {
+		$realm = $id;
+		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+
+		$em = $this->getDoctrine()->getManager();
+		
+		$this->get('realm_manager')->makeRuler($realm, $character);
+		$realm->setActive(TRUE);
+		$this->get('history')->logEvent(
+			$realm,
+			'event.realm.restored',
+			array('%link-realm%'=>$realm->getSuperior()->getID(), '%link-character%'=>$character->getId()),
+			History::ULTRA, true
+		);
+		$this->get('history')->logEvent(
+			$character,
+			'event.realm.restorer',
+			array('%link-realm%'=>$realm->getID()),
+			History::HIGH, true
+		);
+		$em->flush();
+
+		return new Response();
+		
+	}
+	
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
 	  * @Template
@@ -809,13 +1048,19 @@ class RealmController extends Controller {
 	public function electionsAction(Realm $realm) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
 
+		/* 
+		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
+		And yes, you're reading this right, elections only used to be counted when someone was viewing the list of elections in a realm.
+		--Andrew 20170918
+
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
 		foreach ($query->getResult() as $election) {
 			$this->get('realm_manager')->countElection($election);
 		}
-		$em->flush();
+		$em->flush(); 
+		*/
 
 		return array(
 			'realm'=>$realm,
@@ -893,7 +1138,11 @@ class RealmController extends Controller {
 	  * @Template
 	  */
 	public function voteAction(Election $id, Request $request) {
-		$character = $this->gateway();
+		if ($id->getRealm()) {
+			$character = $this->gateway($id->getRealm(), 'hierarchyElectionsTest');
+		}
+		# Because people were sneaking random outsiders into elections.
+		# This method will also allow us to setup alternative security checks later for this page, if it gets expanded.
 		$election = $id; // we use ID in the route because the links extension always uses id
 		$em = $this->getDoctrine()->getManager();
 
@@ -998,7 +1247,7 @@ class RealmController extends Controller {
 
 		$votes = $this->getVotes($election);
 
-		$my_weight = 1; // TODO: different voting mechanism
+		$my_weight = $this->get('realm_manager')->getVoteWeight($election, $character);
 
 		return array(
 			'election' => $election,
@@ -1021,7 +1270,7 @@ class RealmController extends Controller {
 					'contra' => array()
 				);
 			}
-			$weight = 1; // TODO: different voting mechanism
+			$weight = $this->get('realm_manager')->getVoteWeight($election, $vote->getCharacter());
 			if ($vote->getVote() < 0) {
 				$votes[$id]['contra'][] = array('voter'=>$vote->getCharacter(), 'votes'=>$weight);
 			} else {

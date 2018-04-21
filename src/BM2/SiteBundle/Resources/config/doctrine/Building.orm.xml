@@ -12,6 +12,8 @@
 		<field name="current_speed" type="float"/>
 
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="buildings"/>
+		<many-to-one field="place" target-entity="Place" inversed-by="buildings"/>
+		
 		<many-to-one field="type" target-entity="BuildingType" inversed-by="buildings"/>
 
 	</entity>

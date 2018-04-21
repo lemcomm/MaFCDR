@@ -1,0 +1,29 @@
+{
+    "name":"Calitarus/MessagingBundle",
+    "description":"Symfony2 Bundle for Advanced Messaging",
+    "keywords":["messaging"],
+    "homepage":"https://github.com/tvogt/msgbundle",
+    "type":"library",
+    "license":"GPL3",
+    "authors":[
+        {
+            "name":"Tom Vogt",
+            "email":"tom@lemuria.org",
+            "homepage":"http://lemuria.org"
+        },
+        {
+            "name": "Calitarus GmbH",
+            "homepage": "http://calitarus.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "require-dev": {
+    },
+
+    "autoload":{
+        "psr-0": { "Calitarus\\MessagingBundle": "" }
+    },
+    "target-dir": "Calitarus/MessagingBundle"
+}

@@ -65,7 +65,6 @@ if (typeof mapstrings == "undefined") {
 		'settlements': "Settlements",
 		'realms': "Sovereign Realms",
 		'poi': "POI",
-		'towers': "Towers",
 		'cultures': "Cultures",
 		'features': "Features",
 		'markers': "Markers",
@@ -132,9 +131,6 @@ function mapinit(divname, showswitcher, mode, keepsquare){
 			addroads();
 			addoffers();
 			break;
-		case 'network':
-			addsettlements()
-			break;
 		case 'featureconstruction':
 		case 'setmarker':
 			addsettlements();
@@ -146,7 +142,6 @@ function mapinit(divname, showswitcher, mode, keepsquare){
 		default:
 			addsettlements();
 			addrealms();
-			addcultures();
 			addroads();
 			addfeatures();
 			addmarkers();
@@ -599,9 +594,9 @@ function addsettlements(mode) {
 		width: "25em",
 		position: { my: 'right bottom', at: 'right bottom', of: $('#sd_anchor') }
 	});
-}
 
-function addcultures() {
+
+	// cultures
 
 	var style = new OpenLayers.Style({
 		strokeWidth: 0.5,
@@ -842,15 +837,30 @@ var zoomSupport = {
 				case 'cave':			return imgpath+'rpg_map/cave_entrance.svg';
 				case 'wild':			return imgpath+'rpg_map/obelisk.svg';
 				case 'ruin':			return imgpath+'rpg_map/ruins.svg';
-				case 'dungeon':			return imgpath+'rpg_map/monastery.svg';
+				case 'dungeon':			return imgpath+'rpg_map/ruins.svg';
 				case 'glade':			return imgpath+'rpg_map/hill1.svg';
 				case 'lab':			return imgpath+'rpg_map/maze.svg';
-				case 'mausoleum':		return imgpath+'rpg_map/pyramid.svg';
-				case 'hold':			return imgpath+'rpg_map/tower_round.svg';
-				case 'citadel': 		return imgpath+'rpg_map/statue.svg';
-				case 'roguefort':		return imgpath+'rpg_map/fortress.svg';
+				case 'mausoleum':		return imgpath+'rpg_map/ruins.svg';
+				case 'hold':			return imgpath+'rpg_map/ruins.svg';
+				case 'citadel': 		return imgpath+'rpg_map/ruins.svg';
+				case 'roguefort':		return imgpath+'rpg_map/ruins.svg';
 				case 'flooded':			return imgpath+'rpg_map/obelisk.svg';
 				case 'shipgrave':		return imgpath+'rpg_map/shipwreck.svg';
+					
+				// places
+				case 'academy':			return imgpath+'rpg_map/university.svg';				
+				case 'arena':			return imgpath+'rpg_map/statue.svg';
+				case 'capital':			return imgpath+'rpg_map/fountain.svg';
+				case 'castle':			return imgpath+'rpg_map/fort.svg';
+				case 'cave':			return imgpath+'rpg_map/cave_entrace.svg';
+				case 'fort':			return imgpath+'rpg_map/city.svg';
+				case 'home':			return imgpath+'rpg_map/fountain.svg';
+				case 'inn':			return imgpath+'rpg_map/inn.svg';
+				case 'library':			return imgpath+'rpg_map/university.svg';
+				case 'monument':		return imgpath+'rpg_map/statue.svg';
+				case 'plaza':			return imgpath+'rpg_map/arch.svg';
+				case 'portal':			return imgpath+'rpg_map/magic_stones.svg';
+				case 'tavern':			return imgpath+'rpg_map/tavern.svg';
 			}
 		} else {
 			switch (feature.attributes.type) {

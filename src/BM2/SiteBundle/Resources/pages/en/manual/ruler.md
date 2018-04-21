@@ -5,9 +5,9 @@ This is a high rank in any hierarchy, though not necessarily the highest if your
 
 Responsibilities of a Ruler
 ---------------------------
-Keeping the realm together and, if possible, expanding it is the primary responsibility of a ruler. Whether he rules through consent or oppression, making sure that the settlements that make up the realm remain with it ultimately determines its fate.
+Keeping the realm together and, if possible, expanding it is the primary responsibility of a ruler. Whether they rule through consent or oppression, making sure that the settlements that make up the realm remain with it ultimately determines its fate.
 
-Internally, the ruler manages the realm positions (see [others]) and this in turn determines the government system and feel of a realm. It also determines many of the responsibilities of the ruler. In some realms, he might just be the official head of state, while in others he is a tyrant with absolute control of everything. Monarchies, republics and other forms of government lie somewhere inbetween.
+Internally, the ruler manages the realm positions (see [others]) and this in turn determines the government system and feel of a realm. It also determines many of the responsibilities of the ruler. In some realms, they might just be the official head of state, while in others they may be a tyrant with absolute control of everything. Monarchies, republics and other forms of government lie somewhere inbetween.
 
 On the outside, the ruler is also responsible for the realms [diplomacy].
 

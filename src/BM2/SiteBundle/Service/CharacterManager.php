@@ -5,10 +5,12 @@ namespace BM2\SiteBundle\Service;
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\User;
 use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,7 +27,6 @@ class CharacterManager {
 	protected $messagemanager;
 	protected $dm;
 
-	private $seen;
 
 	public function __construct(EntityManager $em, AppState $appstate, History $history, Military $military, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm) {
 		$this->em = $em;
@@ -138,7 +139,7 @@ class CharacterManager {
 
 		// FIXME: apparently, sometimes this return an empty string? HOW ?
 		if ($genome == '' || $genome == '  ') {
-			throw new \Exception("Please report this error to tom@mightandfealty.com: u:".$user->getId()."/f:".($father?$father->getId():'0')."/m:".($mother?$mother->getId():'0')."/g:".$genome."/");
+			throw new \Exception("Please report this error to mafteam@lemuriacommunity.org: u:".$user->getId()."/f:".($father?$father->getId():'0')."/m:".($mother?$mother->getId():'0')."/g:".$genome."/");
 		}
 
 		return $genome;
@@ -157,8 +158,7 @@ class CharacterManager {
 
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
-		// remove from map
-		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		// remove from hierarchy
 		$character->setLiege(null);
 
@@ -274,10 +274,6 @@ class CharacterManager {
 		}
 
 		// dead men are free - TODO: but a notice to the captor would be in order - unless he is the killer (no need for redundancy)
-		if ($captor = $character->getPrisonerOf()) {
-			$character->setPrisonerOf(null);
-			$captor->removePrisoner($character);
-		}
 
 		foreach ($character->getVassals() as $vassal) {
 			if ($vassal->getEstates() || $vassal->getPositions()) {
@@ -356,26 +352,6 @@ class CharacterManager {
 			}
 		}
 
-		// TODO: inherit inheritable positions
-		foreach ($character->getPositions() as $position) {
-			if ($position->getRuler()) {
-				if ($heir) {
-					$this->inheritRealm($position->getRealm(), $heir, $character, $via);
-				} else {
-					$this->failInheritRealm($character, $position->getRealm());
-				}
-			} else {
-				$position->removeHolder($character);
-				$character->removePosition($position);
-				$this->history->logEvent(
-					$position->getRealm(), 'event.position.death',
-					array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
-					History::LOW, true
-				);
-			}
-		}
-
-
 		// close all logs except my personal one
 		foreach ($character->getReadableLogs() as $log) {
 			if ($log != $character->getLog()) {
@@ -388,6 +364,157 @@ class CharacterManager {
 
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
+
+		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+
+		return true;
+	}
+
+	public function retire(Character $character) {
+		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
+		// List is set to 90 as this sorts them to the retired listing on the account character list.
+		$character->setRetired(true)->setList(90)->setSlumbering(true);
+		// remove from map and hiearchy
+		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+		$character->setLiege(null);
+
+		$this->history->logEvent($character, 'event.character.retired', array(), History::HIGH, true);
+
+		// reset account restriction, so it is recalculated - we do this very early so later failures don't impact it
+		if ($character->getUser()) {
+			$character->getUser()->setRestricted(false);
+		}
+
+		// TODO: info/event to parents, children and husband
+
+		// terminate all actions -- don't worry about battles because you can't retire when engaged in one.
+		foreach ($character->getActions() as $act) {
+			$this->em->remove($act);
+		}
+
+		// remove all votes
+		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:Vote v WHERE v.character = :me OR v.target_character = :me');
+		$query->setParameter('me', $character);
+		$query->execute();
+
+		// disband my troops
+		foreach ($character->getSoldiers() as $soldier) {
+			$this->military->disband($soldier, $character);
+		}
+		foreach ($character->getEntourage() as $entourage) {
+			$this->military->disbandEntourage($entourage, $character);
+		}
+
+		// FIXME: Since they're not dead, do they lose their claims still? Hm.
+		/* 
+		foreach ($character->getSettlementClaims() as $claim) {
+			if ($claim->getEnforceable()) {
+				// TODO: enforceable claims are inherited
+			}
+			$claim->getSettlement()->removeClaim($claim);
+			$character->removeSettlementClaim($claim);
+			$this->em->remove($claim);
+		} 
+		*/
+
+		// assigned troops now can't be reclaimed anymore, as character is retired
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.liege = NULL WHERE s.liege = :me');
+		$query->setParameter('me', $character);
+		$query->execute();
+
+		foreach ($character->getNewspapersEditor() as $paper) {
+			// TODO: check if we are the last owner, if so, do something (make editors owners or so)
+			$character->removeNewspapersEditor($paper);
+			$this->em->remove($paper);
+		}
+		foreach ($character->getNewspapersReader() as $paper) {
+			$character->removeNewspapersReader($paper);
+			$this->em->remove($paper);
+		}
+
+		foreach ($character->getPrisoners() as $prisoner) {
+			$prisoner->setPrisonerOf(null);
+			$character->removePrisoner($prisoner);
+			$this->history->logEvent(
+				$prisoner,
+				'event.character.prison.free2',
+				array("%link-character%"=>$character->getId()),
+				History::MEDIUM, true, 30
+			);
+		}
+
+		foreach ($character->getArtifacts() as $artifact) {
+			$this->history->logEvent(
+				$artifact,
+				'event.artifact.lost',
+				array("%link-character%"=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$artifact->setOwner(null);
+		}
+
+		foreach ($character->getVassals() as $vassal) {
+			if ($vassal->getEstates() || $vassal->getPositions()) {
+				$this->history->logEvent(
+					$vassal,
+					'event.character.liegeretired',
+					array("%link-character%"=>$character->getId()),
+					History::MEDIUM, true
+				);
+			} else {
+				$this->history->logEvent(
+					$vassal,
+					'event.character.liegeretired2',
+					array("%link-character%"=>$character->getId()),
+					History::HIGH, true
+				);
+			}
+			$vassal->setLiege(null);
+			$character->removeVassal($vassal);
+		}
+
+		// TODO: When we add dynasites, maybe send gold to family?
+		$character->setGold(0);
+
+		// inheritance
+		$this->seen = new ArrayCollection;
+		list($heir, $via) = $this->findHeir($character);
+
+		// TODO: if no heir set, check if I have a family (need to determine who inherits - partner - children - parents - or a different order ?)
+		// TODO: check for realm laws and decide if inheritance allowed
+
+		if ($heir) {
+			foreach ($character->getEstates() as $estate) {
+				$this->bequeathEstate($estate, $heir, $character, $via);
+			}
+
+			foreach ($character->getVassals() as $vassal) {
+				$this->updateVassal($vassal, $heir, $character, $via);
+			}
+		} else {
+			foreach ($character->getEstates() as $estate) {
+				$this->failInheritEstate($character, $estate);
+			}
+			foreach ($character->findRulerships() as $realm) {
+				$this->failInheritRealm($character, $realm);
+			}
+		}
+
+		// FIXME: Do we want to close logs for a character that could come back?
+		/* 
+		foreach ($character->getReadableLogs() as $log) {
+			if ($log != $character->getLog()) {
+				$this->history->closeLog($log, $character);
+			}
+		} 
+		*/
+
+		// TODO: permission lists - plus clear out those of old dead characters!
+		
+
+		// clean out dungeon stuff
+		$this->dm->retireDungeoneer($character);
+		$character->setRetiredOn(new \DateTime("now"));
 
 		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
 
@@ -426,26 +553,6 @@ class CharacterManager {
 		$captor = $character->getPrisonerOf();
 		$character->setLocation($captor->getLocation());
 		$character->setInsideSettlement($captor->getInsideSettlement());
-	}
-
-	public function findHeir(Character $character, Character $from=null) {
-		if (!$from) { $from = $character; }
-
-		if ($this->seen->contains($character)) {
-			// loops back to someone we've already checked
-			return array(false, false);
-		} else {
-			$this->seen->add($character);
-		}
-
-		if ($heir = $character->getSuccessor()) {
-			if ($heir->isAlive()) {
-				return array($heir, $from);
-			} else {
-				return $this->findHeir($heir, $from);
-			}
-		}
-		return array(false, false);
 	}
 
 	public function bequeathEstate(Settlement $estate, Character $heir, Character $from, Character $via=null) {
@@ -492,9 +599,32 @@ class CharacterManager {
 		// TODO - quite a bit here, the new lord could be a different realm and all
 	}
 
-	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null) {
+	public function findHeir(Character $character, Character $from=null) {
+		// NOTE: This should match the implemenation on GameRunner.php
+		if (!$from) { 
+			$from = $character; 
+		}
+
+		if ($this->seen->contains($character)) {
+			// loops back to someone we've already checked
+			return array(false, false);
+		} else {
+			$this->seen->add($character);
+		}
+
+		if ($heir = $character->getSuccessor()) {
+			if ($heir->isAlive() && !$heir->getSlumbering()) {
+				return array($heir, $from);
+			} else {
+				return $this->findHeir($heir, $from);
+			}
+		}
+		return array(false, false);
+	}
+
+	public function inheritRealm(Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
 		$this->realmmanager->makeRuler($realm, $heir);
-		// Note that this CAN leave a character in charge of a realm he was not a member of
+		// NOTE: This can leave someone ruling a realm they weren't originally part of!
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
@@ -510,22 +640,87 @@ class CharacterManager {
 				History::HIGH, true
 			);
 		}
-		$this->history->logEvent(
-			$realm, 'event.realm.inherited',
-			array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheriteddeath',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+				);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inheritedslumber',
+				array('%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+				History::HIGH, true
+			);
+		}
+	}
+
+	public function failInheritRealm(Character $character, Realm $realm, $why = 'death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifaildeath',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$realm, 'event.realm.inherifailslumber',
+				array('%link-character%'=>$character->getId()),
+				HISTORY::HIGH, true
+			);
+		}
+	}
+
+	public function inheritPosition(RealmPosition $position, Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
+		$this->realmmanager->makePositionHolder($position, $heir);
+		// NOTE: This can add characters to realms they weren't already in!
+		if ($from == $via || $via == null) {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inherit.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character%'=>$from->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inheritvia.position',
+				array('%link-realm%'=>$realm->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				History::HIGH, true
+			);
+		}
+		if ($why == 'death') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.death',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
 			History::HIGH, true
-		);
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+			$realm, 'event.position.inherited.slumber',
+			array('%link-position%'=>$position->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$heir->getId()),
+			History::HIGH, true
+			);
+		}
 	}
-
-	private function failInheritRealm(Character $character, Realm $realm) {
-		$this->history->logEvent(
-			$realm, 'event.realm.inherifail',
-			array('%link-character%'=>$character->getId()),
-			HISTORY::HIGH, true
-		);
-
+	
+	public function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
+		if ($why == 'death') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.death',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		} else if ($why == 'slumber') {
+			$this->history->logEvent(
+				$position->getRealm(), 
+				'event.position.inactive',
+				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
+				History::LOW, true
+			);
+		}
 	}
-
 
 	public function findEvents(Character $character) {
 		$query = $this->em->createQuery('SELECT e, l, m FROM BM2SiteBundle:Event e JOIN e.log l JOIN l.metadatas m WHERE m.reader = :me AND e.ts > m.last_access AND (m.access_until IS NULL OR e.cycle <= m.access_until) AND (m.access_from IS NULL OR e.cycle >= m.access_from) ORDER BY e.ts DESC');
@@ -656,6 +851,17 @@ class CharacterManager {
 
 		return $rep;
 	}
+
+	public function newBackground(Character $character) {
+		if (!$character->getBackground()) {
+			$background = new CharacterBackground;
+			$character->setBackground($background);
+			$background->setCharacter($character);
+			$this->em->persist($background);
+			$this->em->flush();
+		}
+	}
+
 	public function transferHouseToHeir (Character $character, Character $heir) {
 		$house = $character->getHouse;
 		$house->setHead($heir);

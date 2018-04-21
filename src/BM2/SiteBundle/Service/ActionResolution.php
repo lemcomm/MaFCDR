@@ -24,7 +24,6 @@ class ActionResolution {
 	private $generator;
 	private $geography;
 	private $interactions;
-	private $communication;
 	private $politics;
 	private $military;
 	private $characters;
@@ -36,7 +35,7 @@ class ActionResolution {
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Communication $communication, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
@@ -44,7 +43,6 @@ class ActionResolution {
 		$this->generator = $generator;
 		$this->geography = $geography;
 		$this->interactions = $interactions;
-		$this->communication = $communication;
 		$this->politics = $politics;
 		$this->military = $military;
 		$this->permissions = $permissions;
@@ -123,48 +121,6 @@ class ActionResolution {
 			return $this->$up($action);
 		}
 		return false;
-	}
-
-	public function joinBattle(Character $character, BattleGroup $group, $timer_recalc=true, $forced=false) {
-		$battle = $group->getBattle();
-		$soldiers = count($character->getActiveSoldiers());
-
-		// make sure we are only on one side, and send messages to others involved in this battle
-		foreach ($battle->getGroups() as $mygroup) {
-			$mygroup->removeCharacter($character);
-
-			foreach ($mygroup->getCharacters() as $char) {
-				$this->history->logEvent(
-					$char,
-					'event.military.battlejoin',
-					array('%soldiers%'=>$soldiers, '%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 12
-				);
-			}
-		}
-		$group->addCharacter($character);
-
-		$action = new Action;
-		$action->setBlockTravel(true);
-		$action->setCharacter($character)->setTargetBattlegroup($group)->setTargetSettlement($battle->getSettlement())->setCanCancel(false)->setHidden(false);
-		if ($battle->getSettlement() && $group->isAttacker()) {
-			$action->setType('settlement.attack');
-		} else {
-			$action->setType('military.battle');
-		}
-		if ($forced) {
-			$action->setStringValue('forced');
-		}
-		$result = $this->queue($action);
-
-		$character->setTravelLocked(true);
-
-		if ($timer_recalc) {
-			$this->military->recalculateBattleTimer($battle);
-		}
-
-		// join battle message group
-		$this->communication->joinGroup($character, $battle->getMessageGroup(), false);
 	}
 
 
@@ -718,6 +674,7 @@ class ActionResolution {
 		$attackers = new BattleGroup;
 		$attackers->setBattle($battle);
 		$attackers->setAttacker(true);
+		$attackers->addCharacter($character);
 		$battle->addGroup($attackers);
 
 		// setup defenders
@@ -725,6 +682,9 @@ class ActionResolution {
 		$defenders->setBattle($battle);
 		$defenders->setAttacker(false);
 		$battle->addGroup($defenders);
+		foreach ($targets as $target) {
+			$defenders->addCharacter($target);
+		}
 
 		// now we have all involved set up we can calculate the preparation timer
 		$time = $this->military->calculatePreparationTime($battle);
@@ -732,24 +692,37 @@ class ActionResolution {
 		$complete->add(new \DateInterval('PT'.$time.'S'));
 		$battle->setInitialComplete($complete)->setComplete($complete);
 
-		// setup battle communications
-		$group = $this->communication->CreateMessageGroup($battle->getName(), false, null, null, $battle);
-		if ($settlement && $settlement->getOwner()) {
-			$this->communication->joinGroup($settlement->getOwner(), $group, false);
-		}
-
-		// add characters - this also sets up actions and locks travel
-		$this->joinBattle($character, $attackers, false);
-		foreach ($targets as $target) {
-			$this->joinBattle($target, $defenders, false, true);
-		}
-
 		$this->em->persist($battle);
 		$this->em->persist($attackers);
 		$this->em->persist($defenders);
 
+		// setup actions and lock travel
+		$act = new Action;
+		if ($settlement) {
+			$act->setType('settlement.attack');
+		} else {
+			$act->setType('military.battle');
+		}
+		$act->setCharacter($character)
+			->setTargetSettlement($settlement)
+			->setTargetBattlegroup($attackers)
+			->setCanCancel(false)
+			->setBlockTravel(true);
+		$this->queue($act);
+
+		$character->setTravelLocked(true);
+
 		// notifications and counter-actions
 		foreach ($targets as $target) {
+			$act = new Action;
+			$act->setType('military.battle')
+				->setCharacter($target)
+				->setTargetBattlegroup($defenders)
+				->setStringValue('forced')
+				->setCanCancel(false)
+				->setBlockTravel(true);
+			$this->queue($act);
+
 			if ($target->hasAction('military.evade')) {
 				// we have an evade action set, so automatically queue a disengage
 				$this->createDisengage($target, $defenders, $act);
@@ -775,7 +748,16 @@ class ActionResolution {
 			// add everyone who has a "defend settlement" action set
 			foreach ($settlement->getRelatedActions() as $defender) {
 				if ($defender->getType()=='settlement.defend') {
-					$this->joinBattle($defender->getCharacter(), $defenders, false, true);
+					$defenders->addCharacter($defender->getCharacter());
+
+					$act = new Action;
+					$act->setType('military.battle')
+						->setCharacter($defender->getCharacter())
+						->setTargetBattlegroup($defenders)
+						->setStringValue('forced')
+						->setCanCancel(false)
+						->setBlockTravel(true);
+					$this->queue($act);
 
 					// notify
 					$this->history->logEvent(
@@ -786,6 +768,7 @@ class ActionResolution {
 						),
 						History::HIGH, false, 25
 					);
+					$defender->getCharacter()->setTravelLocked(true);
 				}
 			}
 		}

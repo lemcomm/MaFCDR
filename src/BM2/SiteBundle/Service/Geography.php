@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GeoData;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\MapPOI;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
@@ -40,8 +41,9 @@ class Geography {
 		'y_max' => 512000,
 	);
 
-	public function __construct(EntityManager $em, AppState $appstate) {
+	public function __construct(EntityManager $em, PermissionManager $pm, AppState $appstate) {
 		$this->em = $em;
+		$this->pm = $pm;
 		$this->appstate = $appstate;
 	}
 
@@ -217,7 +219,7 @@ class Geography {
 		$query->setMaxResults(1);
 		$result = $query->getSingleResult();
 
-        $coast = json_decode($result['coast']);
+		$coast = json_decode($result['coast']);
 		if ($result['distance'] == 0) {
 			// damn... not sure if this works...
 			$x_off = 0; $y_off = 0;
@@ -281,6 +283,13 @@ class Geography {
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
 	}
+	
+	public function findNearestPlace(Character $character) {
+		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
+		$query->setParameter('char', $character);
+		$query->setMaxResults(1);
+		return $query->getOneOrNullResult();
+	}
 
 	public function findNearestSettlementToPoint(Point $point) {
 		$query = $this->em->createQuery('SELECT s, ST_Distance(g.center, ST_Point(:x, :y)) AS distance FROM BM2SiteBundle:Settlement s JOIN s.geo_data g ORDER BY distance ASC');
@@ -292,6 +301,14 @@ class Geography {
 	public function calculateActionDistance(Settlement $settlement) {
 		// FIXME: ugly hardcoded crap
 		return 15*(10+sqrt($settlement->getFullPopulation()/5));
+	}
+
+	public function calculatePlaceActionDistance(Place $place) {
+		if ($place->getSettlement()) {
+			return $this->calculateActionDistance($place->getSettlement());
+		} else {
+			return 400;
+		}
 	}
 
 	public function findSettlementRoads(Settlement $settlement) {
@@ -325,6 +342,16 @@ class Geography {
 		return $query->getSingleScalarResult();
 	}
 
+	public function calculateDistanceToPlace(Character $a, Place $b) {
+		if ($b->getLocation()) {
+			$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Place b WHERE a=:a and b=:b');
+			$query->setParameters(array('a'=>$a, 'b'=>$b));
+			return $query->getSingleScalarResult();
+		} else {
+			return $this->calculateDistanceToSettlement($a, $b->getSettlement());
+		}
+	}
+	
 	public function calculateDistanceToCharacter(Character $a, Character $b) {
 		$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Character b WHERE a=:a and b=:b');
 		$query->setParameters(array('a'=>$a, 'b'=>$b));
@@ -396,7 +423,26 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
+	
+	public function findPlacesNearMe(Character $character, $maxdistance) {
+		$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
+		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
+		$places = [];
+		foreach ($query->getResult() as $result) {
+			if($this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible() OR $result->getOwner == $character) {
+				$places[] = $result;
+			}
+		}
+		return $places;
+	}
 
+	public function findPlacesInSpotRange(Character $character) {
+		return $this->findPlacesNearMe($character, $this->calculateSpottingDistance($character));
+	}
+	
+	public function findPlacesInActionRange($character) {
+		return $this->findPlacesNearMe($character, $this->calculateInteractionDistance($character));
+	}
 
 	public function findBattlesNearMe(Character $character, $maxdistance) {
 		$query = $this->em->createQuery('SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance');
@@ -407,6 +453,7 @@ class Geography {
 	public function findBattlesInSpotRange(Character $character) {
 		return $this->findBattlesNearMe($character, $this->calculateSpottingDistance($character));
 	}
+	
 	public function findBattlesInActionRange($character) {
 		return $this->findBattlesNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -422,9 +469,11 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
+	
 	public function findDungeonsInSpotRange(Character $character) {
 		return $this->findDungeonsNearMe($character, $this->calculateSpottingDistance($character));
 	}
+	
 	public function findDungeonsInActionRange($character) {
 		return $this->findDungeonsNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -700,12 +749,21 @@ class Geography {
 			$base_speed = $this->base_speed;
 		} else {
 			// on land, the base speed is modified by the size of our army
-			$men = $character->getSoldiers()->count() + ($character->getEntourage()->count()/2);
+			$prisonercount = 0;
+			if ($character->getPrisoners()) {
+				foreach ($character->getPrisoners() as $prisoner) {
+					$prisonercount += $prisoner->getSoldiers()->count() + ($prisoner->getEntourage()->count()/2);
+				}
+			}
+			$men = $character->getSoldiers()->count() + $prisonercount + ($character->getEntourage()->count()/2);
 			$base_speed = $this->base_speed / exp(sqrt($men/200));
+			if ($prisonercount > 0) {
+				$base_speed *= 0.9;
+			}
 		}
 		if ($character->isNPC()) {
 			// make bandits slower so they can't run away so much
-			$base_speed *= 0.9;
+			$base_speed *= 0.75;
 		}
 
 		// modify further if we are near/on a road:

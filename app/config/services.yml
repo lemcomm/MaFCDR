@@ -1,7 +1,7 @@
 services:
     appstate:
         class:      BM2\SiteBundle\Service\AppState
-        arguments:  [@doctrine.orm.entity_manager, @security.context, @session]
+        arguments:  [@doctrine.orm.entity_manager, @security.token_storage, @security.authorization_checker, @session]
     pagereader:
         class:      BM2\SiteBundle\Service\PageReader
     twig.extension.geography:
@@ -27,10 +27,7 @@ services:
 
     geography:
         class:      BM2\SiteBundle\Service\Geography
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
-    communication:
-        class:      BM2\SiteBundle\Service\Communication
-        arguments:  [@doctrine.orm.entity_manager, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @permission_manager, @appstate]
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  [@doctrine.orm.entity_manager, @appstate, @event_dispatcher]
@@ -48,7 +45,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @geography, @history, @permission_manager, @logger]
     military:
         class:      BM2\SiteBundle\Service\Military
-        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @communication, @appstate]
+        arguments:  [@doctrine.orm.entity_manager, @logger, @history, @permission_manager, @appstate]
     generator:
         class:      BM2\SiteBundle\Service\Generator
         arguments:  [@doctrine.orm.entity_manager, @military]
@@ -80,9 +77,12 @@ services:
     news_manager:
         class:      BM2\SiteBundle\Service\NewsManager
         arguments:  [@doctrine.orm.entity_manager, @appstate, @geography]
+    description_manager:
+        class:      BM2\SiteBundle\Service\DescriptionManager
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @history]
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
-        arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @communication, @politics, @military, @permission_manager, @twig.extension.gametime]
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @politics, @military, @permission_manager, @twig.extension.gametime]
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
         arguments:  [@doctrine.orm.entity_manager, @logger, @history, @military, @geography, @character_manager, @npc_manager, @action_resolution, @interactions]
@@ -90,7 +90,7 @@ services:
             - { name: monolog.logger, channel: turn }
     game_runner:
         class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  [@doctrine.orm.entity_manager, @appstate, @logger, @action_resolution, @economy, @politics, @history, @military, @battle_runner, @interactions, @geography, @generator, @realm_manager, @message_manager, @permission_manager, @npc_manager, @communication]
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @logger, @action_resolution, @economy, @politics, @history, @military, @battle_runner, @interactions, @geography, @generator, @realm_manager, @message_manager, @permission_manager, @npc_manager, @character_manager]
         tags:
             - { name: monolog.logger, channel: turn }
 
@@ -138,4 +138,3 @@ services:
         class: Symfony\Bridge\Monolog\Formatter\ConsoleFormatter
         arguments:
             - "%%start_tag%%%%message%%%%end_tag%%\n"
-

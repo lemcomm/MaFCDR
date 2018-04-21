@@ -21,7 +21,10 @@ class DailyNewsCommand extends ContainerAwareCommand {
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$mailer = $this->getContainer()->get('mailer');
-		$spool = $mailer->getTransport()->getSpool();
+		$spool = NULL;
+		if ($mailer->getTransport()->getSpool()) {
+			$spool = $mailer->getTransport()->getSpool();
+		}
 		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 		$translator = $this->getContainer()->get('translator');
 		$em = $this->getContainer()->get('doctrine')->getManager();
@@ -31,6 +34,10 @@ class DailyNewsCommand extends ContainerAwareCommand {
 		$iterableResult = $query->iterate();
 		$i=1; $batchsize=500;
 		while ($row = $iterableResult->next()) {
+			/* because we REALLY don't want these sending a billion emails at once (because we don't use a spooler anymore)
+			we tell it immediately to sleep this execution a random full second value between 1 and 3 seconds.
+			We don't usually send many of these anyways, so this should never end up taking very long. */
+			sleep(rand(1,3));
 			$user = $row[0];
 			$days = $user->getCreated()->diff(new \DateTime("now"), true)->days;
 			$fakestart = new \DateTime("2015-10-30");
@@ -82,8 +89,8 @@ class DailyNewsCommand extends ContainerAwareCommand {
 
 				$message = \Swift_Message::newInstance()
 					->setSubject($subject)
-					->setFrom('server@mightandfealty.com')
-					->setReplyTo('tom@mightandfealty.com')
+					->setFrom('mafserver@lemuriacommunity.org')
+					->setReplyTo('mafteam@lemuriacommunity.org')
 					->setTo($user->getEmail())
 					->setBody(strip_tags($content))
 					->addPart($content, 'text/html');
@@ -91,12 +98,16 @@ class DailyNewsCommand extends ContainerAwareCommand {
 			}
 
 			if (($i++ % $batchsize) == 0) {
-				$spool->flushQueue($transport);
+				if ($spool) {
+					$spool->flushQueue($transport);
+				}
 				$em->flush();
 				$em->clear();
 			}
 		}
-		$spool->flushQueue($transport);
+		if ($spool) {
+			$spool->flushQueue($transport);
+		}
 		$em->flush();
 		$em->clear();
 	}

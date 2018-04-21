@@ -63,11 +63,12 @@ class RealmManageType extends AbstractType {
 			'label'=> 'realm.designation',
 		));
 
-		$builder->add('description', 'textarea', array(
+		/*
+		$builder->add('old_description', 'textarea', array(
 			'label'=>'realm.description',
 			'required'=>false
 		));
-
+		*/
 
 		$builder->add('submit', 'submit', array('label'=>'realm.manage.submit'));
 

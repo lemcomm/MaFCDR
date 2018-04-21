@@ -1,6 +1,7 @@
 # Might & Fealty
-# generic text strings
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Generic text strings for display, mostly on informational pages.
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 dateformat:   Y-m-d
 gametime:
  current:     It is year %year%, week %week%, day %day% in the world of Might & Fealty
@@ -17,39 +18,39 @@ menu:
  your:      Your...
  economy:   Economy
  recruitment: Recruitment
- playing:   playing %name%
- profile:   profile
- characters:  characters
- homepage:  homepage
- terms:     terms
- credits:   credits
- contact:   contact
- forum:     forum
- wiki:      wiki
- bugs:      bugtracker
- about:     about
- manual:    manual
+ playing:   Playing %name%
+ profile:   Profile
+ characters:  Characters
+ homepage:  Homepage
+ terms:     Terms
+ credits:   Credits
+ contact:   Contact
+ forum:     Forum
+ wiki:      Wiki
+ bugs:      Bugtracker
+ about:     About
+ manual:    Manual
  vips:      VIPs
- fiction:   fiction
- community: community
- translator:  translations
- register:  register
- map:       map
- travel:    map & travel
- status:    status
- recent:    summary
+ fiction:   Fiction
+ community: Community
+ translator:  Translations
+ register:  Register
+ map:       Map
+ travel:    Map & travel
+ status:    Status
+ recent:    Summary
  rss:       RSS feed
- events:    events
- messages:  messages
- news:      publications
- relations: relations
- politics:  politics
- quests:    quests
- actions:   actions
- allactions: all actions
+ events:    Events
+ messages:  Messages
+ news:      Publications
+ relations: Relations
+ politics:  Politics
+ quests:    Quests
+ actions:   Actions
+ allactions: All actions
  character:
-  background: character background
-  start:    character placement
+  background: Character background
+  start:    Character placement
  dungeon:   dungeon
  house:     house
 
@@ -97,62 +98,62 @@ login:
  intro: Provide the username or e-mail you used to register below to log in:
 
 pager:
- showing:       showing %from% to %to%, %total% total
- prev:          previous
- next:          next
+ showing:       Showing %from% to %to%, %total% total
+ prev:          Previous
+ next:          Next
 
-togglelist:     toggle list style
+togglelist:     Toggle list style
 
 map:
  title:
-  map:         map
-  both:        map and travel
- layers:       layers
- map:          abstract map
- graphical:    graphical map
- search:       search for settlement
- searching:    searching...
- settlements:  settlements
- realms:       sovereign realms
- cultures:     cultures
- towers:       towers
- features:     structures
- markers:      markers
+  map:         Map
+  both:        Map and travel
+ layers:       Layers
+ map:          Abstract map
+ graphical:    Graphical map
+ search:       Search for settlement
+ searching:    Searching...
+ settlements:  Settlements
+ realms:       Sovereign realms
+ cultures:     Cultures
+ towers:       Towers
+ features:     Structures
+ markers:      Markers
  placer:       placer
- roads:        roads
- chars:        characters
- route:        route plot
- invalid:      invalid route
- usedroads:    road travel
- offers:       knight offers
+ roads:        Roads
+ chars:        Characters
+ route:        Route plot
+ invalid:      Invalid route
+ usedroads:    Road travel
+ offers:       Knight offers
  poi:          POI
- you:          your location
- area:         local area
+ you:          Your location
+ area:         Local area
  howto: >
     You can see and set your travel right on the map. Choose "travel" on the right and then simply click to set waypoints.<br />
     Your route can be as direct or elaborate as you want. Keep in mind that you need to be near a
     settlement to interact with it, rivers can only be crossed at bridges and cliffs cannot be crossed at all.
- legend:    legend
- yourchars: your other characters
- others:    foreign characters
- past:      outdated spottings
- ownedplace: owned settlements
- indyplace: independent settlements
- spot:      your spotting distance
- act:       your interaction distance
+ legend:    Legend
+ yourchars: Your other characters
+ others:    Foreign characters
+ past:      Outdated spottings
+ ownedplace: Owned settlements
+ indyplace: Independent settlements
+ spot:      Your spotting distance
+ act:       Your interaction distance
  clickselect: Click a settlement or character flag to get details.
  travel:    Travel
  locked:    You are currently prevented from travelling (due to battle or other actions). You can set a travel route, but you will not start travelling until this condition has resolved.
  traveldetails: Travel Details
  draw:      Click on the map to set waypoints.
- submit:    set route
- rmlast:    remove last
- enter:     enter destination
- clear:     clear
+ submit:    Set route
+ rmlast:    Remove last
+ enter:     Enter destination
+ clear:     Clear
  newroute:  Your new route has been set. It will take you about %duration% days to complete.
  disembark: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% days considers the route until that point. Red lines show the invalid travel section.</small>
  crossings:
-  title:    river crossings
+  title:    River crossings
   river:    The %river% at the bridge "%bridge%" near %nearby%.
  cleared:   Route cleared.
  error:
@@ -181,34 +182,36 @@ account:
    or reduced the number of living characters, actions and travel on all your characters will be severely limited. You can write
    messages and check your characters in order to decide which to retire and do so in a proper way, but you will not be able to
    really play them.
- list:          click to move this character to a different list
- created:       created: %date%
- lastlogin:     last login: %date%
+ list:          Click to move this character to a different list
+ created:       Created: %date%
+ lastlogin:     Last login: %date%
  identities:    Authentication
- authmail:      username/email and password
+ authmail:      Username/email and password
  locked:        Your characters are currently locked because you have run out of game-time. Please renew your subscription on the profile page.
  level:
-  0: locked
-  10: casual
-  20: basic
-  40: intense
-  50: ultimate
-  name: account level
-  limit: character limit
-  cpm: credits/month
-  firstmonth: first month
+  0: Locked
+  10: Casual
+  20: Basic
+  21: Volunteer
+  40: Intense
+  41: Developer
+  50: Ultimate
+  name: Account level
+  limit: Character limit
+  cpm: Credits/month
+  firstmonth: First month
  data:
   link:   Edit Data
   title:  Personal Data
   saved:  Your personal data has been updated.
  settings:
-  link:   edit settings
+  link:   Edit settings
   title:  Settings
   language:    Your language
   notifications: E-Mail notifications
   newsletter: Occasional newsletter
-  submit: update
-  saved:  your settings have been updated.
+  submit: Update
+  saved:  Your settings have been updated.
  autologin:
   title:    Auto-Login
   intro: >
@@ -253,10 +256,10 @@ account:
      adding additional credits and choosing a subscription level.<br />
      To do so, simply log in and go to your profile page.</p>
  code:
-  title:    redeem code
+  title:    Redeem Code
   intro:    If you have a code from a friend or the crowdfunding campaign, you can redeem it here.
-  label:    code:
-  submit:   redeem
+  label:    Code:
+  submit:   Redeem
   redeemed:   A code for %credits% game credits was found for your e-mail and automatically redeemed.
   redeemed2:  A code was found for your e-mail and automatically redeemed into %credits% game credits and a VIP status of "%vip%".
   redeemed3:  The code you have entered is valid and has been redeemed for %credits% game credits.
@@ -295,12 +298,15 @@ account:
   description3: >
     The price for 100 credits is 1 &euro; or the <a href="http://www.xe.com/currency/eur-euro">equivalent in your local currency</a> (our payment providers will automatically convert currencies for you).
   link:      Change subscription level
-  submit:    change subscription
+  submit:    Change subscription
   remaining: Your new subscription will start today, the first month subscription fee will automatically be reduced by %refund% credits remaining from your current subscription.
   changed:   Your subscription level has been changed.
- play: Play
- viewlog: View History
- familytree: Family Tree
+ play:        Play
+ place:       Place
+ unretire:    Unretire
+ edithistory: Edit Background
+ viewlog:     View History
+ familytree:  Family Tree
  famtreedesc: Inspect the family tree of your characters
  overview:
   link:     Overview
@@ -317,21 +323,21 @@ account:
   link:     Culture
   title:    Culture
   intro: >
-    The core culture that Might & Fealty represents is central european. You can buy access to other cultures and decide for each of
+    The core culture that Might & Fealty represents is Central European. You can buy access to other cultures and decide for each of
     the settlements controlled by your characters which culture they belong to. Depending on the particular set, this always includes the
     names of soldiers and entourage recruited there and can also include visuals such as buildings, troops and entourage.<br />
     Once unlocked, a culture is yours forever and can be used by all of your characters as often as you like. You will also automatically get
     any updates to a culture pack (such as added graphics).
   owned:    Culture Packs you own
   buyable:  Culture Packs you can buy
-  buy:      buy
-  name:     culture
-  cost:     cost
-  contains: contains
+  buy:      Buy
+  name:     Culture
+  cost:     Cost
+  contains: Contains
   contents:
-   names:   names
-  submit:   buy selected culture pack(s)
-  change:   change culture
+   names:   Names
+  submit:   Buy selected culture pack(s)
+  change:   Change culture
   upgrades: >
     Culture packs are occasionally updated and extended, so a pack that does not contain graphics, for example, may
     get them added in the future. If you by a culture pack, you will always get all updates for free.
@@ -348,14 +354,14 @@ account:
     or any of the other payment options, or for whatever other reason you have.<br />
     You need to know your friends e-mail address for this. We will generate a code and send it to both you and your friend. If your friend
     doesn't want the gift, you can simply use the code yourself to take it back.
-  email:    send to e-mail
-  credits:  amount of credits
-  text:     text to include in e-mail
-  invite:   invite your friend
-  gift:     make this gift
+  email:    Send to e-mail
+  credits:  Amount of credits
+  text:     Text to include in e-mail
+  invite:   Invite your friend
+  gift:     Make this gift
   success: >
     Your gift of %credits% credits has been sent to your friends account, and an e-mail with the text you
-    entered should be in his mailbox in some moments. We will also send a copy to your e-mail address.
+    entered should be in their mailbox in some moments. We will also send a copy to your e-mail address.
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
    notarget:  No user with this e-mail address found.
@@ -387,7 +393,7 @@ account:
    subject:   Might & Fealty Friend Invite
    body: >
      <p>Your friend (cc'ed in this e-mail) has invited you to play Might & Fealty. And to sweeten the deal, or maybe as a 
-     bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. He also sent this message:</p>
+     bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. They also sent this message:</p>
      <hr /><p>%message%</p><hr />
      <p>Join your friend in creating history, check out the game here:</p>
      <p><a href="http://mightandfealty.com/">Might & Fealty</a></p>
@@ -400,13 +406,13 @@ account:
   mail2:
    subject:   Might & Fealty Friend Subscription
    body: >
-     <p>Your friend with the e-mail address %mail% has made his first subscription. Since your invite helped win this new player to the game,
+     <p>Your friend with the e-mail address %mail% has made their first subscription. Since your invite helped win this new player to the game,
      we have credited your account with %credits% credits, as promised.<p>
      <p>Thank you so much for helping the game become bigger and better.</p>
 
 newcharacter:
  title: Create Character
- description: create a new character or ancestor
+ description: Create a new character or ancestor
  intro: >
    Enter the vital details of your new character below. Of these, only the name can later be changed, so pick carefully.<br />
    Please note that the character name should be a full name, including a surname. Characters of the same family
@@ -417,9 +423,9 @@ newcharacter:
    frown upon silly names and diplomacy would be much harder. So please, proper names only.<br />
    Choosing a father and mother is optional, if you leave it empty then one or both of the parents will simply be
    people that don't exist as characters in the game. If you want to create a family tree, make sure to start
-   with the older generations.<br />
+   with the oldest generations.<br />
    All characters are <a href="%firstoneurl%">First Ones</a> and begin the game as fully trained and equipped knights.
- limit:     You can create %limit% more living character today.|You can create %limit% more living characters today.
+ limit:     You can create %limit% more living characters today.|You can create %limit% more living characters today.
  limited:   You cannot create new living characters anymore today. You will get more available character slots every real-life day.
  spawnlimit:  You currently have several unspawned characters. Please start playing them first, before you create more characters.
  accountlimit:  You are currently playing %active% of %limit% possible characters.
@@ -427,51 +433,51 @@ newcharacter:
  help:
   name:      The full name of your character, including given and family name, but not including any titles. required
   gender:    required
-  father:    Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the later case, the mother will have to be the (or one of the) fathers partner(s).
-  mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the later case, the father will have to be the (or one of the) mothers partner(s).
+  father:    Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the latter case, the mother will have to be the (or one of the) father's partner(s).
+  mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the latter case, the father will have to be the (or one of the) mother's partner(s).
   partner:   If you want to start a character as married to another of your own characters. Marriages with characters of other players have to be secured in-game.
   dead:      You can create characters who have died already in order to complete your family tree. You will, obviously, not be able to play a dead character.
- submit: create
+ submit: Create
 
 
 summary:
  title:     Recent Events & Messages
  events:    Recent Events
- nothing:   no recent events
- fullread:  mark all as read
- fullread2: mark all as read for all my characters
+ nothing:   No recent events
+ fullread:  Mark all as read
+ fullread2: Mark all as read for all my characters
  soldiers:
-  title:    soldiers status warnings
+  title:    Soldiers' status warnings
   starving:
-   1:       some of your soldiers are starving.
-   2:       many of your soldiers are starving.
-   3:       most of your soldiers are starving.
+   1:       Some of your soldiers are starving.
+   2:       Many of your soldiers are starving.
+   3:       Most of your soldiers are starving.
   hungry:
-   1:       some of your soldiers are hungry.
-   2:       many of your soldiers are hungry.
-   3:       most of your soldiers are hungry.
+   1:       Some of your soldiers are hungry.
+   2:       Many of your soldiers are hungry.
+   3:       Most of your soldiers are hungry.
   dead:
-   1:       your troops carry around many dead bodies, slowing down travel.
-   2:       your army has become a funeral march, and the vast number of dead slows you down a lot.
+   1:       Your troops carry around many dead bodies, slowing down travel.
+   2:       Your army has become a funeral march, and the vast number of dead slows you down a lot.
   wounded:
-   1:       some of your soldiers are wounded.
-   2:       many of your soldiers are wounded.
-   3:       most of your soldiers are wounded.
+   1:       Some of your soldiers are wounded.
+   2:       Many of your soldiers are wounded.
+   3:       Most of your soldiers are wounded.
   lost:
-   1:       some of your soldiers have lost equipment.
-   2:       many of your soldiers have lost equipment.
-   3:       most of your soldiers have lost equipment.
+   1:       Some of your soldiers have lost equipment.
+   2:       Many of your soldiers have lost equipment.
+   3:       Most of your soldiers have lost equipment.
   distance:
-   0:       the soldiers are motivated to defend their homes.
-   1:       there is a little bit of unrest among the soldiers about being away from home.
-   2:       there is unrest among the soldiers about being far away from home.
-   3:       the soldiers are very unhappy about being so very far away from home.
- manageprisoners: manage (free, execute, exchange) prisoners
+   0:       The soldiers are motivated to defend their homes.
+   1:       There is a little bit of unrest among the soldiers about being away from home.
+   2:       There is unrest among the soldiers about being far away from home.
+   3:       The soldiers are very unhappy about being so very far away from home.
+ manageprisoners: Manage (free, execute, exchange) prisoners
 
 first:
  title:     Welcome to Might & Fealty
  liege: >
-   You have accepted the knight offer of %liege% and are now his vassal. This settlement belongs to %liege%, so you are in
+   You have accepted the knight offer of %liege% and are now their vassal. This settlement belongs to %liege%, so you are in
    friendly territory at this time.<br />
    If your knight offer included soldiers, they are being assigned to you already. If your knight offer included lordship 
    of the settlement itself, the local steward is already drawing up the documents. Both of these will take a short time
@@ -479,7 +485,7 @@ first:
    Talk to your liege first to find out what the current political situation is and where you are needed. A welcome message
    should be below. Also make yourself familiar with your troops and the surrounding area.
  free: >
-   You have decided to begin as an independent noble. This is a hard and challenging path. One of the first things you will
+   You have decided to begin as an independent First One. This is a hard and challenging path. One of the first things you will
    want to do is check out the surrounding area, find out who owns the settlement you spawned in, and talk to him or her.<br />
    You have no troops and no income at this time, so finding allies should be your first priority. Serve a lord as a knight
    until you can secure an estate for yourself, for example.
@@ -492,7 +498,7 @@ first:
 
 character:
  name:    Name
- knownas: known as "%name%"
+ knownas: Known as "%name%"
  gender:  Gender
  gold:    Gold: %gold% gold
  health:
@@ -504,26 +510,28 @@ character:
  family:  Family
  father:  Father
  mother:  Mother
- married: married to
- partner: partner|partners
+ married: Married to
+ partner: Partner|Partners
  none:    (no character)
- child:   child|children
+ child:   Child|Children
  resupply: Resupply from camp followers:
  status:  Status of %name%
- history: character history
- inactive:  this character has not been played in a while
+ history: Character history
+ inactive:  This character has not been played in a while
+ banned:    This user has been banned.
  newplayer: This character is being played by a player who is new to the game. Please act accordingly.
  notstarted:
   title:    Rumours
-  text:     Only rumours about this noble have been heard, as this character has not yet been started (placed in the world).
+  text:     Only rumours about this First One have been heard, as this character has not yet been started (placed in the world).
  prisoner:  this character is currently a captive of %captor%.
  prisoner2: You are currently a captive of %captor%.
  captorinactive: Your captor has not been seen in quite a while. You should <a href="%url%">try to escape</a>.
- full:    view full details
+ full:    View full details
  list:
-  select:   move character to:
-  submit:   set new list
+  select:   Move character to:
+  submit:   Set new list
   updated:  just updated, change will be visible on next page load
+  0:  New & Unplaced
   1:  Main Characters
   2:  Secondary Characters
   3:  Roleplaying Characters
@@ -540,12 +548,14 @@ character:
   46:  Explorers
   47:  Troublemakers
   71:  Assorted Characters
-  99: recently deceased
-  100: historic
-  150: ancestors
+  90:  Retired Characters
+  99:  Recently Deceased
+  100: Historic
+  150: Ancestors
  start:
   title:      Character Placement
   intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
+  returnee:   Select the restart location for %name%. As we're sure you're aware, this will affect your play experience.
   offer:      Accept fealty offer
   offerintro: >
     Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers
@@ -557,14 +567,15 @@ character:
   offersummary2: %name%, lordship
   family:     Place with Family
   existing: >
-    Your new character can begin the game in the estate of any of your existing characters, and get helped to start his career by relatives.
+    Your character can begin the game in the estate of any of your existing characters, and get help to start their career from relatives.
   estate:     Starting Estate
-  submit:     start here
+  submit:     Start here
   selection:  Place on Map
   mapintro: >
     You can also select any non-independent settlement from the map below, and negotiate with its lords to get soldiers or how else
     to begin your quest. This is an advanced option only recommended if none of the above are available or you are looking for something
     special to start.
+  returnsuccess:  You have successfully restarted your career in this world of roles, politics, and warfare.
  details:
   realm:      realm(s)
   ultimate:   sovereign realm(s)
@@ -578,14 +589,14 @@ bandits:
  submit:  choose this bandit character
 
 achievements:
- title:       achievements
+ title:       Achievements
  type:
-  battles:    battles fought
-  battlesize: battle glory
-  captures:   nobles captured
+  battles:    Battles fought
+  battlesize: Battle glory
+  captures:   First Ones captured
   kills:
-   soldiers:  mortal soldiers slain
-   nobles:    nobles slain in battle
+   soldiers:  Mortal soldiers slain
+   nobles:    First Ones slain in battle
 
 politics:
  hierarchy: hierarchy
@@ -605,144 +616,148 @@ form:
  email:       E-Mail
  password:    Password
  password_confirmation: Repeat password
- browser:     (browser setting)
- choose:      -- choose --
- none:        (none)
- submit:      submit
+ browser:     (Browser setting)
+ choose:      -- Choose --
+ none:        (None)
+ submit:      Submit
  help:
   displayname:  The name shown in public lists such as the VIP players list
 
 settlement:
- name:  settlement
+ name:  Settlement
  title: %type% of %name%
+ capital: Local Capital(s)
  details: Settlement Details
  dummy:   Click a settlement on the map to show its details here.
  area:  %name% area
- type:  type
- fortified: fortified
+ type:  Type
+ fortified: Fortified
  size:
   name: size
-  1:		hamlet
-  2:		small village
-  3:		medium village
-  4:		large village
-  5:		small town
-  6:		medium town
-  7:		large town
-  8:		small city
-  9:		medium city
-  10:		large city
-  11:		metropolis
- population:  population
- civilians:   civilians
- thralls:     thralls
+  1:		Hamlet
+  2:		Small Village
+  3:		Medium Village
+  4:		Large Village
+  5:		Small Town
+  6:		Medium Town
+  7:		Large Town
+  8:		Small City
+  9:		Medium City
+  10:		Large City
+  11:		Metropolis
+ population:  Population
+ civilians:   Civilians
+ thralls:     Thralls
  allowthralls:
-  yes:        slavery (thralls) is allowed
-  no:         slavery (thralls) is forbidden
+  yes:        Slavery (thralls) is allowed
+  no:         Slavery (thralls) is forbidden
  pop:
-  change:     current trend
-  stable:     stable
+  change:     Current trend
+  stable:     Stable
   grow:
-   1:         slightly growing
-   2:         growing
-   3:         growing quickly
+   1:         Slightly growing
+   2:         Growing
+   3:         Growing quickly
   shrink:
-   1:         slightly falling
-   2:         falling
-   3:         falling quickly
-   4:         falling dramatically
- geography:   geography
- culture:     culture
- biome:       biome
- neighbours:  neighbours
- political:   political
+   1:         Slightly falling
+   2:         Falling
+   3:         Falling quickly
+   4:         Falling dramatically
+ geography:   Geography
+ culture:     Culture
+ biome:       Biome
+ neighbours:  Neighbours
+ political:   Political
  independent: This is an independent settlement
- unowned:     independent
- owner:       owner
+ unowned:     Independent
+ owner:       Owner
  ownedby:     This settlement is ruled by %owner%.
  realm:       This settlement is part of %realm%.
- realm2:      realm
- ultimate:    sovereign realm
+ realm2:      Realm
+ sovereignty: Sovereignty
+ ultimate:    Sovereign Realm
+ localrealm:  Local Realm
  norealm:     This settlement does not belong to any realm.
- economy:     economy
- build:       currently building
+ economy:     Economy
+ build:       Currently building
  starvation:
-  1:  experiencing a minor shortage of food
-  2:  experiencing a severe shortage of food
-  3:  suffering a dramatic shortage of food
-  4:  suffering from starvation
-  5:  suffering from severe starvation
+  1:  Experiencing a minor shortage of food
+  2:  Experiencing a severe shortage of food
+  3:  Suffering a dramatic shortage of food
+  4:  Suffering from starvation
+  5:  Suffering from severe starvation
  shortage:
-  1:  minor shortage of %resource%
-  2:  shortage of %resource%
-  3:  dramatic shortage of %resource%
-  effect:   production and construction requiring this resource are slowed down.|production and construction requiring these resources are slowed down.
-  none:     all resource demands are satisfied.
+  1:  Minor shortage of %resource%
+  2:  Shortage of %resource%
+  3:  Dramatic shortage of %resource%
+  effect:   Production and construction requiring this resource are slowed down.|Production and construction requiring these resources are slowed down.
+  none:     All resource demands are satisfied.
  security:
   tt: How protected the settlement is against forces of nature and bandits. Can be improved with defensive buildings, militia, etc.
-  0:  struggling for economic security
-  1:  low economic security
-  2:  adequate economic security
-  3:  good economic security
-  4:  excellent economic security
+  0:  Struggling for economic security
+  1:  Low economic security
+  2:  Adequate economic security
+  3:  Good economic security
+  4:  Excellent economic security
  corruption:
-  name: corruption
+  name: Corruption
   tt:   Slowly rises with the number of estates you personally hold across all your characters. Give estates to vassals to reduce corruption. See manual for details.
- militia:   soldiers stationed in %name%
- militia2:  militia
- recruits:  soldiers in training in %name%
- recruits2: recruits
- resupply:  equipment available for resupply
- retrain:   equipment available for re-training
- train:     equipment available for training
+ militia:   Eoldiers stationed in %name%
+ militia2:  Militia
+ recruits:  Soldiers in training in %name%
+ recruits2: Recruits
+ resupply:  Equipment available for resupply
+ retrain:   Equipment available for re-training
+ train:     Equipment available for training
  militiacount:  %count% combat-ready local militia
  recruitscount: %count% recruits in training
  resources:
-  type:     type
-  yield:    source
-  base:     base
-  current:  production
-  demand:   demand
-  base:         base
-  corruption:   corruption
-  buildings:    buildings
-  construction: construction
-  total:        total
-  storage:      storage
+  type:     Type
+  yield:    Source
+  base:     Base
+  current:  Production
+  demand:   Demand
+  base:         Base
+  corruption:   Corruption
+  buildings:    Buildings
+  construction: Construction
+  total:        Total
+  storage:      Storage
   trade:
-   name:      trade
-   in:        incoming
-   out:       outgoing
-   balance:   trade balance
-  balance:    total balance
+   name:      Trade
+   in:        Incoming
+   out:       Outgoing
+   balance:   Trade balance
+  balance:    Total balance
   prospector: A prospector could supply a more detailed report.
  workforce:
   atroads:      %number% assigned to road construction
   atbuildings:  %number% assigned to building construction
   atfeatures:   %number% assigned to features construction
   employed:     %number% employed in various buildings
-  available:    %number% available for farming and local economy
+  available:    %number% available for farming and the local economy
+ description:   Settlement Description
 
 road:
  quality:
-  0: (planned)
-  1: dirt track
-  2: dirt road
-  3: country road
-  4: hard road
-  5: paved road
+  0: (Planned)
+  1: Dirt track
+  2: Dirt road
+  3: Country road
+  4: Hard road
+  5: Paved road
  workers:   workers
 
 direction:
  long:
-  north:      north
-  east:       east
-  south:      south
-  west:       west
-  northeast:  north-east
-  northwest:  north-west
-  southeast:  south-east
-  southwest:  south-west
+  north:      North
+  east:       East
+  south:      South
+  west:       West
+  northeast:  North-East
+  northwest:  North-West
+  southeast:  South-East
+  southwest:  South-West
  short:
   north:      N
   east:       E
@@ -755,50 +770,59 @@ direction:
 
 culture:
  european:
-  central:    central european
-  northern:   northern european
-  southern:   southern european
-  eastern:    eastern european
- african:     african
- oriental:    oriental
- indian:      indian
- asian:       asian
+  central:    Central European
+  northern:   Northern European
+  southern:   Southern European
+  eastern:    Eastern European
+ african:     African
+ oriental:    Oriental
+ indian:      Indian
+ asian:       Asian
 
-status:       status
-locked:       locked
-dead:         dead
-inactive:     inactive
-prisoner:     prisoner|prisoners
-wounded:      wounded
-hungry:       hungry
-veryhungry:   starving
-routed:       routed
-offered:      included in a knight offer
-assigned:     assigned from %from%, could still be reclaimed
-lastbattle:   last battle
-islocked:     currently being reassigned to you
+status:       Status
+locked:       Locked
+dead:         Dead
+inactive:     Inactive
+prisoner:     Prisoner|Prisoners
+wounded:      Wounded
+hungry:       Hungry
+veryhungry:   Starving
+routed:       Routed
+offered:      Included in a knight offer
+assigned:     Assigned from %from%, could still be reclaimed
+lastbattle:   Last battle
+islocked:     Currently being reassigned to you
 hour:         hour|hours
 minute:       minute|minutes
 untilturn:    %h% %hours%, %m% %minutes% until next day change
 untilturn2:   %m% %minutes% until next day change
 location:     location
 coordinates:  coordinates
-spotdistance: spotting distance
-actdistance:  interaction distance
-travelspeed:  travel speed
+spotdistance: Spotting distance
+actdistance:  Interaction distance
+travelspeed:  Travel speed
 travellocked: Your recent travel was blocked by local actions or battles.
 base:         (base: %distance%)
-nearest:      nearest settlement
-nothingnear:  no nearby settlement
-nearbyothers: Nearby Nobles
+nearest:      Nearest settlement
+nothingnear:  No nearby settlement
+nearbyothers: Nearby First Ones
 nearbattles:  Nearby Battles
-viewdetails:  view details
+viewdetails:  View details
 none:         none
 yes:          yes
 no:           no
 techtree:     Technology Tree
-inbattle:     battle
-travelling:   travel
+charstatus:
+ inbattle:     battle
+ travelling:   travel
+ annexing:     annex
+ supporting:   support
+ opposing:     oppose
+ looting:      loot
+ blocking:     block
+ granting:     grant
+ renaming:     rename
+ reclaiming:   reclaim
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 inside:       inside %place%
@@ -831,7 +855,7 @@ area:
  sqm:        %value% square mile|%value% square miles
  sql:        %value% square league|%value% square leagues
 metre_abr:   m
-popdensity:  people per square mile
+popdensity:  People per square mile
 day:         day|days
 today:       today
 
@@ -857,24 +881,24 @@ build:
 workforce:   workforce
 inheritance: inheritance
 nobody:      nobody
-underconstruction:  under construction
-finished:           finished
+underconstruction:  Under construction
+finished:           Finished
 
 biome:
- scrub:        scrubland
- thin scrub:   thin scrubland
- grass:        grassland
- thin grass:   thin grassland
- marsh:        marsh
- forest:       forest
- dense forest: dense forest
- snow:         snowy mountains
- rock:         mountain
- desert:       desert
- ocean:        ocean
- lake:         lake
- water:        lake
- river:        river
+ scrub:        Scrubland
+ thin scrub:   Thin scrubland
+ grass:        Grassland
+ thin grass:   Thin grassland
+ marsh:        Marsh
+ forest:       Forest
+ dense forest: Dense forest
+ snow:         Snowy mountains
+ rock:         Mountain
+ desert:       Desert
+ ocean:        Ocean
+ lake:         Lake
+ water:        Lake
+ river:        River
 
 error:
  title:        Error
@@ -884,36 +908,37 @@ error:
   page:        Page not found
   character:   Character not found
   action:      Action not found
+  playlogic:   Now really, I find this highly illogical. (Bad logic passed to page.)
   settlement:  Settlement not found
-  buildingtype: no such building type
-  featuretype:  no such feature type
-  entouragetype: no such entourage type
-  equipmenttype: no such equipment type
-  log:          event journal does not exist
-  battle:       battle not found
-  battlereport: battle report not found
-  recruit:      recruit not found
-  listing:      list not found
-  paper:        publication not found
-  position:     realm position not found
-  realmrelation:  realm relation not found
-  election:     election not found
-  newliege:     settlement owner not found, please choose a different knight offer.
-  offer:        please select a knight offer.
-  nohouse:      there are no houses here which to join.
-  toofar:      You are too far away from what you are interacting with
+  buildingtype: No such building type
+  featuretype:  No such feature type
+  entouragetype: No such entourage type
+  equipmenttype: No such equipment type
+  log:          Event journal does not exist
+  battle:       Battle not found
+  battlereport: Battle report not found
+  recruit:      Recruit not found
+  listing:      List not found
+  paper:        Publication not found
+  position:     Realm position not found
+  realmrelation:  Realm relation not found
+  election:     Election not found
+  newliege:     Settlement owner not found, please choose a different knight offer.
+  offer:        Please select a knight offer.
+  nohouse:      There are no houses here which to join.
+  toofar:       You are too far away from what you are interacting with.
  noaccess:
-  character:    character does not belong to you
-  vassal:       this character is not a vassal of yours.
-  busy:         this bandit has already been chosen by someone else.
-  notnpc:       this is not a bandit character.
-  log:          you do not have access to this log
-  settlement:   you do not have full access to this settlement
-  paper:        you are not a member of this publication
-  edition:      you do not have a copy of this edition
-  paperowner:   you are not an owner of this publication
-  library:      you cannot create new publications because none of your estates has a library
-  battlereport: you were not a participant in that battle, so you have to rely on eye witness reports for its details
+  character:    This character does not belong to you
+  vassal:       This character is not a vassal of yours.
+  busy:         This bandit has already been chosen by someone else.
+  notnpc:       This is not a bandit character.
+  log:          You do not have access to this log
+  settlement:   You do not have full access to this settlement
+  paper:        You are not a member of this publication
+  edition:      You do not have a copy of this edition
+  paperowner:   You are not an owner of this publication
+  library:      You cannot create new publications because none of your estates has a library
+  battlereport: You were not a participant in that battle, so you have to rely on eye witness reports for its details
   nothead:      Only the head of the house may access this page.
 
  missing:
@@ -921,6 +946,9 @@ error:
   location:     This character does not have a location, select a start location first.
   soul:         This character is dead and cannot affect the world of the living anymore.
   user:         You are not logged in or your session has expired. Please log in (again).
+  
+ banned:
+  multi:        The account you're logged into has been banned for using multiple free accounts.
 
  payment:
   already:      This code has already been redeemed, maybe automatically as you logged in. Check your credit history, please. If you believe this to be an error, please contact tom@mightandfealty.com for details.
@@ -957,6 +985,8 @@ npc:
  translator:   translator|translators
  scholar:      scholar|scholars
  soldier:      soldier|soldiers
+ soldiershere: soldiers present
+ intraining:   recruits in training
 
 soldier:
  type:             type
@@ -977,21 +1007,21 @@ soldier:
  groupby:
   intro:           re-group all soldiers
   type:            by type
-  type_desc:       sort soldiers into groups based on their classification (i.e. all light infantry into one group, all archers into one group, etc.)
+  type_desc:       Sort soldiers into groups based on their classification (i.e. all light infantry into one group, all archers into one group, etc.)
   items:           by details
-  items_desc:      sort soldiers into detailed groups so each set of equipment (weapon, armor, item) has its own group.
+  items_desc:      Sort soldiers into detailed groups so each set of equipment (weapon, armor, item) has its own group.
 
- rabble:           rabble|rabble
- light infantry:   light infantry|light infantry
- medium infantry:  medium infantry|medium infantry
- heavy infantry:   heavy infantry|heavy infantry
- archer:           archer|archers
- armoured archer:  armored archer|armored archers
- mounted archer:   mounted archer|mounted archers
- cavalry:          cavalry|cavalry
- light cavalry:    light cavalry|light cavalry
- heavy cavalry:    heavy cavalry|heavy cavalry
- noble:            noble|nobles
+ rabble:           Rabble|Rabble
+ light infantry:   Light Infantry|Light Infantry
+ medium infantry:  Medium Infantry|Medium Infantry
+ heavy infantry:   Heavy Infantry|Heavy Infantry
+ archer:           Archer|Archers
+ armoured archer:  Armored Archer|Armored Archers
+ mounted archer:   Mounted Archer|Mounted Archers
+ cavalry:          Cavalry|Cavalry
+ light cavalry:    Light Cavalry|Light Cavalry
+ heavy cavalry:    Heavy Cavalry|Heavy Cavalry
+ noble:            First One|First Ones
 
 item:
  none:             (none)
@@ -1026,21 +1056,21 @@ events:
  logtitle:  Event Journal of %subject%
  from:      available from
  until:     available until
- events:    events
+ events:    Events
  new:       new
  read:      read
- allread:   mark as read for all my characters
- alldone:   marked as read for all your characters
- alldone2:  marked as read for this character
+ allread:   Mark as read for all my characters
+ alldone:   Marked as read for all your characters
+ alldone2:  Marked as read for this character
  research:
   ongoing:  A scholar of yours is currently researching older records in this journal.|%amount% of your scholars are currently researching older records in this journal.
   intro:    There are more events in older records, a scholar will be able to research them.
   can:      You have a scholar available for research work.|You have %amount% scholars available for research work.
  filter:
-  all:      all events
-  medium:   only interesting
-  high:     only important
-  ultra:    only very important
+  all:      All events
+  medium:   Only interesting
+  high:     Only important
+  ultra:    Only very important
  soldierlog: 
   title:     Soldier Log for link-soldier-name
  entry:      Log Entries
@@ -1072,15 +1102,15 @@ interaction:
   name:     give ship to:
   submit:   give it
  givegold:
-  name:     Noble to receive your gold:
+  name:     First One to receive your gold:
   amount:   Amount of gold to give:
   submit:   give it
  giveartifact:
-  name:     Noble to receive the artifact:
+  name:     First One to receive the artifact:
   which:    Which artifact to give:
   submit:   give artifact away
  surrender:
-  name:     Noble to surrender to
+  name:     First One to surrender to
   submit:   surrender yourself
 
 battle:
@@ -1105,19 +1135,19 @@ battle:
   kill:         %i% enemy killed|%i% enemies killed
   wound:        %i% enemy wounded|%i% enemies wounded
   routed:       %i% enemy routed|%i% enemies routed
-  capture:      %i% enemy noble surrendered|%i% enemy nobles surrendered
+  capture:      %i% enemy First One surrendered|%i% enemy First Ones surrendered
  melee:         
   title:        melee phase %i%
   alive:        %i% soldier fighting|%i% soldiers fighting
   kill:         %i% enemy killed|%i% enemies killed
   wound:        %i% enemy wounded|%i% enemies wounded
   panic:        %i% enemy routed|%i% enemies routed
-  capture:      %i% enemy noble captured|%i% enemy nobles captured
+  capture:      %i% enemy First One captured|%i% enemy First Ones captured
  hunt:          
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
   entkilled:    %i% enemy entourage member was killed during the rout.|%i% enemy entourage members were killed during the rout.
-  dropped:      %i% soldier dropped his equipment to run away faster.|%i% soldiers dropped their equipment to run faster.
+  dropped:      %i% soldier dropped their equipment to run away faster.|%i% soldiers dropped their equipment to run faster.
  extras:
   noble:
    kill:        %who% was killed by %by%.
@@ -1129,7 +1159,7 @@ battle:
    capture:     %who% surrendered to %by%.
  finish:        survivors
  fate:
-  title:        fate of nobles
+  title:        fate of First Ones
   killed:       %character% was killed.
   wounded:      %character% was wounded.
   victory:      %character% was victorious.
@@ -1139,7 +1169,7 @@ battle:
 description:
  scout: >
    Usually a fleet-footed peasant with good eyes, the scout will search the nearby area for anything
-   unusual, notifying his noble of any finds.<br />
+   unusual, notifying their liege of any finds.<br />
    Scouts increase your spotting range. The more scouts you have, the farther away you notice details of
    the land and other characters.
  prospector: >
@@ -1159,17 +1189,17 @@ description:
    marriages, etc.<br />
    Priests allow you to create elections.
  herald: >
-   Announcer and runner for a noble, who is not only practically a requirement if you want to be taken seriously
+   Announcer and runner for a First One, who is not only practically a requirement if you want to be taken seriously
    as a major player in politics and diplomacy. He allows you to send messages at spotting, rather than
    interaction distance. In addition, heralds allow you to announce claims to settlements.
  translator: >
-   A scribe trained in foreign languages, the translator allows you to send messages to nobles who do not speak
+   A scribe trained in foreign languages, the translator allows you to send messages to First Ones who do not speak
    or understand your language. One translator is enough, though you can choose to have more than one, just in
    case.
  scholar: >
    Trained in the arts of reading and writing, documentation and a dozen other arts and techniques that a proper
    noble cares little about, the scholar can at times be useful to gather and sort information and old documents.<br />
-   His main use is to discover more about the history of people and places.
+   Their main use is to discover more about the history of people and places.
  follower: >
    Camp followers are people following the soldiers in your army. They can be professionals, such as smiths, cooks
    or whores, or they can be relatives and family members of the soldiers. Camp followers allow your army to carry
@@ -1232,44 +1262,44 @@ fiction:
 
 manual:
  title:       Game Manual
- intro:       introduction
- background:  background
- videos:      videos
- basics:      basic concepts
- knight:      playing a knight
- lord:        playing a lord
- ruler:       playing a ruler
- others:      other roles
- location:    exploration
- characters:  characters
- economy:     economy
- battles:     battles
- relations:   marriage and relations
- fealty:      oaths of fealty
- soldiers:    soldiers
- entourage:   entourage
- settlements: settlements
- claims:      claims
- realms:      realms
- travel:      travel
- trade:       trade & tribute
- politics:    politics
- diplomacy:   diplomacy
- elections:   elections
- messages:    messages
- publications:  publications
- history:       history & events
- permissions:   permission system
- prison:        captivity
- bandits:       bandits
- looting:       looting
- spotting:      spotting
- quests:        quests
- artifacts:     artifacts
- supply:        army supply
- reference:     reference
- units:         units of measurement
- test:          test instance
+ intro:       Introduction
+ background:  Background
+ videos:      Videos
+ basics:      Basic concepts
+ knight:      Playing a knight
+ lord:        Playing a lord
+ ruler:       Playing a ruler
+ others:      Other roles
+ location:    Exploration
+ characters:  Characters
+ economy:     Economy
+ battles:     Battles
+ relations:   Marriage and relations
+ fealty:      Oaths of fealty
+ soldiers:    Soldiers
+ entourage:   Entourage
+ settlements: Settlements
+ claims:      Claims
+ realms:      Realms
+ travel:      Travel
+ trade:       Trade & tribute
+ politics:    Politics
+ diplomacy:   Diplomacy
+ elections:   Elections
+ messages:    Messages
+ publications:  Publications
+ history:       History & events
+ permissions:   Permission system
+ prison:        Captivity
+ bandits:       Bandits
+ looting:       Looting
+ spotting:      Spotting
+ quests:        Quests
+ artifacts:     Artifacts
+ supply:        Army supply
+ reference:     Reference
+ units:         Units of measurement
+ test:          Test instance
 
 list:
  buildingtypes:   list of all building types
@@ -1374,25 +1404,25 @@ trait:
 
 rating:
  title:     reputation
- intro:     Every noble has a reputation that follows him or her. Reputation is built by other nobles, through gossip.
- empty:     no gossip about this character... yet.
- edit:      update gossip
- write:     add gossip
- content:   words of gossip
+ intro:     Every person has a reputation that follows him or her. Reputation is built by other people, through gossip.
+ empty:     There is no gossip about this character... yet.
+ edit:      Update gossip
+ write:     Add gossip
+ content:   Words of gossip
  respect:
-  label:    respectful
+  label:    Respectful
   help:     Does this noble display proper etiquette and shows respect to both friends and enemies?
  trust:
-  label:    trustworthy
+  label:    Trustworthy
   help:     Is this noble true to words given, and loyal to oaths and promises?
  honor:
-  label:    honourable
+  label:    Honourable
   help:     Does this noble act honourably, with grace in victory and decency in defeat?
- none:      (no opinion)
- yes:       yes
- no:        no
- submit:    submit gossip
- votes:     votes
+ none:      (No opinion)
+ yes:       Yes
+ no:        No
+ submit:    Submit gossip
+ votes:     Votes
 
 unavailable:
  intro:         Sorry, but this action is not currently available, because:
@@ -1416,11 +1446,12 @@ unavailable:
  notyours:      The settlement owner has not granted you permission to do this.
  notyours2:     You do not control this settlement.
  notrain:       No available training options.
- nobody:        No other nobles within range.
+ nobody:        No other First Ones within range.
  nosoldiers:    You do not have any soldiers.
  nomilitia:     There are no soldiers available here.
  nobattles:     There are no battles nearby
  nooffers:      No soldiers or existing offers available.
+ norealm:       This settlement must be part a realm if you wish to take on knights here.
  noassigned:    You have no soldiers assigned.
  nospies:       You don't have any spies in your employ.
  inbattle:      You are already involved in a battle.
@@ -1435,6 +1466,7 @@ unavailable:
  noartifacts:   You don't have any artifacts.
  notprisoner:   You are not a prisoner.
  prisoner:      You are a prisoner and have only very limited actions available.
+ prisonershort: Not available to prisoners.
  notmember:     You are not a member of this realm.
  leader:        As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.
  notleader:     You are not the ruler of this realm.
@@ -1446,7 +1478,8 @@ unavailable:
  novassals:     You do not have any vassals (your own characters don't count).
  fewestates:    A new realm needs to have at least two estates.
  notvassal:     You are not a vassal.
- tooalive:      Your realm has no subrealms that have been abandoned.
+ tooalive:      This realm does not appear to be dead.
+ notsuperruler: You are not the ruler of this realm's superior.
  nosubrealms:   Your realm has no subrealms.
  toolow:        Your realm is of the lowest designation and thus cannot have subrealms.
  toosmall:      Your realm needs to have at least two estates to split one (or more) off into a subrealm.
@@ -1455,7 +1488,7 @@ unavailable:
  both:          You cannot both attack and defend at the same time.
  evading:       You cannot conduct this action while evading or disengaging.
  enter:
-  notyours:     As a prisoner, you can only follow your captor or bring him into your own settlements.
+  notyours:     As a prisoner, you can only follow your captor or bring them into your own settlements.
  building:
   library:      This settlement does not have a library.
   temple:       This settlement does not have a temple.
@@ -1471,14 +1504,14 @@ unavailable:
  nohouses:      There are no houses established nearby. If you are at a settlement and they are inside, you must be inside as well.
 
 marker:
- name:      marker name
- type:      marker type
- owner:     owner
- realm:     visible for
+ name:      Marker name
+ type:      Marker type
+ owner:     Owner
+ realm:     Visible for
  limit:     Maximum marker amount placed. Remove old markers before you set new ones.
- submit:    set and share marker
- waypoint:  waypoint
- enemy:     enemy spotted
+ submit:    Set and share marker
+ waypoint:  Waypoint
+ enemy:     Enemy spotted
  set:
   name:     Create Map Marker
   intro: >
@@ -1515,7 +1548,7 @@ artifact:
     <em>Double-check everything you enter here, as you can not change it once the artifact is created.</em>
   name:         Name:
   description:  Description:
-  submit:       create artifact
+  submit:       Create artifact
  owned:
   title:    Artifacts you created
 
@@ -1524,7 +1557,7 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
-
+  
 house:
  title:         House
  create:

@@ -78,7 +78,11 @@ class LoadDungeonMonsters extends AbstractFixture implements OrderedFixtureInter
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->monsters as $name=>$data) {
-			$type = new DungeonMonsterType;
+			$type = $manager->getRepository('DungeonBundle:DungeonMonsterType')->findOneByName($name);
+			if (!$type) {
+				$type = new DungeonMonsterType;
+				$manager->persist($type);
+			}
 			$type->setName($name);
 			$type->setClass($data['class']);
 			$type->setAreas($data['areas']);

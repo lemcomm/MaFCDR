@@ -103,13 +103,11 @@ doctrine:
 
 # Swiftmailer Configuration
 swiftmailer:
-    transport: %mailer_transport%
-    host:      %mailer_host%
-    username:  %mailer_user%
-    password:  %mailer_password%
-    spool:
-        type:   file
-        path:   "%kernel.root_dir%/spool"
+    transport:  %mailer_transport%
+    host:       %mailer_host%
+    username:   %mailer_user%
+    password:   %mailer_password%
+    disable_delivery: %mailer_disable%
 
 # Framework
 sensio_framework_extra:
@@ -129,6 +127,14 @@ fos_user:
     registration:
         confirmation:
             enabled:    true
+            from_email:
+                address:        mafserver@lemuriacommunity.org
+                sender_name:    Might & Fealty Server
+    resetting:
+        email:
+            from_email:
+                address:        mafserver@lemuriacommunity.org
+                sender_name:    Might & Fealty Server
     from_email:
-        address:        noreply@mightandfealty.com
+        address:        mafserver@lemuriacommunity.org
         sender_name:    Might & Fealty Server

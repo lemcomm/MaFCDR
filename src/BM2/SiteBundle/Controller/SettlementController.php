@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
+use BM2\SiteBundle\Form\DescriptionNewType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -253,6 +254,9 @@ class SettlementController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
 
 		$original_permissions = clone $settlement->getPermissions();
 
@@ -300,8 +304,43 @@ class SettlementController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
-
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
 		return array('settlement'=>$settlement, 'quests'=>$settlement->getQuests());
+	}
+
+	/**
+	  * @Route("/{id}/description", requirements={"id"="\d+"})
+	  * @Template
+	  */
+	public function descriptionAction($id, Request $request) {
+		$character = $this->get('dispatcher')->gateway();
+		$em = $this->getDoctrine()->getManager();
+		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
+		if (!$settlement) {
+			throw $this->createNotFoundException('error.notfound.settlement');
+		}
+		if ($settlement->getOwner() !== $character) {
+			throw $this->createNotFoundException('error.noaccess.settlement');
+		}
+		$desc = $settlement->getDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newDescription($settlement, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return array('settlement'=>$settlement, 'form'=>$form->createView());
 	}
 
 }

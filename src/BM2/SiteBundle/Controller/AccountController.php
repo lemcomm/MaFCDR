@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 /**
  * @Route("/account")
@@ -48,6 +50,9 @@ class AccountController extends Controller {
      * @Template("BM2SiteBundle:Account:account.html.twig")
      */
 	public function indexAction() {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		// clean out character id so we have a clear slate (especially for the template)
@@ -68,6 +73,9 @@ class AccountController extends Controller {
      * @Template
      */
    public function dataAction(Request $request) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
    	$form = $this->createForm(new UserDataType(), $user);
 
@@ -89,14 +97,32 @@ class AccountController extends Controller {
      * @Template
      */
 	public function charactersAction() {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 		$this->getDoctrine()->getManager()->flush();
 
-		$characters = array(); $npcs = array();
+		$characters = array(); 
+		$npcs = array();
+
+		$now = new \DateTime("now");
+		$a_week_ago = $now->sub(new \DateInterval("P7D"));
+				
 		foreach ($user->getCharacters() as $character) {
+			//building our list of character statuses --Andrew
+			$annexing = false;
+			$supporting = false;
+			$opposing = false;
+			$looting = false;
+			$blocking = false;
+			$granting = false;
+			$renaming = false;
+			$reclaiming = false;
+			$unretirable = false;
 			if ($character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
@@ -114,13 +140,51 @@ class AccountController extends Controller {
 				$unread = 0;
 				$events = 0;
 			}
-
+			
+			// This adds in functionality for detecting character actions on this page. --Andrew
+			if ($character->getActions()) {
+				foreach ($character->getActions() as $actions) {
+					switch($actions->getType()) {
+						case 'settlement.take':
+							$annexing = true;
+							break;
+						case 'support':
+							$supporting = true;
+							break;
+						case 'oppose':
+							$opposing = true;
+							break;
+						case 'settlement.loot':
+							$looting = true;
+							break;
+						case 'military.block':
+							$blocking = true;
+							break;
+						case 'settlement.grant':
+							$granting = true;
+							break;
+						case 'settlement.rename':
+							$renaming = true;
+							break;
+						case 'military.reclaim':
+							$reclaiming = true;
+							break;
+					}
+				}
+			}
+			if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
+				$unretirable = true;
+			} else {
+				$unretirable = false;
+			}
 
 			$data = array(
 				'id' => $character->getId(),
 				'name' => $character->getName(),
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
+				'retired' => $character->getRetired(),
+				'unretirable' => $unretirable,
 				'npc' => $character->isNPC(),
 				'slumbering' => $character->getSlumbering(),
 				'prisoner' => $character->getPrisonerOf(),
@@ -130,6 +194,14 @@ class AccountController extends Controller {
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
 				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'annexing' => $annexing,
+				'supporting' => $supporting,
+				'opposing' => $opposing,
+				'looting' => $looting,
+				'blocking' => $blocking,
+				'granting' => $granting,
+				'renaming' => $renaming,
+				'reclaiming' => $reclaiming,
 				'unread' => $unread,
 				'events' => $events
 			);
@@ -204,6 +276,9 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:overview.html.twig")
 	  */
 	public function overviewAction() {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		$characters = array();
@@ -239,6 +314,9 @@ class AccountController extends Controller {
 	  * @Template("BM2SiteBundle:Account:charactercreation.html.twig")
 	  */
 	public function newcharAction(Request $request) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 		$form = $this->createForm(new CharacterCreationType($user, $user->getNewCharsLimit()>0));
 
@@ -379,7 +457,7 @@ class AccountController extends Controller {
 		$levels = $this->get('payment_manager')->getPaymentLevels();
 		$level = $levels[$user->getAccountLevel()];
 		$characters_allowed = $level['characters'];
-		$characters_active = $user->getLivingCharacters()->count();
+		$characters_active = $user->getActiveCharacters()->count();
 		if ($characters_active > $characters_allowed) {
 			if (!$user->getRestricted()) {
 				$user->setRestricted(true);
@@ -397,6 +475,9 @@ class AccountController extends Controller {
 	  * @Template
 	  */
 	public function settingsAction(Request $request) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 		$languages = $this->get('appstate')->availableTranslations();
 		$form = $this->createForm(new SettingsType($user, $languages));
@@ -490,7 +571,10 @@ class AccountController extends Controller {
 	/**
 	  * @Route("/play/{id}", name="bm2_play", requirements={"id"="\d+"})
 	  */
-	public function playAction($id) {
+	public function playAction(Request $request, $id) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
 		$user = $this->getUser();
 
 		$em = $this->getDoctrine()->getManager();
@@ -508,30 +592,66 @@ class AccountController extends Controller {
 
 		$this->get('appstate')->setSessionData($character);
 
-		if ($character->isAlive()) {
-			$character->setLastAccess(new \DateTime("now"));
-			$character->setSlumbering(false);
-			$em->flush();
-			if ($character->getSpecial()) {
-				// special menu active - check for reasons
-				if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
-					return $this->redirectToRoute('bm2_dungeon_dungeon_index');
+		switch ($request->query->get('logic')) {
+			case 'play':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
 				}
-			} 
-			return $this->redirectToRoute('bm2_recent');
-		} else {
-			if ($character->getList() < 100 ) {
-				// move to historic list now that we've looked at his final days
-				$character->setList(100);
-			}
-			$em->flush();
-			return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
+				$em->flush();
+				if ($character->getSpecial()) {
+					// special menu active - check for reasons
+					if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
+						return $this->redirectToRoute('bm2_dungeon_dungeon_index');
+					}
+				} 
+				return $this->redirectToRoute('bm2_recent');
+				break;
+			case 'placenew':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'new'));
+				break;
+			case 'viewhist':
+				if ($character->getList() < 100 ) {
+					// move to historic list now that we've looked at his final days
+					$character->setList(100);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
+				break;
+			case 'edithist':
+				$em->flush(); 
+				/* I don't have words for how stupid I think this is. 
+				Apparently, if you don't flush after setting session data, the game has no idea which character you're trying to edit the background of.
+				Which is super odd to me, because session data doesn't involve the database... --Andrew, 20180213 */
+				return $this->redirectToRoute('bm2_site_character_background');
+				break;
+			case 'unretire':
+				# This should look a lot like 'placenew' above, because it's a very similar process ;) --Andrew, 20180213
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
+				break;				
+			default:
+				throw $this->createAccessDeniedException('error.notfound.playlogic');
+				return $this->redirectToRoute('bm2_characters');
+				break;
 		}
 	}
 
 	/**
 	  * @Route("/choosebandit", name="bm2_choose_bandit")
-     * @Template("BM2SiteBundle:Account:characters.html.twig")
+	  * @Template("BM2SiteBundle:Account:characters.html.twig")
 	  */
 	public function choosebanditAction(Request $request) {
 		$user = $this->getUser();

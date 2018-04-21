@@ -7,6 +7,7 @@
 		<field name="class" type="string"/>
 		<field name="name" type="string"/>
 		<field name="translation_string" type="string"/>
+		<field name="description" type="string" nullable="true"/>
 		<field name="use_value" type="boolean"/>
 		<field name="use_reserve" type="boolean"/>
 

@@ -196,11 +196,65 @@ class ActionsController extends Controller {
 		$this->getDoctrine()->getManager()->flush();
 		return array('settlement'=>$settlement, 'result'=>$result);
 	}
+	
+	/**
+	  * @Route("/places")
+	  * @Template
+	  */
+	public function placesAction() {
+		$character = $this->get('appstate')->getCharacter(true, true, true); # Ensure user has a character selected.
+		
+		$places[] = $this->get('geography')->findPlacesNearMe($character); # Find nearby places that we can see.
+		
+		foreach ($places as $place) {
+			$visit = false; # Create place.visit variable for each place in the twig.
+			if ($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
+				$visit = true; # Set place.visit = true for twig.
+			}
+		}
+		
+		return array('places'=>$places); # Pass places array to the twig for display.
+	}
+	
+	/**
+	  * @Route("/place/{id}/enter")
+	  * @Template
+	  */
+	public function enterPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
 
-   /**
-     * @Route("/embark")
-     * @Template
-     */
+		$result = null;
+		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
+			$result = 'entered';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/place/exit")
+	  * @Template
+	  */
+	public function exitPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+
+		$result = null;
+		if ($this->get('interactions')->characterLeavePlace($character)) {
+			$result = 'left';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+	   /**
+	     * @Route("/embark")
+	     * @Template
+	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
 
@@ -854,8 +908,33 @@ class ActionsController extends Controller {
      */
 	public function offersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		$em = $this->getDoctrine()->getManager();
+		$depth = 1;
+		if ($settlement->getRealm()->getSuperior()) {
+			$depth = 2;
+			if (($settlement->getRealm()->findUltimate() != $settlement->getRealm()) AND ($settlement->getRealm()->findUltimate() != $settlement->getRealm()->getSuperior())) {
+				$depth = 3;
+			}
+		}
+		switch ($depth) {
+			case 3:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true) OR (p.realm = :ultimate AND p.welcomer = true)');
+				$query->setParameter('realm', $settlement->getRealm());
+				$query->setParameter('superior', $settlement->getRealm()->getSuperior());
+				$query->setParameter('ultimate', $settlement->getRealm()->findUltimate());
+				break;
+			case 2:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true)');
+				$query->setParameter('realm', $settlement->getRealm());
+				$query->setParameter('superior', $settlement->getRealm()->findUltimate());
+				break;
+			case 1:
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE p.realm = :realm AND p.welcomer = true');
+				$query->setParameter('realm', $settlement->getRealm());
+				break;
+		}
 
-		$form = $this->createForm(new KnightOfferType($settlement));
+		$form = $this->createForm(new KnightOfferType($settlement, $query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -883,6 +962,7 @@ class ActionsController extends Controller {
 					$offer->setSettlement($settlement);
 					$offer->setDescription($data['intro']);
 					$offer->setGiveSettlement($data['givesettlement']);
+					$offer->setWelcomers($data['welcomers']);
 					$em->persist($offer);
 					if ($data['givesettlement'] == false) {
 						foreach ($data['soldiers'] as $soldier) {

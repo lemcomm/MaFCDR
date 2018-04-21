@@ -211,21 +211,7 @@ class RealmManager {
 		$this->removeRulerLiege($realm, $newruler);
 	}
 	
-/*	public function restoreSubRealm(Realm $realm, Realm $deadrealm, Character $newruler) {
-		//this will allow superior realms to restore dead sub-realms --Andrew
-		if ($deadrealm->getActive() == false && $deadrealm->getSuperior()==$realm) {
-			$this->makeRuler($deadrealm, $newruler);
-			$deadrealm->setActive(true);
-			$this->history->logEvent(
-				$deadrealm,
-				'event.realm.restored',
-				array('%link-realm%'=>$realm->getID(), '%link-character%'=>$newruler->getId()),
-				History::ULTRA, true
-			);
-		}
-	}
-*/
-
+	
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
@@ -239,6 +225,72 @@ class RealmManager {
 		}		
 	}
 
+	public function getVoteWeight(Election $election, Character $character) {
+		switch ($election->getMethod()) {
+			case 'spears':
+				return $character->getActiveSoldiers()->count();
+			case 'swords':
+				return $character->getVisualSize();
+			case 'land':
+				return $character->getEstates()->count();
+			case 'horses':
+				$weight = 0;
+				foreach ($character->getActiveSoldiers() as $soldier) {
+					if ($soldier->getEquipment()->getName()=='horse' || $soldier->getEquipment()->getName()=='war horse') {
+						$weight++;
+					}
+				}
+				return $weight;
+			case 'realmland':
+				$land = 0;
+				$realms = $election->getRealm()->findAllInferiors(true);
+				$realmids = [];
+				foreach ($realms as $realm) {
+					$realmids[] = $realm->getId();
+					}
+				foreach ($character->getEstates() as $e) {
+					if (in_array($e->getRealm()->getId(), $realmids)) {
+						$land++;
+					}
+				}
+				return $land;
+			case 'heads':
+				$pop = 0;
+				foreach ($character->getEstates() as $e) {
+					$pop += $e->getPopulation();
+				}
+				return $pop;
+			case 'realmcastles':
+				$castles = 0;
+				$realms = [];
+				foreach ($election->getRealm()->findAllInferiors(true) as $realm) {
+					$realms[] = $realm->getId();
+				}
+				foreach ($character->getEstates() as $estate) {
+					if (in_array($estate->getRealm()->getId(), $realms)) {
+						foreach ($estate->getBuildings() as $b) {
+							if ($b->getType()->getDefenses() > 0) {
+								$castles += $b->getType()->getDefenses()/10;
+							}
+						}
+					}
+				}
+				return $castles;
+			case 'castles':
+				$castles = 0;
+				foreach ($character->getEstates() as $estate) {
+					foreach ($estate->getBuildings() as $b) {
+						if ($b->getType()->getDefenses() > 0) {
+							$castles += $b->getType()->getDefenses()/10;
+						}
+					}
+				}
+				return $castles;
+			case 'banner':
+			default:
+				return 1;
+		}
+	}
 
 	public function countElection(Election $election) {
 		$election->setClosed(true);
@@ -250,7 +302,7 @@ class RealmManager {
 				$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
 			}
 			$candidates[$c]['votes'] += $vote->getVote();
-			$candidates[$c]['weight'] += $vote->getVote() * $vote->getWeight();
+			$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $vote->getCharacter());
 		}
 
 		$winner = null;
@@ -276,13 +328,91 @@ class RealmManager {
 				);
 				$this->history->logEvent(
 					$election->getRealm(),
-					'event.realm.elected',
-					array('%link-character%'=>$winner->getId()),
+					'event.realm.elected2',
+					array('%link-character%'=>$winner->getId(), '%link-realmposition%'=>$election->getPosition()->getId()),
 					History::MEDIUM, true
 				);
 
 				if ($election->getPosition()->getRuler()) {
 					$this->removeRulerLiege($election->getRealm(), $winner);
+				}
+			}
+		}
+	}
+
+	public function dropIncumbents(Election $election) {
+		if ($election->getRoutine()) {
+			$position = $election->getPosition();
+			$holders = $position->getHolders();
+			foreach ($holders as $character) {		
+				$position->removeHolder($character);
+				$character->removePosition($position);
+			}
+		}
+	}
+	
+	public function dismantleRealm(Character $character, Realm $realm, $sovereign=false) {
+		$this->history->logEvent(
+			$realm,
+			'event.realm.abolished.realm',
+			array('%link-character%'=>$character->getId()),
+			History::HIGH
+		); # 'By order of %link-character%, the realm has been dismantled.'
+		if (!$sovereign) {
+			$superior = $realm->getSuperior();
+			$this->history->logEvent(
+				$superior,
+				'event.realm.abolished.superior',
+				array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
+				History::HIGH
+			); # 'By order of %link-character%, the realm's subrealm of %link-realm% has been dismantled.'
+		}
+		$this->history->logEvent(
+			$character,
+			'event.realm.abolished.character',
+			array('%link-realm%'=>$realm->getId()),
+			History::HIGH
+		); # 'Ordered the dismantling of the realm of %link-realm%.'
+		foreach ($realm->getEstates() as $estate) {
+			if ($sovereign) {
+				$this->history->logEvent(
+					$estate,
+					'event.realm.abolished.sovereign.estate',
+					array('%link-realm%'=>$realm->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the estate is effectively rogue.'
+				$estate->setRealm(null);
+				$realm->removeEstate($estate);
+				$this->em->flush();
+			} else {
+				$this->history->logEvent(
+					$estate,
+					'event.realm.abolished.notsovereign.estate',
+					array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the estate now falls under %link-realm-2%.'
+				$realm->removeEstate($estate);
+				$estate->setRealm($superior);
+				$superior->addEstate($estate);
+				$this->em->flush();
+			}
+		}
+		foreach ($realm->getPositions() as $position) {
+			if ($position->getHolders()) {
+				foreach ($position->getHolders() as $holder) {
+					if ($position->getRuler()) {
+						$this->abdicate($realm, $holder);
+					} else if (!$position->getRuler()) {
+						$position->removeHolder($holder);
+						$holder->removePosition($position);
+						$this->history->logEvent(
+							$holder,
+							'event.character.position.abolished',
+							array('%link-realm%'=>$realm->getId(), '%link-realmposition%'=>$position->getId()),
+							History::MEDIUM
+						); # 'Lost the position of %link-realmposition% due to the dismantling of %link-realm%.'
+					}
+					$this->em->flush();
 				}
 			}
 		}

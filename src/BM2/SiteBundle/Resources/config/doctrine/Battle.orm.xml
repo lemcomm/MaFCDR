@@ -12,7 +12,6 @@
 
 		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="battle"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="battles"/>
-		<one-to-one field="message_group" target-entity="MessageGroup" inversed-by="battle"/>
 		<many-to-one field="war" target-entity="War" inversed-by="related_battles"/>
 
 	</entity>

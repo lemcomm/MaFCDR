@@ -4,8 +4,10 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="description" type="string"/>
+		<field name="description" type="text"/>
 		<field name="give_settlement" type="boolean"/>
+		
+		<many-to-one field="welcomers" target-entity="RealmPosition" inversed-by="welcoming_offers"/>
 
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="knight_offers"/>
 		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="offered_as"/>

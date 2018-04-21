@@ -73,12 +73,16 @@ class GameController extends Controller {
 		$query = $em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 ORDER BY u.username ASC');
 		$users = array();
 		foreach ($query->getResult() as $user) {
-			if ($user->getLivingCharacters()->count()>0) {
+			if ($user->getActiveCharacters()->count()>0 OR $user->getRetiredCharacters()->count()>0) {
 				$users[] = array(
 					'name' => $user->getUsername(),
 					'level' => $user->getAccountLevel(),
+					'credits' => $user->getCredits(),
+					'created' => $user->getCreated(),
 					'last_login' => $user->getLastLogin(),
 					'characters' => $user->getLivingCharacters()->count(),
+					'retired' => $user->getRetiredCharacters()->count(),
+					'dead' => $user->getDeadCharacters()->count()
 				);
 			}
 		}

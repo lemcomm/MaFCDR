@@ -39,6 +39,8 @@ Settlements also produce finished goods, but these do not depend on the region t
 
 Wealth, meanwhile, is an equally abstract term for jewellery, gold coins, luxury items and other money-equivalents. It will only be produced in towns and cities after some high-end buildings have been constructed.
 
+For roleplay's sake, it's planned to make it so that each realm, through their laws, can define what a single unit of each resource actually is (TODO).
+
 
 Resource Demands
 ----------------

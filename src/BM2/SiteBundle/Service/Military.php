@@ -19,7 +19,6 @@ class Military {
 	private $em;
 	private $history;
 	private $pm;
-	private $communication;
 	private $appstate;
 
 	private $group_assign=0;
@@ -27,13 +26,52 @@ class Military {
 	private $group_soldier=0;
 	private $max_group=25; // a=0 ... z=25
 	
-	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, Communication $communication, AppState $appstate) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, AppState $appstate) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
 		$this->pm = $pm;
-		$this->communication = $communication;
 		$this->appstate = $appstate;
+	}
+
+
+	public function joinBattle(Character $character, BattleGroup $group) {
+		$battle = $group->getBattle();
+		$soldiers = count($character->getActiveSoldiers());
+
+		// make sure we are only on one side, and send messages to others involved in this battle
+		foreach ($battle->getGroups() as $mygroup) {
+			$mygroup->removeCharacter($character);
+
+			foreach ($mygroup->getCharacters() as $char) {
+				$this->history->logEvent(
+					$char,
+					'event.military.battlejoin',
+					array('%soldiers%'=>$soldiers, '%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 12
+				);
+			}
+		}
+		$group->addCharacter($character);
+
+		$action = new Action;
+		$action->setBlockTravel(true);
+		$action->setType('military.battle')->setCharacter($character)->setTargetBattlegroup($group)->setCanCancel(false)->setHidden(false);
+//		FIXME: this would be better, but impossible due to circular injections:
+//		$result = $this->get('action_resolution')->queue($action);
+		$action->setStarted(new \DateTime("now"));
+		$max=0;
+		foreach ($character->getActions() as $act) {
+			if ($act->getPriority()>$max) {
+				$max=$act->getPriority();
+			}
+		}
+		$action->setPriority($max+1);
+		$this->em->persist($action);
+
+		$character->setTravelLocked(true);
+
+		$this->recalculateBattleTimer($battle);
 	}
 
 	public function recalculateBattleTimer(Battle $battle) {
@@ -87,15 +125,27 @@ class Military {
 		}
 	}
 
+	#TODO: Move this getClassName method, and it's siblings in other files, into a single HelperService file.
+	private function getClassName($entity) {
+		$classname = get_class($entity);
+		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
+		return $pos;
+	}
 
-	public function findAvailableEquipment(Settlement $settlement, $with_trainers) {
-		if ($with_trainers) {
-			$query = $this->em->createQuery('SELECT e as item, ba.resupply FROM BM2SiteBundle:EquipmentType e LEFT JOIN e.provider p LEFT JOIN p.buildings ba LEFT JOIN ba.settlement sa LEFT JOIN e.trainer t LEFT JOIN t.buildings bb LEFT JOIN bb.settlement sb WHERE sa = :location AND ba.active = true AND sb = :location AND bb.active = true ORDER BY t.name ASC, e.name ASC');
-		} else {
-			$query = $this->em->createQuery('SELECT e as item, b.resupply FROM BM2SiteBundle:EquipmentType e LEFT JOIN e.provider p LEFT JOIN p.buildings b LEFT JOIN b.settlement s WHERE s = :location AND b.active = true ORDER BY p.name ASC, e.name ASC');
+	public function findAvailableEquipment($entity, $with_trainers) {
+		switch($this->getClassName($entity)) {
+			case 'Settlement':
+				if ($with_trainers) {
+					$query = $this->em->createQuery('SELECT e as item, ba.resupply FROM BM2SiteBundle:EquipmentType e LEFT JOIN e.provider p LEFT JOIN p.buildings ba LEFT JOIN ba.settlement sa LEFT JOIN e.trainer t LEFT JOIN t.buildings bb LEFT JOIN bb.settlement sb WHERE sa = :location AND ba.active = true AND sb = :location AND bb.active = true ORDER BY t.name ASC, e.name ASC');
+				} else {
+					$query = $this->em->createQuery('SELECT e as item, b.resupply FROM BM2SiteBundle:EquipmentType e LEFT JOIN e.provider p LEFT JOIN p.buildings b LEFT JOIN b.settlement s WHERE s = :location AND b.active = true ORDER BY p.name ASC, e.name ASC');
+				}
+				$query->setParameter('location', $entity);
+				return $query->getResult();
+			case 'Place':
+				return null;
 		}
-		$query->setParameter('location', $settlement);
-		return $query->getResult();
+		
 	}
 
 	public function groupByType($soldiers) {

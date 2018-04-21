@@ -13,7 +13,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>{% block title %}Might &amp; Fealty{% endblock %}</title>
+	<title>{% block title %}{% if 'mightandfealty.com' in app.request.host %}Might &amp; Fealty{% elseif 'iungard' in app.request.host %}Might &amp; Fealty{% elseif 'valengard' in app.request.host %}Valengard Test Server{% else %}M&amp;F Dev Build{% endif %}{% endblock %}</title>
 	<link rel="icon" sizes="16x16" href="/favicon.ico" />
 	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
 	<link rel="icon" type="image/png" sizes="129x129" href="/apple-touch-icon.png">
@@ -122,7 +122,7 @@
 			{% endif %}
 			</li>
 			{% if character and not simple %}
-				<li><a href="{{ path('bm2_manual') }}">{{ 'menu.manual'|trans }}</a></li>
+				<li><a href="{{ path('bm2_manual') }}/intro">{{ 'menu.manual'|trans }}</a></li>
 			{% endif %}
 		</ul>
 	</div>
@@ -223,7 +223,7 @@
 		<div><a href="{{ path('bm2_credits') }}">{{ 'menu.credits'|trans }}</a></div>
 		<div><a href="{{ path('bm2_contact') }}">{{ 'menu.contact'|trans }}</a></div>
 		<div><a href="http://forum.mightandfealty.com">{{ 'menu.forum'|trans }}</a></div>
-		<div><a href="http://bugs.mightandfealty.com">{{ 'menu.bugs'|trans }}</a></div>
+		<div><a href="http://bugs.lemuriacommunity.org/set_project.php?project_id=1">{{ 'menu.bugs'|trans }}</a></div>
 {# TODO: social sharing buttons (from http://www.heise.de/extras/socialshareprivacy/) etc. #}
 	</div>
 </div>

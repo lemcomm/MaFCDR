@@ -1,0 +1,63 @@
+{% extends "MsgBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'summary.title'|trans({}, "MsgBundle")|title }}</h2>
+
+<div id="actionlist" class="boxlist">
+	<ul>
+		{% if total > 0 %}
+			<li>
+				<a href="{{ path('cmsg_index') }}">{{ 'index.title'|trans({}, "MsgBundle") }}</a>
+				{{ 'summary.total'|trans({"%conversations%":total}, "MsgBundle") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'index.title'|trans({}, "MsgBundle") }}</span>
+				{{ 'summary.nototal'|trans({}, "MsgBundle") }}
+			</li>
+		{% endif %}
+		{% if flagged > 0 %}
+			<li>
+				<a href="{{ path('cmsg_flagged') }}">{{ 'flagged.title'|trans({}, "MsgBundle") }}</a>
+				{{ 'summary.flagged'|trans({"%messages%":flagged}, "MsgBundle") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'flagged.title'|trans({}, "MsgBundle") }}</span>
+				{{ 'summary.noflagged'|trans({}, "MsgBundle") }}
+			</li>
+		{% endif %}
+		<li>
+			<a href="{{ path('cmsg_new_conversation') }}">{{ 'conversation.new.label'|trans({}, "MsgBundle") }}</a>
+			{{ 'conversation.new.desc'|trans({}, "MsgBundle") }}
+		</li>
+	</ul>
+</div>
+<br class="clear"/>
+
+
+{# FIXME: this is a code-duplication from unread.html.twig - there is a way to include it without the layout, but I don't remember #}
+<h2>{{ 'unread.title'|trans({}, "MsgBundle")|title }}</h2>
+<p>
+{% if new.messages > 0 %}
+	{{ 'summary.new'|trans({"%messages%":new.messages, "%conversations%":new.conversations}, "MsgBundle") }}
+{% else %}
+	{{ 'unread.title'|trans({}, "MsgBundle") }}
+{% endif %}
+</p>
+<ul>
+{% for meta in unread %}
+	{% if meta.conversation.appReference %}
+		<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.appReference.name }}: {{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})
+	{% else %}
+		<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+	{% endif %}
+{% endfor %}
+</ul>
+
+{# this is MaF-specific: #}
+{% if not local_news.isempty %}
+	{% include "BM2SiteBundle:element:newslist.html.twig" with {"title":"news.local2"|trans({},"communication")|title, "list":local_news} only %}
+{% endif %}
+
+{% endblock %}

@@ -138,7 +138,6 @@ class MapController extends Controller {
 			case 'realms':			return $this->jsonData($this->dataRealms($mode));
 			case 'cultures':		return $this->jsonData($this->dataCultures($mode, $lowleft, $upright));
 			case 'offers':			return $this->jsonData($this->dataOffers($mode, $lowleft, $upright));
-			case 'network':		return $this->jsonData($this->dataNetwork($mode, $request->query->get('start'), $request->query->get('realm')));
 			case 'trades':
 				if ($request->query->get('secret')=='91c72c604637ec525591efac687690660d67d974') {
 					return $this->jsonData($this->dataTrades($mode, $request->query->get('resource')));
@@ -555,6 +554,20 @@ class MapController extends Controller {
 				);
 				$em->clear();
 			}
+			
+			// mix in places
+			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
+				$features[] = array(
+					'type' => 'Place',
+//					'id' => 'dungeon_'.$d['id'],
+					'properties' => array(
+						'type' => $place->getType()->getName(),
+						'name' => $place->getName(),
+						'active' => true,
+						),
+					'geometry' => json_decode($place->getLocation())
+				);
+			}
 		}
 
 		return $features;
@@ -673,29 +686,6 @@ class MapController extends Controller {
 		return $features;
 	}
 
-	private function dataNetwork($mode, $settlement_id, $realm_id) {
-		$features = array();
-		$em = $this->getDoctrine()->getManager();
-		$start = $em->getRepository('BM2SiteBundle:Settlement')->find($settlement_id);
-		$realm = $em->getRepository('BM2SiteBundle:Realm')->find($realm_id);
-
-/*
-			$query = $em->createQuery('SELECT t.id, t.amount, r.name, ST_AsGeoJSON(ST_MakeLine(aa.center, bb.center)) as geometry FROM BM2SiteBundle:Trade t JOIN t.resource_type r JOIN t.source a JOIN a.geo_data aa JOIN t.destination b JOIN b.geo_data bb WHERE r = :resource');
-			$query->setParameters('resource', $resource);
-*/
-
-		$all = $this->get('communication')->gather_broadcast_settlements($start, $realm);
-		foreach ($all as $settlement) {
-			$features[] = array(
-				'type' => 'Feature',
-				'geometry' => json_decode($settlement->getGeoData()->getCenter())
-			);
-			$em->clear();
-		}
-
-		return $features;
-	}
-
 
 	/**
      * @Route("/details/settlement/{id}", requirements={"id"="\d+"})
@@ -744,10 +734,10 @@ class MapController extends Controller {
 		);
 	}
 
-	/**
-	  * @Route("/details/marker/{id}", requirements={"id"="\d+"})
-	  * @Template
-	  */
+   /**
+     * @Route("/details/marker/{id}", requirements={"id"="\d+"})
+     * @Template
+     */
 	public function detailsMarkerAction($id) {
 		$em = $this->getDoctrine()->getManager();
 		$marker = $em->getRepository('BM2SiteBundle:MapMarker')->find($id);
@@ -756,6 +746,5 @@ class MapController extends Controller {
 
 		return array('marker'=>$marker);
 	}
-
 
 }

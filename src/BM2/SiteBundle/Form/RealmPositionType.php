@@ -38,7 +38,7 @@ class RealmPositionType extends AbstractType {
 			'required'=>true,
 		));
 		if (!$is_ruler) {
-			$builder->add('permissions', 'entity', array(
+			/*$builder->add('permissions', 'entity', array(
 				'label'=>'position.permissions',
 				'required' => false,
 				'multiple' => true,
@@ -49,17 +49,72 @@ class RealmPositionType extends AbstractType {
 				'query_builder'=>function(EntityRepository $er) {
 					return $er->createQueryBuilder('p')->where('p.class = :class')->setParameter('class', 'realm');
 				}
+			));*/
+			$builder->add('type', 'entity', array(
+				'label' => 'position.type',
+				'required' => false,
+				'placeholder' => 'position.help.none',
+				'attr' => array('title'=>'position.help.type'),
+				'class' => 'BM2SiteBundle:PositionType',
+				'choice_translation_domain' => true,
+				'choice_label' => 'name',
+				'query_builder' => function(EntityRepository $er) {
+					return $er->createQueryBuilder('p')->where('p.id > 0')->orderBy('p.name');
+				}
 			));
+			/*$builder->add('rank', 'number', array(
+				'label'=>'position.rank',
+				'required' => false,
+				'empty_data' => '1',
+				'attr' => array('title'=>'position.help.rank'),
+			));*/
+			$builder->add('retired', 'checkbox', array(
+				'label'=>'position.retired',
+				'required' => false,
+				'attr' => array('title'=>'position.help.retired'),
+			));
+		}
+		$builder->add('welcomer', 'checkbox', array(
+			'label'=>'position.welcomer',
+			'required' => false,
+			'attr' => array('title'=>'position.help.welcomer'),
+		));
+		$builder->add('minholders', 'integer', array(
+			'label'=>'position.minholders',
+			'scale'=>0,
+			'required' => false,
+			'empty_data' => '1',
+			'attr' => array('title'=>'position.help.minholders'),
+		));
+		$builder->add('inherit', 'checkbox', array(
+			'label'=>'position.inherit',
+			'required' => false,
+			'attr' => array('title'=>'position.help.inherit'),
+		));
+		if (!$is_ruler) {
 			$builder->add('elected', 'checkbox', array(
 				'label'=>'position.elected',
 				'required' => false,
 				'attr' => array('title'=>'position.help.elected'),
 			));
 		}
-		$builder->add('inherit', 'checkbox', array(
-			'label'=>'position.inherit',
+		$builder->add('electiontype', 'choice', array(
+			'label'=>'elections.method.name',
+			'placeholder'=>'elections.method.empty',
+			'choice_translation_domain' => true,
 			'required' => false,
-			'attr' => array('title'=>'position.help.inherit'),
+			'choices' => array(
+				'banner' => 'elections.method.banner',
+				'spears' => 'elections.method.spears',
+				'swords' => 'elections.method.swords',
+				'horses' => 'elections.method.horses',
+				'land'	=> 'elections.method.land',
+				'realmland' => 'elections.method.realmland',
+				'castles' => 'elections.method.castles',
+				'realmcastles' => 'elections.method.realmcastles',
+				'heads'	=> 'elections.method.heads',
+			),
+			'attr' => array('title'=>'position.help.electiontype'),
 		));
 		$builder->add('term', 'choice', array(
 			'label'=>'position.term',
@@ -68,13 +123,35 @@ class RealmPositionType extends AbstractType {
 				365 => 'position.terms.365',
 				90 => 'position.terms.90',
 				30 => 'position.terms.30',
-			)
+			),
+			'attr' => array('title'=>'position.help.term'),
 		));
-
+		$builder->add('year', 'integer', array(
+			'label'=>'position.year',
+			'scale'=>0,
+			'required' => false,
+			'empty_data' => '1',
+			'attr' => array('title'=>'position.help.year'),
+		));
+		$builder->add('week', 'integer', array(
+			'label'=>'position.week',
+			'scale'=>0,
+			'required' => false,
+			'empty_data' => '1',
+			'attr' => array('title'=>'position.help.week'),
+		));
+		if (!$is_ruler) {
+			$builder->add('keeponslumber', 'checkbox', array(
+				'label'=>'position.keeponslumber',
+				'required' => false,
+				'attr' => array('title'=>'position.help.keeponslumber'),
+			));
+		}
 		$builder->add('submit', 'submit', array('label'=>'position.submit'));
 	}
 
 	public function getName() {
 		return 'realmposition';
 	}
+			
 }

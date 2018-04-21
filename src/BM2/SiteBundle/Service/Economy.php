@@ -240,6 +240,84 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'local seat': // only if lord is ruler of realm
+			case 'regional seat': // only if lord is ruler of realm
+			case 'royal seat': // only if lord is ruler of realm
+			case 'imperial seat': // only if lord is ruler of realm
+				if (!$settlement->getCapitalOf()) {
+					return false;
+				}
+				if (!$settlement->getRealm()) {
+					return false;
+				}
+				# Now that we know we have a realm and a capital, are we the ultimate realm?
+				# We need all this because in_array can't accept an object as the second variable, only arrays. Arrays can however be the first variable submitted to it.
+				$matchedrealms = false;
+				if ($settlement->getRealm()->isUltimate()) {
+					# If we are, do we have multiple capitals here?
+					if (!is_array($settlement->getCapitalOf()->toArray())) {
+						# If we don't, is that capital for this realm?
+						if ($settlement->getCapitalOf() == $settlement->getRealm()) {
+							$matchedrealms = true;
+						}
+					# If we have multiple capitals here, does our realm have one here?
+					} else if (in_array($settlement->getRealm(), $settlement->getCapitalOf()->toArray())) {
+						$matchedrealms = true;
+					}
+				} else {
+					# Since we aren't the ultimate realm, we need to get all the ids for the superior realms (and ourselves!)
+					foreach ($settlement->getRealm()->findAllSuperiors(true) as $realm) {
+						$realmids[] = $realm->getId();
+					}
+					# Now, if we have mutliple capitals here, does the id of any of them match one of our superior realms or our own?
+					if (is_array($settlement->getCapitalOf()->toArray())) {
+						foreach ($settlement->getCapitalOf() as $capital) {
+							if (in_array($capital->getId(), $realmids)) {
+								$matchedrealms = true;
+							}
+						}
+					} else {
+						# If we only have one capital here, is it of one of our superior realms or our own realm?
+						if (in_array($settlement->getCapitalOf()->getId(), $realmids)) {
+							$matchedrealms = true;
+						}
+					}
+				}
+				# Finally, if we didn't match anywhere, we just return false, since we don't meet the conditions.
+				if (!$matchedrealms) {
+					return false;
+				}
+				/* If we want to restrict this to rulers, we can enable the below code.
+				if (is_array($settlement->getRealm()->findRulers())) {
+					if (!in_array($settlement->getOwner(), $settlement->getRealm()->findRulers())) {
+						return false;
+					}
+				} else if ($settlement->getRealm()->findRulers() != $settlement->getOwner()) {
+					return false;
+				}
+				*/
+				break;
+			case 'dockyard': // only at ocean
+				/* TODO: We need a better way to do this before allowing these to be built.
+				if ($settlement->getGeoData()->getCoast() == false) {
+					return false;
+				}
+				*/
+				return false;
+				break;
+			case 'filled moat': // only at a region that has water
+				if ($settlement->getGeoData()->getCoast() == false && $settlement->getGeoData()->getLake() == false && $settlement->getGeoData()->getRiver() == false) {
+					return false;
+				}
+				break;
+			case 'quarry': //only at hills, scrublands, or mountains
+				/* TODO: I don't think I want these implemented quite yet.
+				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
+					return false;
+				} 
+				*/
+				return false;
+				break;
 		}
 		return true;
 	}
@@ -429,12 +507,14 @@ class Economy {
 		//			we could code this by checking for the surplus storage
 		$growth = sqrt(1-exp(-pow($shortage,2)))*$sign;
 		$popchange = $sign*round(pow(abs($growth) * $settlement->getPopulation(),0.666));
-		if ($popchange > 0) {
-			$goods = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('goods'));
-			$wealth = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('wealth'));
-			$mod = min($goods->getSupply(), $wealth->getSupply());
-			echo "growth of ".$settlement->getName()." limited by $mod\n";
-		}
+                /* Commenting this out to bring code in line with Tom's Server. It doesn't actually do anything. -- Andrew
+                if ($popchange > 0) {
+                        $goods = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('goods'));
+                        $wealth = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('money'));
+                        $mod = min($goods->getSupply(), $wealth->getSupply());
+                        echo "growth of ".$settlement->getName()." limited by $mod\n";
+                }
+                */
 		$settlement->setPopulation($settlement->getPopulation() + $popchange);
 
 		// thralls drop faster and rise slower

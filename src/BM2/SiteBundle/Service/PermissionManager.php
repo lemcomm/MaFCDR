@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Listing;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Doctrine\ORM\EntityManager;
@@ -49,6 +50,58 @@ class PermissionManager {
 	}
 
 
+	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false) {
+		// settlement owner always has all permissions without limits
+		if ($place->getOwner() == $character) {
+			if ($return_details) {
+				return array(true, null, 'owner', null);
+			} else {
+				return true;
+			}
+		}
+
+		if ($place->getOwner() == null) {
+			if ($return_details) {
+				return array(true, null, 'unowned', null);
+			} else {
+				return true;
+			}
+		}
+
+		// fetch everyone who is granted this permission
+		$allowed = $place->getPermissions()->filter(
+			function($entry) use ($permission) {
+				if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		);
+
+		// for all of them, now check if our character is in this listing
+		foreach ($allowed as $perm) {
+			list($check, $list, $level) = $this->checkListing($perm->getListing(), $character);
+
+			if ($check === false || $check === true) {
+				// permission denied or granted
+				if ($return_details) {
+					return array($check, $list, $level, $perm);
+				} else {
+					return $check;
+				}
+			}
+			// else not found on list, so continue looking
+		}
+
+		// not found anywhere, so default: deny
+		if ($return_details) {
+			return array(false, null, null, null);
+		} else {
+			return false;
+		}
+	}
+	
 	public function checkSettlementPermission(Settlement $settlement, Character $character, $permission, $return_details=false) {
 		// settlement owner always has all permissions without limits
 		if ($settlement->getOwner() == $character) {

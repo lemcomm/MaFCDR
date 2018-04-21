@@ -85,21 +85,23 @@ class PaymentCommand extends ContainerAwareCommand {
 		$output->writeln("$inactives characters set to inactive");
 		$em->flush();
 
+		/* As M&F now longer uses the spool, this section of code is completely useless, and causes the paymenet processor to hang. --Andrew 20170906
 		// flush the mail queue (account expired messages)
 		$mailer = $this->getContainer()->get('mailer');
 		$spool = $mailer->getTransport()->getSpool();
 		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 		if ($spool && $transport) {
 			$spool->flushQueue($transport);
-		}
+		} */
 
 
 		$pm = $this->getContainer()->get('payment_manager');
-		list($free, $active, $credits, $expired, $storage) = $pm->paymentCycle();
+		list($free, $active, $credits, $expired, $storage, $banned) = $pm->paymentCycle();
 		$output->writeln("$free free accounts");
 		$output->writeln("$storage accounts moved into storage");
 		$output->writeln("$credits credits collected from $active users");
 		$output->writeln("$expired accounts with insufficient credits");
+		$output->writeln("$banned accounts banned and set to level 0");
 
 		return true;
 	}

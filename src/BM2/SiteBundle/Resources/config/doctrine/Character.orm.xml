@@ -7,14 +7,18 @@
 		<field name="version" type="integer" version="true"/>
 		<field name="name" type="string"/>
 		<field name="known_as" type="string" nullable="true"/>
+		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
 		<field name="alive" type="boolean"/>
+		<field name="retired" type="boolean" nullable="true"/>
+		<field name="retired_on" type="datetime" nullable="true"/>
 		<field name="generation" type="smallint"/>
 		<field name="genome" type="string" length="2">
 			<options>
 				<option name="fixed">true</option> 
 			</options>
 		</field>
+		<field name="magic" type="integer" nullable="true"/>
 		<field name="list" type="smallint"/>
 		<field name="created" type="datetime"/>
 		<field name="last_access" type="datetime"/>
@@ -34,6 +38,9 @@
 		<field name="spotting_distance" type="integer"/>
 		<field name="visibility" type="integer"/>
 
+		<field name="auto_read_realms" type="boolean" nullable="true"/>
+		<field name="non_hetero_options" type="boolean" nullable="true"/>
+		
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
 
@@ -85,6 +92,7 @@
 		<many-to-many field="positions" target-entity="RealmPosition" mapped-by="holders"/>
 
 		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="characters_present"/>
+		<many-to-one field="inside_place" target-entity="Place" inversed-by="characters_present"/>
 		<many-to-many field="battlegroups" target-entity="BattleGroup" mapped-by="characters"/>
 
 		<one-to-many field="entourage" target-entity="Entourage" mapped-by="character" index-by="id"/>
@@ -93,6 +101,9 @@
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
+		
+		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
+		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
 
 		<many-to-one field="house" target-entity="House" inversed-by="characters"/>
 	</entity>

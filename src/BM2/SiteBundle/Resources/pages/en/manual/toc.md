@@ -1,50 +1,55 @@
 Table of Contents
 =================
 
-* [intro]
-* [basics]
-* [videos]
-* [background]
+* [Intro](intro)
+* [Basics](basics)
+* [Videos](videos)
+* [Background](background)
 
 Gameplay
 --------
-* [knight]
-* [lord]
-* [ruler]
-* [others]
+* [Playing a Knight](knight)
+* [Playing a Lord](lord)
+* [Playing a Ruler](ruler)
+* [Other Roles](others)
 
 Entities
 --------
-* [realms]
-* [settlements]
-* [characters]
-* [soldiers]
-* [entourage]
+* [Realms](realms)
+* [Settlements](settlements)
+* [Characters](characters)
+* [Soldiers](soldiers)
+* [Entourage](entourage)
 
 Interaction
 -----------
-* [messages]
-* [publications]
-* [relations]
-* [fealty]
-* [claims]
-* [prison]
-* [bandits]
-* [history]
-* [location]
+* [Messages](messages)
+* [Publications](publications)
+* [Relations](relations)
+* [Fealty](fealty)
+* [Claims](claims)
+* [Prison](prison)
+* [Bandits](bandits)
+* [History](history)
+* [Location](location)
 
 Concepts
 --------
-* [battles]
-* [quests]
-* [artifacts]
-* [looting]
-* [supply]
-* [economy]
-* [travel]
-* [spotting]
-* [trade]
-* [diplomacy]
-* [politics]
-* [elections]
-* [permissions]
+* [Battles](battles)
+* [Quests](quests)
+* [Artifacts](artifacts)
+* [Looting](looting)
+* [Supply](supply)
+* [Economy](economy)
+* [Travel](travel)
+* [Spotting](spotting)
+* [Trade](trade)
+* [Diplomacy](diplomacy)
+* [Politics](politics)
+* [Positions](positions)
+* [Elections](elections)
+* [Permissions](permissions)
+
+Other
+-----
+* [Test](test)
