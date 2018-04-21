@@ -166,7 +166,7 @@ event:
    free:        Set free from imprisonment.
    free2:       Freed from imprisonment through the death of %character%.
    kill:
-    behead:     Executed by hanging while imprisoned by %character%.
+    behead:     Executed by beheading while imprisoned by %character%.
     hang:       Executed by hanging while imprisoned by %character%.
     burn:       Burned alive while imprisoned by %character%.
     quarter:    Brutally killed by quartering while imprisoned by %character%.
@@ -189,8 +189,8 @@ event:
    closed:      Rumours have it that a nearby dungeon has been completely explored and is no longer interesting.
   inactive:
    prisoner:    Your captor %character% has not been seen for a long time, and can be assumed to be a victim of slumberblight. It will now be easier to escape.
-   vassal:      Your vassal %character% has not been seen for a long time and rumors have it that he has contracted slumberblight.
-   liege:       Your liege, %character%, has not been heard of for some time. Some say he has been affected by slumberblight.
+   vassal:      Your vassal %character% has not been seen for a long time and rumors have it that they have contracted slumberblight.
+   liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
  military:

@@ -3,9 +3,9 @@
 # Authors: Tom Vogt, Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
 password:
- old:			incorrect current password
- minlength:	'[0,Inf]your password must be at least 6 characters long'
- match:		new password and confirm password fields do not match
+ old:			Incorrect current password
+ minlength:	'[0,Inf]Your password must be at least 6 characters long'
+ match:		New password and confirm password fields do not match
 
 realm:
  new:
@@ -49,7 +49,7 @@ recruit:
   toomany2:		 This settlement can only begin the training of %max% peasants per day.
   noweapon:		 You cannot recruit troops without weapons, they would not be soldiers, would they?
  offer:
-  empty:        knight offers must include something, else you would offer nothing in exchange for something (fealty).
+  empty:        Knight offers must include something, else you would offer nothing in exchange for something (fealty).
   givealready:  You already have a knight offer including lordship of this settlement. You cannot have two.
  mercs:
   fail:			You do not have enough gold to pay for these men. Try fewer men or a different mercenary group.

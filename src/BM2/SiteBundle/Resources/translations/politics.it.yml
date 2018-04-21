@@ -9,9 +9,9 @@ status:
  other:
   landless:			%He% è un cavaliere senza terra.
   independent:	%He% è un signore indipendente.
-  vassal:			  %He% è un vassallo di <a href="%url%">%name%</a>.
-  ruler:	   		%He% è il sovrano di <a href="%url%">%name%</a>.
-  realm:        %He% è un membro di <a href="%url%">%name%</a>.
+  vassal:			  %He% è un vassallo di %realm%.
+  ruler:	   		%He% è il sovrano di %realm%.
+  realm:        %He% è un membro di %realm%.
   ultimate:     %He% è un leader indipendente che non ha ancora formato un reame.
 
 oath:

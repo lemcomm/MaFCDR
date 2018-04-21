@@ -5,7 +5,7 @@
 queued:         The action has been added to your orders queue.
 
 form:
- choose:  -- choose --
+ choose:  -- Choose --
 
 # these are the group names for soldiers - translate them if you use non-latin alphabets in your language
 a: a
@@ -54,11 +54,11 @@ oppose:
      for more decisive actions such as attacking them.<br />
      You can monitor the progress of the control attempt in your action queue.
 either:
- submit:        support/oppose
+ submit:        Support/oppose
  invalid:
-  noid:         no action id
-  wrongid:      action id unknown
-  action:       not available on this type of action
+  noid:         No action id
+  wrongid:      Action id unknown
+  action:       Not available on this type of action
   already:      You are already opposing or supporting this action
 
 queue:
@@ -81,8 +81,8 @@ queue:
  supported:     Supported by
  opposed:       Opposed by
  details:       details
- up:            up
- down:          down
+ up:            Up
+ down:          Down
  cancel:        Cancel action
  cancelled:     This action has been cancelled
  support:       Support action
@@ -207,7 +207,7 @@ building:
   intro: >
     At the library of %settlement%, scrolls and maps are available for your perusal. The local scholars and cartographers have collected
     data not readily available unless curated.<br />
-    <i>(for maximum usefulness, when you click on the maps you get a full-size image. Use your browsers "back" button to return to this page.)</i>
+    <i>(for maximum usefulness, when you click on the maps you get a full-size image. Use your browser's "back" button to return to this page.)</i>
   maps:
    name:        Maps
    allrealms:   All realms of the world
@@ -350,7 +350,7 @@ control:
     The central european culture is available to everyone. Additional cultures can be bought on your account page (Credits and Gifts).
     If you conquer a settlement belonging to a culture you do not own, it will retain its culture, but you can only change
     settlements to cultures you own.
-  newculture:   new culture
+  newculture:   New culture
   success: >
     You have now declared that this place follows the %culture% culture.
   queued: >
@@ -756,8 +756,8 @@ recruit:
     Here you can manage your soldiers, depending on their current status. You can only resupply troops if their equipment is available in this
     settlement. You can only assign troops to other characters who are in the same location (and not on the other side of city walls) and not locked into battle.
   limited:      Due to your current ongoing actions (such as battle or looting), your management options are limited.
-  choose:       -- action --
-  nothing:      (no action)
+  choose:       -- Action --
+  nothing:      (No action)
   apply:        Apply to group
   disband:      Disband
   assign:       Assign...
@@ -777,7 +777,7 @@ recruit:
   groupinfo:    Automatically group soldiers according to equipment. Warning: This will overwrite any groups you may have.
   grouped:      Your soldiers have been automatically put into groups
  offers:
-  name:         knights offers
+  name:         Knights offers
   description:  Set aside soldiers to offer to new knights swearing allegiance to you.
   intro: >
     Knights are lower nobles who fight in your name, using your soldiers. To attract new knights to your banner, you can set aside
@@ -931,7 +931,7 @@ meta:
   description:  Assign or change crest
   intro: >
     Here you can assign the <a href="%url%">heraldic crests</a> that you have created to your character.<br />
-    A character can only have one crest, it identifies him and/or his family, dynasty or other group he belongs to.
+    A character can only have one crest, it identifies them and/or their family, dynasty or other group that they belong to.
   remove:       Use no crest
   submit:       Assign crest
   nocrests:     You do not have any crests available. Follow the link above to design crests for your characters.

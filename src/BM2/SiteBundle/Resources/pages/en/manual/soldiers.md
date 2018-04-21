@@ -7,7 +7,7 @@ This allows you to create any kind of army you wish with any mix of troop types 
 
 Experience
 ----------
-In addition to individual equipment and status, soldiers also gain experience on an individual level. Experience improves a soldiers effectiveness in battle, with diminishing returns. That means the first few experience points are more important than the same amount later. The first few battles are vital learning experiences for freshly trained troops, while yet another battle doesn't mean all that much to a veteran anymore. But experience improves many other aspects of a soldiers behaviours as well and should not be underestimated. For example, experienced troops are less likely to panic and rout and will instead make an orderly retreat. In other words: They will suffer much less casualties on retreat than inexperienced troops.
+In addition to individual equipment and status, soldiers also gain experience on an individual level. Experience improves a soldier's effectiveness in battle, with diminishing returns. That means the first few experience points are more important than the same amount later. The first few battles are vital learning experiences for freshly trained troops, while yet another battle doesn't mean all that much to a veteran anymore. But experience improves many other aspects of a soldier's behaviours as well and should not be underestimated. For example, experienced troops are less likely to panic and rout and will instead make an orderly retreat. In other words: They will suffer much fewer casualties on retreat than inexperienced troops.
 
 Experience also reduces retraining time, as experienced soldiers adapt to new equipment faster.
 
@@ -32,12 +32,12 @@ You can station soldiers at your estates or you can have them follow you around 
 
 Militia (soldiers stationed at estates) will always automatically defend a settlement when it is being attacked. Mobile forces only defend settlements they are at automatically if they have the "defend settlement" action set. Otherwise they need to explicitly join the battle.
 
-As the world we simulate does not have professional standing armies, stationed militia continues to work their old jobs for half of the day and thus contributes to the local economy and resource production. They cannot, however, be used for construction work. Recruits in training need all their time for training and do not contribute to the local economy.
+As the world we simulate does not have professional standing armies, stationed militia continue to work their old jobs for half of the day and thus contributes to the local economy and resource production. They cannot, however, be used for construction work. Recruits in training need all their time for training and do not contribute to the local economy.
 
 
 Assigning and Reclaiming
 ------------------------
-Soldiers can be assigned to and put under the command of other nobles.
+Soldiers can be assigned to and put under the command of other First Ones.
 
 As you can never be certain of loyalties in the world of Might & Fealty, assigning soldiers is always a bit of a gamble. However, soldiers are not items, they have minds of their own, and that works to your advantage. Assigned soldiers can be *reclaimed* for a limited time. What happens if you do that depends on how long they have been assigned.
 
@@ -60,7 +60,7 @@ Troops also scatter if the character leading them dies. This works the same way 
 
 Wounds
 ------
-When you see blood drops next to a soldier, it indicates he is wounded. The more drops, the more seriously. One drop is a light wound, two drops are a more serious wound and three drops are a very serious, life-threatening wound. Mostly, over time wounds will heal and disappear. However, there is also a chance that wounds get infected, become worse, and kill. There is nothing you can do about that, everything that can be done with the treatments available in this medieval-like world is already being done. But if you notice many wounded after a battle, and then some days later most are healed but there are some dead even though you buried all dead after the battle - it is injured soldiers who fell victim to their wounds.
+When you see blood drops next to a soldier, it indicates that they are wounded. The more drops, the more seriously. One drop is a light wound, two drops are a more serious wound and three drops are a very serious, life-threatening wound. Mostly, over time wounds will heal and disappear. However, there is also a chance that wounds get infected, become worse, and lead to death. There is nothing you can do about that, everything that can be done with the treatments available in this medieval-like world is already being done. But if you notice many wounded after a battle, and then some days later most are healed but there are some dead even though you buried all dead after the battle - it is injured soldiers who fell victim to their wounds.
 
 
 ---

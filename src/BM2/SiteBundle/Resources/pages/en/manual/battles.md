@@ -5,11 +5,11 @@ Battle Preparations
 -------------------
 In the medieval world simulated by Might & Fealty, many concepts of modern warfare are non-existent. There is no trench warfare, no artillery and no air superiority. War is not fought by mobile infantry and Blitzkrieg maneuvers. Instead, war is quite often orchestrated, battlefields agreed upon beforehand and strategies well-known and familiar.
 
-That said, battles are initiated by someone preparing to attack one or more opponents. This forces both sides to begin battle preparations, deploy troops, maneuver for optimal positions - a process that can take hours, and sometimes days. Many ancient and medieval battles actually worked very similar to this, though of course for gameplay purposes the process has been abstracted and structured.
+That said, battles are initiated by someone preparing to attack one or more opponents. This forces both sides to begin battle preparations, deploy troops, maneuver for optimal positions - a process that can take hours, and sometimes days. Many ancient and medieval battles actually worked very similarly to this, though of course for gameplay purposes the process has been abstracted and structured.
 
-When you engage an enemy, whether attacking him on the open field or assaulting a settlement, you are beginning a timed action, with the time required depending on many factors, the most important being the armies involved. The more troops are involved in a battle, the longer preparations will take. The exception to this is for very one-sided battles. If one side outnumbers the other more than 10:1, additional troops will not make battle preparations take longer. Trying to stop a 1000 men army with 5 soldiers will not delay them very much.
+When you engage an enemy, whether attacking them on the open field or assaulting a settlement, you are beginning a timed action, with the time required depending on many factors, the most important being the armies involved. The more troops are involved in a battle, the longer preparations will take. The exception to this is for very one-sided battles. If one side outnumbers the other more than 10:1, additional troops will not make battle preparations take longer. Trying to stop a 1000 men army with 5 soldiers will not delay them very much.
 
-While battle preparations are underway, the battle is visible to others in the area and everyone within action distance can join in, choosing freely which side they wish to support. Nobles joining the battle will also extend the preparation time, but with a decreasing impact (so you cannot delay a battle forever just by having more people join in continuously).
+While battle preparations are underway, the battle is visible to others in the area and everyone within action distance can join in, choosing freely which side they wish to support. First Ones joining the battle will also extend the preparation time, but with a decreasing impact (so you cannot delay a battle forever just by having more people join in continuously).
 
 Once you have joined a battle, either by force or by initiating it, you cannot cancel it anymore. You can only avoid fighting a battle by evasive actions.
 
@@ -57,17 +57,17 @@ Morale primarily affects the routing chances. Troops with low morale will flee t
 
 Battle Results
 --------------
-Maybe counter-intuitively, the game engine will not declare a winner for a battle. This is because battles do not happen in a vacuum. If the purpose of the battle was to delay the enemy invasion, then even a defeat can be a victory. If the enemy king died, it might be considered a victory even if you were driven off the battlefield. If you defeated an enemy with horrible losses even though you were numerically superior - is that really a victory?
+Maybe counter-intuitively, the game engine will not declare a winner for a battle. This is because battles do not happen in a vacuum. If the purpose of the battle was to delay the enemy invasion, then even a defeat can be a victory. If the enemy King died, it might be considered a victory even if you were driven off the battlefield. If you defeated an enemy with horrible losses even though you were numerically superior - is that really a victory?
 
 No, the game leaves it to you to declare yourself victorious.
 
 
-The game **does**, however, apply battle results for nobles and individual soldiers on both sides. Your troops can come out of a battle routed, wounded and with lost or damaged equipment, forcing a resupply. They can, of course, also not come out of the battle alive at all.
+The game **does**, however, apply battle results for First Ones and individual soldiers on both sides. Your troops can come out of a battle routed, wounded and with lost or damaged equipment, forcing a resupply. They can, of course, also not come out of the battle alive at all.
 
-The same is true for nobles, except for equipment - nobles are assumed to have spare equipment and possibilities to replace killed horses, etc. But nobles can be victorious, defeated, wounded, killed or captured (see [prison]). They are considered victorious if their side is in control of the battlefield at the end of the battle, and defeated if all troops on their side were wiped out.
+The same is true for First Ones, except for equipment - First Ones are assumed to have spare equipment and possibilities to replace killed horses, etc. But nobles can be victorious, defeated, wounded, killed or captured (see [prison]). They are considered victorious if their side is in control of the battlefield at the end of the battle, and defeated if all troops on their side were wiped out.
 As a result of battles over settlements, victorious attackers will enter a settlement. Defeated troops that had previously forced their way into the settlement (i.e. who do not have permission to enter) will be forced outside.
 
-Wounds on both soldiers and nobles do not affect their actions in the game, but additional wounds make death more likely. Going into battle while still wounded can be very dangerous.
+Wounds on both soldiers and First Ones do not affect their actions in the game, but additional wounds make death more likely. Going into battle while still wounded can be very dangerous.
 
 
 After-Battle Actions
