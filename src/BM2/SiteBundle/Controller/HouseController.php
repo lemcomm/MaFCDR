@@ -4,11 +4,13 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\HouseBackgroundType;
 
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
+use BM2\SiteBundle\Service\DescriptionManager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
@@ -42,7 +44,11 @@ class HouseController extends Controller {
 				$inhouse = true;
 			}
 		}
-	}	
+		
+		return array(
+			'inhouse' => $inhouse,
+		);
+	}
 
 	/**
 	  * @Route("/create")
@@ -52,35 +58,33 @@ class HouseController extends Controller {
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
-		$location = null;
-		$inside = null;
 		$crest = $character->getCrest();
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 		} else {
-			$location = $character->getLocation();
+			throw createNotFoundException('unvailable.notinside');
 		}
-		
-		$form = $this->createForm(new HouseBackgroundType($house);
-		$form->handleRequest($request);
-		if ($character->getHouse() > 0 ) {
+		if ($character->getHouse()) {
 			throw createNotFoundException('error.found.house');
 		}
+		$form = $this->createForm(new HouseCreationType());
+		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$data = $form->getData();
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
 			if ($character->getCrest()); {
 				$crest = $character->getCrest();
 			}
-			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private_description'], $data['secret_description'], null, $location, $settlement, $crest, $character);
+			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
 		);
-	}	
+	}
 	
 	/**
 	  * @Route("/{id}/edit", requirements={"id"="\d+"})
@@ -91,17 +95,39 @@ class HouseController extends Controller {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$house = $id;
 		$em = $this->getDoctrine()->getManager();
+		
+		$name = $house->getName();
+		if($
 
-		$form = $this->createForm(new HouseBackgroundType($house);
+		$form = $this->createForm(new HouseCreationType($name, $desc, $priv, $secret));
 		$form->handleRequest($request);
 		if ($character != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
 		if ($form->isValid()) {
+			$data = $form->getData();
+			$change = FALSE;
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
-			$em->flush();
+			if (!$house->getDescription() AND $data['description'] != NULL) {
+				$this->get('description_manager')->newDescription($house, $data['description'], $character);
+				$change = TRUE;
+			} else if ($house->getDescription() AND $data['description'] != $house->getDescription()->getText()) {
+				$this->get('description_manager')->newDescription($house, $data['description'], $character);
+				$change = TRUE;
+			}
+			if ($data['secret'] != $house->getSecret()) {
+				$house->setSecret($data['secret']);
+				$change = TRUE;
+			}
+			if ($data['private'] != $house->getPrivate()) {
+				$house->setPrivate($data['secret']);
+				$change = TRUE;
+			}
+			if ($change) {
+				$em->flush();
+			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'actions'));
 		}
 		return array(
@@ -113,27 +139,25 @@ class HouseController extends Controller {
 	  * @Route("/{id}/join", requirements={"id"="\d+"})
 	  * @Template
 	  */
-					  
+	
+		/* TODO: Review all of this file below this line. The above should be good.
+		We'll want to be sure to work joinAction and approveAction into the GameRequest system.*/
+	
 	public function joinAction(Request $request) {
 		$house = $id;
 		$hashouse = FALSE;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		
 		$em = $this->getDoctrine()->getManager();
-		if ($character->getInsideSettlement()->getHouses() != $house) {
+		# TODO: Rework this later to allow for Houses at Places.
+		if (!$character->getInsideSettlement()) {
+			throw createNotFoundException('unvailable.notinside');
+		}
+		if (!in_array($house, $character->getInsideSettlement()->getHouses())) {
 			throw createNotFoundException('error.notfound.nohouse');
 		} 
-		if ($character->getInsideSettlement()) {
-			$form = $this->createForm(new HouseJoinType($house);
-			$form->handleRequest($request);
-		} else {
-			$location = $this->getCharacter()->getLocation();
-			$nearest = $this->geography->findNearestHouse($character);
-			if($nearest['distance'] < $this->geography->caluclateInteractionDistance($character)) {
-				$form = $this->createForm(new HouseJoinType($nearest);
-				$form->handleRequest($request);
-			} else throw createNotFoundException('error.notfound.toofar');
-		}
+		$form = $this->createForm(new HouseJoinType($house));
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
@@ -152,13 +176,13 @@ class HouseController extends Controller {
 		$house = $id;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
-		if ($character->getHouse() < 1) {
+		if (!$character->getHouse()) {
 			throw createNotFoundException('error.noaccess.nohouse')
 		}
 		if ($character->getHouse()->getHead() !== $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
-		$form = $this->createForm(new HouseApproveType($house);
+		$form = $this->createForm(new HouseApproveType($house));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em->flush();
