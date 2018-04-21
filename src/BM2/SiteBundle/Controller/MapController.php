@@ -554,6 +554,20 @@ class MapController extends Controller {
 				);
 				$em->clear();
 			}
+			
+			// mix in places
+			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
+				$features[] = array(
+					'type' => 'Place',
+//					'id' => 'dungeon_'.$d['id'],
+					'properties' => array(
+						'type' => $place->getType()->getName(),
+						'name' => $place->getName(),
+						'active' => true,
+						),
+					'geometry' => json_decode($place->getLocation())
+				);
+			}
 		}
 
 		return $features;

@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -143,7 +144,7 @@ class CharacterManager {
 
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
-		// remove from map
+		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		// remove from hierarchy
 		$character->setLiege(null);
 
@@ -344,6 +345,157 @@ class CharacterManager {
 
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
+
+		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+
+		return true;
+	}
+
+	public function retire(Character $character) {
+		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
+		// List is set to 90 as this sorts them to the retired listing on the account character list.
+		$character->setRetired(true)->setList(90)->setSlumbering(true);
+		// remove from map and hiearchy
+		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
+		$character->setLiege(null);
+
+		$this->history->logEvent($character, 'event.character.retired', array(), History::HIGH, true);
+
+		// reset account restriction, so it is recalculated - we do this very early so later failures don't impact it
+		if ($character->getUser()) {
+			$character->getUser()->setRestricted(false);
+		}
+
+		// TODO: info/event to parents, children and husband
+
+		// terminate all actions -- don't worry about battles because you can't retire when engaged in one.
+		foreach ($character->getActions() as $act) {
+			$this->em->remove($act);
+		}
+
+		// remove all votes
+		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:Vote v WHERE v.character = :me OR v.target_character = :me');
+		$query->setParameter('me', $character);
+		$query->execute();
+
+		// disband my troops
+		foreach ($character->getSoldiers() as $soldier) {
+			$this->military->disband($soldier, $character);
+		}
+		foreach ($character->getEntourage() as $entourage) {
+			$this->military->disbandEntourage($entourage, $character);
+		}
+
+		// FIXME: Since they're not dead, do they lose their claims still? Hm.
+		/* 
+		foreach ($character->getSettlementClaims() as $claim) {
+			if ($claim->getEnforceable()) {
+				// TODO: enforceable claims are inherited
+			}
+			$claim->getSettlement()->removeClaim($claim);
+			$character->removeSettlementClaim($claim);
+			$this->em->remove($claim);
+		} 
+		*/
+
+		// assigned troops now can't be reclaimed anymore, as character is retired
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.liege = NULL WHERE s.liege = :me');
+		$query->setParameter('me', $character);
+		$query->execute();
+
+		foreach ($character->getNewspapersEditor() as $paper) {
+			// TODO: check if we are the last owner, if so, do something (make editors owners or so)
+			$character->removeNewspapersEditor($paper);
+			$this->em->remove($paper);
+		}
+		foreach ($character->getNewspapersReader() as $paper) {
+			$character->removeNewspapersReader($paper);
+			$this->em->remove($paper);
+		}
+
+		foreach ($character->getPrisoners() as $prisoner) {
+			$prisoner->setPrisonerOf(null);
+			$character->removePrisoner($prisoner);
+			$this->history->logEvent(
+				$prisoner,
+				'event.character.prison.free2',
+				array("%link-character%"=>$character->getId()),
+				History::MEDIUM, true, 30
+			);
+		}
+
+		foreach ($character->getArtifacts() as $artifact) {
+			$this->history->logEvent(
+				$artifact,
+				'event.artifact.lost',
+				array("%link-character%"=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$artifact->setOwner(null);
+		}
+
+		foreach ($character->getVassals() as $vassal) {
+			if ($vassal->getEstates() || $vassal->getPositions()) {
+				$this->history->logEvent(
+					$vassal,
+					'event.character.liegeretired',
+					array("%link-character%"=>$character->getId()),
+					History::MEDIUM, true
+				);
+			} else {
+				$this->history->logEvent(
+					$vassal,
+					'event.character.liegeretired2',
+					array("%link-character%"=>$character->getId()),
+					History::HIGH, true
+				);
+			}
+			$vassal->setLiege(null);
+			$character->removeVassal($vassal);
+		}
+
+		// TODO: When we add dynasites, maybe send gold to family?
+		$character->setGold(0);
+
+		// inheritance
+		$this->seen = new ArrayCollection;
+		list($heir, $via) = $this->findHeir($character);
+
+		// TODO: if no heir set, check if I have a family (need to determine who inherits - partner - children - parents - or a different order ?)
+		// TODO: check for realm laws and decide if inheritance allowed
+
+		if ($heir) {
+			foreach ($character->getEstates() as $estate) {
+				$this->bequeathEstate($estate, $heir, $character, $via);
+			}
+
+			foreach ($character->getVassals() as $vassal) {
+				$this->updateVassal($vassal, $heir, $character, $via);
+			}
+		} else {
+			foreach ($character->getEstates() as $estate) {
+				$this->failInheritEstate($character, $estate);
+			}
+			foreach ($character->findRulerships() as $realm) {
+				$this->failInheritRealm($character, $realm);
+			}
+		}
+
+		// FIXME: Do we want to close logs for a character that could come back?
+		/* 
+		foreach ($character->getReadableLogs() as $log) {
+			if ($log != $character->getLog()) {
+				$this->history->closeLog($log, $character);
+			}
+		} 
+		*/
+
+		// TODO: permission lists - plus clear out those of old dead characters!
+		
+
+		// clean out dungeon stuff
+		$this->dm->retireDungeoneer($character);
+		$character->setRetiredOn(new \DateTime("now"));
 
 		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
 
@@ -679,6 +831,16 @@ class CharacterManager {
 		if ($trust['no'] > $threshold) { $rep[] = 'distrust'; }
 
 		return $rep;
+	}
+
+	public function newBackground(Character $character) {
+		if (!$character->getBackground()) {
+			$background = new CharacterBackground;
+			$character->setBackground($background);
+			$background->setCharacter($character);
+			$this->em->persist($background);
+			$this->em->flush();
+		}
 	}
 
 }

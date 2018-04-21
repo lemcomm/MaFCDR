@@ -1,6 +1,7 @@
 # Might & Fealty
-# text strings for events
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Text strings for events
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 rss:
  desc:        Might & Fealty Event Log Summary
  feed:        Get event updates via RSS
@@ -21,6 +22,13 @@ event:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
   estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
+ 
+ description:
+  updated:
+   artifact:    The description of this artifact has changed.
+   item:        The description of this item has changed.
+   place:       %character% has changed the description of %place%.
+   settlement:  %character% has updated the description of %settlement%.
 
  feature2:
   damaged:      The %featuretype% %name% is deteriorating. Workers should be assigned for repair.
@@ -98,6 +106,7 @@ event:
   knownas2:     No longer known as "%oldname%".
   death:        Died.
   death2:       Died in battle.
+  retired:      Has retired from war and politics.
   npcdeath:     Without troops, disappeared and died.
   desertions:   %complaining% soldiers are complaining about being too far away from home. %gone% of them deserted.
   deathreclaim: %amount% soldiers returned to you upon the death of %character%, whom you had them assigned to.
@@ -124,6 +133,7 @@ event:
    appointed:    Appointed %realmposition% in %realm%.
    demoted:      Demoted from %realmposition% in %realm%.
    elected:      Elected %realmposition% in %realm%.
+   abolished:    Lost the position of %realmposition% due to the dismantling of %realm%.
   liegedied:    Your liege %character% has died. This dissolves your oath of fealty.
   liegedied2:   Your liege %character% has died. This dissolves your oath of fealty and has turned you into a wandering noble with no realm affiliation.
   spot:         Your scouts spotted %character% in the vicinity.
@@ -227,11 +237,26 @@ event:
   war:
    declared:    Declared war "%war%".
    received:    %realm% has declared war, announcing settlements of your realm as targets. They call it "%war%".
-
+  abolished:
+   realm:       By order of %character%, the realm has been dismantled.
+   superior:    By order of %character%, the realm's subrealm of %realm% has been dismantled.
+   character:   Ordered the dismantling of the realm of %realm%.
+   sovereign:
+    inferior:   
+     subrealm:  With the abolishment of %realm%, the realm has become autonomous.
+     realm:     With the dismantling of the realm, the formal vassal of %realm% has gained it's autonomy.
+    estate:     With the dismantling of %realm%, the estate is effectively rogue.
+   notsovereign:
+    inferior:
+     subrealm:  With the abolishment of its superior realm, %realm-1%, %realm-2%'s superior is now %realm-3%.
+     realm:     With the abolishment of the realm, %realm-1% assumes superiorship over %realm-2%.
+     superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
+    estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
+  capital:      Declared that its capital shall now be %settlement%.
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
-  inactivekept: The holder of %position%, %character%, has succumbed to the slumber.
+  inactivekept: The holder of %realmposition%, %character%, has succumbed to the slumber.
   inherited:
    slumber:     The position of %position% has been inherited by %character-2% after the slumbering of %character-1%.
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
@@ -463,3 +488,4 @@ trans:
    friend:        I am quite sorry, but I cannot accept your offer at this time.
    neutral:       I have to refuse your request.
    hostile:       You can have what is rightfully mine if you take it from my cold, dead hands.
+   

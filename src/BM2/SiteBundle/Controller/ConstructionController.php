@@ -362,7 +362,7 @@ class ConstructionController extends Controller {
 		$unavailable=array();
 		$all = $em->getRepository('BM2SiteBundle:BuildingType')->findAll();
 		foreach ($all as $type) {
-			if ($settlement->hasBuilding($type, true)) continue;
+			if ($settlement->hasBuilding($type, true) OR !in_array('city',$type->getBuiltIn())) continue; # Already have it? Not buildable here? Move along.
 			$data = $this->checkBuildability($settlement, $type);
 
 			if ($data['buildable']) {

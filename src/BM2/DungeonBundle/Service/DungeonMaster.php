@@ -103,6 +103,13 @@ class DungeonMaster {
 		return true;
 	}
 
+	public function retireDungeoneer(Character $character) {
+		$dungeoneer = $character->getDungeoneer();
+		if (!$dungeoneer) return false; 
+
+		$this->exitDungeon($dungeoneer, 0, 0);
+		return true;
+	}
 
 	public function postMessage(Dungeoneer $sender, $content) {
 		if (!$sender->isInDungeon()) {

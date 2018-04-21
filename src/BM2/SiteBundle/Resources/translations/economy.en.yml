@@ -1,6 +1,7 @@
 # Might & Fealty
 # text strings for economy and buildings
-# Author: Tom Vogt <tom@mightandfealty.com>
+# Authors: Tom Vogt, Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
 req:        Requires
 reqfor:     Required for
 provides:   Provides
@@ -9,6 +10,7 @@ trainer:    Trained at %building%
 trainingfor:   Training for %item%
 bonus:      Droduction bonus
 defbonus:   Defensive bonus
+
 minpop:     %pop% minimum population to construct
 optpop:     Full efficiency requires %pop%+ population
 
@@ -24,8 +26,10 @@ feature:
 building:
  Academy: Academy
  Alchemist: Alchemist
+ Apothecary: Apothecary
  Archery Range: Archery Range
  Archery School: Archery School
+ Arena: Arena
  Armourer: Armorer
  Armoury: Armory
  Bank: Bank
@@ -37,17 +41,24 @@ building:
  Citadel: Citadel
  City Hall: City Hall
  Dirt Streets: Dirt Streets
+ Dockyard: Dockyard
+ Empty Moat: Empty Moat
  Fairground: Fairground
+ Filled Moat: Filled Moat
  Fishery: Fishery
  Fortress: Fortress
  Garrison: Garrison
  Great Temple: Great Temple
  Guardhouse: Guardhouse
+ Guild District: Guild District
+ Guild Square: Guild Square
  Heavy Armourer: Heavy Armorer
+ Imperial Seat: Imperial Seat
  Inn: Inn
  Irrigation Ditches: Irrigation Ditches
  Leather Tanner: Leather Tanner
  Library: Library
+ Local Seat: Local Seat
  Lumber Yard: Lumber Yard
  Market: Market
  Mason: Mason
@@ -57,7 +68,11 @@ building:
  Mine: Mine
  Palisade: Palisade
  Paved Streets: Paved Streets
+ Quarry: Quarry
+ Race Track: Race Track
+ Regional Seat: Regional Seat
  Royal Mews: Royal Mews
+ Royal Seat: Royal Seat
  Saddler: Saddler
  School: School
  Shrine: Shrine
@@ -71,6 +86,7 @@ building:
  Town Hall: Town Hall
  Training Ground: Training Ground
  University: University
+ Warehouse: Warehouse
  Weaponsmith: Weaponsmith
  Wood Castle: Wood Castle
  Wood Towers: Wood Towers
@@ -104,12 +120,20 @@ description:
    Usually set at the edge of the settlement, the alchemist is always expected to blow up spectacularily, but
    in reality most of his experiments are far less dangerous or spectacular. While much of the research done
    here is of questionable quality, there is the occasional poison or interesting substance discovered.
+ Apothecary: >
+   Sometimes called an herbalist, or a pharmacist, the apothecary formulates and dispenses medical herbs and drugs
+   to other medical workers or even to patients directly. The inclusion of such an individual in a society is
+   certain to aid in survival.
  Archery Range: >
    A reserved spot with targets and some wood walls to catch misfires. A place for archers to train and learn
    how to draw, aim and fire. Required if you want to train any kind of archers.
  Archery School: >
    The famous longbow requires more extensive training than other ranged weapons and the archery school offers
    just that, adding more versatility and greater ranges to the archery range.
+ Arena: >
+   An arena is a formal fighting area, surrounded by spectator seating for both commoners and the more affluent.
+   It normally also houses areas for keeping slave fighters locked up, an area for storing weapons and equipment
+   to be used in the fights, and sometimes even keeping more dangerous animals to be let loose on the competitors.
  Armourer: >
    A specialist creating all kinds of armor for your soldiers, the armorer combines cloth, leather and metal
    into some serious protection.
@@ -140,9 +164,18 @@ description:
  Dirt Streets: >
    More solid and reliable streets within the settlement allow for better travel and are required for some heavy transports
    and the buildings that require them.
+ Dockyard: >
+   The dockyard is an area in a settlement for processing and handling ships and their cargo and passengers. Some larger
+   dockyards may also have shipbuilding capabilities, and many are capable of handling some smaller repairs.
+ Empty Moat: >
+   An empty moat, otherwise known as a ditch, is an excavated area of land around a foritification put in place to deliberately
+   slow the advance of attackers. Normally, there is a bridge that can be let down to ease authorized travelers getting in and out.
  Fairground: >
    A larger and more permanent place of trade, the fairground allows for extensive trade and barter as well as special
    events which bring in traders from far away places and through trade increase the local wealth.
+ Filled Moat: >
+   A filled moat, or a ditch filled with water or other liquid, is used to considerably slow attacking forces reaching the walls
+   of a fortification. Some filled moats may also include animals in the water that attack anyone who may be so unlucky as to fall in.
  Fishery: >
    A small port, boat yard and processing facilities for sea fishing, adding more fish to the menu of the local inhabitants
    as fishermen can go further out with better boats and better nets than they can build by themselves.<br />
@@ -160,9 +193,20 @@ description:
  Guardhouse: >
    A small house for the guards and soldiers of the settlement to gather and store their equipment, allowing for the
    training and recruitment of some basic soldier types.
+ Guild District: >
+   A larger and more formalized version of the Guild Square, the Guild District is an area in a city specifically setup by the
+   administration for the dealings of the various guilds and associations.
+ Guild Square: >
+   A square or plaza within a settlement that has come to home to various guilds and associations. Just the presence of the
+   guild square is enough to draw some of the mortal guilds to a settlement, as having a guild square also entails a settlement
+   having the administrative oversight to deal with guilds.
  Heavy Armourer: >
    A rare specialist for heavy armor who can work miracles with metal and create the rare and valuable plate armor, the
    ultimate in personal armor.
+ Imperial Seat: >   
+   The Seat of Power for an Empire, the Imperial Seat supports the administration of such world powers, and contains
+   the various bureaucratic workers and offices that keep it all working. The completion of such a complex array of offices
+   and buildings, tends to be quite an accomplishment.
  Inn: >
    The village inn or for towns and cities a collection of roadhouses, inns, brothels and similar places for travellers to 
    rest and spend the night, this is where you can also find the odd talent to hire or meet shady figures at corner tables
@@ -176,6 +220,9 @@ description:
  Library: >
    Storage place for books and manuscripts of both holy and secular importance. <br />
    This building is also required to create your own publications.
+ Local Seat: >   
+   The Seat of Power for a Barony or County, the Local Seat supports the administration of such powers, and contains
+   the various bureaucratic workers and offices that keep it all working.
  Lumber Yard: >
    Central storage and processing area for woodcutting and forestry work. This improves the efficiency of woodcutting
    in the area, resulting in higher wood production.
@@ -204,10 +251,22 @@ description:
  Paved Streets: >
    Paving the streets of the settlement allows for better transport especially with wheeled vehicles. Even more importantly,
    it makes travel more independent from weather, and is necessary for some large-scale constructions.
+ Quarry: >
+   An area set aside for the large scale excavation of granite, limestone, or similar usable construction material.
+ Race Track: >
+   Regardless of what is actually being raced, race tracks tend to boost the local economy either by drawing people to the city
+   or by increasing morale, and thus a person's willingness to spend. Many also include formal betting houses, though the
+   legitimacy of such establishments can vary from city to city.
+ Regional Seat: >   
+   The Seat of Power for a March or Duchy, the Regional Seat supports the administration of such regional powers, and contains
+   the various bureaucratic workers and offices that keep it all working.
  Royal Mews: >
    Larger and with more experienced breeders and trainers than the regular stables, the royal mews allow for the
    breeding and training of the rare and valuable war horses, massive steeds who won't panic in battle and will
    under a capable rider trample down an enemy.
+ Royal Seat: >
+   The Seat of Power for a Principality or Kingdom, the Royal Seat supports the administration of such royal realms, and contains
+   the various bureaucratic workers and offices that keep it all working.
  Saddler: >
    A specialised craftsman who creates saddles, stirrups, bridles, reins and other gear for horses and carts.
  School: >
@@ -242,6 +301,9 @@ description:
  University: >
    The highest place of learning available to your people, the university is a center of knowledge and the foundation of some
    of the most rare and valuable experts.
+ Warehouse: >
+   Used to store goods and equipment of all kinds, it's best used for things that don't spoil. That said, it does provide a
+   slight benefit to the local food production industry, if not always directly.
  Weaponsmith: >
    A specialised craftsman forging weapons. While most of his work is similar to the blacksmith, he also handles some woodwork
    for handles and uses more advanced smelting and forging techniques to create weapons capable of withstanding a higher
@@ -257,12 +319,19 @@ description:
    against wild animals, bandit and unorganized attackers.
 
 condition:
- Mine:         Can only be built in mountains and hills with metal ore in the ground.
- Stables:      Can only be built in grass- or scrublands.
- Royal Mews:   Can only be built in grasslands.
- Fortress:     Cannot be built in marshland.
- Citadel:      Cannot be built in marshland.
- Fishery:      Can only be built at the coast (both ocean and lakes).
- Lumber Yard:  Can only be built in forests.
+ Archery Range:      Cannot be built in mountains and dense forests.
+ Citadel:            Cannot be built in marshland.
+ Fishery:            Can only be built at the coast (both ocean and lakes).
+ Fortress:           Cannot be built in marshland.
  Irrigation Ditches: Can only be built near rivers, can't be built in mountains or marshes.
- Archery Range:   Cannot be built in mountains and dense forests.
+ Local Seat:         Can only be built in the capital of a realm.
+ Lumber Yard:        Can only be built in forests.
+ Quarry:             Not yet enabled/complete.
+ Mine:               Can only be built in mountains and hills with metal ore in the ground.
+ Regional Seat:      Can only be built in the capital of a realm.
+ Royal Mews:         Can only be built in grasslands.
+ Royal Seat:         Can only be built in the capital of a realm.
+ Stables:            Can only be built in grass- or scrublands.
+ Imperial Seat:      Can only be built in the capital of a realm.
+ Dockyard:           Not yet enabled/complete.
+ Filled Moat: Region must be coastal or have a river.

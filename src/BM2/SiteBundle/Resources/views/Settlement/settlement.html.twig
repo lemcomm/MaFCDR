@@ -27,6 +27,7 @@
 		{% set isowner = false %}
 	{% endif %}
 	<ul class="simple">
+		{% if settlement.capitalOf is not empty %}<li>{{ 'settlement.capital'|trans }}: {% for capitalOf in settlement.capitalOf %}<a href="{{ path('bm2_realm', {'id':capitalOf.id})}}">{{ capitalOf.name }}, </a>{% endfor %}</li>{% endif %}
 		<li>{% if settlement.fortified %}{{ 'settlement.fortified'|trans }} {% endif %}{{ settlement.type|trans }}, {{ ('biome.'~settlement.geodata.biome.name)|trans }}</li>
 		<li>{{ 'settlement.culture'|trans }}: {{ ('culture.'~settlement.culture.name)|trans }}</li>
 		{% if isowner %}
@@ -75,6 +76,7 @@
 		{% if isowner %}
 			<br /><a href="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}">{{ 'control.permissions.name'|trans({},"actions") }}</a>
 			- <a href="{{ path('bm2_site_settlement_quests', {'id':settlement.id}) }}">{{ 'control.quests.name'|trans({},"actions") }}</a>
+			- <a href="{{ path('bm2_site_settlement_description', {'id':settlement.id}) }}">{{ 'control.description.settlement.name'|trans({},"actions") }}</a>
 		{% endif %}
 	{% else %}
 		{{ 'settlement.independent'|trans }}
@@ -332,7 +334,6 @@
 		{% endif %}
 	{% endif %}
 
-
 	<h2>{{ 'settlement.neighbours'|trans|title }}</h2>
 	<ul>
 	{% for neighbour in neighbours %}
@@ -340,6 +341,11 @@
 			{{ neighbour.distance|distance }}, {{ neighbour.direction|direction(true)|trans }}</li>
 	{% endfor %}
 	</ul>
+
+	{% if settlement.description is not null %}
+		<h2>{{ 'settlement.description'|trans|title }}</h2>
+		{{ settlement.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% endif %}
 
 	<br class="clear" />
 

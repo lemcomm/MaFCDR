@@ -126,7 +126,11 @@
 {# add a simple form - hidden input field with id, button to click "mark as read" #}
 <ul>
 {% for meta in unread %}
+	{% if meta.conversation.appReference %}
+	<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.appReference.name }}: {{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+	{% else %}
 	<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
+	{% endif %}
 {% else %}
 	<li>{{ 'summary.nonew'|trans({}, "MsgBundle") }}</li>
 {% endfor %}

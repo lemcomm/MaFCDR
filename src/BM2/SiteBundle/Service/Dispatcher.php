@@ -28,6 +28,7 @@ class Dispatcher {
 
 	// test results to store because they are expensive to calculate
 	private $actionableSettlement=false;
+	private $actionablePlace=false;
 	private $actionableRegion=false;
 	private $actionableDock=false;
 	private $actionableShip=false;
@@ -110,17 +111,26 @@ class Dispatcher {
 		}
 
 		$actions=array();
-		if ($place = $this->getActionableSettlement()) {
+		if ($this->getLeaveableSettlement()) {
+			$actions[] = $this->locationLeaveTest(true);
+		} else if ($estate = $this->getActionableSettlement()) {
 			$actions[] = $this->locationEnterTest(true);
 		} else {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
-		if ($this->getLeaveableSettlement()) {
-			$actions[] = $this->locationLeaveTest(true);
+		/* Code not yet ready for deployment!
+		if ($actionableplace = $this->getActionablePlace()) {
+			$actions[] = array("name"=>"places.actionable.name", "description"=>"places.actionable.description");
+		} else if ($this->getLeaveablePlace()) {
+			$actions[] = $this->placeLeaveTest(true);
 		} else {
-			$actions[] = array("name"=>"location.exit.name", "description"=>"unavailable.inside");
+			$actions[] = array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
+		if ($newplace = $this->placeCreateTest(true)) {
+			$actions[] = $newplace;
+		}
+		*/
 
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
@@ -244,6 +254,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"control.all", "description"=>"unavailable.notinside");
 		} else {
 			$actions[] = $this->controlChangeRealmTest(true);
+			$actions[] = $this->controlSettlementDescriptionTest();
 			$actions[] = $this->controlGrantTest(true);
 			$actions[] = $this->controlRenameTest(true);
 			$actions[] = $this->controlCultureTest(true);
@@ -255,7 +266,7 @@ class Dispatcher {
 	}
 
 	private function controlActionsGenericTests() {
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return 'notinside';
 		}
 		return $this->veryGenericTests();
@@ -289,26 +300,34 @@ class Dispatcher {
 
 		$actions[] = $this->militaryDamageFeatureTest(true);
 		$actions[] = $this->militaryLootSettlementTest(true);
-		if ($place = $this->getActionableSettlement()) {
+		if ($estate = $this->getActionableSettlement()) {
 			$actions[] = $this->militaryAttackSettlementTest(true);
 			$actions[] = $this->militaryDefendSettlementTest(true);
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
+		/* Not ready yet!
+		if ($estate = $this->getActionableSettlement()) {
+			$actions[] = $this->militaryAttackPlaceTest(true);
+			$actions[] = $this->militaryDefendPlaceTest(true);
+		} else {
+			$actions[] = array("name"=>"military.other", "description"=>"unavailable.noplace");
+		}
+		*/
 
 		return array("name"=>"military.name", "elements"=>$actions);
 	}
 
 	public function economyActions() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
 			return array("name"=>"economy.name", "elements"=>array(array("name"=>"economy.all", "description"=>"unavailable.$check")));
 		}
 
 		$actions=array();
 		$actions[] = $this->economyTradeTest();
 
-		if ($this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'construct')) {
+		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
 			$actions[] = $this->economyRoadsTest();
 			$actions[] = $this->economyFeaturesTest();
 			$actions[] = $this->economyBuildingsTest();
@@ -320,8 +339,8 @@ class Dispatcher {
 		return array("name"=>"economy.name", "elements"=>$actions);
 	}
 
-	private function economyActionsGenericTests(Settlement $place=null) {
-		if (!$place) {
+	private function economyActionsGenericTests(Settlement $estate=null) {
+		if (!$estate) {
 			return 'notinside';
 		}
 		return $this->veryGenericTests();
@@ -335,10 +354,10 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"recruit.name", "description"=>"unavailable.npc");
 		}
-		if (! $place = $this->getCharacter()->getInsideSettlement()) {
+		if (! $estate = $this->getCharacter()->getInsideSettlement()) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
-		if ($this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'recruit')) {
+		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'recruit')) {
 				$actions[] = $this->personalEntourageTest();
 				$actions[] = $this->personalSoldiersTest();
 				$actions[] = $this->personalMilitiaTest();
@@ -353,14 +372,14 @@ class Dispatcher {
 		return array("name"=>"recruit.name", "elements"=>$actions);
 	}
 
-	private function personalActionsGenericTests(Settlement $place=null, $test='recruit') {
+	private function personalActionsGenericTests(Settlement $estate=null, $test='recruit') {
 		if ($this->getCharacter()->isNPC()) {
 			return 'npc';
 		}
-		if (!$place) {
+		if (!$estate) {
 			return 'notinside';
 		}
-		if (!$this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), $test)) {
+		if (!$this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), $test)) {
 			return 'notyours';
 		}
 
@@ -403,11 +422,14 @@ class Dispatcher {
 			$actions[] = array("title"=>$realm->getFormalName());
 			$actions[] = array("name"=>"realm.view.name", "url"=>"bm2_site_realm_hierarchy", "parameters"=>array("realm"=>$realm->getId()), "description"=>"realm.view.description", "long"=>"realm.view.longdesc");
 			$actions[] = $this->hierarchyManageRealmTest();
+			$actions[] = $this->hierarchyManageDescriptionTest();
+			$actions[] = $this->hierarchySelectCapitalTest();
 			$actions[] = $this->hierarchyAbdicateTest();
 			$actions[] = $this->hierarchyRealmPositionsTest();
 			$actions[] = $this->hierarchyRealmLawsTest();
 			$actions[] = $this->hierarchyWarTest();
 			$actions[] = $this->hierarchyDiplomacyTest();
+			$actions[] = $this->hierarchyAbolishRealmTest();
 			$actions[] = $this->hierarchyElectionsTest();
 		}
 
@@ -439,7 +461,40 @@ class Dispatcher {
 		return array("name"=>"inheritance", "elements"=>$actions);
 	}
 
+	/* ========== Place Dispatchers ========= */
+	/* Code not yet ready for deployment!	
 
+	public function PlacesActions() {
+		$actions=array();
+		if (($check = $this->placesActionsGenericTests()) !== true) {
+			$actions[] = array("name"=>"places.all", "description"=>"unavailable.$check");
+			return array("name"=>"places.name", "intro"=>"politics.intro", "elements"=>$actions);
+		}
+		$actions[] = $this->placeCreateTest();
+		
+		foreach ($this->geo->findPlacesInActionRange($this->getCharacter()) as $place) {
+			$this->setPlace($place);
+			$actions[] = array("title"=>$place->getFormalName());
+			$actions[] = array("name"=>"place.view.name", "url"=>"bm2_site_place_view", "parameters"=>array("id"=>$place->getId()), "description"=>"place.view.description", "long"=>"place.view.longdesc");
+			$actions[] = $this->placeCreateTest();
+			$actions[] = $this->placeManageTest();
+			$actions[] = $this->placeEnterTest();
+		}
+		
+		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
+	}
+
+	private function placeActionsGenericTests(Place $place=null) {
+		if ($this->getCharacter()->getUser()->getRestricted()) {
+			return 'restricted';
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return 'npc';
+		}
+
+		return $this->veryGenericTests();
+	}
+	*/
 
 	/* ========== Meta Dispatchers ========== */
 
@@ -452,6 +507,7 @@ class Dispatcher {
 			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
 			$actions[] = $this->metaRenameTest();
+			$actions[] = $this->metaRetireTest();
 			$actions[] = $this->metaKillTest();
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
@@ -482,7 +538,7 @@ class Dispatcher {
 		if ($this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inside");
 		}
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.enter')) {
@@ -493,7 +549,7 @@ class Dispatcher {
 		}
 
 		if ($this->getCharacter()->isPrisoner()) {
-			if ($place->getOwner() == $this->getCharacter()) {
+			if ($estate->getOwner() == $this->getCharacter()) {
 				return array("name"=>"location.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"location.enter.description2");
 			} else {
 				return array("name"=>"location.enter.name", "description"=>"unavailable.enter.notyours");
@@ -511,7 +567,7 @@ class Dispatcher {
 		if (!$this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.outside");
 		}
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.exit')) {
@@ -657,7 +713,7 @@ class Dispatcher {
 
 
 	public function nearbySpyTest($check_duplicate=false) {
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($this->getCharacter()->getAvailableEntourageOfType("spy")->count() <= 0) {
@@ -676,10 +732,10 @@ class Dispatcher {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.prisoner");
 		}
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($place->isFortified() && $this->getCharacter()->getInsideSettlement()!=$place) {
+		if ($estate->isFortified() && $this->getCharacter()->getInsideSettlement()!=$estate) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.location.fortified");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.take')) {
@@ -701,16 +757,16 @@ class Dispatcher {
 			return array("name"=>"control.take.name", "description"=>"unavailable.free2");
 		}
 
-		if ($place->getOwner() == $this->getCharacter()) {
+		if ($estate->getOwner() == $this->getCharacter()) {
 			// I control this settlement - defend if applicable
-			if ($place->getRelatedActions()->exists(
+			if ($estate->getRelatedActions()->exists(
 				function($key, $element) { return $element->getType() == 'settlement.take'; }
 			)) {
 				return $this->action("control.takeX", "bm2_site_actions_take");
 			} else {
 				return array("name"=>"control.take.name", "description"=>"unavailable.location.yours");
 			}
-		} elseif ($place->getOwner()) {
+		} elseif ($estate->getOwner()) {
 			// someone else controls this settlement
 			// TODO: different text?
 			return $this->action("control.take", "bm2_site_actions_take");
@@ -729,14 +785,14 @@ class Dispatcher {
 		}
 		// FIXME: this still sometimes gives a "you are not inside" message when it shouldn't, I think?
 		if ($this->settlement) {
-			$place = $this->settlement;
+			$estate = $this->settlement;
 		} else {
-			$place = $this->getCharacter()->getInsideSettlement();
+			$estate = $this->getCharacter()->getInsideSettlement();
 		}
-		if (!$place) {
+		if (!$estate) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notsettlement");
 		}
-		if ($place->getOwner() != $this->getCharacter()) {
+		if ($estate->getOwner() != $this->getCharacter()) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notyours2");
 		}
 
@@ -744,7 +800,7 @@ class Dispatcher {
 		if ($myrealms->isEmpty()) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.norealms");
 		}
-		return $this->action("control.changerealm", "bm2_site_actions_changerealm", false, array('id'=>$place->getId()));
+		return $this->action("control.changerealm", "bm2_site_actions_changerealm", false, array('id'=>$estate->getId()));
 	}
 
 	public function controlGrantTest($check_duplicate=false) {
@@ -754,10 +810,10 @@ class Dispatcher {
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.grant')) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.already");
 		}
-		if (!$place = $this->getCharacter()->getInsideSettlement()) {
+		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($place->getOwner() != $this->getCharacter()) {
+		if ($estate->getOwner() != $this->getCharacter()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.notyours2");
 		}
 		if (!$this->getActionableCharacters()) {
@@ -771,13 +827,28 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.$check");
 		}
-		if (!$place = $this->getCharacter()->getInsideSettlement()) {
+		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($place->getOwner() == $this->getCharacter()) {
+		if ($estate->getOwner() == $this->getCharacter()) {
 			return $this->action("control.rename", "bm2_site_actions_rename");
 		} else {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.notyours2");
+		}
+	}
+
+
+	public function controlSettlementDescriptionTest($check_duplicate=false) {
+		if (($check = $this->controlActionsGenericTests()) !== true) {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.$check");
+		}
+		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($estate->getOwner() == $this->getCharacter()) {
+			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$estate->getId()));
+		} else {
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.notyours2");
 		}
 	}
 
@@ -785,10 +856,10 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.$check");
 		}
-		if (!$place = $this->getCharacter()->getInsideSettlement()) {
+		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($place->getOwner() == $this->getCharacter()) {
+		if ($estate->getOwner() == $this->getCharacter()) {
 			return $this->action("control.culture", "bm2_site_actions_changeculture");               
 		} else {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.notyours2");
@@ -799,9 +870,9 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.$check");
 		}
-		$place = $this->getCharacter()->getInsideSettlement();
-		if ($place->getOwner() == $this->getCharacter()) {
-			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$place->getId()));
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if ($estate->getOwner() == $this->getCharacter()) {
+			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$estate->getId()));
 		} else {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.notyours2");
 		}
@@ -811,9 +882,9 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.$check");
 		}
-		$place = $this->getCharacter()->getInsideSettlement();
-		if ($place->getOwner() == $this->getCharacter()) {
-			return $this->action("control.quests", "bm2_site_settlement_quests", false, array('id'=>$place->getId()));
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if ($estate->getOwner() == $this->getCharacter()) {
+			return $this->action("control.quests", "bm2_site_settlement_quests", false, array('id'=>$estate->getId()));
 		} else {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.notyours2");
 		}
@@ -905,7 +976,7 @@ class Dispatcher {
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.defend')) {
 			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.already");
 		}
-		if ( ! $place = $this->getCharacter()->getInsideSettlement()) {
+		if ( ! $estate = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.notinside");
 		}
 		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
@@ -942,13 +1013,13 @@ class Dispatcher {
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosoldiers");
 		}
-		if (!$place = $this->getActionableSettlement()) {
+		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($place->getOwner() == $this->getCharacter()) {
+		if ($estate->getOwner() == $this->getCharacter()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.yours");
 		}
-		if (!$place->isDefended()) {
+		if (!$estate->isDefended()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
 		}
 		if ($this->getCharacter()->isInBattle()) {
@@ -958,6 +1029,68 @@ class Dispatcher {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.fresh");
 		}
 		return $this->action("military.settlement.attack", "bm2_site_war_attacksettlement");
+	}
+	
+		public function militaryDefendPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.defend')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.already");
+		}
+		if (!$estate = $this->getCharacter()->getInsidePlace()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.notinside");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.inbattle");			
+		}
+		return $this->action("military.place.defend", "bm2_site_war_defendplace");
+	}
+
+	public function militaryAttackPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if (!$estate = $this->getActionablePlace()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.noplace");
+		}
+		if ($estate->getOwner() == $this->getCharacter()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.yours");
+		}
+		if (!$estate->isDefended()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.nodefenders");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.inbattle");			
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.place.attack", "bm2_site_war_attackplace");
 	}
 
 	public function militaryDamageFeatureTest($check_duplicate=false) {
@@ -1054,7 +1187,6 @@ class Dispatcher {
 		return $this->action("military.aid", "bm2_site_war_aid");
 	}
 
-
 	public function militaryJoinBattleTest() {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"military.battles.join.name", "description"=>"unavailable.prisoner");
@@ -1073,7 +1205,6 @@ class Dispatcher {
 		}
 		return $this->action("military.battles.join", "bm2_site_war_battlejoin");
 	}
-
 
 	/* ========== Personal Actions ========== */
 
@@ -1120,11 +1251,9 @@ class Dispatcher {
 		return $this->action("escape", "bm2_site_character_escape");
 	}
 
-
-
 	public function personalEntourageTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
 			return array("name"=>"recruit.entourage.name", "description"=>"unavailable.$check");
 		}
 
@@ -1132,11 +1261,11 @@ class Dispatcher {
 	}
 
 	public function personalSoldiersTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
 		}
-		$available = $this->military->findAvailableEquipment($place, true);
+		$available = $this->military->findAvailableEquipment($estate, true);
 		if (empty($available)) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");			
 		}
@@ -1145,33 +1274,33 @@ class Dispatcher {
 	}
 
 	public function personalMilitiaTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($place, 'mobilize')) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
 			return array("name"=>"recruit.militia.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getSoldiers()->isEmpty()) {
+		if ($estate->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.militia.name", "description"=>"unavailable.nomilitia");
 		}
 
-		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$place->getID()));
+		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$estate->getID()));
 	}
 
 	public function personalOffersTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($place, 'mobilize')) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOwner() != $this->getCharacter()) {
+		if ($estate->getOwner() != $this->getCharacter()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.notyours2");
 		}
-		if ($place->getSoldiers()->isEmpty()) {
+		if ($estate->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
 		}
-		if (!$place->getRealm()) {
+		if (!$estate->getRealm()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
 		}
 
-		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$place->getID()));
+		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$estate->getID()));
 	}
 
 	public function personalAssignedSoldiersTest() {
@@ -1188,14 +1317,14 @@ class Dispatcher {
 	/* ========== Economy Actions ========== */
 
 	public function economyTradeTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
 			return array("name"=>"economy.trade.name", "description"=>"unavailable.$check");
 		}
 
 		// TODO: need a merchant in your entourage for trade options? or just foreign trade?
 
-		if ($this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'trade')) {
+		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'trade')) {
 			return array("name"=>"economy.trade.name", "url"=>"bm2_site_actions_trade", "description"=>"economy.trade.owner");
 		} else {
 			if ($this->getCharacter()->getEstates()->isEmpty()) {
@@ -1206,11 +1335,11 @@ class Dispatcher {
 	}
 
 	public function economyRoadsTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.notyours");
 		}
 
@@ -1218,11 +1347,11 @@ class Dispatcher {
 	}
 
 	public function economyFeaturesTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.notyours");
 		}
 
@@ -1230,20 +1359,129 @@ class Dispatcher {
 	}
 
 	public function economyBuildingsTest() {
-		$place = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($place)) !== true) {
+		$estate = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($place, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.notyours");
 		}
 
 		return array("name"=>"economy.build.name", "url"=>"bm2_site_construction_buildings", "description"=>"economy.build.description");
 	}
 
+	/* ========== Place Actions ============== */
+	/* Code not yet ready for deployment!
+
+	public function placeCreateTest() {
+		if ($this->getCharacter()->isTrial()) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.free");
+		}
+		if ($check = $this->placeActionsGenericTests() !== true) {
+			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
+		}
+		return array("name"=>"place.new.name", "url"=>"bm2_site_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
+	}
+
+	public function placeManageTest() {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->place->getOwner != $this->getCharacter() OR !$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'describe')) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
+		} else {
+			return $this->action("place.manage", "bm2_site_place_manage", true, 
+				array('place'=>$this->place->getId()),
+				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
+			);
+		}
+	}
+	
+	public function placePermissionsTest() {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
+		}
+		if ($this->place != $this->getActionablePlace()) {
+			return array("name"=>"place.enter.name", 
+				     "description"=>"unavailable.noplace"
+				    );
+		}
+		if (!$this->place->getOwner != $this->getCharacter()) {
+			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
+		}
+		return $this->action("place.permissions", "bm2_site_place_permissions", true, 
+				array('place'=>$this->place->getId()),
+				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
+			);
+	}
+	
+	public function placeEnterTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
+		}
+		if ($this->place != $this->getActionablePlace()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.inbattle");
+		}
+
+		if ($this->getCharacter()->isPrisoner()) {
+			if ($place->getOwner() == $this->getCharacter()) {
+				return array("name"=>"place.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"place.enter.description2");
+			} else {
+				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
+			}
+		} else {
+			return $this->action("place.enter", "bm2_site_actions_place", false, array('id'=>$place->getId()));
+		}
+	}
+	
+	public function placeLeaveTest($check_duplicate=false) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.$check"
+				    );
+		}
+		if (!$this->getCharacter()->getInsidePlace()) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.outside"
+				    );
+		}
+		if (!$place = $this->getActionablePlace()) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.noplace"
+				    );
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.exit')) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.already"
+				    );
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.inbattle"
+				    );
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"place.exit.name", 
+				     "description"=>"unavailable.prisoner"
+				    );
+		} else {
+			return $this->action("place.exit", 
+					     "bm2_site_actions_place_exit"
+					    );
+		}
+	}
+	*/
 
 	/* ========== Political Actions ========== */
-
 
 	public function hierarchyOathTest() {
 		// swear an oath of fealty - only available if we don't lead a realm (if we do, similar actions are under realm management)
@@ -1314,6 +1552,34 @@ class Dispatcher {
 		}
 	}
 
+	public function hierarchyManageDescriptionTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.description.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.description.name", "description"=>"unavailable.notleader");
+		} else {
+			return $this->action("realm.description", "bm2_site_realm_description", true, 
+				array('realm'=>$this->realm->getId()),
+				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			);
+		}
+	}
+
+	public function hierarchyAbolishRealmTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.abolish.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.abolish.name", "description"=>"unavailable.notleader");
+		} else {
+			return $this->action("realm.abolish", "bm2_site_realm_abolish", true, 
+				array('realm'=>$this->realm->getId()),
+				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			);
+		}
+	}
+
 	public function hierarchyAbdicateTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"realm.abdicate.name", "description"=>"unavailable.$check");
@@ -1341,7 +1607,6 @@ class Dispatcher {
 			);
 		}
 	}
-
 
 	public function hierarchyRealmPositionsTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
@@ -1371,7 +1636,6 @@ class Dispatcher {
 		}
 	}
 
-
 	public function hierarchyDiplomacyTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"diplomacy.name", "description"=>"unavailable.$check");
@@ -1395,6 +1659,20 @@ class Dispatcher {
 		}
 
 		return $this->action("elections", "bm2_site_realm_elections", false, 
+			array('realm'=>$this->realm->getId()), 
+			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+		);
+	}
+
+	public function hierarchySelectCapitalTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.capital.name1", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.capital.name1", "description"=>"unavailable.notleader");
+		}
+
+		return $this->action("realm.capital", "bm2_site_realm_capital", false, 
 			array('realm'=>$this->realm->getId()), 
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
@@ -1515,11 +1793,22 @@ class Dispatcher {
 		return array("name"=>"meta.settings.name", "url"=>"bm2_site_character_settings", "description"=>"meta.settings.description");
 	}
 
+	public function metaRetireTest() {
+		if ($this->getCharacter()->isNPC()) {
+			// FIXME: respawn template doesn't exist.
+			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"meta.background.name", "description"=>"unavailble.prisoner");
+		}
+		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
+	}
+
 	public function metaKillTest() {
 		if ($this->getCharacter()->isNPC()) {
 			// FIXME: respawn template doesn't exist.
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
-			return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
+			# return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
 		}
 		return array("name"=>"meta.kill.name", "url"=>"bm2_site_character_kill", "description"=>"meta.kill.description");
 	}
@@ -1556,6 +1845,32 @@ class Dispatcher {
 			return $this->getCharacter()->getInsideSettlement();
 		}
 	}
+	
+	public function getActionablePlace() {
+		if (is_object($this->actionablePlace) || $this->actionablePlace===null) return $this->actionablePlace;
+
+		$this->actionablePlace=null;
+		if ($this->getCharacter()) {
+			if ($this->getCharacter()->getInsidePlace()) {
+				$this->actionablePlace = $this->getCharacter()->getInsidePlace();
+			} else if ($location=$this->getCharacter()->getLocation()) {
+				$nearest = $this->geography->findNearestPlace($this->getCharacter());
+				if ($nearest) {
+					$place=array_shift($nearest);
+					if ($nearest['distance'] < $this->geography->calculatePlaceActionDistance($place)) {
+						$this->actionablePlace=$place;
+					}
+				}
+			}
+		}
+		return $this->actionablePlace;
+	}
+
+	public function getLeaveablePlace() {
+		if ($this->getCharacter()->getInsidePlace()) {
+			return $this->getCharacter()->getInsidePlace();
+		}
+	}
 
 	public function getActionableRegion() {
 		if (is_object($this->actionableRegion) || $this->actionableRegion===null) return $this->actionableRegion;
@@ -1568,12 +1883,12 @@ class Dispatcher {
 		if (!$this->getCharacter()) {
 			throw new AccessDeniedHttpException('error.nocharacter');
 		}
-		if ($place = $this->getCharacter()->getInsideSettlement()) {
+		if ($estate = $this->getCharacter()->getInsideSettlement()) {
 			// initially, this was all restricted to characters inside the settlement, but that makes attacks towards the outside, etc. impossible,
 			// and since we don't have a "leave settlement" action...
 			// FIXME: it should contain both - inside settlement and in action range
 			// FIXME: anyway this doesn't work and those outside are excluded
-//			return $this->geography->findCharactersInSettlement($place, $this->getCharacter());
+//			return $this->geography->findCharactersInSettlement($estate, $this->getCharacter());
 			return $this->geography->findCharactersInActionRange($this->getCharacter(), false, $match_battle);
 		} else {
 			return $this->geography->findCharactersInActionRange($this->getCharacter(), true, $match_battle);
