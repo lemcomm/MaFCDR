@@ -38,7 +38,7 @@ class HouseController extends Controller {
 		$house = $id;
 		$inhouse = false;
 		
-		$character = $this->get('appstate')getCharacters(false, true, true);
+		$character = $this->get('appstate')->getCharacter(false, true, true);
 		if ($character) {
 			if ($character->getHouse() == $house) {
 				$inhouse = true;
@@ -97,7 +97,6 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		
 		$name = $house->getName();
-		if($
 
 		$form = $this->createForm(new HouseCreationType($name, $desc, $priv, $secret));
 		$form->handleRequest($request);
@@ -177,7 +176,7 @@ class HouseController extends Controller {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse')
+			throw createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() !== $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
@@ -192,3 +191,4 @@ class HouseController extends Controller {
 			'form' => $form->createView(),
 		);
 	}
+}
