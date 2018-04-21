@@ -71,7 +71,7 @@
 	<dl class="wide">
 		{% for perm in permissions %}
 			<dt>{{ perm.translationstring|trans({},"politics") }}</dt>
-			<dd>{{ ('perm.desc.'~perm.name)|trans({},"politics")|raw }}</dd>
+			<dd>{{ perm.description|trans({},"politics") }}</dd>
 		{% endfor %}
 	</dl>
 
