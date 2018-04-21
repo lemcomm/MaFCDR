@@ -45,6 +45,10 @@ class DescriptionManager {
 					$olddesc->setActiveArtifact(NULL);
 					$this->em->flush();
 					break;
+				case 'House':
+					$olddesc->setActiveHouse(NULL);
+					$this->em->flush();
+					break;
 				case 'Item':
 					$olddesc->setActiveItem(NULL);
 					$this->em->flush();
@@ -71,6 +75,10 @@ class DescriptionManager {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
 				$desc->setArtifact($entity);
+				break;
+			case 'House':
+				$desc->setActiveHouse($entity);
+				$desc->setHouse($entity);
 				break;
 			case 'Item':
 				$desc->setActiveItem($entity);
@@ -106,6 +114,13 @@ class DescriptionManager {
 						$entity,
 						'event.description.updated.artifact',
 						null,
+						History::LOW
+					);
+					break;
+				case 'House':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.house',
 						History::LOW
 					);
 					break;
