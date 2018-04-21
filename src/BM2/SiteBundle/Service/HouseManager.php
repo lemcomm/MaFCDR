@@ -89,7 +89,9 @@ class HouseManager {
 		$house->setGold(0);
 		$this->em->persist($house);
 		$this->em->flush($house);
-		$this->descman->newDescription($house, $description, $founder, TRUE);
+		if ($description) {
+			$this->descman->newDescription($house, $description, $founder, TRUE);
+		}
 
 		return $house;
 	}
