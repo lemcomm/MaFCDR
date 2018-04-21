@@ -82,7 +82,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @appstate, @history]
     house_manager:
         class:      BM2\SiteBundle\Service\HouseManager
-        arguments:  [@doctrine.orm.entity_manager, @appstate, @history]
+        arguments:  [@doctrine.orm.entity_manager, @history]
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
         arguments:  [@doctrine.orm.entity_manager, @appstate, @history, @dispatcher, @generator, @geography, @interactions, @politics, @military, @permission_manager, @twig.extension.gametime]
