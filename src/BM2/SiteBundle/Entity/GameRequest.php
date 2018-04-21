@@ -2,7 +2,7 @@
 
 namespace BM2\SiteBundle\Entity;
 
-class Request {
+class GameRequest {
 
 	public function __toString() {
 		return "request {$this->id} - {$this->type}";
