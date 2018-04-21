@@ -34,6 +34,9 @@
 		<one-to-many field="resources" target-entity="GeoResource" mapped-by="settlement"/>
 		<one-to-many field="buildings" target-entity="Building" mapped-by="settlement" index-by="type"/>
 		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="base" index-by="id" fetch="EXTRA_LAZY"/>
+		
+		<one-to-many field="houses_present" taget-entity="House" inversed-by="inside_settlement"/>
+		<one-to-many field="houses_pending" target-entity="House" inversed-by="pending_settlement"/>
 
 		<one-to-many field="claims" target-entity="SettlementClaim" mapped-by="settlement" fetch="EXTRA_LAZY"/>
 		<one-to-many field="knight_offers" target-entity="KnightOffer" mapped-by="settlement"/>
@@ -50,6 +53,7 @@
 		<one-to-many field="permissions" target-entity="SettlementPermission" mapped-by="settlement" fetch="EXTRA_LAZY"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="settlement"/>
+		
 
 	</entity>
 </doctrine-mapping>

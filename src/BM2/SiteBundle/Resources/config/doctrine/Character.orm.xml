@@ -105,5 +105,6 @@
 		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
 
+		<many-to-one field="house" target-entity="House" inversed-by="characters"/>
 	</entity>
 </doctrine-mapping>

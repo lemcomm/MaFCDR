@@ -6,6 +6,7 @@ use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -69,12 +70,25 @@ class CharacterManager {
 		if ($father) {
 			$father->addChild($character);
 			$character->setGeneration($father->getGeneration()+1);
+			if ($father->getHouse > 0) {
+				$fatherhouse = $father->getHouse();
+			}
 		}
 		if ($mother) {
 			$mother->addChild($character);
 			if ($mother->getGeneration() >= $character->getGeneration()) {
-                $character->setGeneration($mother->getGeneration() + 1);
-            }
+         			$character->setGeneration($mother->getGeneration() + 1);
+            		}
+			if ($mother->getHouse > 0) {
+				$motherhouse = $mother->getHouse();
+			}
+		}
+		if ($fatherhouse > 0 && $motherhouse > 0) {
+			$character->setHouse(NULL);
+		} else if ($fatherhouse > 0) {
+			$character->setHouse($father->getHouse());
+		} else if ($motherhouse > 0) {
+			$character->setHouse($mother->getHouse());
 		}
 		if ($partner) {
 			$relation = new Partnership();
@@ -301,7 +315,7 @@ class CharacterManager {
 		// inheritance
 		if ($forcekiller) {
 			$heir = null;
-          		$via = null;
+			$via = null;
 		} else {
 			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
@@ -320,9 +334,11 @@ class CharacterManager {
 			foreach ($character->getEstates() as $estate) {
 				$this->bequeathEstate($estate, $heir, $character, $via);
 			}
-
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
+			}
+			if ($character->getHeir() == $character->getHouse()->getSuccessor()) {
+				$this->transferHouseToHeir($character, $heir);
 			}
 		} else {
 			foreach ($character->getEstates() as $estate) {
@@ -330,6 +346,9 @@ class CharacterManager {
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
+			}
+			if ($character->getHeir() != $character->getHouse()->getSuccessor()) {
+				$this->transferHouseNoHeir($character);
 			}
 		}
 
@@ -843,4 +862,34 @@ class CharacterManager {
 		}
 	}
 
+	public function transferHouseToHeir (Character $character, Character $heir) {
+		$house = $character->getHouse;
+		$house->setHead($heir);
+		$this->history->logEvent(
+			$heir,
+			'event.character.house.newhead',
+			array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
+			HISTORY::ULTRA, true
+		);
+	}
+	public function transferHouseNoHeir (Character $character)
+		$house = $character->getHouse();
+		if ($house->getSuccessor) {
+			$house->setHead($house->getSuccessor());
+		} else {
+			$oldest = 0;
+			foreach ($house->getMembers() as $option) {
+				if ($option->DaysInGame > $best) {
+					$best = $option;
+				}
+			}
+			$house->setHead($best);
+			$this->history->logEvent(
+				$heir,
+				'event.character.house.newhead',
+				array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
+				HISTORY::ULTRA, true
+			);
+		}
+	}
 }

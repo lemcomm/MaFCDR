@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\House;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 
@@ -32,6 +33,7 @@ class Dispatcher {
 	private $actionableRegion=false;
 	private $actionableDock=false;
 	private $actionableShip=false;
+	private $actionableHouse=false;
 
 	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, Military $military, Interactions $interactions) {
 		$this->appstate = $appstate;
@@ -159,6 +161,10 @@ class Dispatcher {
 		$spy = $this->nearbySpyTest(true);
 		if (isset($spy['url'])) { 
 			$actions[] = $spy;
+		}
+		$has = $this->locationVisitHousesTest();
+		if (isset($has['url'])) {
+			$actions[] = $has;
 		}
 		$has = $this->locationDungeonsTest();
 		if (isset($has['url'])) { 
@@ -669,6 +675,20 @@ class Dispatcher {
 			return array("name"=>"location.giveship.name", "description"=>"unavailable.noship");
 		}
 		return array("name"=>"location.giveship.name", "url"=>"bm2_site_actions_giveship", "description"=>"location.giveship.description", "long"=>"location.giveship.longdesc");
+	}
+	
+	public function locationVisitHousesTest() {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"location.houses.name", "description"=>"unavailable.$check");
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"location.houses.name", "description"=>"unavailable.npc");
+		}
+		$houses = $this->getActionableHouses();
+		if (!$houses) {
+			return array("name"=>"location.houses.name", "description"=>"unavaibable.nohouses");
+		}
+		return array("name"=>"location.houses.name", "url"=>"bm2_site_house_local", "description"=>"location.houses.description");
 	}
 
 	public function locationDungeonsTest() {
@@ -1924,8 +1944,20 @@ class Dispatcher {
 		}
 		return $this->actionableShip;
 	}
-
-
+	
+	public function getActionableHouses() {
+		if (is_object($this->actionableHouse) || $this->actionableHouse===null) return $this->actionableHouse;
+		$this->actionableHouse=null;
+		
+		if ($this->getCharacter()) {
+			if ($this->getCharacter()->getInsideSettlement()) {
+				$this->getCharacter()->getInsideSettlement()->getHousesPresent();
+			} else if ($location=$this->getCharacter()->getLocation()) {
+				$this->actionableHouse = $this->geography->findNearbyHouses($this->getCharacter());
+			}
+		}
+		return $this->actionableHouse;
+	}
 
 	private function action($trans, $url, $with_long=false, $parameters=null, $transkeys=null) {
 		$data = array(
