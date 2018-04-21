@@ -121,7 +121,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.place',
-						array('%character%'=>$character->getId(), '%place%'=>$entity->getId()),
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$entity->getId()),
 						History::LOW
 					);
 					break;
@@ -129,7 +129,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.realm',
-						array('%character%'=>$character->getId()),
+						array('%link-character%'=>$character->getId()),
 						History::LOW
 					);
 					break;
@@ -137,7 +137,7 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.settlement',
-						array('%character%'=>$character->getId(), '%settlement%'=>$entity->getId()),
+						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$entity->getId()),
 						History::LOW
 					);
 					break;
