@@ -11,6 +11,7 @@
 		<field name="string_value" type="string" nullable="true"/>
 		<field name="subject" type="string" nullable="true"/>
 		<field name="text" type="text" nullable="true"/>
+		<field name="accepted" type="boolean" nullable="true"/>
 
 		<many-to-one field="from_character" target-entity="Character" inversed-by="requests"/>
 		<many-to-one field="from_settlement" target-entity="Settlement" inversed-by="requests"/>
@@ -27,7 +28,7 @@
 		<many-to-one field="include_realm" target-entity="Realm" inversed-by="part_of_requests"/>
 		<many-to-one field="include_house" target-entity="House" inversed-by="part_of_requests"/>
 		<many-to-many field="include_soldiers" target-entity="Soldier" inversed-by="part_of_requests">
-			<join-table name="requests_soldiers">
+			<join-table name="gamerequest_soldiers">
 				<join-columns>
 					<join-column name="request_id"/>
 				</join-columns>
@@ -37,7 +38,7 @@
 			</join-table>
 		</many-to-many>
 		<many-to-many field="equipment" target-entity="EquipmentType">
-			<join-table name="requests_equipment">
+			<join-table name="gamerequest_equipment">
 				<join-columns>
 					<join-column name="request_id"/>
 				</join-columns>
