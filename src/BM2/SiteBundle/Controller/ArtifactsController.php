@@ -71,7 +71,7 @@ class ArtifactsController extends Controller {
 
 				$artifact = new Artifact;
 				$artifact->setName($name);
-				$artifact->setDescription($desc);
+				$artifact->setOldDescription($desc);
 				$artifact->setCreator($user);
 				$em->persist($artifact);
 
