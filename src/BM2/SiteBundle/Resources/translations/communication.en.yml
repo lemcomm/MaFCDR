@@ -234,7 +234,7 @@ event:
   inheritedslumber:  Rulership passed to %character-2% upon the slumbering of %character-1%
   inherifailslumber: Rulership disputed after the slumbering of %character%, who left no heir.
   elected:      %character% was elected as ruler.
-  elected2:     %character% was elected to the position of %position%.
+  elected2:     %character% was elected to the position of %realmposition%.
   joined:       Became a part of %realm%.
   wasjoined:    Acquired control of %realm%.
   left:         Left %realm% and became independent.
