@@ -9,8 +9,9 @@ class Character {
 
 	protected $ultimate=false;
 	protected $my_realms=null;
+	protected $my_houses=null;
 	protected $my_rulerships=false;
-    public $full_health = 100;
+	public $full_health = 100;
 
 	public function __toString() {
 		return "{$this->id} ({$this->name})";
@@ -331,6 +332,22 @@ class Character {
 		return $realms;
 	}
 
+	public function findHouses() {
+		if ($this->my_houses!=null) return $this->my_houses;
+
+		$houses = new ArrayCollection;
+
+		foreach ($houses as $house) {
+			foreach ($house->findAllSuperiors() as $suphouse) {
+				if (!$houses->contains($suphouse)) {
+					$houses->add($suphouse);
+				}
+			}
+		}
+		$this->my_houses = $houses;
+		
+		return $houses;
+	}
 
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
