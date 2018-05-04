@@ -422,6 +422,7 @@ class Dispatcher {
 		}
 
 		$actions[] = $this->hierarchyCreateRealmTest();
+		$actions[] = $this->houseCreateHouseTest();
 		foreach ($this->getCharacter()->findHouses() as $house) {
 			$this->setRealm($realm);
 			$actions[] = array("title"=>$house->getFormalName());
