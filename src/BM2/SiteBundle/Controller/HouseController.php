@@ -30,12 +30,11 @@ class HouseController extends Controller {
 	private $house;
 
 	/**
-	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
+	  * @Route("/{house}", name="bm2_house", requirements={"house"="\d+"})
 	  * @Template("BM2SiteBundle:House:house.html.twig")
 	  */
 	
-	public function viewAction(House $id) {
-		$house = $id;
+	public function viewAction(House $house) {
 		$inhouse = false;
 		
 		$character = $this->get('appstate')->getCharacter(false, true, true);
@@ -51,7 +50,7 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/create")
+	  * @Route("/create", name="bm2_house_create")
 	  * @Template
 	  */	
 	
@@ -87,13 +86,12 @@ class HouseController extends Controller {
 	}
 	
 	/**
-	  * @Route("/{id}/edit", requirements={"id"="\d+"})
+	  * @Route("/{house}/edit", name="bm2_house_manage", requirements={"house"="\d+"})
 	  * @Template
 	  */
 		
-	public function editAction(Request $request) {
+	public function editAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$house = $id;
 		$em = $this->getDoctrine()->getManager();
 		
 		$name = $house->getName();
@@ -135,15 +133,14 @@ class HouseController extends Controller {
 	}
 					  
 	/**
-	  * @Route("/{id}/join", requirements={"id"="\d+"})
+	  * @Route("/{house}/join", name="bm2_house_join", requirements={"house"="\d+"})
 	  * @Template
 	  */
 	
 		/* TODO: Review all of this file below this line. The above should be good.
 		We'll want to be sure to work joinAction and approveAction into the GameRequest system.*/
 	
-	public function joinAction(Request $request) {
-		$house = $id;
+	public function joinAction(House $house, Request $request) {
 		$hashouse = FALSE;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		
@@ -167,12 +164,11 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/approve", requirements={"id"="\d+"})
+	  * @Route("/{house}/approve", name="bm2_house_approve", requirements={"house"="\d+"})
 	  * @Template
 	  */
 	
-	public function approveAction(Request $request) {
-		$house = $id;
+	public function approveAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
 		if (!$character->getHouse()) {
