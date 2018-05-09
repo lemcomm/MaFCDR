@@ -3,15 +3,22 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\User;
+
 use BM2\SiteBundle\Form\CharacterCreationType;
 use BM2\SiteBundle\Form\ListSelectType;
 use BM2\SiteBundle\Form\NpcSelectType;
 use BM2\SiteBundle\Form\SettingsType;
 use BM2\SiteBundle\Form\UserDataType;
+
+use BM2\SiteBundle\Service\CharacterManager;
+
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -580,11 +587,14 @@ class AccountController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$character = $em->getRepository('BM2SiteBundle:Character')->find($id);
 		if (!$character) {
-			throw $this->createAccessDeniedException('error.notfound.character');
+			throw $this->createAccessDeniedHttpException('error.notfound.character');
 		}
 		if ($character->getUser() != $user) {
-			throw $this->createAccessDeniedException('error.noaccess.character');
+			throw $this->createAccessDeniedHttpException('error.noaccess.character');
 		}
+		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
+		$this->get('character_manager')->checkReturnability($character);
+
 		$user->setCurrentCharacter($character);
 
 		// time-based action resolution
@@ -643,7 +653,7 @@ class AccountController extends Controller {
 				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
 				break;				
 			default:
-				throw $this->createAccessDeniedException('error.notfound.playlogic');
+				throw new AccessDeniedHttpException('error.notfound.playlogic');
 				return $this->redirectToRoute('bm2_characters');
 				break;
 		}
