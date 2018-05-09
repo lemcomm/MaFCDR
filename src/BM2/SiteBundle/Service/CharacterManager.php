@@ -15,6 +15,7 @@ use BM2\SiteBundle\Entity\User;
 use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CharacterManager {
 
@@ -890,6 +891,12 @@ class CharacterManager {
 				array('%link-character-1%'=>$heir->getId(), '%link-character-2%'=>$character->getId()),
 				HISTORY::ULTRA, true
 			);
+		}
+	}
+
+	public function checkReturnability(Character $character) {
+		if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days < 7) {
+			throw new AccessDeniedHttpException('error.noaccess.notreturnable');
 		}
 	}
 }
