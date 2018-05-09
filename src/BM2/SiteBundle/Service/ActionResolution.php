@@ -35,9 +35,10 @@ class ActionResolution {
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
+	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
 		$this->em = $em;
 		$this->appstate = $appstate;
+		$this->charman = $charman;
 		$this->history = $history;
 		$this->dispatcher = $dispatcher;
 		$this->generator = $generator;
@@ -557,8 +558,10 @@ class ActionResolution {
 			}
 			if (rand(0,99) < $chance) {
 				// escaped!
+				$this->charman->addAchievement($captor, 'escapees', 1);
 				$captor->removePrisoner($char);
 				$char->setPrisonerOf(null);
+				$this->charman->addAchievement($char, 'escaped', 1);
 				$this->history->logEvent(
 					$char,
 					'resolution.escape.success',
@@ -573,6 +576,7 @@ class ActionResolution {
 				);
 			} else {
 				// failed
+				$this->charman->addAchievement($char, 'failedescapes', 1);
 				$this->history->logEvent(
 					$char,
 					'resolution.escape.failed',
