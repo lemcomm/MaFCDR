@@ -1876,19 +1876,20 @@ class Dispatcher {
 	public function metaRetireTest() {
 		if ($this->getCharacter()->isNPC()) {
 			// FIXME: respawn template doesn't exist.
-			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.npc");
 		}
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"meta.background.name", "description"=>"unavailble.prisoner");
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.prisonershort");
 		}
 		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
 	}
 
 	public function metaKillTest() {
 		if ($this->getCharacter()->isNPC()) {
-			// FIXME: respawn template doesn't exist.
-			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
-			# return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
+			return array("name"=>"meta.kill.name", "description"=>"unavailable.npc");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"meta.kill.name", "description"=>"unavailable.prisonershort");
 		}
 		return array("name"=>"meta.kill.name", "url"=>"bm2_site_character_kill", "description"=>"meta.kill.description");
 	}
