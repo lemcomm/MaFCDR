@@ -165,7 +165,8 @@ class GameRunner {
 		}
 
 		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
-		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND c.system <> :system) OR (c.alive = true and c.slumbering = true AND c.system <> :system)');
+		// NOTE: We're going to want to change this from c.system is null to something else, or build additional logic down the line, when we have more thant 'procd_inactive' as the system flag.
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND (c.system IS NULL OR c.system <> :system)) OR (c.alive = true and c.slumbering = true AND (c.system IS NULL OR c.system <> :system))');
 		$query->setParameter('system', 'procd_inactive');
 		$result = $query->getResult();
 		if (count($result) > 0) {
