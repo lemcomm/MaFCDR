@@ -29,32 +29,32 @@ class HouseCreationType extends AbstractType {
 		$desc = $this->desc;
 		$priv = $this->priv;
 		$secret = $this->secret;
-		$builder->add('name', 'textfield', array(
-			'label'=>'house.setup.name',
+		$builder->add('name', 'text', array(
+			'label'=>'house.create.name',
 			'required'=>true,
 			'data'=>$name,
-			'attr' => array('size'=>30, 'maxlength'=>80, 'title'=>'newcharacter.help.name')
+			'attr' => array('size'=>30, 'maxlength'=>80)
 		));
 		$builder->add('description', 'textarea', array(
-			'label'=>'house.setup.description',
+			'label'=>'house.create.description',
 			'trim'=>true,
 			'required'=>false,
 			'data'=>$desc
 		));
 		$builder->add('private', 'textarea', array(
-			'label'=>'house.setup.private',
+			'label'=>'house.create.private',
 			'trim'=>true,
 			'required'=>false,
 			'data'=>$priv
 		));
 		$builder->add('secret', 'textarea', array(
-			'label'=>'house.setup.secret',
+			'label'=>'house.create.secret',
 			'trim'=>true,
 			'required'=>false,
 			'data'=>$secret
 		));
 
-		$builder->add('submit', 'submit', array('label'=>'house.setup.submit'));
+		$builder->add('submit', 'submit', array('label'=>'house.create.submit'));
 	}
 	
 	public function getName() {
