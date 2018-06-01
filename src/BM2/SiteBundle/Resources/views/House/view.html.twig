@@ -1,1 +1,31 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	{% if details %}
+		<div class="queue">
+			<h3>{{ 'house.history.name'|trans({},"politics")|title }}</h3>
+			<dl>
+			{% for event in house.log.events if event.public %}
+				<dt>{{ event.cycle|gametime('short') }}</dt>
+				<dd>{{ event|eventtranslate }}</dd>
+			{% endfor %}
+			</dl>
+		</div>
+
+		<h2>{{ house.formalname }}</h2>
+
+		<dl>
+			<dt>{{ 'house.name'|trans({},"politics") }}</dt>
+			<dd>{{ house.name }}</dd>
+			<dt>{{ 'house.founder'|trans({},"politics") }}</dt>
+			<dd>{{ house.founder }}</dd>
+			<dt>{{ 'house.head'|trans({},"politics") }}</dt>
+			<dd>{{ house.head }}</dd>
+		</dl>
+		{% if house.description is not null and house.description.text is not null %}
+			<h3>{{ 'house.description'|trans({},"politics")|title }}</h3>
+			{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+		{# Add logic here to handle people being in the house, and the head/founder viewing the page, so their private one also displays  #}
+		{% endif %}
+
+{% endblock %}
