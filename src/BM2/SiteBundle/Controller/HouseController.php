@@ -6,7 +6,7 @@ use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
-use BM2\SiteBundle\Form\HouseBackgroundType;
+use BM2\SiteBundle\Form\HouseCreationType;
 
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
@@ -31,7 +31,7 @@ class HouseController extends Controller {
 
 	/**
 	  * @Route("/{house}", name="bm2_house", requirements={"house"="\d+"})
-	  * @Template("BM2SiteBundle:House:house.html.twig")
+	  * @Template("BM2SiteBundle:House:view.html.twig")
 	  */
 	
 	public function viewAction(House $house) {
