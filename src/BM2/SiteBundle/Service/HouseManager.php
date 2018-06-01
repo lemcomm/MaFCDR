@@ -84,6 +84,7 @@ class HouseManager {
 		$house->setSuperior($superior);
 		$house->setInsideSettlement($settlement);
 		$house->setCrest($crest);
+		$house->setFounder($founder);
 		$house->setHead($founder);
 		$house->setMembers($founder);
 		$house->setGold(0);
