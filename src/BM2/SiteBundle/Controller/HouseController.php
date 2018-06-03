@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\HouseCreationType;
+use BM2\SiteBundle\Form\AreYouSureType;
 
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
@@ -79,6 +80,7 @@ class HouseController extends Controller {
 			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
+			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -107,7 +109,7 @@ class HouseController extends Controller {
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
-			if (!$house->getDescription() AND $data['description'] != NULL) {
+			if ((!$house->getDescription() AND $data['description'] != NULL) OR ($data['description'] != NULL AND $house->getDescription() != $data['description'])) {
 				$this->get('description_manager')->newDescription($house, $data['description'], $character);
 				$change = TRUE;
 			} else if ($house->getDescription() AND $data['description'] != $house->getDescription()->getText()) {
@@ -126,6 +128,7 @@ class HouseController extends Controller {
 				$em->flush();
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'actions'));
+			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -149,14 +152,22 @@ class HouseController extends Controller {
 		if (!$character->getInsideSettlement()) {
 			throw createNotFoundException('unvailable.notinside');
 		}
-		if (!in_array($house, $character->getInsideSettlement()->getHouses())) {
-			throw createNotFoundException('error.notfound.nohouse');
+		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
+			throw createNotFoundException('error.notfound.housenothere');
 		} 
-		$form = $this->createForm(new HouseJoinType($house));
+		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			$em->flush();
+			$fail = false;
+			$data = $form->getData();
+			if ($data['sure'] != true) {
+				$fail = true;
+			}
+			if (!$fail) {
+				$this->get('game_request_manager')->createHouseJoinRequest($character, $house);
+			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
+			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView(),
@@ -174,14 +185,20 @@ class HouseController extends Controller {
 		if (!$character->getHouse()) {
 			throw createNotFoundException('error.noaccess.nohouse');
 		}
-		if ($character->getHouse()->getHead() !== $house->getHead()) {
+		if ($character->getHouse()->getHead() != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
-		$form = $this->createForm(new HouseApproveType($house));
+		foreach ($this->get('game_request_manager')->getHouseJoinRequests($house) as $requests) {
+			$form = $this->createForm(new HouseApproveType($request));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('house.member.approve', array(), 'actions'));
+			$data = $form->getData();
+			if ($data['accept']) {
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.approved', array(), 'actions'));
+			}
+			if ($data['reject']) {
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.rejected', array(), 'actions'));
 		}
 		return array(
 			'form' => $form->createView(),
