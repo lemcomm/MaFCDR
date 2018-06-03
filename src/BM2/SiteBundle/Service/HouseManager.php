@@ -4,7 +4,6 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\House;
-use BM2\SiteBundle\Entity\HouseBackground;
 use Doctrine\ORM\EntityManager;
 
 
@@ -20,7 +19,8 @@ class HouseManager {
 	}
 
 	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $crest = null, $settlement=null, Character $founder) {
-		$house = $this->_create($name, $description, $private_description, $secret_description, $crest, $location=null, $settlement=null, $founder);
+		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
+		$house = $this->_create($name, $description, $private_description, $secret_description, null, $settlement, $crest, $founder);
 
 		$this->history->logEvent(
 			$house,
@@ -34,7 +34,6 @@ class HouseManager {
 			array('%link-realm%'=>$house->getId()),
 			History::ULTRA, true
 		);
-		$this->updateHierarchy($founder, $realm);
 		return $house;
 	}
 
@@ -44,10 +43,8 @@ class HouseManager {
 		$secret_description = null;
 		$crest = $founder->getCrest();
 		
+		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
 		$house = $this->_create($name, $description, $private_description, $secret_description, $superior, $crest, $settlement, $founder);
-		# We wait to set this because it's not until after that function executes that we have an id to set for the superior/cadet relationship.
-		$house->setSuperior($id);
-		$id->addCadet($house);
 
 		$this->history->logEvent(
 			$id,
@@ -64,7 +61,7 @@ class HouseManager {
 		$this->history->logEvent(
 			$founder,
 			'event.character.house.subfounded',
-			array('%link-house%'=>$id->getId(), '%link-character-1%'=>$character '%link-character-2%'=>$founder->getId()),
+			array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId(), '%link-house%'=>$id->getId()),
 			History::HIGH, true
 		);
 		$this->history->logEvent(
@@ -78,18 +75,21 @@ class HouseManager {
 
 	private function _create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement = null, $crest = null, Character $founder) {
 		$house = new House;
+		$this->em->persist($house);
 		$house->setName($name);
 		$house->setPrivate($private_description);
 		$house->setSecret($secret_description);
-		$house->setSuperior($superior);
+		if ($superior) {
+			$house->setSuperior($superior);
+			$superior->addCadet($house);
+		}
 		$house->setInsideSettlement($settlement);
 		$house->setCrest($crest);
 		$house->setFounder($founder);
 		$house->setHead($founder);
-		$house->setMembers($founder);
 		$house->setGold(0);
-		$this->em->persist($house);
-		$this->em->flush($house);
+		$head->setHouse($house);
+		$this->em->flush();
 		if ($description) {
 			$this->descman->newDescription($house, $description, $founder, TRUE);
 		}
