@@ -46,7 +46,7 @@ class HouseController extends Controller {
 		}
 		
 		return array(
-			'inhouse' => $inhouse,
+			'inhouse' => $inhouse
 		);
 	}
 
@@ -57,8 +57,6 @@ class HouseController extends Controller {
 	
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$em = $this->getDoctrine()->getManager();
-		$crest = $character->getCrest();
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 		} else {
@@ -67,6 +65,9 @@ class HouseController extends Controller {
 		if ($character->getHouse()) {
 			throw createNotFoundException('error.found.house');
 		}
+
+		$em = $this->getDoctrine()->getManager();
+		$crest = $character->getCrest();
 		$form = $this->createForm(new HouseCreationType());
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -83,7 +84,7 @@ class HouseController extends Controller {
 			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
-			'form' => $form->createView(),
+			'form' => $form->createView()
 		);
 	}
 	
@@ -131,7 +132,7 @@ class HouseController extends Controller {
 			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
-			'form' => $form->createView(),
+			'form' => $form->createView()
 		);
 	}
 					  
@@ -165,21 +166,23 @@ class HouseController extends Controller {
 			}
 			if (!$fail) {
 				$this->get('game_request_manager')->createHouseJoinRequest($character, $house);
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'actions'));
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
 			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
-			'form' => $form->createView(),
+			'form' => $form->createView()
 		);
 	}
 
 	/**
-	  * @Route("/{house}/approve", name="bm2_house_approve", requirements={"house"="\d+"})
+	  * @Route("/{house}/applicants", name="bm2_house_applicants", requirements={"house"="\d+"})
 	  * @Template
 	  */
 	
-	public function approveAction(House $house, Request $request) {
+	public function applicantsAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
 		if (!$character->getHouse()) {
@@ -188,20 +191,26 @@ class HouseController extends Controller {
 		if ($character->getHouse()->getHead() != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
-		foreach ($this->get('game_request_manager')->getHouseJoinRequests($house) as $requests) {
-			$form = $this->createForm(new HouseApproveType($request));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$em->flush();
-			$data = $form->getData();
-			if ($data['accept']) {
-				$this->addFlash('notice', $this->get('translator')->trans('house.member.approved', array(), 'actions'));
-			}
-			if ($data['reject']) {
-				$this->addFlash('notice', $this->get('translator')->trans('house.member.rejected', array(), 'actions'));
-		}
+		$joinrequests = $this->get('game_request_manager')->getHouseJoinRequests($house);
 		return array(
-			'form' => $form->createView(),
+			'joinrequests' => $joinrequests
 		);
+	}
+
+	/**
+	  * @Route("/{house}/approve/{id}", name="bm2_house_approve", requirements={"house"="\d+", "id"="\d+"})
+	  * @Template
+	  */
+	
+	public function approveAction(House $house, GameRequest $id, Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$em = $this->getDoctrine()->getManager();
+		if (!$character->getHouse()) {
+			throw createNotFoundException('error.noaccess.nohouse');
+		}
+		if ($character->getHouse()->getHead() != $house->getHead()) {
+			throw createNotFoundException('error.noaccess.nothead');
+		}
+		$form = $this->createForm(new HouseJoinRequestType(), $id);
 	}
 }
