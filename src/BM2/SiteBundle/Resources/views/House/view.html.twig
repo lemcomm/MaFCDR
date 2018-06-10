@@ -1,6 +1,11 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
 {% block content %}
+	{% if house.crest %}
+		<div class="heraldry">
+			<img src="{{ path("bm2_site_heraldry_crest", {"id":house.crest.id}) }}"/>
+		</div>
+	{% endif %}
 	<div class="queue">
 		<h3>{{ 'house.history.name'|trans({},"politics")|title }}</h3>
 		<dl>
@@ -10,9 +15,7 @@
 		{% endfor %}
 		</dl>
 	</div>
-
 	<h2>{{ house.name }}</h2>
-
 	<dl>
 		{% if house.founder is same as(house.head) %}
 			<dt>{{ 'house.founder'|trans({},"politics") }}</dt>
@@ -24,14 +27,14 @@
 			<dd>{{ house.head.name }}</dd>
 		{% endif %}
 	</dl>
+	{% if details %}
+		<h3>{{ 'house.private'|trans({},"politics")|title }}</h3>
+		{{ house.private|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% endif %}
 	{% if house.description is not null and house.description.text is not null %}
 		<h3>{{ 'house.description'|trans({},"politics")|title }}</h3>
 		{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{# Add logic here to handle people being in the house, and the head/founder viewing the page, so their private one also displays  #}
-	{% endif %}
-	{% if details %}
-		<h3>{{ 'house.private'|trans({},"politics")|title }}</h3>
-		{{ house.private|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{% endif %}
 	{% if head %}
 		<h3>{{ 'house.secret'|trans({},"politics")|title }}</h3>
