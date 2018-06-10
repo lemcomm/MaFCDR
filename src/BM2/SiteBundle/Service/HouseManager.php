@@ -18,7 +18,7 @@ class HouseManager {
 		$this->descman = $descman;
 	}
 
-	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $crest = null, $settlement=null, Character $founder) {
+	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement=null, $crest = null, Character $founder) {
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
 		$house = $this->_create($name, $description, $private_description, $secret_description, null, $settlement, $crest, $founder);
 
@@ -88,7 +88,7 @@ class HouseManager {
 		$house->setFounder($founder);
 		$house->setHead($founder);
 		$house->setGold(0);
-		$head->setHouse($house);
+		$founder->setHouse($house);
 		$this->em->flush();
 		if ($description) {
 			$this->descman->newDescription($house, $description, $founder, TRUE);
