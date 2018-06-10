@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
@@ -160,7 +161,7 @@ class GameRequestManager {
 		if ($includeSettlement) {
 			$GR->setIncludeSettlement($includeSettlement);
 		}
-		if ($includRealm) {
+		if ($includeRealm) {
 			$GR->setIncludeRealm($includeRealm);
 		}
 		if ($includeHouse) {
