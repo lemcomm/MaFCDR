@@ -7,8 +7,10 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\HouseCreationType;
+use BM2\SiteBundle\Form\HouseJoinType;
 use BM2\SiteBundle\Form\AreYouSureType;
 
+use BM2\SiteBundle\Service\GameRequestManager;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\DescriptionManager;
@@ -37,16 +39,22 @@ class HouseController extends Controller {
 	
 	public function viewAction(House $house) {
 		$inhouse = false;
-		
+		$details = false;
+		$head = false;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
 		if ($character) {
 			if ($character->getHouse() == $house) {
-				$inhouse = true;
+				$details = true;
+				if ($character->getHeadOfHouses()->contains($house)) {
+					$head = true;
+				}
 			}
 		}
 		
 		return array(
-			'inhouse' => $inhouse
+			'house' => $house,
+			'details' => $details,
+			'head' => $head
 		);
 	}
 
@@ -155,17 +163,19 @@ class HouseController extends Controller {
 		}
 		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
 			throw createNotFoundException('error.notfound.housenothere');
-		} 
-		$form = $this->createForm(new AreYouSureType());
+		}
+		$form = $this->createForm(new HouseJoinType());
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			$fail = false;
+			$fail = true;
 			$data = $form->getData();
-			if ($data['sure'] != true) {
+			if ($data['sure']) {
+				$fail = false;
+			} else {
 				$fail = true;
 			}
 			if (!$fail) {
-				$this->get('game_request_manager')->createHouseJoinRequest($character, $house);
+				$this->get('game_request_manager')->newRequestFromCharacterToHouse('house.join', null, null, null, $data['subject'], $data['text'], $character, $house);
 			} else {
 				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'actions'));
 			}
@@ -191,7 +201,7 @@ class HouseController extends Controller {
 		if ($character->getHouse()->getHead() != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
-		$joinrequests = $this->get('game_request_manager')->getHouseJoinRequests($house);
+		$joinrequests = $em->getRepository('BM2SiteBundle\GameRequest')->findBy(array('type' => 'house.join', 'toHouse' => $house));
 		return array(
 			'joinrequests' => $joinrequests
 		);
