@@ -479,9 +479,18 @@ class CharacterController extends Controller {
 				$banned = true;
 			}
 		}
+		$relationship = false;
+		if ($character->getPartnerships()) {
+			foreach ($character->getPartnerships() as $partnership) {
+				if ($partnership->getOtherPartner($character) == $char) {
+					$relationship = true;
+				}
+			}
+		}
 		return array(
 			'char'		=> $char,
 			'details'	=> $details,
+			'relationship'	=> $relationship,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
 			'banned'	=> $banned,
