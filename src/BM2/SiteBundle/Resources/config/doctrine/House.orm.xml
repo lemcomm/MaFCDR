@@ -9,7 +9,7 @@
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
 		<many-to-one field="founder" target-entity="Character" inversed-by="founded_houses"/>
-		<many-to-one field="head" target-entity="Character" inversed-by="head_of_houses"/>
+		<one-to-one field="head" target-entity="Character" inversed-by="head_of_house"/>
 		<many-to-one field="successor" target-entity="Character" inversed-by="successor_to_houses"/>
 		
 		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
