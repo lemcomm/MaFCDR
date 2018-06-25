@@ -31,7 +31,7 @@ class House {
 	
 	public function findAllLiving() {
 		$all_living = new ArrayCollection;
-		$all_members = $this->finalAllMembers();
+		$all_members = $this->findAllMembers();
 		foreach ($all_members as $member) {
 			if ($member->isAlive) {
 				$all_living[] = $member;
@@ -42,7 +42,7 @@ class House {
 	
 	public function findAllDead() {
 		$all_dead = new ArrayCollection;
-		$all_members = $this->finalAllMembers();
+		$all_members = $this->findAllMembers();
 		foreach ($all_members as $member) {
 			if (!$member->isAlive) {
 				$all_dead[] = $member;
