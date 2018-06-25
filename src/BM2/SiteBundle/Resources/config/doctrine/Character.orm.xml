@@ -107,7 +107,7 @@
 
 		<many-to-one field="house" target-entity="House" inversed-by="members"/>
 		<one-to-many field="founded_houses" target-entity="House" mapped-by="founder"/>
-		<one-to-many field="head_of_houses" target-entity="House" mapped-by="head"/>
+		<one-to-one field="head_of_house" target-entity="House" mapped-by="head"/>
 		<one-to-many field="successor_to_houses" target-entity="House" mapped-by="successor"/>
 	</entity>
 </doctrine-mapping>
