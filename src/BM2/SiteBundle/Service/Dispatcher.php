@@ -1816,6 +1816,9 @@ class Dispatcher {
 
 
 	public function houseCreateHouseTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
+		}
 		if ($this->getCharacter()->getHouse()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
 		}
