@@ -26,6 +26,8 @@
 			<dt>{{ 'house.head'|trans({},"politics") }}</dt>
 			<dd>{{ house.head.name }}</dd>
 		{% endif %}
+		<dt>{{ 'house.home'|trans({},"politics") }}</dt>
+		<dd>{{ house.insideSettlement.name }}</dt>
 	</dl>
 	{% if details %}
 		<h3>{{ 'house.private'|trans({},"politics")|title }}</h3>
