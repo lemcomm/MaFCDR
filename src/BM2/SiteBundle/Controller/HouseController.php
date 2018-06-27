@@ -38,14 +38,13 @@ class HouseController extends Controller {
 	  */
 	
 	public function viewAction(House $house) {
-		$inhouse = false;
 		$details = false;
 		$head = false;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
 		if ($character) {
 			if ($character->getHouse() == $house) {
 				$details = true;
-				if ($character->getHeadOfHouses()->contains($house)) {
+				if ($character->getHeadOfHouse() && $character->getHeadOfHouse() == $house) {
 					$head = true;
 				}
 			}
@@ -205,22 +204,5 @@ class HouseController extends Controller {
 		return array(
 			'joinrequests' => $joinrequests
 		);
-	}
-
-	/**
-	  * @Route("/{house}/approve/{id}", name="bm2_house_approve", requirements={"house"="\d+", "id"="\d+"})
-	  * @Template
-	  */
-	
-	public function approveAction(House $house, GameRequest $id, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$em = $this->getDoctrine()->getManager();
-		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
-		}
-		$form = $this->createForm(new HouseJoinRequestType(), $id);
 	}
 }
