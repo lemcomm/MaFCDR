@@ -193,20 +193,14 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
+  joinhouse: 
+   approved:    After review, the %link-house% has decided to accept you as one of it's own.
+   denied:      Try as you might, %link-house% does not consider you worthy.
   house:
-   founded:     You have founded the House of %house%.
-   subcreated:  You have created the House of %house% with %character% as its head.
-   subfounded:  You have been made head of %house-1%, a new cadet house of %house-2%, by %character%.
-   newhead:     You have been made the new the head of the House of %house% after the death of %character%.
-   joined:      You have joined the House of %house%.
-   born:        You were born into the House of %house%.
- house:
-  founded:      %character% has established the House.
-  subfounded:   %character-1% has established this House as cadet house of %house% with %character-2% as its head.
-  subcreated:   %character-1% has established the House of %house% as a cadet house with %character-2% as its head.
-  join:         %character% has joined the House.
-  birth:        %character% has been born into the House. 
-  newhead:      %character-1% has been made the new head of the house after the death of %character-2%.
+   founded:     By your words, the %link-house% has been formalized.
+   subcreated:  By your words, the %link-house% has been formalized as a cadet of your house, under leadership of %link-character%.
+   subfouned:   By the decree of %link-character% from the %link-house-1%, you have been made the first heirarch of the %link-house-2%.
+   newhead:     You have been made the new head of %link-house% after the death of %link-character%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -276,6 +270,13 @@ event:
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
+ house:
+  founded:      By decree of %link-character% the house has been formalized!
+  newmember:    %character% has been accepted into the ranks.
+  subfounded:   By decree of %link-character-1%, the %link-house% has been formalized as a Cadet under leadership of %link-character-2% 
+  subcreated:   By decree of %link-character-1% of the %link-house-1%, the %link-house-2% has been formalized under them with leadership granted to %link-character-2%.
+  newhead:      %link-character-1% has been made the new head after the passing of %link-character-2%.
+ 
 
 report:
  building:
