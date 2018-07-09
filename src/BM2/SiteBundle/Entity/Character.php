@@ -334,9 +334,10 @@ class Character {
 
 	public function findHouses() {
 		if ($this->my_houses!=null) return $this->my_houses;
-
 		$houses = new ArrayCollection;
-
+		if ($this->getHouse()) {
+			$houses[] = $this->getHouse();
+		}
 		foreach ($houses as $house) {
 			foreach ($house->findAllSuperiors() as $suphouse) {
 				if (!$houses->contains($suphouse)) {
@@ -345,7 +346,6 @@ class Character {
 			}
 		}
 		$this->my_houses = $houses;
-		
 		return $houses;
 	}
 
