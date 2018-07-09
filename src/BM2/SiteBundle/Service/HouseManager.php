@@ -31,7 +31,7 @@ class HouseManager {
 		$this->history->logEvent(
 			$founder,
 			'event.character.house.founded',
-			array('%link-realm%'=>$house->getId()),
+			array('%link-house%'=>$house->getId()),
 			History::ULTRA, true
 		);
 		return $house;
@@ -61,13 +61,13 @@ class HouseManager {
 		$this->history->logEvent(
 			$founder,
 			'event.character.house.subfounded',
-			array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId(), '%link-house%'=>$id->getId()),
+			array('%link-character%'=>$founder->getId(), '%link-house-1%'=>$id->getId(), '%link-house-2%'=>$house->getId()),
 			History::HIGH, true
 		);
 		$this->history->logEvent(
 			$house,
 			'event.house.subcreated',
-			array('%link-house%'=>$house->getId(), '%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId()),
+			array('%link-house-1%'=>$id->getId(), '%link-house-2%'=>$id->getId(), '%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId()),
 			History::ULTRA, true
 		);
 		return $house;
