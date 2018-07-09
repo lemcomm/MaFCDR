@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -19,6 +20,7 @@ class Dispatcher {
 
 	private $character=false;
 	private $realm;
+	private $house;
 	private $settlement;
 	private $appstate;
 	private $permission_manager;
@@ -56,6 +58,9 @@ class Dispatcher {
 	}
 	public function setSettlement(Settlement $settlement) {
 		$this->settlement = $settlement;
+	}
+	public function setHouse(House $house) {
+		$this->house = $house;
 	}
 
 	public function clear() {
@@ -424,8 +429,8 @@ class Dispatcher {
 		$actions[] = $this->hierarchyCreateRealmTest();
 		$actions[] = $this->houseCreateHouseTest();
 		foreach ($this->getCharacter()->findHouses() as $house) {
-			$this->setRealm($realm);
-			$actions[] = array("title"=>$house->getFormalName());
+			$this->setHouse($house);
+			$actions[] = array("title"=>$house->getName());
 			$actions[] = $this->houseManageHouseTest();
 			$actions[] = $this->houseManageApplicantsTest();
 		}
@@ -1829,7 +1834,7 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->house->getHead() != $this->getCharacter()) {
+		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.house", "bm2_house_manage", true, 
@@ -1843,10 +1848,10 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->house->getHead() != $this->getCharacter()) {
+		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.applicants", "bm2_house_approve", true, 
+			return $this->action("house.manage.applicants", "bm2_house_applicants", true, 
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
