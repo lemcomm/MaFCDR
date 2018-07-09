@@ -72,7 +72,7 @@ class HouseController extends Controller {
 		if ($character->getHouse()) {
 			throw createNotFoundException('error.found.house');
 		}
-
+		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$crest = $character->getCrest();
 		$form = $this->createForm(new HouseCreationType());
@@ -96,18 +96,26 @@ class HouseController extends Controller {
 	}
 	
 	/**
-	  * @Route("/{house}/edit", name="bm2_house_manage", requirements={"house"="\d+"})
+	  * @Route("/{house}/manage", name="bm2_house_manage", requirements={"house"="\d+"})
 	  * @Template
 	  */
 		
-	public function editAction(House $house, Request $request) {
+	public function manageAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
 		
 		$name = $house->getName();
+		if ($house->getDescription()) {
+			$desc = $house->getDescription()->getText();
+		} else {
+			$desc = null;
+		}
+		$priv = $house->getPrivate();
+		$secret = $house->getSecret();
 
 		$form = $this->createForm(new HouseCreationType($name, $desc, $priv, $secret));
 		$form->handleRequest($request);
+		# TODO: Rework this to use dispatcher.
 		if ($character != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
@@ -117,18 +125,18 @@ class HouseController extends Controller {
 			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
 			// FIXME: need to apply this here - maybe data transformers or something?
 			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
-			if ((!$house->getDescription() AND $data['description'] != NULL) OR ($data['description'] != NULL AND $house->getDescription() != $data['description'])) {
+			if ((!$house->getDescription() AND $data['description'] != NULL) OR ($data['description'] != NULL AND ($house->getDescription() AND $desc != $data['description']))) {
 				$this->get('description_manager')->newDescription($house, $data['description'], $character);
 				$change = TRUE;
-			} else if ($house->getDescription() AND $data['description'] != $house->getDescription()->getText()) {
+			} else if ($house->getDescription() AND $data['description'] != $desc) {
 				$this->get('description_manager')->newDescription($house, $data['description'], $character);
 				$change = TRUE;
 			}
-			if ($data['secret'] != $house->getSecret()) {
+			if ($data['secret'] != $secret) {
 				$house->setSecret($data['secret']);
 				$change = TRUE;
 			}
-			if ($data['private'] != $house->getPrivate()) {
+			if ($data['private'] != $priv) {
 				$house->setPrivate($data['secret']);
 				$change = TRUE;
 			}
@@ -157,6 +165,7 @@ class HouseController extends Controller {
 		
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this later to allow for Houses at Places.
+		# TODO: Rework this to use dispatcher.
 		if (!$character->getInsideSettlement()) {
 			throw createNotFoundException('unvailable.notinside');
 		}
@@ -194,6 +203,7 @@ class HouseController extends Controller {
 	public function applicantsAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$em = $this->getDoctrine()->getManager();
+		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
 			throw createNotFoundException('error.noaccess.nohouse');
 		}
