@@ -753,38 +753,72 @@ claim:
  enforceable: Holds an enforceable claim, which makes taking control very easy.
  
 house:
- setup:
-  title:        Manage Your House
-  name:         Name Your House
-  desc: >
-   Houses, sometimes referred to as Dynasties, Lineages, or Clans, can be everything from a small family to a powerful collection of
-   many different families. Historically, the most powerful dynasties have gone so far to place strangeholds on entire continents,
-   while even today certain families are known by the world over.<br />
-   In Might & Fealty this is still a new feature, in the first stages of deployment, but it will act as a way for characters to gather
-   together their characters outside the confines of a realm. Already it includes announcement for certain House related events
-   such as new characters being created into the house or joining, and can be created either inside an existing settlement, or
-   someone outside a settlement in the regions themselves.<br />
-   Beyond that, the House a character belongs to will be displayed prominently alongside their own name, bringing notoriety to them
-   when they own settlements or rule realms, and eventually this will expand beyond as new features are added and new properties are
-   created.<br />
-   Later this will include functionality to allow you to build up your House, appoint members to certain roles in the House, or perhaps
-   even control how succession works for not just your House, but Cadet Houses as well.
-  description: 
-   name:        Public Description 
-   description: >
-    This is the public description that will be shown to others when they look your house's information. <br />
-    The information displayed here will usually reflect the history or lore of the house, along with any significant accomplishments
-    of the house, in particular those they want to boast about, such as winning major battles or ruling powerful realms.
+ new:
+  name:         Formalize Your House
+  description:  Any First One can declare themselves head of their House
+  intro: >
+   If you peer into the history books, you will usually find that Houses came before Realms. As to what a "House" is, well
+   that really depends on the culture. Some were dynasties traced back by blood through eons, others were tribes, united
+   by their believes or convictions. Others yet were more impromptu bonds, created through bloodshed or catastrophe.<br />
+   Whatever yours will be, that is up to you, and those who will be part of it.<br />
+   It is the right of any First One to declare themselves the head of a new House, or to formalize themselves as head
+   of an already existing one. Like those who came before, you too, have this right. <br />
+   <em>As the creator of a house, your crest if you have one will become the crest of this house until it's demise.</em><br />
+   If you don't have a crest, should you get one later it will be added automatically.<br />
+   Alternatively, should your character die and another character inherit the house that has a crest, it will be set to theirs.<br />
+   It is worth note however, that any of your future descendants will, if the other parent either has no house, or is part of the
+   same house, also join your house automatically.<br />
+   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't available
+   the House will automatically pass to it's eldest active member.
+ background:
+  name:
+   name:        Name of the House
+   desc:        The name of the house says a lot about it's members. Make it something memorable, perhaps?
+  description:
+   name:        Public Description
+   desc: >
+    These words will be what others, outside of your house will be able to know about it. All those who look up your House will be able
+    to review them and will judge you on them.
   private:
-   name:        Private Description
-   description: >
-    This description will only be shown to members of the House. <br />
-    This is useful for planning house activites across multiple branches of the house or to share rumors or information that the house
-    has become aware of.
+   name:        Head of Household Message
+   desc: >
+    In contrast, these are the words your house members will see. How you decide to use them is up to you. Perhaps as a way to pass messages to many at once?
+    Or perhaps a way to spread the mantra of your ways?
   secret:
-   name:        Secret Description
-   description: >
-    And this field will only be shared by heads of the house. This will mostly only make it useful for storing notes from one head to
-    another head, such as where important artifacts might be located or some secret they learned of an enemy but couldn't risk sharing
-    in life.
-  submit:       Submit
+   name:        Secret Memo
+   desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
+ manage:
+  details:
+   name:        Manage House Details
+   intro:       From here you can edit the various details of your house, and set them to your liking.
+  house:
+   name:        Manage Details
+   description: Alter the internal and external details...
+  applicant:
+   preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
+   approve:     Approve
+   approved:    The applcation from %link-character% has been approved.
+   deny:        Deny
+   denied:      The applcation from %link-character% has been denied.
+  applicants:
+   name:        Manage Applicants
+   name2:       Manage Applicants to the %name%
+   description: Review the pending applications...
+   empty:       For better or worse, it doesn't look like you've any applications to review.
+   intro: >
+    As head of the %name%, it falls to you to manage the various applications that come from individuals seeking to join.<br />
+    You are welcome to approve or deny these requests at your leisure, of course.
+   list:        Pending Applications
+  return:       Return
+ updated:
+  background:   You have successfully updated the background of this House.
+  created:      You have successfully created a noble house.
+ member:
+  approve:      You have approved this member joining your house.
+  join:         You have applied to become a memebr of this house.
+ view:
+  head:         Head
+  members:      Members
+  notable:      Notable Members
+  internal:     Internal Information
+  secret:       Secret Information 
