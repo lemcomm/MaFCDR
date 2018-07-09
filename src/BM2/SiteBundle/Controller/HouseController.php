@@ -210,8 +210,15 @@ class HouseController extends Controller {
 		if ($character->getHouse()->getHead() != $house->getHead()) {
 			throw createNotFoundException('error.noaccess.nothead');
 		}
-		$joinrequests = $em->getRepository('BM2SiteBundle\GameRequest')->findBy(array('type' => 'house.join', 'toHouse' => $house));
+		$joinrequests = $em->getRepository('BM2SiteBundle:GameRequest')->findBy(array('type' => 'house.join', 'to_house' => $house));
+
+		foreach ($joinrequests as $joinrequest) {
+			$id = $joinrequest->getId();
+			$subject = $joinrequest->getSubject();
+			$text = $joinrequest->getText();
+		}
 		return array(
+			'name' => $house->getName(),
 			'joinrequests' => $joinrequests
 		);
 	}
