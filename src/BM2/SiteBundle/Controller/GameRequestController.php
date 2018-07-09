@@ -33,7 +33,7 @@ class GameRequestController extends Controller {
 		$result;
 		switch ($id->getType()) {
 			case 'house.join':
-				if ($character->getHeadOfHouse() != $id->getToHouse()) {
+				if ($char->getHeadOfHouse() != $id->getToHouse()) {
 					$result = false;
 				} else {
 					$result = true;
@@ -56,7 +56,8 @@ class GameRequestController extends Controller {
 		switch($id->getType()) {
 			case 'house.join':
 				if ($allowed) {
-					$id->getFromCharacter()->setHouse($id->getToHouse());
+					$house = $id->getToHouse();
+					$id->getFromCharacter()->setHouse($house);
 					$this->get('history')->logEvent(
 						$house,
 						'event.house.newmember',
@@ -65,12 +66,14 @@ class GameRequestController extends Controller {
 					);
 					$this->get('history')->logEvent(
 						$id->getFromCharacter(),
-						'event.character.joinhouse',
+						'event.character.joinhouse.approved',
 						array('%link-house%'=>$house->getId()),
 						History::ULTRA, true
 					);
 					$em->remove($id);
 					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.approved', array('%link-character%'=>$id->getFromCharacter()->getId()), 'politics'));
+					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
@@ -92,14 +95,17 @@ class GameRequestController extends Controller {
 		switch($id->getType()) {
 			case 'house.join':
 				if ($allowed) {
+					$house = $id->getToHouse();
 					$this->get('history')->logEvent(
 						$id->getFromCharacter(),
-						'event.character.joinhousedenied',
+						'event.character.joinhouse.denied',
 						array('%link-house%'=>$house->getId()),
 						History::HIGH, true
 					);
 					$em->remove($id);
 					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%link-character%'=>$id->getFromCharacter()->getId()), 'politics'));
+					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
