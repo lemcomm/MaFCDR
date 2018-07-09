@@ -36,7 +36,7 @@ menu:
  translator:  Translations
  register:  Register
  map:       Map
- travel:    Map & travel
+ travel:    Map & Travel
  status:    Status
  recent:    Summary
  rss:       RSS feed
@@ -45,14 +45,14 @@ menu:
  news:      Publications
  relations: Relations
  politics:  Politics
+ realms:    Realms
  quests:    Quests
  actions:   Actions
- allactions: All actions
+ allactions: All Actions
  character:
-  background: Character background
-  start:    Character placement
- dungeon:   dungeon
- house:     house
+  background: Character Background
+  start:    Character Placement
+ dungeon:   Dungeon
 
 contact:
  title:     Contact
@@ -939,7 +939,8 @@ error:
   paperowner:   You are not an owner of this publication
   library:      You cannot create new publications because none of your estates has a library
   battlereport: You were not a participant in that battle, so you have to rely on eye witness reports for its details
-  nothead:      Only the head of the house may access this page.
+  nothead:      Only the head of the House may access this page.
+  nohouse:      You must be in a house to perform this action.
 
  missing:
   character:    Character required, but missing. Please select a character from the character page or log in again.
@@ -1502,6 +1503,7 @@ unavailable:
   noestate:     You do not have any estates with which to trade.
   nooptions:    There are no possible trade/tribute deals you could make at this location.
  nohouses:      There are no houses established nearby. If you are at a settlement and they are inside, you must be inside as well.
+ havehouse:     You already have a House.
 
 marker:
  name:      Marker name
@@ -1557,37 +1559,3 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
-  
-house:
- title:         House
- create:
-  title:        Create a New House
-  intro: >
-    Here you can create a new house for you dynasty, which will be able to display some information about a group
-    of First Ones as a whole, such as how many claim to be in this house or how it styles itself.<br />
-    <em>As the creator of a house, your crest if you have one will become the crest of this house until it's demise.</em><br />
-    If you don't have a crest, should you get one later it will be added automatically.<br />
-    Alternatively, should your character die and another character inherit the house that has a crest, it will be set to theirs.<br />
-    It is important to note, that once you found a house, you can never leave it.
- update:
-  title:       Update House Information
-  intro:       Here you can update the information on your house.
- description:
-  pubtitle:    Public Description
-  public:      This description will be displayed to anyone who wants to know about your house.
-  prititle:    Private Description
-  private:     This information will only be shown to memebrs of the household that you, or a previous head of house, approved to join.
-  sectitle:    Secret Description
-  secret:      And this information will only be seen by the head of a household, which can be useful to pass information along after a succession.
- updated:
-  background:   You have successfully updated the background of this House.
-  created:      You have successfully created a noble house.
- member:
-  approve:      You have approved this member joining your house.
-  join:         You have applied to become a memebr of this house.
- view:
-  head:         Head
-  members:      Members
-  notable:      Notable Members
-  internal:     Internal Information
-  secret:       Secret Information 
