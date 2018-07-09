@@ -35,5 +35,9 @@
 
 		<one-to-many field="conversations" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
 
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_realm"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm"/>
+
 	</entity>
 </doctrine-mapping>
