@@ -52,7 +52,10 @@
 		<one-to-many field="permissions" target-entity="SettlementPermission" mapped-by="settlement" fetch="EXTRA_LAZY"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="settlement"/>
-		
+
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_settlement"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_settlement"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_settlement"/>
 
 	</entity>
 </doctrine-mapping>
