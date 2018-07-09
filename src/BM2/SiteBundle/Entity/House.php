@@ -79,4 +79,24 @@ class House {
 		return $all_cadets;
 	}
 
+	public function findAllSuperiors($include_myself = false) {
+		$all_sups = new ArrayCollection;
+		if ($include_myself) {
+			$all_sups->add($this);
+		}
+
+		if ($superior = $this->getSuperior()) {
+			$all_sups->add($superior);
+			$supall = $superior->findAllSuperiors();
+			foreach ($supall as $sup) {
+				if (!$all_sups->contains($sup)) {
+					$all_sups->add($sup);
+				}
+			}
+		}
+
+		return $all_sups;
+
+	}
+	
 }
