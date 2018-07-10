@@ -275,7 +275,22 @@ event:
   newmember:    %character% has been accepted into the ranks.
   subfounded:   By decree of %link-character-1%, the %link-house% has been formalized as a Cadet under leadership of %link-character-2% 
   subcreated:   By decree of %link-character-1% of the %link-house-1%, the %link-house-2% has been formalized under them with leadership granted to %link-character-2%.
-  newhead:      %link-character-1% has been made the new head after the passing of %link-character-2%.
+  merged:
+   death:       After the passing of %link-character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
+   retire:      After the passing of %link-character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
+   slumber:     After the passing of %link-character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
+  inherited:
+   death:       After the passing of %link-character-1%, %link-character-2% has taken leadership as the designated successor or heir.
+   retire:      After the retiring of %link-character-1%, %link-character-2% has assumed leadership as the designated successor or heir.
+   slumber:     After the slumber of %link-character-1%, %link-character-2% has assumed leadership as the designated successor or heir.
+  newhead:      
+   death:       After the passing of %link-character-1%, %link-character-2% has taken leadership as the eldest member.
+   retire:      After the retiring of %link-character-1%, %link-character-2% has assumed leadership as the eldest member.
+   slumber:     After the slumber of %link-character-1%, %link-character-2% has assumed leadership as the eldest member.
+  collapsed:
+   death:       Unable to locate a successor after the passing of it's last head, the house has collapsed.
+   retire:	Unable to locate a successor after the retiring of it's last head, the house has collapsed.
+   slumber:     Unable to locate a successor after the slumber of it's last head, the house has collapsed.
  
 
 report:
