@@ -358,6 +358,7 @@ class CharacterManager {
 			}
 		}
 		if ($character->getHeadOfHouse()) {
+			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the retire method below, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
 			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
 				$successor = $character->getHeadOfHouse->getSuccessor();
@@ -383,12 +384,21 @@ class CharacterManager {
 				}
 				$house->setHead($best);
 				$house->setSuccessor(null);
-				$this->history->logEvent(
-					$house,
-					'event.house.newhead.death',
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-					History::ULTRA, true
-				);
+				if ($best !== null) {
+					$this->history->logEvent(
+						$house,
+						'event.house.newhead.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						History::ULTRA, true
+					);
+				} else {
+					$this->history->logEvent(
+						$house,
+						'event.house.collapsed.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
 		
@@ -541,6 +551,7 @@ class CharacterManager {
 			}
 		}
 		if ($character->getHeadOfHouse()) {
+			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the kill method above, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
 			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
 				$successor = $character->getHeadOfHouse->getSuccessor();
@@ -564,12 +575,22 @@ class CharacterManager {
 					}
 				}
 				$house->setHead($best);
-				$this->history->logEvent(
-					$house,
-					'event.house.newhead.retire',
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-					History::ULTRA, true
-				);
+				$house->setSuccessor(null);
+				if ($best !== null) {
+					$this->history->logEvent(
+						$house,
+						'event.house.newhead.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						History::ULTRA, true
+					);
+				} else {
+					$this->history->logEvent(
+						$house,
+						'event.house.collapsed.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
 
