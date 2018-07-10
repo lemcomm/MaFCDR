@@ -95,6 +95,26 @@ class Character {
 		return null;
 	}
 
+	public function findImmediateRelatives() {
+		$relatives = new ArrayCollection;
+		if ($this->getParents()) {
+			foreach ($this->getParents() as $parent) {
+				$relatives[] = $parent;
+				foreach ($parent->getChildren() as $child) {
+					if ($this != $child) {
+						$relatives[] = $child;
+					}
+				}
+			}
+		}
+		if ($this->getChildren()) {
+			foreach ($this->getChildren() as $child) {
+				$relatives[] = $child;
+			}
+		}
+		return $relatives;
+	}
+
 	public function healthValue() {
 		return max(0.0, ($this->full_health - $this->getWounded())) / $this->full_health;
 	}
@@ -348,6 +368,7 @@ class Character {
 		$this->my_houses = $houses;
 		return $houses;
 	}
+
 
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
