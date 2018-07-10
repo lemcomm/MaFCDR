@@ -40,6 +40,17 @@ class House {
 		return $all_living;
 	}
 	
+	public function findAllActive() {
+		$all_active = new ArrayCollection;
+		$all_members = $this->findAllMembers();
+		foreach ($all_members as $member) {
+			if ($member->isAlive && !$member->isRetired && !$member->isSlumbering) {
+				$all_living[] = $member;
+			}
+		}
+		return $all_active;
+	}
+	
 	public function findAllDead() {
 		$all_dead = new ArrayCollection;
 		$all_members = $this->findAllMembers();
