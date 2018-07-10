@@ -360,26 +360,52 @@ class CharacterManager {
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the retire method below, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
+			$inheritor = false;
+			$difhouse = false;
 			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
+			} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+				$inheritor = true;
+				$successor = $character->getSuccessor();
+				if ($successor->getHouse() != $character->getHouse()) {
+					$difhouse = true;
+				}
+			}
+			if ($inheritor) {
 				$house->setHead($successor);
 				$house->setSuccessor(null);
-				$this->history->logEvent(
-					$house,
-					'event.house.inherited.death',
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-					History::ULTRA, true
-				);
+				if (!$difhouse) {
+					$this->history->logEvent(
+						$house,
+						'event.house.inherited.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				} else {
+					$this->history->logEvent(
+						$house,
+						'event.house.merged.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
+						History::ULTRA, true
+					);
+					$this->history->logEvent(
+						$successor->getHouse(),
+						'event.house.merged.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
+						History::ULTRA, true
+					);
+					$house->setSuperior($successor->getHouse());
+					$successor->setHouse($house);
+				}
 			} else {
 				$best = null;
-				foreach ($house->getMembers() as $member) {
-					if (!$member->getRetired() && !$member->getSlumbering()) {
-						if ($best === null) {
-							$best = $member;
-						}
-						if ($member->getCreated() < $best->getCreated) {
-							$best = $member;
-						}
+				foreach ($house->findAllActive() as $member) {
+					if ($best === null) {
+						$best = $member;
+					}
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+						$best = $member;
 					}
 				}
 				$house->setHead($best);
@@ -553,25 +579,52 @@ class CharacterManager {
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the kill method above, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
+			$inheritor = false;
+			$difhouse = false;
 			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
+			} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+				$inheritor = true;
+				$successor = $character->getSuccessor();
+				if ($successor->getHouse() != $character->getHouse()) {
+					$difhouse = true;
+				}
+			}
+			if ($inheritor) {
 				$house->setHead($successor);
-				$this->history->logEvent(
-					$house,
-					'event.house.inherited.retire',
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-					History::ULTRA, true
-				);
+				$house->setSuccessor(null);
+				if (!$difhouse) {
+					$this->history->logEvent(
+						$house,
+						'event.house.inherited.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				} else {
+					$this->history->logEvent(
+						$house,
+						'event.house.merged.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
+						History::ULTRA, true
+					);
+					$this->history->logEvent(
+						$successor->getHouse(),
+						'event.house.merged.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
+						History::ULTRA, true
+					);
+					$house->setSuperior($successor->getHouse());
+					$successor->setHouse($house);
+				}
 			} else {
 				$best = null;
-				foreach ($house->getMembers() as $member) {
-					if (!$member->getRetired() && !$member->getSlumbering()) {
-						if ($best === null) {
-							$best = $member;
-						}
-						if ($member->getCreated() < $best->getCreated) {
-							$best = $member;
-						}
+				foreach ($house->findAllActive() as $member) {
+					if ($best === null) {
+						$best = $member;
+					}
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+						$best = $member;
 					}
 				}
 				$house->setHead($best);
