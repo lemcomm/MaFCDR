@@ -58,6 +58,7 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$house = $id->getToHouse();
 					$id->getFromCharacter()->setHouse($house);
+					$id->getFromCharacter()->setHouseJoinDate(new \DateTime("now"));
 					$this->get('history')->logEvent(
 						$house,
 						'event.house.newmember',
