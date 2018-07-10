@@ -313,6 +313,50 @@ class GameRunner {
 				if ($character->getEstates()) {
 					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
 				}
+				if ($character->getHeadOfHouse()) {
+					$house = $character->getHeadOfHouse();
+					$this->logger->info("Detectd character is head of house ID #".$house->getId());
+					#TODO: Make this it's own method on CharMan, and call it from there, merging it with the two similar instances theres, with switch on event firing for different circumstances.
+					if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+						$successor = $character->getHeadOfHouse->getSuccessor();
+						$house->setHead($successor);
+						$house->setSuccessor(null);
+						$this->history->logEvent(
+							$house,
+							'event.house.inherited.slumber',
+							array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+							History::ULTRA, true
+						);
+					} else {
+						$best = null;
+						foreach ($house->getMembers() as $member) {
+							if (!$member->getRetired() && !$member->getSlumbering()) {
+								if ($best === null) {
+									$best = $member;
+								}
+								if ($member->getCreated() < $best->getCreated) {
+									$best = $member;
+								}
+							}
+						}
+						$house->setHead($best);
+						$house->setSuccessor(null);
+						if ($best !== null) {
+							$this->history->logEvent(
+								$house,
+								'event.house.newhead.slumber',
+								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+								History::ULTRA, true
+							);
+						} else {
+							$this->history->logEvent(
+								$house,
+								'event.house.collapsed.slumber',
+								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+								History::ULTRA, true
+							);
+						}	
+					}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known slumber.");
 			} else {
