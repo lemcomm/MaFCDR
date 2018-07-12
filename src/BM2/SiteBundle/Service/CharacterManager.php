@@ -6,6 +6,7 @@ use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -362,10 +363,10 @@ class CharacterManager {
 			$house = $character->getHeadOfHouse();
 			$inheritor = false;
 			$difhouse = false;
-			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+			if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
 				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
-			} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+			} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
 				$inheritor = true;
 				$successor = $character->getSuccessor();
 				if ($successor->getHouse() != $character->getHouse()) {
