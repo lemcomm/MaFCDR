@@ -759,17 +759,17 @@ house:
   intro: >
    If you peer into the history books, you will usually find that Houses came before Realms. As to what a "House" is, well
    that really depends on the culture. Some were dynasties traced back by blood through eons, others were tribes, united
-   by their believes or convictions. Others yet were more impromptu bonds, created through bloodshed or catastrophe.<br />
-   Whatever yours will be, that is up to you, and those who will be part of it.<br />
+   by their believes or convictions. Others yet were more impromptu bonds, created through bloodshed or catastrophe.
+   Whatever yours will be, that is up to you, and those who will be part of it.<br /><br />
    It is the right of any First One to declare themselves the head of a new House, or to formalize themselves as head
-   of an already existing one. Like those who came before, you too, have this right. <br />
+   of an already existing one. Like those who came before, you too, have this right. <br /><br />
    <em>As the creator of a house, your crest if you have one will become the crest of this house until it's demise.</em><br />
    If you don't have a crest, should you get one later it will be added automatically.<br />
    Alternatively, should your character die and another character inherit the house that has a crest, it will be set to theirs.<br />
    It is worth note however, that any of your future descendants will, if the other parent either has no house, or is part of the
    same house, also join your house automatically.<br />
-   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't available
-   the House will automatically pass to it's eldest active member.
+   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't a legal 
+   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.
  background:
   name:
    name:        Name of the House
@@ -787,6 +787,8 @@ house:
   secret:
    name:        Secret Memo
    desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
+ create:
+  submit:       Create Your House!
  manage:
   details:
    name:        Manage House Details
@@ -818,7 +820,15 @@ house:
   join:         You have applied to become a memebr of this house.
  view:
   head:         Head
+  founder:      Founder
+  home:         Home
   members:      Members
   notable:      Notable Members
   internal:     Internal Information
-  secret:       Secret Information 
+  secret:       Secret Information
+ nearby:
+  name2:        Viewing Local Houses
+  intro: >
+   Houses, courtesy of the First Ones that comprise them, are hard to miss things. If they're there, you'll know.
+   It's a First One thing. As a First One yourself though, you can view any of the local ones, and even petition to join one if you
+   are not already part of another.
