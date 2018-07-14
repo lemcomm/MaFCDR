@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Building;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\GeoData;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\Settlement;
@@ -319,10 +320,10 @@ class GameRunner {
 					$difhouse = false;
 					$this->logger->info("Detectd character is head of house ID #".$house->getId());
 					#TODO: Make this it's own method on CharMan, and call it from there, merging it with the two similar instances theres, with switch on event firing for different circumstances.
-					if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+					if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
 						$inheritor = true;
 						$successor = $character->getHeadOfHouse->getSuccessor();
-					} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+					} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
 						$inheritor = true;
 						$successor = $character->getSuccessor();
 						if ($successor->getHouse() != $character->getHouse()) {
@@ -1311,3 +1312,4 @@ class GameRunner {
 		return array($total, $done);
 	}
 }
+	
