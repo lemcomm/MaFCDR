@@ -34,7 +34,7 @@ class Dispatcher {
 	private $actionableRegion=false;
 	private $actionableDock=false;
 	private $actionableShip=false;
-	private $actionableHouse=false;
+	private $actionableHouses=false;
 
 	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, Military $military, Interactions $interactions) {
 		$this->appstate = $appstate;
@@ -69,6 +69,7 @@ class Dispatcher {
 		$this->actionableSettlement=false;
 		$this->actionableDock=false;
 		$this->actionableShip=false;
+		$this->actionableHouses=false;
 	}
 
 	/*
@@ -741,7 +742,7 @@ class Dispatcher {
 		if (!$houses) {
 			return array("name"=>"location.houses.name", "description"=>"unavaibable.nohouses");
 		}
-		return array("name"=>"location.houses.name", "url"=>"bm2_site_house_local", "description"=>"location.houses.description");
+		return array("name"=>"location.houses.name", "url"=>"bm2_house_nearby", "description"=>"location.houses.description");
 	}
 
 	public function personalPartyTest() {
@@ -1824,6 +1825,9 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
 		}
+		if (!$this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+		}
 		if ($this->getCharacter()->getHouse()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
 		}
@@ -2015,15 +2019,15 @@ class Dispatcher {
 	}
 	
 	public function getActionableHouses() {
-		if (is_object($this->actionableHouse) || $this->actionableHouse===null) return $this->actionableHouse;
-		$this->actionableHouse=null;
+		if (is_object($this->actionableHouses) || $this->actionableHouses===null) return $this->actionableHouses;
+		$this->actionableHouses=null;
 		
-		if ($this->getCharacter()) {
-			if ($this->getCharacter()->getInsideSettlement()) {
-				$this->getCharacter()->getInsideSettlement()->getHousesPresent();
-			}
+		if ($this->getCharacter() && $this->getCharacter()->getInsideSettlement()) {
+			$this->actionableHouses = $this->getCharacter()->getInsideSettlement()->getHousesPresent();
+		} else {
+			# Code for being outside settlement will go here and interact with Places.
 		}
-		return $this->actionableHouse;
+		return $this->actionableHouses;
 	}
 
 
