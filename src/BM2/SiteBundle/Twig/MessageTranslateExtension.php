@@ -164,6 +164,10 @@ class MessageTranslateExtension extends \Twig_Extension {
 							$data['%item'.$index.'%'] = $this->links->ObjectLink($type, false, $this->absolute);
 						}
 						break;
+					case 'house':
+						$house = $this->em->getRepository('BM2SiteBundle:House')->find($value);
+						$data['%house'.$index.'%'] = $this->links->ObjectLink($house, false, $this->absolute);
+						break;
 					default:
 						if (is_array($value)) {
 							$data[$key]=$this->translator->trans($value['key'], $value);
