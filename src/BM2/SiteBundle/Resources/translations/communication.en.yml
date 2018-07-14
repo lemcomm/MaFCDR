@@ -193,6 +193,7 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
+  newplace:     Formalized %link-place% by %link-character%.
   joinhouse: 
    approved:    After review, the %link-house% has decided to accept you as one of it's own.
    denied:      Try as you might, %link-house% does not consider you worthy.
@@ -271,7 +272,7 @@ event:
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
  house:
-  founded:      By decree of %link-character% the house has been formalized!
+  founded:      By decree of %character% the house has been formalized!
   newmember:    %character% has been accepted into the ranks.
   subfounded:   By decree of %link-character-1%, the %link-house% has been formalized as a Cadet under leadership of %link-character-2% 
   subcreated:   By decree of %link-character-1% of the %link-house-1%, the %link-house-2% has been formalized under them with leadership granted to %link-character-2%.
