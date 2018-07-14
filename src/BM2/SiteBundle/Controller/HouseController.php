@@ -33,7 +33,7 @@ class HouseController extends Controller {
 	private $house;
 
 	/**
-	  * @Route("/{house}", name="bm2_house", requirements={"house"="\d+"})
+	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:House:view.html.twig")
 	  */
 	
@@ -54,6 +54,43 @@ class HouseController extends Controller {
 			'house' => $house,
 			'details' => $details,
 			'head' => $head
+		);
+	}
+
+	/**
+	  * @Route("/nearby", name="bm2_house_nearby")
+	  * @Template
+	  */
+	
+	public function nearbyAction() {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$houses = [];
+		if ($character) {
+			if ($character->getInsideSettlement()) {
+				$houses = $character->getInsideSettlement()->getHousesPresent();
+			} else {
+				#TODO: Add code for houses as places here.
+			}
+		}
+		$already = false;
+		if ($character->getHouse()) {
+			$already = true;
+		}
+		
+		foreach ($houses as $house) {
+			$member = false;
+			$head = false;
+			if ($house->getMembers()->contains($character)) {
+				$member = true;
+				if ($house->getHead() == $character) {
+					$head = true;
+				}
+			}
+		}
+
+		return array(
+			'houses' => $houses,
+			'already' => $already
 		);
 	}
 
@@ -88,7 +125,7 @@ class HouseController extends Controller {
 			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
-			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
+			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
