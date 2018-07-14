@@ -100,6 +100,14 @@ class LinksExtension extends \Twig_Extension {
 				case 'realmposition':
 					$type = 'RealmPosition';
 					break;
+				case 'h':
+				case 'f':
+				case 'house':
+				case 'dynasty':
+				case 'clan':
+				case 'family':
+					$type = 'House';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
@@ -145,7 +153,7 @@ class LinksExtension extends \Twig_Extension {
 		switch (strtolower($name)) {
 			case 'character':       return 'bm2_site_character_view';
 			case 'settlement':      return 'bm2_settlement';
-			case 'battle':    		return 'bm2_battle';
+			case 'battle':    	return 'bm2_battle';
 			case 'battlereport':    return 'bm2_battlereport';
 			case 'realm':           return 'bm2_realm';
 			case 'realmposition':   return 'bm2_position';
@@ -157,13 +165,14 @@ class LinksExtension extends \Twig_Extension {
 			case 'entourage':
 			case 'entouragetype':   return 'bm2_site_info_entouragetype';
 			case 'equipmenttype':   return 'bm2_site_info_equipmenttype';
-			case 'action':				return 'bm2_actiondetails';
-			case 'election':			return 'bm2_site_realm_vote';
-			case 'mercenaries':		return 'bm2_mercenaries';
-			case 'quest':				return 'bm2_site_quests_details';
-			case 'artifact':			return 'bm2_site_artifacts_details';
-			case 'war':					return 'bm2_site_war_view';
-			case 'newsedition':		return 'bm2_site_news_read';
+			case 'action':		return 'bm2_actiondetails';
+			case 'election':	return 'bm2_site_realm_vote';
+			case 'mercenaries':	return 'bm2_mercenaries';
+			case 'quest':		return 'bm2_site_quests_details';
+			case 'artifact':	return 'bm2_site_artifacts_details';
+			case 'war':		return 'bm2_site_war_view';
+			case 'newsedition':	return 'bm2_site_news_read';
+			case 'house':		return 'bm2_house';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
@@ -238,7 +247,7 @@ class LinksExtension extends \Twig_Extension {
 		}
 		// setting link-types only for some entities:
 		switch ($classname) {
-			case 'Character':				$linktype = 'character'; break;
+			case 'Character':		$linktype = 'character'; break;
 			case 'EquipmentType':		$linktype = 'equipment'; break;
 			case 'RealmPosition':		$linktype = 'position'; break;
 		}
