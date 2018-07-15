@@ -44,6 +44,17 @@ is still required, but we'll leave it in the code just in case. --Andrew
 {% endif %}
 
 <ul>
+{% if character.house %}
+	<li>
+		{% if character.house.head == character %}
+			{{ ("status."~who~".househead")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
+			{{ macros.realm_hierarchy(character.house, gender_he) }}.
+		{% else %}
+			{{ ("status."~who~".housememb")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
+			{{ macros.realm_hierarchy(character.house, gender_he) }}.
+		{% endif %}
+	</li>
+{% endif %}
 {% for position in character.positions %}
 	<li>
 		{% if position.ruler %}
