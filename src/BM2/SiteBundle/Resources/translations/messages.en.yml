@@ -1560,3 +1560,12 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
+
+house:
+ member:
+  exile:       You have exiled %character% from the House.
+  join:        You have applied to join the House.
+  successor:   You have successfully updated your successor.
+ updated:
+  created:     You have formalized your House!
+  background:  The details of your House have been udpated.
