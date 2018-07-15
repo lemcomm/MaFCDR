@@ -22,6 +22,7 @@ class HouseManager {
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
 		$house = $this->_create($name, $description, $private_description, $secret_description, null, $settlement, $crest, $founder);
 
+		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
 			$house,
 			'event.house.founded',
@@ -34,18 +35,20 @@ class HouseManager {
 			array('%link-house%'=>$house->getId()),
 			History::ULTRA, true
 		);
+		$this->em->flush();
 		return $house;
 	}
 
-	public function subcreate(Character $character, $name, $description = null, $location = null, $settlement = null, $founder, House $id) {
+	public function subcreate(Character $character, $name, $description = null, $place = null, $settlement = null, $founder, House $id) {
 		# Cadet houses won't be created with these so we set them to null in order to ensure they exist for passing to _create.
 		$private_description = null;
 		$secret_description = null;
 		$crest = $founder->getCrest();
 		
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$house = $this->_create($name, $description, $private_description, $secret_description, $superior, $crest, $settlement, $founder);
+		$house = $this->_create($name, $description, $private_description, $secret_description, $id, $crest, $settlement, $founder);
 
+		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
 			$id,
 			'event.house.subfounded',
