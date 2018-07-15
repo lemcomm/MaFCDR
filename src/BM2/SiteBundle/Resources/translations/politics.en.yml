@@ -812,6 +812,24 @@ house:
     You are welcome to approve or deny these requests at your leisure, of course.
    list:        Pending Applications
   return:       Return
+  disown:
+   name:        Disown A Member
+   name2:       Disown Someone In The %name%
+   description: Revoke someone's membership...
+   intro: >
+    As the head of the %name%, it is within your powers to disown any member of the House for whatever reason you see fit.
+    For ease of use, you may only disown one person at a time, but they are sorted according to the House they are in.
+  successor:
+   name:        Declare Your Successor
+   name2:       Determine the Successor to the %name%
+   description: Ensure your House's legacy!
+   intro: >
+    Sometimes, it's not about who runs the %name%, but who *will* run the %name%. As the Head of the House, right now anyways,
+    choosing the next to take your position is entirely up to you. It is worth noting that if the Successor you choose today
+    leaves the Dynasty for some reason, the nominated Successor will no longer be a legal inheritor (usually). It is highly recommended
+    that you read the manual on [houses].
+ members:
+  submit:       Submit  
  updated:
   background:   You have successfully updated the background of this House.
   created:      You have successfully created a noble house.
