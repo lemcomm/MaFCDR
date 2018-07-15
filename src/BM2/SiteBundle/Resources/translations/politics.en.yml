@@ -794,6 +794,8 @@ house:
    desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
  create:
   submit:       Create Your House!
+ join:
+  button:       Petition to Join
  manage:
   details:
    name:        Manage House Details
