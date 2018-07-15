@@ -800,6 +800,7 @@ house:
   house:
    name:        Manage Details
    description: Alter the internal and external details...
+   longdesc:    From this menu you can alter the public and private details of your house, to include the name and Head of House message.
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
    approve:     Approve
@@ -810,6 +811,7 @@ house:
    name:        Manage Applicants
    name2:       Manage Applicants to the %name%
    description: Review the pending applications...
+   longdesc:    From this menu you can approve and deny applications to join the house.
    empty:       For better or worse, it doesn't look like you've any applications to review.
    intro: >
     As head of the %name%, it falls to you to manage the various applications that come from individuals seeking to join.<br />
@@ -820,6 +822,7 @@ house:
    name:        Disown A Member
    name2:       Disown Someone In The %name%
    description: Revoke someone's membership...
+   longdesc:    Don't like a member of your house? Evict them!
    intro: >
     As the head of the %name%, it is within your powers to disown any member of the House for whatever reason you see fit.
     For ease of use, you may only disown one person at a time, but they are sorted according to the House they are in.
@@ -827,6 +830,7 @@ house:
    name:        Declare Your Successor
    name2:       Determine the Successor to the %name%
    description: Ensure your House's legacy!
+   longdesc:    It's always a good idea to know who will takeover after you depart. Just make sure they're part of the house!
    intro: >
     Sometimes, it's not about who runs the %name%, but who *will* run the %name%. As the Head of the House, right now anyways,
     choosing the next to take your position is entirely up to you. It is worth noting that if the Successor you choose today
