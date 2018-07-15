@@ -12,6 +12,8 @@ status:
   ultimate:     You are an independent leader, but have not formed a realm yet.
   liege:        Liege of:
   position:     %position% of %realm%.
+  househead:    You are head of the %house%
+  housememb:    You are part of the %house%
  other:
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
@@ -20,6 +22,8 @@ status:
   realm:        %He% is a member of %realm%
   ultimate:     %He% is an independent leader, but has not formed a realm yet.
   liege:        Liege of:
+  househead:    %He% is head of the %house%
+  housememb:    %He% is part of the %house%
  realm:
   independent:  %name% is an independent realm.
   ultimate:     %name% is a sovereign realm.
