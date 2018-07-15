@@ -69,6 +69,21 @@ class Character {
 		return $this->my_rulerships;
 	}
 
+	public function findHighestRulership() {
+		$highest = null;
+		if ($this->findRulerships()) {
+			foreach ($this->findRulerships() as $rulership) {
+				if ($highest == NULL) {
+					$highest = $rulership;
+				}
+				if ($rulership->getType() > $highest->getType()) {
+					$highest = $rulership;
+				}
+			}
+		}
+		return $highest;
+	}
+
 	public function isPrisoner() {
 		if ($this->getPrisonerOf()) return true; else return false;
 	}
