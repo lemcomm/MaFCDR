@@ -62,10 +62,10 @@ class House {
 		return $all_dead;
 	}
 	
-	public function findAllMembers() {
+	public function findAllMembers($include_myself=true) {
 		$all_members = new ArrayCollection;
 		$all_cadets = $this->findAllCadets($include_myself=true);
-		foreach ($allcadets as $cadet) {
+		foreach ($all_cadets as $cadet) {
 			foreach ($cadet->getMembers() as $cadetmember) {
 				$all_members[] = $cadetmember;
 			}
