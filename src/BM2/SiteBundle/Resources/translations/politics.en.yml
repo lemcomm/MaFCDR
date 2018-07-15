@@ -757,6 +757,7 @@ claim:
  enforceable: Holds an enforceable claim, which makes taking control very easy.
  
 house:
+ nodesc:        For reasons beyond your ability to know, this house does not have a description.
  new:
   name:         Formalize Your House
   description:  Any First One can declare themselves head of their House
