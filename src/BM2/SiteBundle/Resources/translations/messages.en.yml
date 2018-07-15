@@ -1301,6 +1301,7 @@ manual:
  reference:     Reference
  units:         Units of measurement
  test:          Test instance
+ houses:        Houses
 
 list:
  buildingtypes:   list of all building types
