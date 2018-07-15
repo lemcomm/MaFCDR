@@ -193,15 +193,15 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
-  newplace:     Formalized %link-place% by %link-character%.
+  newplace:     Formalized %place% by %link-character%.
   joinhouse: 
-   approved:    After review, the %link-house% has decided to accept you as one of it's own.
-   denied:      Try as you might, %link-house% does not consider you worthy.
+   approved:    After review, the %house% has decided to accept you as one of it's own.
+   denied:      Try as you might, %house% does not consider you worthy.
   house:
-   founded:     By your words, the %link-house% has been formalized.
-   subcreated:  By your words, the %link-house% has been formalized as a cadet of your house, under leadership of %link-character%.
-   subfouned:   By the decree of %link-character% from the %link-house-1%, you have been made the first heirarch of the %link-house-2%.
-   newhead:     You have been made the new head of %link-house% after the death of %link-character%.
+   founded:     By your words, the %house% has been formalized.
+   subcreated:  By your words, the %house% has been formalized as a cadet of your house, under leadership of %character%.
+   subfouned:   By the decree of %character% from the %link-house-1%, you have been made the first heirarch of the %house-2%.
+   newhead:     You have been made the new head of %house% after the death of %character%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
