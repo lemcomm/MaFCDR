@@ -338,7 +338,9 @@ class PoliticsController extends Controller {
 			$choices=array();
 			if ($character->getPartnerships()) {
 				foreach ($character->getPartnerships() as $partnership) {
-					$existingpartners[] = $partnership->getOtherPartner($character);
+					if (!$partnership->getEndDate()) {
+						$existingpartners[] = $partnership->getOtherPartner($character);
+					}
 				}
 			}
 			foreach ($others as $other) {
