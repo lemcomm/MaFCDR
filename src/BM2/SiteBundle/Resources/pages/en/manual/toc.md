@@ -16,6 +16,7 @@ Gameplay
 Entities
 --------
 * [Realms](realms)
+* [Houses](houses)
 * [Settlements](settlements)
 * [Characters](characters)
 * [Soldiers](soldiers)
