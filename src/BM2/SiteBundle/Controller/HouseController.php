@@ -125,7 +125,7 @@ class HouseController extends Controller {
 			}
 			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			# No flush needed, HouseMan flushes.
-			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
 		}
 		return array(
@@ -181,7 +181,7 @@ class HouseController extends Controller {
 			if ($change) {
 				$em->flush();
 			}
-			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
 			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
 		}
 		return array(
@@ -222,7 +222,7 @@ class HouseController extends Controller {
 			if (!$fail) {
 				$this->get('game_request_manager')->newRequestFromCharacterToHouse('house.join', null, null, null, $data['subject'], $data['text'], $character, $house);
 			} else {
-				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'actions'));
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'messages'));
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
 			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
@@ -301,7 +301,7 @@ class HouseController extends Controller {
 				}
 				$this->get('history')->closeLog($house, $character);
 				$em->flush();
-				$this->addFlash('notice', $this->get('translator')->trans('house.member.exile', array(), 'actions'));
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.exile', array('%link-character%'=>$exile->getId()), 'messages'));
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
@@ -337,7 +337,7 @@ class HouseController extends Controller {
 			if ($member) {
 				$house->setSuccessor($member);
 				$em->flush();
-				$this->addFlash('notice', $this->get('translator')->trans('house.member.successor', array(), 'actions'));
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.successor', array(), 'messages'));
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
