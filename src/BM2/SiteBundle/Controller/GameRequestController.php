@@ -57,8 +57,10 @@ class GameRequestController extends Controller {
 			case 'house.join':
 				if ($allowed) {
 					$house = $id->getToHouse();
-					$id->getFromCharacter()->setHouse($house);
-					$id->getFromCharacter()->setHouseJoinDate(new \DateTime("now"));
+					$character = $id->getFromCharacter();
+					$character->setHouse($house);
+					$character->setHouseJoinDate(new \DateTime("now"));
+					$this->get('history')->openLog($house, $character);
 					$this->get('history')->logEvent(
 						$house,
 						'event.house.newmember',
