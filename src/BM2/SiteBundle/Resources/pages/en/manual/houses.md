@@ -1,6 +1,6 @@
 One of the first extra-realm political units of Might & Fealty you might encounter is the *house*, which is a collection of First Ones united under their *Head of the House*.
 
-Unlike other extra-realm politicies, Houses are regarded as particular worthy of note, with the leadership of [realms] displaying the houses of their [rulers] on realm pages, and [settlements] listing all locally established houses when visited.
+Unlike other extra-realm politicies, Houses are regarded as particular worthy of note, with the leadership of [realms] displaying the houses of their [ruler]s on realm pages, and [settlements] listing all locally established houses when visited.
 
 Houses are also unique in that they have quite strict rules on inheritance, that ensure the leadership of the House never passes too far away from itself.
 
