@@ -795,7 +795,21 @@ house:
    desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
  create:
   submit:       Create Your House!
- join:
+ join:  
+  name:         Ask to Join this House
+  intro: >
+   As you do not yet have a house, you can always request to join one. If you find this one to your liking, why not join$
+   Whether or not you are accepted, is up to the head of the house, however.<br /><br />
+   As part of your request to join, you should write a small message explaining why.
+  subject:
+   name:        Subject
+   desc:        A short, and to the point summary
+  text:
+   name:        Message Contents
+   desc:        If there is any particular reason for your request, this is where you would detail it.
+  sure:
+   name:        Certain?
+   desc:        Once you join a house, it's not up to you whether you are allowed to leave or not, so be certain.
   button:       Petition to Join
  manage:
   details:
