@@ -48,7 +48,5 @@ House are a relatively new feature in Might & Fealty, and are not yet considered
 
 Related Topics
 ==============
-* [settlements]
-* [fealty]
-* [diplomacy]
-* [permissions]
+* [characters]
+* [realms]
