@@ -482,7 +482,7 @@ class CharacterController extends Controller {
 		$relationship = false;
 		if ($character->getPartnerships()) {
 			foreach ($character->getPartnerships() as $partnership) {
-				if ($partnership->getOtherPartner($character) == $char) {
+				if (!$partnership->getEndDate() && $partnership->getOtherPartner($character) == $char) {
 					$relationship = true;
 				}
 			}
