@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\HouseCreationType;
+use BM2\SiteBundle\Form\HouseMembersType;
 use BM2\SiteBundle\Form\HouseJoinType;
 use BM2\SiteBundle\Form\AreYouSureType;
 
@@ -123,7 +124,7 @@ class HouseController extends Controller {
 				$crest = $character->getCrest();
 			}
 			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
-			$em->flush();
+			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'actions'));
 			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
 		}
@@ -200,7 +201,6 @@ class HouseController extends Controller {
 		$hashouse = FALSE;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		
-		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this later to allow for Houses at Places.
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getInsideSettlement()) {
@@ -257,6 +257,94 @@ class HouseController extends Controller {
 		return array(
 			'name' => $house->getName(),
 			'joinrequests' => $joinrequests
+		);
+	}
+
+	/**
+	  * @Route("/{house}/disown", name="bm2_house_disown", requirements={"house"="\d+"})
+	  * @Template
+	  */
+	
+	public function disownAction(House $house, Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$em = $this->getDoctrine()->getManager();
+		# TODO: Rework this to use dispatcher.
+		if (!$character->getHouse()) {
+			throw createNotFoundException('error.noaccess.nohouse');
+		}
+		if ($character->getHouse()->getHead() != $house->getHead()) {
+			throw createNotFoundException('error.noaccess.nothead');
+		}
+		$members = $house->findAllMembers();
+
+		$form = $this->createForm(new HouseMembersType($members));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$exile = $data['member'];
+			if ($exile) {
+				$exile->setHouse(null);
+				if ($exile->isRuler()) {
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.exile.ruler',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$exile->getId(), '%link-realm%'=>$exile->findHighestRulership()->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.exile.knight',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$exile->getId()),
+						History::MEDIUM, true
+					);
+				}
+				$this->get('history')->closeLog($house, $character);
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.exile', array(), 'actions'));
+				return $this->redirectToRoute('bm2_politics', array());
+			}
+		}
+		
+		return array(
+			'name' => $house->getName(),
+			'form' => $form->createView(),
+		);
+	}
+
+	/**
+	  * @Route("/{house}/successor", name="bm2_house_successor", requirements={"house"="\d+"})
+	  * @Template
+	  */
+	
+	public function successorAction(House $house, Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$em = $this->getDoctrine()->getManager();
+		# TODO: Rework this to use dispatcher.
+		if (!$character->getHouse()) {
+			throw createNotFoundException('error.noaccess.nohouse');
+		}
+		if ($character->getHouse()->getHead() != $house->getHead()) {
+			throw createNotFoundException('error.noaccess.nothead');
+		}
+		$members = $house->findAllMembers();
+
+		$form = $this->createForm(new HouseMembersType($members));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$member = $data['member'];
+			if ($member) {
+				$house->setSuccessor($member);
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('house.member.successor', array(), 'actions'));
+				return $this->redirectToRoute('bm2_politics', array());
+			}
+		}
+		
+		return array(
+			'name' => $house->getName(),
+			'form' => $form->createView(),
 		);
 	}
 }
