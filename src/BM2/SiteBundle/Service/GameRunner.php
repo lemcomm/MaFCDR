@@ -384,6 +384,7 @@ class GameRunner {
 							);
 						}	
 					}
+				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known slumber.");
 			} else {
@@ -1312,4 +1313,3 @@ class GameRunner {
 		return array($total, $done);
 	}
 }
-	
