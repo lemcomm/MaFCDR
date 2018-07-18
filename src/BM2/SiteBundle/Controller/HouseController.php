@@ -182,7 +182,7 @@ class HouseController extends Controller {
 				$em->flush();
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
-			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
+			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
@@ -225,7 +225,7 @@ class HouseController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'messages'));
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
-			return $this->redirectToRoute('bm2_house', array('house'=>$house->getId()));
+			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
