@@ -55,7 +55,7 @@ class NotificationEventListener {
 			}
 		}
 
-		if ($text!=false) {
+		if ($text != false && $user && $user->getNotifications() != false) {
 			$text.= $this->msgtrans->eventTranslate($event->getEvent(), true)."<br /><br />\n\n";
 			$text.= $this->translator->trans('mail.footer', array(), "communication");
 
