@@ -75,8 +75,8 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
-					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.approved', array('%link-character%'=>$id->getFromCharacter()->getId()), 'politics'));
-					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					return $this->redirectToRoute('bm2_house_applicants', array('id'=>$house->getId()));
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
