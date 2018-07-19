@@ -836,5 +836,34 @@ class Geography {
 		}
 		return array(false,false, false);
 	}
+	
+	public function findNearestHouse(Character $character) {
+		$query = $this->em->createQuery('SELECT f, ST_Distance(f.location, c.location) AS distance FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :char AND t.name = :type AND f.active = true ORDER BY distance ASC');
+		$query->setParameters(array('char'=> $character, 'type'=>'house'));
+		$query->setMaxResults(1);
+		$results = $query->getResult();
+		if ($results) {
+			return $results[0];
+		} else {
+			return false;
+		}
+	}
+	
+	public function findHousesNearMe(Character $character, $maxdistance=-1) {
+		if ($maxdistance==-1) {
+			$maxdistance = $this->calculateInteractionDistance($character);
+		}
+		$query = $this->em->createQuery('SELECT f as feature FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :me AND t.hidden = false AND t.name = :type AND ST_DWithin(f.location, c.location, :maxdistance) = true');
+		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance, 'type'=>'house'));
+		return $query->getResult();
+	}
+	
+	public function findHousesInSpotRange(Character $character) {
+		return $this->findHousesNearMe($character, $this->calculateSpottingDistance($character));
+	}
+	
+	public function findHousesInActionRange($character) {
+		return $this->findHousesNearMe($character);
+	}
 
 }

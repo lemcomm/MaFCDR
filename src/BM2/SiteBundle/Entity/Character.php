@@ -9,8 +9,9 @@ class Character {
 
 	protected $ultimate=false;
 	protected $my_realms=null;
+	protected $my_houses=null;
 	protected $my_rulerships=false;
-    public $full_health = 100;
+	public $full_health = 100;
 
 	public function __toString() {
 		return "{$this->id} ({$this->name})";
@@ -68,6 +69,21 @@ class Character {
 		return $this->my_rulerships;
 	}
 
+	public function findHighestRulership() {
+		$highest = null;
+		if ($this->findRulerships()) {
+			foreach ($this->findRulerships() as $rulership) {
+				if ($highest == NULL) {
+					$highest = $rulership;
+				}
+				if ($rulership->getType() > $highest->getType()) {
+					$highest = $rulership;
+				}
+			}
+		}
+		return $highest;
+	}
+
 	public function isPrisoner() {
 		if ($this->getPrisonerOf()) return true; else return false;
 	}
@@ -92,6 +108,26 @@ class Character {
 			if ($parent->getMale() == $male) return $parent;
 		}
 		return null;
+	}
+
+	public function findImmediateRelatives() {
+		$relatives = new ArrayCollection;
+		if ($this->getParents()) {
+			foreach ($this->getParents() as $parent) {
+				$relatives[] = $parent;
+				foreach ($parent->getChildren() as $child) {
+					if ($this != $child) {
+						$relatives[] = $child;
+					}
+				}
+			}
+		}
+		if ($this->getChildren()) {
+			foreach ($this->getChildren() as $child) {
+				$relatives[] = $child;
+			}
+		}
+		return $relatives;
 	}
 
 	public function healthValue() {
@@ -329,6 +365,23 @@ class Character {
 		$this->my_realms = $realms;
 		
 		return $realms;
+	}
+
+	public function findHouses() {
+		if ($this->my_houses!=null) return $this->my_houses;
+		$houses = new ArrayCollection;
+		if ($this->getHouse()) {
+			$houses[] = $this->getHouse();
+		}
+		foreach ($houses as $house) {
+			foreach ($house->findAllSuperiors() as $suphouse) {
+				if (!$houses->contains($suphouse)) {
+					$houses->add($suphouse);
+				}
+			}
+		}
+		$this->my_houses = $houses;
+		return $houses;
 	}
 
 

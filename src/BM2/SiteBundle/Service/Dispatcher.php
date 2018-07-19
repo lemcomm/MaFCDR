@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -19,6 +20,7 @@ class Dispatcher {
 
 	private $character=false;
 	private $realm;
+	private $house;
 	private $settlement;
 	private $appstate;
 	private $permission_manager;
@@ -32,6 +34,7 @@ class Dispatcher {
 	private $actionableRegion=false;
 	private $actionableDock=false;
 	private $actionableShip=false;
+	private $actionableHouses=false;
 
 	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, Military $military, Interactions $interactions) {
 		$this->appstate = $appstate;
@@ -56,6 +59,9 @@ class Dispatcher {
 	public function setSettlement(Settlement $settlement) {
 		$this->settlement = $settlement;
 	}
+	public function setHouse(House $house) {
+		$this->house = $house;
+	}
 
 	public function clear() {
 		$this->character=false;
@@ -63,6 +69,7 @@ class Dispatcher {
 		$this->actionableSettlement=false;
 		$this->actionableDock=false;
 		$this->actionableShip=false;
+		$this->actionableHouses=false;
 	}
 
 	/*
@@ -159,6 +166,10 @@ class Dispatcher {
 		$spy = $this->nearbySpyTest(true);
 		if (isset($spy['url'])) { 
 			$actions[] = $spy;
+		}
+		$has = $this->locationVisitHousesTest();
+		if (isset($has['url'])) {
+			$actions[] = $has;
 		}
 		$has = $this->locationDungeonsTest();
 		if (isset($has['url'])) { 
@@ -417,6 +428,30 @@ class Dispatcher {
 		}
 
 		$actions[] = $this->hierarchyCreateRealmTest();
+		$actions[] = $this->houseCreateHouseTest();
+		foreach ($this->getCharacter()->findHouses() as $house) {
+			$this->setHouse($house);
+			$actions[] = array("title"=>$house->getName());
+			$actions[] = $this->houseManageHouseTest();
+			$actions[] = $this->houseManageApplicantsTest();
+			$actions[] = $this->houseManageDisownTest();
+			$actions[] = $this->houseManageSuccessorTest();
+		}
+
+		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
+	}
+
+	public function politicsRealmsActions() {
+		$actions=array();
+		$actions[] = $this->personalPrisonersTest();
+		$actions[] = $this->personalClaimsTest();
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			$actions[] = array("name"=>"politics.all", "description"=>"unavailable.$check");
+			return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
+		}
+
+		$actions[] = $this->hierarchyCreateRealmTest();
+		$actions[] = $this->houseCreateHouseTest();
 		foreach ($this->getCharacter()->findRealms() as $realm) {
 			$this->setRealm($realm);
 			$actions[] = array("title"=>$realm->getFormalName());
@@ -435,6 +470,7 @@ class Dispatcher {
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
 	}
+
 
 	private function politicsActionsGenericTests() {
 		return $this->veryGenericTests();
@@ -695,6 +731,20 @@ class Dispatcher {
 			return array("name"=>"location.dungeons.name", "description"=>"unavailable.nodungeons");
 		}
 		return $this->action("location.dungeons", "bm2_dungeons");
+	}
+	
+	public function locationVisitHousesTest() {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"location.houses.name", "description"=>"unavailable.$check");
+		}
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"location.houses.name", "description"=>"unavailable.npc");
+		}
+		$houses = $this->getActionableHouses();
+		if (!$houses) {
+			return array("name"=>"location.houses.name", "description"=>"unavaibable.nohouses");
+		}
+		return array("name"=>"location.houses.name", "url"=>"bm2_house_nearby", "description"=>"location.houses.description");
 	}
 
 	public function personalPartyTest() {
@@ -1770,6 +1820,78 @@ class Dispatcher {
 		return array("name"=>"partners.name", "url"=>"bm2_site_politics_partners", "description"=>"");
 	}
 
+	/* ========== House Actions ========== */
+
+
+	public function houseCreateHouseTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+		}
+		if ($this->getCharacter()->getHouse()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+		}
+		return array("name"=>"house.new.name", "url"=>"bm2_house_create", "description"=>"house.new.description", "long"=>"house.new.longdesc");
+	}
+
+	public function houseManageHouseTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.house.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.manage.house", "bm2_house_manage", true, 
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageApplicantsTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.manage.applicants", "bm2_house_applicants", true, 
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageDisownTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.disown.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.disown.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.manage.disown", "bm2_house_disown", true, 
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageSuccessorTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.manage.successor", "bm2_house_successor", true, 
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
 	/* ========== Meta Actions ========== */
 
 	public function metaBackgroundTest() {
@@ -1796,19 +1918,20 @@ class Dispatcher {
 	public function metaRetireTest() {
 		if ($this->getCharacter()->isNPC()) {
 			// FIXME: respawn template doesn't exist.
-			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.npc");
 		}
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"meta.background.name", "description"=>"unavailble.prisoner");
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.prisonershort");
 		}
 		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
 	}
 
 	public function metaKillTest() {
 		if ($this->getCharacter()->isNPC()) {
-			// FIXME: respawn template doesn't exist.
-			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
-			# return array("name"=>"meta.respawn.name", "url"=>"bm2_site_character_respawn", "description"=>"meta.respawn.description");
+			return array("name"=>"meta.kill.name", "description"=>"unavailable.npc");
+		}
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"meta.kill.name", "description"=>"unavailable.prisonershort");
 		}
 		return array("name"=>"meta.kill.name", "url"=>"bm2_site_character_kill", "description"=>"meta.kill.description");
 	}
@@ -1923,6 +2046,18 @@ class Dispatcher {
 			}
 		}
 		return $this->actionableShip;
+	}
+	
+	public function getActionableHouses() {
+		if (is_object($this->actionableHouses) || $this->actionableHouses===null) return $this->actionableHouses;
+		$this->actionableHouses=null;
+		
+		if ($this->getCharacter() && $this->getCharacter()->getInsideSettlement()) {
+			$this->actionableHouses = $this->getCharacter()->getInsideSettlement()->getHousesPresent();
+		} else {
+			# Code for being outside settlement will go here and interact with Places.
+		}
+		return $this->actionableHouses;
 	}
 
 

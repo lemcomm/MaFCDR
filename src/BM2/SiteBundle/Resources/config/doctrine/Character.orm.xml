@@ -21,6 +21,7 @@
 		<field name="magic" type="integer" nullable="true"/>
 		<field name="list" type="smallint"/>
 		<field name="created" type="datetime"/>
+		<field name="house_join_date" type="datetime" nullable="true"/>
 		<field name="last_access" type="datetime"/>
 		<field name="slumbering" type="boolean"/>
 		<field name="special" type="boolean"/>
@@ -105,5 +106,13 @@
 		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
 
+		<many-to-one field="house" target-entity="House" inversed-by="members"/>
+		<one-to-many field="founded_houses" target-entity="House" mapped-by="founder"/>
+		<one-to-one field="head_of_house" target-entity="House" mapped-by="head"/>
+		<one-to-many field="successor_to_houses" target-entity="House" mapped-by="successor"/>
+
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_character"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_character"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
 	</entity>
 </doctrine-mapping>

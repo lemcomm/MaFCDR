@@ -12,6 +12,8 @@ status:
   ultimate:     You are an independent leader, but have not formed a realm yet.
   liege:        Liege of:
   position:     %position% of %realm%.
+  househead:    You are head of the %house%
+  housememb:    You are part of the %house%
  other:
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
@@ -20,6 +22,8 @@ status:
   realm:        %He% is a member of %realm%
   ultimate:     %He% is an independent leader, but has not formed a realm yet.
   liege:        Liege of:
+  househead:    %He% is head of the %house%
+  housememb:    %He% is part of the %house%
  realm:
   independent:  %name% is an independent realm.
   ultimate:     %name% is a sovereign realm.
@@ -752,3 +756,123 @@ claim:
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
  
+house:
+ nodesc:        For reasons beyond your ability to know, this house does not have a description.
+ new:
+  name:         Formalize Your House
+  description:  Any First One can declare themselves head of their House
+  longdesc:     Formalizing a House is something any First One may do, if they so desire and are not already part of a house. You are no exception to this.
+  intro: >
+   If you peer into the history books, you will usually find that Houses came before Realms. As to what a "House" is, well
+   that really depends on the culture. Some were dynasties traced back by blood through eons, others were tribes, united
+   by their believes or convictions. Others yet were more impromptu bonds, created through bloodshed or catastrophe.
+   Whatever yours will be, that is up to you, and those who will be part of it.<br /><br />
+   It is the right of any First One to declare themselves the head of a new House, or to formalize themselves as head
+   of an already existing one. Like those who came before, you too, have this right. <br /><br />
+   <em>As the creator of a house, your crest if you have one will become the crest of this house until it's demise.</em><br />
+   If you don't have a crest, should you get one later it will be added automatically.<br />
+   Alternatively, should your character die and another character inherit the house that has a crest, it will be set to theirs.<br />
+   It is worth note however, that any of your future descendants will, if the other parent either has no house, or is part of the
+   same house, also join your house automatically.<br />
+   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't a legal 
+   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.
+ background:
+  name:
+   name:        Name of the House
+   desc:        The name of the house says a lot about it's members. Make it something memorable, perhaps?
+  description:
+   name:        Public Description
+   desc: >
+    These words will be what others, outside of your house will be able to know about it. All those who look up your House will be able
+    to review them and will judge you on them.
+  private:
+   name:        Head of Household Message
+   desc: >
+    In contrast, these are the words your house members will see. How you decide to use them is up to you. Perhaps as a way to pass messages to many at once?
+    Or perhaps a way to spread the mantra of your ways?
+  secret:
+   name:        Secret Memo
+   desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
+ create:
+  submit:       Create Your House!
+ join:  
+  name:         Ask to Join this House
+  intro: >
+   As you do not yet have a house, you can always request to join one. If you find this one to your liking, why not join$
+   Whether or not you are accepted, is up to the head of the house, however.<br /><br />
+   As part of your request to join, you should write a small message explaining why.
+  subject:
+   name:        Subject
+   desc:        A short, and to the point summary
+  text:
+   name:        Message Contents
+   desc:        If there is any particular reason for your request, this is where you would detail it.
+  sure:
+   name:        Certain?
+   desc:        Once you join a house, it's not up to you whether you are allowed to leave or not, so be certain.
+  button:       Petition to Join
+ manage:
+  details:
+   name:        Manage House Details
+   intro:       From here you can edit the various details of your house, and set them to your liking.
+  house:
+   name:        Manage Details
+   description: Alter the internal and external details...
+   longdesc:    From this menu you can alter the public and private details of your house, to include the name and Head of House message.
+  applicant:
+   preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
+   approve:     Approve
+   approved:    The applcation from %link-character% has been approved.
+   deny:        Deny
+   denied:      The applcation from %link-character% has been denied.
+  applicants:
+   name:        Manage Applicants
+   name2:       Manage Applicants to the %name%
+   description: Review the pending applications...
+   longdesc:    From this menu you can approve and deny applications to join the house.
+   empty:       For better or worse, it doesn't look like you've any applications to review.
+   intro: >
+    As head of the %name%, it falls to you to manage the various applications that come from individuals seeking to join.<br />
+    You are welcome to approve or deny these requests at your leisure, of course.
+   list:        Pending Applications
+  return:       Return
+  disown:
+   name:        Disown A Member
+   name2:       Disown Someone In The %name%
+   description: Revoke someone's membership...
+   longdesc:    Don't like a member of your house? Evict them!
+   intro: >
+    As the head of the %name%, it is within your powers to disown any member of the House for whatever reason you see fit.
+    For ease of use, you may only disown one person at a time, but they are sorted according to the House they are in.
+  successor:
+   name:        Declare Your Successor
+   name2:       Determine the Successor to the %name%
+   description: Ensure your House's legacy!
+   longdesc:    It's always a good idea to know who will takeover after you depart. Just make sure they're part of the house!
+   intro: >
+    Sometimes, it's not about who runs the %name%, but who *will* run the %name%. As the Head of the House, right now anyways,
+    choosing the next to take your position is entirely up to you. It is worth noting that if the Successor you choose today
+    leaves the Dynasty for some reason, the nominated Successor will no longer be a legal inheritor (usually). It is highly recommended
+    that you read the manual on [houses].
+ members:
+  submit:       Submit  
+ updated:
+  background:   You have successfully updated the background of this House.
+  created:      You have successfully created a noble house.
+ member:
+  approve:      You have approved this member joining your house.
+  join:         You have applied to become a memebr of this house.
+ view:
+  head:         Head
+  founder:      Founder
+  home:         Home
+  members:      Members
+  notable:      Notable Members
+  internal:     Internal Information
+  secret:       Secret Information
+ nearby:
+  name2:        Viewing Local Houses
+  intro: >
+   Houses, courtesy of the First Ones that comprise them, are hard to miss things. If they're there, you'll know.
+   It's a First One thing. As a First One yourself though, you can view any of the local ones, and even petition to join one if you
+   are not already part of another.

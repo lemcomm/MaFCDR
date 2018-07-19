@@ -36,7 +36,7 @@ menu:
  translator:  Translations
  register:  Register
  map:       Map
- travel:    Map & travel
+ travel:    Map & Travel
  status:    Status
  recent:    Summary
  rss:       RSS feed
@@ -45,13 +45,14 @@ menu:
  news:      Publications
  relations: Relations
  politics:  Politics
+ realms:    Realms
  quests:    Quests
  actions:   Actions
- allactions: All actions
+ allactions: All Actions
  character:
-  background: Character background
-  start:    Character placement
- dungeon:   dungeon
+  background: Character Background
+  start:    Character Placement
+ dungeon:   Dungeon
 
 contact:
  title:     Contact
@@ -580,6 +581,7 @@ character:
   ultimate:   sovereign realm(s)
   entourage:  entourage
   soldiers:   soldiers
+ personality: Personality
 
 bandits:
  title:   Bandits
@@ -901,6 +903,8 @@ biome:
 
 error:
  title:        Error
+ found:
+  house:       You already have a house
  notfound:
   page:        Page not found
   character:   Character not found
@@ -922,6 +926,8 @@ error:
   election:     Election not found
   newliege:     Settlement owner not found, please choose a different knight offer.
   offer:        Please select a knight offer.
+  nohouse:      There are no houses here which to join.
+  toofar:       You are too far away from what you are interacting with.
  noaccess:
   character:    This character does not belong to you
   vassal:       This character is not a vassal of yours.
@@ -934,6 +940,8 @@ error:
   paperowner:   You are not an owner of this publication
   library:      You cannot create new publications because none of your estates has a library
   battlereport: You were not a participant in that battle, so you have to rely on eye witness reports for its details
+  nothead:      Only the head of the House may access this page.
+  nohouse:      You must be in a house to perform this action.
 
  missing:
   character:    Character required, but missing. Please select a character from the character page or log in again.
@@ -1294,6 +1302,7 @@ manual:
  reference:     Reference
  units:         Units of measurement
  test:          Test instance
+ houses:        Houses
 
 list:
  buildingtypes:   list of all building types
@@ -1495,6 +1504,8 @@ unavailable:
  trade:
   noestate:     You do not have any estates with which to trade.
   nooptions:    There are no possible trade/tribute deals you could make at this location.
+ nohouses:      There are no houses established nearby. If you are at a settlement and they are inside, you must be inside as well.
+ havehouse:     You already have a House.
 
 marker:
  name:      Marker name
@@ -1550,4 +1561,12 @@ artifact:
     You can give artifacts to other nearby First Ones, simply by handing them over. Note that these transfers
     are permanent and there is absolutely no way to reverse it once it is done.
   success:  You have given the %artifact% to %character%.
-  
+
+house:
+ member:
+  exile:       You have exiled %character% from the House.
+  join:        You have applied to join the House.
+  successor:   You have successfully updated your successor.
+ updated:
+  created:     You have formalized your House!
+  background:  The details of your House have been udpated.

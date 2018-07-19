@@ -7,9 +7,12 @@
 		
 		<many-to-one field="artifact" target-entity="Artifact" inversed-by="descriptions"/>
 		<one-to-one field="active_artifact" target-entity="Artifact" inversed-by="description"/>
+		
 		<!-- Someday, we'll add this, probably.
 		<many-to-one field="item" target-entity="Item" inversed-by="descriptions"/>
+		<one-to-one field="active_item" target-entity="Item" inversed-by"description"/>
 		-->
+		
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="descriptions"/>
 		<one-to-one field="active_settlement" target-entity="Settlement" inversed-by="description"/>
 
@@ -18,6 +21,9 @@
 
 		<many-to-one field="realm" target-entity="Realm" inversed-by="descriptions"/>
 		<one-to-one field="active_realm" target-entity="Realm" inversed-by="description"/>
+		
+		<many-to-one field="house" target-entity="House" inversed-by="descriptions"/>
+		<one-to-one field="active_house" target-entity="House" inversed-by="description"/>
 		
 		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
 		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>

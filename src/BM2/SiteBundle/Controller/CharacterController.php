@@ -14,6 +14,8 @@ use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
+
+use BM2\SiteBundle\Service\CharacterManager;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
 
@@ -24,6 +26,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -268,6 +271,8 @@ class CharacterController extends Controller {
 		} else {
 			$retiree = false;
 		}
+		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
+		$this->get('character_manager')->checkReturnability($character);
 
 		$form_offer = $this->createForm(new CharacterPlacementType('offer', $character));
 		$form_existing = $this->createForm(new CharacterPlacementType('family', $character));
@@ -474,9 +479,18 @@ class CharacterController extends Controller {
 				$banned = true;
 			}
 		}
+		$relationship = false;
+		if ($character && $character->getPartnerships() && $char->getPartnerships()) {
+			foreach ($character->getPartnerships() as $partnership) {
+				if (!$partnership->getEndDate() && $partnership->getOtherPartner($character) == $char) {
+					$relationship = true;
+				}
+			}
+		}
 		return array(
 			'char'		=> $char,
 			'details'	=> $details,
+			'relationship'	=> $relationship,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
 			'banned'	=> $banned,
@@ -794,7 +808,7 @@ class CharacterController extends Controller {
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if ($character->isPrisoner()) {
-			throw new AccessDeniedException('unvailable.prisoner');
+			throw new AccessDeniedHttpException('unavailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
@@ -865,7 +879,7 @@ class CharacterController extends Controller {
 	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if ($character->isPrisoner()) {
-			throw new AccessDeniedException('unvailable.prisoner');
+			throw new AccessDeniedHttpException('unvailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('retirement', 'textarea', array(

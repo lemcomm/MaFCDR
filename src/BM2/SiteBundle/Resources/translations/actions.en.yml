@@ -178,6 +178,9 @@ location:
  dungeons:
   name:         Enter Dungeon
   description:  Explore the nearby dungeon.
+ houses:
+  name:         View Local Houses
+  description:  View one of the Houses that have set themselves up here.
 
 building:
  title:         Local Buildings

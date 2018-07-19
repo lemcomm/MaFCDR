@@ -30,6 +30,8 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
 
+		<many-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_soldiers"/>
+
 		<lifecycle-callbacks>
 			<lifecycle-callback type="preRemove" method="onPreRemove" />
 		</lifecycle-callbacks>

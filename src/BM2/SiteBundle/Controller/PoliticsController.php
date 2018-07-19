@@ -40,6 +40,16 @@ class PoliticsController extends Controller {
 	}
 
    /**
+     * @Route("/realms", name="bm2_politics_realms")
+     * @Template("BM2SiteBundle:Politics:realms.html.twig")
+     */
+	public function realmsAction() {
+		$this->get('dispatcher')->gateway();
+
+		return array();
+	}
+
+   /**
      * @Route("/relations", name="bm2_relations")
      * @Template("BM2SiteBundle:Politics:relations.html.twig")
      */
@@ -328,7 +338,9 @@ class PoliticsController extends Controller {
 			$choices=array();
 			if ($character->getPartnerships()) {
 				foreach ($character->getPartnerships() as $partnership) {
-					$existingpartners[] = $partnership->getOtherPartner($character);
+					if (!$partnership->getEndDate()) {
+						$existingpartners[] = $partnership->getOtherPartner($character);
+					}
 				}
 			}
 			foreach ($others as $other) {
