@@ -172,6 +172,7 @@ class CharacterManager {
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
+		$character->setSystem(null);
 		// remove from hierarchy
 		$character->setLiege(null);
 
