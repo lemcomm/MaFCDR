@@ -105,10 +105,10 @@ class HouseController extends Controller {
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 		} else {
-			throw createNotFoundException('unvailable.notinside');
+			throw $this->createNotFoundException('unvailable.notinside');
 		}
 		if ($character->getHouse()) {
-			throw createNotFoundException('error.found.house');
+			throw $this->createNotFoundException('error.found.house');
 		}
 		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
@@ -155,7 +155,7 @@ class HouseController extends Controller {
 		$form->handleRequest($request);
 		# TODO: Rework this to use dispatcher.
 		if ($character != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -204,10 +204,10 @@ class HouseController extends Controller {
 		# TODO: Rework this later to allow for Houses at Places.
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getInsideSettlement()) {
-			throw createNotFoundException('unvailable.notinside');
+			throw $this->createNotFoundException('unvailable.notinside');
 		}
 		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
-			throw createNotFoundException('error.notfound.housenothere');
+			throw $this->createNotFoundException('error.notfound.housenothere');
 		}
 		$form = $this->createForm(new HouseJoinType());
 		$form->handleRequest($request);
@@ -242,10 +242,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$joinrequests = $em->getRepository('BM2SiteBundle:GameRequest')->findBy(array('type' => 'house.join', 'to_house' => $house));
 
@@ -270,10 +270,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$members = $house->findAllMembers();
 
@@ -322,10 +322,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$members = $house->findAllMembers();
 
