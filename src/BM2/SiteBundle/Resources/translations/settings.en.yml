@@ -3,7 +3,8 @@
 # Author: Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
 
-buttons:
+areyousure: Confirm Your Decision
+button:
  submit:  Submit
  
 character:
