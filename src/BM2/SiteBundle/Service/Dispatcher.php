@@ -1880,6 +1880,10 @@ class Dispatcher {
 		if (!$this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notinside");
 		}
+		if (!$this->getCharacter()->getInsideSettlement()->getOwner() != $this->getCharacter()) {
+			#TODO: Rework this for permissions when we add House permissions (if we do).
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notyours2");
+		}
 		if ($this->getCharacter()->getInsideSettlement() == $this->house->getInsideSettlement()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.househere");
 		} else {
