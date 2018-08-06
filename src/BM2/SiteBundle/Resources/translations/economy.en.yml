@@ -8,7 +8,7 @@ provides:   Provides
 provider:   Provided by %building%
 trainer:    Trained at %building%
 trainingfor:   Training for %item%
-bonus:      Droduction bonus
+bonus:      Production bonus
 defbonus:   Defensive bonus
 
 minpop:     %pop% minimum population to construct
@@ -118,7 +118,7 @@ description:
    the great academy, where new strategies and tactics are discovered.
  Alchemist: >
    Usually set at the edge of the settlement, the alchemist is always expected to blow up spectacularily, but
-   in reality most of his experiments are far less dangerous or spectacular. While much of the research done
+   in reality most of the experiments are far less dangerous or spectacular. While much of the research done
    here is of questionable quality, there is the occasional poison or interesting substance discovered.
  Apothecary: >
    Sometimes called an herbalist, or a pharmacist, the apothecary formulates and dispenses medical herbs and drugs
