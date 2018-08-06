@@ -819,6 +819,16 @@ house:
    name:        Manage Details
    description: Alter the internal and external details...
    longdesc:    From this menu you can alter the public and private details of your house, to include the name and Head of House message.
+  relocate:
+   name:        Relocate the House
+   name2:       Relocate the %name%
+   description: Find a location that better suits your House?
+   longdesc:    If your house's previous location didn't quite suit your likings, you can always move it to another settlement.
+   intro: >
+    As the Head of the %name% it is well within your powers to relocate the House to a place more of your choosing.
+    You can do this whenever you so desire, so long as you are in a region in which you have the rights to do so--moving 
+    isn't so simple as forming one, and it's not seen as such an inalienable right of First Ones to do.
+    If you're sure about moving to the settlement you're currently in, simple check the box below, and click 'submit'.
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
    approve:     Approve
