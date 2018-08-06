@@ -17,11 +17,11 @@ class AreYouSureType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$builder->add('sure', 'checkbox', array(
-			'label' => 'settings.areyousure',
+			'label' => 'areyousure',
 			'required' => true
 		));
 
-		$builder->add('submit', 'submit', array('label'=>'settings.submit'));
+		$builder->add('submit', 'submit', array('label'=>'button.submit'));
 	}
 
 	public function getName() {
