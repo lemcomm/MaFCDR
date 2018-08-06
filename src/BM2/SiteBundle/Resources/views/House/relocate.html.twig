@@ -5,8 +5,9 @@
 	<p>{{ 'house.manage.relocate.intro'|trans({"%name%":name},"politics")|raw|manuallinks }}</p>
 
 	{{ form_start(form) }}
-	{{ form_errors(form) }}
-	{{ form_widget(form.member) }}
+	{{ form_errors(form) }}<br />
+	{{ form_row(form.sure) }}<br />
+	{{ form_row(form.submit) }}
 	{{ form_end(form) }}
 
 {% endblock %}
