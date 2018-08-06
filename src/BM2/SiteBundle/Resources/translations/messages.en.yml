@@ -592,12 +592,16 @@ bandits:
 achievements:
  title:       Achievements
  type:
-  battles:    Battles fought
-  battlesize: Battle glory
-  captures:   First Ones captured
+  battles:    Battles Fought
+  battlesize: Battle Glory
+  captures:   First Ones Captured
+  escaped:    Successful Escapes
+  escapees:   Escaped Prisoners
+  failedescapes: Failed Escapes
+
   kills:
-   soldiers:  Mortal soldiers slain
-   nobles:    First Ones slain in battle
+   soldiers:  Mortals Slain
+   nobles:    First Ones Slain in Battle
 
 politics:
  hierarchy: hierarchy
