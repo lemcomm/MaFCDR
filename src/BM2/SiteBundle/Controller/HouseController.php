@@ -357,8 +357,10 @@ class HouseController extends Controller {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		$settlement = null;
 		$house = null;
+		#Character must be inside a settlement in order to relocate the house
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
+			#Can only relocate a house if you own the target settlement
 			if ($settlement->getOwner() != $character) {
 				throw $this->createNotFOundException('unavailable.notyours2');
 			} else {
@@ -367,9 +369,11 @@ class HouseController extends Controller {
 		} else {
 			throw $this->createNotFoundException('unvailable.notinside');
 		}
+		#Impossible to relocate a house if you don't belong to one.
 		if (!$character->getHouse()) {
 			throw $this->createNotFoundException('error.found.house');
 		} 
+		#Only the Head of a house can relocate.
 		if ($character->getHouse()->getHead() != $character) {
 			throw $this->createNotFoundException('error.noaccess.nothead');
 		} else {
@@ -386,7 +390,9 @@ class HouseController extends Controller {
 				$fail = false;
 			}
 			if (!$fail) {
+				#Update House location
 				$house->setInsideSettlement($settlement);
+				#Create relocation event in House's event log
 				$this->get('history')->logEvent(
 					$house,
 					'event.house.relocated.settlement',
@@ -394,6 +400,7 @@ class HouseController extends Controller {
 					History::HIGH, true
 				);
 				$em->flush();
+				#Add "success" flash message to the top of the redirected page for feedback.
 				$this->addFlash('notice', $this->get('translator')->trans('house.updated.relocated', array(), 'messages'));
 				return $this->redirectToRoute('bm2_politics', array());
 			} else {
