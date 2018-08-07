@@ -432,10 +432,14 @@ class Dispatcher {
 		foreach ($this->getCharacter()->findHouses() as $house) {
 			$this->setHouse($house);
 			$actions[] = array("title"=>$house->getName());
-			$actions[] = $this->houseManageHouseTest();
-			$actions[] = $this->houseManageApplicantsTest();
-			$actions[] = $this->houseManageDisownTest();
-			$actions[] = $this->houseManageSuccessorTest();
+			$actions[] = $this->houseViewTest(); #Welcome to the simplest test ever...
+			if ($house->getHead() == $this->getCharacter()) {
+				$actions[] = $this->houseManageHouseTest();
+				$actions[] = $this->houseManageRelocateTest();
+				$actions[] = $this->houseManageApplicantsTest();
+				$actions[] = $this->houseManageDisownTest();
+				$actions[] = $this->houseManageSuccessorTest();
+			}
 		}
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
@@ -456,16 +460,19 @@ class Dispatcher {
 			$this->setRealm($realm);
 			$actions[] = array("title"=>$realm->getFormalName());
 			$actions[] = array("name"=>"realm.view.name", "url"=>"bm2_site_realm_hierarchy", "parameters"=>array("realm"=>$realm->getId()), "description"=>"realm.view.description", "long"=>"realm.view.longdesc");
-			$actions[] = $this->hierarchyManageRealmTest();
-			$actions[] = $this->hierarchyManageDescriptionTest();
-			$actions[] = $this->hierarchySelectCapitalTest();
-			$actions[] = $this->hierarchyAbdicateTest();
-			$actions[] = $this->hierarchyRealmPositionsTest();
-			$actions[] = $this->hierarchyRealmLawsTest();
-			$actions[] = $this->hierarchyWarTest();
-			$actions[] = $this->hierarchyDiplomacyTest();
-			$actions[] = $this->hierarchyAbolishRealmTest();
 			$actions[] = $this->hierarchyElectionsTest();
+			if ($realm->findRulers()->contains($this->getCharacter())) {
+				# NOTE: We'll have to rework this later when othe positions can manage a realm.
+				$actions[] = $this->hierarchyManageRealmTest();
+				$actions[] = $this->hierarchyManageDescriptionTest();
+				$actions[] = $this->hierarchySelectCapitalTest();
+				$actions[] = $this->hierarchyAbdicateTest();
+				$actions[] = $this->hierarchyRealmPositionsTest();
+				$actions[] = $this->hierarchyRealmLawsTest();
+				$actions[] = $this->hierarchyWarTest();
+				$actions[] = $this->hierarchyDiplomacyTest();
+				$actions[] = $this->hierarchyAbolishRealmTest();
+			}
 		}
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
@@ -1823,6 +1830,19 @@ class Dispatcher {
 	/* ========== House Actions ========== */
 
 
+	public function houseViewTest() {
+		/* This is mostly just here for consistency in the dispatcher.
+		I've no idea why you would ever need to actually test this... -Andrew */
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.view.name", "description"=>"unavailable.$check");
+		} else {
+			return $this->action("house.view", "bm2_house", true, 
+				array('id'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
 	public function houseCreateHouseTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
@@ -1844,6 +1864,30 @@ class Dispatcher {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.house", "bm2_house_manage", true, 
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageRelocateTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.nothead");
+		}
+		if (!$this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notinside");
+		}
+		if (!$this->getCharacter()->getInsideSettlement()->getOwner() != $this->getCharacter()) {
+			#TODO: Rework this for permissions when we add House permissions (if we do).
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notyours2");
+		}
+		if ($this->getCharacter()->getInsideSettlement() == $this->house->getInsideSettlement()) {
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.househere");
+		} else {
+			return $this->action("house.manage.relocate", "bm2_house_relocate", true, 
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
