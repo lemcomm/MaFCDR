@@ -2,14 +2,16 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Entourage;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Soldier;
-use BM2\SiteBundle\Entity\Action;
-use BM2\SiteBundle\Entity\Battle;
+use BM2\SiteBundle\Entity\UnitSettings;
+
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
@@ -692,4 +694,15 @@ class Military {
 		}
 	}
 
+	public function newUnitSettings($unit, Character $character) {
+		$settings = new UnitSettings();
+		$this->em->persist($settings);
+		if ($character) {
+			$settings->setCharacter($character);
+		} else {
+			$settings->setUnit($unit);
+		}
+		$this->em->flush();
+		return $settings;
+	}
 }
