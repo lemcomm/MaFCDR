@@ -244,6 +244,7 @@ relation:
   crest:      Allow partner to bear your crest?
 
 realm:
+ description:   Realm Description
  view:
   name:         Hierarchy Tree
   description:  See a graphical view of the realm hierarchy.
