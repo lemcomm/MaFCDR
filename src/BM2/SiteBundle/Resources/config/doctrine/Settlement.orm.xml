@@ -57,5 +57,6 @@
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_settlement"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_settlement"/>
 
+		<one-to-many field="supplies_units" target-entity="UnitSettings" inversed-by="supplier"/>
 	</entity>
 </doctrine-mapping>
