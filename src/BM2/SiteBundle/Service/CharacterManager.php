@@ -423,7 +423,7 @@ class CharacterManager {
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.death',
-						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						array(),
 						History::ULTRA, true
 					);
 				}
@@ -642,7 +642,7 @@ class CharacterManager {
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.retire',
-						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+						array(),
 						History::ULTRA, true
 					);
 				}

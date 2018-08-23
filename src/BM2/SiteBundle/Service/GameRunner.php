@@ -379,7 +379,7 @@ class GameRunner {
 							$this->history->logEvent(
 								$house,
 								'event.house.collapsed.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+								array(),
 								History::ULTRA, true
 							);
 						}	
