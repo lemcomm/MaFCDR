@@ -757,6 +757,8 @@ claim:
  enforceable: Holds an enforceable claim, which makes taking control very easy.
  
 house:
+ history:
+  name:         House History
  nodesc:        For reasons beyond your ability to know, this house does not have a description.
  new:
   name:         Formalize Your House
