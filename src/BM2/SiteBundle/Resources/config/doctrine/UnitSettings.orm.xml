@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\UnitSettings" table="UnitSettings">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<one-to-one field="character" target-entity="Character" inversed-by="unit_settings"/>
+		<!-- one-to-one field="unit" target-entity="Unit" inversed-by="unit_settings"/ -->
+		<field name="name" type="string"/>
+		<many-to-one field="supplier" target-entity="Settlement" mapped-by="supplies_units"/>
+		<field name="strategy" type="string" nullable="true"/>
+		<field name="tactic" type="string" nullable="true"/>
+		<field name="respect_fort" type="boolean" nullable="true"/>
+		<field name="line" type="smallint" nullable="true"/>
+		<field name="siege_orders" type="string" nullable="true"/>
+		
+	</entity>
+</doctrine-mapping>
