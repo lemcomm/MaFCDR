@@ -244,7 +244,6 @@ relation:
   crest:      Allow partner to bear your crest?
 
 realm:
- description:   Realm Description
  view:
   name:         Hierarchy Tree
   description:  See a graphical view of the realm hierarchy.
@@ -283,6 +282,7 @@ realm:
   sure:         You Absolutely Certain?
   success:      For better or worse, the realm has been taken down.
  description:
+  title:        Realm Description
   name:         Update Description
   description:  Change the public words about the realm.
   longdesc:     As you are the ruler of %formalname%, it is well within your powers to determine how the realm is described abroad, at least formally speaking, anyways.
