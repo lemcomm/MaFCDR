@@ -1233,35 +1233,21 @@ class CharacterController extends Controller {
 		if (!$settings) {
 			throw new \Exception("Anata wa naniwoshita!?"); # Seriously, what did you do to get this!? Stop trying to break my game.
 		}
-		# Create units array. Load the character as a unit. It makes sense, trust me.
-		$units = array();
-		$units[] = $character;
-		/* TODO: Activate this code when we add units in. 
-		# Functionally, unit settings are the same data regardless if it's a unit or a character in control.
-		if ($character->getUnits()) {		
-			foreach ($character->getUnits() as $unit) {
-				$units[] = $unit;
-			}
-		} */
 
-		# Perpare each form for page. Pass character and true in order to build supply points listing. Passing false will make this default to unit homebase options (feed or no). When units are added, we'll make that optionally based on the unit itself whether this shows or not.
-		foreach ($units as $unit) {
-			if ($unit == $character) {
-				$form = $this->createForm(new UnitSettingsType($character, true), $unit->getUnitSettings());
-			} else {
-				$form = $this->createForm(new UnitSettingsType($character, false), $unit->getUnitSettings());
-			}
-			$form->handleRequest($request);
-		}
+		#NOTE: Originally, I was planning to have one page to manage all unit settings, but trying to get Symfony to understand what I'm asking doesn't appear to be feasible.
+		# It probably has something to do with dynamic form loading, kind of how the permissions forms work, but that's way beyond my skill level.
 
+		$form = $this->createForm(new UnitSettingsType($character, true), $settings);
+
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			# I love passing entities. It means I don't have to actually code what happens when this is all committed. :) --Andrew
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('update.unit.success', array(%name%=>$data()->getName()), 'settings'));
+			$this->addFlash('notice', $this->get('translator')->trans('unit.success', array('%name%'=>$data->getName()), 'settings'));
 		}
 			
-		return array('units'=>$units);
+		return array('form'=>$form->createView());
 	}
 
    /**
