@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityRepository;
 
 use BM2\SiteBundle\Entity\UnitSettings;
 
@@ -20,7 +21,8 @@ class UnitSettingsType extends AbstractType {
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       	=> 'unitsettings_1337',
-			'translation_domain' => 'settings',
+			'translation_domain' 	=> 'settings',
+			'attr'			=> array('class'=>'wide')
 		));
 	}
 
@@ -29,15 +31,14 @@ class UnitSettingsType extends AbstractType {
 		$supply = $this->supply;
 
 		$builder->add('name', 'text', array(
-			'label'=>'setting.unit.name',
-			'required'=>true,
-			'placeholder'=>$char->getName()."'s Force";
+			'label'=>'unit.name',
+			'required'=>true
 		));
 		if ($supply) {
 			$builder->add('supplier', 'entity', array(
-				'label' => 'setting.unit.supplier',
+				'label' => 'unit.supplier',
 				'multiple'=>false,
-				'expanded'=>true,
+				'expanded'=>false,
 				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($char) {
 					$qb = $er->createQueryBuilder('e');
 					$qb->where('e.owner = :char')->setParameter('char', $char);
@@ -47,47 +48,47 @@ class UnitSettingsType extends AbstractType {
 			));
 		}
 		$builder->add('strategy', 'choice', array(
-			'label'=>'setting.unit.strategy.name',
+			'label'=>'unit.strategy.name',
 			'required'=>false,
 			'choices'=>array(
-				'advance' => 'settings.unit.strategy.advance',
-				'hold' => 'settings.unit.strategy.hold',
-				'distance' => 'settings.unit.strategy.distance'
+				'advance' => 'unit.strategy.advance',
+				'hold' => 'unit.strategy.hold',
+				'distance' => 'unit.strategy.distance'
 			),
 		));
 		$builder->add('tactic', 'choice', array(
-			'label'=>'setting.unit.tactic.name',
+			'label'=>'unit.tactic.name',
 			'required'=>false,
 			'choices'=>array(
-				'melee' => 'setting.unit.tactic.melee',
-				'ranged' => 'settings.unit.tactic.ranged',
-				'mixed' => 'settings.unit.tactic.mixed'
+				'melee' => 'unit.tactic.melee',
+				'ranged' => 'unit.tactic.ranged',
+				'mixed' => 'unit.tactic.mixed'
 			),
 		));
 		$builder->add('respect_fort', 'checkbox', array(
-			'label'=>'setting.unit.tactic.name',
+			'label'=>'unit.usefort',
 			'required'=>false
 		));
 		$builder->add('line', 'choice', array(
-			'label'=>'setting.unit.line.name',
+			'label'=>'unit.line.name',
 			'required'=>false,
 			'choices'=>array(
-				'1' => 'setting.unit.line.1',
-				'2' => 'setting.unit.line.2',
-				'3' => 'setting.unit.line.3',
-				'4' => 'setting.unit.line.4',
-				'5' => 'setting.unit.line.5',
-				'6' => 'setting.unit.line.6',
-				'7' => 'setting.unit.line.7',
+				'1' => 'unit.line.1',
+				'2' => 'unit.line.2',
+				'3' => 'unit.line.3',
+				'4' => 'unit.line.4',
+				'5' => 'unit.line.5',
+				'6' => 'unit.line.6',
+				'7' => 'unit.line.7',
 			),
 		));
 		$builder->add('siege_orders', 'choice', array(
-			'label'=>'setting.unit.siege.name',
+			'label'=>'unit.siege.name',
 			'required'=>false,
 			'choices'=>array(
-				'engage' => 'setting.unit.siege.engage',
-				'stayback' => 'settings.unit.siege.stayback',
-				'avoid' => 'settings.unit.siege.avoid'
+				'engage' => 'unit.siege.engage',
+				'stayback' => 'unit.siege.stayback',
+				'avoid' => 'unit.siege.avoid'
 			),
 		));
 		$builder->add('submit', 'submit', array('label'=>'submit'));
