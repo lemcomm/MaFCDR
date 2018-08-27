@@ -82,15 +82,6 @@ class UnitSettingsType extends AbstractType {
 				'7' => 'unit.line.7',
 			),
 		));
-		$builder->add('siege_orders', 'choice', array(
-			'label'=>'unit.siege.name',
-			'required'=>false,
-			'choices'=>array(
-				'engage' => 'unit.siege.engage',
-				'stayback' => 'unit.siege.stayback',
-				'avoid' => 'unit.siege.avoid'
-			),
-		));
 		$builder->add('submit', 'submit', array('label'=>'submit'));
 	}
 
