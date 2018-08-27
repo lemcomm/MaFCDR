@@ -707,7 +707,7 @@ settlement:
  corruption:
   name: Corruption
   tt:   Slowly rises with the number of estates you personally hold across all your characters. Give estates to vassals to reduce corruption. See manual for details.
- militia:   Eoldiers stationed in %name%
+ militia:   Soldiers stationed in %name%
  militia2:  Militia
  recruits:  Soldiers in training in %name%
  recruits2: Recruits
