@@ -20,7 +20,7 @@ Past Supplies, there are two main things you'll concern yourself with in regards
 
 Line Settings & Fortifications
 ------------------------------
-Simply put, these control where your forces deploy in relation to their allies and enemies and whether or not they'll leave fortifications to attack an enemy. They let you fine tune your forces time to encounter as well as make effective use of walls (which give a handy bonus to defenders).
+Simply put, these control where your forces deploy in relation to their allies and enemies and whether or not they'll leave fortifications to attack an enemy. They let you fine tune your forces time to encounter as well as make effective use of walls (which give a handy bonus to defenders). This defaults to Line 4, the middle, if not set.
 
 Militia versus Professional
 ---------------------------
