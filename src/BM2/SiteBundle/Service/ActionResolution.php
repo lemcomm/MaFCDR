@@ -235,7 +235,7 @@ class ActionResolution {
 		$victims = array();
 		foreach ($possible_targets as $target) {
 			list($check, $list, $level) = $this->permissions->checkListing($action->getTargetListing(), $target['character']);
-			if ( ($check && $action->getStringValue()=='attack') || (!$check && $action->getStringValue()=='allow') ) {
+			if ( ( ($check && $action->getStringValue()=='attack') || (!$check && $action->getStringValue()=='allow') ) && $target['character']->getSystem() != 'GM' ){
 				$victims[] = $target['character'];
 			}
 		}
