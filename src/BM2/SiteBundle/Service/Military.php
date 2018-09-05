@@ -698,6 +698,7 @@ class Military {
 		$settings = new UnitSettings();
 		$this->em->persist($settings);
 		if ($character) {
+			$character->setUnitSettings($settings);
 			$settings->setCharacter($character);
 			$settings->setName($character->getName()."'s Unit");
 		} else {
