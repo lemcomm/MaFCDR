@@ -1,6 +1,10 @@
-Basics
-------
+### This manual page is detailing a highly experimental and incomplete feature that is in the process of being implemented. Everything on this page, while as detailed as it may be, is subject to change. ###
+
 Units are the primary unit of organization between you and your soldiers, allowing you to set orders and manage hundreds of individuals soldiers at once. Each unit under your command will have it's own supply source, battle strategy, tactics, name, and deployment settings, allowing you as their leader to maximize their use on the field.
+
+Generally speaking, units are best when homogenous, or made up of soldiers all using relatively the same equipment. Archers with archers, cavalry with cavalry. In battle a unit will only move as slow as it's slowest soldier, and while it can be said that a disorganized mess is hard to fight against, it's also hard to deploy effectively.
+
+For more detailed guidance on how exactly units work in the field, we recommend you read the [new battles](battles2) page.
 
 Supplies
 --------
