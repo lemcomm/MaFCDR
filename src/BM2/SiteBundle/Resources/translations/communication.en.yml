@@ -27,6 +27,7 @@ event:
   updated:
    artifact:    The description of this artifact has changed.
    item:        The description of this item has changed.
+   realm:       %character% has updated the description of the realm.
    place:       %character% has changed the description of %place%.
    settlement:  %character% has updated the description of %settlement%.
 

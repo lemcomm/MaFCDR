@@ -14,5 +14,40 @@ character:
   readrealms:        Automatically mark realm messages as read?
  non_hetero_options: Show homosexual partnership options?
 
+unit:
+ title:     Unit Settings
+ description: >
+  This page lets you manage the individual tactics and strategy for each unit under your command, as well as change their unit names and supply sources (as applicable).
+  All of this is presently not implemented, but will be fully tied into the rest of the game in short order, starting with supply sources, as things are completed. Full information can be found on the manual's "Units" page.
+ yourown:   Settings for your personal force
+ name:      Unit Name?
+ supplier:  Where are they supplied from?
+ strategy:
+  name:     Battle Strategy?
+  advance:  Charge enemy
+  hold:     Hold position
+  distance: Avoid enemies
+ tactic:
+  name:     Engagement Tactic?
+  melee:    Melee only
+  ranged:   Ranged only
+  mixed:    Use best
+ usefort:   Respect fortifications?
+ line:
+  name:     On which line shall they deploy?
+  1:        1st Row (Front Line)
+  2:        2nd Row
+  3:        3rd Row
+  4:        4th Row (Middle)
+  5:        5th Row
+  6:        6th Row
+  7:        7th Row (Very back)
+ siege:
+  name:     How should siege teams act outside of sieges?
+  engage:   Join in combat
+  stayback: Reserve only
+  avoid:    Avoid combat
+ success:   Settings for the %name% have been updated!
+
 update:
  success:  Settings updated successfully!

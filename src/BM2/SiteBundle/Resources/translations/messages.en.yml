@@ -1304,9 +1304,12 @@ manual:
  artifacts:     Artifacts
  supply:        Army supply
  reference:     Reference
- units:         Units of measurement
+ measurements:  Units of measurement
  test:          Test instance
  houses:        Houses
+ units:         Units
+ battles2:      Battles (Upcoming Change)
+ sieges:        Sieges (Upcoming Feature)
 
 list:
  buildingtypes:   list of all building types

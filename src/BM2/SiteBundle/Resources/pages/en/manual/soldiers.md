@@ -4,6 +4,8 @@ Armies in Might & Fealty are comprised of individuals, not numbers. Both in mana
 
 This allows you to create any kind of army you wish with any mix of troop types you like (or can afford). It also allows damage and attrition to be meaningful instead of statistical. So after a battle, you will find Hans and Frank dead, while Peter and Gustav have been wounded and Tyler dropped his shield in the retreat.
 
+While every soldier in your army, is tracked individually, it's not feasible for you to constantly manage the tactics and gear of hundreds of soldiers. This is where [units] come in. They let you manage entire swaths of the force under your command, and automate a lot of the more tedious functions.
+
 
 Experience
 ----------

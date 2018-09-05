@@ -282,6 +282,7 @@ realm:
   sure:         You Absolutely Certain?
   success:      For better or worse, the realm has been taken down.
  description:
+  title:        Realm Description
   name:         Update Description
   description:  Change the public words about the realm.
   longdesc:     As you are the ruler of %formalname%, it is well within your powers to determine how the realm is described abroad, at least formally speaking, anyways.
@@ -757,6 +758,8 @@ claim:
  enforceable: Holds an enforceable claim, which makes taking control very easy.
  
 house:
+ history:
+  name:         House History
  nodesc:        For reasons beyond your ability to know, this house does not have a description.
  new:
   name:         Formalize Your House

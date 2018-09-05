@@ -545,16 +545,18 @@ class Dispatcher {
 		$actions=array();
 
 		if ($this->getCharacter()->isNPC()) {
+			$actions[] = $this->metaUnitSettingsTest();
 			$actions[] = $this->metaKillTest();
 		} else {
-			$actions[] = $this->metaSettingsTest();
+			$actions[] = $this->metaUnitSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
-			$actions[] = $this->metaRenameTest();
-			$actions[] = $this->metaRetireTest();
-			$actions[] = $this->metaKillTest();
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
 			}
+			$actions[] = $this->metaSettingsTest();
+			$actions[] = $this->metaRenameTest();
+			$actions[] = $this->metaRetireTest();
+			$actions[] = $this->metaKillTest();
 		}
 
 		return array("name"=>"meta.name", "elements"=>$actions);
@@ -1985,6 +1987,11 @@ class Dispatcher {
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
 		}
 		return array("name"=>"meta.heraldry.name", "url"=>"bm2_site_character_heraldry", "description"=>"meta.heraldry.description");
+	}
+
+	public function metaUnitSettingsTest() {
+		# Not even sure there's a reason to have this here besides standardization. --Andrew
+		return array("name"=>"meta.unitsettings.name", "url"=>"bm2_site_character_unitsettings", "description"=>"meta.unitsettings.description");
 	}
 
 	/* ========== various tests and helpers ========== */
