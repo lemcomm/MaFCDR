@@ -22,15 +22,15 @@ Sometimes referred to as your "Battle Setup", your Unit Setup, or Unit Settings,
 
 Battle Resolution
 -----------------
-Unlike the battles of old, things are a lot less abstract. Gone are the days when you only witnessed the outcome in numbers. Battles can usually be resolved into 5 phases, starting with 0, then looping through phases 1, 2, 3, and 4, in order, until there is only a single surviving side.
+Unlike the battles of old, things are a lot less abstract. Gone are the days when you only witnessed the outcome in numbers. Battles can usually be resolved into 5 phases, starting with 1, then looping through phases 2, 3, 4, and 5, in order, until there is only a single surviving side.
 
-0. Deployment Phase (Pre-Battle)
-1. Movement Phase
-2. Attack Phase
-3. Status Phase
-4. Rout Phase
+1. Deployment Phase (Pre-Battle)
+2. Movement Phase
+3. Attack Phase
+4. Status Phase
+5. Rout Phase
 
-Within these phases, all actions are resolved simultaneously.
+Within these phases, all actions are resolved "simultaneously".
 
 ### Deployment Phase ###
 
@@ -94,4 +94,3 @@ After-Battle Actions
 If anyone involved in battle had travel set, he will move a short distance (about 25% of daily travel) immediately after the battle. This represents retreat from the battlefield, orderly or not, and is also intended to prevent players from keeping their enemies stationary by enaging them in multiple small battles.
 
 Anyone in a battle will also need to regroup afterwards, during which time he cannot join or initiate new battles. The time needed to regroup depends on the number of soldiers under his command and will in most cases amount to somewhere between 30 minutes and 2 hours (real time).
-
