@@ -539,13 +539,9 @@ class WarController extends Controller {
 	}
 
 	private function lootvalue($max) {
-		if ($max = 0) {
-			$a = 0;
-			$b = 0;
-		} else {
-			$a = max(rand(0, $max), rand(0, $max));
-			$b = max(rand(0, $max), rand(0, $max));
-		}
+		$a = max(rand(0, $max), rand(0, $max));
+		$b = max(rand(0, $max), rand(0, $max));
+		
 		if ($a < $b) {
 			return array($a, $b);
 		} else {
