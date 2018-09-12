@@ -11,6 +11,7 @@
 		<field name="starvation" type="float"/>
 		<field name="gold" type="integer"/>
 		<field name="war_fatigue" type="integer"/>
+		<field name="abduction_cooldown" type="integer"/>
 
 		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
