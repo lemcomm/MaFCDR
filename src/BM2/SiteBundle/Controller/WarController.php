@@ -266,12 +266,67 @@ class WarController extends Controller {
 			foreach ($data['method'] as $method) {
 				switch ($method) {
 					case 'thralls':
-						$max = round($settlement->getPopulation() * $ratio * 1.5);
+						$mod = 1;
+						$cycle = $this->get('appstate')->getCycle();
+						if ($settlement->getAbductionCooldown()) {
+							$cooldown = $settlement->getAbductionCooldown() - $cycle;
+							if ($cooldown <= -24) {
+								$mod = 1;
+							} elseif ($cooldown <= -20) {
+								$mod = 0.9;
+							} elseif ($cooldown <= -16) {
+								$mod = 0.75;
+							} elseif ($cooldown <= -12) {
+								$mod = 0.6;
+							} elseif ($cooldown <= -8) {
+								$mod = 0.45;
+							} elseif ($cooldown <= -4) {
+								$mod = 0.3;
+							} elseif ($cooldown <= -2) {
+								$mod = 0.25;
+							} elseif ($cooldown <= -1) {
+								$mod = 0.225;
+							} elseif ($cooldown <= 0) {
+								$mod = 0.2; 
+							} elseif ($cooldown <= 6) {
+								$mod = 0.15;
+							} elseif ($cooldown <= 12) {
+								$mod = 0.1;
+							} elseif ($cooldown <= 18) {
+								$mod = 0.05;
+							} else {
+								$mod = 0;
+							}
+						}
+						$max = floor($settlement->getPopulation() * $ratio * 1.5 * $mod);
 						list($taken, $lost) = $this->lootvalue($max);
 						if ($taken > 0) {
 							// no loss / inefficiency here
 							$destination->setThralls($destination->getThralls() + $taken);
 							$settlement->setPopulation($settlement->getPopulation() - $taken);
+							# Now to factor in abduction cooldown so the next looting operation to abduct people won't be nearly so successful.
+							# Yes, this is semi-random. It's setup to *always* increase, but the amount can be quite unpredictable.
+							if ($cooldown < 0) {
+								$settlement->setAbductionCooldown($cycle);
+							} elseif ($cooldown < 1) {
+								$settlement->setAbductionCooldown($cycle + 1);
+							} elseif ($cooldown <= 2) {
+								$settlement->setAbductionCooldown($cycle + rand(1,2) + rand(2,3));
+							} elseif ($cooldown <= 4) {
+								$settlement->setAbductionCooldown($cycle + rand(3,4) + rand(2,3));
+							} elseif ($cooldown <= 6) {
+								$settlement->setAbductionCooldown($cycle + rand(5,6) + rand(2,4));
+							} elseif ($cooldown <= 8) {
+								$settlement->setAbductionCooldown($cycle + rand(7,8) + rand(2,4));
+							} elseif ($cooldown <= 12) {
+								$settlement->setAbductionCooldown($cycle + rand(9,12) + rand(4,6));
+							} elseif ($cooldown <= 16) {
+								$settlement->setAbductionCooldown($cycle + rand(13,16) + rand(4,6));
+							} elseif ($cooldown <= 20) {
+								$settlement->setAbductionCooldown($cycle + rand(17,20) + rand(4,6));
+							} else {
+								$settlement->setAbductionCooldown($cycle + rand(21,24) + rand(4,6));
+							}
 							$this->get('history')->logEvent(
 								$destination,
 								'event.settlement.lootgain.thralls',
@@ -479,9 +534,13 @@ class WarController extends Controller {
 	}
 
 	private function lootvalue($max) {
-		$a = max(rand(0, $max), rand(0, $max));
-		$b = max(rand(0, $max), rand(0, $max));
-
+		if ($max = 0) {
+			$a = 0;
+			$b = 0;
+		} else {
+			$a = max(rand(0, $max), rand(0, $max));
+			$b = max(rand(0, $max), rand(0, $max));
+		}
 		if ($a < $b) {
 			return array($a, $b);
 		} else {
