@@ -268,7 +268,7 @@ class WarController extends Controller {
 					case 'thralls':
 						$mod = 1;
 						$cycle = $this->get('appstate')->getCycle();
-						if ($settlement->getAbductionCooldown()) {
+						if ($settlement->getAbductionCooldown() && !$inside) {
 							$cooldown = $settlement->getAbductionCooldown() - $cycle;
 							if ($cooldown <= -24) {
 								$mod = 1;
@@ -306,6 +306,11 @@ class WarController extends Controller {
 							$settlement->setPopulation($settlement->getPopulation() - $taken);
 							# Now to factor in abduction cooldown so the next looting operation to abduct people won't be nearly so successful.
 							# Yes, this is semi-random. It's setup to *always* increase, but the amount can be quite unpredictable.
+							if ($settlement->getAbductionCooldown()) {
+								$cooldown = $settlement->getAbductionCooldown() - $cycle;
+							} else {
+								$cooldown = 0;
+							}
 							if ($cooldown < 0) {
 								$settlement->setAbductionCooldown($cycle);
 							} elseif ($cooldown < 1) {
