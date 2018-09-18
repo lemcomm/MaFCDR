@@ -541,7 +541,7 @@ class ActionResolution {
 
 	private function military_intercepted(Action $action) {
 		// Get our character.
-		$char = $action->getCharacter();
+		$character = $action->getCharacter();
 		// Set battle to false.
 		$battle = false;
 		// Get character actions.
