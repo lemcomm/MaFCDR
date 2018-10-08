@@ -335,7 +335,7 @@ class AccountController extends Controller {
 		// Don't allow "reserves" - set a limit of 2 created but unspawned characters
 		$unspawned = $user->getCharacters()->filter(
 			function($entry) {
-				return ($entry->isAlive() && $entry->getLocation()==false);
+				return ($entry->isAlive() && $entry->getLocation()==false && $entry->getRetired()!=false);
 			}
 		);
 		if ($unspawned->count() >= 2) {
