@@ -420,6 +420,7 @@ class Dispatcher {
 
 	public function PoliticsActions() {
 		$actions=array();
+		$actions[] = $this->personalRelationsTest();
 		$actions[] = $this->personalPrisonersTest();
 		$actions[] = $this->personalClaimsTest();
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
@@ -447,6 +448,7 @@ class Dispatcher {
 
 	public function politicsRealmsActions() {
 		$actions=array();
+		$actions[] = $this->personalRelationsTest();
 		$actions[] = $this->personalPrisonersTest();
 		$actions[] = $this->personalClaimsTest();
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
@@ -1267,6 +1269,14 @@ class Dispatcher {
 
 	/* ========== Personal Actions ========== */
 
+	public function personalRelationsTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"relations", "description"=>"unavailable.npc");
+		}
+
+		return $this->action("relations", "bm2_relations");
+
+	}
 	public function personalPrisonersTest() {
 		if ( $this->getCharacter()->getPrisoners()->count() == 0) {
 			return array("name"=>"diplomacy.prisoners.name", "description"=>"unavailable.noprisoners");
