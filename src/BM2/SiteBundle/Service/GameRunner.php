@@ -957,6 +957,7 @@ class GameRunner {
 				} else {
                                         $this->logger->info("---Already saw it");
 				}
+				$this->em->flush(); #Otherwise we can end up with duplicate key errors from the database.
 			}
 			$this->rm->countElection($election);
                         $this->logger->info("--Counted.");

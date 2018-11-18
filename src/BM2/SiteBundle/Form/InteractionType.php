@@ -49,6 +49,7 @@ class InteractionType extends AbstractType {
 				$qb->from('BM2SiteBundle:Character', 'me');
 				$qb->where('c.alive = true');
 				$qb->andWhere('c.prisoner_of IS NULL');
+				$qb->andWhere('c.system NOT LIKE :gm OR c.system IS NULL')->setParameter('gm', 'GM');
 				$qb->andWhere('me = :me')->andWhere('c != me')->setParameter('me', $me);
 				if ($maxdistance) {
 					$qb->andWhere('ST_Distance(me.location, c.location) < :maxdistance')->setParameter('maxdistance', $maxdistance);					

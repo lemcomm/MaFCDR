@@ -318,8 +318,14 @@ class RealmManager {
 		if ($winner) {
 			$election->setWinner($winner);
 			if ($election->getPosition()) {
-				$election->getPosition()->addHolder($winner);
-				$winner->addPosition($election->getPosition());
+				if (!$election->getPosition()->getHolders()->contains($winner)) {
+					/* Yes, this ranks up there as one of the more stupid checks. 
+					The game is supposed to remove existing holders, but sometimes, it doesn't.
+					No idea why not. If we do this though, the code can carry on carrying on.
+					*/
+					$election->getPosition()->addHolder($winner);
+					$winner->addPosition($election->getPosition());
+				}
 				$this->history->logEvent(
 					$winner,
 					'event.character.position.elected',

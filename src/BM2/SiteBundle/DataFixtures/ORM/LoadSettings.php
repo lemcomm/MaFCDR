@@ -20,7 +20,8 @@ class LoadSettings extends AbstractFixture implements OrderedFixtureInterface, C
         'spot.towerdistance' => 2500,
         'act.basedistance' => 250,
         'act.scoutmod' => 50,
-        'cycle' => 0
+        'cycle' => 0,
+        'battling' => 0
     );
 
     /**

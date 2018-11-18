@@ -35,7 +35,7 @@
 	</li>
 
 	<li>
-		<a href="{{ path('cmsg_summary') }}"{% if character.hasnewmessages %} class="new"{% endif %}>{{ 'menu.messages'|trans }}</a>
+		<a href="#"{% if character.hasnewmessages %} class="new"{% endif %}>{{ 'menu.messages'|trans }}</a>
 		<div class="sub">
 			<ul class="row">
 				<li class="part">
@@ -58,7 +58,7 @@
 	</li>
 	{% if character.npc == false %}
 	<li>
-		<a href="{{ path('bm2_politics') }}">{{ 'menu.politics'|trans }}</a>
+		<a href="#">{{ 'menu.politics'|trans }}</a>
 		<div class="sub">
 			<ul class="row">
 				<li class="part">
@@ -75,7 +75,7 @@
 	</li>
 	{% endif %}
 	<li>
-		<a href="{{ path('bm2_actions') }}">{{ 'menu.actions'|trans }}</a>
+		<a href="#">{{ 'menu.actions'|trans }}</a>
 		<div class="sub">
 			<ul class="row">
 				{% set check = dispatcher.locationEnterTest() %}
