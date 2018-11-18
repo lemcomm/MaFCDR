@@ -23,11 +23,11 @@ security:
                 provider:               fos_userbundle
                 login_path:             fos_user_security_login
                 check_path:             fos_user_security_check
-                csrf_provider:          security.csrf.token_manager
+                csrf_token_generator:   security.csrf.token_manager
                 remember_me:            true
                 default_target_path:    bm2_account
             remember_me:
-                key:            "%secret%"
+                secret:            "%secret%"
                 lifetime:       7776000 # 90 days in seconds
                 path:           /
                 domain:         ~ # Defaults to the current domain from $_SERVER
@@ -37,6 +37,7 @@ security:
 
     access_control:
         - { path: ^/(../)?admin, roles: ROLE_ADMIN }
+        - { path: ^/(../)?gamerequest, roles: ROLE_USER } # Without this, users will be locked out of the gamerequest path by the line below. --Andrew
         - { path: ^/(../)?game, roles: ROLE_ADMIN }
         - { path: ^/(../)?account, roles: ROLE_USER }
         - { path: ^/(../)?heraldry, roles: ROLE_USER }
