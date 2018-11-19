@@ -132,4 +132,8 @@ class Battle {
 		return $this->soldiers;
 	}
 
+	public function isSiege() {
+		return $this->is_siege;
+	}
+
 }
