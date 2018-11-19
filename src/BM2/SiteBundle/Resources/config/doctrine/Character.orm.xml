@@ -116,5 +116,6 @@
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
 
 		<one-to-one field="unit_settings" target-entity="UnitSettings" mapped-by="character"/>
+		<one-to-one filed="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
 	</entity>
 </doctrine-mapping>
