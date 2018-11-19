@@ -5,7 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="location" type="point"/>
-		<field name="siege" type="boolean"/>
+		<field name="is_siege" type="boolean"/>
 		<field name="started" type="datetime"/>
 		<field name="complete" type="datetime"/>
 		<field name="initial_complete" type="datetime"/>
@@ -13,6 +13,7 @@
 		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="battle"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="battles"/>
 		<many-to-one field="war" target-entity="War" inversed-by="related_battles"/>
+		<many-to-one field="siege" target-entity="Siege" inversed-by="battles"/>
 
 	</entity>
 </doctrine-mapping>
