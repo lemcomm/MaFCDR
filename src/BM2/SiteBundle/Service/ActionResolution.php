@@ -663,7 +663,7 @@ class ActionResolution {
 
 
 
-	public function createBattle(Character $character, Settlement $settlement=null, $targets=array()) {
+	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null) {
 		if ($settlement) {
 			$location = $settlement->getGeoData()->getCenter();
 			$outside = false;
@@ -691,7 +691,9 @@ class ActionResolution {
 				History::MEDIUM, false, 60
 			);
 		}
-		$battle->setSiege(false); // TODO...
+		if ($siege) {
+			$battle->setSiege($siege);
+		}
 		$battle->setStarted(new \DateTime('now'));
 
 		// setup attacker (i.e. me)
