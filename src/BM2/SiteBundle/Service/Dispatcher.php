@@ -1055,9 +1055,78 @@ class Dispatcher {
 		return $this->action("military.settlement.defend", "bm2_site_war_defendsettlement");
 	}
 
-	public function militaryAttackSettlementTest($check_duplicate=false) {
+	public function militarySiegeSettlementTest($check_duplicate=false) {
+		$estate = $this->getActionableSettlement();
 		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+			# Already doing.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Already inside.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inside");
+		}
+		if (!$estate) {
+			# Can't attack nothing.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($estate->getSiege()) {
+			# No siege, no attack.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.already");
+		}
+		if (!$this->getCharacter()->isDoingAction('military.siege')) {
+			# Must be part of a siege.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosiege");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($estate->getOwner() == $this->getCharacter()) {
+			# No need to siege your own estate.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.location.yours");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inbattle");			
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			# Too new.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.settlement.siege", "bm2_site_war_siegesettlement");
+	}
+
+	public function militaryAttackSettlementTest($check_duplicate=false) {
+		$estate = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if (!$estate) {
+			# Can't attack nothing.
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$estate->getSiege()) {
+			# No siege, no attack.
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosiege");
+		} else {
+			$siege = $estate->getSiege();
+		}
+		if (!$this->getCharacter()->isDoingAction('military.siege')) {
+			# Must be part of a siege.
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosiege");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.already");
@@ -1074,15 +1143,13 @@ class Dispatcher {
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosoldiers");
 		}
-		if (!$estate = $this->getActionableSettlement()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosettlement");
-		}
 		if ($estate->getOwner() == $this->getCharacter()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.yours");
 		}
+		/* Since these are parts of sieges now, and I don't want to reveal as much info on defenders anymore, whether there are defenders or not is irrelevant.
 		if (!$estate->isDefended()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
-		}
+		}*/
 		if ($this->getCharacter()->isInBattle()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.inbattle");			
 		}
