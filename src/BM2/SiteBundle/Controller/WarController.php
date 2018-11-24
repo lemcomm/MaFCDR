@@ -2,17 +2,20 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\BattleGroup;
+use BM2\SiteBundle\Entity\Siege;
 use BM2\SiteBundle\Entity\War;
 use BM2\SiteBundle\Entity\WarTarget;
 use BM2\SiteBundle\Entity\Realm;
-use BM2\SiteBundle\Entity\Action;
-use BM2\SiteBundle\Entity\BattleGroup;
+
 use BM2\SiteBundle\Form\WarType;
 use BM2\SiteBundle\Form\BattleParticipateType;
 use BM2\SiteBundle\Form\DamageFeatureType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\LootType;
 use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
+
 use BM2\SiteBundle\Service\History;
 
 use Doctrine\ORM\EntityRepository;
@@ -128,6 +131,133 @@ class WarController extends Controller {
 			return array('settlement'=>$settlement, 'result'=>$result);
 		}
 		return array('settlement'=>$settlement, 'form'=>$form->createView());
+	}
+
+	/**
+	  * @Route("/settlement/siege")
+	  * @Template
+	  */
+	public function siegeSettlementAction(Request $request) {
+		# Security checks and set $character and $settlement.		
+		list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+		# Prepare other variables.
+		$siege = null;
+		$leader = null;
+		# Prepare entity manager referencing.
+		$em = $this->getDoctrine()->getManager();
+
+		# Figure out if we're in a siege already or not. Build appropriate form.
+		if ($settlement->getSiege()) {
+			$already = TRUE;
+			$siege = $settlement->getSiege();
+			$form = $this->createForm(new SiegeManageType($character, $settlement, $siege);
+		} else {
+			$already = FALSE;
+			$form = $this->createForm(new SiegeNewType($character, $settlement));
+		}
+		
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			# Figure out which form is being submitted.
+			if ($form->getName() == 'newsiege') {
+				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
+				$siege = new Siege;
+				$siege->setSettlement($settlement);
+				$em->persist();
+				$em->flush();
+				
+				// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
+				$battle->setSettlement($settlement);
+				$this->get('history')->logEvent(
+					$settlement,
+					'event.settlement.besieged',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+
+				# TODO: combine this code with the code in action resolution for battles so we have less code duplication.
+				# setup attacker (i.e. me)
+				$attackers = new BattleGroup;
+				$attackers->setSiege($siege);
+				$attackers->setAttacker(true);
+				$attackers->addCharacter($character);
+				$attackers->setLeader($character);
+				$siege->addGroup($attackers);
+				$em->persist($attackers);
+
+				# setup defenders
+				$defenders = new BattleGroup;
+				$defenders->setSiege($siege);
+				$defenders->setAttacker(false);
+				$siege->addGroup($defenders);
+				$em->persist($defenders);
+
+				# create character action
+				$act = new Action;
+				$act->setCharacter($character)
+					->setTargetSettlement($settlement)
+					->setTargetBattlegroup($attackers)
+					->setCanCancel(false)
+					->setBlockTravel(true);
+				$this->get('action_resolution')->queue($act);
+
+				# add everyone who has a "defend settlement" action set
+				foreach ($settlement->getRelatedActions() as $defender) {
+					if ($defender->getType()=='settlement.defend') {
+						$defenders->addCharacter($defender->getCharacter());
+
+						$act = new Action;
+						$act->setType('military.siege')
+							->setCharacter($defender->getCharacter())
+							->setTargetBattlegroup($defenders)
+							->setStringValue('forced')
+							->setCanCancel(true)
+							->setBlockTravel(true);
+						$this->get('action_resolution')->queue($act);
+
+						# notify
+						$this->get('history')->logEvent(
+							$defender->getCharacter(),
+							'resolution.defend.success', array(
+								"%link-settlement%"=>$settlement->getId(),
+								"%time%"=>$this->gametime->realtimeFilter($time)
+							),
+							History::HIGH, false, 25
+						);
+						$defender->getCharacter()->setTravelLocked(true);
+					}
+				}
+				$em->flush();
+			} else {
+				# Selection dependent siege management, engage!
+				switch($data['action']) {
+					case 'leadership':
+						if ($data['newleader']) {
+							$siege->setLeader($data['newleader']);
+						} else {
+							# ERROR! Shouldn't be possible to do this.
+						}
+						break;
+					case 'build':
+						# Start constructing siege equipment!
+					case 'assault':
+						# New battle code goes here. Assault the walls!
+					case 'disband':
+						# Stop the siege.
+					case 
+
+
+
+				$em->flush();
+			}
+		}
+
+		return array(
+			'settlement'=>$settlement,
+			'leader'=>$leader,
+			'form'=>$form->createView()
+		);
 	}
 
 	/**
@@ -880,3 +1010,4 @@ class WarController extends Controller {
 	}
 
 }
+						  
