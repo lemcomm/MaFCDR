@@ -365,6 +365,7 @@ account:
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
    notarget:  No user with this e-mail address found.
+   inusfficient: Your account doesn't have enough credits to send a gift of this size.
   mail:
    subject:   Might & Fealty Gift
    body: >
