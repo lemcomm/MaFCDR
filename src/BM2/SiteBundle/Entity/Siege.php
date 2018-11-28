@@ -24,5 +24,19 @@ class Siege {
 		}
 		$this->getDoctrine()->getManager()->flush();
 	}
+
+	public function getAttacker() {
+		foreach ($this->groups as $group) {
+			if ($group->isAttacker()) return $group;
+		}
+		return null;
+	}
+
+	public function getDefender() {
+		foreach ($this->groups as $group) {
+			if ($group->isDefender()) return $group;
+		}
+		return null;
+	}
   
 }
