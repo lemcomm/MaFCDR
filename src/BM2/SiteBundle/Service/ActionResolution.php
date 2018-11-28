@@ -381,6 +381,16 @@ class ActionResolution {
 		$this->military_battle($action);
 	}
 
+	private function settlement_assault(Action $action) {
+		/* Just an alias for now, so we can differentiate these on creation. Later we can add more dynamic logic. */
+		$this->military_battle($action);
+	}
+
+	private function settlement_sortie(Action $action) {
+		/* Just an alias for now, so we can differentiate these on creation. Later we can add more dynamic logic. */
+		$this->military_battle($action);
+	}
+
 	private function update_settlement_defend(Action $action) {
 		if (!$action->getCharacter() || !$action->getTargetSettlement()) {
 			$this->log(0, 'invalid action '.$action->getId());
@@ -663,54 +673,145 @@ class ActionResolution {
 
 
 
-	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null) {
-		if ($settlement) {
-			$location = $settlement->getGeoData()->getCenter();
+	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
+		/* for future reference, $outside is used to determine whether or not attackers need to leave the settlement in order to attack someone. 
+		It's used by attackOthersAction of WarCon. --Andrew */
+		$bothinside = false;
+		$type = 'field';
+
+		$battle = new Battle;
+		if ($siege) {
+			# Check for sieges first, because they'll always have settlements attached, but settlements won't always come with sieges.
+			$location = $siege->getSettlement()->getGeoData()->getCenter();
 			$outside = false;
+
+			$battle->setSiege($siege);
+			if ($attackers->getAttacker()) {
+				# If they are the siege attackers and attacking in this battle, then they're assaulting. If not, they're sallying. It affects defensive bonuses.
+				$battle->setType('siegeassault');
+				$type = 'assault';
+				$this->history->logEvent(
+					$settlement,
+					'event.settlement.siege.assault',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+			} else {
+				$battle->setType('siegesortie');
+				$type = 'sortie';
+				$this->history->logEvent(
+					$settlement,
+					'event.settlement.siege.sortie',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+			}
+		} else if ($settlement) {
+			$battle->setSettlement($settlement);
+			$foundinside = false;
+			$foundoutside = false;
+			$foundboth = false;
+			/* Because you can only attakc a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
+			So we need to figure out if our targets are inside or outside. If we find a mismatch,  */
+			foreach ($targets as $target) {
+				if ($target->getInsideSettlement()) {
+					$foundinside = true;
+				} else {
+					$foundoutside = true;
+				}
+			}
+			if ($foundinside && $foundoutside) {
+				# Found people inside and outside, prioritize inside. Battle type is urban.
+				$foundboth = true;
+				$battle->setType('urban');
+				$location = $settlement->getGeoData()->getCenter();
+				foreach ($targets as $target) {
+					# Logic to remove people outside from target list.
+					if (!$target->getInsideSettlement()) {
+						$key = array_search($target, $targets);
+						if($key!==false){
+						    unset($targets[$key]);
+						}
+					}
+				}
+				$this->history->logEvent(
+					$settlement,
+					'event.settlement.skirmish',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+				$type = 'skirmish';
+			} else if ($foundinside && !$foundoutside) {
+				# Only people inside. Urban battle.
+				$battle->setType('urban');
+				$location = $settlement->getGeoData()->getCenter();
+				$outside = false;
+				$this->history->logEvent(
+					$settlement,
+					'event.settlement.skirmish',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+				$type = 'skirmish';
+			} else if (!$foundinside && $foundoutside) {
+				# Only people outside. Battle type is field. Collect location data.
+				$battle->setType('field');
+				$outside = true;
+				$x=0; $y=0; $count=0;
+				foreach ($targets as $target) {
+					$x+=$target->getLocation()->getX();
+					$y+=$target->getLocation()->getY();
+					$count++;
+				}
+				$location = new Point($x/$count, $y/$count);
+				# Yes, we are literally just averaging the X and Y coords of the participants.
+				$this->history->logEvent(
+					$settlement,
+					'event.settlement.sortie',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, false, 60
+				);
+				$type = 'sortie';
+			} else {
+				# You've somehow broke the laws of space. Congrats.
+			}
 		} else {
 			$x=0; $y=0; $count=0; $outside = false;
 			foreach ($targets as $target) {
 				$x+=$target->getLocation()->getX();
 				$y+=$target->getLocation()->getY();
 				$count++;
-				if (!$target->getInsideSettlement()) {
-					$outside = true;
-				}
 			}
 			$location = new Point($x/$count, $y/$count);
 		}
-		$battle = new Battle;
 		$battle->setLocation($location);
-		if ($settlement) {
-			// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
-			$battle->setSettlement($settlement);
-			$this->history->logEvent(
-				$settlement,
-				'event.settlement.attacked',
-				array('%link-character%'=>$character->getId()),
-				History::MEDIUM, false, 60
-			);
-		}
-		if ($siege) {
-			$battle->setSiege($siege);
-		}
 		$battle->setStarted(new \DateTime('now'));
 
 		// setup attacker (i.e. me)
-		$attackers = new BattleGroup;
+		if (!$attackers) {
+			$attackers = new BattleGroup;
+		}
 		$attackers->setBattle($battle);
-		$attackers->setAttacker(true);
-		$attackers->addCharacter($character);
+		if (!$siege) {
+			# Already setup by siege handlers.
+			$attackers->setAttacker(true);
+			$attackers->addCharacter($character);
+		}
 		$battle->addGroup($attackers);
 
 		// setup defenders
-		$defenders = new BattleGroup;
-		$defenders->setBattle($battle);
-		$defenders->setAttacker(false);
-		$battle->addGroup($defenders);
-		foreach ($targets as $target) {
-			$defenders->addCharacter($target);
+		if (!$defenders) {
+			$defenders = new BattleGroup;
 		}
+		$defenders->setBattle($battle);
+		if (!$siege) {
+			# Already setup by siege handlers.
+			$defenders->setAttacker(false);
+			foreach ($targets as $target) {
+				$defenders->addCharacter($target);
+			}
+		}
+		$battle->addGroup($defenders);
 
 		// now we have all involved set up we can calculate the preparation timer
 		$time = $this->military->calculatePreparationTime($battle);
@@ -723,12 +824,22 @@ class ActionResolution {
 		$this->em->persist($defenders);
 
 		// setup actions and lock travel
-		$act = new Action;
-		if ($settlement) {
-			$act->setType('settlement.attack');
-		} else {
-			$act->setType('military.battle');
+		switch ($type) {
+			case 'field':
+			case 'urban':
+				$acttype = 'military.battle';
+				break;
+			case 'siegeassault':
+				$acttype = 'settlement.assault';
+				break;
+			case 'siegesortie':
+			case 'sortie'
+				$acttype = 'settlement.sortie';
+				break;
 		}
+
+		$act = new Action;
+		$act->setType($acttype);
 		$act->setCharacter($character)
 			->setTargetSettlement($settlement)
 			->setTargetBattlegroup($attackers)
@@ -741,7 +852,7 @@ class ActionResolution {
 		// notifications and counter-actions
 		foreach ($targets as $target) {
 			$act = new Action;
-			$act->setType('military.battle')
+			$act->setType($acttype)
 				->setCharacter($target)
 				->setTargetBattlegroup($defenders)
 				->setStringValue('forced')
@@ -768,35 +879,6 @@ class ActionResolution {
 			}
 
 			$target->setTravelLocked(true);
-		}
-
-		if ($settlement) {
-			// add everyone who has a "defend settlement" action set
-			foreach ($settlement->getRelatedActions() as $defender) {
-				if ($defender->getType()=='settlement.defend') {
-					$defenders->addCharacter($defender->getCharacter());
-
-					$act = new Action;
-					$act->setType('military.battle')
-						->setCharacter($defender->getCharacter())
-						->setTargetBattlegroup($defenders)
-						->setStringValue('forced')
-						->setCanCancel(false)
-						->setBlockTravel(true);
-					$this->queue($act);
-
-					// notify
-					$this->history->logEvent(
-						$defender->getCharacter(),
-						'resolution.defend.success', array(
-							"%link-settlement%"=>$settlement->getId(),
-							"%time%"=>$this->gametime->realtimeFilter($time)
-						),
-						History::HIGH, false, 25
-					);
-					$defender->getCharacter()->setTravelLocked(true);
-				}
-			}
 		}
 
 		return array('time'=>$time, 'outside'=>$outside, 'battle'=>$battle);
