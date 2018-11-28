@@ -150,7 +150,7 @@ class WarController extends Controller {
 		if ($settlement->getSiege()) {
 			$already = TRUE;
 			$siege = $settlement->getSiege();
-			$form = $this->createForm(new SiegeManageType($character, $settlement, $siege);
+			$form = $this->createForm(new SiegeManageType($character, $settlement, $siege));
 		} else {
 			$already = FALSE;
 			$form = $this->createForm(new SiegeNewType($character, $settlement));
@@ -202,51 +202,63 @@ class WarController extends Controller {
 					->setBlockTravel(true);
 				$this->get('action_resolution')->queue($act);
 
+				$character->setTravelLocked(true);
+
 				# add everyone who has a "defend settlement" action set
-				foreach ($settlement->getRelatedActions() as $defender) {
-					if ($defender->getType()=='settlement.defend') {
-						$defenders->addCharacter($defender->getCharacter());
+				foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('related_settlement_id' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
+					$defenders->addCharacter($defender->getCharacter());
 
-						$act = new Action;
-						$act->setType('military.siege')
-							->setCharacter($defender->getCharacter())
-							->setTargetBattlegroup($defenders)
-							->setStringValue('forced')
-							->setCanCancel(true)
-							->setBlockTravel(true);
-						$this->get('action_resolution')->queue($act);
+					$act = new Action;
+					$act->setType('military.siege')
+						->setCharacter($defender->getCharacter())
+						->setTargetBattlegroup($defenders)
+						->setStringValue('forced')
+						->setCanCancel(true)
+						->setBlockTravel(true);
+					$this->get('action_resolution')->queue($act);
 
-						# notify
-						$this->get('history')->logEvent(
-							$defender->getCharacter(),
-							'resolution.defend.success', array(
-								"%link-settlement%"=>$settlement->getId(),
-								"%time%"=>$this->gametime->realtimeFilter($time)
-							),
-							History::HIGH, false, 25
-						);
-						$defender->getCharacter()->setTravelLocked(true);
-					}
+					# notify
+					$this->get('history')->logEvent(
+						$defender->getCharacter(),
+						'resolution.defend.success', array(
+							"%link-settlement%"=>$settlement->getId(),
+							"%time%"=>$this->gametime->realtimeFilter($time)
+						),
+						History::HIGH, false, 25
+					);
+					$defender->getCharacter()->setTravelLocked(true);
 				}
 				$em->flush();
 			} else {
 				# Selection dependent siege management, engage!
 				switch($data['action']) {
 					case 'leadership':
-						if ($data['newleader']) {
+						if ($siege->getLeader() == $character && $data['action'] == 'newleader' && $data['newleader'] != $character) {
 							$siege->setLeader($data['newleader']);
 						} else {
-							# ERROR! Shouldn't be possible to do this.
+							throw $this->createNotFoundException('error.notfound.change');
 						}
 						break;
 					case 'build':
 						# Start constructing siege equipment!
 					case 'assault':
-						# New battle code goes here. Assault the walls!
+						if ($siege->getLeader() == $character && data['action'] == 'assault') {
+							$this->get('action_resolution')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
+						} else {
+							
+						}
+						break;
 					case 'disband':
 						# Stop the siege.
-					case 
-
+						break;
+					case 'leave':
+						# Leave the siege.
+						break;
+					case 'attack':
+						# Suicide run?
+						break;
+								
+				}
 
 
 				$em->flush();
@@ -905,7 +917,7 @@ class WarController extends Controller {
 			if (count($data['target']) == 0) {
 				$form->addError(new FormError("attack.nobody"));
 			} else {
-				$result = $this->get('action_resolution')->createBattle($character, null, $data['target']);
+				$result = $this->get('action_resolution')->createBattle($character, $character->getInsideSettlement(), $data['target']);
 				if ($result['outside'] && $character->getInsideSettlement()) {
 					// leave settlement if we attack targets outside
 					$character->setInsideSettlement(null);
@@ -918,8 +930,9 @@ class WarController extends Controller {
 				foreach ($data['target'] as $target) {
 					$recipients[] = $this->get('message_manager')->getMsgUser($target);
 				}
-				list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, 'attack by '.$character->getName(), $data['message']);
-
+				if ($data['message']) {
+					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, 'attack by '.$character->getName(), $data['message']);
+				}
 				$em->flush();
 			}
 		}
@@ -1010,4 +1023,3 @@ class WarController extends Controller {
 	}
 
 }
-						  
