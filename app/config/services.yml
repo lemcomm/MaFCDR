@@ -88,7 +88,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@military', '@permission_manager', '@twig.extension.gametime']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@military', '@geography', '@character_manager', '@npc_manager', '@action_resolution', '@interactions']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@military', '@geography', '@character_manager', '@npc_manager', '@action_resolution', '@interactions', '@war_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     game_runner:
@@ -99,6 +99,9 @@ services:
     game_request_manager:
         class:      BM2\SiteBundle\Service\GameRequestManager
         arguments:  ['@doctrine.orm.entity_manager']
+    war_manager:
+        class:      BM2\SiteBundle\Service\WarManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@action_resolution']
 
     bm2.registration.form.type:
         class:      BM2\SiteBundle\Form\RegistrationFormType
