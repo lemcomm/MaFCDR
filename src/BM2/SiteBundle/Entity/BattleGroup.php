@@ -111,11 +111,34 @@ class BattleGroup {
 		return !$this->attacker;
 	}
 
+	/* Legacy code from pre-sieges. 
 	public function getEnemy() {
 		foreach ($this->battle->getGroups() as $group) {
 			if ($group != $this) return $group;
 		}
 		throw new \Exception('battle group '.$this->id.' has no enemy');
+	} */
+
+	public function getEnemies() {
+		$enemies = array();
+		if ($this->battle) {
+			foreach ($this->battle->getGroups() as $group) {
+				if ($group->getReinforcing() != $this && $group != $this) {
+					$enemies[] = $group;
+				}
+			}
+		} else if ($this->siege) {
+			foreach ($this->siege->getGroups() as $group) {
+				if ($group->getReinforcing() != $this) {
+					$enemies[] = $group;
+				}
+			}
+		}
+		if (!empty($enemies)) {
+			return $enemies;
+		} else {
+			throw new \Exception('battle group '.$this->id.' has no enemies');
+		}
 	}
 
 	public function getLocalId() {
