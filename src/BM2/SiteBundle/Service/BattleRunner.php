@@ -34,7 +34,7 @@ class BattleRunner {
 	private $battlesize=1;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Military $military, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, ActionResolution $resolver, Interactions $interactions) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Military $military, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, ActionResolution $resolver, Interactions $interactions, WarManager $war_manager) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
@@ -44,6 +44,7 @@ class BattleRunner {
 		$this->npc_manager = $npc_manager;
 		$this->resolver = $resolver;
 		$this->interactions = $interactions;
+		$this->war_manager = $war_manager
 	}
 
 	public function enableLog($level=10) {
@@ -182,36 +183,15 @@ class BattleRunner {
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
 		foreach ($this->nobility as $noble) {
 			$noble->getCharacter()->removeSoldier($noble);
-			$this->addRegroupAction($noble->getCharacter());
-			foreach ($noble->getCharacter()->getBattleGroups() as $g) {
-				if ($g->getBattle()==$battle) {
-					// removing manually, because character might have died, imprisoned or otherwise already removed
-					$noble->getCharacter()->removeBattlegroup($g);
-					$g->removeCharacter($noble->getCharacter());
-				}
+			$this->war_manager->addRegroupAction($battlesize, $noble->getCharacter());
+		}
+
+		if (!$battle->getSiege()) {
+			foreach ($battle->getGroups() as $group) {
+				$this->war_manager->disbandGroup($group);
 			}
 		}
-
-		foreach ($battle->getGroups() as $group) {
-			$this->em->remove($group);
-		}
 		$this->em->remove($battle);
-	}
-
-	private function addRegroupAction(Character $character) {
-		// FIXME: to prevent abuse, this should be lower in very uneven battles
-		// setup regroup timer and change action
-		$amount = min($this->battlesize*5, $character->getLivingSoldiers()->count())+2; // to prevent regroup taking long in very uneven battles
-		$regroup_time = sqrt($amount*10) * 5; // in minutes
-
-		$act = new Action;
-		$act->setType('military.regroup')->setCharacter($character);
-		$act->setBlockTravel(false);
-		$act->setCanCancel(false);
-		$complete = new \DateTime('now');
-		$complete->add(new \DateInterval('PT'.ceil($regroup_time).'M'));
-		$act->setComplete($complete);
-		$this->resolver->queue($act, true);
 	}
 
 
@@ -264,13 +244,18 @@ class BattleRunner {
 
 			foreach ($battle->getGroups() as $group) {
 				$mysize = $group->getVisualSize();
+				foreach ($group->getReinforcedBy() as $reinforcement) {
+					$mysize += $reinforcement->getVisualSize();
+				}
 				if ($group->isDefender() && $battle->getDefenseBonus()) {
 					// if we're on defense, we feel like we're more
 					$mysize *= 1 + ($battle->getDefenseBonus()/200);
 				}
-				$enemy = $group->getEnemy();
-				if ($enemy) {
-					$enemysize = $enemy->getVisualSize();
+				$enemies = $group->getEnemies();
+				if ($enemies) {
+					foreach ($enemies as $enemy) {
+						$enemysize += $enemy->getVisualSize();
+					}
 					$mod = sqrt($mysize / $enemysize);
 				} else {
 					// FIXME: strange, we don't know our enemy?
@@ -493,7 +478,10 @@ class BattleRunner {
 		$this->prepareRound();
 		foreach ($this->battle->getGroups() as $group) {
 			$shots = 0; $hits=0; $routed=0; $results=array();
-			$enemy_collection = $group->getEnemy()->getActiveSoldiers();
+			$enemycollection = array();
+			foreach ($group->getEnemies() as $enemygroup) {
+				$enemycollection[] = $enemygroup->getActiveSoldiers();
+			}
 			$enemies = $enemy_collection->count();
 			$this->log(5, "group ".$group->getLocalId()." (".($group->getAttacker()?"attacker":"defender").") - ".$group->getFightingSoldiers()->count()." left, $enemies targets\n");
 			foreach ($group->getFightingSoldiers() as $soldier) {
@@ -521,10 +509,14 @@ class BattleRunner {
 
 							// special results for nobles
 							if ($target->isNoble() && in_array($result, array('kill','capture'))) {
-								$enemy = $group->getEnemy()->getLocalId();
+								foreach ($group->getEnemies() as $enemygroup) {
+									if (!$enemygroup->getReinforcing) {
+										$enemy = $enemygroup->getLocalId();
+									}
+								}
 
-								if (!isset($extras[$group->getEnemy()->getLocalId()])) {
-									$extras[$group->getEnemy()->getLocalId()] = array();
+								if (!isset($extras[$enemy])) {
+									$extras[$enemy] = array();
 								}
 								if ($result=='capture') {
 									$extra = array(
@@ -535,7 +527,7 @@ class BattleRunner {
 									$extra = array('what'=>'ranged.'.$result);
 								}
 								$extra['who'] = $target->getCharacter()->getId();
-								$extras[$group->getEnemy()->getLocalId()][] = $extra;
+								$extras[$enemy][] = $extra;
 							}
 
 						} else {
@@ -562,22 +554,24 @@ class BattleRunner {
 				$moraledamage = ($shots+$hits*2) / $enemies;
 				$this->log(10, "morale damage: $moraledamage\n");
 				$total = 0; $count = 0;
-				foreach ($group->getEnemy()->getActiveSoldiers() as $soldier) { 
-					if ($soldier->isFortified()) {
-						$soldier->reduceMorale($moraledamage/2);
-					} else {
-						$soldier->reduceMorale($moraledamage);
+				foreach ($group->getEnemies() as $enemygroup) {
+					foreach ($enemygroup->getActiveSoldiers() as $soldier) { 
+						if ($soldier->isFortified()) {
+							$soldier->reduceMorale($moraledamage/2);
+						} else {
+							$soldier->reduceMorale($moraledamage);
+						}
+						$total += $soldier->getMorale();
+						$count++;
+						$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
+						if ($soldier->getMorale()*2 < rand(0,100)) { 
+							$this->log(50, " - panics");
+							$soldier->setRouted(true);
+							$this->history->addToSoldierLog($soldier, 'routed.ranged');
+							$routed++;
+						}
+						$this->log(50, "\n");
 					}
-					$total += $soldier->getMorale();
-					$count++;
-					$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
-					if ($soldier->getMorale()*2 < rand(0,100)) { 
-						$this->log(50, " - panics");
-						$soldier->setRouted(true);
-						$this->history->addToSoldierLog($soldier, 'routed.ranged');
-						$routed++;
-					}
-					$this->log(50, "\n");
 				}
 				$this->log(10, "==> avg. morale: ".round($total/max(1,$count))."\n");
 			}
@@ -608,7 +602,10 @@ class BattleRunner {
 				$attackers = $group->getFightingSoldiers()->count();
 				$melee[$round][$group->getLocalId()]['alive'] = $attackers;
 				$this->log(5, "group ".$group->getLocalId()." (".($group->getAttacker()?"attacker":"defender").") - $attackers left\n");
-				$enemy_collection = $group->getEnemy()->getActiveSoldiers();
+				$enemycollection = array();
+				foreach ($group->getEnemies() as $enemygroup) {
+					$enemycollection[] = $enemygroup->getActiveSoldiers();
+				}
 				$enemies = $enemy_collection->count();
 				$bonus = sqrt($enemies);
 				foreach ($group->getFightingSoldiers() as $soldier) {
@@ -654,7 +651,11 @@ class BattleRunner {
 
 						// special results for nobles
 						if ($target->isNoble() && in_array($result, array('kill','capture'))) {
-							$enemy = $group->getEnemy()->getLocalId();
+							foreach ($group->getEnemies() as $enemygroup) {
+								if (!$enemygroup->getReinforcing) {
+									$enemy = $enemygroup->getLocalId();
+								}
+							}
 
 							if (!isset($extras[$enemy])) {
 							  $extras[$enemy] = array();
@@ -678,9 +679,22 @@ class BattleRunner {
 
 			$this->log(10, "morale checks:\n");
 			foreach ($this->battle->getGroups() as $group) {
-				$melee[$round][$group->getEnemy()->getLocalId()]['panic'] = 0;
+				foreach ($group->getEnemies() as $enemygroup) {
+					if (!$enemygroup->getReinforcing) {
+						$enemy = $enemygroup->getLocalId();
+					}
+				}
+				$melee[$round][$enemy]['panic'] = 0;
 				$count_us = $group->getActiveSoldiers()->count();
-				$count_enemy = $group->getEnemy()->getActiveSoldiers()->count();
+				foreach ($group->getReinforcedBy() as $reinforcement) {
+					$count_us += $reinforcement->getActiveSoldiers()->count();
+				}
+				$enemies = $group->getEnemies();
+				foreach ($enemies as $enemygroup) {
+					$count_enemy += $enemygroup->getActiveSoldiers()->count();
+				}
+				$mod = sqrt($mysize / $enemysize);
+
 				foreach ($group->getActiveSoldiers() as $soldier) {
 					// still alive? check for panic
 					if ($count_enemy > 0) {
@@ -713,7 +727,7 @@ class BattleRunner {
 					}
 					$soldier->setMorale($soldier->getMorale() * $mod);
 					if ($soldier->getMorale() < rand(0,100)) {
-						$melee[$round][$group->getEnemy()->getLocalId()]['panic']++;
+						$melee[$round][$enemy]['panic']++;
 						$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - panics\n");
 						$soldier->setRouted(true);
 						$count_us--;
@@ -761,7 +775,10 @@ class BattleRunner {
 		foreach ($this->battle->getGroups() as $group) {
 			$hunt[$group->getLocalId()]=array('killed'=>0,'entkilled'=>0);
 			$this->prepareRound(); // called again each group to update the fighting status of all enemies
-			$enemy_collection = $group->getEnemy()->getRoutedSoldiers();
+			$enemy_collection = array();
+			foreach ($enemies as $enemygroup) {
+				$enemy_collection[] = $enemygroup->getRoutedSoldiers();
+			}
 			foreach ($group->getFightingSoldiers() as $soldier) {
 				$target = $this->getRandomSoldier($enemy_collection);
 				$hitchance = 0; // safety-catch, it should be set in all cases further down
