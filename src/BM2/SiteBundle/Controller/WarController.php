@@ -160,7 +160,7 @@ class WarController extends Controller {
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
 			# Figure out which form is being submitted.
-			if ($form->getName() == 'newsiege') {
+			if ($request->request->has('newsiege')) {
 				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
 				$siege = new Siege;
 				$siege->setSettlement($settlement);
@@ -229,7 +229,7 @@ class WarController extends Controller {
 					$defender->getCharacter()->setTravelLocked(true);
 				}
 				$em->flush();
-			} else {
+			} else if ($request->request->has('managesiege')) {
 				# Selection dependent siege management, engage!
 				switch($data['action']) {
 					case 'leadership':
@@ -249,13 +249,19 @@ class WarController extends Controller {
 						}
 						break;
 					case 'disband':
+						if ($siege->getLeader() == $character && $data['action'] == 'disband') {
+							$this->get('war_manager')->disbandSiege($siege, $character);
+						} else {
+							throw $this->createNotFoundException('error.notfound.change');
+						}
+						break;
 						# Stop the siege.
 						break;
 					case 'leave':
 						# Leave the siege.
 						break;
 					case 'attack':
-						# Suicide run?
+						# Suicide run.
 						break;
 								
 				}
