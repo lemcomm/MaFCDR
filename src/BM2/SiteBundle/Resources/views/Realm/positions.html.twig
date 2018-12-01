@@ -20,7 +20,7 @@
 				{% endif %}
 			</dt>
 			<dd>
-				{{ position.description }}
+				{{ position.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 				<hr />
 				{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
 				<ul class="shortlist" style="display:inline">
