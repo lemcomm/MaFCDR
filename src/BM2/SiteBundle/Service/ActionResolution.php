@@ -833,7 +833,7 @@ class ActionResolution {
 				$acttype = 'settlement.assault';
 				break;
 			case 'siegesortie':
-			case 'sortie'
+			case 'sortie':
 				$acttype = 'settlement.sortie';
 				break;
 		}
