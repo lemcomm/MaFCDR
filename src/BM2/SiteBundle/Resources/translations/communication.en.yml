@@ -27,6 +27,7 @@ event:
   updated:
    artifact:    The description of this artifact has changed.
    item:        The description of this item has changed.
+   realm:       %character% has updated the description of the realm.
    place:       %character% has changed the description of %place%.
    settlement:  %character% has updated the description of %settlement%.
 
@@ -295,6 +296,8 @@ event:
    death:       Unable to locate a successor after the passing of its last head, the house has collapsed.
    retire:	Unable to locate a successor after the retiring of its last head, the house has collapsed.
    slumber:     Unable to locate a successor after the slumber of its last head, the house has collapsed.
+  relocated:
+   settlement:  Relocated to the settlement of %settlement%.
  
 
 report:

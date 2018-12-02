@@ -379,7 +379,7 @@ class GameRunner {
 							$this->history->logEvent(
 								$house,
 								'event.house.collapsed.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
+								array(),
 								History::ULTRA, true
 							);
 						}	
@@ -957,6 +957,7 @@ class GameRunner {
 				} else {
                                         $this->logger->info("---Already saw it");
 				}
+				$this->em->flush(); #Otherwise we can end up with duplicate key errors from the database.
 			}
 			$this->rm->countElection($election);
                         $this->logger->info("--Counted.");

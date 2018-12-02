@@ -30,48 +30,55 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 		$cycle = $container->get('appstate')->getCycle();
 		$opt_time = $input->getOption('time');
 		$arg_debug = $input->getArgument('debug level');
+		$appstate = $container->get('appstate');
 
-		$logger->info("battles: starting...");
-		$stopwatch = new Stopwatch();
-		$stopwatch->start('battles');
+		if ($appstate->getGlobal('battling') == 0) {
+			$logger->info("battles: starting...");
+			$appstate->setGlobal('battling', 1);
 
-		$now = new \DateTime("now");
+			$stopwatch = new Stopwatch();
+			$stopwatch->start('battles');
 
-		// recalculate battle timers for battles I'm about to resolve to fix various trickery
-		$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
-		$query->setParameters(array('now'=>$now));
-		foreach ($query->getResult() as $battle) {
-			$military->recalculateBattleTimer($battle);
-		}
-		$em->flush();
+			$now = new \DateTime("now");
 
-		$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
-		$query->setParameters(array('now'=>$now));
-		foreach ($query->getResult() as $battle) {
-			$battlerunner->enableLog($arg_debug);
-			$battlerunner->run($battle, $cycle);
+			// recalculate battle timers for battles I'm about to resolve to fix various trickery
+			$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
+			$query->setParameters(array('now'=>$now));
+			foreach ($query->getResult() as $battle) {
+				$military->recalculateBattleTimer($battle);
+			}
+			$em->flush();
 
-			// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
-			// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
-			foreach ($battle->getGroups() as $group) {
-				foreach ($group->getCharacters() as $char) {
-					if ($char->getTravel()) {
-						$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
+			$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
+			$query->setParameters(array('now'=>$now));
+			foreach ($query->getResult() as $battle) {
+				$battlerunner->enableLog($arg_debug);
+				$battlerunner->run($battle, $cycle);
+
+				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
+				// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
+				foreach ($battle->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						if ($char->getTravel()) {
+							$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
+						}
 					}
 				}
 			}
+			if ($opt_time) {
+				$event = $stopwatch->lap('battles');
+				$logger->info("battles: computation timing ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
+			}
+			$logger->info("battles: ...flushing...");
+			$em->flush();
+			if ($opt_time) {
+				$event = $stopwatch->stop('battles');
+				$logger->info("battles: flush data timing ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
+			}
+			$appstate->setGlobal('battling', 0);
+			$logger->info("battles: ...complete");
+		} else {
+			$logger->info("battles: additional running prevented");
 		}
-		if ($opt_time) {
-			$event = $stopwatch->lap('battles');
-			$logger->info("battles: computation timing ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
-		}
-		$logger->info("battles: ...flushing...");
-		$em->flush();
-		if ($opt_time) {
-			$event = $stopwatch->stop('battles');
-			$logger->info("battles: flush data timing ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
-		}
-		$logger->info("battles: ...complete");
 	}
-
 }

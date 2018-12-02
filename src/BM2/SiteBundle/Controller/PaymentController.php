@@ -355,25 +355,28 @@ class PaymentController extends Controller {
 				return array('error'=>'self');
 			}
 
-			$code = $this->get('payment_manager')->createCode($value, 0, $data['email'], $user);
-			$this->get('payment_manager')->spend($user, "gift", $value);
+			$spent = $this->get('payment_manager')->spend($user, "gift", $value);
+			if ($spent) {
+				$code = $this->get('payment_manager')->createCode($value, 0, $data['email'], $user);
 
-			$em->flush();
+				$em->flush();
 
-			$text = $this->get('translator')->trans('account.gift.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
-			$message = \Swift_Message::newInstance()
-				->setSubject($this->get('translator')->trans('account.gift.mail.subject', array()))
-				->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
-				->setTo($data['email'])
-				->setCc($user->getEmail())
-				->setBody($text, 'text/html')
-				->setMaxLineLength(1000)
-			;
-			$numSent = $this->get('mailer')->send($message);
-			$this->get('logger')->info("sent gift: ($numSent) from ".$user->getId()." to ".$data['email']." for $value credits");
+				$text = $this->get('translator')->trans('account.gift.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
+				$message = \Swift_Message::newInstance()
+					->setSubject($this->get('translator')->trans('account.gift.mail.subject', array()))
+					->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
+					->setTo($data['email'])
+					->setCc($user->getEmail())
+					->setBody($text, 'text/html')
+					->setMaxLineLength(1000)
+				;
+				$numSent = $this->get('mailer')->send($message);
+				$this->get('logger')->info("sent gift: ($numSent) from ".$user->getId()." to ".$data['email']." for $value credits");
 
-			return array('success'=>true, 'credits'=>$value);
-
+				return array('success'=>true, 'credits'=>$value);
+			} else {
+				return array('error'=>'insufficient');
+			}
 		}
 
 		return array('form'=>$form->createView());

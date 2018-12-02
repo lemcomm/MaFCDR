@@ -335,7 +335,7 @@ class AccountController extends Controller {
 		// Don't allow "reserves" - set a limit of 2 created but unspawned characters
 		$unspawned = $user->getCharacters()->filter(
 			function($entry) {
-				return ($entry->isAlive() && $entry->getLocation()==false);
+				return ($entry->isAlive() && $entry->getLocation()==false && $entry->getRetired()!=true);
 			}
 		);
 		if ($unspawned->count() >= 2) {
@@ -587,10 +587,10 @@ class AccountController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$character = $em->getRepository('BM2SiteBundle:Character')->find($id);
 		if (!$character) {
-			throw $this->createAccessDeniedHttpException('error.notfound.character');
+			throw $this->createAccessDeniedException('error.notfound.character');
 		}
 		if ($character->getUser() != $user) {
-			throw $this->createAccessDeniedHttpException('error.noaccess.character');
+			throw $this->createAccessDeniedException('error.noaccess.character');
 		}
 		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
 		$this->get('character_manager')->checkReturnability($character);

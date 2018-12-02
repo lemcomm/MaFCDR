@@ -157,16 +157,25 @@ class Economy {
 			foreach ($settlement->getGeoData()->getFeatures() as $feature) {
 				$feature->setWorkers(0);
 			}
-			$workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
 				// still? ok, abandon all buildings now, it's the only thing that can cause this
+				foreach ($settlement->getBuildings() as $building) {
+					if ($building->isActive() && $building->getType()->getDefenses() < 10) {
+						$building->setActive(false);
+						$building->setCondition(-rand(10,200));
+					}
+				}
+			}
+                        $workforce = $settlement->getAvailableWorkforce();
+			if ($workforce < 0) {
+				// Just how many people are we short!? All we have left is defenses... 
 				foreach ($settlement->getBuildings() as $building) {
 					if ($building->isActive()) {
 						$building->setActive(false);
 						$building->setCondition(-rand(10,200));
 					}
 				}
-			}
+			} 
 			$workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
 				// This should be utterly impossible to ever happen (but it does, occasionally), so log if it does because that means something is really wrong

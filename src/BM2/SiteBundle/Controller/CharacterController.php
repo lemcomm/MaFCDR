@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
+use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\CharacterBackgroundType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
@@ -14,6 +15,7 @@ use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
+use BM2\SiteBundle\Form\UnitSettingsType;
 
 use BM2\SiteBundle\Service\CharacterManager;
 use BM2\SiteBundle\Service\Geography;
@@ -1210,6 +1212,42 @@ class CharacterController extends Controller {
 			'form' => $form->createView(),
 			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100)
 		);
+	}
+	
+   /**
+     * @Route("/unitsettings")
+     * @Template
+     */
+	public function unitSettingsAction(Request $request) {
+		# Get the current character, setup Doctrine EntityManager.
+		$character = $this->get('appstate')->getCharacter();
+		$em = $this->getDoctrine()->getManager();
+
+		# Check if unit settings info exists. If not, create.
+		if (!$character->getUnitSettings()) {
+			# TODO: newUnitSettings expects either a Unit, which doesn't exist yet (hence the TODO) or a character.
+			$settings = $this->get('military')->newUnitSettings(null, $character);
+		} else {
+			$settings = $character->getUnitSettings();
+		}
+		if (!$settings) {
+			throw new \Exception("Anata wa naniwoshita!?"); # Seriously, what did you do to get this!? Stop trying to break my game.
+		}
+
+		#NOTE: Originally, I was planning to have one page to manage all unit settings, but trying to get Symfony to understand what I'm asking doesn't appear to be feasible.
+		# It probably has something to do with dynamic form loading, kind of how the permissions forms work, but that's way beyond my skill level.
+
+		$form = $this->createForm(new UnitSettingsType($character, true), $settings);
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			# I love passing entities. It means I don't have to actually code what happens when this is all committed. :) --Andrew
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('unit.success', array('%name%'=>$data->getName()), 'settings'));
+		}
+			
+		return array('form'=>$form->createView());
 	}
 
    /**

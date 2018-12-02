@@ -938,6 +938,9 @@ meta:
   remove:       Use no crest
   submit:       Assign crest
   nocrests:     You do not have any crests available. Follow the link above to design crests for your characters.
+ unitsettings:
+  name:         Battle Setup
+  description:  Alter deployment orders
 
 escape:
  name:      Escape

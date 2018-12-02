@@ -1,43 +1,35 @@
-Most units of measurement in the world of Might & Fealty are derived from human or daily-life base values, and the metric system has not yet been invented. This is mostly flavor because you as a player never need to do any calculations with these numbers, so it doesn't matter if the units are confusing, as they often were in the real world middle ages.
+### This manual page is detailing a highly experimental and incomplete feature that is in the process of being implemented. Everything on this page, while as detailed as it may be, is subject to change. ###
 
-One advantage of our fictional world is that everyone uses the same measurements, instead of, say, the word "mile" referring to anything from 578 m (China) to 8888 m (Baden, Germany). Also, if you hover the mouse over any distance value, the game will show you the distance in other values (miles in yards, etc).
+Units are the primary unit of organization between you and your soldiers, allowing you to set orders and manage hundreds of individuals soldiers at once. Each unit under your command will have it's own supply source, battle strategy, tactics, name, and deployment settings, allowing you as their leader to maximize their use on the field.
 
+Generally speaking, units are best when homogenous, or made up of soldiers all using relatively the same equipment. Archers with archers, cavalry with cavalry. In battle a unit will only move as slow as it's slowest soldier, and while it can be said that a disorganized mess is hard to fight against, it's also hard to deploy effectively.
 
-Distances
----------
+For more detailed guidance on how exactly units work in the field, we recommend you read the [new battles](battles2) page.
 
-###Yards (y)###
-People in Might & Fealty use the yard as their unit of measurement for short distances, with a yard being almost the same as a metre (0.9144 metres, to be exact).
+Supplies
+--------
+Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, or the settlement of the Unit's origin (TODO). Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
 
-###Miles (mi)###
-For medium distances, the world of Might & Fealty uses the mile as a unit of measurement. The mile used in Might & Fealty is the [nautical mile](https://en.wikipedia.org/wiki/Nautical_mile) of 1,852 metres which is used in the real world today in international law and treaties.
+Strategy & Tactics (TODO)
+------------------
+Past Supplies, there are two main things you'll concern yourself with in regards to Units: Strategy and Tactics.
 
-###Leagues###
-For larger distances beyond a few miles, the league is the common unit of measurement. For purely sentimental reasons, Might & Fealty uses the [Hamburg League](https://en.wikipedia.org/wiki/League_%28unit%29), also known as the Landesmeile or German state mile, which is equivalent to 7,532.5 metres.
+**Strategy** is your unit's course of action when in battle. Specifically, where it will try to orient itself in relation to opposing forces, and from which direction it will attack them. Each strategy is detailed below:
 
-Leagues are not abbreviated. If you can travel for a day, you can write a whole word.
+* Charge enemy - The Unit will always seek to be in range of enemy Units, moving direclty towards the nearest enemy if one isn't in range. If they are in range, they'll stay where they are. Best for regular infantry and cavalry. This is the default, if none is set.
+* Hold position - The Unit will stay in it's current position, where it originally deployed. Unless morale breaks (perhaps from watching their allies get slaughtered), it won't move, even if engaged. Best for mixed forces (infantry + archers, for instance).
+* Avoid enemies - The Unit will seek to distance itself from any nearby melees or enemy Units until all non-routed units on it's side only have "Avoid enemeis" as their strategy. At that point they'll begin retreating. If all units on a side are set to "Avoid enemies", the attacking side will default to "Charge enemy", while defenders will swap to "Hold Position", in order to prevent griefing.
 
+**Tactics**, on the other hand, is how they will engage the enemy. Will they use ranged weapons? Melee? Or whatever is appropriate? The game will default to "Use Best" if not otherwise declared.
 
-##Areas##
+Line Settings & Fortifications
+------------------------------
+Simply put, these control where your forces deploy in relation to their allies and enemies and whether or not they'll leave fortifications to attack an enemy. They let you fine tune your forces time to encounter as well as make effective use of walls (which give a handy bonus to defenders). This defaults to Line 4, the middle, if not set.
 
-###Hectare###
-The hectare is used mostly be peasants to measure small areas and covers 100m by 100m.
+Militia versus Professional
+---------------------------
+Lastly, while not yet a configurable options, you'll be able to define a unit as militia or not. 
 
-###Square Mile###
-For medium-sized areas, the square mile is used, which is (of course) one mile squared, equivalent to about 343 hectares.
+Militia units will contribute to their home settlement's economy while there and will be able to bolster their numbers significanlty faster. Their training may include some basic weapon usage, but in times of emergency (like when under siege) it may just be giving them whatever weapons are available and hoping for the best. Lastly, they take penalties when going too far afield. You can march them across the continent, but it's not what they "signed up for".
 
-###Square League###
-Extensive areas such as large realms, are measures in square leagues, where one square league is equivalent to about 16.54 square miles.
-
-
-
-Time
-----
-The game is set in accelerated realtime, meaning one day in our world equals four days in the game (one day in Might & Fealty happens every 6 hours).
-
-The world of Might & Fealty also has its own calendar, which is a bit simpler than most earthly ones:
-
-* 6 days make one week
-* 60 weeks make one year
-
-The typical shorthand notation for dates within the game is year-week-day, so 1-14-3 is the 3rd day of the 14th week in the 1st year.
+Professional Units will trade that off for a passive experience gain and combat effectiveness bonus, being more likely to hold together in combat, and less likely to retreat when a fellow unit breaks or a First One falls in combat on their side. Their bonuses bolster both attack and defense, as well as maintaining morale and resisting opportunities to break and run. They're also the only forces capable of operating siege equipment afield.

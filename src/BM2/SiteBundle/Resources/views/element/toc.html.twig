@@ -2,7 +2,7 @@
 	{{ toc|markdown|manuallinks }}
 	<h2>{{ 'manual.reference'|trans }}</h2>
 	<ul>
-		<li><a href="{{ path('bm2_manual', {'page':'units'}) }}">{{ 'manual.units'|transchoice(10) }}</a></li>
+		<li><a href="{{ path('bm2_manual', {'page':'measurements'}) }}">{{ 'manual.measurements'|transchoice(10) }}</a></li>
 		<li><a href="{{ path('bm2_site_info_allbuildingtypes') }}">{{ 'building'|transchoice(10) }}</a></li>
 		<li><a href="{{ path('bm2_site_info_allfeaturetypes') }}">{{ 'feature'|transchoice(10) }}</a></li>
 		<li><a href="{{ path('bm2_site_info_allentouragetypes') }}">{{ 'npc.entourage'|transchoice(10) }}</a></li>

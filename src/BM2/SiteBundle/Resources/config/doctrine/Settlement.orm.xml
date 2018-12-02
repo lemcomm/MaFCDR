@@ -11,6 +11,7 @@
 		<field name="starvation" type="float"/>
 		<field name="gold" type="integer"/>
 		<field name="war_fatigue" type="integer"/>
+		<field name="abduction_cooldown" type="integer" nullable="true"/>
 
 		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
@@ -57,5 +58,6 @@
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_settlement"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_settlement"/>
 
+		<one-to-many field="supplies_units" target-entity="UnitSettings" mapped-by="supplier"/>
 	</entity>
 </doctrine-mapping>

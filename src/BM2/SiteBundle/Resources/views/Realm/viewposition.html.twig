@@ -5,7 +5,7 @@
 
 <dl class="wide">
 	<dt>{{ 'position.description'|trans({}, "politics") }}</dt>
-	<dd>{{ position.description }}</dd>
+	<dd>{{ position.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
 
 	{# <dt>{{ 'position.permissions'|trans({}, "politics") }}</dt>
 	<dd><ul class="shortlist">

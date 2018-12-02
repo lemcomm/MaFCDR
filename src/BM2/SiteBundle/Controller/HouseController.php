@@ -105,10 +105,10 @@ class HouseController extends Controller {
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 		} else {
-			throw createNotFoundException('unvailable.notinside');
+			throw $this->createNotFoundException('unvailable.notinside');
 		}
 		if ($character->getHouse()) {
-			throw createNotFoundException('error.found.house');
+			throw $this->createNotFoundException('error.found.house');
 		}
 		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
@@ -155,7 +155,7 @@ class HouseController extends Controller {
 		$form->handleRequest($request);
 		# TODO: Rework this to use dispatcher.
 		if ($character != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -204,10 +204,10 @@ class HouseController extends Controller {
 		# TODO: Rework this later to allow for Houses at Places.
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getInsideSettlement()) {
-			throw createNotFoundException('unvailable.notinside');
+			throw $this->createNotFoundException('unvailable.notinside');
 		}
 		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
-			throw createNotFoundException('error.notfound.housenothere');
+			throw $this->createNotFoundException('error.notfound.housenothere');
 		}
 		$form = $this->createForm(new HouseJoinType());
 		$form->handleRequest($request);
@@ -242,10 +242,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$joinrequests = $em->getRepository('BM2SiteBundle:GameRequest')->findBy(array('type' => 'house.join', 'to_house' => $house));
 
@@ -270,10 +270,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$members = $house->findAllMembers();
 
@@ -322,10 +322,10 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
-			throw createNotFoundException('error.noaccess.nohouse');
+			throw $this->createNotFoundException('error.noaccess.nohouse');
 		}
 		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw createNotFoundException('error.noaccess.nothead');
+			throw $this->createNotFoundException('error.noaccess.nothead');
 		}
 		$members = $house->findAllMembers();
 
@@ -345,6 +345,71 @@ class HouseController extends Controller {
 		return array(
 			'name' => $house->getName(),
 			'form' => $form->createView(),
+		);
+	}
+
+	/**
+	  * @Route("/relocate", name="bm2_house_relocate")
+	  * @Template
+	  */	
+	
+	public function relocateAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$settlement = null;
+		$house = null;
+		#Character must be inside a settlement in order to relocate the house
+		if ($character->getInsideSettlement()) {
+			$settlement = $character->getInsideSettlement();
+			#Can only relocate a house if you own the target settlement
+			if ($settlement->getOwner() != $character) {
+				throw $this->createNotFOundException('unavailable.notyours2');
+			} else {
+				$settlement = $character->getInsideSettlement();
+			}
+		} else {
+			throw $this->createNotFoundException('unvailable.notinside');
+		}
+		#Impossible to relocate a house if you don't belong to one.
+		if (!$character->getHouse()) {
+			throw $this->createNotFoundException('error.found.house');
+		} 
+		#Only the Head of a house can relocate.
+		if ($character->getHouse()->getHead() != $character) {
+			throw $this->createNotFoundException('error.noaccess.nothead');
+		} else {
+			$house = $character->getHouse();
+		}
+		# TODO: Rework this to use dispatcher.
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$fail = true;
+			if ($data['sure'] == true) {
+				$fail = false;
+			}
+			if (!$fail) {
+				#Update House location
+				$house->setInsideSettlement($settlement);
+				#Create relocation event in House's event log
+				$this->get('history')->logEvent(
+					$house,
+					'event.house.relocated.settlement',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::HIGH, true
+				);
+				$em->flush();
+				#Add "success" flash message to the top of the redirected page for feedback.
+				$this->addFlash('notice', $this->get('translator')->trans('house.updated.relocated', array(), 'messages'));
+				return $this->redirectToRoute('bm2_politics', array());
+			} else {
+				/* You shouldn't ever reach this. The form requires input. */
+			}
+		}
+		return array(
+			'name' => $house->getName(),
+			'form' => $form->createView()
 		);
 	}
 }

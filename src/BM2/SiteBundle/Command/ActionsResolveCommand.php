@@ -29,6 +29,7 @@ class ActionsResolveCommand extends ContainerAwareCommand {
 		$ar = $this->getContainer()->get('action_resolution');
 
 		$ar->progress();
+		$em->flush();
 	}
 
 }

@@ -235,7 +235,7 @@ class ActionResolution {
 		$victims = array();
 		foreach ($possible_targets as $target) {
 			list($check, $list, $level) = $this->permissions->checkListing($action->getTargetListing(), $target['character']);
-			if ( ($check && $action->getStringValue()=='attack') || (!$check && $action->getStringValue()=='allow') ) {
+			if ( ( ($check && $action->getStringValue()=='attack') || (!$check && $action->getStringValue()=='allow') ) && $target['character']->getSystem() != 'GM' ){
 				$victims[] = $target['character'];
 			}
 		}
@@ -539,6 +539,26 @@ class ActionResolution {
 		}
 	}
 
+	private function military_intercepted(Action $action) {
+		// Get our character.
+		$character = $action->getCharacter();
+		// Set battle to false.
+		$battle = false;
+		// Get character actions.
+		if ($character->getActions()) {
+			// Check each of them.
+			foreach ($character->getActions() as $otheract) {
+				// If one of them is a battle, set $battle to true and stop checking.
+				if ($otheract->getType() == 'military.battle' && !$battle) {
+					$battle = true;
+				}
+			}
+		}
+		// If we didn't find a battle, remove the military.intercepted action. Otherwise, we keep it, to ensure you can only evade once.
+		if (!$battle) {
+			$this->em->remove($action);
+		}
+	}
 
 	private function personal_prisonassign(Action $action) {
 		// just remove, this is just a blocking action
