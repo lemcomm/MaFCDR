@@ -113,6 +113,13 @@ Table headers are handled as translation strings from the character.list databas
 				<!-- Play button would normally be here. -->
 			</td>
 		{% endif %}
+	{% elseif not character.alive and character.location %}
+		<td colspan="4">
+			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
+		</td>
+		<td colspan="2">
+			<center><i>Awaiting Turn Processing</i></center>
+		</td>
 	{% else %}
 		<td colspan="4">
 			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
