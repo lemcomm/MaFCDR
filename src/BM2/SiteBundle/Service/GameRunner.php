@@ -1261,7 +1261,7 @@ class GameRunner {
 			$election->setMethod('banner');
 		}
 		$complete = new \DateTime("now");
-		$complete->add(new \DateInterval("P3D"));
+		$complete->add(new \DateInterval("P7D"));
 		$election->setComplete($complete);
 		$election->setName("Election number ".$counter." for ".$position->getName());
 		switch ($electiontype) {
