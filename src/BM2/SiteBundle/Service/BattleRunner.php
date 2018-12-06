@@ -44,7 +44,7 @@ class BattleRunner {
 		$this->npc_manager = $npc_manager;
 		$this->resolver = $resolver;
 		$this->interactions = $interactions;
-		$this->war_manager = $war_manager
+		$this->war_manager = $war_manager;
 	}
 
 	public function enableLog($level=10) {
