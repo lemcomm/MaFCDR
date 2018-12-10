@@ -31,10 +31,11 @@ class SettlementController extends Controller {
 
 		// check if we should be able to see details
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
+			$character = NULL; //Override Appstate's return so we don't need to tinker with the rest of this function.
 		}
 		$details = $this->get('interactions')->characterViewDetails($character, $settlement);
 		if (isset($details['startme'])) {
@@ -151,6 +152,9 @@ class SettlementController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
@@ -213,6 +217,9 @@ class SettlementController extends Controller {
 	public function cancelTrainingAction(Request $request) {
 		if ($request->isMethod('POST') && $request->request->has("settlement") && $request->request->has("recruit")) {
 			list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+			if (! $character instanceof Character) {
+				return $this->redirectToRoute($character);
+			}
 
 			$em = $this->getDoctrine()->getManager();
 			$recruit = $em->getRepository('BM2SiteBundle:Soldier')->find($request->request->get('recruit'));
@@ -249,6 +256,9 @@ class SettlementController extends Controller {
 	  */
 	public function permissionsAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
@@ -299,6 +309,9 @@ class SettlementController extends Controller {
 	  */
 	public function questsAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
@@ -316,6 +329,9 @@ class SettlementController extends Controller {
 	  */
 	public function descriptionAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
