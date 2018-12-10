@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EventLog;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Form\EntourageAssignType;
@@ -25,6 +26,9 @@ class EventsController extends Controller {
 		*/
 	public function eventsAction() {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT l FROM BM2SiteBundle:EventLog l JOIN l.metadatas m WHERE m.reader = :me GROUP BY l');
@@ -82,6 +86,9 @@ class EventsController extends Controller {
 		*/
 	public function eventlogAction($id, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$log = $em->getRepository('BM2SiteBundle:EventLog')->find($id);
@@ -156,6 +163,9 @@ class EventsController extends Controller {
 		*/
 	public function allreadAction(EventLog $log) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT m FROM BM2SiteBundle:EventMetadata m JOIN m.reader r WHERE m.log = :log AND r.user = :me');
 		$query->setParameters(array('log'=>$log, 'me'=>$character->getUser()));
@@ -173,6 +183,9 @@ class EventsController extends Controller {
 		*/
 	public function fullreadAction($which) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		switch ($which) {
@@ -208,6 +221,9 @@ class EventsController extends Controller {
 		*/
 	public function soldierlogAction(Soldier $soldier) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$access = false;
 		if ($soldier->getCharacter() == $character) {
