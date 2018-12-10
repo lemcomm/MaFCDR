@@ -47,6 +47,9 @@ class WarController extends Controller {
 	public function declareAction(Realm $realm, Request $request) {
 		$this->get('dispatcher')->setRealm($realm);
 		$character = $this->get('dispatcher')->gateway('hierarchyWarTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$war = new War;
 /*
 		$me = array();
@@ -115,6 +118,9 @@ class WarController extends Controller {
 	  */
 	public function defendSettlementAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryDefendSettlementTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
 			->add('submit', 'submit', array(
@@ -140,6 +146,9 @@ class WarController extends Controller {
 	public function siegeSettlementAction(Request $request) {
 		# Security checks and set $character and $settlement.		
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		# Prepare other variables.
 		$siege = null;
 		$leader = null;
@@ -284,6 +293,9 @@ class WarController extends Controller {
 	  */
 	public function attackSettlementAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackSettlementTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// TODO: also allow attack on travel destination
 
@@ -335,6 +347,9 @@ class WarController extends Controller {
 	  */
 	public function lootSettlementAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryLootSettlementTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if ($character->getInsideSettlement()) {
@@ -703,6 +718,9 @@ class WarController extends Controller {
 	  */
 	public function disengageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDisengageTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$engagements = array();
 		foreach ($character->findForcedBattles() as $act) {
@@ -778,6 +796,9 @@ class WarController extends Controller {
 	  */
 	public function evadeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryEvadeTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder()
 			->add('submit', 'submit', array('label'=>'military.evade.submit', 'translation_domain' => 'actions'))
@@ -803,6 +824,9 @@ class WarController extends Controller {
 	  */
 	public function blockAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryBlockTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$form = $this->createFormBuilder(null, array('attr'=>array('class'=>'wide')))
 			->add('mode', 'choice', array(
 				'required'=>true,
@@ -844,6 +868,9 @@ class WarController extends Controller {
 	  */
 	public function damageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDamageFeatureTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$actdistance = $this->get('geography')->calculateInteractionDistance($character);
 		$spotdistance = $this->get('geography')->calculateSpottingDistance($character);
 
@@ -911,6 +938,9 @@ class WarController extends Controller {
 	  */
 	public function attackOthersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackNoblesTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = false;
 
@@ -952,6 +982,9 @@ class WarController extends Controller {
 	  */
 	public function aidAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryAidTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$success = false; $target = null;
@@ -990,6 +1023,9 @@ class WarController extends Controller {
 	  */
 	public function battleJoinAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryJoinBattleTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$success = false;
 		$nearby_battles = $this->get('geography')->findBattlesInActionRange($character);
