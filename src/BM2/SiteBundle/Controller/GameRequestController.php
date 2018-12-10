@@ -48,7 +48,10 @@ class GameRequestController extends Controller {
 	  */
 	
 	public function approveAction(GameRequest $id) {
-		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		# Are we allowed to act on this GR? True = yes. False = no.
 		$allowed = $this->security($character, $id);
@@ -91,7 +94,10 @@ class GameRequestController extends Controller {
 	  */
 	
 	public function denyAction(GameRequest $id) {
-		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		# Are we allowed to act on this GR? True = yes. False = no.
 		$allowed = $this->security($character, $id);
