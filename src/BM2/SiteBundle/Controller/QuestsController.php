@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Quest;
 use BM2\SiteBundle\Entity\Quester;
 use BM2\SiteBundle\Entity\Settlement;
@@ -26,6 +27,9 @@ class QuestsController extends Controller {
 	  */
 	public function localQuestsAction() {
 		$character = $this->get('dispatcher')->gateway('locationQuestsTest', false, false);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$geo = $this->get('geography')->findMyRegion($character);
 		$settlement = $geo->getSettlement();
@@ -39,6 +43,9 @@ class QuestsController extends Controller {
 	  */
 	public function myQuestsAction() {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('my_quests'=>$character->getQuestings(), 'owned_quests'=>$character->getQuestsOwned());
 	}
@@ -50,6 +57,9 @@ class QuestsController extends Controller {
 	  */
 	public function detailsAction(Quest $id) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$quest = $id;
 
@@ -70,6 +80,9 @@ class QuestsController extends Controller {
 	  */
 	public function createAction(Settlement $settlement, Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationQuestsTest', false, false);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$quest = new Quest;
 		$form = $this->createForm(new QuestType(), $quest);
@@ -107,6 +120,9 @@ class QuestsController extends Controller {
 	  */
 	public function joinAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		foreach ($quest->getQuesters() as $q) {
@@ -143,6 +159,9 @@ class QuestsController extends Controller {
 	  */
 	public function leaveAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		foreach ($quest->getQuesters() as $q) {
@@ -172,6 +191,9 @@ class QuestsController extends Controller {
 	  */
 	public function completedAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		foreach ($quest->getQuesters() as $q) {
@@ -200,6 +222,9 @@ class QuestsController extends Controller {
 	  */
 	public function confirmAction(Quester $quester) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if ($quester->getQuest()->getOwner() != $character) {
@@ -229,6 +254,9 @@ class QuestsController extends Controller {
 	  */
 	public function rejectAction(Quester $quester) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if ($quester->getQuest()->getOwner() != $character) {
