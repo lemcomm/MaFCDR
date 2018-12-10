@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -22,6 +23,9 @@ class BuildingController extends Controller {
 	  */
 	public function tavernAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationTavernTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:GeoData me WHERE ST_Distance(g.center, me.center) < :maxdistance AND me.id = :me AND s != me');
@@ -46,6 +50,9 @@ class BuildingController extends Controller {
 	  */
 	public function innAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationInnTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$offers = $em->getRepository('BM2SiteBundle:KnightOffer')->findAll();
@@ -107,6 +114,9 @@ class BuildingController extends Controller {
 	  */
 	public function libraryAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLibraryTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s ORDER BY s.population+s.thralls DESC');
@@ -133,6 +143,9 @@ class BuildingController extends Controller {
 	  */
 	public function mapAction($map) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLibraryTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// TODO: there are several better ways to do it, e.g.:
 		// http://stackoverflow.com/questions/3697748/fastest-way-to-serve-a-file-using-php
@@ -159,6 +172,9 @@ class BuildingController extends Controller {
 	  */
 	public function templeAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationTempleTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$data = array(
 			"population"	=> array("label" => "population", "data" => array()),
@@ -184,6 +200,9 @@ class BuildingController extends Controller {
 	  */
 	public function barracksAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationBarracksTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$data = array(
 			"militia"		=> array("label" => "militia", "data" => array()),
