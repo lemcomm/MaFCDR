@@ -18,7 +18,7 @@ class Dispatcher {
 
 	const FREE_ACCOUNT_ESTATE_LIMIT = 3;
 
-	private $character=false;
+	private $character;
 	private $realm;
 	private $house;
 	private $settlement;
@@ -45,7 +45,9 @@ class Dispatcher {
 	}
 
 	public function getCharacter() {
-		if ($this->character) return $this->character;
+		if ($this->character instanceof Character) {
+			return $this->character;
+		}
 		return $this->appstate->getCharacter();
 	}
 
@@ -77,8 +79,18 @@ class Dispatcher {
 		and then applying any (optional) test on the whole thing.
 	*/
 	public function gateway($test=false, $getSettlement=false, $check_duplicate=true) {
-		if (!$this->getCharacter()) {
-			throw new AccessDeniedHttpException('error.nocharacter');
+		$character = $this->getCharacter();
+		if (!$character || ! $character instanceof Character) {
+			/* Yes, if it's not a character, we return it. We check this on the other side again, and redirect if it's not a character.
+			Would it make more sense to just redirect here? Probably. Symfony doesn't work that way though.
+			Services, like Dispatcher, do logic, not interaction. Redirection, though, is distinctly interactive.
+			When Dispatcher calls AppState to get the character, it adds a flash message explaining why it's not returning a character.
+			That flash will then generate on the route the calling Controller will redirect to, explaining to the user what's going on.*/
+			if ($getSettlement) {
+				return array($character, null);
+			} else {
+				return $character;
+			}
 		}
 		$settlement = null;
 		if ($test || $getSettlement) {
@@ -93,9 +105,9 @@ class Dispatcher {
 			}
 		}
 		if ($getSettlement) {
-			return array($this->getCharacter(), $settlement);
+			return array($character, $settlement);
 		} else {
-			return $this->getCharacter();
+			return $character;
 		}
 	}
 
