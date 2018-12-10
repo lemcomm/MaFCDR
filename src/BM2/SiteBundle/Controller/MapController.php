@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\MapMarker;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Service\Geography;
@@ -31,7 +32,7 @@ class MapController extends Controller {
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			if ($character->getTravel()) {
 				$travel = $this->get('geography')->jsonTravelSegments($character);
 				$details = $this->get('geography')->travelDetails($character);
@@ -58,6 +59,9 @@ class MapController extends Controller {
 	  */
 	public function markerAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$my_realms = $character->findRealms();
 		if (!$my_realms) {
@@ -99,6 +103,9 @@ class MapController extends Controller {
 	  */
 	public function removemarkerAction(MapMarker $marker) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($marker->getOwner() == $character) {
 			$em = $this->getDoctrine()->getManager();
