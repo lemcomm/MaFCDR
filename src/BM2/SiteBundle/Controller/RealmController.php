@@ -71,6 +71,8 @@ class RealmController extends Controller {
 	public function viewAction(Realm $id) {
 		$realm = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		# NOTE: Character onject checking not conducted because we don't need it. 
+		# $character isn't checked in a context that would require it to be NULL or an Object.
 		$superrulers = array();
 
 		$territory = $realm->findTerritory();
