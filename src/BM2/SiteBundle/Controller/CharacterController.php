@@ -62,6 +62,9 @@ class CharacterController extends Controller {
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($location=$character->getLocation()) {
 			$geo = $this->get('geography');
@@ -95,6 +98,9 @@ class CharacterController extends Controller {
 	  */
 	public function summaryAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$character->getLocation()) {
 			return $this->redirectToRoute('bm2_site_character_start');
@@ -153,6 +159,9 @@ class CharacterController extends Controller {
 	  */
 	public function scoutingAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// FIXME: this needs to be reworked !
 		$spotted = array();
@@ -191,6 +200,9 @@ class CharacterController extends Controller {
 	  */
 	public function estatesAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$estates = array();
@@ -245,26 +257,32 @@ class CharacterController extends Controller {
      * @Route("/first", name="bm2_first")
      * @Template
      */
-   public function firstAction() {
-   	$character = $this->get('appstate')->getCharacter(true, true, true);
+	public function firstAction() {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-   	if (!$character->getLocation()) {
-   		return $this->redirectToRoute('bm2_site_character_start');
-   	}
+		if (!$character->getLocation()) {
+			return $this->redirectToRoute('bm2_site_character_start');
+		}
 
-   	$msguser = $this->get('message_manager')->getCurrentUser();
+		$msguser = $this->get('message_manager')->getCurrentUser();
 
-   	return array(
-   		'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
-   	);
-   }
+		return array(
+			'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
+		);
+	}
 
    /**
      * @Route("/start")
      * @Template
      */
-   public function startAction(Request $request) {
+	public function startAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
@@ -462,9 +480,9 @@ class CharacterController extends Controller {
 	  */
 	public function viewAction(Character $id) {
 		$char = $id;
-		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$character = $this->get('appstate')->getCharacter(FALSE, TRUE, TRUE);
 		$banned = false;
-		if ($character) {
+		if ($character instanceof Character) {
 			$details = $this->get('interactions')->characterViewDetails($character, $char);
 		} else {
 			$details = array('spot' => false, 'spy' => false);
@@ -482,7 +500,7 @@ class CharacterController extends Controller {
 			}
 		}
 		$relationship = false;
-		if ($character && $character->getPartnerships() && $char->getPartnerships()) {
+		if ($character instanceof Character && $character->getPartnerships() && $char->getPartnerships()) {
 			foreach ($character->getPartnerships() as $partnership) {
 				if (!$partnership->getEndDate() && $partnership->getOtherPartner($character) == $char) {
 					$relationship = true;
@@ -666,6 +684,9 @@ class CharacterController extends Controller {
      */
 	public function backgroundAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		if ($request->query->get('starting')) {
@@ -713,6 +734,9 @@ class CharacterController extends Controller {
 	  */
 	public function renameAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder()
 			->add('name', 'text', array(
@@ -784,6 +808,9 @@ class CharacterController extends Controller {
      */
 	public function settingsAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$form = $this->createForm(new CharacterSettingsType(), $character);
@@ -809,6 +836,9 @@ class CharacterController extends Controller {
      */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->isPrisoner()) {
 			throw new AccessDeniedHttpException('unavailable.prisoner');
 		}
@@ -868,7 +898,7 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.kill.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_characters');
 			}
 		}
 		return array('form'=>$form->createView());
@@ -880,6 +910,9 @@ class CharacterController extends Controller {
      */
 	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->isPrisoner()) {
 			throw new AccessDeniedHttpException('unvailable.prisoner');
 		}
@@ -937,7 +970,7 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_characters');
 			}
 		}
 		return array('form'=>$form->createView());
@@ -949,6 +982,9 @@ class CharacterController extends Controller {
 	  */
 	public function surrenderAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalSurrenderTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('surrender', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -984,6 +1020,9 @@ class CharacterController extends Controller {
 	  */
 	public function escapeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalEscapeTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($character->getPrisonerOf()->getSlumbering() == false && $character->getPrisonerOf()->isAlive() == true) {
 			$captor_active = true;
@@ -1023,6 +1062,9 @@ class CharacterController extends Controller {
 	  */
 	public function heraldryAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('metaHeraldryTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$available = array();
 		
@@ -1085,7 +1127,11 @@ class CharacterController extends Controller {
 	  * @Template
 	  */
 	public function entourageAction(Request $request) {
+		# TODO: We call AppState and Dispatcher? Can't we combine this into a single call and return it as a list somehow? -- Andrew 20181210
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$others = $this->get('dispatcher')->getActionableCharacters();
 		$em = $this->getDoctrine()->getManager();
 
@@ -1141,6 +1187,9 @@ class CharacterController extends Controller {
 	  */
 	public function groupsoldiersAction($by) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($by=="type") {
 			$this->get('military')->groupByType($character->getSoldiers());
@@ -1159,7 +1208,11 @@ class CharacterController extends Controller {
 	  * @Template
 	  */
 	public function soldiersAction(Request $request) {
+		# TODO: An AppState call followed by a Dispatcher call. Can we combine these? --Andrew 20181210
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$settlement = $this->get('dispatcher')->getActionableSettlement();
 		if ($character->getPrisonerOf()) {
 			$others = array($character->getPrisonerOf());
@@ -1221,6 +1274,9 @@ class CharacterController extends Controller {
 	public function unitSettingsAction(Request $request) {
 		# Get the current character, setup Doctrine EntityManager.
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		# Check if unit settings info exists. If not, create.
@@ -1256,6 +1312,9 @@ class CharacterController extends Controller {
 	public function setTravelAction(Request $request) {
 		if ($request->isMethod('POST') && $request->request->has("route")) {
 			$character = $this->get('appstate')->getCharacter();
+			if (! $character instanceof Character) {
+				return $this->redirectToRoute($character);
+			}
 			if ($character->isPrisoner()) {
 				// prisoners cannot travel on their own
 				return new Response(json_encode(array('turns'=>0, 'prisoner'=>true)));
@@ -1375,6 +1434,9 @@ class CharacterController extends Controller {
 	  */
 	public function clearTravelAction() {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$character->setTravel(null)->setProgress(null)->setSpeed(null)->setTravelEnter(false)->setTravelDisembark(false);
 		$this->getDoctrine()->getManager()->flush();
 		return new Response();
@@ -1387,6 +1449,9 @@ class CharacterController extends Controller {
      */
 	public function viewBattleReportAction($id) {
 		$character = $this->get('appstate')->getCharacter(true,true,true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$report = $em->getRepository('BM2SiteBundle:BattleReport')->find($id);
@@ -1446,6 +1511,9 @@ class CharacterController extends Controller {
 	  */
 	public function mercenariesAction($id) {
 		$character = $this->get('appstate')->getCharacter(true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$mercs = $em->getRepository('BM2SiteBundle:Mercenaries')->find($id);
