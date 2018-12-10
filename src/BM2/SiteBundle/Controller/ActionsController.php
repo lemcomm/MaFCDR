@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\KnightOffer;
 use BM2\SiteBundle\Entity\Trade;
 use BM2\SiteBundle\Form\AssignedSoldiersType;
@@ -34,6 +35,9 @@ class ActionsController extends Controller {
      */
 	public function indexAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($settlement) {
 			$pagetitle = $this->get('translator')->trans('settlement.title', array(
@@ -55,6 +59,9 @@ class ActionsController extends Controller {
 	  */
 	public function supportAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -112,7 +119,9 @@ class ActionsController extends Controller {
 	  */
 	public function opposeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
-
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -167,6 +176,9 @@ class ActionsController extends Controller {
 	  */
 	public function enterAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEnterTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterEnterSettlement($character, $settlement)) {
@@ -185,6 +197,9 @@ class ActionsController extends Controller {
 	  */
 	public function exitAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterLeaveSettlement($character)) {
@@ -202,7 +217,11 @@ class ActionsController extends Controller {
 	  * @Template
 	  */
 	public function placesAction() {
+		# TODO: This should be dispatcher. --Andrew 20181210
 		$character = $this->get('appstate')->getCharacter(true, true, true); # Ensure user has a character selected.
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		
 		$places[] = $this->get('geography')->findPlacesNearMe($character); # Find nearby places that we can see.
 		
@@ -222,6 +241,9 @@ class ActionsController extends Controller {
 	  */
 	public function enterPlaceAction() {
 		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
@@ -240,6 +262,9 @@ class ActionsController extends Controller {
 	  */
 	public function exitPlaceAction() {
 		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterLeavePlace($character)) {
@@ -257,6 +282,9 @@ class ActionsController extends Controller {
 	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$act = $this->get('geography')->calculateInteractionDistance($character);
 		$embark_ship = false;
@@ -304,6 +332,9 @@ class ActionsController extends Controller {
      */
 	public function giveGoldAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationGiveGoldTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('givegold', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -339,6 +370,9 @@ class ActionsController extends Controller {
      */
 	public function giveShipAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationGiveShipTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('giveship', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -377,6 +411,9 @@ class ActionsController extends Controller {
 	  */
 	public function spyAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('nearbySpyTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 
 		return array('settlement'=>$settlement);
@@ -389,6 +426,9 @@ class ActionsController extends Controller {
 	  */
 	public function takeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlTakeTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$realms = $character->findRealms();
 		if ($realms->isEmpty()) {
@@ -456,13 +496,17 @@ class ActionsController extends Controller {
      * @Template
      */
 	public function changeRealmAction($id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
 		$this->get('dispatcher')->setSettlement($settlement);
-		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
 
 		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changerealm'));
 		$form->handleRequest($request);
@@ -502,6 +546,9 @@ class ActionsController extends Controller {
      */
 	public function grantAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlGrantTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType(
 			$settlement->getRealm()?'grant':'grant2', 
@@ -555,6 +602,9 @@ class ActionsController extends Controller {
      */
 	public function renameAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlRenameTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions', 'attr'=>array('class'=>'wide')))
 			->add('name', 'text', array(
@@ -595,6 +645,9 @@ class ActionsController extends Controller {
      */
 	public function changecultureAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlCultureTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new CultureType($character->getUser(), true, $settlement->getCulture()));
 		$form->handleRequest($request);
@@ -617,6 +670,9 @@ class ActionsController extends Controller {
      */
 	public function tradeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyTradeTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$resources = $em->getRepository('BM2SiteBundle:ResourceType')->findAll();
@@ -753,6 +809,9 @@ class ActionsController extends Controller {
      */
 	public function entourageAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalEntourageTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery('SELECT e as type, p as provider FROM BM2SiteBundle:EntourageType e LEFT JOIN e.provider p LEFT JOIN p.buildings b
@@ -826,6 +885,9 @@ class ActionsController extends Controller {
      */
 	public function soldiersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalSoldiersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required > 0');
@@ -908,6 +970,9 @@ class ActionsController extends Controller {
      */
 	public function offersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$depth = 1;
 		if ($settlement->getRealm()->getSuperior()) {
@@ -997,6 +1062,9 @@ class ActionsController extends Controller {
 	  */
 	public function offerdeleteAction(KnightOffer $offer) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($offer->getSettlement() == $settlement) {
 			$em = $this->getDoctrine()->getManager();
@@ -1021,6 +1089,9 @@ class ActionsController extends Controller {
 	  */
 	public function assignedAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalAssignedSoldiersTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new AssignedSoldiersType($character));
 		$form->handleRequest($request);
@@ -1144,6 +1215,9 @@ class ActionsController extends Controller {
 	  */
 	public function dungeonsAction() {
 		$character = $this->get('dispatcher')->gateway('locationDungeonsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('dungeons'=>$this->get('geography')->findDungeonsInActionRange($character));
 	}
