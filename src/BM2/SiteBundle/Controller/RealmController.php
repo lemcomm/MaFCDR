@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
@@ -51,6 +52,9 @@ class RealmController extends Controller {
 			$this->get('dispatcher')->setRealm($realm);
 		}
 		$character = $this->get('dispatcher')->gateway($test);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($realm && !$test) {
 			if (!$character->findRealms()->contains($realm)) {
 				throw $this->createAccessDeniedException('actions::unavailable.notmember');
@@ -139,6 +143,9 @@ class RealmController extends Controller {
 	  */
    public function newAction(Request $request) {
 		$character = $this->gateway(false, 'hierarchyCreateRealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new RealmCreationType());
 
@@ -187,6 +194,9 @@ class RealmController extends Controller {
 	  */
 	public function manageAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyManageRealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$min = 0;
 		foreach ($realm->getInferiors() as $inferior) {
@@ -224,6 +234,9 @@ class RealmController extends Controller {
 	  */
 	public function descriptionAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyManageDescriptionTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$desc = $realm->getDescription();
 		if ($desc) {
@@ -253,6 +266,9 @@ class RealmController extends Controller {
 	  */
 	public function abdicateAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyAbdicateTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$success=false;
 		$form = $this->createForm(new InteractionType('abdicate', $this->get('geography')->calculateInteractionDistance($character), $character, false, true));
@@ -279,6 +295,9 @@ class RealmController extends Controller {
 	  */
 	public function abolishAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyAbolishRealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$form = $this->createFormBuilder()
 			->add('sure', 'checkbox', array(
 				'required'=>true,
@@ -385,6 +404,9 @@ class RealmController extends Controller {
 	public function lawsAction(Realm $realm, Request $request) {
 		// FIXME: these should be visible to all realm members - seperate method or same?
 		$character = $this->gateway($realm, 'hierarchyRealmLawsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array(
 			'realm' => $realm,
@@ -400,6 +422,9 @@ class RealmController extends Controller {
 	public function positionsAction(Realm $realm, Request $request) {
 		// FIXME: these should be visible to all realm members - seperate method or same?
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array(
 			'realm' => $realm,
@@ -413,6 +438,9 @@ class RealmController extends Controller {
 	  */
 	public function viewpositionAction(RealmPosition $id) {
 		$character = $this->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('position'=>$id);
 	}
@@ -423,6 +451,9 @@ class RealmController extends Controller {
 	  */
 	public function positionAction(Realm $realm, Request $request, RealmPosition $position=null) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$cycle = $this->get('appstate')->getCycle();
 
@@ -506,6 +537,9 @@ class RealmController extends Controller {
 	  */
 	public function officialsAction(Realm $realm, RealmPosition $position, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if (!$position || $position->getRealm() != $realm) {
@@ -588,6 +622,9 @@ class RealmController extends Controller {
      */
 	public function diplomacyAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyDiplomacyTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('realm'=>$realm);
 	}
@@ -599,25 +636,25 @@ class RealmController extends Controller {
 	public function hierarchyAction(Realm $realm) {
 		$this->addToHierarchy($realm);
 
-   	$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin 
-		   1 => array("pipe", "w"),  // stdout
-		   2 => array("pipe", "w") // stderr
-		);
+	   	$descriptorspec = array(
+			   0 => array("pipe", "r"),  // stdin 
+			   1 => array("pipe", "w"),  // stdout
+			   2 => array("pipe", "w") // stderr
+			);
 
-   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
+   		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
-   	if (is_resource($process)) {
-   		$dot = $this->renderView('BM2SiteBundle:Realm:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$realm));
+	   	if (is_resource($process)) {
+	   		$dot = $this->renderView('BM2SiteBundle:Realm:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$realm));
 
-   		fwrite($pipes[0], $dot);
-   		fclose($pipes[0]);
+	   		fwrite($pipes[0], $dot);
+	   		fclose($pipes[0]);
 
-   		$svg = stream_get_contents($pipes[1]);
-   		fclose($pipes[1]);
+	   		$svg = stream_get_contents($pipes[1]);
+	   		fclose($pipes[1]);
 
-   		$return_value = proc_close($process);
-   	}
+	   		$return_value = proc_close($process);
+	   	}
 
 		return array('svg'=>$svg);
 	}
@@ -642,6 +679,9 @@ class RealmController extends Controller {
      */
 	public function joinAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyHierarchyTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// TODO: more transparency - who is near and why can't I join some realms?
 
@@ -728,6 +768,9 @@ class RealmController extends Controller {
      */
 	public function subrealmAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacySubrealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new SubrealmType($realm));
 		$form->handleRequest($request);
@@ -790,6 +833,9 @@ class RealmController extends Controller {
 	  */
 	public function capitalAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchySelectCapitalTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new RealmCapitalType($realm));
 		$form->handleRequest($request);
@@ -839,6 +885,9 @@ class RealmController extends Controller {
 	public function restoreAction(Realm $id) {
 		$realm = $id;
 		$character = $this->gateway($realm, 'diplomacyRestoreTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		
@@ -868,6 +917,9 @@ class RealmController extends Controller {
 	  */
 	public function breakAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyBreakHierarchyTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST')) {
 			$parent = $realm->getSuperior();
@@ -932,6 +984,9 @@ class RealmController extends Controller {
 	  */
 	public function editrelationAction(Realm $realm, Request $request, RealmRelation $relation=null, Realm $target=null) {
 		$character = $this->gateway($realm, 'diplomacyRelationsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($relation==null) {
 			// make sure we don't duplicate a relation, e.g. when the player opens two tabs
@@ -984,6 +1039,9 @@ class RealmController extends Controller {
 	  */
 	public function deleterelationAction(Realm $realm, Request $request, RealmRelation $relation=null, Realm $target=null) {
 		$character = $this->gateway($realm, 'diplomacyRelationsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($relation!=null && $relation->getSourceRealm() == $realm) {
 			$em = $this->getDoctrine()->getManager();
@@ -1002,6 +1060,9 @@ class RealmController extends Controller {
 	  */
 	public function viewrelationsAction(Realm $realm, Realm $target) {
 		$character = $this->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT r FROM BM2SiteBundle:RealmRelation r WHERE r.source_realm = :me AND r.target_realm = :they');
@@ -1047,6 +1108,9 @@ class RealmController extends Controller {
 	  */
 	public function electionsAction(Realm $realm) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		/* 
 		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
@@ -1074,6 +1138,9 @@ class RealmController extends Controller {
 	  */
 	public function electionAction(Realm $realm, Request $request, Election $election=null) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if ($election == null) {
@@ -1140,6 +1207,9 @@ class RealmController extends Controller {
 	public function voteAction(Election $id, Request $request) {
 		if ($id->getRealm()) {
 			$character = $this->gateway($id->getRealm(), 'hierarchyElectionsTest');
+		}
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
 		# Because people were sneaking random outsiders into elections.
 		# This method will also allow us to setup alternative security checks later for this page, if it gets expanded.
