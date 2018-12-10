@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
@@ -33,15 +34,20 @@ class PlaceController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		$character = $this->get('appstate')->getCharacter(false, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		
-		if ($character != $place->getOwner()) {
+		if ($character instanceof Character && $character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
 		}
 		
 		# Check if we should be able to view any details on this place. A lot of places won't return much! :)
-		$details = $this->get('interactions')->characterViewDetails($character, $place);
+		if ($character instanceof Character) {
+			$details = $this->get('interactions')->characterViewDetails($character, $place);
+		}
 
 		/* Leaving this here for later implementation...
 		if ($details['spy'] || $place->getOwner() == $character) {
@@ -52,7 +58,7 @@ class PlaceController extends Controller {
 		When we add this, get rid of $militia below this. */
 		$militia = null;
 		
-		if ($character->getInsidePlace() == $place) {
+		if ($character instanceof Character && $character->getInsidePlace() == $place) {
 			$inside = true;
 		} else {
 			$inside = false;
@@ -73,6 +79,9 @@ class PlaceController extends Controller {
 	  */
 	public function permissionsAction(Place $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway($place, 'placePermissionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		/* Not sure if we'll need this just yet.
 		$place = $em->getRepository('BM2SiteBundle:Place')->find($id);
@@ -120,6 +129,9 @@ class PlaceController extends Controller {
 	  */
 	public function newAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		
 		# Build the list of requirements we have.
 		$rights[] = NULL;
@@ -228,7 +240,10 @@ class PlaceController extends Controller {
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		
 		$olddescription = $place->getDescription()->getText();
 		if ($place->getOwner() == $character) {
