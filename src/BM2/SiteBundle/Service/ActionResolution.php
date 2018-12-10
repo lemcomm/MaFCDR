@@ -825,16 +825,17 @@ class ActionResolution {
 
 		// setup actions and lock travel
 		switch ($type) {
-			case 'field':
-			case 'urban':
-				$acttype = 'military.battle';
-				break;
 			case 'siegeassault':
 				$acttype = 'settlement.assault';
 				break;
 			case 'siegesortie':
 			case 'sortie':
 				$acttype = 'settlement.sortie';
+				break;
+			case 'field':
+			case 'urban':
+			default:
+				$acttype = 'military.battle';
 				break;
 		}
 
