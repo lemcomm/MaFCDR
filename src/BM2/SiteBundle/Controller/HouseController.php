@@ -42,7 +42,7 @@ class HouseController extends Controller {
 		$details = false;
 		$head = false;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
-		if ($character) {
+		if ($character instanceof Character) {
 			if ($character->getHouse() == $house) {
 				$details = true;
 				if ($character->getHeadOfHouse() && $character->getHeadOfHouse() == $house) {
@@ -64,14 +64,15 @@ class HouseController extends Controller {
 	  */
 	
 	public function nearbyAction() {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$houses = [];
-		if ($character) {
-			if ($character->getInsideSettlement()) {
-				$houses = $character->getInsideSettlement()->getHousesPresent();
-			} else {
-				#TODO: Add code for houses as places here.
-			}
+		if ($character->getInsideSettlement()) {
+			$houses = $character->getInsideSettlement()->getHousesPresent();
+		} else {
+			#TODO: Add code for houses as places here.
 		}
 		$already = false;
 		if ($character->getHouse()) {
@@ -101,7 +102,10 @@ class HouseController extends Controller {
 	  */	
 	
 	public function createAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 		} else {
@@ -139,7 +143,10 @@ class HouseController extends Controller {
 	  */
 		
 	public function manageAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		
 		$name = $house->getName();
@@ -194,12 +201,12 @@ class HouseController extends Controller {
 	  * @Template
 	  */
 	
-		/* TODO: Review all of this file below this line. The above should be good.
-		We'll want to be sure to work joinAction and approveAction into the GameRequest system.*/
-	
 	public function joinAction(House $house, Request $request) {
 		$hashouse = FALSE;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		
 		# TODO: Rework this later to allow for Houses at Places.
 		# TODO: Rework this to use dispatcher.
@@ -238,7 +245,10 @@ class HouseController extends Controller {
 	  */
 	
 	public function applicantsAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
@@ -266,7 +276,10 @@ class HouseController extends Controller {
 	  */
 	
 	public function disownAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
@@ -318,7 +331,10 @@ class HouseController extends Controller {
 	  */
 	
 	public function successorAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getHouse()) {
@@ -354,7 +370,10 @@ class HouseController extends Controller {
 	  */	
 	
 	public function relocateAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$settlement = null;
 		$house = null;
 		#Character must be inside a settlement in order to relocate the house
