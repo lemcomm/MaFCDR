@@ -26,6 +26,7 @@
 		<one-to-one field="leader" target-entity="Character" inversed-by="leading_battlegroup"/>
 		<many-to-one field="siege" target-entity="Siege" inversed-by="groups"/>
 		<many-to-one field="reinforcing" target-entity="BattleGroup" inversed-by="reinforced_by"/>
+		<one-to-many field="reinforced_by" target-entity="BattleGroup" mapped-by="reinforcing"/>
 		<field name="engaged" type="boolean" nullable="true"/>
 	</entity>
 </doctrine-mapping>
