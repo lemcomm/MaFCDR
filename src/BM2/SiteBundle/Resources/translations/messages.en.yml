@@ -365,7 +365,7 @@ account:
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
    notarget:  No user with this e-mail address found.
-   inusfficient: Your account doesn't have enough credits to send a gift of this size.
+   insufficient: You don't have enough credits to send this gift.
   mail:
    subject:   Might & Fealty Gift
    body: >
@@ -788,6 +788,7 @@ culture:
 status:       Status
 locked:       Locked
 dead:         Dead
+battling:     Battling
 inactive:     Inactive
 prisoner:     Prisoner|Prisoners
 wounded:      Wounded
@@ -934,6 +935,7 @@ error:
   nohouse:      There are no houses here which to join.
   toofar:       You are too far away from what you are interacting with.
  noaccess:
+  battling:     This character is too busy battling for their life for you to interact with them. (A battle involving this character is actively being processed, please try again later.)
   character:    This character does not belong to you
   vassal:       This character is not a vassal of yours.
   busy:         This bandit has already been chosen by someone else.
