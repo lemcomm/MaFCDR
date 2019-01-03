@@ -190,6 +190,7 @@ class AccountController extends Controller {
 				'name' => $character->getName(),
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
+				'battling' => $character->getBattling(),
 				'retired' => $character->getRetired(),
 				'unretirable' => $unretirable,
 				'npc' => $character->isNPC(),
@@ -588,6 +589,9 @@ class AccountController extends Controller {
 		$character = $em->getRepository('BM2SiteBundle:Character')->find($id);
 		if (!$character) {
 			throw $this->createAccessDeniedException('error.notfound.character');
+		}
+		if ($character->getBattling()) {
+			throw $this->createAccessDeniedException('error.noaccess.battling');
 		}
 		if ($character->getUser() != $user) {
 			throw $this->createAccessDeniedException('error.noaccess.character');
