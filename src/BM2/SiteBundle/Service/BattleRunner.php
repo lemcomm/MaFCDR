@@ -129,6 +129,16 @@ class BattleRunner {
 			$this->report->addDefenseBuilding($building);
 		}
 
+		$this->log(1, "populating characters and locking...\n");
+		$characters = array();
+		foreach ($battle->getGroups() as $group) {
+			foreach ($group->getCharacters() as $char) {
+				$characters[] = $char->getId();
+				$char->setBattling(true);
+			}
+		}
+		$this->em->flush();
+
 		$this->log(25, "checking mercenaries...\n");
 		$characters = array();
 		foreach ($battle->getGroups() as $group) {
@@ -454,7 +464,6 @@ class BattleRunner {
 				History::HIGH
 			);
 		}
-		unset($allnobles);
 
 		if ($this->battle->getSettlement()) {
 			$this->history->logEvent(
@@ -468,6 +477,13 @@ class BattleRunner {
 		$this->report->setCompleted(true);
 		// FIXME: why does it work with this enabled, and fails without (soldiers not updated) ???
 		$this->em->flush();
+		$this->log(1, "unlocking characters...\n");
+		foreach ($allnobles as $noble) {
+			$noble->setBattling(false);
+		}
+		$this->em->flush();
+		$this->log(1, "unlocked...\n");
+		unset($allnobles);
 	}
 
 	private function resolveRangedPhase($no_rewards) {	
