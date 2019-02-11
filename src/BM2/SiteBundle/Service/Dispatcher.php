@@ -324,7 +324,7 @@ class Dispatcher {
 		$actions[] = $this->militaryDamageFeatureTest(true);
 		$actions[] = $this->militaryLootSettlementTest(true);
 		if ($estate = $this->getActionableSettlement()) {
-			$actions[] = $this->militaryAttackSettlementTest(true);
+			$actions[] = $this->militarySiegeSettlementTest(true);
 			$actions[] = $this->militaryDefendSettlementTest(true);
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
@@ -588,6 +588,7 @@ class Dispatcher {
 	}
 
 	public function locationEnterTest($check_duplicate=false) {
+		#TODO: Have this check to see if we actually have permission to enter. As it stands, that check is done separetly, which seems dumb.
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.$check");
 		}
@@ -596,6 +597,9 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inside");
+		}
+		if ($this->getCharacter()->getInsideSettlement() && $this->getCharacter()->getInsideSettlement()->getSiege()) {
+			return array("name"=>"location.enter.name", "description"=>"unavailable.besieged");
 		}
 		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
@@ -625,6 +629,9 @@ class Dispatcher {
 		}
 		if (!$this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.outside");
+		}
+		if ($this->getCharacter()->getInsideSettlement()->getSiege()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.besieged");
 		}
 		if (!$estate = $this->getActionableSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.nosettlement");
@@ -1085,14 +1092,6 @@ class Dispatcher {
 			# Can't attack nothing.
 			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->getSiege()) {
-			# No siege, no attack.
-			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.already");
-		}
-		if (!$this->getCharacter()->isDoingAction('military.siege')) {
-			# Must be part of a siege.
-			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosiege");
-		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.regrouping");
@@ -1120,6 +1119,7 @@ class Dispatcher {
 		return $this->action("military.settlement.siege", "bm2_site_war_siegesettlement");
 	}
 
+	/* This function has been removed and is maintained as a legacy artifact as this functionality is now handled by sieges. 
 	public function militaryAttackSettlementTest($check_duplicate=false) {
 		$estate = $this->getActionableSettlement();
 		if ($this->getCharacter()->isPrisoner()) {
@@ -1158,10 +1158,10 @@ class Dispatcher {
 		if ($estate->getOwner() == $this->getCharacter()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.yours");
 		}
-		/* Since these are parts of sieges now, and I don't want to reveal as much info on defenders anymore, whether there are defenders or not is irrelevant.
-		if (!$estate->isDefended()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
-		}*/
+		# Since these are parts of sieges now, and I don't want to reveal as much info on defenders anymore, whether there are defenders or not is irrelevant.
+		# if (!$estate->isDefended()) {
+		# 	return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
+		# }
 		if ($this->getCharacter()->isInBattle()) {
 			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.inbattle");			
 		}
@@ -1170,7 +1170,7 @@ class Dispatcher {
 		}
 		return $this->action("military.settlement.attack", "bm2_site_war_attacksettlement");
 	}
-	
+	*/
 		public function militaryDefendPlaceTest($check_duplicate=false) {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"military.place.defend.name", "description"=>"unavailable.prisoner");
