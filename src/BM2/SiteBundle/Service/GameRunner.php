@@ -917,7 +917,24 @@ class GameRunner {
 				}
 			}
 		}
-
+		$this->logger->notice("Checking for inactive realms with conversations...");
+		$query = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
+		$count = $query->getSingleScalarResult();
+		if ($count > 0) {
+			$this->logger->notice($count." conversations found...");
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
+			$result = $query->getResult();
+			if ($result) {
+				foreach ($query->getResult() as $realm) {
+					foreach ($realm->getConversations() as $conv) {
+						$this->em->remove($conv);
+					}
+				}
+			}
+			$this->logger->notice("Conversations removed...");
+		} else {
+			$this->logger->notice("None found...");
+		}
 		$this->appstate->setGlobal('cycle.realm', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -1261,7 +1278,7 @@ class GameRunner {
 			$election->setMethod('banner');
 		}
 		$complete = new \DateTime("now");
-		$complete->add(new \DateInterval("P3D"));
+		$complete->add(new \DateInterval("P7D"));
 		$election->setComplete($complete);
 		$election->setName("Election number ".$counter." for ".$position->getName());
 		switch ($electiontype) {
