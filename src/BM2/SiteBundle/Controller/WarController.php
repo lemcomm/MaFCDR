@@ -4,17 +4,20 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\BattleGroup;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Siege;
 use BM2\SiteBundle\Entity\War;
 use BM2\SiteBundle\Entity\WarTarget;
 use BM2\SiteBundle\Entity\Realm;
 
-use BM2\SiteBundle\Form\WarType;
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\BattleParticipateType;
 use BM2\SiteBundle\Form\DamageFeatureType;
+use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\LootType;
-use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
+use BM2\SiteBundle\Form\SiegeType;
+use BM2\SiteBundle\Form\WarType;
 
 use BM2\SiteBundle\Service\History;
 
@@ -159,10 +162,10 @@ class WarController extends Controller {
 		if ($settlement->getSiege()) {
 			$already = TRUE;
 			$siege = $settlement->getSiege();
-			$form = $this->createForm(new SiegeManageType($character, $settlement, $siege));
+			$form = $this->createForm(new SiegeType($character, $settlement, $siege));
 		} else {
 			$already = FALSE;
-			$form = $this->createForm(new SiegeNewType($character, $settlement));
+			$form = $this->createForm(new AreYouSureType());
 		}
 		
 		$form->handleRequest($request);
@@ -254,7 +257,7 @@ class WarController extends Controller {
 						if ($siege->getLeader() == $character && data['action'] == 'assault') {
 							$this->get('action_resolution')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
 						} else {
-							
+							throw $this->createNotFoundException('error.notfound.leader');
 						}
 						break;
 					case 'disband':
@@ -281,7 +284,9 @@ class WarController extends Controller {
 		}
 
 		return array(
+			'character'=>$character,
 			'settlement'=>$settlement,
+			'siege'=>$siege,
 			'leader'=>$leader,
 			'form'=>$form->createView()
 		);
