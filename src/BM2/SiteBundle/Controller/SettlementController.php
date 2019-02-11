@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
