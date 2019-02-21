@@ -21,19 +21,20 @@ class CharacterManager {
 
 	protected $em;
 	protected $appstate;
-	protected $military;
+	protected $milman;
 	protected $history;
 	protected $politics;
 	protected $realmmanager;
 	protected $messagemanager;
 	protected $dm;
+	protected $warman;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, Military $military, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm, WarManager $warman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->politics = $politics;
 		$this->realmmanager = $realmmanager;
 		$this->messagemanager = $messagemanager;
@@ -190,7 +191,7 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
 		// remove all votes
@@ -200,10 +201,10 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+			$this->milman->disband($soldier, $character);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// remove all claims
@@ -478,10 +479,10 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+			$this->milman->disband($soldier, $character);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// FIXME: Since they're not dead, do they lose their claims still? Hm.
@@ -697,7 +698,7 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->war_manager->removeCharacterFromBattlegroup($character, $bg);
 		}
 		$captor = $character->getPrisonerOf();
 		$character->setLocation($captor->getLocation());
