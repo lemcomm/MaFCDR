@@ -465,7 +465,7 @@ class ActionsController extends Controller {
 			$complete = new \DateTime("now");
 			$complete->add(new \DateInterval("PT".$time_to_take."S"));
 			$act->setComplete($complete);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			$this->get('history')->logEvent(
 				$settlement,
@@ -586,7 +586,7 @@ class ActionsController extends Controller {
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT".$time_to_grant."M"));
 					$act->setComplete($complete);
-					$result = $this->get('action_resolution')->queue($act);
+					$result = $this->get('action_manager')->queue($act);
 					return array('settlement'=>$settlement, 'result'=>$result, 'newowner'=>$data['target']);
 				}
 			}
@@ -630,7 +630,7 @@ class ActionsController extends Controller {
 				$complete = new \DateTime("now");
 				$complete->add(new \DateInterval("PT6H"));
 				$act->setComplete($complete);
-				$result = $this->get('action_resolution')->queue($act);
+				$result = $this->get('action_manager')->queue($act);
 
 				return array('settlement'=>$settlement, 'result'=>$result, 'newname'=>$newname);
 			}
@@ -894,7 +894,7 @@ class ActionsController extends Controller {
 		$query->setParameter('here', $settlement);
 		$allocated = $query->getSingleResult();
 
-		$available = $this->get('military')->findAvailableEquipment($settlement, true);
+		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 		$form = $this->createForm(new SoldiersRecruitType($available));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -957,7 +957,7 @@ class ActionsController extends Controller {
 		return array(
 			'settlement'=>$settlement,
 			'allocated'=>$allocated,
-			'training'=>$this->get('military')->findAvailableEquipment($settlement, true),
+			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
 			'soldierscount' => $settlement->getSoldiers()->count(),
 
 			'form'=>$form->createView()
@@ -1137,7 +1137,7 @@ class ActionsController extends Controller {
 				}
 				if (rand(0,99)<$desert) {
 					// deserts - vanish
-					$this->get('military')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
+					$this->get('military_manager')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
 					$deserting++;
 				} else if (rand(0,99) < ($days*2)) {
 					// stays with new lord
@@ -1149,21 +1149,21 @@ class ActionsController extends Controller {
 				} else {
 					// returns to liege
 					$settlement = $soldier->getBase();
-					$group = $this->get('military')->assign($soldier, $character);
+					$group = $this->get('military_manager')->assign($soldier, $character);
 					$soldier->setLiege(null)->setAssignedSince(null);
 					// in training - interrupt that and reset equipment
 					if ($soldier->getTrainingRequired() > 0) {
 						if ($soldier->getOldWeapon() || $soldier->getOldArmour() || $soldier->getOldEquipment()) {
 							if ($soldier->getOldWeapon() != $soldier->getWeapon()) {
-								$this->get('military')->returnItem($settlement, $soldier->getWeapon());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getWeapon());
 								$soldier->setWeapon($soldier->getOldWeapon());
 							}
 							if ($soldier->getOldArmour() != $soldier->getArmour()) {
-								$this->get('military')->returnItem($settlement, $soldier->getArmour());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getArmour());
 								$soldier->setArmour($soldier->getOldArmour());
 							}
 							if ($soldier->getOldEquipment() != $soldier->getEquipment()) {
-								$this->get('military')->returnItem($settlement, $soldier->getEquipment());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getEquipment());
 								$soldier->setEquipment($soldier->getOldEquipment());
 							}
 						}
@@ -1181,7 +1181,7 @@ class ActionsController extends Controller {
 				$takes = 16;
 				$complete->add(new \DateInterval("PT".$takes."H"));
 				$act->setComplete($complete);
-				$this->get('action_resolution')->queue($act);
+				$this->get('action_manager')->queue($act);
 			}
 
 			foreach ($reclaimed as $rec) {
