@@ -711,7 +711,7 @@ class PoliticsController extends Controller {
 							$complete->add(new \DateInterval("PT2H"));
 							$act->setComplete($complete);
 							$act->setBlockTravel(false);
-							$this->get('action_resolution')->queue($act);
+							$this->get('action_manager')->queue($act);
 
 							$this->get('history')->logEvent(
 								$prisoner,
