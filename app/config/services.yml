@@ -43,12 +43,15 @@ services:
     interactions:
         class:      BM2\SiteBundle\Service\Interactions
         arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@logger']
-    military:
-        class:      BM2\SiteBundle\Service\Military
+    military_manager:
+        class:      BM2\SiteBundle\Service\MilitaryManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate']
+    war_manager:
+        class:      BM2\SiteBundle\Service\WarManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager']
     generator:
         class:      BM2\SiteBundle\Service\Generator
-        arguments:  ['@doctrine.orm.entity_manager', '@military']
+        arguments:  ['@doctrine.orm.entity_manager', '@military_manager']
     twig.extension.appstate:
         class:      BM2\SiteBundle\Twig\AppStateExtension
         arguments:  ['@appstate']
@@ -56,7 +59,7 @@ services:
             - { name: twig.extension }
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography', '@military', '@interactions']
+        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions']
     twig.extension.dispatcher:
         class:      BM2\SiteBundle\Twig\DispatcherExtension
         arguments:  ['@dispatcher']
@@ -67,7 +70,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
     character_manager:
         class:      BM2\SiteBundle\Service\CharacterManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military', '@politics', '@realm_manager', '@message_manager', '@dungeon_master']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@message_manager', '@dungeon_master', '@war_manager']
     npc_manager:
         class:      BM2\SiteBundle\Service\NpcManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
@@ -85,23 +88,23 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@military', '@permission_manager', '@twig.extension.gametime']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@action_manager', '@war_manager']
+    action_manager:
+        class:      BM2\SiteBundle\Service\ActionManager
+        arguments:  ['@doctrine.orm.entity_manager']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@military', '@geography', '@character_manager', '@npc_manager', '@action_resolution', '@interactions', '@war_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     game_runner:
         class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@message_manager', '@permission_manager', '@npc_manager', '@character_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@message_manager', '@permission_manager', '@npc_manager', '@character_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     game_request_manager:
         class:      BM2\SiteBundle\Service\GameRequestManager
         arguments:  ['@doctrine.orm.entity_manager']
-    war_manager:
-        class:      BM2\SiteBundle\Service\WarManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@action_resolution']
 
     bm2.registration.form.type:
         class:      BM2\SiteBundle\Form\RegistrationFormType
