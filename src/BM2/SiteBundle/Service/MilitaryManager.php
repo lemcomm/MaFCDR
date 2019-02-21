@@ -15,8 +15,11 @@ use BM2\SiteBundle\Entity\UnitSettings;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
+/*
+Military exists for management of soldiers, units, and entourage, and for their settings, training, and recruitment. For things more combat related (sieges, battles, battle groups etc.) use WarManager.php.
+*/
 
-class Military {
+class MilitaryManager {
 
 	private $em;
 	private $history;
@@ -35,76 +38,6 @@ class Military {
 		$this->pm = $pm;
 		$this->appstate = $appstate;
 	}
-
-
-	public function joinBattle(Character $character, BattleGroup $group) {
-		$battle = $group->getBattle();
-		$soldiers = count($character->getActiveSoldiers());
-
-		// make sure we are only on one side, and send messages to others involved in this battle
-		foreach ($battle->getGroups() as $mygroup) {
-			$mygroup->removeCharacter($character);
-
-			foreach ($mygroup->getCharacters() as $char) {
-				$this->history->logEvent(
-					$char,
-					'event.military.battlejoin',
-					array('%soldiers%'=>$soldiers, '%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 12
-				);
-			}
-		}
-		$group->addCharacter($character);
-
-		$action = new Action;
-		$action->setBlockTravel(true);
-		$action->setType('military.battle')->setCharacter($character)->setTargetBattlegroup($group)->setCanCancel(false)->setHidden(false);
-//		FIXME: this would be better, but impossible due to circular injections:
-//		$result = $this->get('action_resolution')->queue($action);
-		$action->setStarted(new \DateTime("now"));
-		$max=0;
-		foreach ($character->getActions() as $act) {
-			if ($act->getPriority()>$max) {
-				$max=$act->getPriority();
-			}
-		}
-		$action->setPriority($max+1);
-		$this->em->persist($action);
-
-		$character->setTravelLocked(true);
-
-		$this->recalculateBattleTimer($battle);
-	}
-
-	public function recalculateBattleTimer(Battle $battle) {
-		$time = $this->calculatePreparationTime($battle);
-		$complete = clone $battle->getStarted();
-		$complete->add(new \DateInterval("PT".$time."S"));
-		// it can't be less than the initial timer, but otherwise, update the time calculation
-		if ($complete > $battle->getInitialComplete()) {
-			$battle->setComplete($complete);
-		}
-	}
-
-	public function calculatePreparationTime(Battle $battle) {
-		// prep time is based on the total number of soldiers, but only 20:1 (attackers) or 10:1 (defenders) actually get ready, i.e.
-		// if your 1000 men army attacks 10 men, it calculates battle time as if only 200 of your men get ready for battle.
-		// if your 1000 men are attacked by 10 men, it calculates battle time as if only 100 of them get ready for battle.
-		// this is to prevent blockade battles from being too effective for tiny sacrifical units
-		$smaller = max(1,min($battle->getActiveAttackersCount(), $battle->getActiveDefendersCount()));
-		$soldiers = min($battle->getActiveAttackersCount(), $smaller*20) + min($battle->getActiveDefendersCount(), $smaller*10);
-		// base time is 6 hours, less if the attacker is much smaller than the defender - FIXME: this and the one above overlap, maybe they could be unified?
-		$base_time = 6.0 * min(1.0, ($battle->getActiveAttackersCount()*2.0) / (1+$battle->getActiveDefendersCount()));
-		$time = $base_time + pow($soldiers, 1/1.666)/12;
-		if ($soldiers < 20 && $battle->getActiveAttackersCount()*5 < $battle->getActiveDefendersCount()) {
-			// another fix downwards for really tiny sacrifical battles
-			$time *= $soldiers/20;
-		}
-		$time = round($time * 3600); // convert to seconds
-		return $time;
-	}
-
-
 
 	public function TrainingCycle(Settlement $settlement) {
 		if ($settlement->getRecruits()->isEmpty()) return;
@@ -659,39 +592,6 @@ class Military {
 		$to->getEntourage()->add($npc);
 		$npc->setLocked(true); // why? to prevent chain-assignements as a means of instant troop transportation
 		return true;
-	}
-
-
-
-	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg) {
-		$bg->removeCharacter($character);
-		if ($bg->getCharacters()->count()==0) {
-			// there are no more participants in this battlegroup
-			$battle = $bg->getBattle();
-			foreach ($bg->getRelatedActions() as $act) {
-				$this->em->remove($act);
-			}
-			$this->em->remove($bg);
-
-			if ($battle->getGroups()->count()<=2 && $battle->getSettlement()==null) {
-				// battle is terminated
-				foreach ($battle->getGroups() as $group) {
-					foreach ($group->getRelatedActions() as $act) {
-						$this->em->remove($act);
-					}
-					foreach ($group->getCharacters() as $char) {
-						$this->history->logEvent(
-							$char,
-							'battle.failed',
-							array(),
-							History::HIGH, false, 25
-						);						
-					}
-					$this->em->remove($group);
-				}
-				$this->em->remove($battle);
-			}
-		}
 	}
 
 	public function newUnitSettings($unit, Character $character) {
