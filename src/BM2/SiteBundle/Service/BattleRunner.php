@@ -39,7 +39,6 @@ class BattleRunner {
 		$this->geo = $geo;
 		$this->character_manager = $character_manager;
 		$this->npc_manager = $npc_manager;
-		$this->resolver = $resolver;
 		$this->interactions = $interactions;
 		$this->war_manager = $war_manager;
 	}
