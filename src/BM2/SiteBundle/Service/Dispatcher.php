@@ -25,7 +25,7 @@ class Dispatcher {
 	private $appstate;
 	private $permission_manager;
 	private $geography;
-	private $military;
+	private $milman;
 	private $interactions;
 
 	// test results to store because they are expensive to calculate
@@ -36,11 +36,11 @@ class Dispatcher {
 	private $actionableShip=false;
 	private $actionableHouses=false;
 
-	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, Military $military, Interactions $interactions) {
+	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions) {
 		$this->appstate = $appstate;
 		$this->permission_manager = $pm;
 		$this->geography = $geo;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->interactions = $interactions;
 	}
 
@@ -1413,7 +1413,7 @@ class Dispatcher {
 		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
 		}
-		$available = $this->military->findAvailableEquipment($estate, true);
+		$available = $this->milman->findAvailableEquipment($estate, true);
 		if (empty($available)) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");			
 		}
