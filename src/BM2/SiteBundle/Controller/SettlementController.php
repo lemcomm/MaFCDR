@@ -168,8 +168,8 @@ class SettlementController extends Controller {
 			$others = $this->get('dispatcher')->getActionableCharacters(true);
 		}
 
-		$resupply = $this->get('military')->findAvailableEquipment($settlement, false);
-		$training = $this->get('military')->findAvailableEquipment($settlement, true);
+		$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+		$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 
 		// this duplicates functionality from the Soldier Entity (e.g. determine who is militia and who recruit),
 		// but I think we need it for memory reasons, since loading all and then slicing is a ton less efficient
@@ -191,7 +191,7 @@ class SettlementController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			$this->get('military')->manage($militia_slice, $data, $settlement, $character);
+			$this->get('military_manager')->manage($militia_slice, $data, $settlement, $character);
 			$em->flush();
 			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
 			return $this->redirect($request->getUri());
@@ -229,9 +229,9 @@ class SettlementController extends Controller {
 			}
 
 			// return his equipment to the stockpile:
-			$this->get('military')->returnItem($settlement, $recruit->getWeapon());
-			$this->get('military')->returnItem($settlement, $recruit->getArmour());
-			$this->get('military')->returnItem($settlement, $recruit->getEquipment());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
 
 			if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
 				// old soldier - return to militia with his old stuff
