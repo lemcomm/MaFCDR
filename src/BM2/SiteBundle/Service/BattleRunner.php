@@ -23,6 +23,7 @@ class BattleRunner {
 	private $character_manager;
 	private $npc_manager;
 	private $interactions;
+	private $warman;
 
 	private $battle;
 	private $debug=0;
