@@ -328,7 +328,7 @@ class CharacterController extends Controller {
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT15M"));
 					$act->setComplete($complete);
-					$this->get('action_resolution')->queue($act);
+					$this->get('action_manager')->queue($act);
 
 					// pseudo-action to prevent that he moves away in this time
 					$act->setType('settlement.receive')->setCharacter($character);
@@ -337,7 +337,7 @@ class CharacterController extends Controller {
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT15M"));
 					$act->setComplete($complete);
-					$this->get('action_resolution')->queue($act);
+					$this->get('action_manager')->queue($act);
 
 					$this->get('history')->logEvent(
 						$character,
@@ -347,7 +347,7 @@ class CharacterController extends Controller {
 					);
 				} else {
 					foreach ($data['offer']->getSoldiers() as $soldier) {
-						$this->get('military')->assign($soldier, $character);
+						$this->get('military_manager')->assign($soldier, $character);
 					}
 					$this->get('history')->logEvent(
 						$character,
@@ -1044,7 +1044,7 @@ class CharacterController extends Controller {
 			$complete->add(new \DateInterval("PT".$hours."H"));
 			$act->setComplete($complete);
 			$act->setBlockTravel(false);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			return array('queued'=>true, 'hours'=>$hours);
 		}
@@ -1141,7 +1141,7 @@ class CharacterController extends Controller {
 			$data = $form->getData();
 
 			$settlement = $this->get('dispatcher')->getActionableSettlement();
-			$this->get('military')->manage($character->getEntourage(), $data, $settlement, $character);
+			$this->get('military_manager')->manage($character->getEntourage(), $data, $settlement, $character);
 
 			$em->flush();
 			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our entourage count
@@ -1192,9 +1192,9 @@ class CharacterController extends Controller {
 		}
 
 		if ($by=="type") {
-			$this->get('military')->groupByType($character->getSoldiers());
+			$this->get('military_manager')->groupByType($character->getSoldiers());
 		} else {
-			$this->get('military')->groupByEquipment($character->getSoldiers());
+			$this->get('military_manager')->groupByEquipment($character->getSoldiers());
 		}
 		$this->getDoctrine()->getManager()->flush();
 
@@ -1226,10 +1226,10 @@ class CharacterController extends Controller {
 		$training=array();
 		if ($settlement) {
 			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
-				$resupply = $this->get('military')->findAvailableEquipment($settlement, false);
+				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
 			}
 			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
-				$training = $this->get('military')->findAvailableEquipment($settlement, true);
+				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 			}
 		} else {
 			foreach ($character->getEntourage() as $entourage) {
@@ -1248,7 +1248,7 @@ class CharacterController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			list($success, $fail) = $this->get('military')->manage($character->getSoldiers(), $data, $settlement, $character);
+			list($success, $fail) = $this->get('military_manager')->manage($character->getSoldiers(), $data, $settlement, $character);
 			// TODO: notice with result
 
 			$em = $this->getDoctrine()->getManager();
@@ -1282,7 +1282,7 @@ class CharacterController extends Controller {
 		# Check if unit settings info exists. If not, create.
 		if (!$character->getUnitSettings()) {
 			# TODO: newUnitSettings expects either a Unit, which doesn't exist yet (hence the TODO) or a character.
-			$settings = $this->get('military')->newUnitSettings(null, $character);
+			$settings = $this->get('military_manager')->newUnitSettings(null, $character);
 		} else {
 			$settings = $character->getUnitSettings();
 		}
