@@ -13,11 +13,11 @@ use Doctrine\ORM\EntityManager;
 class Generator {
 
 	protected $em;
-	protected $military;
+	protected $milman;
 
-	public function __construct(EntityManager $em, Military $military) {
+	public function __construct(EntityManager $em, MilitaryManager $milman) {
 		$this->em = $em;
-		$this->military = $military;
+		$this->milman = $milman;
 	}
 
 	public function randomName(Settlement $home=null, $gender=false) {
@@ -62,15 +62,15 @@ class Generator {
 	
 		$soldier->setExperience(0)->setTraining(0);
 		if ($home) {
-			if ($this->military->acquireItem($home, $weapon, true, false)
-				&& $this->military->acquireItem($home, $armour, true, false)
-				&& $this->military->acquireItem($home, $equipment, true, false)) {
+			if ($this->milman->acquireItem($home, $weapon, true, false)
+				&& $this->milman->acquireItem($home, $armour, true, false)
+				&& $this->milman->acquireItem($home, $equipment, true, false)) {
 
-				$this->military->acquireItem($home, $weapon, true);
+				$this->milman->acquireItem($home, $weapon, true);
 				$soldier->setWeapon($weapon);
-				$this->military->acquireItem($home, $armour, true);
+				$this->milman->acquireItem($home, $armour, true);
 				$soldier->setArmour($armour);
-				$this->military->acquireItem($home, $equipment, true);
+				$this->milman->acquireItem($home, $equipment, true);
 				$soldier->setEquipment($equipment);
 			} else {
 				return null;
