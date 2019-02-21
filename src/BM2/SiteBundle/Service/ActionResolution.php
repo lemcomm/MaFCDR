@@ -25,17 +25,18 @@ class ActionResolution {
 	private $geography;
 	private $interactions;
 	private $politics;
-	private $military;
 	private $characters;
 	private $permissions;
 	private $gametime;
+	private $warman;
+	private $actman;
 
 	private $max_progress = 5; // maximum number of actions to resolve in each background progression call
 	private $debug=100;
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
+	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->charman = $charman;
@@ -45,9 +46,10 @@ class ActionResolution {
 		$this->geography = $geography;
 		$this->interactions = $interactions;
 		$this->politics = $politics;
-		$this->military = $military;
 		$this->permissions = $permissions;
 		$this->gametime = $gametime;
+		$this->warman = $warman;
+		$this->actman = $actman;
 		$this->characters = new ArrayCollection();
 
 		$this->speedmod = (float)$this->appstate->getGlobal('travel.speedmod', 1.0);
@@ -60,42 +62,6 @@ class ActionResolution {
 		foreach ($query->getResult() as $action) {
 			$this->resolve($action);
 		}
-	}
-
-	public function queue(Action $action, $neverimmediate=false) {
-		$action->setStarted(new \DateTime("now"));
-
-		if ($neverimmediate || $action->getComplete() != null) {
-			$immediate=false;
-		} else {
-			$set = $this->appstate->getGlobal('immediateActions');
-			if ($set && in_array($set, array(true, 'true', 't', '1'))) { $immediate=true; } else { $immediate=false; }			
-		}
-		if ($immediate) {
-			// do if immediate actions are enabled
-			// FIXME: some actions cannot be resolved like this - like the battle and settlement attack ones!
-			$success = $this->resolve($action);
-		} else {
-			// store in database and queue
-			$success = true;
-			$max=0;
-			foreach ($action->getCharacter()->getActions() as $act) {
-				if ($act->getPriority()>$max) {
-					$max=$act->getPriority();
-				}
-			}
-			$action->setPriority($max+1);
-
-			// some defaults, otherwise I'd have to set it explicitly everywhere
-			if (null===$action->getHidden()) { $action->setHidden(false); }
-			if (null===$action->getHourly()) { $action->setHourly(false); }
-			if (null===$action->getCanCancel()) { $action->setCanCancel(true); }
-			$this->em->persist($action);
-		}
-
-		$this->em->flush();
-
-		return array('success'=>$success, 'immediate'=>$immediate);
 	}
 
 	public function resolve(Action $action) {
@@ -425,7 +391,7 @@ class ActionResolution {
 			if ($distance < $actiondistance && $character->getInsideSettlement() == $action->getTargetCharacter()->getInsideSettlement()) {
 				// join all battles on his side
 				foreach ($action->getTargetCharacter()->getBattlegroups() as $group) {
-					$this->military->joinBattle($character, $group);
+					$this->warman->joinBattle($character, $group);
 					$this->history->logEvent(
 						$character,
 						'resolution.aid.success',
@@ -506,9 +472,9 @@ class ActionResolution {
 				$complete = new \DateTime('now');
 				$complete->add(new \DateInterval('PT60M'));
 				$act->setComplete($complete);
-				$this->queue($act, true);
+				$this->actman->queue($act, true);
 			}
-			$this->military->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
+			$this->warman->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
 			$this->history->logEvent(
 				$char,
 				'resolution.disengage.success',
@@ -669,262 +635,6 @@ class ActionResolution {
 			echo $text."\n";
 			flush();			
 		}
-	}
-
-
-
-	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
-		/* for future reference, $outside is used to determine whether or not attackers need to leave the settlement in order to attack someone. 
-		It's used by attackOthersAction of WarCon. --Andrew */
-		$bothinside = false;
-		$type = 'field';
-
-		$battle = new Battle;
-		if ($siege) {
-			# Check for sieges first, because they'll always have settlements attached, but settlements won't always come with sieges.
-			$location = $siege->getSettlement()->getGeoData()->getCenter();
-			$outside = false;
-
-			$battle->setSiege($siege);
-			if ($attackers->getAttacker()) {
-				# If they are the siege attackers and attacking in this battle, then they're assaulting. If not, they're sallying. It affects defensive bonuses.
-				$battle->setType('siegeassault');
-				$type = 'assault';
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.siege.assault',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-			} else {
-				$battle->setType('siegesortie');
-				$type = 'sortie';
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.siege.sortie',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-			}
-		} else if ($settlement) {
-			$battle->setSettlement($settlement);
-			$foundinside = false;
-			$foundoutside = false;
-			$foundboth = false;
-			/* Because you can only attakc a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
-			So we need to figure out if our targets are inside or outside. If we find a mismatch,  */
-			foreach ($targets as $target) {
-				if ($target->getInsideSettlement()) {
-					$foundinside = true;
-				} else {
-					$foundoutside = true;
-				}
-			}
-			if ($foundinside && $foundoutside) {
-				# Found people inside and outside, prioritize inside. Battle type is urban.
-				$foundboth = true;
-				$battle->setType('urban');
-				$location = $settlement->getGeoData()->getCenter();
-				foreach ($targets as $target) {
-					# Logic to remove people outside from target list.
-					if (!$target->getInsideSettlement()) {
-						$key = array_search($target, $targets);
-						if($key!==false){
-						    unset($targets[$key]);
-						}
-					}
-				}
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.skirmish',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-				$type = 'skirmish';
-			} else if ($foundinside && !$foundoutside) {
-				# Only people inside. Urban battle.
-				$battle->setType('urban');
-				$location = $settlement->getGeoData()->getCenter();
-				$outside = false;
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.skirmish',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-				$type = 'skirmish';
-			} else if (!$foundinside && $foundoutside) {
-				# Only people outside. Battle type is field. Collect location data.
-				$battle->setType('field');
-				$outside = true;
-				$x=0; $y=0; $count=0;
-				foreach ($targets as $target) {
-					$x+=$target->getLocation()->getX();
-					$y+=$target->getLocation()->getY();
-					$count++;
-				}
-				$location = new Point($x/$count, $y/$count);
-				# Yes, we are literally just averaging the X and Y coords of the participants.
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.sortie',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-				$type = 'sortie';
-			} else {
-				# You've somehow broke the laws of space. Congrats.
-			}
-		} else {
-			$x=0; $y=0; $count=0; $outside = false;
-			foreach ($targets as $target) {
-				$x+=$target->getLocation()->getX();
-				$y+=$target->getLocation()->getY();
-				$count++;
-			}
-			$location = new Point($x/$count, $y/$count);
-		}
-		$battle->setLocation($location);
-		$battle->setStarted(new \DateTime('now'));
-
-		// setup attacker (i.e. me)
-		if (!$attackers) {
-			$attackers = new BattleGroup;
-		}
-		$attackers->setBattle($battle);
-		if (!$siege) {
-			# Already setup by siege handlers.
-			$attackers->setAttacker(true);
-			$attackers->addCharacter($character);
-		}
-		$battle->addGroup($attackers);
-
-		// setup defenders
-		if (!$defenders) {
-			$defenders = new BattleGroup;
-		}
-		$defenders->setBattle($battle);
-		if (!$siege) {
-			# Already setup by siege handlers.
-			$defenders->setAttacker(false);
-			foreach ($targets as $target) {
-				$defenders->addCharacter($target);
-			}
-		}
-		$battle->addGroup($defenders);
-
-		// now we have all involved set up we can calculate the preparation timer
-		$time = $this->military->calculatePreparationTime($battle);
-		$complete = new \DateTime('now');
-		$complete->add(new \DateInterval('PT'.$time.'S'));
-		$battle->setInitialComplete($complete)->setComplete($complete);
-
-		$this->em->persist($battle);
-		$this->em->persist($attackers);
-		$this->em->persist($defenders);
-
-		// setup actions and lock travel
-		switch ($type) {
-			case 'siegeassault':
-				$acttype = 'settlement.assault';
-				break;
-			case 'siegesortie':
-			case 'sortie':
-				$acttype = 'settlement.sortie';
-				break;
-			case 'field':
-			case 'urban':
-			default:
-				$acttype = 'military.battle';
-				break;
-		}
-
-		$act = new Action;
-		$act->setType($acttype);
-		$act->setCharacter($character)
-			->setTargetSettlement($settlement)
-			->setTargetBattlegroup($attackers)
-			->setCanCancel(false)
-			->setBlockTravel(true);
-		$this->queue($act);
-
-		$character->setTravelLocked(true);
-
-		// notifications and counter-actions
-		foreach ($targets as $target) {
-			$act = new Action;
-			$act->setType($acttype)
-				->setCharacter($target)
-				->setTargetBattlegroup($defenders)
-				->setStringValue('forced')
-				->setCanCancel(false)
-				->setBlockTravel(true);
-			$this->queue($act);
-
-			if ($target->hasAction('military.evade')) {
-				// we have an evade action set, so automatically queue a disengage
-				$this->createDisengage($target, $defenders, $act);
-				// and notify
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.evading', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
-			} else {
-				// regular notififaction
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.targeted', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
-			}
-
-			$target->setTravelLocked(true);
-		}
-
-		return array('time'=>$time, 'outside'=>$outside, 'battle'=>$battle);
-	}
-
-
-
-	public function calculateDisengageTime(Character $character) {
-		$base = 15;
-		$base += sqrt($character->getEntourage()->count()*10);
-
-		$takes = $character->getSoldiers()->count() * 5;
-		foreach ($character->getSoldiers() as $soldier) {
-			if ($soldier->isWounded()) {
-				$takes += 5;
-			}
-			switch ($soldier->getType()) {
-				case 'cavalry':
-				case 'mounted archer':		$takes += 3;
-				case 'heavy infantry':		$takes += 2;
-			}
-		}
-
-		$base += sqrt($takes);
-
-		return $base*60;
-	}
-
-	public function createDisengage(Character $character, BattleGroup $bg, Action $attack) {
-		$takes = $this->calculateDisengageTime($character);
-		$complete = new \DateTime("now");
-		$complete->add(new \DateInterval("PT".round($takes)."S"));
-		// TODO: at most until just before the battle!
-
-		$act = new Action;
-		$act->setType('military.disengage')
-			->setCharacter($character)
-			->setTargetBattlegroup($bg)
-			->setCanCancel(true)
-			->setOpposedAction($attack)
-			->setComplete($complete)
-			->setBlockTravel(false);
-		$act->addOpposingAction($act);
-
-		return $this->queue($act);
 	}
 
 }
