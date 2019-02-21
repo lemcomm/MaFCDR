@@ -22,7 +22,6 @@ class BattleRunner {
 	private $geo;
 	private $character_manager;
 	private $npc_manager;
-	private $resolver;
 	private $interactions;
 
 	private $battle;
@@ -33,7 +32,7 @@ class BattleRunner {
 	private $battlesize=1;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, ActionResolution $resolver, Interactions $interactions, WarManager $war_manager) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
