@@ -89,7 +89,7 @@ class BuildingController extends Controller {
 					->setComplete($complete)
 					->setCanCancel(false)
 					->setBlockTravel(true);
-				$this->get('action_resolution')->queue($act);
+				$this->get('action_manager')->queue($act);
 				$em->flush();
 				return array('success'=>true);
 			} else {
