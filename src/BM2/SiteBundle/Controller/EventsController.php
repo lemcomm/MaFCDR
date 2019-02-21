@@ -133,7 +133,7 @@ class EventsController extends Controller {
 					$act->setCanCancel(true);
 					$func = 'setTarget'.ucfirst($log->getType());
 					$act->$func($log->getSubject());
-					$result = $this->get('action_resolution')->queue($act);
+					$result = $this->get('action_manager')->queue($act);
 					$research = $act;
 				}
 				foreach ($data['entourage'] as $npc) {
