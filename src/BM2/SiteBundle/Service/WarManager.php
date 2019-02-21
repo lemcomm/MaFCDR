@@ -9,7 +9,7 @@ use BM2\SiteBundle\Eneity\Siege;
 
 use Doctrine\ORM\EntityManager;
 use BM2\SiteBundle\Service\History;
-use BM2\SiteBundle\Service\ActionResolution;
+use BM2\SiteBundle\Service\ActionManager;
 
 /*
 War Manager exists to handle all service duties involved in battles and sieges. Things relating to specific soldiers, units, equipment, or entourage belong in Military.
