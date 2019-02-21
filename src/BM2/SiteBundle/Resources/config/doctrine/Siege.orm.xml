@@ -4,6 +4,8 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
+		<field name="stage" type="integer"/>
+		<field name="max_stage" type="integer"/>
 		<one-to-one field="settlement" target-entity="Settlement" inversed-by="siege"/>
 		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="siege"/>
 		<one-to-many field="battles" target-entity="Battle" mapped-by="siege"/>
