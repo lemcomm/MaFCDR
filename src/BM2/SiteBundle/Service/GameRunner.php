@@ -31,7 +31,7 @@ class GameRunner {
 	private $economy;
 	private $politics;
 	private $history;
-	private $military;
+	private $milman;
 	private $battlerunner;
 	private $interactions;
 	private $geography;
@@ -50,7 +50,7 @@ class GameRunner {
 	private $bandits_ok_distance = 50000;
 	private $seen;
 
-	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, Military $military, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
+	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, MilitaryManager $milman, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->logger = $logger;
@@ -58,7 +58,7 @@ class GameRunner {
 		$this->economy = $economy;
 		$this->politics = $politics;
 		$this->history = $history;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->battlerunner = $battlerunner;
 		$this->interactions = $interactions;
 		$this->geography = $geography;
@@ -476,7 +476,7 @@ class GameRunner {
 				//$chance = sqrt($chance); // because this runs every turn, leaving it high would lead to immediate loss
 				$chance = sqrt($chance/10); // because this runs every turn, leaving it high would lead to immediate loss
 				if (rand(0,100)<$chance) {
-					$this->military->disband($row['soldier'], $row['soldier']->getCharacter());
+					$this->milman->disband($row['soldier'], $row['soldier']->getCharacter());
 					$deserters[$index]['gone']++;
 				}
 			}
@@ -593,7 +593,7 @@ class GameRunner {
 		$i=1;
 		while ($row = $iterableResult->next()) {
 			$soldier = $row[0];
-			$this->military->resupply($soldier, $soldier->getBase()); 
+			$this->milman->resupply($soldier, $soldier->getBase()); 
 
 			if (($i++ % $this->batchsize) == 0) {
 				$this->em->flush();
@@ -636,7 +636,7 @@ class GameRunner {
 			}
 			if (rand(0,250) < $days) {
 				$disband_soldiers++;
-				$this->military->disband($soldier, $soldier->getCharacter());
+				$this->milman->disband($soldier, $soldier->getCharacter());
 			}
 
 			if (($i++ % $this->batchsize) == 0) {
@@ -662,7 +662,7 @@ class GameRunner {
 			}
 			if (rand(0,200) < ($days-20)) {
 				$disband_entourage++;
-				$this->military->disbandEntourage($entourage, $entourage->getCharacter());
+				$this->milman->disbandEntourage($entourage, $entourage->getCharacter());
 			}
 
 			if (($i++ % $this->batchsize) == 0) {
