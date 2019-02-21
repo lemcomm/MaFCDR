@@ -39,6 +39,7 @@ class CharacterManager {
 		$this->realmmanager = $realmmanager;
 		$this->messagemanager = $messagemanager;
 		$this->dm = $dm;
+		$this->warman = $warman;
 	}
 
 
