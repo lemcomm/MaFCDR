@@ -4,6 +4,8 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Action;
 
+use Doctrine\ORM\EntityManager;
+
 /*
 This mostly exists to get the queue function out of ActionResolution, in order to avoid circular dependencies.
 */
