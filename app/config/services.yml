@@ -88,7 +88,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@action_manager', '@war_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager']
     action_manager:
         class:      BM2\SiteBundle\Service\ActionManager
         arguments:  ['@doctrine.orm.entity_manager']
