@@ -172,15 +172,26 @@ class WarController extends Controller {
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
 			# Figure out which form is being submitted.
-			if ($request->request->has('areyousure')) {
+			if ($request->request->has('areyousure') && $data['sure'] == true) {
 				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
 				$siege = new Siege;
 				$siege->setSettlement($settlement);
-				$em->persist();
+				$siege->setStage(1);
+				$maxstages = 1;
+				if($settlement->hasBuildingNamed('Wood Castle') OR $settlement->hasBuildingNamed('Stone Castle')) {
+					$maxstages++;
+				}
+				if($settlement->hasBuildingNamed('Fortress')) {
+					$maxstages++;
+				}
+				if($settlement->hasBuildingNamed('Citadel')) {
+					$maxstages++;
+				}
+				$siege->setMaxStage($maxstages);
+				$em->persist($siege);
 				$em->flush();
 				
 				// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
-				$battle->setSettlement($settlement);
 				$this->get('history')->logEvent(
 					$settlement,
 					'event.settlement.besieged',
@@ -207,7 +218,8 @@ class WarController extends Controller {
 
 				# create character action
 				$act = new Action;
-				$act->setCharacter($character)
+				$act->setType('military.siege')
+					->setCharacter($character)
 					->setTargetSettlement($settlement)
 					->setTargetBattlegroup($attackers)
 					->setCanCancel(false)
@@ -217,7 +229,7 @@ class WarController extends Controller {
 				$character->setTravelLocked(true);
 
 				# add everyone who has a "defend settlement" action set
-				foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('related_settlement_id' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
+				foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_settlement' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
 					$defenders->addCharacter($defender->getCharacter());
 
 					$act = new Action;
@@ -284,7 +296,7 @@ class WarController extends Controller {
 						# Suicide run.
 						if ($data['action'] == 'attack') {
 							# Now, figure out if this character is part of defenders or attackers...
-							if ($siege->getAttacker()->getCharacters()->contains($character) {
+							if ($siege->getAttacker()->getCharacters()->contains($character)) {
 								# An attacker is going solo, let createBattle make his group on the fly.
 								$this->get('war_manager')->createBattle($character, $settlement, null, $siege, null, $siege->getDefender());
 							} else {
@@ -298,6 +310,7 @@ class WarController extends Controller {
 						if ($data['action'] == 'join' && $data['target']) {
 							#TODO
 						}
+						break;
 					case 'assume':
 						# Someone is assuming leadership.
 						if ($data['action'] == 'assume') {
@@ -307,10 +320,13 @@ class WarController extends Controller {
 								$siege->setLeader($character);
 								$em->flush();
 							}
+						}
+						break;
+					default:
+						# This shouldn't be possible, but just in case.
+						throw $this->createNotFoundException('error.notfound.noinput');
 						break;
 				}
-
-
 				$em->flush();
 			}
 		}
