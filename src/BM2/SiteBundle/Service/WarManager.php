@@ -9,7 +9,7 @@ use BM2\SiteBundle\Eneity\Siege;
 
 use Doctrine\ORM\EntityManager;
 use BM2\SiteBundle\Service\History;
-use BM2\SiteBundle\Service\ActionManager;
+use BM2\SiteBundle\Service\ActionResolution;
 
 /*
 War Manager exists to handle all service duties involved in battles and sieges. Things relating to specific soldiers, units, equipment, or entourage belong in Military.
@@ -362,7 +362,7 @@ class WarManager {
 	public function disbandSiege(Siege $siege, Character $leader) {
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
-				$this->removeCharacterFromBattlegroup($character, $group)
+				$this->removeCharacterFromBattlegroup($character, $group);
 				$this->history->logEvent(
 					$character,
 					'event.character.siege.disband',
@@ -430,7 +430,7 @@ class WarManager {
 
 	public function leaveSiege($character, $siege) {
 		foreach ($siege->geGroups() as $group) {
-			if ($group->getCharacters()->contains($character) {
+			if ($group->getCharacters()->contains($character)) {
 				$character->removeGroup($group);
 				$group->removeCharacter($character);
 				$this->addRegroupAction(null, $character);
