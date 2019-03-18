@@ -49,8 +49,14 @@ class ActionsController extends Controller {
 			$pagetitle = $this->get('translator')->trans('settlement.area', array(
 				'%name%' => $this->get('twig.extension.links')->ObjectLink($settlement) ));
 		}
+		# I can't think of an instnace where we'd have a siege with no groups, but just in case...
+		if ($settlement->getSiege() && $settlement->getSiege()->getGroups()) {
+			$siege=$settlement->getSiege()->getCharacters()->contains($character);
+		} else {
+			$siege = FALSE;
+		}
 
-		return array('pagetitle'=>$pagetitle);
+		return array('pagetitle'=>$pagetitle, 'siege'=>$siege);
 	}
 
 	/**
