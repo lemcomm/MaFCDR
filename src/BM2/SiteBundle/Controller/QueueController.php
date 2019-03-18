@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBUndle\Entity\Character;
 use BM2\SiteBundle\Service\History;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
