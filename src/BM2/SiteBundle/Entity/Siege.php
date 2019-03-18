@@ -6,19 +6,23 @@ use Doctrine\ORM\EntityRepository;
 
 class Siege {
 
-	public function getLeader() {
+	public function getLeader($side) {
 		$leader = null;
 		foreach ($this->groups as $group) {
-			if ($group->isAttacker) {
+			if ($side == 'attacker' && $group->isAttacker()) {
+				$leader = $group->getLeader();
+			} else if ($side == 'defender' && $group->isDefender()) {
 				$leader = $group->getLeader();
 			}
 		}
 		return $leader;
 	}
 	
-	public function setLeader($character) {
+	public function setLeader($side, $character) {
 		foreach ($this->groups as $group) {
-			if ($group->isAttacker) {
+			if ($side == 'attackers' && $group->isAttacker()) {
+				$group->setLeader($character);
+			} else if ($side == 'defenders' && $group->isDefender()) {
 				$group->setLeader($character);
 			}
 		}
@@ -37,6 +41,17 @@ class Siege {
 			if ($group->isDefender()) return $group;
 		}
 		return null;
+	}
+
+	public function getCharacters($forceupdated = false) {
+		$all = new ArrayCollection;
+		foreach ($this->groups as $group) {
+			foreach ($group->getCharacters() as $character) {
+				$all->add($character);
+			}
+		}
+
+		return $all;
 	}
   
 }
