@@ -190,12 +190,12 @@ class BattleRunner {
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
 		foreach ($this->nobility as $noble) {
 			$noble->getCharacter()->removeSoldier($noble);
-			$this->war_manager->addRegroupAction($battlesize, $noble->getCharacter());
 		}
 
 		if (!$battle->getSiege()) {
 			foreach ($battle->getGroups() as $group) {
-				$this->war_manager->disbandGroup($group);
+				$this->war_manager->disbandGroup($group, $battlesize);
+				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
 		}
 		$this->em->remove($battle);
