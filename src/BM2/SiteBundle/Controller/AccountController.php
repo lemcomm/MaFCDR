@@ -108,6 +108,7 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
@@ -146,6 +147,11 @@ class AccountController extends Controller {
 				// dead characters don't have events or messages...
 				$unread = 0;
 				$events = 0;
+			}
+			if ($character->getBattling() && $character->getBattleGroups()->isEmpty() == TRUE) {
+				# NOTE: Because sometimes, battling isn't reset after a battle. May be related to entity locking.
+				$character->setBattling(false);
+				$em->flush();
 			}
 			
 			// This adds in functionality for detecting character actions on this page. --Andrew
