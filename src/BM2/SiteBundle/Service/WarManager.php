@@ -376,6 +376,16 @@ class WarManager {
 		return true;
 	}
 
+	#TODO: Combine this with disbandSiege so we have less duplication of effort.
+	public function disbandGroup(BattleGroup $group, $battlesize = null) {
+		foreach ($group->getCharacters() as $character) {
+			$this->removeCharacterFromBattlegroup($character, $group);
+			$this->addRegroupAction($battlesize, $character);
+		}
+		$this->em->flush();
+		return true;
+	}
+
 	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg) {
 		$bg->removeCharacter($character);
 		if ($bg->getCharacters()->count()==0) {
