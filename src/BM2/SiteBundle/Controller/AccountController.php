@@ -119,7 +119,7 @@ class AccountController extends Controller {
 
 		$now = new \DateTime("now");
 		$a_week_ago = $now->sub(new \DateInterval("P7D"));
-				
+		
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
 			$annexing = false;
@@ -131,7 +131,10 @@ class AccountController extends Controller {
 			$renaming = false;
 			$reclaiming = false;
 			$unretirable = false;
-			if ($character->getLocation()) {
+			$preBattle = false;
+			$siege = false;
+			$alive = $character->getAlive();
+			if ($alive && $character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
 				$at_settlement = ($nearest['distance'] < $this->get('geography')->calculateActionDistance($settlement));
@@ -155,7 +158,7 @@ class AccountController extends Controller {
 			}
 			
 			// This adds in functionality for detecting character actions on this page. --Andrew
-			if ($character->getActions()) {
+			if ($alive && $character->getActions()) {
 				foreach ($character->getActions() as $actions) {
 					switch($actions->getType()) {
 						case 'settlement.take':
@@ -185,10 +188,20 @@ class AccountController extends Controller {
 					}
 				}
 			}
-			if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
+			if ($alive && !is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
 				$unretirable = true;
 			} else {
 				$unretirable = false;
+			}
+			if ($alive && !$character->getBattleGroups()->isEmpty()) {
+				foreach ($character->getBattleGroups() as $group) {
+					if ($group->getBattle()) {
+						$preBattle = true;
+					}
+					if ($group->getSiege()) {
+						$siege = true;
+					}
+				}
 			}
 
 			$data = array(
@@ -207,7 +220,8 @@ class AccountController extends Controller {
 				'at_settlement' => $at_settlement,
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
-				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'prebattle' => $preBattle,
+				'sieging' => $siege,
 				'annexing' => $annexing,
 				'supporting' => $supporting,
 				'opposing' => $opposing,
