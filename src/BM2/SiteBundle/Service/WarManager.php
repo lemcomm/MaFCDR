@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Eneity\Siege;
+use BM2\SiteBundle\Entity\Siege;
 
 use Doctrine\ORM\EntityManager;
 use BM2\SiteBundle\Service\History;
@@ -346,7 +346,7 @@ class WarManager {
 		/* FIXME: to prevent abuse, this should be lower in very uneven battles
 		FIXME: We should probably find some better logic about calculating the battlesize variable when this is called by sieges, but we can work that out later. */
 		# setup regroup timer and change action
-		$amount = min($this->battlesize*5, $character->getLivingSoldiers()->count())+2; # to prevent regroup taking long in very uneven battles
+		$amount = min($battlesize*5, $character->getLivingSoldiers()->count())+2; # to prevent regroup taking long in very uneven battles
 		$regroup_time = sqrt($amount*10) * 5; # in minutes
 
 		$act = new Action;
@@ -362,13 +362,13 @@ class WarManager {
 	public function disbandSiege(Siege $siege, Character $leader) {
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
-				$this->removeCharacterFromBattlegroup($character, $group);
 				$this->history->logEvent(
 					$character,
 					'event.character.siege.disband',
 					array('%link-settlement%'=>$siege->getSettlement()->getId(), '%link-character%'=>$leader->getId()),
 					History::LOW, true
 				);
+				$this->removeCharacterFromBattlegroup($character, $group);
 				$this->addRegroupAction(null, $character);
 			}
 		}
@@ -392,16 +392,16 @@ class WarManager {
 			// there are no more participants in this battlegroup
 			if ($bg->getBattle()) {
 				$focus = $bg->getBattle();
+				$type = 'battle';
 			} else if ($bg->getSiege()) {
 				$focus = $bg->getSiege();
+				$type = 'siege';
 			}
 			foreach ($bg->getRelatedActions() as $act) {
 				$this->em->remove($act);
 			}
-			$this->em->remove($bg);
-
-			if ($focus->getBattle() && $battle->getGroups()->count() <= 2 && $battle->getSettlement()==null) {
-				// battle is terminated
+			if ($type == 'battle' && $focus->getGroups()->count() <= 2 && $focus->getSettlement()==null) {
+				// battle is terminated, as battles care if we have less than two groups participating.
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
 						$this->em->remove($act);
@@ -412,13 +412,19 @@ class WarManager {
 							'battle.failed',
 							array(),
 							History::HIGH, false, 25
-						);						
+						);
+						if ($group->getLeader() == $char) {
+							$group->setLeader(null);
+							$char->removeLeadingBattelgroup($bg);
+						}
 					}
 					$this->em->remove($group);
 				}
 				$this->em->remove($focus);
-			} else if ($focus->getSiege() && $focus->getGroups()->count() <= 2) {
-				// siege is terminated
+			} else if ($type == 'siege' && $focus->getAttackers() == $bg) {
+				$focus->getSettlement()->setSiege(null);
+				$focus->setSettlement(null);
+				// siege is terminated, as sieges don't care how many groups, only if the attacker group has no more attackers in it.
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
 						$this->em->remove($act);
@@ -429,7 +435,11 @@ class WarManager {
 							'siege.failed',
 							array(),
 							History::HIGH, false, 25
-						);						
+						);
+						if ($group->getLeader() == $char) {
+							$group->setLeader(null);
+							$char->removeLeadingBattelgroup($bg);
+						}
 					}
 					$this->em->remove($group);
 				}
