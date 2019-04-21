@@ -45,7 +45,7 @@ class Siege {
 	}
 
 	public function getCharacters() {
-		$allsiegers = []
+		$allsiegers = new ArrayCollection;
 		foreach ($this->groups as $group) {
 			foreach ($group->getCharacters() as $character) {
 				$allsiegers->add($character);
