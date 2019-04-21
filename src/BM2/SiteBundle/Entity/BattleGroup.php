@@ -14,6 +14,8 @@ class BattleGroup {
 	/*
 	 * @codeCoverageIgnore
 	 */  
+
+/* No idea why this was a thing, but it was throwing an error when sieges were implemented.
 	public function __toString() {
 		\Doctrine\Common\Util\Debug::dump($this, 3);
 
@@ -24,7 +26,7 @@ class BattleGroup {
 
 		return $r;
 	}
-
+*/
 	public function setupSoldiers() {
 		$this->soldiers = new ArrayCollection;
 		foreach ($this->getCharacters() as $char) {
