@@ -147,8 +147,47 @@ class WarController extends Controller {
 	  * @Template
 	  */
 	public function siegeSettlementAction(Request $request) {
-		# Security checks and set $character and $settlement.		
-		list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+		# Security check.
+		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true); #Mostly so we can get the settlement...
+		if ($action = $request->query->get('action')) {
+			$action = $request->query->get('action');
+		} else {
+			$action = 'select';
+		}
+		if($settlement->getSiege()) {
+			switch($action) {
+				case 'leadership':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeLeadershipTest', true);
+					break;
+				case 'build':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeBuildTest', true);
+					break;
+				case 'assault':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAssaultTest', true);
+					break;
+				case 'disband':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeDisbandTest', true);
+					break;
+				case 'leave':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', true);
+					break;
+				case 'attack':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAttackTest', true);
+					break;
+				case 'join':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', true);
+					break;
+				case 'assume':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+					break;
+				case 'select':	
+				default:
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeGeneralTest', true);
+					break;
+			}
+		} else {
+			list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+		}
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -162,7 +201,7 @@ class WarController extends Controller {
 		if ($settlement->getSiege()) {
 			$already = TRUE;
 			$siege = $settlement->getSiege();
-			$form = $this->createForm(new SiegeType($character, $settlement, $siege));
+			$form = $this->createForm(new SiegeType($character, $settlement, $siege, $action));
 		} else {
 			$already = FALSE;
 			$form = $this->createForm(new AreYouSureType());
@@ -176,20 +215,21 @@ class WarController extends Controller {
 				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
 				$siege = new Siege;
 				$siege->setSettlement($settlement);
+				$settlement->setSiege($siege);
 				$siege->setStage(1);
-				$maxstages = 1;
+				$maxstages = 1; # No defense, no siege, thus if we have a siege, we always have atleast one stage.
 				if($settlement->hasBuildingNamed('Wood Castle') OR $settlement->hasBuildingNamed('Stone Castle')) {
-					$maxstages++;
+					$maxstages++; # A small citadel, just big enough to offer a last ditch defense.
 				}
 				if($settlement->hasBuildingNamed('Fortress')) {
-					$maxstages++;
+					$maxstages++; # Think "curtain wall".
 				}
 				if($settlement->hasBuildingNamed('Citadel')) {
-					$maxstages++;
+					$maxstages++; # At this point, our castle has a large, enclosed compound of it's own, usually built at the same strength as the primary walls.
 				}
 				$siege->setMaxStage($maxstages);
 				$em->persist($siege);
-				$em->flush();
+				$em->flush(); # We need this flushed in order to link to it below.
 				
 				// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
 				$this->get('history')->logEvent(
@@ -253,81 +293,119 @@ class WarController extends Controller {
 					$defender->getCharacter()->setTravelLocked(true);
 				}
 				$em->flush();
-			} else if ($request->request->has('managesiege')) {
-				# Selection dependent siege management, engage!
-				switch($data['action']) {
-					case 'leadership':
-						if ($siege->getLeader() == $character && $data['action'] == 'newleader' && $data['newleader'] != $character) {
-							$siege->setLeader($data['newleader']);
-							$em->flush();
-						} else {
-							throw $this->createNotFoundException('error.notfound.change');
-						}
-						break;
-					case 'build':
-						# Start constructing siege equipment!
-						if ($siege->getAttacker()->getCharacters()->contains($character) && data['action'] == 'build') {
-							$this->get('war_manager')->buildSiegeTools($data['type'], $data['quantity']);
-						}
-					case 'assault':
-						if ($siege->getLeader() == $character && $data['action'] == 'assault') {
-							$this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
-						} else {
-							throw $this->createNotFoundException('error.notfound.leader');
-						}
-						break;
-					case 'disband':
-						# Stop the siege.
-						if ($siege->getLeader() == $character && $data['action'] == 'disband') {
-							$this->get('war_manager')->disbandSiege($siege, $character);
-						} else {
-							throw $this->createNotFoundException('error.notfound.change');
-						}
-						break;
-					case 'leave':
-						# Leave the siege.
-						if ($siege->getLeader() == $character) {
-							throw $this->createNotFoundException('error.notfound.areleader');
-						} else {
-							$this->get('war_manager')->leaveSiege($character, $siege);
-						}
-						break;
-					case 'attack':
-						# Suicide run.
-						if ($data['action'] == 'attack') {
-							# Now, figure out if this character is part of defenders or attackers...
-							if ($siege->getAttacker()->getCharacters()->contains($character)) {
-								# An attacker is going solo, let createBattle make his group on the fly.
-								$this->get('war_manager')->createBattle($character, $settlement, null, $siege, null, $siege->getDefender());
-							} else {
-								# Someone is sortieing solo, brave of them. That makes the "defenders" in this case, the besiegers.
-								$this->get('war_manager')->createBattle($character, $settlement, null, $siege, null, $siege->getAttacker());
-							}
-						}
-						break;
-					case 'join':
-						# Join someone else's suicide run.
-						if ($data['action'] == 'join' && $data['target']) {
-							#TODO
-						}
-						break;
-					case 'assume':
-						# Someone is assuming leadership.
-						if ($data['action'] == 'assume') {
-							# First, make sure they're in a position to actually do this. 
-							#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
-							if ($siege->getDefender()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
-								$siege->setLeader($character);
+				return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
+			} else {
+				if($data['action'] != 'selected') {
+					switch($data['action']){
+						case 'leadership':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'leadership'));
+							break;
+						case 'build':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'build'));
+							break;
+						case 'assault':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'assault'));
+							break;
+						case 'disband':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'disband'));
+							break;
+						case 'leave':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'leave'));
+							break;
+						case 'attack':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'attack'));
+							break;
+						case 'join':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'join'));
+							break;
+						case 'assume':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'assume'));
+							break;
+					}
+				} else {
+					# Selection dependent siege management, engage!
+					switch($data['subaction']) {
+						case 'leadership':
+							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'newleader' && $data['newleader'] != $character) {
+								$siege->setLeader($data['newleader']);
 								$em->flush();
+								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
+							} else {
+								throw $this->createNotFoundException('error.notfound.change');
 							}
-						}
-						break;
-					default:
-						# This shouldn't be possible, but just in case.
-						throw $this->createNotFoundException('error.notfound.noinput');
-						break;
+							break;
+						case 'build':
+							# Start constructing siege equipment!
+							if ($siege->getAttacker()->getCharacters()->contains($character) && data['subaction'] == 'build') {
+								$this->get('war_manager')->buildSiegeTools($data['type'], $data['quantity']);
+								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
+							}
+						case 'assault':
+							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'assault') {
+								$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							} else {
+								throw $this->createNotFoundException('error.notfound.leader');
+							}
+							break;
+						case 'disband':
+							# Stop the siege.
+							if ($siege->getAttackers()->getLeader() == $character && $data['subaction'] == 'disband' && $data['disband'] == TRUE) {
+								$this->get('war_manager')->disbandSiege($siege, $character);
+								return $this->redirectToRoute('bm2_actions');
+							} else {
+								throw $this->createNotFoundException('error.notfound.change');
+							}
+							break;
+						case 'leave':
+							# Leave the siege.
+							if ($siege->getAttackers()->getLeader() == $character) {
+								throw $this->createNotFoundException('error.notfound.areleader');
+							} else {
+								$this->get('war_manager')->leaveSiege($character, $siege);
+								return $this->redirectToRoute('bm2_actions');
+							}
+							break;
+						case 'attack':
+							# Suicide run.
+							if ($data['action'] == 'attack') {
+								# Now, figure out if this character is part of defenders or attackers...
+								if ($siege->getAttacker()->getCharacters()->contains($character)) {
+									# An attacker is going solo, let createBattle make his group on the fly.
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, null, $siege->getDefender());
+								} else {
+									# Someone is sortieing solo, brave of them. That makes the "defenders" in this case, the besiegers.
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, null, $siege->getAttacker());
+								}
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							}
+							break;
+						case 'join':
+							# Join someone else's suicide run.
+							if ($data['action'] == 'join' && $data['target']) {
+								#TODO
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							}
+							break;
+						case 'assume':
+							# Someone is assuming leadership.
+							if ($data['action'] == 'assume') {
+								# First, make sure they're in a position to actually do this. 
+								#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
+								if ($siege->getDefenders()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
+									$siege->setLeader($character);
+									$em->flush();
+								}
+								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
+							}
+							break;
+						default:
+							# This shouldn't be possible, but just in case.
+							throw $this->createNotFoundException('error.notfound.noinput');
+							break;
+					}
+					$em->flush();
 				}
-				$em->flush();
 			}
 		}
 
@@ -336,6 +414,7 @@ class WarController extends Controller {
 			'settlement'=>$settlement,
 			'siege'=>$siege,
 			'leader'=>$leader,
+			'action'=>$action,
 			'form'=>$form->createView()
 		);
 	}
