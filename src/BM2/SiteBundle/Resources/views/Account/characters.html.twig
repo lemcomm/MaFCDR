@@ -59,8 +59,10 @@ Table headers are handled as translation strings from the character.list databas
 			{% endif %}
 		</td>
 		<td>
-			{% if character.inbattle %}
-				{{ 'charstatus.inbattle'|trans }}
+			{% if character.prebattle %}
+				{{ 'charstatus.prebattle'|trans }}
+			{% elseif character.sieging %}
+				{{ 'charstatus.sieging'|trans }}
 			{% elseif character.annexing %}
 				{{ 'charstatus.annexing'|trans }}
 			{% elseif character.supporting %}
