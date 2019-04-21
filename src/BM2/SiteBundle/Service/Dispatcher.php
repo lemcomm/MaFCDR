@@ -1439,6 +1439,31 @@ class Dispatcher {
 		return $this->action("military.siege.leave", "bm2_site_war_siegesettlement", false, array('action'=>'leave'));
 	}
 
+	public function militarySiegeGeneralTest($check_duplicate=false) {
+		# Controls access to the siege action seleection menu.
+		$estate = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.prisoner");
+		}
+		if (!$estate->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $estate->getSiege();
+		$inSiege = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+			}
+		}
+		if (!$inSiege) {
+			# Not in the siege.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.notinsiege");
+		}
+		return $this->action("military.siege.leave", "bm2_site_war_siegesettlement", false, array('action'=>'leave'));
+	}
+
 	public function militarySiegeAttackTest($check_duplicate=false) {
 		# Controls access to the suicide run menu for sieges.
 		$estate = $this->getActionableSettlement();
