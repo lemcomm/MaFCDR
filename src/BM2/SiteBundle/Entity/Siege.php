@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Siege {
 
@@ -29,29 +30,29 @@ class Siege {
 		$this->getDoctrine()->getManager()->flush();
 	}
 
-	public function getAttacker() {
+	public function getAttackers() {
 		foreach ($this->groups as $group) {
 			if ($group->isAttacker()) return $group;
 		}
 		return null;
 	}
 
-	public function getDefender() {
+	public function getDefenders() {
 		foreach ($this->groups as $group) {
 			if ($group->isDefender()) return $group;
 		}
 		return null;
 	}
 
-	public function getCharacters($forceupdated = false) {
-		$all = new ArrayCollection;
+	public function getCharacters() {
+		$allsiegers = []
 		foreach ($this->groups as $group) {
 			foreach ($group->getCharacters() as $character) {
-				$all->add($character);
+				$allsiegers->add($character);
 			}
 		}
 
-		return $all;
+		return $allsiegers;
 	}
-  
+	
 }
