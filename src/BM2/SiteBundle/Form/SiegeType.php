@@ -40,14 +40,20 @@ class SiegeType extends AbstractType {
 		$character = $this->character;
 		$action = $this->action;
 		$isLeader = FALSE;
+		$isAttacker = FALSE;
+		$isDefender = FALSE;
 		$defLeader = FALSE;
 		$attLeader = FALSE;
 		$actionslist = array();
-#$actionslist = array('leadership' => 'siege.action.leadership', 'assault' => 'siege.action.assault', 'disband' => 'siege.action.disband', 'join' => 'siege.action.join');
 		#NOTE: $allactions = array('leadership', 'build', 'assault', 'disband', 'leave', 'attack', 'join', 'assume');
 		# Figure out if we're the group leader, and while we're at it, if both groups have leaders.
 		if (!$action || $action == 'select') {
 			foreach ($siege->getGroups() as $group) {
+				if ($group->getCharacters()->contains($character) && $group->isAttacker()) {
+					$isAttacker = TRUE;
+				} elseif ($group->getCharacters()->contains($character) && $group->isDefender()) {
+					$isDefender = TRUE;
+				}
 				if ($character == $group->getLeader()) {
 					
 					$isLeader = TRUE;
@@ -61,23 +67,41 @@ class SiegeType extends AbstractType {
 					}
 				}
 			}
-			$actionslist = array('attack' => 'siege.action.attack');
-			# $actionslist = array('build' => 'siege.action.build', 'attack' => 'siege.action.attack'); #For when we implement siege equipment.
-			if ($isLeader) {
-				$actionslist = array_merge($actionslist, array('disband'=>'siege.action.disband', 'leadership'=>'siege.action.leadership', 'assault'=>'siege.action.assault'));
+			if (!$character->isDoingAction('military.regroup')) {
+				$actionslist = array('attack' => 'siege.action.attack');
 			} else {
+				$actionslist = array();
+			}
+			# Once we add siege equipment, we'll give everyone the option to build it, regrouping or not.
+			# $actionslist = array('build' => 'siege.action.build', 'attack' => 'siege.action.attack');
+			if ($isLeader) {
+				# Leaders always have disband and transfer leadership actions.
+				$actionslist = array_merge($actionslist, array('disband'=>'siege.action.disband', 'leadership'=>'siege.action.leadership'));
+				if (!$character->isDoingAction('military.regroup')) {
+					# Not regrouping? Then you can call an assault if you'r the leader.
+					$actionslist = array_merge($actionslist, array('assault'=>'siege.action.assault'));
+				}
+			} else {
+				# Anyone that isn't the leader can opt to just leave.
 				$actionslist = array_merge($actionslist, array('leave' => 'siege.action.leave'));
 			}
-			if ($character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character && !$defLeader) {
+			if (
+				(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character && !$defLeader) 
+				|| (!$defLeader && !$settlement->getCharactersPresent()->contains($settlement->getOwner()) && $isDefender)
+				|| (!$attLeader && $isDefender)
+			) {
+				# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
 				$actionslist = array_merge($actionslist, array('assume'=>'siege.action.assume'));
 			}
 			if (!$siege->getBattles()->isEmpty()) {
+				# If there's a battle ongoing, anyone can opt to join it. If the leader does, they'll be able to call their entire force into action.
 				$actionslist = array_merge($actionslist, array('join'=>'siege.action.join'));
 			}
 			ksort($actionslist, 2); #Sort array as strings.
 			$builder->add('action', ChoiceType::class, array(
 				'required'=>true,
 				'choices' => $actionslist,
+				'placeholder'=>'action.none',
 				'label'=> 'siege.actions',
 			));
 		} else {
@@ -92,12 +116,12 @@ class SiegeType extends AbstractType {
 					$builder->add('newleader', 'entity', array(
 						'label'=>'siege.newleader',
 						'required'=>true,
-						'placeholder'=>'character.none',
+						'placeholder'=>'siege.character.none',
 						'attr'=>array('title'=>'siege.help.newleader'),
 						'class'=>'BM2SiteBundle:Character',
 						'choice_label'=>'name',
 						'query_builder'=>function(EntityRepository $er) use ($character, $siege) {
-							return $er->createQueryBuilder('c')->leftjoin('c.battlegroups', 'bg')->where(':character = bg.leader')->andWhere('bg.siege = :siege')->setParameters(array('character'=>$character, 'siege'=>$siege))->orderBy('c.name', 'ASC');
+							return $er->createQueryBuilder('c')->leftjoin('c.battlegroups', 'bg')->where(':character = bg.leader')->andWhere('bg.siege = :siege')->andWhere(':character != c')->setParameters(array('character'=>$character, 'siege'=>$siege))->orderBy('c.name', 'ASC');
 						}
 					));
 					break;
@@ -158,13 +182,36 @@ class SiegeType extends AbstractType {
 						'required' => true
 					));
 					break;
-				case 'join':
+				case 'joinattack':
 					$builder->add('subaction', HiddenType::class, array(
-						'data'=>'join'
+						'data'=>'joinattack'
 					));
 					$builder->add('join', CheckboxType::class, array(
 						'label' => 'siege.join',
 						'required' => true
+					));
+					if ($isLeader) {
+						$builder->add('joinall', CheckboxType::class, array(
+							'label' => 'siege.joinall',
+							'required' => true
+						));
+					}
+					break;
+				case 'joinsiege':
+					$builder->add('subaction', HiddenType::class, array(
+						'data'=>'joinsiege'
+					));
+					# Later we'll extend this to include reinforcing parties, hence the arrays. Those looking to attack the attackers and those looking to attack the defenders but weren't part of the original siege (presumably because they showed up late).
+					if ($character->getInsideSettlement() == $settlement) {
+						$sides = array('defenders' => 'siege.side.defenders');
+					} else {
+						$sides = array('attackers' => 'siege.side.attackers');
+					}
+					$builder->add('side', ChoiceType::class, array(
+						'required'=>true,
+						'choices' => $sides,
+						'placeholder'=>'siege.sides.none',
+						'label'=> 'siege.joinside'
 					));
 					break;
 				case 'assume':
