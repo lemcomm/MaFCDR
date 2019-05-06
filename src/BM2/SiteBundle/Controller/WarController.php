@@ -174,11 +174,14 @@ class WarController extends Controller {
 				case 'attack':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAttackTest', true);
 					break;
-				case 'join':
+				case 'joinattack':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', true);
 					break;
+				case 'joinsiege':
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeJoinSiegeTest', true);
+					break;
 				case 'assume':
-					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true);
+					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAssumeTest', true);
 					break;
 				case 'select':	
 				default:
@@ -295,7 +298,9 @@ class WarController extends Controller {
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 			} else {
+				# Either request doesn't have AreYouSureType or data['sure'] did not equal true. 
 				if($data['action'] != 'selected') {
+					# if action is not already selected that means we shouldn't be here yet, rereoute the user to whatever action is.
 					switch($data['action']){
 						case 'leadership':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'leadership'));
@@ -315,8 +320,11 @@ class WarController extends Controller {
 						case 'attack':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'attack'));
 							break;
-						case 'join':
-							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'join'));
+						case 'joinattack':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'joinattack'));
+							break;
+						case 'joinsiege':
+							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'joinsiege'));
 							break;
 						case 'assume':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'assume'));
@@ -324,6 +332,7 @@ class WarController extends Controller {
 					}
 				} else {
 					# Selection dependent siege management, engage!
+					# This only engages if we've already got action set to "selected", so we start looking at what subaction we're processing.
 					switch($data['subaction']) {
 						case 'leadership':
 							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'newleader' && $data['newleader'] != $character) {
@@ -380,11 +389,39 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							}
 							break;
-						case 'join':
+						case 'joinattack':
 							# Join someone else's suicide run.
-							if ($data['action'] == 'join' && $data['target']) {
+							if ($data['subaction'] == 'joinattack' && $data['target']) {
 								#TODO
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							}
+							break;
+						case 'joinsiege':
+							# Join an ongoing siege.
+							if ($data['subaction'] == 'joinsiege' && $data['side']) {
+								if($data['side'] == 'attackers') {
+									# User wants to join the attackers...
+									$side = $siege->getAttackers();
+									$side->addCharacter($character);
+									$character->addBattleGroup($side);
+								} elseif ($data['side'] == 'defenders') {
+									# User wants to join the defenders...
+									$side = $siege->getDefenders();
+									$side->addCharacter($character);
+									$character->addBattleGroup($side);
+								}
+								if ($side) {
+									# We should have a side, but just in case we don't, we don't make the action, because the user won't be able to unset this.
+									$act = new Action;
+									$act->setType('military.siege')
+										->setCharacter($character)
+										->setTargetSettlement($settlement)
+										->setTargetBattlegroup($side)
+										->setCanCancel(false)
+										->setBlockTravel(true);
+									$this->get('action_manager')->queue($act);
+								}
+								return $this->redirectToRoute('bm2_site_war_siegesettlement');
 							}
 							break;
 						case 'assume':
@@ -415,6 +452,7 @@ class WarController extends Controller {
 			'siege'=>$siege,
 			'leader'=>$leader,
 			'action'=>$action,
+			'status'=>$action,
 			'form'=>$form->createView()
 		);
 	}
