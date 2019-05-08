@@ -449,9 +449,13 @@ class WarManager {
 	}
 
 	public function leaveSiege($character, $siege) {
-		foreach ($siege->geGroups() as $group) {
+		foreach ($character->findActions('military.siege') as $action) {
+			#This should only ever be one, but just in case, and because findActions returns an ArrayCollection...
+			$this->em->remove($action);
+		}
+		foreach ($siege->getGroups() as $group) {
 			if ($group->getCharacters()->contains($character)) {
-				$character->removeGroup($group);
+				$character->removeBattlegroup($group);
 				$group->removeCharacter($character);
 				$this->addRegroupAction(null, $character);
 			}
