@@ -367,6 +367,7 @@ class Dispatcher {
 		if ($estate = $this->getActionableSettlement()) {
 			$actions[] = $this->militarySiegeSettlementTest();
 			$actions[] = $this->militarySiegeLeadershipTest();
+			$actions[] = $this->militarySiegeAssumeTest();
 			$actions[] = $this->militarySiegeBuildTest();
 			$actions[] = $this->militarySiegeAssaultTest();
 			$actions[] = $this->militarySiegeDisbandTest();
@@ -1172,19 +1173,19 @@ class Dispatcher {
 		$estate = $this->getActionableSettlement();
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.prisoner");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.prisoner");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
 			# Already doing.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.already");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.already");
 		}
 		if (!$estate) {
 			# Can't attack nothing.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosettlement");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosettlement");
 		}
 		if (!$estate->getSiege()) {
 			# No siege.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosiege");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosiege");
 		}
 		$siege = $estate->getSiege();
 		$inSiege = FALSE;
@@ -1214,21 +1215,21 @@ class Dispatcher {
 		}
 		if (!$isLeader) {
 			# Isn't leader.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.isleader");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
 		}
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
 			# The guards laugh at your "siege".
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosoldiers");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosoldiers");
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.inbattle");			
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.fresh");
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.siege.assume", "bm2_site_war_siegesettlement", false, array('action'=>'assume'));
+		return $this->action("military.siege.leadership", "bm2_site_war_siegesettlement", false, array('action'=>'leadership'));
 	}
 
 	public function militarySiegeAssumeTest($check_duplicate=false) {
