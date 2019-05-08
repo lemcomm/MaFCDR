@@ -335,8 +335,15 @@ class WarController extends Controller {
 					# This only engages if we've already got action set to "selected", so we start looking at what subaction we're processing.
 					switch($data['subaction']) {
 						case 'leadership':
-							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'newleader' && $data['newleader'] != $character) {
-								$siege->setLeader($data['newleader']);
+							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
+								# We already know they're *a* leader, now to figure out what group they lead. 
+								#TODO: Later when we add more sides to a battle, we'll need to expand this.
+								if ($siege->getAttackers()->getCharacters()->contains($character)) {
+									$group = $siege->getAttackers();
+								} else {
+									$group = $siege->getDefenders();
+								}
+								$group->setLeader($data['newleader']);
 								$em->flush();
 								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 							} else {
@@ -369,8 +376,10 @@ class WarController extends Controller {
 						case 'leave':
 							# Leave the siege.
 							if ($siege->getAttackers()->getLeader() == $character) {
+								# Leaders can't leave, though we may change this in the future. They must transfer leadership first, or just cancel the siege.
 								throw $this->createNotFoundException('error.notfound.areleader');
 							} else {
+								# Leave siege will remove the siege action and add a regroup action, as well as remove them from the siege battelgroup they're in.
 								$this->get('war_manager')->leaveSiege($character, $siege);
 								return $this->redirectToRoute('bm2_actions');
 							}
@@ -441,7 +450,6 @@ class WarController extends Controller {
 							throw $this->createNotFoundException('error.notfound.noinput');
 							break;
 					}
-					$em->flush();
 				}
 			}
 		}
