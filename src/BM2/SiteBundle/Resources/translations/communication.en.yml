@@ -208,6 +208,14 @@ event:
   assigned2:    You were assigned %count% entourage by %character%.
   reclaimed:    %character% has reclaimed %count% soldiers assigned to you. %stay% of them decided to remain under your command.
   battlejoin:   %character% has joined the battle with %soldiers% soldiers.
+  supplier:
+   food:
+    start:      %character% was granted authority to pull food from the storehouses for their troops.
+  supplied:
+   food:
+    start:      %character% has authorized you to pull food from their storehouses at %settlement% for your troops.
+    rejected:   Your request for food to be supplied from %settlement% was rejected by the lord.
+    end:        Your ability to draw food from %settlement% has reached the agreed upon conclusion.
 
  quest:
   created:      Quest created.
