@@ -29,9 +29,18 @@ class GameRequestController extends Controller {
 
 	private function security(Character $char, GameRequest $id) {
 		/* Most other places in the game have a single dispatcher call to do security. Unfortunately, for GameRequests, it's not that easy, as this file handles *ALL* processing of the request itself.
-		That means, we need a way to check whether or not a given user has rights to do things, when the things in questions could vary every time this controller is called. */
+		That means, we need a way to check whether or not a given user has rights to do things, when the things in questions could vary every time this controller is called. 
+		Yes, I realize this is a massive bastardization of how Symfony says Symfony is supposed to handle things, mainly that they say this should be in a Service as it's all back-end stuff, but if it works, it works.
+		Maybe in the future, when I'm looking to refine things, we can move it around then. Really, all that'd change is these being moved to the service and returning a true or false--personally I like all the logic being in one place though.*/
 		$result;
 		switch ($id->getType()) {
+			case 'soldier.food':
+				if ($id->getToSettlement()->getOwner() != $char) {
+					$result = false;
+				} else {
+					$result = true;
+				}
+				break;
 			case 'house.join':
 				if ($char->getHeadOfHouse() != $id->getToHouse()) {
 					$result = false;
@@ -57,6 +66,31 @@ class GameRequestController extends Controller {
 		$allowed = $this->security($character, $id);
 		# Do try to keep this switch and the denyAction switch in the order of most expected request. It'll save processing time.
 		switch($id->getType()) {
+			case 'soldier.food':
+				if ($allowed) {
+					$settlement = $id->getToSettlement();
+					$character = $id->getFromCharacter();
+					$character->setSoldierFood($settlement);
+					$this->get('history')->logEvent(
+						$settlement,
+						'event.military.supplier.food.start',
+						array('%link-character%'=>$id->getFromCharacter()->getId()),
+						History::LOW, true
+					);
+					$this->get('history')->logEvent(
+						$id->getFromCharacter(),
+						'event.military.supplied.food.start',
+						array('%link-character%'=>$settlement->getOwner()->getId(), '%link-settlement%'=>$settlement->getId()),
+						History::LOW, true
+					);
+					$id->setAccepted(true);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('military.settlement.food.supplied', array('%character%'=>$id->getFromCharacter()->getName(), '%settlement%'=>$id->getToSettlement()->getName()), 'actions'));
+					return $this->redirectToRoute('bm2_gamerequest_manage');
+				} else {
+					throw new AccessDeniedHttpException('unavailable.notlord');
+				}
+				break;
 			case 'house.join':
 				if ($allowed) {
 					$house = $id->getToHouse();
@@ -102,6 +136,27 @@ class GameRequestController extends Controller {
 		# Are we allowed to act on this GR? True = yes. False = no.
 		$allowed = $this->security($character, $id);
 		switch($id->getType()) {
+			case 'soldier.food':
+				if ($allowed) {
+					$settlement = $id->getToSettlement();
+					# Create event notice for denied character.
+					$this->get('history')->logEvent(
+						$id->getFromCharacter(),
+						'event.military.supplied.food.rejected',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::LOW, true
+					);
+					# Set accepted to false so we can hang on to this to prevent spamming. These get removed after a week, hence the new expiration date.
+					$id->setAccepted(FALSE);
+					$timeout = new \DateTime("now");
+					$id->setExpires($timeout->add(new \DateInterval("P7D")));
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('military.settlement.food.rejected', array('%character%'=>$id->getFromCharacter()->getName(), '%settlement%'=>$id->getToSettlement()->getName()), 'actions'));
+					return $this->redirectToRoute('bm2_gamerequest_manage');
+				} else {
+					throw new AccessDeniedHttpException('unavailable.notlord');
+				}
+				break;
 			case 'house.join':
 				if ($allowed) {
 					$house = $id->getToHouse();
@@ -113,7 +168,7 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
-					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%link-character%'=>$id->getFromCharacter()->getId()), 'politics'));
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
 					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
@@ -123,4 +178,30 @@ class GameRequestController extends Controller {
 		
 		return new Response();
 	}
+
+	/**
+	  * @Route("/manage", name="bm2_gamerequest_manage")
+	  * @Template
+	  */
+
+	public function manageAction() {
+		$character = $this->get('dispatcher')->gateway('personalRequestsManageTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		# TODO: Rework this to use dispatcher.
+		$requests = $this->get('game_request_manager')->findAllManageableRequests($character);
+
+		/*foreach ($requests as $request) {
+			$id = $joinrequest->getId();
+			$subject = $joinrequest->getSubject();
+			$text = $joinrequest->getText();
+		}*/
+		return array(
+			'gamerequests' => $requests
+		);
+	}
+
+
 }
