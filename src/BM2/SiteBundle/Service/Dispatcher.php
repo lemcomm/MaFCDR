@@ -386,7 +386,7 @@ class Dispatcher {
 		#}
 		
 
-		return array("name"=>"siege.name", "elements"=>$actions);
+		return array("name"=>"military.siege.name", "elements"=>$actions);
 	}
 
 	public function economyActions() {
@@ -417,7 +417,7 @@ class Dispatcher {
 		return $this->veryGenericTests();
 	}
 
-	public function personalActions() {
+	public function recruitActions() {
 		$actions=array();
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return array("name"=>"recruit.name", "elements"=>array(array("name"=>"recruit.all", "description"=>"unavailable.restricted")));
@@ -443,7 +443,23 @@ class Dispatcher {
 		return array("name"=>"recruit.name", "elements"=>$actions);
 	}
 
-	private function personalActionsGenericTests(Settlement $estate=null, $test='recruit') {
+	public function personalActions() {
+		$actions=array();
+
+		if ($this->getCharacter()->isNPC()) {
+			$actions[] = $this->metaUnitSettingsTest();
+			$actions[] = $this->metaKillTest();
+		} else {
+			$actions[] = $this->personalRequestsManageTest();
+			$actions[] = $this->metaUnitSettingsTest();
+			if ($this->getCharacter()->getUser()->getCrests()) {
+				$actions[] = $this->metaHeraldryTest();
+			}
+		}
+		return array("name"=>"personal.name", "elements"=>$actions);
+	}
+		
+	private function recruitActionsGenericTests(Settlement $estate=null, $test='recruit') {
 		if ($this->getCharacter()->isNPC()) {
 			return 'npc';
 		}
@@ -1944,7 +1960,7 @@ class Dispatcher {
 
 	public function personalEntourageTest() {
 		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
+		if (($check = $this->recruitActionsGenericTests($estate)) !== true) {
 			return array("name"=>"recruit.entourage.name", "description"=>"unavailable.$check");
 		}
 
@@ -1953,7 +1969,7 @@ class Dispatcher {
 
 	public function personalSoldiersTest() {
 		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
+		if (($check = $this->recruitActionsGenericTests($estate)) !== true) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
 		}
 		$available = $this->milman->findAvailableEquipment($estate, true);
@@ -1966,7 +1982,7 @@ class Dispatcher {
 
 	public function personalMilitiaTest() {
 		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
+		if (($check = $this->recruitActionsGenericTests($estate, 'mobilize')) !== true) {
 			return array("name"=>"recruit.militia.name", "description"=>"unavailable.$check");
 		}
 		if ($estate->getSoldiers()->isEmpty()) {
@@ -1978,7 +1994,7 @@ class Dispatcher {
 
 	public function personalOffersTest() {
 		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
+		if (($check = $this->recruitActionsGenericTests($estate, 'mobilize')) !== true) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.$check");
 		}
 		if ($estate->getOwner() != $this->getCharacter()) {
@@ -2003,6 +2019,15 @@ class Dispatcher {
 		}
 
 		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
+
+	}
+
+	public function personalRequestsManageTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"personal.requests.name", "description"=>"unavailable.npc");
+		}
+
+		return $this->action("personal.requests", "bm2_gamerequest_manage");
 
 	}
 	/* ========== Economy Actions ========== */
