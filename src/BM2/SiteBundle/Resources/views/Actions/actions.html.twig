@@ -20,6 +20,7 @@
 	<h1>{{ pagetitle|title|raw }}</h1>
 	<button id="style">{{ 'togglelist'|trans }}</button>
 	<div id="actionlist" class="boxlist">
+	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.personalActions, "domain":'actions'} only %}
 	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.interActions, "domain":'actions'} only %}
 	{% if siege %}
 		{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.siegeActions, "domain":'actions'} only %}
@@ -29,7 +30,7 @@
 	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.buildingActions, "domain":'actions'} only %}
 	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.controlActions, "domain":'actions'} only %}
 	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.economyActions, "domain":'actions'} only %}
-	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.personalActions, "domain":'actions'} only %}
+	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.recruitActions, "domain":'actions'} only %}
 	</div>
 	<br class="clear"/>
 {% endblock %}
