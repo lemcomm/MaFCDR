@@ -25,5 +25,9 @@
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="place"/>
 		
 		<one-to-many field="houses_present" target-entity="House" mapped-by="inside_place"/>
+
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_place"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_place"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_place"/>
 	</entity>
 </doctrine-mapping>
