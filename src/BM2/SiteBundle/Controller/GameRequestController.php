@@ -6,6 +6,8 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\House;
 
+use BM2\SiteBundle\Form\SoldierFoodType;
+
 use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 
@@ -193,13 +195,51 @@ class GameRequestController extends Controller {
 		# TODO: Rework this to use dispatcher.
 		$requests = $this->get('game_request_manager')->findAllManageableRequests($character);
 
-		/*foreach ($requests as $request) {
-			$id = $joinrequest->getId();
-			$subject = $joinrequest->getSubject();
-			$text = $joinrequest->getText();
-		}*/
 		return array(
 			'gamerequests' => $requests
+		);
+	}
+
+	/**
+	  * @Route("/soldierfood", name="bm2_gamerequest_soldierfood")
+	  * @Template
+	  */
+
+	public function soldierfoodAction(Request $request) {
+		# Get player character from security and check their access.		
+		$character = $this->get('dispatcher')->gateway('personalRequestSoldierFoodTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		# Get all character realms.
+		$myRealms = $character->findRealms();
+		$topRealms = new ArrayCollection;
+		# Sort through all realms and compile collection of top realms.
+		foreach ($myRealms as $realm) {
+			if (!$topRealms->contains($realm->findUltimate())) {
+				$topRealms->add($realm->findUltimate());
+			}
+		}
+		# Establish realm IDs array, go through all top realms to find all inferior realms (including self, hence the 'true') and add the realm IDs to $realms.
+		$realms = array();
+		foreach ($topRealms as $topRealm) {
+			foreach ($topRealm->findAllInferiors(true) as $indRealm) {
+				$realms[] = $indRealm->getId();
+			}
+		}
+
+		$form = $this->createForm(new SoldierFoodType($realms));
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			# newRequestFromCharactertoSettlement ($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Settlement $toSettlement = null)
+			$this->get('game_request_manager')->newRequestFromCharacterToSettlement('soldier.food', $data['expires'], $data['limit'], null, $data['subject'], $data['text'], $character, $data['target']);
+			$this->addFlash('notice', $this->get('translator')->trans('request.soldierfood.sent', array('%settlement%'=>$data['target']->getName()), 'actions'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return array(
+			'form' => $form->createView(),
+			'size' => $character->getEntourage()->count()+$character->getSoldiers()->count()
 		);
 	}
 
