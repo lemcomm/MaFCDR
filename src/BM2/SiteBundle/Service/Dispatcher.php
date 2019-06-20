@@ -451,6 +451,7 @@ class Dispatcher {
 			$actions[] = $this->metaKillTest();
 		} else {
 			$actions[] = $this->personalRequestsManageTest();
+			$actions[] = $this->personalRequestSoldierFoodTest();
 			$actions[] = $this->metaUnitSettingsTest();
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
@@ -2028,6 +2029,14 @@ class Dispatcher {
 		}
 
 		return $this->action("personal.requests", "bm2_gamerequest_manage");
+	}
+
+	public function personalRequestSoldierFoodTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"personal.soldierfood.name", "description"=>"unavailable.npc");
+		}
+
+		return $this->action("personal.soldierfood", "bm2_gamerequest_soldierfood");
 
 	}
 	/* ========== Economy Actions ========== */
