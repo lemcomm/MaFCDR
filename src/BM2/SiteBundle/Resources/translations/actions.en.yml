@@ -1036,6 +1036,9 @@ personal:
   soldierfood: %character% has requested that they be allowed to use the food stores of %settlement% to feed their mobilized forces, and has provided the following message explaining their request.
   expires:     This request allows this until %date%.
   noexpire:    This request is good forever, or until circumstances change (see the manual).
+ soldierfood:
+  name:        Request Food for Your Unit
+  description: Formalize a request for provisions.
 
 mercenaries:
  title:     Available Mercenary Groups
@@ -1075,3 +1078,20 @@ quests:
  details:   Details
  current:   Current Quests
  past:      Past Quests
+
+request:
+ generic:
+  subject:     Subject
+  text:        Message
+  expires:     Expiration Date & Time
+  submit:      Send Request
+  help:
+   subject:    A title for your request, similar to those used in regular messages.
+   text:       Here you can put a message to go along with your request. The same formating that is useable in other text boxes in the game can be used here. For more details on that, please see the manual.
+   expires:    This will determine how long this request will be considered valid. Only valid requests will confer their benefits, like granting access or allowing food usage.
+ soldierfood:
+  estate:      Supplying Settlement
+  estatehelp:  The estate from which food will be drawn, up to the limit set in this request. This list is generated from all settlements of all realms you are part of.
+  limit:       Maximum Amount
+  sent:        Your request to receive food from %settlement% has been sent.
+  limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
