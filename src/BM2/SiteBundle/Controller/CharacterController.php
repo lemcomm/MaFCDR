@@ -205,11 +205,11 @@ class CharacterController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 
-		$estates = array();
-		foreach ($character->getEstates() as $estate) {
+		$settlements = array();
+		foreach ($character->getOwnedSettlements() as $settlement) {
 			// FIXME: better: some trend analysis
 			$query = $em->createQuery('SELECT s.population as pop FROM BM2SiteBundle:StatisticSettlement s WHERE s.settlement = :here ORDER BY s.cycle DESC');
-			$query->setParameter('here', $estate);
+			$query->setParameter('here', $settlement);
 			$query->setMaxResults(3);
 			$data = $query->getArrayResult();
 			if (isset($data[2])) {
@@ -217,40 +217,40 @@ class CharacterController extends Controller {
 			} else {
 				$popchange = 0;
 			}
-			if ($estate->getRealm()) {
-				$r = $estate->getRealm();
-				$u = $estate->getRealm()->findUltimate();
+			if ($settlement->getRealm()) {
+				$r = $settlement->getRealm();
+				$u = $settlement->getRealm()->findUltimate();
 				$realm = array('id'=>$r->getId(), 'name'=>$r->getName());
 				$ultimate = array('id'=>$u->getId(), 'name'=>$u->getName());
 			} else {
 				$realm = null; $ultimate = null;
 			}
 			$build = array();
-			foreach ($estate->getBuildings()->filter(
+			foreach ($settlement->getBuildings()->filter(
 				function($entry) {
 					return ($entry->getActive()==false && $entry->getWorkers()>0);
 				}) as $building) {
 				$build[] = array('id'=>$building->getType()->getId(), 'name'=>$building->getType()->getName());
 			}
 
-			$estates[] = array(
-				'id' => $estate->getId(),
-				'name' => $estate->getName(),
-				'pop' => $estate->getFullPopulation(),
-				'peasants' => $estate->getPopulation(),
-				'thralls' => $estate->getThralls(),
-				'size' => $estate->getSize(),
+			$settlements[] = array(
+				'id' => $settlement->getId(),
+				'name' => $settlement->getName(),
+				'pop' => $settlement->getFullPopulation(),
+				'peasants' => $settlement->getPopulation(),
+				'thralls' => $settlement->getThralls(),
+				'size' => $settlement->getSize(),
 				'popchange' => $popchange,
-				'militia' => $estate->getActiveMilitia()->count(),
-				'recruits' => $estate->getRecruits()->count(),
+				'militia' => $settlement->getActiveMilitia()->count(),
+				'recruits' => $settlement->getRecruits()->count(),
 				'realm' => $realm,
 				'ultimate' => $ultimate,
 				'build' => $build,
 			);
 		}
 
-		$poly = $this->get('geography')->findRegionsPolygon($character->getEstates());
-		return array('estates'=>$estates, 'poly'=>$poly);
+		$poly = $this->get('geography')->findRegionsPolygon($character->getOwnedSettlements());
+		return array('settlements'=>$settlements, 'poly'=>$poly);
 	}
 
    /**
@@ -418,7 +418,7 @@ class CharacterController extends Controller {
 			if ($form_existing->isValid()) {
 				// place at estate of family member
 				$data = $form_existing->getData();
-				$startlocation = $data['estate'];
+				$startlocation = $data['settlement'];
 			}
 
 			$form_map->bind($request);
