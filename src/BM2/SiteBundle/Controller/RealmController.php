@@ -73,13 +73,14 @@ class RealmController extends Controller {
 		$character = $this->get('appstate')->getCharacter(false, true, true);
 		# NOTE: Character onject checking not conducted because we don't need it. 
 		# $character isn't checked in a context that would require it to be NULL or an Object.
+
 		$superrulers = array();
 
 		$territory = $realm->findTerritory();
 		$population = 0;
 		$restorable = FALSE;
-		foreach ($territory as $estate) {
-			$population += $estate->getPopulation() + $estate->getThralls();
+		foreach ($territory as $settlement) {
+			$population += $settlement->getPopulation() + $settlement->getThralls();
 		}
 
 		if ($realm->getSuperior()) {
@@ -130,7 +131,7 @@ class RealmController extends Controller {
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'parentpoly' => $parentpoly,
 			'subpolygons' => $subpolygons,
-			'estates' =>	$territory->count(),
+			'settlements' =>	$territory->count(),
 			'population'=>	$population,
 			'area' =>		$this->get('geography')->calculateRealmArea($realm),
 			'nobles' =>		$realm->findMembers()->count(),
@@ -353,7 +354,7 @@ class RealmController extends Controller {
 					$em->flush();
 				}
 				if (!$sovereign && $inferiors) {
-					$this->get('realm_manager')->dismantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$this->get('realm_manager')->dismantleRealm($character, $realm); # Move settlements up a level, remove position holders.
 					$superior = $realm->getSuperior();
 					foreach ($realm->getInferiors() as $subrealm) {
 						$this->get('history')->logEvent(
@@ -383,7 +384,7 @@ class RealmController extends Controller {
 					$em->flush();
 				}
 				if (!$sovereign && !$inferiors) {
-					$this->get('realm_manager')->dimsantleRealm($character, $realm); # Move estates up a level, remove position holders.
+					$this->get('realm_manager')->dimsantleRealm($character, $realm); # Move settlements up a level, remove position holders.
 					$realm->setActive(false);
 					$em->flush();
 				}
@@ -782,13 +783,13 @@ class RealmController extends Controller {
 
 			$newsize = 0;
 			$chars = new ArrayCollection;
-			foreach ($data['estate'] as $e) {
+			foreach ($data['settlement'] as $e) {
 				$newsize++;
 				if ($e->getOwner()) {
 					$chars->add($e->getOwner());
 				}
 			}
-			if ($newsize==0 || $newsize==$realm->getEstates()->count()) {
+			if ($newsize==0 || $newsize==$realm->getSettlements()->count()) {
 				$form->addError(new FormError($this->get('translator')->trans("diplomacy.subrealm.invalid.size", array(), 'politics')));
 				$fail=true;
 			}
@@ -808,7 +809,7 @@ class RealmController extends Controller {
 			}
 			if (!$fail) {
 				$subrealm = $this->get('realm_manager')->subcreate($data['name'], $data['formal_name'], $data['type'], $data['ruler'], $character, $realm);
-				foreach ($data['estate'] as $e) {
+				foreach ($data['settlement'] as $e) {
 					$this->get('politics')->changeSettlementRealm($e, $subrealm, 'subrealm');
 				}
 
