@@ -32,7 +32,7 @@ class Realm {
 	}
 
 	public function findTerritory($with_subs=true, $all_subs=true) {
-		if (!$with_subs) return $this->getEstates();
+		if (!$with_subs) return $this->getSettlements();
 
 		$territory = new ArrayCollection;
 
@@ -43,9 +43,9 @@ class Realm {
 			$all[] = $this->getInferiors();
 		}
 		foreach ($all as $realm) {
-			foreach ($realm->getEstates() as $estate) {
-				if (!$territory->contains($estate)) {
-					$territory->add($estate);					
+			foreach ($realm->getSettlements() as $settlement) {
+				if (!$territory->contains($settlement)) {
+					$territory->add($settlement);					
 				}
 			}			
 		}
@@ -73,8 +73,8 @@ class Realm {
 		if ($this->all_characters && $forceupdate == false) return $this->all_characters;
 		$this->all_characters = new ArrayCollection;
 
-		foreach ($this->findTerritory(false) as $estate) {
-			$owner = $estate->getOwner();
+		foreach ($this->findTerritory(false) as $settlement) {
+			$owner = $settlement->getOwner();
 			if ($owner) {
 				$this->addRealmMember($owner);
 			}
@@ -101,8 +101,8 @@ class Realm {
 		if ($this->all_active_characters && $forceupdate == false) return $this->all_active_characters;
 		$this->all_active_characters = new ArrayCollection;
 
-		foreach ($this->findTerritory(false) as $estate) {
-			$owner = $estate->getOwner();
+		foreach ($this->findTerritory(false) as $settlement) {
+			$owner = $settlement->getOwner();
 			if ($owner AND $owner->isActive(true)) {
 				$this->addActiveRealmMember($owner);
 			}
@@ -198,4 +198,5 @@ class Realm {
 		return $all;
 
 	}
+	
 }
