@@ -63,8 +63,8 @@ class Politics {
 			$newUltimate = null;
 		}
 
-		foreach ($character->getEstates() as $estate) {
-			$oldrealm = $estate->getRealm();
+		foreach ($character->getOwnedSettlements() as $settlement) {
+			$oldrealm = $settlement->getRealm();
 			if ($oldrealm != $newrealm) {
 				if ($oldrealm) {
 					$oldUltimate = $oldrealm->findUltimate();
@@ -91,7 +91,7 @@ class Politics {
 					} else { // leaving realm for an independent lord
 
 					}
-					$oldrealm->removeEstate($estate);
+					$oldrealm->removeSettlement($settlement);
 				} else { // we are independent
 					if ($newrealm) { // independent lord joining a realm
 						if ($newrealm === $newUltimate) { // joining at the top level
@@ -103,12 +103,12 @@ class Politics {
 
 					}
 				}
-				$estate->setRealm($newrealm);
+				$settlement->setRealm($newrealm);
 				if ($newrealm) {
-					$newrealm->addEstate($estate);
+					$newrealm->addSettlement($settlement);
 				}
 			}
-		} // end for each estate
+		} // end for each settlement
 		$character->setLiege($newLiege);
 
 		$mydata = $data; $mydata['events'] = $messages['self'];
@@ -151,10 +151,10 @@ class Politics {
 	public function changeSettlementOwner(Settlement $settlement, Character $character=null, $reason=false) {
 		$oldowner = $settlement->getOwner();
 		if ($oldowner) {
-			$oldowner->removeEstate($settlement);
+			$oldowner->removeSettlement($settlement);
 		}
 		if ($character) {
-			$character->addEstate($settlement);
+			$character->addSettlement($settlement);
 		}
 		$settlement->setOwner($character);
 
@@ -288,10 +288,10 @@ class Politics {
 		$oldrealm = $settlement->getRealm();
 
 		if ($newrealm) {
-			$newrealm->addEstate($settlement);
+			$newrealm->addSettlement($settlement);
 		}
 		if ($oldrealm) {
-			$oldrealm->removeEstate($settlement);
+			$oldrealm->removeSettlement($settlement);
 		}
 		$settlement->setRealm($newrealm);
 
