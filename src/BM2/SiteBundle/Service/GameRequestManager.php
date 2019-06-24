@@ -78,18 +78,57 @@ class GameRequestManager {
 	}
 
 	public function findAllManageableRequests(Character $char) {
+		# Build a list of all realms we are in, using their IDs.		
 		$realms = $char->findRealms();
 		$realmIDs =  [];
 		foreach ($realms as $realm) {
 			$realmIDs[] = $realm->getId();
 		}
-		$counter = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:GameRequest r JOIN r.to_settlement s JOIN r.to_house h JOIN r.to_place p WHERE (r.to_character = :char OR s.owner = :char OR r.to_realm IN (:realms) OR h.head = :char OR p.owner = :char) AND r.accepted IS NULL OR r.accepted = true');
-		$counter->setParameters(array('char'=>$char, 'realms'=>$realmIDs));
+		# Build a list of all settlements we own, using their IDs.
+		$settlementIDs = [];
+		foreach ($char->getOwnedSettlements() as $settlement) {
+			$settlementIDs[] = $settlement->getId();
+		}
+		# Build a list of all places we own, using their IDs.
+		$placeIDs = [];
+		foreach ($char->getOwnedPlaces() as $place) {
+			$placeIDs[] = $place->getId();
+		}
+		# Check if we're in a house, and if we are, check who the head of it is. If we are, grab the ID.
+		$houseID = null;
+		if ($char->getHouse() && $char->getHouse()->getHead() == $char) {
+			$houseID = $char->getHouse()->getId();
+		}
+		/*
+		# Now, realistically, we could've added flags to check if any of those entities we just sorted through had pending requests, but due to how Doctrine loads things, that's an additional query per check (as it'd have to load the requests of that entity, rather than just the entity).
+		# If we have a house ID, we check that as well. if not, we skip that.
+		if ($houseID) {
+			$counter = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs);
+		} else {
+			$counter = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs);
+		}
+		# And now, we execute that query to see if we have anything. If we do, we build our list and return it, if not, we return null.
+		# echo 'Request count: '.$counter->getSingleScalarResult();
 		if ($counter->getSingleScalarResult() > 0) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r JOIN r.to_settlement s JOIN r.to_house h JOIN r.to_place p WHERE (r.to_character = :char OR s.owner = :char OR r.to_realm IN (:realms) OR h.head = :char OR p.owner = :char) AND r.accepted IS NULL OR r.accepted = true GROUP BY r.accepted ASC ORDER BY r.created ASC');
-			$query->setParameters(array('char'=>$char, 'realms'=>$realmIDs));
+			if ($houseID) {
+				$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs);
+			} else {
+				$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs);
+			}
 			return $query->getResult();
 		} else {
+			return null;
+		}*/
+		if ($houseID) {
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs));
+		} else {
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs));
+		}
+		try {
+			# We try/catch this because doctrine doesn't like to return null. By not like, I mean it won't return null on this type of query.
+			return $query->getResult();
+		} catch(Exception $e) {
+			# If there's an exception, we drop it--an exception here is Doctrine complaining it can't return null--and return null.
 			return null;
 		}
 	}
