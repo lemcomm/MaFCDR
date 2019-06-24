@@ -1062,14 +1062,14 @@ class Economy {
 
 	public function calculateCorruption(Settlement $settlement) {
 		if (false === $settlement->corruption) {
-			$estates = 0;
+			$settlements = 0;
 			if ($settlement->getOwner()) {
 				$user = $settlement->getOwner()->getUser();
 				$query = $this->em->createQuery('SELECT count(s) FROM BM2SiteBundle:Settlement s JOIN s.owner c WHERE c.user = :user');
 				$query->setParameter('user', $user);
-				$estates = $query->getSingleScalarResult();
+				$settlements = $query->getSingleScalarResult();
 			}
-			$settlement->corruption = $estates/500;
+			$settlement->corruption = $settlements/500;
 		}
 		return $settlement->corruption;
 	}
