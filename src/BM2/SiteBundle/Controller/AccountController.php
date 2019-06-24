@@ -310,12 +310,12 @@ class AccountController extends Controller {
 		$user = $this->getUser();
 
 		$characters = array();
-		$estates = new ArrayCollection;
+		$settlements = new ArrayCollection;
 		$claims = new ArrayCollection;
 		foreach ($user->getLivingCharacters() as $character) {
 
-			foreach ($character->getEstates() as $estate) {
-				$estates->add($estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$settlements->add($settlement);
 			}
 			foreach ($character->getSettlementClaims() as $claim) {
 				$claims->add($claim->getSettlement());
@@ -331,7 +331,7 @@ class AccountController extends Controller {
 
 		return array(
 			'characters' => $characters,
-			'estates' => $this->get('geography')->findRegionsPolygon($estates),
+			'settlements' => $this->get('geography')->findRegionsPolygon($settlements),
 			'claims' => $this->get('geography')->findRegionsPolygon($claims)
 		);
 	}
