@@ -250,8 +250,8 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getEstates()) {
-					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getOwnedSettlements()) {
+					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
 				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known dead.");
@@ -311,8 +311,8 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getEstates()) {
-					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getOwnedSettlements()) {
+					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
 				}
 				if ($character->getHeadOfHouse()) {
 					$house = $character->getHeadOfHouse();
