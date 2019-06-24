@@ -191,8 +191,8 @@ class PoliticsController extends Controller {
 						$realms->add($realm);
 					}
 				}
-				foreach ($lord->getEstates() as $estate) {
-					if ($realm = $estate->getRealm()) {
+				foreach ($lord->getOwnedSettlements() as $settlement) {
+					if ($realm = $settlement->getRealm()) {
 						if (!$realms->contains($realm)) {
 							$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
 							$realms->add($realm);
