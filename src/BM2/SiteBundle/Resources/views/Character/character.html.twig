@@ -57,9 +57,9 @@
 		{% include "BM2SiteBundle:element:hierarchy.html.twig" with {"character":character, "who":'self'} only %}
 
 		<div id="myestates">
-		<h2>{{ 'estate'|transchoice(character.estates|length)|title }}{% if character.estates|length > 0%} <button id="expandestates">expand</button>{% endif %}</h2>
+		<h2>{{ 'estate'|transchoice(character.ownedSettlements|length)|title }}{% if character.ownedSettlements|length > 0%} <button id="expandestates">expand</button>{% endif %}</h2>
 		<ul>
-		{% for estate in character.estates %}
+		{% for settlement in character.ownedSettlements %}
 			<li>
 				{{ link(estate) }}
 				{% if estate.realm %}
