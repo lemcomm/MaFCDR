@@ -105,9 +105,9 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 				$militia = 0;
 				$nobles = $realm->findMembers();
 
-				foreach ($territory as $estate) {
-					$population += $estate->getFullPopulation();
-					$militia += $estate->getMilitia()->count();
+				foreach ($territory as $settlement) {
+					$population += $settlement->getFullPopulation();
+					$militia += $settlement->getMilitia()->count();
 				}
 
 				$players = array();
@@ -210,5 +210,4 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 
 }
-
 
