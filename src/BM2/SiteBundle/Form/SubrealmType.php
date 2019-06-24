@@ -26,7 +26,7 @@ class SubrealmType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$realm = $this->realm;
 
-		$builder->add('estate', 'entity', array(
+		$builder->add('settlement', 'entity', array(
 			'label' => 'diplomacy.subrealm.estates',
 			'multiple'=>true,
 			'expanded'=>true,
@@ -69,8 +69,8 @@ class SubrealmType extends AbstractType {
 			'expanded'=>false,
 			'class'=>'BM2SiteBundle:Character', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($realm) {
 				$qb = $er->createQueryBuilder('c');
-				$qb->join('c.estates', 'e');
-				$qb->where('e.realm = :realm')->setParameter('realm', $realm);
+				$qb->join('c.owned_settlements', 's');
+				$qb->where('s.realm = :realm')->setParameter('realm', $realm);
 				$qb->orderBy('c.name');
 				return $qb;
 			},
