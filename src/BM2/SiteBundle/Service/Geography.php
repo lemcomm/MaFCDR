@@ -142,16 +142,16 @@ class Geography {
 	}
 
 	public function findRealmPolygon(Realm $realm, $format='text', $with_subs='true') {
-		$estate_ids=array();
-		foreach ($realm->findTerritory($with_subs) as $estate) {
-			$estate_ids[] = $estate->getId();
+		$settlement_ids=array();
+		foreach ($realm->findTerritory($with_subs) as $settlement) {
+			$settlement_ids[] = $settlement->getId();
 		}
-		if (empty($estate_ids)) {
+		if (empty($settlement_ids)) {
 			return null;
 		} else {
 			if ($format=='json') { $as='ST_AsGeoJSON'; } else { $as='ST_AsText'; }
-			$query = $this->em->createQuery('SELECT '.$as.'(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:estates)');
-			$query->setParameters(array('estates'=>$estate_ids));
+			$query = $this->em->createQuery('SELECT '.$as.'(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:settlements)');
+			$query->setParameters(array('settlements'=>$settlement_ids));
 			$data = $query->getSingleResult();
 			return $data['poly'];
 		}
@@ -175,15 +175,15 @@ class Geography {
 
 
 	public function calculateRealmArea(Realm $realm) {
-		$estate_ids=array();
-		foreach ($realm->findTerritory() as $estate) {
-			$estate_ids[] = $estate->getId();
+		$settlement_ids=array();
+		foreach ($realm->findTerritory() as $settlement) {
+			$settlement_ids[] = $settlement->getId();
 		}
-		if (empty($estate_ids)) {
+		if (empty($settlement_ids)) {
 			return 0;
 		} else {
-			$query = $this->em->createQuery('SELECT ST_Area(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:estates)');
-			$query->setParameters(array('estates'=>$estate_ids));
+			$query = $this->em->createQuery('SELECT ST_Area(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:settlements)');
+			$query->setParameters(array('settlements'=>$settlement_ids));
 			return $query->getSingleScalarResult(); // this is in square m
 		}
 	}
