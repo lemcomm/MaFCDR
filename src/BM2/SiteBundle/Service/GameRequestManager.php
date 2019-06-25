@@ -29,8 +29,8 @@ class GameRequestManager {
 		StringValue		-> String. For text values. Optional.
 		Subject			-> String. The subject of the request. Some will be automated, others not.
 		Text			-> Text. The body of a message to accompany a request. Optional.
-		Accepted		-> Boolean. Stores whether the request was accepted or not. Not set initially. 
-					   If this is set FALSE, the Expires date will be updated to a week out, and after that week the game will purge the request. If set to TRUE and expirations is met, this request will be purged.
+		Accepted		-> Boolean. Stores whether the request was accepted or not. Defaults to FALSE because Doctrine is buggy (or the PDO is, or PHP is, depending on who you ask).
+		Rejected		-> Tracks whether or not a requst has been rejected. Once rejected (or accepted and expired) a request will be purged from teh database.
 
 			REQUESTOR INFORMATION -- Who/what made the request. Only one should be set, as appropriate. Reverses as "Requests".
 		FromCharacter		-> Character.
@@ -82,7 +82,11 @@ class GameRequestManager {
 		$realms = $char->findRealms();
 		$realmIDs =  [];
 		foreach ($realms as $realm) {
-			$realmIDs[] = $realm->getId();
+			foreach ($realm->findRulers() as $ruler) {
+				if ($char == $ruler) {
+					$realmIDs[] = $realm->getId();
+				}
+			}
 		}
 		# Build a list of all settlements we own, using their IDs.
 		$settlementIDs = [];
@@ -99,30 +103,12 @@ class GameRequestManager {
 		if ($char->getHouse() && $char->getHouse()->getHead() == $char) {
 			$houseID = $char->getHouse()->getId();
 		}
-		/*
-		# Now, realistically, we could've added flags to check if any of those entities we just sorted through had pending requests, but due to how Doctrine loads things, that's an additional query per check (as it'd have to load the requests of that entity, rather than just the entity).
-		# If we have a house ID, we check that as well. if not, we skip that.
+		# Now we build the query, or two of them.
+		# TODO: See if we need to actually differentiate these. I'm suspeting Doctrine is smart enough to know what to do here.
 		if ($houseID) {
-			$counter = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs);
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs));
 		} else {
-			$counter = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs);
-		}
-		# And now, we execute that query to see if we have anything. If we do, we build our list and return it, if not, we return null.
-		# echo 'Request count: '.$counter->getSingleScalarResult();
-		if ($counter->getSingleScalarResult() > 0) {
-			if ($houseID) {
-				$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs);
-			} else {
-				$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs);
-			}
-			return $query->getResult();
-		} else {
-			return null;
-		}*/
-		if ($houseID) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs));
-		} else {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND r.accepted IS NULL OR r.accepted = TRUE')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs));
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs));
 		}
 		try {
 			# We try/catch this because doctrine doesn't like to return null. By not like, I mean it won't return null on this type of query.
@@ -141,6 +127,8 @@ class GameRequestManager {
 		$this->em->persist($GR);
 		$GR->setType($type);
 		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
 		if ($expires) {
 			$GR->setExpires($expires);
 		}
@@ -220,6 +208,8 @@ class GameRequestManager {
 		$this->em->persist($GR);
 		$GR->setType($type);
 		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
 		if ($expires) {
 			$GR->setExpires($expires);
 		}
@@ -268,6 +258,8 @@ class GameRequestManager {
 		$this->em->persist($GR);
 		$GR->setType($type);
 		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
 		if ($expires) {
 			$GR->setExpires($expires);
 		}
