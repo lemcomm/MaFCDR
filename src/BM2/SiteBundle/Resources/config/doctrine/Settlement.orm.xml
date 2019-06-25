@@ -28,7 +28,7 @@
 		<one-to-many field="inferiors" target-entity="Settlement" mapped-by="superior"/>
 		-->
 		
-		<many-to-one field="owner" target-entity="Character" inversed-by="settlements"/>
+		<many-to-one field="owner" target-entity="Character" inversed-by="owned_settlements"/>
 		<many-to-one field="realm" target-entity="Realm" inversed-by="settlements"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital"/>
 		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="settlement"/>
