@@ -61,9 +61,9 @@
 		<ul>
 		{% for settlement in character.ownedSettlements %}
 			<li>
-				{{ link(estate) }}
-				{% if estate.realm %}
-					<small>({{link(estate.realm)}})</small>
+				{{ link(settlement) }}
+				{% if settlement.realm %}
+					<small>({{link(settlement.realm)}})</small>
 				{% endif %}
 			</li>
 		{% else %}
