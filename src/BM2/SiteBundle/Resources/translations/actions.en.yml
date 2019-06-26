@@ -1095,3 +1095,4 @@ request:
   limit:       Maximum Amount
   sent:        Your request to receive food from %settlement% has been sent.
   limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
+ 

@@ -216,7 +216,7 @@ class GameController extends Controller {
 			$value = false;
 			switch ($what) {
 				case 'area':		$value = $row->getArea(); break;
-				case 'estates':	$value = $row->getEstates(); break;
+				case 'settlements':	$value = $row->getSettlements(); break;
 				case 'players':	$value = $row->getPlayers(); break;
 				case 'soldiers':	$value = $row->getSoldiers(); break;
 			}
@@ -236,7 +236,7 @@ class GameController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		$data = array(
-			"estates"		=> array("label" => "estates", "data" => array()),
+			"settlements"		=> array("label" => "settlements", "data" => array()),
 			"population"	=> array("label" => "population", "data" => array()),
 			"soldiers"		=> array("label" => "soldiers", "data" => array()),
 			"militia"		=> array("label" => "militia", "data" => array()),
@@ -249,7 +249,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $row) {
 			$cycle = $row->getCycle();
 
-			$data["estates"]["data"][] 	= array($cycle, $row->getEstates());
+			$data["settlements"]["data"][] 	= array($cycle, $row->getSettlements());
 			$data["population"]["data"][] = array($cycle, $row->getPopulation());
 			$data["soldiers"]["data"][] 	= array($cycle, $row->getSoldiers());
 			$data["militia"]["data"][] 	= array($cycle, $row->getMilitia());
@@ -302,7 +302,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $result) {
 			$data = array(
 				'realm' =>		$result->getRealm(),
-				'estates' =>	$result->getEstates(),
+				'settlements' =>	$result->getSettlements(),
 				'population'=>	$result->getPopulation(),
 				'soldiers'=>	$result->getSoldiers(),
 				'militia'=>		$result->getMilitia(),

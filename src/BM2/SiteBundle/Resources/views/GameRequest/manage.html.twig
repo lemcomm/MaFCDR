@@ -9,7 +9,7 @@
 	{% for gamerequest in gamerequests %}
 		{% if gamerequest.type == 'soldier.food' %}
 			<hr>
-			{{ 'personal.request.soldierfood'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-settlement%":link(gamerequest.toSettlement)}, "actions")|raw }}
+			{{ 'personal.request.soldierfood'|trans({"%character%":link(gamerequest.fromCharacter), "%settlement%":link(gamerequest.toSettlement)}, "actions")|raw }}
 			{{ 'personal.request.created'|trans({"%date%":gamerequest.created|date("D, d M Y H:i:s")}, "actions")|raw }}
 			{% if gamerequest.expires %}
 				{{ 'personal.request.expires'|trans({"%date%":gamerequest.expires|date("D, d M Y H:i:s")}, "actions")|raw }}
@@ -23,7 +23,7 @@
 			</div>
 		{% elseif gamerequest.type == 'house.join' %}
 			<hr>
-			{{ 'house.manage.applicant.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{{ 'house.manage.applicant.preamble'|trans({"%character%":link(gamerequest.fromCharacter), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
 			<div class="subcontent inline_announcements" style="color:#460702">
 			<h4>{{ gamerequest.subject|title }}</h4>
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}

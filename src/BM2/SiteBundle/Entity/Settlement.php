@@ -375,9 +375,7 @@ class Settlement {
 			}
 		}
 		return $total;
-	}
+	}*/
 	
-	*/
-
 	
 }

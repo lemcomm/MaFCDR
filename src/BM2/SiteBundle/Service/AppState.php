@@ -153,11 +153,11 @@ class AppState {
 			$this->session->set('entourage', $character->getLivingEntourage()->count());
 			$query = $this->em->createQuery('SELECT s.id, s.name FROM BM2SiteBundle:Settlement s WHERE s.owner = :me');
 			$query->setParameter('me', $character);
-			$estates = array();
+			$settlements = array();
 			foreach ($query->getResult() as $row) {
-				$estates[$row['id']] = $row['name'];
+				$settlements[$row['id']] = $row['name'];
 			}
-			$this->session->set('estates', $estates);
+			$this->session->set('settlements', $settlements);
 			$realms = array();
 			foreach ($character->findRulerships() as $realm) {
 				$realms[$realm->getId()] = $realm->getName();

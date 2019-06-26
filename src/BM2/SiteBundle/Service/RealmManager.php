@@ -118,7 +118,7 @@ class RealmManager {
 			array(),
 			History::ULTRA, true
 		);
-		foreach ($realm->getEstates() as $e) {
+		foreach ($realm->getSettlements() as $e) {
 			if ($realm->getSuperior() && $realm->getSuperior()->getActive()) {
 				$this->politics->changeSettlementRealm($e, $realm->getSuperior(), 'fail');
 			} else {
@@ -139,9 +139,9 @@ class RealmManager {
 		}
 
 		if ($setrealm) {
-			foreach ($char->getEstates() as $estate) {
-				if (!$estate->getRealm()) {
-					$this->politics->changeSettlementRealm($estate, $realm, 'update');
+			foreach ($char->getOwnedSettlements() as $settlement) {
+				if (!$settlement->getRealm()) {
+					$this->politics->changeSettlementRealm($settlement, $realm, 'update');
 				}
 			}
 		}
@@ -232,7 +232,7 @@ class RealmManager {
 			case 'swords':
 				return $character->getVisualSize();
 			case 'land':
-				return $character->getEstates()->count();
+				return $character->getOwnedSettlements()->count();
 			case 'horses':
 				$weight = 0;
 				foreach ($character->getActiveSoldiers() as $soldier) {
@@ -248,7 +248,7 @@ class RealmManager {
 				foreach ($realms as $realm) {
 					$realmids[] = $realm->getId();
 					}
-				foreach ($character->getEstates() as $e) {
+				foreach ($character->getOwnedSettlements() as $e) {
 					if (in_array($e->getRealm()->getId(), $realmids)) {
 						$land++;
 					}
@@ -256,7 +256,7 @@ class RealmManager {
 				return $land;
 			case 'heads':
 				$pop = 0;
-				foreach ($character->getEstates() as $e) {
+				foreach ($character->getOwnedSettlements() as $e) {
 					$pop += $e->getPopulation();
 				}
 				return $pop;
@@ -266,9 +266,9 @@ class RealmManager {
 				foreach ($election->getRealm()->findAllInferiors(true) as $realm) {
 					$realms[] = $realm->getId();
 				}
-				foreach ($character->getEstates() as $estate) {
-					if (in_array($estate->getRealm()->getId(), $realms)) {
-						foreach ($estate->getBuildings() as $b) {
+				foreach ($character->getOwnedSettlements() as $settlement) {
+					if (in_array($settlement->getRealm()->getId(), $realms)) {
+						foreach ($settlement->getBuildings() as $b) {
 							if ($b->getType()->getDefenses() > 0) {
 								$castles += $b->getType()->getDefenses()/10;
 							}
@@ -278,8 +278,8 @@ class RealmManager {
 				return $castles;
 			case 'castles':
 				$castles = 0;
-				foreach ($character->getEstates() as $estate) {
-					foreach ($estate->getBuildings() as $b) {
+				foreach ($character->getOwnedSettlements() as $settlement) {
+					foreach ($settlement->getBuildings() as $b) {
 						if ($b->getType()->getDefenses() > 0) {
 							$castles += $b->getType()->getDefenses()/10;
 						}
@@ -379,27 +379,27 @@ class RealmManager {
 			array('%link-realm%'=>$realm->getId()),
 			History::HIGH
 		); # 'Ordered the dismantling of the realm of %link-realm%.'
-		foreach ($realm->getEstates() as $estate) {
+		foreach ($realm->getSettlements() as $settlement) {
 			if ($sovereign) {
 				$this->history->logEvent(
-					$estate,
+					$settlement,
 					'event.realm.abolished.sovereign.estate',
 					array('%link-realm%'=>$realm->getId()),
 					History::HIGH
 				); # 'With the dismantling of %link-realm%, the estate is effectively rogue.'
-				$estate->setRealm(null);
-				$realm->removeEstate($estate);
+				$settlement->setRealm(null);
+				$realm->removeSettlement($settlement);
 				$this->em->flush();
 			} else {
 				$this->history->logEvent(
-					$estate,
+					$settlement,
 					'event.realm.abolished.notsovereign.estate',
 					array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
 					History::HIGH
 				); # 'With the dismantling of %link-realm%, the estate now falls under %link-realm-2%.'
-				$realm->removeEstate($estate);
-				$estate->setRealm($superior);
-				$superior->addEstate($estate);
+				$realm->removeSettlement($settlement);
+				$settlement->setRealm($superior);
+				$superior->addSettlement($settlement);
 				$this->em->flush();
 			}
 		}

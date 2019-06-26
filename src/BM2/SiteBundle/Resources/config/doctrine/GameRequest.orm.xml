@@ -12,6 +12,7 @@
 		<field name="subject" type="string" nullable="true"/>
 		<field name="text" type="text" nullable="true"/>
 		<field name="accepted" type="boolean" nullable="true"/>
+		<field name="rejected" type="boolean" nullable="true"/>
 
 		<many-to-one field="from_character" target-entity="Character" inversed-by="requests"/>
 		<many-to-one field="from_settlement" target-entity="Settlement" inversed-by="requests"/>

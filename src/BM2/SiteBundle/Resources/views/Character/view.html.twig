@@ -181,10 +181,10 @@
 		<h2>{{ 'politics.hierarchy'|trans|title }}</h2>
 		{% include "BM2SiteBundle:element:hierarchy.html.twig" with {"character":char, "who":'other'} only %}
 
-		<h2>{{ 'estate'|transchoice(char.estates|length)|title }}</h2>
+		<h2>{{ 'estate'|transchoice(char.ownedSettlements|length)|title }}</h2>
 		<ul>
-		{% for estate in char.estates %}
-			<li>{{ link(estate) }}</li>
+		{% for settlement in char.ownedSettlements %}
+			<li>{{ link(settlement) }}</li>
 		{% else %}
 			<li>{{ 'none'|trans }}</li>
 		{% endfor %}

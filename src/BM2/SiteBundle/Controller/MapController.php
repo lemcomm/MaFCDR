@@ -603,7 +603,7 @@ class MapController extends Controller {
 			$data = $this->get('geography')->findRealmDataPolygons($realm);
 			foreach ($data as $row) {
 				$geo = json_decode($row['poly']);
-				$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+				$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 				$features[] = array(
 							'type' => 'Feature',
 //							'id' => $id++,
@@ -611,7 +611,7 @@ class MapController extends Controller {
 								'name' => $realm->getName(),
 								'colour_hex' => $realm->getColourHex(),
 								'colour_rgb' => $realm->getColourRgb(),
-								'estates' => $estates
+								'settlements' => $settlements
 								),
 							'geometry' => $geo
 						);
@@ -625,7 +625,7 @@ class MapController extends Controller {
 				$data = $this->get('geography')->findRealmDataPolygons($realm);
 				foreach ($data as $row) {
 					$geo = json_decode($row['poly']);
-					$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+					$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 					$features[] = array(
 								'type' => 'Feature',
 //								'id' => $id++,
@@ -633,7 +633,7 @@ class MapController extends Controller {
 									'name' => $realm->getName(),
 									'colour_hex' => $realm->getColourHex(),
 									'colour_rgb' => $realm->getColourRgb(),
-									'estates' => $estates
+									'settlements' => $settlements
 									),
 								'geometry' => $geo
 							);
@@ -645,7 +645,7 @@ class MapController extends Controller {
 	}
 
     // FIXME: this is not used anymore ?
-	private function realmdataArray($realm, $estates, $with_subs) {
+	private function realmdataArray($realm, $settlements, $with_subs) {
 		$data = json_decode($this->get('geography')->findRealmDataPolygons($realm));
 		var_dump($data);
 
@@ -657,7 +657,7 @@ class MapController extends Controller {
 				'name' => $realm->getName(),
 				'colour_hex' => $realm->getColourHex(),
 				'colour_rgb' => $realm->getColourRgb(),
-				'estates' => $estates
+				'settlements' => $settlements
 				),
 			'geometry' => json_decode($this->get('geography')->findRealmPolygon($realm, 'json', $with_subs))
 		);

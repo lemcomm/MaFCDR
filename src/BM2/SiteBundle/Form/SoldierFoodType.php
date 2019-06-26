@@ -19,8 +19,9 @@ class SoldierFoodType extends AbstractType {
 
 	private $realms;
 
-	public function __construct($realms) {
+	public function __construct($realms, $char) {
 		$this->realms = $realms;
+		$this->char = $char;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -32,6 +33,7 @@ class SoldierFoodType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$realms = $this->realms;
+		$char = $this->char;
 
 		if (date("m") == 12) {
 			$year = date("Y")+1;
@@ -60,7 +62,7 @@ class SoldierFoodType extends AbstractType {
 			'choice_label'=>'name',
 			'query_builder'=>function(EntityRepository $er) use ($realms) {
 				$qb = $er->createQueryBuilder('e');
-				$qb->where('e.realm IN (:realms)')->join('e.realm', 'r')->setParameter('realms', $realms);
+				$qb->where('e.realm IN (:realms)')->join('e.realm', 'r')->andWhere('s.owner != :char')->setParameters(array('realms'=>$realms, 'char'=>$char));
 				$qb->orderBy('r.name')->addOrderBy('e.name');
 				return $qb;
 			},
@@ -79,7 +81,7 @@ class SoldierFoodType extends AbstractType {
 		$builder->add('expires', DateTimeType::class, array(
 			'attr' => array('title'=>'request.generic.help.expires'),
 			'required' => false,
-			'placeholder' => array('year' => $year, 'month'=> $month, 'day'=>$day, 'hour'=>$hour, 'minute'=>$minute),
+			'placeholder' => array('year' => 'request.generic.year', 'month'=> 'request.generic.month', 'day'=>'request.generic.day', 'hour'=>'request.generic.hour', 'minute'=>'request.generic.minute'),
 			'years' => array(date("Y"), date("Y")+1, date("Y")+2)
 		));
 

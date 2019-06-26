@@ -577,7 +577,7 @@ class ActionsController extends Controller {
 			}
 
 			if ($data['target']) {
-				if ($data['target']->isTrial() && $data['target']->getEstates()->count() >= 3) {
+				if ($data['target']->isTrial() && $data['target']->getOwnedSettlements()->count() >= 3) {
 					$form->addError(new FormError("settlement.grant.free2"));
 				} elseif ($data['target']->isNPC()) {
 					$form->addError(new FormError("settlement.grant.npc"));
@@ -691,7 +691,7 @@ class ActionsController extends Controller {
 
 		// FIXME: to get trade permissions working, this and the code in TradeType.php need to be refactored to include permissions
 		$sources = array();
-		foreach ($character->getEstates() as $e) {
+		foreach ($character->getOwnedSettlements() as $e) {
 			$sources[] = $e->getId();
 		}
 		foreach ($trades as $t) {
@@ -752,17 +752,17 @@ class ActionsController extends Controller {
 			}
 		}
 
-		$estatesdata = array();
-		foreach ($character->getEstates() as $estate) {
-			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $estate, $merchants->count()>0);
-			$estate_resources = array();
+		$settlementsdata = array();
+		foreach ($character->getOwnedSettlements() as $settlement) {
+			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $settlement, $merchants->count()>0);
+			$settlement_resources = array();
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
+				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
+				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
-					$estate_resources[] = array(
+					$settlement_resources[] = array(
 						'type' => $resource,
 						'production' => $production,
 						'demand' => $demand,
@@ -771,9 +771,9 @@ class ActionsController extends Controller {
 					);
 				}
 			}
-			$estatesdata[] = array(
-				'settlement' => $estate,
-				'resources' => $estate_resources
+			$settlementsdata[] = array(
+				'settlement' => $settlement,
+				'resources' => $settlement_resources
 			);
 		}
 
@@ -781,9 +781,9 @@ class ActionsController extends Controller {
 		if ($settlement->getOwner() == $character) {
 			// TODO: maybe require a merchant and/or prospector ?
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
+				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
+				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
 					$local_resources[] = array(
@@ -800,7 +800,7 @@ class ActionsController extends Controller {
 		return array(
 			'settlement'=>$settlement,
 			'owned' => ($settlement->getOwner()==$character?true:false),
-			'estates' => $estatesdata,
+			'settlements' => $settlementsdata,
 			'local' => $local_resources,
 			'trades' => $trades,
 			'form' => $form->createView(),
