@@ -82,25 +82,25 @@
 
 {% if is_new == false %}
 <h3>{{ "lists.delete.submit"|trans({},"politics")|title }}</h3>
-{% if can_delete %}
-	{{ form(form_delete) }}
-{% else %}
-	{{ "lists.delete.locked"|trans({},"politics") }}
-	<ul>
-	{% for reason in locked_reasons %}
-		<li>{{ ("lists.delete."~reason)|trans({},"politics") }}</li>
-	{% endfor %}
-	</ul>
-{% endif %}
+	{% if can_delete %}
+		{{ form(form_delete) }}
+	{% else %}
+		{{ "lists.delete.locked"|trans({},"politics") }}
+		<ul>
+		{% for reason in locked_reasons %}
+			<li>{{ ("lists.delete."~reason)|trans({},"politics") }}</li>
+		{% endfor %}
+		</ul>
+	{% endif %}
 
-{% if used_by and used_by is not empty %}
-<h3>{{ "lists.usedby"|trans({},"politics")|title }}</h3>
-<ul class="shortlist">
-	{% for settlement in used_by %}
-		<li>{{ link(settlement) }}</li>
-	{% endfor %}
-</ul>
-{% endif %}
+	{% if used_by and used_by is not empty %}
+		<h3>{{ "lists.usedby"|trans({},"politics")|title }}</h3>
+		<ul class="shortlist">
+		{% for settlement in used_by %}
+			<li>{{ link(settlement) }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
 {% endif %}
 
 {% endblock %}
