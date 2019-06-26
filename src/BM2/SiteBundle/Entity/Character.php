@@ -30,6 +30,10 @@ class Character {
 		}
 	}
 
+	public function getListName() {
+		return $this->getName().' (ID: '.$this->id.')';
+	}
+
 	public function DaysInGame() {
 		return $this->created->diff(new \DateTime("now"), true)->days;
 	}
