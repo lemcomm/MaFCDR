@@ -7,16 +7,20 @@
 <div class="fullwidth texts">
 {{ form_start(form) }}
 {{ form_errors(form) }}
-	<h4>{{ "personal.soldierfood.subject.name"|trans({}, "actions") }}</h4>
-	{{ "personal.soldierfood.subject.desc"|trans({}, "actions")|raw }}<br />{{ form_widget(form.subject) }}
+	<h3>{{ "personal.soldierfood.subject.name"|trans({}, "actions") }}</h4>
+	{{ "personal.soldierfood.subject.desc"|trans({}, "actions")|raw }}<br>{{ form_widget(form.subject) }}
 
-	<h4>{{ "personal.soldierfood.text.name"|trans({}, "actions") }}</h4>
-	{{ "personal.soldierfood.text.desc"|trans({}, "actions")|raw }}<br />{{ form_widget(form.text) }}
+	<h3>{{ "personal.soldierfood.text.name"|trans({}, "actions") }}</h4>
+	{{ "personal.soldierfood.text.desc"|trans({}, "actions")|raw }}<br>{{ form_widget(form.text) }}
 
-	<h4>{{ "personal.soldierfood.details.name"|trans({}, "actions") }}</h4>
-	{{ "personal.soldierfood.text.desc"|trans({}, "actions")|raw }}<br />
-	{{ form_widget(form.target) }}<br />
-	{{ form_widget(form.limit) }}<br />
+	<h3>{{ "personal.soldierfood.source.name"|trans({}, "actions") }}</h4>
+	{{ "personal.soldierfood.source.desc"|trans({}, "actions")|raw }}<br>
+	{{ form_widget(form.target) }}
+	<h4>{{ "personal.soldierfood.limit.name"|trans({}, "actions") }}</h4>
+	{{ "personal.soldierfood.source.desc"|trans({}, "actions")|raw }}<br>
+	{{ form_widget(form.limit) }}
+	<h3>{{ "personal.soldierfood.expiration.name"|trans({}, "actions") }}</h4>
+	{{ "personal.soldierfood.expiration.desc"|trans({}, "actions")|raw }}<br>
 	{{ form_widget(form.expires) }}
 
 <br /><br />{{ form_end(form) }}
