@@ -386,6 +386,10 @@ class AccountController extends Controller {
 					$form->addError(new FormError("character.burst"));
 					$works = false;
 				}
+				if (preg_match('/[01234567890\!\@\#\$\%\^\&\*\(\)_\+\-\=\[\]\{\}\:\;\<\>\.\?\/\\\|\~\"]/', $data['name'])) {
+					$form->addError(new FormError("character.illegaltext"));
+					$works = false;
+				}
 
 				if ($spawnlimit) {
 					$form->addError(new FormError("character.spawnlimit"));
