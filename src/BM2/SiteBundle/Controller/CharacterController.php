@@ -1289,11 +1289,23 @@ class CharacterController extends Controller {
 		if (!$settings) {
 			throw new \Exception("Anata wa naniwoshita!?"); # Seriously, what did you do to get this!? Stop trying to break my game.
 		}
-
+		# Build the list of settlements we can get food from...
+		$query = $em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$character, 'type'=>'soldier.food'));
+		$results = $query->getResult();
+		# Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'. 
+		# Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0. 
+		# Which will never happen.
+		if (count($results) < 1) {
+			$settlements = 0;
+		} else {
+			$settlements = array();		
+			foreach ($query->getResult() as $result) {
+				$settlements[] = $result->getToSettlement()->getId();
+			}
+		}
 		#NOTE: Originally, I was planning to have one page to manage all unit settings, but trying to get Symfony to understand what I'm asking doesn't appear to be feasible.
 		# It probably has something to do with dynamic form loading, kind of how the permissions forms work, but that's way beyond my skill level.
-
-		$form = $this->createForm(new UnitSettingsType($character, true), $settings);
+		$form = $this->createForm(new UnitSettingsType($character, true, $settlements), $settings);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
