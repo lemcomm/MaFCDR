@@ -228,7 +228,7 @@ class GameRequestController extends Controller {
 			}
 		}
 
-		$form = $this->createForm(new SoldierFoodType($realms));
+		$form = $this->createForm(new SoldierFoodType($realms, $character));
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
