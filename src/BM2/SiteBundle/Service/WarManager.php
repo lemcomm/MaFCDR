@@ -67,7 +67,8 @@ class WarManager {
 			$foundinside = false;
 			$foundoutside = false;
 			$foundboth = false;
-			/* Because you can only attakc a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
+			/* Because you can only attack a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
+			Outside of a siege this is only set if you start a battle 
 			So we need to figure out if our targets are inside or outside. If we find a mismatch, we drop the outsiders and only attack those inside. */
 			foreach ($targets as $target) {
 				if ($target->getInsideSettlement()) {
@@ -168,6 +169,8 @@ class WarManager {
 			}
 		}
 		$battle->addGroup($defenders);
+		$battle->setPrimaryAttacker($attackers);
+		$battle->setPrimaryDefender($defenders);
 
 		// now we have all involved set up we can calculate the preparation timer
 		$time = $this->military->calculatePreparationTime($battle);
