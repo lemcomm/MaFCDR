@@ -10,6 +10,7 @@ class BattleGroup {
 
 	protected $soldiers=null;
 	protected $enemy;
+	protected $myReport;
 
 	/*
 	 * @codeCoverageIgnore
