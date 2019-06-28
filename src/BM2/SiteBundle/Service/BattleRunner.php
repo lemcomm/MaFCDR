@@ -59,90 +59,121 @@ class BattleRunner {
 		$this->battle = $battle;
 		$this->log(1, "Battle ".$battle->getId()."\n");
 
-		$siege = false;
+		$siege = $battle->getIsSiege();
 		$assault = false;
 		$sortie = false;
 		$some_inside = false;
 		$some_outside = false;
 		$no_rewards = false;
+		$char_count = 0;
+		$slumberers = 0;
+		
 		foreach ($battle->getGroups() as $group) {
 			foreach ($group->getCharacters() as $char) {
 				if ($char->getSlumbering() == true) {
-					$no_rewards = true;
-					$this->log(3, "No rewards flag set.\n");
-				}
-				if ($char->getInsideSettlement()) {
-					if ($battle->getSettlement()) {
-						$some_inside = true;
-					} else {
-						// put everyone outside, because it could be a sortie
-						$sortie = $char->getInsideSettlement();
-					}
-				} else {
-					$some_outside = true;
+					$slumberers++;
 				}
 			}
+			$char_count++;
 		}
-		if ($some_outside && $some_inside) {
-			$assault = true;
+		$this->log(15, "Found ".$char_count." characters and ".$slumberers." slumberers\n");
+		$xp_ratio = $slumberers/$char_count;
+		if ($xp_ratio < 0.1) {
+			$xp_mod = 1;
+		} else if ($xp_ratio < 0.2) {
+			$xp_mod = 0.5;
+		} else if ($xp_ratio < 0.3) {
+			$xp_mod = 0.2;
+		} else if ($xp_ratio < 0.5) {
+			$xp_mod = 0.1;
+		} else {
+			$xp_mod = 0;
 		}
-		
+		$this->log(15, "XP modifier set to ".$char_count." characters and ".$slumberers." slumberers\n");
 
 		$this->report = new BattleReport;
+		switch ($battle->getType()) {
+			case 'siegesortie':
+				$this->report->setSiege(FALSE);
+				$this->report->setAssault(FALSE);
+				$this->report->setSortie(TRUE);
+				$this->report->setUrban(FALSE);
+				if ($battle->getSiege()->getStage() > 1) {
+					$location = array('key'=>'battle.location.sortie', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				} else {
+					$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				}
+				break;
+			case 'siegeassault':
+				$this->report->setSiege(FALSE);
+				$this->report->setAssault(TRUE);
+				$this->report->setSortie(FALSE);
+				$this->report->setUrban(FALSE);
+				if ($battle->getSiege()->getStage() > 1 && $battle->getSiege()->getStage() == $battle->getSiege()->getMaxStage()) {
+					$location = array('key'=>'battle.location.castle', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				} else {
+					$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				}
+				break;
+			case 'urban':
+				$this->report->setSiege(FALSE);
+				$this->report->setAssault(FALSE);
+				$this->report->setSortie(FALSE);
+				$this->report->setUrban(TRUE);
+				$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				break;
+			case 'field':
+				$this->report->setSiege(FALSE);
+				$this->report->setAssault(FALSE);
+				$this->report->setSortie(FALSE);
+				$this->report->setUrban(FALSE);
+				$loc = $this->geo->locationName($battle->getLocation());
+				$location = array('key'=>'battle.location.'.$loc['key'], 'id'=>$loc['entity']->getId(), 'name'=>$loc['entity']->getName());
+				break;
+		}
+		
 		$this->report->setCycle($cycle);
-		$this->report->setSiege($siege);
-		$this->report->setAssault($assault);
-		$this->report->setSortie($sortie===false?false:true);
 		$this->report->setLocation($battle->getLocation());
 		$this->report->setSettlement($battle->getSettlement());
 		$this->report->setWar($battle->getWar());
-
-		if ($battle->getSettlement()) {
-			if ($siege) {
-				$location = array('key'=>'battle.location.siege', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
-			} elseif ($assault) {
-				$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
-			} else {
-				$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
-			}
-		} else {
-			if ($sortie) {
-				$location = array('key'=>'battle.location.sortie', 'id'=>$sortie->getId(), 'name'=>$sortie->getName());
-			} else {
-				// TODO: find nearby settlement, river, etc. to name this battle
-				$loc = $this->geo->locationName($battle->getLocation());
-				$location = array('key'=>'battle.location.'.$loc['key'], 'id'=>$loc['entity']->getId(), 'name'=>$loc['entity']->getName());
-			}
-		}
 		$this->report->setLocationName($location);
-
 
 		$this->report->setCompleted(false);
 		$this->report->setDebug("");
 		$this->em->persist($this->report);
 		$this->em->flush(); // because we need the id below
 
-		foreach ($battle->getDefenseBuildings() as $building) {
-			$this->report->addDefenseBuilding($building);
+		/* First stage defenses */
+		if ($battle->getType() == 'siegeassault') {
+			foreach ($battle->getDefenseBuildings() as $building) {
+				$this->report->addDefenseBuilding($building);
+			}
 		}
 
-		$this->log(1, "populating characters and locking...\n");
+		/* So, this next chunk actually does a LOT of processing, and prepares the bulk of the battle report. 
+		The advantage of this is that it should save us a bit of preparation time. 
+
+		Regardless, TODO: this is horribly unfinished at the moment and the entire file will require extensive reivew.*/
+		$this->log(15, "populating characters and locking...\n");
 		$characters = array();
+		$group_count = 0;
 		foreach ($battle->getGroups() as $group) {
+			$group_count++;
 			foreach ($group->getCharacters() as $char) {
 				$characters[] = $char->getId();
 				$char->setBattling(true);
+				$chRep = new BattleParticipant;
+				$chRep->setGroupId($group_count); #Determines column alignment in report and tracks this particular group.
+				$chRep->setStanding(true)->setWounded(false)->setKilled(false); # Default settings.
+				$chRep->setBattleReport($this->report); #Links back to report.
+				$group->myReport = $chRep;
+				$this->report->getParticipants()->add($char);
 			}
+			
 		}
-		$this->em->flush();
+		$this->em->flush(); #So we don't have doctrine entity lock failures, we need the above battling flag set.
 
 		$this->log(25, "checking mercenaries...\n");
-		$characters = array();
-		foreach ($battle->getGroups() as $group) {
-			foreach ($group->getCharacters() as $char) {
-				$characters[] = $char->getId();
-			}
-		}
 		$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Mercenaries m WHERE m.hired_by IN (:chars)');
 		$query->setParameter('chars', $characters);
 		foreach ($query->getResult() as $mercs) {
@@ -152,7 +183,9 @@ class BattleRunner {
 		}
 
 		$this->log(15, "preparing...\n");
-		if ($this->prepare($battle, $no_rewards)) {
+				
+		if ($this->prepare($battle)) {
+			
 			foreach ($battle->getGroups() as $group) {
 				foreach ($group->getCharacters() as $char) {
 					$me = new BattleParticipant;
@@ -164,9 +197,10 @@ class BattleRunner {
 					$this->em->persist($me);
 				}
 			}
+			*/
 			// the main call to actually run the battle:
 			$this->log(15, "resolving...\n");
-			$this->resolveBattle($no_rewards);
+			$this->resolveBattle($xp_mod);
 		} else {
 			// if there are no soldiers in the battle
 			$this->log(1, "failed battle\n");
@@ -192,6 +226,7 @@ class BattleRunner {
 			$noble->getCharacter()->removeSoldier($noble);
 		}
 
+		# TODO: Adapt this for when sieges have reached their conclusion, and pass which side was victorious to a different function to closeout the siege properly.
 		if (!$battle->getSiege()) {
 			foreach ($battle->getGroups() as $group) {
 				$this->war_manager->disbandGroup($group, $battlesize);
@@ -215,12 +250,10 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getSoldiers() as $soldier) {
-				if (!$no_rewards) {
-					if ($soldier->getExperience()<=5) {
-						$soldier->gainExperience(2);
-					} else {
-						$soldier->gainExperience(1);					
-					}
+				if ($soldier->getExperience()<=5) {
+					$soldier->addXP(2);
+				} else {
+					$soldier->addXP(1);					
 				}
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -240,11 +273,13 @@ class BattleRunner {
 			if ($combatworthy) {
 				$combatworthygroups++;
 			}
-			$starting[$group->getLocalId()] = $troops;
+			$starting[$combatworthy] = $troops;
 		}
 
 		// FIXME: in huge battles, this can potentially take, like, FOREVER :-(
 		if ($combatworthygroups>1) {
+
+			#TODO: Rework this to use new defense logic.
 			if ($battle->getDefenseBonus() > 0) {
 				$this->log(10, "Defense Bonus / Fortification: ".$battle->getDefenseBonus()."\n");
 			}
