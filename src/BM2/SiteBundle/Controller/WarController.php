@@ -221,7 +221,10 @@ class WarController extends Controller {
 				$settlement->setSiege($siege);
 				$siege->setStage(1);
 				$maxstages = 1; # No defense, no siege, thus if we have a siege, we always have atleast one stage.
-				if($settlement->hasBuildingNamed('Wood Castle') OR $settlement->hasBuildingNamed('Stone Castle')) {
+				if($settlement->hasBuildingNamed('Palisade')) {
+					$maxstages++; # It may be a wall of sticks for the most part, but it's still *something*.
+				}
+				if($settlement->hasBuildingNamed('Wood Castle')) {
 					$maxstages++; # A small citadel, just big enough to offer a last ditch defense.
 				}
 				if($settlement->hasBuildingNamed('Fortress')) {
@@ -357,8 +360,11 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 							}
 						case 'assault':
-							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'assault') {
+							if ($siege->getAttackers()->getLeader() == $character && $data['subaction'] == 'assault') {
 								$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							} else if ($siege->getDefenders()->getLeader() == $character && $data['subaction'] == 'assault') {
+								$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getDefender(), $siege->getAttacker());
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							} else {
 								throw $this->createNotFoundException('error.notfound.leader');
@@ -1206,32 +1212,13 @@ class WarController extends Controller {
 		}
 
 		$success = false;
-		$nearby_battles = $this->get('geography')->findBattlesInActionRange($character);
-
-		if ($character->getInsideSettlement()) {
-			$battles = $nearby_battles;
-		} else {
-			$battles = array();
-			foreach ($nearby_battles as $b) {
-				$someone_outside = false;
-				foreach ($b['battle']->getGroups() as $group) {
-					foreach ($group->getCharacters() as $char) {
-						if ($char->getInsideSettlement() == false) {
-							$someone_outside = true;
-							break 2;
-						}
-					}
-				}
-				if ($someone_outside) {
-					$battles[] = $b;
-				}
-			}
-		}
+		$battles = $this->get('geography')->findBattlesInActionRange($character);
 
 		$form = $this->createForm(new BattleParticipateType($battles));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
+			$character->setInsideSettlement(NULL);
 			if (isset($data['group'])) {
 				$this->get('war_manager')->joinBattle($character, $data['group']);
 				$this->getDoctrine()->getManager()->flush();
