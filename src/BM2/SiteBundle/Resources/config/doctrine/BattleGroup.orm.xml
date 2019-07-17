@@ -30,5 +30,7 @@
 		<one-to-one field="attacking_in_battles" target-entity="Battle" mapped-by="primary_attacker"/>
 		<one-to-one field="defending_in_battles" target-entity="Battle" mapped-by="primary_defender"/>
 		<field name="engaged" type="boolean" nullable="true"/>
+
+		<one-to-one field="active_report" target-entity="BattleReportGroup"/>
 	</entity>
 </doctrine-mapping>
