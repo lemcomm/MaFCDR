@@ -6,6 +6,9 @@ use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\BattleParticipant;
 use BM2\SiteBundle\Entity\BattleReport;
+use BM2\SiteBundle\Entity\BattleReportGroup;
+use BM2\SiteBundle\Entity\BattleReportStage;
+use BM2\SiteBundle\Entity\BattleReportCharacter;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Action;
@@ -31,6 +34,7 @@ class BattleRunner {
 	private $report;
 	private $nobility;
 	private $battlesize=1;
+	private $defense_bonus=0;
 
 
 	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager) {
@@ -64,7 +68,6 @@ class BattleRunner {
 		$sortie = false;
 		$some_inside = false;
 		$some_outside = false;
-		$no_rewards = false;
 		$char_count = 0;
 		$slumberers = 0;
 		
@@ -73,8 +76,8 @@ class BattleRunner {
 				if ($char->getSlumbering() == true) {
 					$slumberers++;
 				}
+				$char_count++;
 			}
-			$char_count++;
 		}
 		$this->log(15, "Found ".$char_count." characters and ".$slumberers." slumberers\n");
 		$xp_ratio = $slumberers/$char_count;
@@ -89,9 +92,10 @@ class BattleRunner {
 		} else {
 			$xp_mod = 0;
 		}
-		$this->log(15, "XP modifier set to ".$char_count." characters and ".$slumberers." slumberers\n");
+		$this->log(15, "XP modifier set to ".$xp_mod." with ".$char_count." characters and ".$slumberers." slumberers\n");
 
 		$this->report = new BattleReport;
+		$assault = false;
 		switch ($battle->getType()) {
 			case 'siegesortie':
 				$this->report->setSiege(FALSE);
@@ -114,6 +118,12 @@ class BattleRunner {
 				} else {
 					$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
 				}
+				$assault = true;
+				# TODO: Expand this to figure out other stages.
+				foreach ($battle->getDefenseBuildings() as $building) {
+					$this->report->addDefenseBuilding($building); 
+				}
+				$this->defense_bonus = $battle->getDefenseBonus();
 				break;
 			case 'urban':
 				$this->report->setSiege(FALSE);
@@ -143,17 +153,6 @@ class BattleRunner {
 		$this->em->persist($this->report);
 		$this->em->flush(); // because we need the id below
 
-		/* First stage defenses */
-		if ($battle->getType() == 'siegeassault') {
-			foreach ($battle->getDefenseBuildings() as $building) {
-				$this->report->addDefenseBuilding($building);
-			}
-		}
-
-		/* So, this next chunk actually does a LOT of processing, and prepares the bulk of the battle report. 
-		The advantage of this is that it should save us a bit of preparation time. 
-
-		Regardless, TODO: this is horribly unfinished at the moment and the entire file will require extensive reivew.*/
 		$this->log(15, "populating characters and locking...\n");
 		$characters = array();
 		$group_count = 0;
@@ -239,7 +238,7 @@ class BattleRunner {
 
 	// FIXME: apparently, if you fight someone with no troops, you fight your own soldiers?
 
-	private function prepare(Battle $battle, $no_rewards) {
+	private function prepare(Battle $battle) {
 		$starting=array();
 		$combatworthygroups = 0;
 		$enemy=null;
@@ -279,9 +278,9 @@ class BattleRunner {
 		// FIXME: in huge battles, this can potentially take, like, FOREVER :-(
 		if ($combatworthygroups>1) {
 
-			#TODO: Rework this to use new defense logic.
-			if ($battle->getDefenseBonus() > 0) {
-				$this->log(10, "Defense Bonus / Fortification: ".$battle->getDefenseBonus()."\n");
+			# Only siege assaults get defense bonuses.
+			if ($this->defense_bonus) {
+				$this->log(10, "Defense Bonus / Fortification: ".$this->defense_bonus."\n");
 			}
 
 			foreach ($battle->getGroups() as $group) {
@@ -289,35 +288,45 @@ class BattleRunner {
 				foreach ($group->getReinforcedBy() as $reinforcement) {
 					$mysize += $reinforcement->getVisualSize();
 				}
-				if ($group->isDefender() && $battle->getDefenseBonus()) {
+
+				if ($group->isDefender() && $this->defense_bonus) {
 					// if we're on defense, we feel like we're more
-					$mysize *= 1 + ($battle->getDefenseBonus()/200);
+					$mysize *= 1 + ($this->defense_bonus/200);
 				}
+
 				$enemies = $group->getEnemies();
-				if ($enemies) {
-					foreach ($enemies as $enemy) {
-						$enemysize += $enemy->getVisualSize();
-					}
-					$mod = sqrt($mysize / $enemysize);
-				} else {
-					// FIXME: strange, we don't know our enemy?
-					$mod = 1.0;
+				foreach ($enemies as $enemy) {
+					$enemysize += $enemy->getVisualSize();
 				}
+				$mod = sqrt($mysize / $enemysize);
+
 				$this->log(3, "Group #".$group->getId().", visual size $mysize.\n");
 
 				$this->battlesize = min($mysize, $enemysize);
+				
+				$group_report = new BattleReportGroup();
+				$this->em->persist($group_report);
+				$this->em->flush(); # Because we need to set this immediately to keep tracking things simple. 
+				# Right now, this makes this slower, but when battles take actual time to happen, this will be very nice to already have.
+				$this->report->addGroup($group_report); # attach group report to main report
+				$group->setActiveReport($group_report); # attack the group report to the battle group
+
 				foreach ($group->getCharacters() as $char) {
 					$this->character_manager->addAchievement($char, 'battlesize', $this->battlesize);
+					$char_report = new BattleReportCharacter()
+					$this->em->persist($char_report);
+					$char_report->setBattleReportGroup($group_report);
+					$this->em->flush()
+					$char->setActiveReport($char_report);
+					$group_report->addCharacter($char_report);
 				}
 
 				$base_morale = 50;
 				// defense bonuses:
-				if ($group->isDefender()) {
-					if ($battle->getDefenseBonus()) {
-						$base_morale += $battle->getDefenseBonus()/2;
-					}
-					if ($battle->getSettlement()) {
-						$base_morale += 10; // note: this will always be true if the above is true, as for the moment we have fortifications only at settlements
+				if ($group == $battle->getPrimaryDefender() or $battle->getPrimaryDefender()->getReinforcedBy()->contains($group)) {
+					if ($battle->getType = 'siegeassault') {
+						$base_morale += $this->defense_bonus/2;
+						$base_morale += 10; 
 					}
 				}
 				$this->log(10, "Base morale: $base_morale, mod = $mod\n");
@@ -347,7 +356,7 @@ class BattleRunner {
 					$soldier->resetCasualties();
 				}
 			}
-
+			$this->em->flush(); # Save all active reports for characters, and all character reports to their group reports.
 			$this->report->setStart($starting);
 			return true;
 		} else {
@@ -379,17 +388,17 @@ class BattleRunner {
 
 
 
-	private function resolveBattle($no_rewards) {
+	private function resolveBattle($xp_mod) {
 		// TODO: Siege battles (attacks on fortifications) should give 2 or even 3 (depending on towers, especially) ranged rounds,
 		//			but this requires changes to the battle report format as well, and backwards compatability is a bitch...
 		$this->log(20, "...ranged phase...\n");
-		$ranged = $this->resolveRangedPhase($no_rewards);
+		$ranged = $this->resolveRangedPhase($xp_mod);
 		$this->log(20, "...melee phase...\n");
-		$melee = $this->resolveMeleePhase($no_rewards);
+		$melee = $this->resolveMeleePhase($xp_mod);
 		$this->report->setCombat(array('ranged'=>$ranged, 'melee'=>$melee));
 
 		$this->log(20, "...pursuit phase...\n");
-		$hunt = $this->resolvePursuitPhase($no_rewards);
+		$hunt = $this->resolvePursuitPhase($xp_mod);
 		$this->report->setHunt($hunt);
 
 		$this->log(3, "survivors:\n");
@@ -405,9 +414,7 @@ class BattleRunner {
 
 			$types=array();
 			foreach ($group->getActiveSoldiers() as $soldier) {
-				if (!$no_rewards) {
-					$soldier->gainExperience(2);
-				}
+				$soldier->gainExperience(2*$xp_mod);
 
 				$type = $soldier->getType();
 				if (isset($types[$type])) {
@@ -428,6 +435,7 @@ class BattleRunner {
 
 		$noblefates=array();
 		$allnobles=array();
+		$all_groups = $this->battle->getGroups();
 		$this->log(2, "Fate of First Ones:\n");
 		foreach ($this->battle->getGroups() as $group) {
 			$noblegroup=array();
@@ -511,14 +519,18 @@ class BattleRunner {
 		$this->em->flush();
 		$this->log(1, "unlocking characters...\n");
 		foreach ($allnobles as $noble) {
+			$noble->setActiveReport(null); #Unset active report.
 			$noble->setBattling(false);
 		}
+		foreach ($all_groups as $group) {
+			$group->setActiveReport(null); #Unset active report.
+		|
 		$this->em->flush();
 		$this->log(1, "unlocked...\n");
 		unset($allnobles);
 	}
 
-	private function resolveRangedPhase($no_rewards) {	
+	private function resolveRangedPhase($xp_mod) {	
 		// ranged combat:
 		$ranged=array();
 		$extras=array();
@@ -544,7 +556,7 @@ class BattleRunner {
 						if (rand(0,100)<min(95,$soldier->RangedPower()+$bonus)) {
 							// target hit
 							$hits++;
-							$result = $this->RangedHit($soldier, $target, $no_rewards);
+							$result = $this->RangedHit($soldier, $target, $xp_mod);
 							if (isset($results[$result])) {
 								$results[$result]++;
 							} else {
@@ -633,7 +645,7 @@ class BattleRunner {
 		return $ranged;
 	}
 
-	private function resolveMeleePhase($no_rewards) {
+	private function resolveMeleePhase($xp_mod) {
 		// melee combat (several rounds)
 		$round=0;
 		$melee=array();
@@ -666,7 +678,7 @@ class BattleRunner {
 							// hit someone
 							$target = $this->getRandomSoldier($enemy_collection);
 							if ($target) {
-								$result = $this->RangedHit($soldier, $target, $no_rewards, 'melee');
+								$result = $this->RangedHit($soldier, $target, $xp_mod, 'melee');
 							} else {
 								// no more targets
 								$this->log(10, "no more targets\n");
@@ -680,7 +692,7 @@ class BattleRunner {
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemy_collection);
 						if ($target) {
-							$result = $this->MeleeAttack($soldier, $target, $no_rewards, $round);
+							$result = $this->MeleeAttack($soldier, $target, $xp_mod, $round);
 						} else {
 							// no more targets
 							$this->log(10, "but finds no target\n");
@@ -798,7 +810,7 @@ class BattleRunner {
 	}
 
 
-	private function resolvePursuitPhase($no_rewards) {
+	private function resolvePursuitPhase($xp_mod) {
 		// hunting down retreating enemies
 		$this->log(5, "\nhunting them down:\n");
 		$hunt=array();
@@ -856,7 +868,7 @@ class BattleRunner {
 						// hit someone!
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") caught up with ".$target->getName()." (".$target->getType().") - ");
 						if (rand(0,$power) > rand(0,$target->DefensePower())) {
-							$result = $this->resolveDamage($soldier, $target, $no_rewards, $power, 'escape');
+							$result = $this->resolveDamage($soldier, $target, $xp_mod, $power, 'escape');
 							if ($result) {
 								$hunt[$group->getLocalId()]['killed']++;
 								if ($result == 'killed') {
@@ -936,10 +948,8 @@ class BattleRunner {
 
 	// TODO: attacks on mounted soldiers could kill the horse instead
 
-	private function MeleeAttack(Soldier $soldier, Soldier $target, $no_rewards, $round) {
-		if (!$no_rewards) {
-			$soldier->gainExperience(1);
-		}
+	private function MeleeAttack(Soldier $soldier, Soldier $target, $xp_mod, $round) {
+		$soldier->gainExperience(1*$xp_mod);
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -956,10 +966,8 @@ class BattleRunner {
 		$this->log(15, (round($attack*10)/10)." vs. ".(round($defense*10)/10)." - ");
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($soldier, $target, $no_rewards, $attack, 'melee');
-			if (!$no_rewards) {
-				$soldier->gainExperience($result=='kill'?2:1);
-			}
+			$result = $this->resolveDamage($soldier, $target, $xp_mod, $attack, 'melee');
+			$soldier->gainExperience(($result=='kill'?2:1)*$xp_mod);
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -971,10 +979,8 @@ class BattleRunner {
 		return $result;
 	}
 
-	private function RangedHit(Soldier $soldier, Soldier $target, $no_rewards, $phase='ranged') {
-		if (!$no_rewards) {
-			$soldier->gainExperience(1);
-		}	   
+	private function RangedHit(Soldier $soldier, Soldier $target, $xp_mod, $phase='ranged') {
+		$soldier->gainExperience(1*$xp_mod);
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -995,7 +1001,7 @@ class BattleRunner {
 		$this->log(10, "hits ".$target->getName()." (".$target->getType().") - (".round($attack)." vs. ".round($defense).") = ");
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($soldier, $target, $no_rewards, $attack, 'ranged');
+			$result = $this->resolveDamage($soldier, $target, $xp_mod, $attack, 'ranged');
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -1048,7 +1054,7 @@ class BattleRunner {
 		}
 	}
 
-	private function resolveDamage(Soldier $soldier, Soldier $target, $no_rewards, $power, $phase) {
+	private function resolveDamage(Soldier $soldier, Soldier $target, $xp_mod, $power, $phase) {
 		// this checks for penetration again AND low-damage weapons have lower lethality AND wounded targets die more easily
 		if (rand(0,$power) > rand(0,max(1,$target->DefensePower() - $target->getWounded(true)))) {
 			// penetrated again = kill
@@ -1083,9 +1089,7 @@ class BattleRunner {
 			$target->wound(rand(max(1, round($power/10)), $power));
 			$this->history->addToSoldierLog($target, 'wounded.'.$phase);
 			$result='wound';
-			if (!$no_rewards) {
-				$target->gainExperience(1); // it hurts, but it is a teaching experience...
-			}
+			$target->gainExperience(1*$xp_mod); // it hurts, but it is a teaching experience...
 		}
 		
 		$soldier->addCasualty();
