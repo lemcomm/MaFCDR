@@ -118,5 +118,7 @@
 
 		<one-to-one field="unit_settings" target-entity="UnitSettings" mapped-by="character"/>
 		<one-to-many field="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
+
+		<one-to-one field="active_report" target-entity="BattleReportCharacter"/>
 	</entity>
 </doctrine-mapping>
