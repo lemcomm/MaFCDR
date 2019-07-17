@@ -10,7 +10,6 @@ class BattleGroup {
 
 	protected $soldiers=null;
 	protected $enemy;
-	protected $myReport;
 
 	/*
 	 * @codeCoverageIgnore
@@ -125,16 +124,24 @@ class BattleGroup {
 	public function getEnemies() {
 		$enemies = array();
 		if ($this->battle) {
-			foreach ($this->battle->getGroups() as $group) {
-				if ($group->getReinforcing() != $this && $group != $this) {
-					$enemies[] = $group;
+			$attacker = $this->battle->getPrimaryAttacker(); #Because we have to start somewhere, let's just grab the attacker!
+			if ($attacker == $this OR $attacker->getReinforcedBy()->contains($this)) {
+				$enemies[] = $this->battle->getPrimaryDefender(); #If we're attacker, defenders are enemies.
+				foreach ($this->battle->getPrimaryDefender()->getReinforcedBy() as $group) {
+					$enemies[] = $group; #Add all other defenders.
+				}
+			} else {
+				$enemies[] = $this->battle->getPrimaryAttacker(); #Since we're not attacker, the attackers are the enemies!
+				foreach ($this->battle->getPrimaryAttacker()->getReinforcedBy() as $group) {
+					$enemies[] = $group; #Add all other attackers.
 				}
 			}
 		} else if ($this->siege) {
-			foreach ($this->siege->getGroups() as $group) {
-				if ($group->getReinforcing() != $this) {
-					$enemies[] = $group;
-				}
+			# Sieges are a lot easier, as they're always 2 sided.
+			if ($this->siege->getAttackers()->contains($this)) {
+				$enemies = $this->siege->getDefenders();
+			} else {
+				$enemies = $this->siege->getAttackers();
 			}
 		}
 		if (!empty($enemies)) {
