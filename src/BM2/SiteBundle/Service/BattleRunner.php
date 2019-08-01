@@ -155,22 +155,18 @@ class BattleRunner {
 
 		$this->log(15, "populating characters and locking...\n");
 		$characters = array();
-		$group_count = 0;
+		$regionType = false;
 		foreach ($battle->getGroups() as $group) {
-			$group_count++;
 			foreach ($group->getCharacters() as $char) {
 				$characters[] = $char->getId();
 				$char->setBattling(true);
-				$chRep = new BattleParticipant;
-				$chRep->setGroupId($group_count); #Determines column alignment in report and tracks this particular group.
-				$chRep->setStanding(true)->setWounded(false)->setKilled(false); # Default settings.
-				$chRep->setBattleReport($this->report); #Links back to report.
-				$group->myReport = $chRep;
-				$this->report->getParticipants()->add($char);
+				if (!$regionType) {
+					$regionType = $this->geo->findMyRegion($char)->getBiome()->getName(); #We're hijacking this loop to grab the region type for later calculations.
+				}
 			}
 			
 		}
-		$this->em->flush(); #So we don't have doctrine entity lock failures, we need the above battling flag set.
+		$this->em->flush(); #So we don't have doctrine entity lock failures, we need the above battling flag set. It also gives us an easy way to check which characters we need to check below.
 
 		$this->log(25, "checking mercenaries...\n");
 		$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Mercenaries m WHERE m.hired_by IN (:chars)');
@@ -184,19 +180,6 @@ class BattleRunner {
 		$this->log(15, "preparing...\n");
 				
 		if ($this->prepare($battle)) {
-			
-			foreach ($battle->getGroups() as $group) {
-				foreach ($group->getCharacters() as $char) {
-					$me = new BattleParticipant;
-					$me->setGroupId($group->getLocalId());
-					$me->setStanding(true)->setWounded(false)->setKilled(false);
-					$me->setBattleReport($this->report);
-					$this->report->getParticipants()->add($me);
-					$me->setCharacter($char);
-					$this->em->persist($me);
-				}
-			}
-			*/
 			// the main call to actually run the battle:
 			$this->log(15, "resolving...\n");
 			$this->resolveBattle($xp_mod);
@@ -313,12 +296,13 @@ class BattleRunner {
 
 				foreach ($group->getCharacters() as $char) {
 					$this->character_manager->addAchievement($char, 'battlesize', $this->battlesize);
-					$char_report = new BattleReportCharacter()
-					$this->em->persist($char_report);
-					$char_report->setBattleReportGroup($group_report);
+					$charReport = new BattleReportCharacter()
+					$this->em->persist($charReport);
+					$charReport->setBattleReportGroup($group_report);
+					$charReport->setStanding(true)->setWounded(false)->setKilled(false);
 					$this->em->flush()
-					$char->setActiveReport($char_report);
-					$group_report->addCharacter($char_report);
+					$char->setActiveReport($charReport);
+					$group_report->addCharacter($charReport);
 				}
 
 				$base_morale = 50;
@@ -386,6 +370,341 @@ class BattleRunner {
 	}
 
 
+	private function resolveBattleNew($xpMod) {
+		$phase = 1; # Initial value.
+		$combat = true;
+		$this->log(20, "...starting phases...\n");
+		while ($combat) {
+			$this->prepareRound($phase);
+			# Main combat loop, go!
+			# TODO: Make $battle->getRangedPhases() actually a thing.
+			if ($battle->getRangedPhases() <= $phase) {
+				$combat = $this->runStage('ranged', $xpMod);
+			} else {
+				$combat = $this->runStage('normal', $xpMod);
+			}
+		}
+	}
+
+	private function runStage($type = 'normal') {
+		$groups = $this->battle->getGroups();
+		foreach ($groups as $group) {
+			$shots = 0; # Ranged attack attempts
+			$strikes = 0; # Melee attack attempts
+			$rangedhits = 0;
+			$meleehits = 0;
+			$routed = 0;
+
+			$stageResult=array(); # Initialize this for later use. At the end of this loop, we commit this data to $stageReport->setData($stageResult);
+			$stageReport = new BattleReportStage; # Generate new stage report.
+			$this->em->persist($stageReport);
+			$stageReport->setRound($phase);
+			$stageReport->setGroupReport($group->getActiveReport());
+			$this->em->flush();
+			$group->getActiveReport()->addCombatStage($stageReport);
+
+			$enemycollection = array();
+			foreach ($group->getEnemies() as $enemygroup) {
+				$enemycollection[] = $enemygroup->getActiveSoldiers();
+			}
+			$enemies = $enemy_collection->count();
+
+			if (($battle->getPrimaryDefender() == $group) OR ($battle->getPrimaryAttacker() == $group)) {
+				$this->log(5, "group ".$group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") - ".$group->getFightingSoldiers()->count()." left, $enemies targets\n");
+			} else {
+				$this->log(5, "group ".$group->getActiveReport()->getId()." (Reinforcing group ".$group->getReinforcing()->getActiveReport()->getId().") - ".$group->getFightingSoldiers()->count()." left, $enemies targets\n");
+			}
+
+			# TODO: Move all of this out of the runStage and into resolveBattleNew so we don't have to run this each time.
+			$rangedPenalty = 1; # Default of no penalty. Yes, 1 is no penalty. It's a multiplier.
+			if ($battle->getType() == 'siegeassault' AND ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker()) {
+					$rangedPenalty *= 0.3; # Defenders in seiges get a blanket defensive boost as they're harder to hit being on the walls. This affects the determination of a hit, not how bad the hit is.
+			}
+			switch ($regionType) {
+				case 'scrub':
+					$rangedPenalty *=0.8;
+					break;
+				case 'thin scrub':
+					$rangedPenalty *=0.9;
+					break;
+				case 'marsh':
+					$rangedPenalty *=0.8;
+					break;
+				case 'forest':
+					$rangedPenalty *=0.7;
+					break;
+				case 'dense forest':
+					$rangedPenalty *=0.5;
+					break;
+				case 'rock':
+					$rangedPenalty *=0.9;
+					break;
+				case 'snow':
+					$rangedPenalty *=0.6;
+					break;
+			}
+			if ($type == 'ranged') {
+				foreach ($group->getFightingSoldiers() as $soldier) {
+					if ($soldier->RangedPower()>0) {
+						// ranged soldier - fire!
+						$result=false;
+						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
+						$target = $this->getRandomSoldier($enemy_collection);
+						if ($target) {
+							$shots++;
+							$bonus = sqrt($enemies); // easier to hit if there are many enemies
+							if (rand(0,100)<min(95*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
+								// target hit
+								$rangedhits++;
+								$result = $this->RangedHit($soldier, $target, $xp_mod);
+								if (isset($results[$result])) {
+									$results[$result]++;
+								} else {
+									$results[$result] = 1;
+								}
+								if ($result=='kill'||$result=='capture') {
+									$enemies--;
+									$enemy_collection->removeElement($target);
+								}
+								// special results for nobles
+								if ($target->isNoble() && in_array($result, array('kill','capture'))) {
+									foreach ($group->getEnemies() as $enemygroup) {
+										if (!$enemygroup->getReinforcing) {
+											$enemy = $enemygroup->getLocalId();
+										}
+									}
+
+									if ($result=='capture') {
+										$extra = array(
+											'what' => 'ranged.'.$result,
+											'by' => $soldier->getCharacter()->getId()
+										);
+									} else {
+										$extra = array('what'=>'ranged.'.$result);
+									}
+									$extra['who'] = $target->getCharacter()->getId();
+									$extras[] = $extra;
+								}
+
+							} else {
+								// missed
+								$this->log(10, "missed\n");
+							}
+							if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
+								if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
+									// one-shot weapon, that only longbowmen will use by default in this phase
+									// TODO: Better logic that determines this, for when we add new weapons.
+									$soldier->dropEquipment();
+								}
+							}
+						} else {
+							$this->log(10, "no more targets\n");
+						}
+					}
+				}
+				if ($enemies > 0 && $hits > 0) {
+					// morale damage - a function of how much fire we are taking
+					// yes, this makes hits count several times - morale reduction above and twice here (since they're also always a shot)
+					// we also double the effective morale of a soldier (after damage), because even a single hit triggers this test
+					// and we don't want it to be overwhelming
+					$moraledamage = ($shots+$hits*2) / $enemies;
+					$this->log(10, "morale damage: $moraledamage\n");
+					$total = 0; $count = 0;
+					foreach ($group->getEnemies() as $enemygroup) {
+						foreach ($enemygroup->getActiveSoldiers() as $soldier) { 
+							if ($soldier->isFortified()) {
+								$soldier->reduceMorale($moraledamage/2);
+							} else {
+								$soldier->reduceMorale($moraledamage);
+							}
+							$total += $soldier->getMorale();
+							$count++;
+							$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
+							if ($soldier->getMorale()*2 < rand(0,100)) { 
+								$this->log(50, " - panics");
+								$soldier->setRouted(true);
+								$this->history->addToSoldierLog($soldier, 'routed.ranged');
+								$routed++;
+							}
+							$this->log(50, "\n");
+						}
+					}
+					$this->log(10, "==> avg. morale: ".round($total/max(1,$count))."\n");
+				}
+
+				$stageResult = array('shots'=>$shots, 'hits'=>$hits, 'results'=>$results, 'routed'=>$routed, 'extra'=>$extras);
+			} # End of Ranged combat rules.
+			if ($type == 'normal') {
+			
+			}
+		$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
+		}
+	}
+
+	# The below is temporarily duplicated so I can have a working and static copy of it.
+	private function resolveMeleePhase($xp_mod) {
+		// melee combat (several rounds)
+		$round=0;
+		$melee=array();
+		$fighting = true;
+		while ($fighting) {
+			$round++;
+			$this->log(5, "\nround $round:\n");
+			$melee[$round]=array();
+			$extras=array();
+
+			$this->prepareRound();
+			foreach ($this->battle->getGroups() as $group) {
+				$melee[$round][$group->getLocalId()] = array();
+				$attackers = $group->getFightingSoldiers()->count();
+				$melee[$round][$group->getLocalId()]['alive'] = $attackers;
+				$this->log(5, "group ".$group->getLocalId()." (".($group->getAttacker()?"attacker":"defender").") - $attackers left\n");
+				$enemycollection = array();
+				foreach ($group->getEnemies() as $enemygroup) {
+					$enemycollection[] = $enemygroup->getActiveSoldiers();
+				}
+				$enemies = $enemy_collection->count();
+				$bonus = sqrt($enemies);
+				foreach ($group->getFightingSoldiers() as $soldier) {
+					$result=false; $target=null;
+					if ($soldier->isRanged()) {
+						// continue firing on enemy targets, but at a reduced to-hit chance
+						// TODO: friendly fire !
+						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
+						if (rand(0,100)<min(75,($soldier->RangedPower()+$bonus)*0.5)) {
+							// hit someone
+							$target = $this->getRandomSoldier($enemy_collection);
+							if ($target) {
+								$result = $this->RangedHit($soldier, $target, $xp_mod, 'melee');
+							} else {
+								// no more targets
+								$this->log(10, "no more targets\n");
+							}
+						} else {
+							// missed
+							$this->log(10, "missed\n");
+						}
+					} else {
+						// melee unit
+						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
+						$target = $this->getRandomSoldier($enemy_collection);
+						if ($target) {
+							$result = $this->MeleeAttack($soldier, $target, $xp_mod, $round);
+						} else {
+							// no more targets
+							$this->log(10, "but finds no target\n");
+						}
+					}
+					if ($result) {
+						if ($result=='kill'||$result=='capture') {
+							$enemies--;
+							$enemy_collection->removeElement($target);
+						}
+						if (isset($melee[$round][$group->getLocalId()][$result])) {
+							$melee[$round][$group->getLocalId()][$result]++;
+						} else {
+							$melee[$round][$group->getLocalId()][$result] = 1;
+						}
+
+						// special results for nobles
+						if ($target->isNoble() && in_array($result, array('kill','capture'))) {
+							foreach ($group->getEnemies() as $enemygroup) {
+								if (!$enemygroup->getReinforcing) {
+									$enemy = $enemygroup->getLocalId();
+								}
+							}
+
+							if (!isset($extras[$enemy])) {
+							  $extras[$enemy] = array();
+							}
+
+							if ($result=='capture' || $soldier->isNoble()) {
+								$extra = array(
+									'what' => 'noble.'.$result,
+									'by' => $soldier->getCharacter()->getId()
+								);
+							} else {
+								$extra = array('what'=>'mortal.'.$result);
+							}
+
+							$extra['who'] = $target->getCharacter()->getId();
+							$extras[$enemy][] = $extra;
+						}
+					}
+				}
+			}
+
+			$this->log(10, "morale checks:\n");
+			foreach ($this->battle->getGroups() as $group) {
+				foreach ($group->getEnemies() as $enemygroup) {
+					if (!$enemygroup->getReinforcing) {
+						$enemy = $enemygroup->getLocalId();
+					}
+				}
+				$melee[$round][$enemy]['panic'] = 0;
+				$count_us = $group->getActiveSoldiers()->count();
+				foreach ($group->getReinforcedBy() as $reinforcement) {
+					$count_us += $reinforcement->getActiveSoldiers()->count();
+				}
+				$enemies = $group->getEnemies();
+				foreach ($enemies as $enemygroup) {
+					$count_enemy += $enemygroup->getActiveSoldiers()->count();
+				}
+				$mod = sqrt($mysize / $enemysize);
+
+				foreach ($group->getActiveSoldiers() as $soldier) {
+					// still alive? check for panic
+					if ($count_enemy > 0) {
+						$ratio = $count_us / $count_enemy;
+						if ($ratio > 10) {
+							$mod = 0.95;
+						} elseif ($ratio > 5) {
+							$mod = 0.9;
+						} elseif ($ratio > 2) {
+							$mod = 0.8;
+						} elseif ($ratio > 0.5) {
+							$mod = 0.75;
+						} elseif ($ratio > 0.25) {
+							$mod = 0.65;
+						} elseif ($ratio > 0.15) {
+							$mod = 0.6;
+						} elseif ($ratio > 0.1) {
+							$mod = 0.5;
+						} else {
+							$mod = 0.4;
+						}
+					} else {
+						// no enemies left
+						$mod = 0.99;
+					}
+
+					if ($soldier->getAttacks()==0) {
+						// we did not get attacked this round
+						$mod = min(0.99, $mod+0.1);
+					}
+					$soldier->setMorale($soldier->getMorale() * $mod);
+					if ($soldier->getMorale() < rand(0,100)) {
+						$melee[$round][$enemy]['panic']++;
+						$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - panics\n");
+						$soldier->setRouted(true);
+						$count_us--;
+						$this->history->addToSoldierLog($soldier, 'routed.melee');
+					} else {
+						$this->log(20, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())."\n");
+					}
+				}
+
+				foreach ($extras as $index=>$data) {
+					$melee[$round][$index]['extra'] = $data;
+				}
+
+				if ($count_us==0) {
+					$fighting = false;
+				}
+			}
+		}
+		return $melee;
+	}
 
 
 	private function resolveBattle($xp_mod) {
@@ -528,121 +847,6 @@ class BattleRunner {
 		$this->em->flush();
 		$this->log(1, "unlocked...\n");
 		unset($allnobles);
-	}
-
-	private function resolveRangedPhase($xp_mod) {	
-		// ranged combat:
-		$ranged=array();
-		$extras=array();
-
-		$this->prepareRound();
-		foreach ($this->battle->getGroups() as $group) {
-			$shots = 0; $hits=0; $routed=0; $results=array();
-			$enemycollection = array();
-			foreach ($group->getEnemies() as $enemygroup) {
-				$enemycollection[] = $enemygroup->getActiveSoldiers();
-			}
-			$enemies = $enemy_collection->count();
-			$this->log(5, "group ".$group->getLocalId()." (".($group->getAttacker()?"attacker":"defender").") - ".$group->getFightingSoldiers()->count()." left, $enemies targets\n");
-			foreach ($group->getFightingSoldiers() as $soldier) {
-				if ($soldier->RangedPower()>0) {
-					// ranged soldier - fire!
-					$result=false;
-					$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
-					$target = $this->getRandomSoldier($enemy_collection);
-					if ($target) {
-						$shots++;
-						$bonus = sqrt($enemies); // easier to hit if there are many enemies
-						if (rand(0,100)<min(95,$soldier->RangedPower()+$bonus)) {
-							// target hit
-							$hits++;
-							$result = $this->RangedHit($soldier, $target, $xp_mod);
-							if (isset($results[$result])) {
-								$results[$result]++;
-							} else {
-								$results[$result] = 1;
-							}
-							if ($result=='kill'||$result=='capture') {
-								$enemies--;
-								$enemy_collection->removeElement($target);
-							}
-
-							// special results for nobles
-							if ($target->isNoble() && in_array($result, array('kill','capture'))) {
-								foreach ($group->getEnemies() as $enemygroup) {
-									if (!$enemygroup->getReinforcing) {
-										$enemy = $enemygroup->getLocalId();
-									}
-								}
-
-								if (!isset($extras[$enemy])) {
-									$extras[$enemy] = array();
-								}
-								if ($result=='capture') {
-									$extra = array(
-										'what' => 'ranged.'.$result,
-										'by' => $soldier->getCharacter()->getId()
-									);
-								} else {
-									$extra = array('what'=>'ranged.'.$result);
-								}
-								$extra['who'] = $target->getCharacter()->getId();
-								$extras[$enemy][] = $extra;
-							}
-
-						} else {
-							// missed
-							$this->log(10, "missed\n");
-						}
-						if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
-							if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
-								// one-shot weapon, that only longbowmen will use by default in this phase
-								// TODO: Better logic that determines this, for when we add new weapons.
-								$soldier->dropEquipment();
-							}
-						}
-					} else {
-						$this->log(10, "no more targets\n");
-					}
-				}
-			}
-			if ($enemies > 0 && $hits > 0) {
-				// morale damage - a function of how much fire we are taking
-				// yes, this makes hits count several times - morale reduction above and twice here (since they're also always a shot)
-				// we also double the effective morale of a soldier (after damage), because even a single hit triggers this test
-				// and we don't want it to be overwhelming
-				$moraledamage = ($shots+$hits*2) / $enemies;
-				$this->log(10, "morale damage: $moraledamage\n");
-				$total = 0; $count = 0;
-				foreach ($group->getEnemies() as $enemygroup) {
-					foreach ($enemygroup->getActiveSoldiers() as $soldier) { 
-						if ($soldier->isFortified()) {
-							$soldier->reduceMorale($moraledamage/2);
-						} else {
-							$soldier->reduceMorale($moraledamage);
-						}
-						$total += $soldier->getMorale();
-						$count++;
-						$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
-						if ($soldier->getMorale()*2 < rand(0,100)) { 
-							$this->log(50, " - panics");
-							$soldier->setRouted(true);
-							$this->history->addToSoldierLog($soldier, 'routed.ranged');
-							$routed++;
-						}
-						$this->log(50, "\n");
-					}
-				}
-				$this->log(10, "==> avg. morale: ".round($total/max(1,$count))."\n");
-			}
-
-			$ranged[$group->getLocalId()] = array('shots'=>$shots, 'hits'=>$hits, 'results'=>$results, 'routed'=>$routed);
-		}
-		foreach ($extras as $index=>$data) {
-			$ranged[$index]['extra'] = $data;
-		}
-
-		return $ranged;
 	}
 
 	private function resolveMeleePhase($xp_mod) {
@@ -1106,7 +1310,7 @@ class BattleRunner {
 		return $result;
 	}
 
-	private function prepareRound() {
+	private function prepareRound($phase) {
 		// store who is active, because this changes with hits and would give the first group to resolve the initiative while we want things to be resolved simultaneously
 		foreach ($this->battle->getGroups() as $group) {
 			foreach ($group->getSoldiers() as $soldier) {
