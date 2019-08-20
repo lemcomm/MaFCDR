@@ -7,7 +7,7 @@
 
 		<field name="start" type="array"/>
 
-		<one-to-many field="combat_stages" target-entity="BattleReportStage" mapped-by="group">
+		<one-to-many field="combat_stages" target-entity="BattleReportStage" mapped-by="group_report">
 			<order-by>
 				<order-by-field name="round" direction="ASC"/>
 			</order-by>
