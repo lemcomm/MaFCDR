@@ -12,6 +12,7 @@
 				<order-by-field name="round" direction="ASC"/>
 			</order-by>
 		</one-to-many>
+		<field name="hunt" type="array"/>
 		<field name="finish" type="array"/>
 
 		<one-to-many field="characters" target-entity="BattleReportCharacter" mapped-by="group_report"/>
