@@ -192,8 +192,14 @@ class WarController extends Controller {
 				$siege->setSettlement($settlement);
 				$settlement->setSiege($siege);
 				$siege->setStage(1);
-				$maxstages = 1; # No defense, no siege, thus if we have a siege, we always have atleast one stage.
-				if($settlement->hasBuildingNamed('Palisade')) {
+
+				if ($character->getActiveSoldiers()->count() >= 200) {
+					$siege->setEncircled(TRUE);
+				} else {
+					$siege->setEncircled(FALSE);
+				}
+				$maxstages = 1; # No defense, no siege, thus if we have a siege, we always have atleast one stage. This means we have at least a Palisade.
+				if($settlement->hasBuildingNamed('Wood Wall')) {
 					$maxstages++; # It may be a wall of sticks for the most part, but it's still *something*.
 				}
 				if($settlement->hasBuildingNamed('Wood Castle')) {
@@ -205,7 +211,7 @@ class WarController extends Controller {
 				if($settlement->hasBuildingNamed('Citadel')) {
 					$maxstages++; # At this point, our castle has a large, enclosed compound of it's own, usually built at the same strength as the primary walls.
 				}
-				$siege->setMaxStage($maxstages);
+				$siege->setMaxStage($maxstages); # Assuming we have everything, this will max out at 5.
 				$em->persist($siege);
 				$em->flush(); # We need this flushed in order to link to it below.
 				
