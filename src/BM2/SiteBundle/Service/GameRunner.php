@@ -1138,8 +1138,6 @@ class GameRunner {
 			}
 
 			$character = $row[0];
-			$soldiers = $character->getSoldiers()->count();
-			$entourage = $character->getEntourage()->count();
 
 			//	a) troops eat food from camp followers
 			// b) small chance of shipwreck and landing at nearby random beach (to prevent the eternal hiding at sea exploit I use myself)
@@ -1161,10 +1159,6 @@ class GameRunner {
 						);
 					}
 				}
-			}
-			if ($character->getTravelAtSea()) {
-				// we are still at sea, so let's eat some fish
-				$this->economy->feedSoldiers($character, 2);
 			}
 		}
 
