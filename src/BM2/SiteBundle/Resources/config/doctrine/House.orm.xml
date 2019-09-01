@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<field name="motto" type="string" nullable="true"/>
 
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
