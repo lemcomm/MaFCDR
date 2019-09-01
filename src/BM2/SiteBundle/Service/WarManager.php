@@ -15,6 +15,8 @@ use BM2\SiteBundle\Service\ActionManager;
 use BM2\SiteBundle\Service\MilitaryManager;
 use BM2\SiteBundle\Twig\GameTimeExtension;
 
+use CrEOF\Spatial\PHP\Types\Geometry\Point;
+
 /*
 War Manager exists to handle all service duties involved in battles and sieges. Things relating to specific soldiers, units, equipment, or entourage belong in Military.
 */
