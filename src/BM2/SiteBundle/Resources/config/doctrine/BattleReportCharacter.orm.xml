@@ -8,6 +8,7 @@
 		<field name="wounded" type="boolean"/>
 		<field name="killed" type="boolean"/>
 
+		<field name="attacks" type="integer"/>
 		<field name="kills" type="integer"/>
 		<field name="hits_taken" type="integer"/>
 		<field name="hits_made" type="integer"/>
