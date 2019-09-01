@@ -96,27 +96,20 @@ class BattleGroup {
 		return !$this->attacker;
 	}
 
-	/* Legacy code from pre-sieges. 
-	public function getEnemy() {
-		foreach ($this->battle->getGroups() as $group) {
-			if ($group != $this) return $group;
-		}
-		throw new \Exception('battle group '.$this->id.' has no enemy');
-	} */
-
 	public function getEnemies() {
 		$enemies = array();
 		if ($this->battle) {
-			$attacker = $this->battle->getPrimaryAttacker(); #Because we have to start somewhere, let's just grab the attacker!
-			if ($attacker == $this OR $attacker->getReinforcedBy()->contains($this)) {
-				$enemies[] = $this->battle->getPrimaryDefender(); #If we're attacker, defenders are enemies.
-				foreach ($this->battle->getPrimaryDefender()->getReinforcedBy() as $group) {
-					$enemies[] = $group; #Add all other defenders.
-				}
+			if ($this->getReinforcing()) {
+				$primary = $this->getReinforcing();
 			} else {
-				$enemies[] = $this->battle->getPrimaryAttacker(); #Since we're not attacker, the attackers are the enemies!
-				foreach ($this->battle->getPrimaryAttacker()->getReinforcedBy() as $group) {
-					$enemies[] = $group; #Add all other attackers.
+				$primary = $this;
+			}
+			$enemies = new ArrayCollection;
+			foreach ($this->battle->getGroups() as $group) {
+				if ($group == $primary || $group->getReinforcing() == $primary) {
+					# Do nothing, those are allies!
+				} else {
+					$enemies->add($group);
 				}
 			}
 		} else if ($this->siege) {
