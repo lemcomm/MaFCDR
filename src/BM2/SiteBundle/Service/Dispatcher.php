@@ -663,11 +663,12 @@ class Dispatcher {
 		if ($this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inside");
 		}
-		if ($this->getCharacter()->getInsideSettlement() && $this->getCharacter()->getInsideSettlement()->getSiege()) {
-			return array("name"=>"location.enter.name", "description"=>"unavailable.besieged");
-		}
-		if (!$settlement = $this->getActionableSettlement()) {
+		$settlement = $this->getActionableSettlement();
+		if (!$settlement) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($settlement->getSiege()) {
+			return array("name"=>"location.enter.name", "description"=>"unavailable.besieged");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.enter')) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.already");
@@ -1650,6 +1651,10 @@ class Dispatcher {
 		if (!$settlement) {
 			# Can't attack nothing.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Already inside.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inside");
 		}
 		if (!$settlement->getSiege()) {
 			# No siege.
