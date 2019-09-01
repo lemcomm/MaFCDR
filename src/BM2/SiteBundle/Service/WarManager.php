@@ -3,13 +3,17 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Siege;
 
 use Doctrine\ORM\EntityManager;
 use BM2\SiteBundle\Service\History;
-use BM2\SiteBundle\Service\ActionResolution;
+use BM2\SiteBundle\Service\ActionManager;
+use BM2\SiteBundle\Service\MilitaryManager;
+use BM2\SiteBundle\Twig\GameTimeExtension;
 
 /*
 War Manager exists to handle all service duties involved in battles and sieges. Things relating to specific soldiers, units, equipment, or entourage belong in Military.
@@ -22,11 +26,12 @@ class WarManager {
 	protected $milman;
 	protected $actman;
 
-	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman) {
+	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->milman = $milman;
 		$this->actman = $actman;
+		$this->gametime = $gametime;
 	}
 
 	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
@@ -173,7 +178,7 @@ class WarManager {
 		$battle->setPrimaryDefender($defenders);
 
 		// now we have all involved set up we can calculate the preparation timer
-		$time = $this->military->calculatePreparationTime($battle);
+		$time = $this->calculatePreparationTime($battle);
 		$complete = new \DateTime('now');
 		$complete->add(new \DateInterval('PT'.$time.'S'));
 		$battle->setInitialComplete($complete)->setComplete($complete);
