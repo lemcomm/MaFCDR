@@ -9,6 +9,7 @@
 		<field name="location_name" type="array" nullable="true"/>
 		<field name="assault" type="boolean"/>
 		<field name="sortie" type="boolean"/>
+		<field name="urban" type="boolean" nullable="true"/>
 		<field name="defender_group_id" type="smallint" nullable="true"/>
 
 		<field name="start" type="array"/>
