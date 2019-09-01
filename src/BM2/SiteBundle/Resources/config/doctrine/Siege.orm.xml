@@ -6,9 +6,12 @@
 		</id>
 		<field name="stage" type="integer"/>
 		<field name="max_stage" type="integer"/>
+		<field name="encircled" type="boolean"/>
+
 		<one-to-one field="settlement" target-entity="Settlement" inversed-by="siege"/>
 		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="siege"/>
 		<one-to-many field="battles" target-entity="Battle" mapped-by="siege"/>
+		<one-to-many field="related_battle_reports" target-entity="BattleReport" mapped-by="siege"/>
 
 	</entity>
 </doctrine-mapping>
