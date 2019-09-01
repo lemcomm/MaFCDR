@@ -127,7 +127,7 @@ class HouseController extends Controller {
 			if ($character->getCrest()); {
 				$crest = $character->getCrest();
 			}
-			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
+			$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
@@ -150,6 +150,7 @@ class HouseController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		
 		$name = $house->getName();
+		$motto = $house->getMotto();
 		if ($house->getDescription()) {
 			$desc = $house->getDescription()->getText();
 		} else {
@@ -158,7 +159,7 @@ class HouseController extends Controller {
 		$priv = $house->getPrivate();
 		$secret = $house->getSecret();
 
-		$form = $this->createForm(new HouseCreationType($name, $desc, $priv, $secret));
+		$form = $this->createForm(new HouseCreationType($name, $motto, $desc, $priv, $secret));
 		$form->handleRequest($request);
 		# TODO: Rework this to use dispatcher.
 		if ($character != $house->getHead()) {
@@ -167,9 +168,14 @@ class HouseController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$change = FALSE;
-			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
-			// FIXME: need to apply this here - maybe data transformers or something?
-			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
+			if ($data['name'] != $motto) {
+				$change = TRUE;
+				$house->setMotto($data['name']);
+			}
+			if ($data['motto'] != $motto) {
+				$change = TRUE;
+				$house->setMotto($data['motto']);
+			}
 			if ((!$house->getDescription() AND $data['description'] != NULL) OR ($data['description'] != NULL AND ($house->getDescription() AND $desc != $data['description']))) {
 				$this->get('description_manager')->newDescription($house, $data['description'], $character);
 				$change = TRUE;
