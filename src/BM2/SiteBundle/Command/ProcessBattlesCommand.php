@@ -26,7 +26,7 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 		$em = $container->get('doctrine')->getManager();
 		$logger = $container->get('logger');
 		$battlerunner = $container->get('battle_runner');
-		$military = $container->get('military');
+		$warmanager = $container->get('war_manager');
 		$cycle = $container->get('appstate')->getCycle();
 		$opt_time = $input->getOption('time');
 		$arg_debug = $input->getArgument('debug level');
@@ -45,7 +45,7 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 			$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
 			$query->setParameters(array('now'=>$now));
 			foreach ($query->getResult() as $battle) {
-				$military->recalculateBattleTimer($battle);
+				$warmanager->recalculateBattleTimer($battle);
 			}
 			$em->flush();
 
