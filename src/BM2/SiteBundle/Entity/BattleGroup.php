@@ -5,28 +5,11 @@ namespace BM2\SiteBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 
-
 class BattleGroup {
 
 	protected $soldiers=null;
 	protected $enemy;
 
-	/*
-	 * @codeCoverageIgnore
-	 */  
-
-/* No idea why this was a thing, but it was throwing an error when sieges were implemented.
-	public function __toString() {
-		\Doctrine\Common\Util\Debug::dump($this, 3);
-
-		$r = "battlegroup ".$this->id." of battle ".$this->battle->getId()." characters: ";
-		foreach ($this->getCharacters() as $char) {
-			$r.=", ".$char->getId();
-		}
-
-		return $r;
-	}
-*/
 	public function setupSoldiers() {
 		$this->soldiers = new ArrayCollection;
 		foreach ($this->getCharacters() as $char) {
@@ -35,7 +18,7 @@ class BattleGroup {
 			}
 		}
 
-		if ($this->battle->getSettlement() && $this->isDefender()) {
+		if ($this->battle->getSettlement() && $this->isDefender() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() == $this->battle->getSettlement()) {
 			foreach ($this->battle->getSettlement()->getActiveMilitia() as $soldier) {
 				if ($soldier->isActive()) {
 					$this->soldiers->add($soldier);
@@ -154,4 +137,5 @@ class BattleGroup {
 	public function getLocalId() {
 		return intval($this->isDefender());
 	}
+	
 }
