@@ -1610,10 +1610,6 @@ class Dispatcher {
 			# Can't attack nothing.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($this->getCharacter()->getInsideSettlement()) {
-			# Already inside.
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inside");
-		}
 		if (!$settlement->getSiege()) {
 			# No siege.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
@@ -1630,10 +1626,6 @@ class Dispatcher {
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosoldiers");
-		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
-			# No need to siege your own settlement.
-			return array("name"=>"military.siege.join.name", "description"=>"unavailable.location.yours");
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
