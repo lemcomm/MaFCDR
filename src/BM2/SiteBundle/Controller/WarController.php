@@ -114,34 +114,6 @@ class WarController extends Controller {
 		return array('form'=>$form->createView());
 	}
 
-
-	/**
-	  * @Route("/settlement/defend")
-	  * @Template
-	  */
-	public function defendSettlementAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryDefendSettlementTest', true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
-			->add('submit', 'submit', array(
-				'label'=>'military.settlement.defend.submit',
-				))
-			->getForm();
-
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$act = new Action;
-			$act->setType('settlement.defend')->setCharacter($character)->setTargetSettlement($settlement);
-			$act->setBlockTravel(false);
-			$result = $this->get('action_manager')->queue($act);
-			return array('settlement'=>$settlement, 'result'=>$result);
-		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
-	}
-
 	/**
 	  * @Route("/settlement/siege")
 	  * @Template
@@ -472,60 +444,6 @@ class WarController extends Controller {
 	}
 
 	/**
-	  * @Route("/settlement/attack")
-	  * @Template
-	  */
-	public function attackSettlementAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackSettlementTest', true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		// TODO: also allow attack on travel destination
-
-		$result=false;
-		$builder = $this->createFormBuilder();
-		$wars = array();
-		foreach ($settlement->getWarTargets() as $target) {
-			if ($character->findRealms()->contains($target->getWar()->getRealm())) {
-				$wars[] = $target->getWar()->getId();
-			}
-		}
-		if ($wars) {
-			$builder->add('war', 'entity', array(
-				'label'=>'military.settlement.attack.war',
-				'translation_domain'=>'actions',
-				'required'=>true,
-				'class'=>'BM2SiteBundle:War', 'choice_label'=>'summary', 'query_builder'=>function(EntityRepository $er) use ($wars) {
-					return $er->createQueryBuilder('w')->where('w IN (:wars)')->setParameters(array('wars'=>$wars));
-				}
-			));
-		}
-		$builder->add('submit', 'submit', array('label'=>'military.settlement.attack.submit', 'translation_domain'=>'actions'));
-		$form = $builder->getForm();
-
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$em = $this->getDoctrine()->getManager();
-			$data = $form->getData();
-			$result = $this->get('war_manager')->createBattle($character, $settlement);
-			if (isset($result['battle']) && isset($data['war'])) {
-				$target->setAttacked(true);
-				$this->get('history')->logEvent(
-					$data['war'],
-					'event.war.settlement',
-					array('%link-settlement%'=>$settlement->getId()),
-					History::LOW, true
-				);
-				$data['war']->addRelatedBattle($result['battle']);
-				$result['battle']->setWar($data['war']);
-			}
-			$em->flush();
-		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView(), 'result'=>$result);
-	}
-
-	/**
 	  * @Route("/settlement/loot")
 	  * @Template
 	  */
@@ -553,7 +471,7 @@ class WarController extends Controller {
 		$form->handleRequest($request);	
 		if ($form->isValid()) {
 
-// FIXME: shouldn't militia defend against looting?
+		// FIXME: shouldn't militia defend against looting?
 			$my_soldiers = $character->getActiveSoldiers()->count();
 			$ratio = $my_soldiers / (100 + $settlement->getFullPopulation());
 			if ($ratio > 0.25) { $ratio = 0.25; }
