@@ -143,12 +143,14 @@ class WarController extends Controller {
 				case 'leave':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', true);
 					break;
+				/*
 				case 'attack':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAttackTest', true);
 					break;
 				case 'joinattack':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', true);
 					break;
+				*/
 				case 'joinsiege':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeJoinSiegeTest', true);
 					break;
@@ -227,10 +229,11 @@ class WarController extends Controller {
 				# setup attacker (i.e. me)
 				$attackers = new BattleGroup;
 				$attackers->setSiege($siege);
-				$attackers->setAttacker(true);
+				$attackers->setAttackingInSiege($siege);
 				$attackers->addCharacter($character);
 				$attackers->setLeader($character);
 				$siege->addGroup($attackers);
+				$siege->addAttacker($attackers);
 				$em->persist($attackers);
 
 				# setup defenders
@@ -298,12 +301,14 @@ class WarController extends Controller {
 						case 'leave':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'leave'));
 							break;
+						/*
 						case 'attack':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'attack'));
 							break;
 						case 'joinattack':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'joinattack'));
 							break;
+							*/
 						case 'joinsiege':
 							return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'joinsiege'));
 							break;
@@ -316,10 +321,10 @@ class WarController extends Controller {
 					# This only engages if we've already got action set to "selected", so we start looking at what subaction we're processing.
 					switch($data['subaction']) {
 						case 'leadership':
-							if (($siege->getAttackers()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
+							if (($siege->getAttacker()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
 								# We already know they're *a* leader, now to figure out what group they lead. 
 								#TODO: Later when we add more sides to a battle, we'll need to expand this.
-								if ($siege->getAttackers()->getCharacters()->contains($character)) {
+								if ($siege->getAttacker()->getCharacters()->contains($character)) {
 									$group = $siege->getAttackers();
 								} else {
 									$group = $siege->getDefenders();
@@ -338,7 +343,7 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 							}
 						case 'assault':
-							if ($siege->getAttackers()->getLeader() == $character && $data['subaction'] == 'assault') {
+							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'assault') {
 								$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							} else if ($siege->getDefenders()->getLeader() == $character && $data['subaction'] == 'assault') {
@@ -350,7 +355,7 @@ class WarController extends Controller {
 							break;
 						case 'disband':
 							# Stop the siege.
-							if ($siege->getAttackers()->getLeader() == $character && $data['subaction'] == 'disband' && $data['disband'] == TRUE) {
+							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'disband' && $data['disband'] == TRUE) {
 								$this->get('war_manager')->disbandSiege($siege, $character);
 								return $this->redirectToRoute('bm2_actions');
 							} else {
@@ -359,7 +364,7 @@ class WarController extends Controller {
 							break;
 						case 'leave':
 							# Leave the siege.
-							if ($siege->getAttackers()->getLeader() == $character) {
+							if ($siege->getAttacker()->getLeader() == $character) {
 								# Leaders can't leave, though we may change this in the future. They must transfer leadership first, or just cancel the siege.
 								throw $this->createNotFoundException('error.notfound.areleader');
 							} else {
@@ -368,6 +373,7 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_actions');
 							}
 							break;
+						/* I'm very mixed on whether or not to allow this. I'll leave this here for now though, since it should be functional.
 						case 'attack':
 							# Suicide run.
 							if ($data['action'] == 'attack') {
@@ -389,17 +395,18 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							}
 							break;
+						No attack, no joinattack. */
 						case 'joinsiege':
 							# Join an ongoing siege.
 							if ($data['subaction'] == 'joinsiege' && $data['side']) {
 								if($data['side'] == 'attackers') {
 									# User wants to join the attackers...
-									$side = $siege->getAttackers();
+									$side = $siege->getAttacker();
 									$side->addCharacter($character);
 									$character->addBattleGroup($side);
 								} elseif ($data['side'] == 'defenders') {
 									# User wants to join the defenders...
-									$side = $siege->getDefenders();
+									$side = $siege->getDefender();
 									$side->addCharacter($character);
 									$character->addBattleGroup($side);
 								}
