@@ -29,6 +29,7 @@
 		<one-to-many field="reinforced_by" target-entity="BattleGroup" mapped-by="reinforcing"/>
 		<one-to-one field="attacking_in_battles" target-entity="Battle" mapped-by="primary_attacker"/>
 		<one-to-one field="defending_in_battles" target-entity="Battle" mapped-by="primary_defender"/>
+		<one-to-one field="attacking_in_siege" target-entity="Siege" mapped-by="attacker"/>
 		<field name="engaged" type="boolean" nullable="true"/>
 
 		<one-to-one field="active_report" target-entity="BattleReportGroup"/>
