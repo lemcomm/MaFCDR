@@ -49,7 +49,7 @@ class WarManager {
 			$outside = false;
 
 			$battle->setSiege($siege);
-			if ($attackers->getAttacker()) {
+			if ($siege->getAttacker() == $attackers) {
 				# If they are the siege attackers and attacking in this battle, then they're assaulting. If not, they're sallying. It affects defensive bonuses.
 				$battle->setType('siegeassault');
 				$type = 'assault';
@@ -410,11 +410,13 @@ class WarManager {
 			foreach ($bg->getRelatedActions() as $act) {
 				$this->em->remove($act);
 			}
-			if ($type == 'battle' && $focus->getGroups()->count() <= 2 && $focus->getSettlement()==null) {
-				// battle is terminated, as battles care if we have less than two groups participating.
+			if ($type == 'battle' && $focus->getGroups()->count() <= 2) {
+				// If we're dealing with a battle, we have an empty group, we have 2 or less groups in this battle, we remove any actions relating to the battle and call the battle as failed..
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
-						$this->em->remove($act);
+						if ($act->getType == 'military.battle') {
+							$this->em->remove($act);
+						}
 					}
 					foreach ($group->getCharacters() as $char) {
 						$this->history->logEvent(
@@ -428,21 +430,26 @@ class WarManager {
 							$char->removeLeadingBattelgroup($bg);
 						}
 					}
-					$this->em->remove($group);
+					if (!$focus->getSiege()) {
+						$this->em->remove($group); # If this battle isn't tied to a siege, we can safely remove the battlegroup. Groups tied to a siege and a battle will be handled by the siege closing out (which will, if a battle remains, detach the group from the siege and just let this code handle it afterwards.)
+					}
 				}
 				$this->em->remove($focus);
-			} else if ($type == 'siege' && $focus->getAttackers() == $bg) {
+			} else if ($type == 'siege' && $focus->getAttacker() == $bg) {
+				# Since attackers control the siege, the siege only ends if the attackers disband it (or are otherwise broken)
 				$focus->getSettlement()->setSiege(null);
 				$focus->setSettlement(null);
 				// siege is terminated, as sieges don't care how many groups, only if the attacker group has no more attackers in it.
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
-						$this->em->remove($act);
+						if ($act->getType() == 'military.siege') {
+							$this->em->remove($act); #As it's possible there are other battles related to this group, we only remove the siege.
+						}
 					}
 					foreach ($group->getCharacters() as $char) {
 						$this->history->logEvent(
 							$char,
-							'siege.failed',
+							'siege.ended',
 							array(),
 							History::HIGH, false, 25
 						);
@@ -451,7 +458,11 @@ class WarManager {
 							$char->removeLeadingBattelgroup($bg);
 						}
 					}
-					$this->em->remove($group);
+					if (!$group->getBattle()) {
+						$this->em->remove($group); # No battle? Remove the group. Groups can only be tied to 1x Siege, and 1x Battle.
+					} else {
+						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
+					}
 				}
 				$this->em->remove($focus);
 			}
