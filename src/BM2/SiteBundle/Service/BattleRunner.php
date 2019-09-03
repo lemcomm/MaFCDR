@@ -35,9 +35,6 @@ class BattleRunner {
 	private $xpMod;
 	private $debug=0;
 
-	# This is primarily so I can code in future updates while I'm fresh on how this all works together. Options will be "sieges" or "battle2.0".
-	private $build='sieges';
-
 	private $report;
 	private $nobility;
 	private $battlesize=1;
@@ -106,6 +103,9 @@ class BattleRunner {
 		$assault = false;
 		$this->report->setAssault(FALSE);
 		$this->report->setSortie(FALSE);
+		$this->report->setUrban(FALSE);
+		$myStage = NULL;
+		$maxStage = NULL;
 		switch ($battle->getType()) {
 			case 'siegesortie':
 				$this->report->setSortie(TRUE);
@@ -127,36 +127,42 @@ class BattleRunner {
 					$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
 				}
 				$assault = true;
-				# TODO: Expand this to figure out other stages.
+				# So, this looks a bit weird, but stone stuff counts during stages 1 and 2, while wood stuff and moats only count during stage 1. Stage 3 gives you the fortress, and stage 4 gives the citadel bonus.
+				# If you're wondering why this looks different from how we figure out the max stage, that's because the final stage works differently.
 				foreach ($battle->getDefenseBuildings() as $building) {
 					switch (strtolower($building->getType()->getName())) {
+						case 'stone wall':
+						case 'stone towers':
+						case 'stone castle':
+							if ($myStage < 3) {
+								$this->report->addDefenseBuilding($building);
+								$this->defenseBonus += $building->getDefenses();
+							}
 						case 'palisade':
 						case 'empty moat':
 						case 'filled moat':
 						case 'wood wall':
-						case 'stone wall':
 						case 'wood towers':
-						case 'stone towers':
+						case 'wood castle':
 							if ($myStage < 2) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
-						case 'wood castle':
-						case 'stone castle':
-							if ($mystage < 3) {
+						case 'fortress':
+							if ($myStage == 3) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
-						case 'fortress':
-							if ($mystage < 4) {
+						case 'citadel':
+							if ($myStage == 4) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
 						default:
-							$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, Seats of Governance, and Citadels ALWAYS give their bonus, if they exist.
+							$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
 							$this->defenseBonus += $building->getDefenses();
 							break;
 					}
@@ -168,7 +174,6 @@ class BattleRunner {
 				break;
 			case 'field':
 			default:
-				$this->report->setType('field');
 				$loc = $this->geo->locationName($battle->getLocation());
 				$location = array('key'=>'battle.location.'.$loc['key'], 'id'=>$loc['entity']->getId(), 'name'=>$loc['entity']->getName());
 				break;
@@ -214,7 +219,7 @@ class BattleRunner {
 		if ($this->prepare()) {
 			// the main call to actually run the battle:
 			$this->log(15, "Resolving Battle...\n");
-			$this->resolveBattle();
+			$this->resolveBattle($myStage, $maxStage);
 			$this->log(15, "Post Battle Cleanup...\n");
 			$victor = $this->concludeBattle();
 		} else {
@@ -228,6 +233,7 @@ class BattleRunner {
 						array(),
 						History::MEDIUM, false, 20
 					);
+					# TODO Make this siege-aware.
 					// put winners inside settlement to prevent exploiting this.
 					if ($battle->getSettlement()) {
 						$char->setInsideSettlement($battle->getSettlement());
@@ -236,7 +242,15 @@ class BattleRunner {
 			}
 		}
 
-		// cleaning up
+		# Remove actions related to this battle.
+		foreach ($battle->getGroups() as $group) {
+			foreach ($group->getRelatedActions() as $act) {
+				if ($act->getType() == 'military.battle') {
+					$this->em->remove($act);
+				}
+			}
+		}
+		
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
 		foreach ($this->nobility as $noble) {
 			$noble->getCharacter()->setActiveReport(null);
@@ -413,15 +427,12 @@ class BattleRunner {
 		}
 	}
 
-	private function resolveBattle() {
+	private function resolveBattle($myStage, $maxStage) {
 		$battle = $this->battle;
 		$phase = 1; # Initial value.
 		$combat = true; # Initial value.
 		$this->log(20, "Calculating ranged penalties...\n");
 		$rangedPenalty = 1; # Default of no penalty. Yes, 1 is no penalty. It's a multiplier.
-		if ($battle->getType() == 'siegeassault' AND ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker())) {
-			$rangedPenalty *= 0.3; # Defenders in seiges get a blanket defensive boost as they're harder to hit being on the walls. This affects the determination of a hit, not how bad the hit is.
-		}
 		switch ($this->regionType) {
 			case 'scrub':
 				$rangedPenalty *=0.8;
@@ -445,19 +456,28 @@ class BattleRunner {
 				$rangedPenalty *=0.6;
 				break;
 		}
-		$this->log(20, "Ranged Penalty: ".$rangedPenalty."\n\n");
+		if ($battle->getType() == 'urban') {
+			$rangedPenalty = 0.3;
+		}
+		$doRanged = TRUE;
+		if ($myStage > 1 && $myStage == $maxStage) {
+			$doRanged = FALSE; #Final siege battle, no ranged phase!
+			$this->log(20, "...final siege battle detected, skipping ranged phase...\n\n");
+		} else {
+			$this->log(20, "Ranged Penalty: ".$rangedPenalty."\n\n");
+		}
 		$this->log(20, "...starting phases...\n");
 		while ($combat) {
 			$this->prepareRound($phase);
 			# Main combat loop, go!
 			# TODO: Expand this for multiple ranged phases.
-			if ($phase === 1) {
+			if ($phase === 1 && $doRanged) {
 				$this->log(20, "...ranged phase...\n");
 				$combat = $this->runStage('ranged', $rangedPenalty, $phase);
 				$phase++;
 			} else {
 				$this->log(20, "...melee phase...\n");
-				$combat = $this->runStage('normal', $rangedPenalty, $phase);
+				$combat = $this->runStage('normal', $rangedPenalty, $phase, $doRanged);
 				$phase++;
 			}
 		}
@@ -465,7 +485,7 @@ class BattleRunner {
 		$hunt = $this->runStage('hunt', $rangedPenalty, $phase);
 	}
 
-	private function runStage($type = 'normal', $rangedPenalty, $phase) {
+	private function runStage($type = 'normal', $rangedPenaltyStart, $phase, $doRanged) {
 		$groups = $this->battle->getGroups();
 		$battle = $this->battle;
 		foreach ($groups as $group) {
@@ -474,7 +494,10 @@ class BattleRunner {
 			$rangedHits = 0;
 			$routed = 0;
 			$extras = array();
-
+			$rangedPenalty = $rangedPenaltyStart; #We need each group to reset their penalty.
+			if ($battle->getType() == 'siegeassault' && ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker())) {
+				$rangedPenalty *= 0.3; # Defenders in seiges get a blanket defensive boost as they're harder to hit being on the walls. This affects the determination of a hit, not how bad the hit is.
+			}
 			if ($type != 'hunt') {
 				$stageResult=array(); # Initialize this for later use. At the end of this loop, we commit this data to $stageReport->setData($stageResult);
 				$stageReport = new BattleReportStage; # Generate new stage report.
@@ -606,8 +629,8 @@ class BattleRunner {
 					}
 					$result = false;
 					$target = false;
-					if ($soldier->isRanged()) {
-						// continue firing on enemy targets, but at a reduced to-hit chance
+					if ($soldier->isRanged() && $doRanged) {
+						// Continure firing with a reduced hit chance in regular battle. If we skipped the ranged phase due to this being the last battle in a siege, we forego ranged combat to pure melee instead.
 						// TODO: friendly fire !
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
 						if (rand(0,100)<min(75,($soldier->RangedPower()+$bonus)*0.5)) {
@@ -625,8 +648,8 @@ class BattleRunner {
 							// missed
 							$this->log(10, "missed\n");
 						}
-					} else {
-						// melee unit
+					} else if ($soldier->MeleePower() > 0) {
+						// melee unit or ranged unit with melee capabilities in final siege battle
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
@@ -636,6 +659,8 @@ class BattleRunner {
 							// no more targets
 							$this->log(10, "but finds no target\n");
 						}
+					} else {
+						$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack ");
 					}
 					if ($result) {
 						if ($result=='kill'||$result=='capture') {
@@ -1006,7 +1031,7 @@ class BattleRunner {
 					}
 					// defeated losers could be forced out
 					if ($nobleGroup[$id]!='victory') {
-						if ($this->battle->getSettlement() && $soldier->getCharacter()->getInsideSettlement()) {
+						if ($this->battle->getUrban() && $soldier->getCharacter()->getInsideSettlement()) {
 							$this->interactions->characterLeaveSettlement($soldier->getCharacter(), true);
 						}
 					}
