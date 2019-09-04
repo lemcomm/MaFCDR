@@ -52,6 +52,8 @@ conversation:
   reference: sub-topics to this:
  nearby:
   label:		characters in the vicinity that you can contact
+ captor:
+  label:		send a message to your captor
  owner:
   label:    leave a message for the owner of the nearby settlement
  recipients:
@@ -109,3 +111,4 @@ flag:
  act:         action required
  remind:      remind later
  keep:        keep/archive
+ 
