@@ -66,6 +66,21 @@ class NewConversationType extends AbstractType {
 			$me = $this->character;
 			$maxdistance = $this->distance;
 
+			if ($me->getPrisonerOf()) {
+				$captor = $me->getPrisonerOf();
+				$builder->add('captor', 'entity', array(
+					'required' => false,
+					'multiple'=>true,
+					'expanded'=>true,
+					'label'=>'conversation.captor.label',
+					'class'=>'BM2SiteBundle:Character', 'property'=>'name', 'query_builder'=>function(EntityRepository $er) use ($captor) {
+						$qb = $er->createQueryBuilder('c');
+						$qb->where('c.alive = true');
+						$qb->andWhere('c = :captor')->setParameter('captor', $captor);
+						return $qb;
+				}));
+			}
+
 			// Might & Fealty: contact nearby characters
 			$builder->add('nearby', 'entity', array(
 				'required' => false,
