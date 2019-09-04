@@ -14,7 +14,7 @@ use Calitarus\MessagingBundle\Entity\Message;
 use Calitarus\MessagingBundle\Form\NewConversationType;
 use Calitarus\MessagingBundle\Form\MessageReplyType;
 
-
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Realm;
 
 
@@ -32,6 +32,9 @@ class WriteController extends Controller {
 	public function newconversationAction(Request $request, Realm $realm=null) {
 		$user = $this->get('message_manager')->getCurrentUser();
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($realm && !$character->findRealms()->contains($realm)) {
 			$realm = null;
@@ -60,6 +63,12 @@ class WriteController extends Controller {
 
 			$recipients = new ArrayCollection;
 			if (isset($data['nearby'])) foreach ($data['nearby'] as $rec) {
+				$r = $this->get('message_manager')->getMsgUser($rec);
+				if (!$recipients->contains($r)) {
+					$recipients->add($r);
+				}
+			}
+			if (isset($data['captor'])) foreach ($data['captor'] as $rec) {
 				$r = $this->get('message_manager')->getMsgUser($rec);
 				if (!$recipients->contains($r)) {
 					$recipients->add($r);
@@ -98,7 +107,10 @@ class WriteController extends Controller {
 		* @Template
 		*/
 	public function replyAction(Request $request) {
-		$user = $this->get('message_manager')->getCurrentUser();
+		$user = $this->get('message_manager')->getCurrentUser(); # I present, the only place in the game where we get the character from something other than AppState or Dispatcher... This gets it form Appstate, for the record.
+		if (! $user instanceof Character) {
+			return $this->redirectToRoute($user);
+		}
 
 		$form = $this->createForm(new MessageReplyType());
 
