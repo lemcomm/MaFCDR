@@ -65,6 +65,12 @@ class WriteController extends Controller {
 					$recipients->add($r);
 				}
 			}
+			if (isset($data['captor'])) foreach ($data['captor'] as $rec) {
+				$r = $this->get('message_manager')->getMsgUser($rec);
+				if (!$recipients->contains($r)) {
+					$recipients->add($r);
+				}
+			}
 			if (isset($data['contacts'])) foreach ($data['contacts'] as $rec) {
 				$r = $this->get('message_manager')->getMsgUser($rec);
 				if (!$recipients->contains($r)) {
