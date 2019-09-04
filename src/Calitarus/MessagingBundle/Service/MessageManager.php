@@ -48,6 +48,9 @@ class MessageManager {
 	public function getCurrentUser() {
 		if ($this->user==null) {
 			$character = $this->appstate->getCharacter();
+			if (! $character instanceof Character) {
+				return $character;
+			}
 			$this->user = $this->getMsgUser($character);
 		}
 		return $this->user;
