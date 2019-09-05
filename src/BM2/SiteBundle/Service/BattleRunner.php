@@ -473,7 +473,7 @@ class BattleRunner {
 			# TODO: Expand this for multiple ranged phases.
 			if ($phase === 1 && $doRanged) {
 				$this->log(20, "...ranged phase...\n");
-				$combat = $this->runStage('ranged', $rangedPenalty, $phase);
+				$combat = $this->runStage('ranged', $rangedPenalty, $phase, $doRanged);
 				$phase++;
 			} else {
 				$this->log(20, "...melee phase...\n");
@@ -482,7 +482,7 @@ class BattleRunner {
 			}
 		}
 		$this->log(20, "...hunt phase...\n");
-		$hunt = $this->runStage('hunt', $rangedPenalty, $phase);
+		$hunt = $this->runStage('hunt', $rangedPenalty, $phase, $doRanged);
 	}
 
 	private function runStage($type = 'normal', $rangedPenaltyStart, $phase, $doRanged) {
@@ -526,6 +526,11 @@ class BattleRunner {
 				$results = array();
 			}
 
+			/*
+
+			Ranged Phase Combat Handling Code
+
+			*/
 			if ($type == 'ranged') {
 				foreach ($group->getFightingSoldiers() as $soldier) {
 					if ($soldier->isNoble()) {
@@ -619,6 +624,11 @@ class BattleRunner {
 					$stageResult[$index]['extra'] = $data;
 				}
 			} # End of Ranged combat rules.
+			/*
+
+			Melee Phase Combat Handling Code
+
+			*/
 			if ($type == 'normal') {
 				$bonus = sqrt($enemies);
 				foreach ($group->getFightingSoldiers() as $soldier) {
@@ -699,10 +709,15 @@ class BattleRunner {
 					$stageResult[$index]['extra'] = $data;
 				}
 			}
-			if ($type != 'hunt') {
+			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
 			}
 		}
+		/*
+
+		Ranged & Melee Phase Morale Handling Code
+
+		*/
 		# In order to support legacy melee morale handling, we need to break this apart. First, refactor it. Second, rework the ranged morale into it and give them both a distinct area.
 		if ($type == 'normal') {
 			foreach ($groups as $group) {
@@ -760,8 +775,7 @@ class BattleRunner {
 						$this->log(20, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())."\n");
 					}
 				}
-				
-				$stageResult->add(array('routed'=>$routed));
+				$stageResult->setData($stageResult->getData()[] = array('routed'=>$routed));
 			}
 		}
 
@@ -1031,7 +1045,7 @@ class BattleRunner {
 					}
 					// defeated losers could be forced out
 					if ($nobleGroup[$id]!='victory') {
-						if ($this->battle->getUrban() && $soldier->getCharacter()->getInsideSettlement()) {
+						if ($this->battle->getType()=='urban' && $soldier->getCharacter()->getInsideSettlement()) {
 							$this->interactions->characterLeaveSettlement($soldier->getCharacter(), true);
 						}
 					}
