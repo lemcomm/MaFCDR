@@ -563,17 +563,23 @@ class MapController extends Controller {
 			}
 			
 			// mix in places
-			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
-				$features[] = array(
-					'type' => 'Place',
-//					'id' => 'dungeon_'.$d['id'],
-					'properties' => array(
-						'type' => $place->getType()->getName(),
-						'name' => $place->getName(),
-						'active' => true,
-						),
-					'geometry' => json_decode($place->getLocation())
-				);
+			$query = $em->createQuery('SELECT p.id, p.name, t.name as type, ST_asGeoJSON(p.location) as location FROM BM2SiteBundle:Place p JOIN p.type t, BM2SiteBundle:Character me WHERE me = :me AND p.settlement IS NULL AND ((p.visible=true AND ST_Distance(p.location, me.location) < :maxistance) OR p.owner = :me)');
+			$query->setParameters(array('me'=>$character, 'maxdistance'=>$this->get('geography')->calculateSpottingDistance($character)));
+			try {
+				$results = $query->getResults();	
+				foreach ($query->getResults() as $p) {
+					$features[] = array(
+						'type' => 'Place',
+						'properties' => array(
+							'type' => $p['type'],
+							'name' => $p['name'],
+							'active' => true,
+							),
+						'geometry' => json_decode($p->getLocation())
+					);
+				}
+			} catch (\Doctrine\DBAL\DBALException $e) {
+				# No results, don't care, move on!
 			}
 		}
 
