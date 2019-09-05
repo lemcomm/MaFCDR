@@ -434,7 +434,6 @@ class WarManager {
 						$this->em->remove($group); # If this battle isn't tied to a siege, we can safely remove the battlegroup. Groups tied to a siege and a battle will be handled by the siege closing out (which will, if a battle remains, detach the group from the siege and just let this code handle it afterwards.)
 					}
 				}
-				$this->em->remove($focus);
 			} else if ($type == 'siege' && $focus->getAttacker() == $bg) {
 				# Since attackers control the siege, the siege only ends if the attackers disband it (or are otherwise broken)
 				$focus->getSettlement()->setSiege(null);
@@ -464,7 +463,7 @@ class WarManager {
 						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 					}
 				}
-				$this->em->remove($focus);
+				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
 			}
 		}
 	}
@@ -494,3 +493,4 @@ class WarManager {
 	#TODO
 	}
 }
+
