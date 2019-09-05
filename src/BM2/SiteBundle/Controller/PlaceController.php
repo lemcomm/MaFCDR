@@ -38,7 +38,7 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		
-		if ($character instanceof Character && $character != $place->getOwner()) {
+		if ($character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
@@ -58,7 +58,7 @@ class PlaceController extends Controller {
 		When we add this, get rid of $militia below this. */
 		$militia = null;
 		
-		if ($character instanceof Character && $character->getInsidePlace() == $place) {
+		if ($character->getInsidePlace() == $place) {
 			$inside = true;
 		} else {
 			$inside = false;
@@ -74,9 +74,98 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
+	  * @Route("/actionable", name="bm2_place_actionable")
 	  * @Template
 	  */
+
+	public function actionableAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('placeListTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		$placeList = $this->get('geography')->findPlacesInActionRange($character);
+		$places = array();
+		foreach ($placeList as $place) {
+			$data = array(
+				'id' => $place->getId(),
+				'name' => $place->getName(),
+				'description' => $place->getShortDescription(),
+				'canManage' => $this->canManage($place, $character),
+				'canEnter' => $this->canEnter($place, $character)
+			);
+			$places[] = $data;
+		}
+		return array(
+			'places' => $places
+		);
+	}
+
+	private function canManage(Place $place, Character $character) {
+		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'describe')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private function canEnter(Place $place, Character $character) {
+		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	  * @Route("/{id}/enter", name="bm2_place_enter")
+	  * @Template
+	  */
+
+	public function enterPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$result = null;
+		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
+			$result = 'entered';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/exit", name="bm2_place_exit")
+	  * @Template
+	  */
+
+	public function exitPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$result = null;
+		if ($this->get('interactions')->characterLeavePlace($character)) {
+			$result = 'left';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="bm2_place_manage")
+	  * @Template
+	  */
+
 	public function permissionsAction(Place $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway($place, 'placePermissionsTest');
 		if (! $character instanceof Character) {
