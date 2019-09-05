@@ -151,10 +151,10 @@ class Politics {
 	public function changeSettlementOwner(Settlement $settlement, Character $character=null, $reason=false) {
 		$oldowner = $settlement->getOwner();
 		if ($oldowner) {
-			$oldowner->removeSettlement($settlement);
+			$oldowner->removeOwnedSettlement($settlement);
 		}
 		if ($character) {
-			$character->addSettlement($settlement);
+			$character->addOwnedSettlement($settlement);
 		}
 		$settlement->setOwner($character);
 
