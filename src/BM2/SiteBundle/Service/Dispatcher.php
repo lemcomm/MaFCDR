@@ -130,6 +130,7 @@ class Dispatcher {
 		}
 
 		$actions=array();
+
 		if ($this->getLeaveableSettlement()) {
 			$actions[] = $this->locationLeaveTest(true);
 		} else if ($settlement = $this->getActionableSettlement()) {
@@ -138,18 +139,10 @@ class Dispatcher {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
-		/* Code not yet ready for deployment!
-		if ($actionableplace = $this->getActionablePlace()) {
-			$actions[] = array("name"=>"places.actionable.name", "description"=>"places.actionable.description");
-		} else if ($this->getLeaveablePlace()) {
-			$actions[] = $this->placeLeaveTest(true);
-		} else {
-			$actions[] = array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
-		}
+		$actions[] = $this->placeListTest();
 		if ($newplace = $this->placeCreateTest(true)) {
 			$actions[] = $newplace;
 		}
-		*/
 
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
@@ -567,7 +560,6 @@ class Dispatcher {
 	}
 
 	/* ========== Place Dispatchers ========= */
-	/* Code not yet ready for deployment!	
 
 	public function PlacesActions() {
 		$actions=array();
@@ -581,12 +573,21 @@ class Dispatcher {
 			$this->setPlace($place);
 			$actions[] = array("title"=>$place->getFormalName());
 			$actions[] = array("name"=>"place.view.name", "url"=>"bm2_site_place_view", "parameters"=>array("id"=>$place->getId()), "description"=>"place.view.description", "long"=>"place.view.longdesc");
-			$actions[] = $this->placeCreateTest();
 			$actions[] = $this->placeManageTest();
 			$actions[] = $this->placeEnterTest();
 		}
 		
 		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
+	}
+
+	private function placeListTest() {
+		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
+			return $this->action("place.list", "bm2_place_actionable");
+		} else if ($this->getLeaveablePlace()) {
+			return $this->placeLeaveTest(true);
+		} else {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
+		}
 	}
 
 	private function placeActionsGenericTests(Place $place=null) {
@@ -599,7 +600,6 @@ class Dispatcher {
 
 		return $this->veryGenericTests();
 	}
-	*/
 
 	/* ========== Meta Dispatchers ========== */
 
@@ -1937,7 +1937,6 @@ class Dispatcher {
 	}
 
 	/* ========== Place Actions ============== */
-	/* Code not yet ready for deployment!
 
 	public function placeCreateTest() {
 		if ($this->getCharacter()->isTrial()) {
@@ -1985,6 +1984,9 @@ class Dispatcher {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
 		}
+		if (!$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'visit')) {
+			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
+		}
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
 		}
@@ -1999,7 +2001,7 @@ class Dispatcher {
 		}
 
 		if ($this->getCharacter()->isPrisoner()) {
-			if ($place->getOwner() == $this->getCharacter()) {
+			if ($place->getOwner() == $this->getCharacter()) { # FIXME: Wut?
 				return array("name"=>"place.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"place.enter.description2");
 			} else {
 				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
@@ -2045,7 +2047,6 @@ class Dispatcher {
 					    );
 		}
 	}
-	*/
 
 	/* ========== Political Actions ========== */
 
@@ -2526,7 +2527,7 @@ class Dispatcher {
 			return $this->getCharacter()->getInsideSettlement();
 		}
 	}
-	
+
 	public function getActionablePlace() {
 		if (is_object($this->actionablePlace) || $this->actionablePlace===null) return $this->actionablePlace;
 
@@ -2548,8 +2549,10 @@ class Dispatcher {
 	}
 
 	public function getLeaveablePlace() {
-		if ($this->getCharacter()->getInsidePlace()) {
+		if ($this->getCharacter() && $this->getCharacter()->getInsidePlace()) {
 			return $this->getCharacter()->getInsidePlace();
+		} else {
+			return false;
 		}
 	}
 
