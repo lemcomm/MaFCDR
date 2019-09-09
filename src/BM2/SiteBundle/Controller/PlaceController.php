@@ -224,31 +224,36 @@ class PlaceController extends Controller {
 		
 		# Build the list of requirements we have.
 		$rights[] = NULL;
-		$settlement = $character->getInsideSettlement();
-		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside')) {
-			if ($character == $settlement->getOwner()) {
-				$rights[] = 'lord';
-				if ($settlement->hasBuildingNamed('Wood Castle')) {
-					$rights[] = 'castle';
-				}
-				if ($settlement->getRealm()->findRulers()->contains($character)) {
-					$rights[] = 'ruler';
-				}
+		if ($character->getInsideSettlement()) {
+			$settlement = $character->getInsideSettlement();
+		} else if ($region = $this->get('geography')->findMyRegion($character)) {
+			$settlement = $region->getSettlement();
+		} else {
+			# FIXME: Throw error.
+		}
+
+		if ($character == $settlement->getOwner()) {
+			$rights[] = 'lord';
+			if ($settlement->hasBuildingNamed('Wood Castle')) {
+				$rights[] = 'castle';
 			}
-			$realm = $settlement->getRealm();
-			if ($settlement->getCapitalOf() == $realm) {
-				if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
-					$rights[] = 'ruler';
-				} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
-					$rights[] = 'ruler';
-				}
+			if ($settlement->getRealm()->findRulers()->contains($character)) {
+				$rights[] = 'ruler';
 			}
-			if ($settlement->hasBuildingNamed('Library')) {
-				$rights[] = 'library';
+		}
+		$realm = $settlement->getRealm();
+		if ($settlement->getCapitalOf() == $realm) {
+			if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
+				$rights[] = 'ruler';
+			} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
+				$rights[] = 'ruler';
 			}
-			if ($settlement->hasBuildingNamed('Academy')) {
-				$rights[] = 'academy';
-			}
+		}
+		if ($settlement->hasBuildingNamed('Library')) {
+			$rights[] = 'library';
+		}
+		if ($settlement->hasBuildingNamed('Academy')) {
+			$rights[] = 'academy';
 		}
 		if ($character->getMagic() > 0) {
 			$rights[] = 'magic';
