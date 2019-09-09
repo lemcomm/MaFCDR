@@ -1939,11 +1939,16 @@ class Dispatcher {
 	/* ========== Place Actions ============== */
 
 	public function placeCreateTest() {
-		if ($this->getCharacter()->isTrial()) {
+		$character = $this->getCharacter();
+		if ($character->isTrial()) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.free");
 		}
 		if ($check = $this->placeActionsGenericTests() !== true) {
 			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
+		}
+		if (($character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside')) || (!$character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))) {
+			# It's a long line, but basically, are we inside a settlement with permission, or outside a settlement with permission. If neither, we don't get access :)
+			return array("name"=>"place.new.name", "description"=>"unavailable.nopermission");
 		}
 		return array("name"=>"place.new.name", "url"=>"bm2_site_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 	}
