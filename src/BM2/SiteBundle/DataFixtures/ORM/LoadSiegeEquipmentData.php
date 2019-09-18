@@ -6,28 +6,17 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use BM2\SiteBundle\Entity\PlaceType;
+use BM2\SiteBundle\Entity\SiegeEquipmentType;
 
 class LoadSiegeEquipmentData extends AbstractFixture implements OrderedFixtureInterface {
 
-	private $placetypes = array(
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4),
-		'catapult'	=> array('hours' => 40, 'ranged' => true, 'minimum' => 1, 'maximum' => 4)
+	private $types = array(
+		'ballista'	=> array('hours' => 36, 'ranged' => true,  'soldiers' => 2, 'contacts' => 0),
+		'catapult'	=> array('hours' => 24, 'ranged' => true,  'soldiers' => 4, 'contacts' => 0),
+		'ladder'	=> array('hours' =>  6, 'ranged' => false, 'soldiers' => 2, 'contacts' => 1),
+		'ram'		=> array('hours' => 12, 'ranged' => false, 'soldiers' => 8, 'contacts' => 0),
+		'tower'		=> array('hours' => 48, 'ranged' => false, 'soldiers' => 4, 'contacts' => 4),
+		'trebuchet'	=> array('hours' => 48, 'ranged' => true,  'soldiers' => 4, 'contacts' => 0)
 	);
 	
 	/**
@@ -41,17 +30,17 @@ class LoadSiegeEquipmentData extends AbstractFixture implements OrderedFixtureIn
 	 * {@inheritDoc}
 	 */
 	public function load(ObjectManager $manager) {
-		foreach ($this->placetypes as $name=>$data) {
-			$type = $manager->getRepository('BM2SiteBundle:PlaceType')->findOneByName($name);
+		foreach ($this->types as $name=>$data) {
+			$type = $manager->getRepository('BM2SiteBundle:SiegeEquipmentType')->findOneByName($name);
 			if (!$type) {
-				$type = new PlaceType();
+				$type = new SiegeEquipmentType();
 				$manager->persist($type);
 			}
 			$type->setName($name);
-			if ($data['requires']) {
-				$type->setRequires($data['requires']);
-			}
-			$type->setVisible($data['visible']);
+			$type->setHours($data['hours']);
+			$type->setRanged($data['ranged']);
+			$type->setSoldies($data['soldiers']);
+			$type->setContacts($data['contacts']);
 			$manager->persist($type);
 		}
 		$manager->flush();
