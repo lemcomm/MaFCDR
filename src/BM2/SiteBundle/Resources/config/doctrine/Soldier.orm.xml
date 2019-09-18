@@ -31,6 +31,7 @@
 		</one-to-many>
 
 		<many-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_soldiers"/>
+		<many-to-one field="manning_equipment" target-entity="SiegeEquipment" inversed-by="manned_by"/>
 
 		<lifecycle-callbacks>
 			<lifecycle-callback type="preRemove" method="onPreRemove" />
