@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\SiegeEquipment">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="type" target-entity="SiegeEquipmentType"/>
+		<many-to-one field="owner" target-entity="Character" inversed-by="siege_equipment"/>
+		<one-to-many field="manned_by" target-entity="Soldier" mapped-by="manning_equipment"/>
+		<field name="hours_spent" type="integer"/>
+		<field name="hours_needed" type="integer"/>
+		<field name="ready" type="boolean"/>
+	</entity>
+</doctrine-mapping>
