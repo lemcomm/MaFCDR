@@ -275,6 +275,21 @@ class AccountController extends Controller {
 
 		$list_form = $this->createForm(new ListSelectType);
 
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+
+		if ($user->getIp() != $ip) {
+			$user->setIp($ip);
+			$em->flush();
+		}
+
 		return array(
 			'announcements' => $announcements,
 			'notices' => $notices,
