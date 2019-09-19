@@ -4,6 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
+		<field name="ip" type="string" nullable="true"/>
 		<field name="display_name" type="string"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
@@ -17,7 +18,7 @@
 		<field name="account_level" type="smallint"/>
 		<field name="vip_status" type="smallint"/>
 		<field name="paid_until" type="date"/>
-		<field name="credits" type="smallint"/>
+		<field name="credits" type="integer"/>
 		<one-to-many field="payments" target-entity="UserPayment" mapped-by="user" />
 		<one-to-many field="credit_history" target-entity="CreditHistory" mapped-by="user" />
 		<field name="restricted" type="boolean"/>
