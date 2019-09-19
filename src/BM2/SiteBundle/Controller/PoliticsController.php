@@ -279,13 +279,13 @@ class PoliticsController extends Controller {
 			}
 		}
 		foreach ($character->getUser()->getCharacters() as $mychar) {
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
 		foreach ($character->getPartnerships() as $partnership) {
 			$mychar = $partnership->getOtherPartner($character);
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
