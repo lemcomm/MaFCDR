@@ -111,4 +111,13 @@ class User extends BaseUser {
 		}
 	}
 
+	public function getFreePlaces() {
+		$months = $this->getCreated()->diff(new \DateTime("now"), true)->months;
+		$count = 0;
+		foreach ($this->getCharacters() as $character) {
+			$count += $character->getCreatedPlaces()->count();
+		}
+		return $months - $count;
+	}
+
 }
