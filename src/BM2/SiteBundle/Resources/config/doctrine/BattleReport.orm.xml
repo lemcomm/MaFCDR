@@ -23,7 +23,11 @@
 		<many-to-one field="settlement" target-entity="Settlement"/>
 		<one-to-many field="participants" target-entity="BattleParticipant" mapped-by="battle_report"/>
 
-		<one-to-many field="groups" target-entity="BattleReportGroup" mapped-by="battle_report"/>
+		<one-to-many field="groups" target-entity="BattleReportGroup" mapped-by="battle_report">
+			<order-by>
+				<order-by-field name="id" direction="ASC"/>
+			</order-by>
+		</one-to-many>
 		<one-to-one field="primary_attacker" target-entity="BattleReportGroup"/>
 		<one-to-one field="primary_defender" target-entity="BattleReportGroup"/>
 
