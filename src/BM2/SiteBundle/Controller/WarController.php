@@ -131,9 +131,11 @@ class WarController extends Controller {
 				case 'leadership':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeLeadershipTest', true);
 					break;
+				/*
 				case 'build':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeBuildTest', true);
 					break;
+				*/
 				case 'assault':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAssaultTest', true);
 					break;
@@ -143,7 +145,7 @@ class WarController extends Controller {
 				case 'leave':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', true);
 					break;
-				/*
+				/* TODO: Make suicide runs possible.
 				case 'attack':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAttackTest', true);
 					break;
@@ -217,7 +219,6 @@ class WarController extends Controller {
 				$em->persist($siege);
 				$em->flush(); # We need this flushed in order to link to it below.
 				
-				// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
 				$this->get('history')->logEvent(
 					$settlement,
 					'event.settlement.besieged',
@@ -233,7 +234,7 @@ class WarController extends Controller {
 				$attackers->addCharacter($character);
 				$attackers->setLeader($character);
 				$siege->addGroup($attackers);
-				$siege->addAttacker($attackers);
+				$siege->setAttacker($attackers);
 				$em->persist($attackers);
 
 				# setup defenders
