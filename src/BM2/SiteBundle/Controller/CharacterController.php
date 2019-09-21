@@ -1471,7 +1471,7 @@ class CharacterController extends Controller {
 			throw $this->createNotFoundException('error.notfound.battlereport');
 		}
 
-   	if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
+		if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
 			$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
 			$query->setParameters(array('br'=>$report, 'me'=>$character));
 			$check = $query->getOneOrNullResult();
@@ -1486,35 +1486,44 @@ class CharacterController extends Controller {
 			$location = array('key'=>'battle.location.nowhere');
 		}
 
+
 		// get entity references
-		$start = array();
-		foreach ($report->getStart() as $i=>$group) {
-			$start[$i]=array();
-			foreach ($group as $id=>$amount) {
-				$start[$i][] = array('type'=>$id, 'amount'=>$amount);
+		if ($report->getStart()) {
+			$start = array();
+			foreach ($report->getStart() as $i=>$group) {
+				$start[$i]=array();
+				foreach ($group as $id=>$amount) {
+					$start[$i][] = array('type'=>$id, 'amount'=>$amount);
+				}
 			}
-		}
 
-		$survivors = array();
-		$nobles = array();
-		$finish = $report->getFinish();
-		$survivors_data = $finish['survivors'];
-		$nobles_data = $finish['nobles'];
-		foreach ($survivors_data as $i=>$group) {
-			$survivors[$i]=array();
-			foreach ($group as $id=>$amount) {
-				$survivors[$i][] = array('type'=>$id, 'amount'=>$amount);
+			$survivors = array();
+			$nobles = array();
+			$finish = $report->getFinish();
+			$survivors_data = $finish['survivors'];
+			$nobles_data = $finish['nobles'];
+			foreach ($survivors_data as $i=>$group) {
+				$survivors[$i]=array();
+				foreach ($group as $id=>$amount) {
+					$survivors[$i][] = array('type'=>$id, 'amount'=>$amount);
+				}
 			}
-		}
-		foreach ($nobles_data as $i=>$group) {
-			$nobles[$i]=array();
-			foreach ($group as $id=>$fate) {
-				$char = $em->getRepository('BM2SiteBundle:Character')->find($id);
-				$nobles[$i][] = array('character'=>$char, 'fate'=>$fate);
+			foreach ($nobles_data as $i=>$group) {
+				$nobles[$i]=array();
+				foreach ($group as $id=>$fate) {
+					$char = $em->getRepository('BM2SiteBundle:Character')->find($id);
+					$nobles[$i][] = array('character'=>$char, 'fate'=>$fate);
+				}
 			}
+			return array('version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location);
+		} else {
+			$count = $report->getGroups()->count(); # These return in a specific order, low to high, ID ascending.
+			foreach ($report->getGroups() as $group) {
+				$totalRounds = $group->getCombatStages()->count();
+				break;
+			}
+			return array('version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds);
 		}
-
-		return array('start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location);
 	}
 
 	/**
