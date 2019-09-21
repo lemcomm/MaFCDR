@@ -44,8 +44,10 @@ class SiegeType extends AbstractType {
 		$isDefender = FALSE;
 		$defLeader = FALSE;
 		$attLeader = FALSE;
+		$attCount = 0;
+		$defCount = 0;
 		$actionslist = array();
-		#NOTE: $allactions = array('leadership', 'build', 'assault', 'disband', 'leave', 'attack', 'join', 'assume');
+		#NOTE: $allactions = array('leadership', 'build', 'assault', 'disband', 'leave', 'join', 'assume');
 		# Figure out if we're the group leader, and while we're at it, if both groups have leaders.
 		if (!$action || $action == 'select') {
 			foreach ($siege->getGroups() as $group) {
@@ -57,26 +59,33 @@ class SiegeType extends AbstractType {
 				if ($character == $group->getLeader()) {
 					
 					$isLeader = TRUE;
-					if ($group->isAttacker() && $group->getLeader()) {
+					if ($siege->getAttacker() == $group && $group->getLeader()) {
 						$attLeader = TRUE;
+						$attCount = $group->getCharacters()->count();
 						# Not used now, but later we'll set this up so other people can assume leadership of attackers in certain instances.
 					}
-					if ($group->isDefender() && $group->getLeader()) {
+					if ($siege->getAttacker() != $group && $group->getLeader()) {
 						$defLeader = TRUE;
 						# If this isn't TRUE, the lord can assume leadership of the siege.
+						$defCount = $group->getCharacters()->count();
 					}
 				}
 			}
+			/* TODO: Originally the plan was to allow suicide runs, but they make siege battles *messy* with how the groups are handled. For now, no suicide runs.
 			if (!$character->isDoingAction('military.regroup')) {
 				$actionslist = array('attack' => 'siege.action.attack');
 			} else {
 				$actionslist = array();
 			}
+			*/
 			# Once we add siege equipment, we'll give everyone the option to build it, regrouping or not.
 			# $actionslist = array('build' => 'siege.action.build', 'attack' => 'siege.action.attack');
 			if ($isLeader) {
 				# Leaders always have disband and transfer leadership actions.
-				$actionslist = array_merge($actionslist, array('disband'=>'siege.action.disband', 'leadership'=>'siege.action.leadership'));
+				$actionslist = array_merge($actionslist, array('disband'=>'siege.action.disband'));
+				if ($defCount > 1 || $attCount > 1) {
+					$actionslist = array_merge($actionslist, array('leadership'=>'siege.action.leadership'));
+				}
 				if (!$character->isDoingAction('military.regroup')) {
 					# Not regrouping? Then you can call an assault if you'r the leader.
 					$actionslist = array_merge($actionslist, array('assault'=>'siege.action.assault'));
@@ -101,7 +110,7 @@ class SiegeType extends AbstractType {
 			$builder->add('action', ChoiceType::class, array(
 				'required'=>true,
 				'choices' => $actionslist,
-				'placeholder'=>'action.none',
+				'placeholder'=>'siege.action.none',
 				'label'=> 'siege.actions',
 			));
 		} else {
@@ -182,7 +191,7 @@ class SiegeType extends AbstractType {
 						'required' => true
 					));
 					break;
-				case 'joinattack':
+				/*case 'joinattack':
 					$builder->add('subaction', HiddenType::class, array(
 						'data'=>'joinattack'
 					));
@@ -196,7 +205,7 @@ class SiegeType extends AbstractType {
 							'required' => true
 						));
 					}
-					break;
+					break;*/
 				case 'joinsiege':
 					$builder->add('subaction', HiddenType::class, array(
 						'data'=>'joinsiege'
