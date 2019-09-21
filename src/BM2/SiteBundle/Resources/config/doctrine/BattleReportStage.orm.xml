@@ -7,6 +7,7 @@
 		<many-to-one field="group_report" target-entity="BattleReportGroup" inversed-by="combat_stages"/>
 		<field name="round" type="smallint"/>
 		<field name="data" type="array"/>
+		<field name="extra" type="array" nullable="true"/>
 
 	</entity>
 </doctrine-mapping>
