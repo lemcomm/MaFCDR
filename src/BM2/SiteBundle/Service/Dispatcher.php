@@ -1946,6 +1946,12 @@ class Dispatcher {
 		if ($check = $this->placeActionsGenericTests() !== true) {
 			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
 		}
+		if ($character->getUser()->getFreePlaces() < 1) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
+		}
+		if ($this->geography->checkPlacePlacement($character)) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
+		}
 		if (($character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside')) || (!$character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))) {
 			# It's a long line, but basically, are we inside a settlement with permission, or outside a settlement with permission. If neither, we don't get access :)
 			return array("name"=>"place.new.name", "description"=>"unavailable.nopermission");
