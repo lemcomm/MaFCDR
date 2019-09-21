@@ -272,6 +272,9 @@ class PlaceController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name']);
+			if ($this->get('geography')->checkPlacePlacement($character)) {
+				$fail = TRUE; #You shouldn't even have access but players will be players, best check anyways.
+			}
 			if (!$fail) {
 				$place = new Place();
 				$this->getDoctrine()->getManager()->persist($place);
