@@ -23,6 +23,7 @@ class Geography {
 
 	private $embark_distance = 200;
 	private $road_buffer = 200;
+	private $place_separation = 1000;
 
 	private $base_speed = 12000; // 12km a day base speed
 	private $spotBase = -1;
@@ -431,26 +432,38 @@ class Geography {
 			$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
 			$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
 			$places = [];
+
+			/* So Doctrine loses its mind if we try to select an object and get zero, but you'll notice every single other one of these works without a try/catch, likely because we're not selecting an object but specific data. If *that* returns 0 rows, well, it don't care I guess.
 			try {
 				$results = $query->getResult();
 			} catch (\Doctrine\DBAL\DBALException $e) {
+				$results = NULL;
 				# No results :(
 			}
+			*/
 		}
-		foreach ($results as $result) {
-			if($result->getOwner() == $character OR $this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible()) {
-				$places[] = $result;
+		if ($results) {
+			foreach ($results as $result) {
+				if($result->getOwner() == $character OR $this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible()) {
+					$places[] = $result;
+				}
 			}
+			return $places;
+		} else {
+			return NULL;
 		}
-		return $places;
 	}
 
 	public function findPlacesInSpotRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateSpottingDistance($character));
 	}
 	
-	public function findPlacesInActionRange($character) {
+	public function findPlacesInActionRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateInteractionDistance($character));
+	}
+
+	public function checkPlacePlacement(Character $character) {
+		return $this->findPlacesnearMe($character, $this->place_separation);
 	}
 
 	public function findBattlesNearMe(Character $character, $maxdistance) {
@@ -873,6 +886,10 @@ class Geography {
 	
 	public function findHousesInActionRange($character) {
 		return $this->findHousesNearMe($character);
+	}
+
+	public function getDistance($locA, $locB) {
+		$query = $this->em->createQuery('SELECT ST_Distance(:locA, :locB)'); #Yes, this is a PHP wrapper for checking distance between points in PostGIS.
 	}
 
 }
