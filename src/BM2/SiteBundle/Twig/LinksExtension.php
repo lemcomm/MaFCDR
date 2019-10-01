@@ -181,7 +181,7 @@ class LinksExtension extends \Twig_Extension {
 	public function ObjectLink($entity, $raw=false, $absolute=false, $number=1) {
 		if (!is_object($entity)) {
 			$this->logger->error("link() called without object - $entity"); // fuck, it's impossible to get a backtrace! - out of memory
-			$this->logger->error("dump: ".\Doctrine\Common\Util\Debug::dump($entity, 1, true, false));			
+			$this->logger->error("dump: ".\Doctrine\Common\Util\Debug::dump($entity, 1, true, false));
 			$this->logger->error("request: ".$this->request_stack->getCurrentRequest()->getRequestUri());
 			return "[invalid object]";
 		}
@@ -255,10 +255,17 @@ class LinksExtension extends \Twig_Extension {
 		return $this->linkhelper($this->getLink($classname), $id, $name, $linktype, $raw, $absolute);
 	}
 
-	public function IdNameLink($type, $id, $name, $raw=false, $absolute=false) {
+	public function IdNameLink($type, $id, $name = null, $raw=false, $absolute=false) {
 		$linktype = null;
 		switch (strtolower($type)) {
-			case 'character':			$linktype = 'character'; break;
+			case 'character':
+				$linktype = 'character';
+				if (!$name) {
+					$name = $this->em->getRepository('BM2SiteBundle:Character')->find($id)->getName();
+					# Yes, this exists solely for battle reports. *sigh*
+					# For the record, if you fail to declare $name, linkhelper, below, will fail out. :)
+				}
+				break;
 			case 'geofeature':
 			case 'feature':         $linktype = 'feature'; $name = $this->featurename($name); break;
 			case 'building':
