@@ -37,7 +37,7 @@ class WarManager {
 	}
 
 	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
-		/* for future reference, $outside is used to determine whether or not attackers need to leave the settlement in order to attack someone. 
+		/* for future reference, $outside is used to determine whether or not attackers need to leave the settlement in order to attack someone.
 		It's used by attackOthersAction of WarCon. --Andrew */
 		$bothinside = false;
 		$type = 'field';
@@ -75,7 +75,7 @@ class WarManager {
 			$foundoutside = false;
 			$foundboth = false;
 			/* Because you can only attack a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
-			Outside of a siege this is only set if you start a battle 
+			Outside of a siege this is only set if you start a battle
 			So we need to figure out if our targets are inside or outside. If we find a mismatch, we drop the outsiders and only attack those inside. */
 			foreach ($targets as $target) {
 				if ($target->getInsideSettlement()) {
@@ -436,8 +436,9 @@ class WarManager {
 				}
 			} else if ($type == 'siege' && $focus->getAttacker() == $bg) {
 				# Since attackers control the siege, the siege only ends if the attackers disband it (or are otherwise broken)
-				$focus->getSettlement()->setSiege(null);
-				$focus->setSettlement(null);
+				$focus->getSettlement()->setSiege(NULL);
+				$focus->setSettlement(NULL);
+				$focus->setAttacker(NULL);
 				// siege is terminated, as sieges don't care how many groups, only if the attacker group has no more attackers in it.
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
@@ -463,6 +464,7 @@ class WarManager {
 						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 					}
 				}
+				$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
 			}
 		}
@@ -493,4 +495,3 @@ class WarManager {
 	#TODO
 	}
 }
-
