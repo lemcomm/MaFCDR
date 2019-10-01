@@ -83,7 +83,9 @@ class Geography {
 	}
 
 	public function travelDetails(Character $character, $to=1.0) {
-		$query = $this->em->createQuery('SELECT s as place,b.name as biome,ST_Length(ST_Intersection(g.poly,ST_Line_Substring(c.travel, c.progress, :to)) as length from BM2SiteBundle:Settlement s JOIN s.geo_data g JOIN g.biome b, BM2SiteBundle:Character c WHERE c = :me AND ST_Intersects(g.poly, ST_Line_Substring(c.travel, c.progress, :to)) = true');
+		$query = $this->em->createQuery('
+			SELECT s as place,b.name as biome,ST_Length(ST_Intersection(g.poly,ST_Line_Substring(c.travel, c.progress, :to)) as length from BM2SiteBundle:Settlement s JOIN s.geo_data g JOIN g.biome b, BM2SiteBundle:Character c WHERE c = :me AND ST_Intersects(g.poly, ST_Line_Substring(c.travel, c.progress, :to)) = true
+		'); #For reasons unfathomable, this query is tripping up the highlighing on my new editor. Putting it on a new line fixes it.
 		$query->setParameters(array('me'=>$character, 'to'=>$to));
 		return $query->getResult();
 	}
@@ -284,7 +286,7 @@ class Geography {
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
 	}
-	
+
 	public function findNearestPlace(Character $character) {
 		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
 		$query->setParameter('char', $character);
@@ -352,7 +354,7 @@ class Geography {
 			return $this->calculateDistanceToSettlement($a, $b->getSettlement());
 		}
 	}
-	
+
 	public function calculateDistanceToCharacter(Character $a, Character $b) {
 		$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Character b WHERE a=:a and b=:b');
 		$query->setParameters(array('a'=>$a, 'b'=>$b));
@@ -424,14 +426,14 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
-	
+
 	public function findPlacesNearMe(Character $character, $maxdistance) {
 		if ($character->getInsideSettlement()) {
 			$results = $character->getInsideSettlement()->getPlaces();
 		} else {
 			$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
 			$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
-			$places = [];
+			$results = $query->getResult();
 
 			/* So Doctrine loses its mind if we try to select an object and get zero, but you'll notice every single other one of these works without a try/catch, likely because we're not selecting an object but specific data. If *that* returns 0 rows, well, it don't care I guess.
 			try {
@@ -457,7 +459,7 @@ class Geography {
 	public function findPlacesInSpotRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findPlacesInActionRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -475,7 +477,7 @@ class Geography {
 	public function findBattlesInSpotRange(Character $character) {
 		return $this->findBattlesNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findBattlesInActionRange($character) {
 		return $this->findBattlesNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -491,11 +493,11 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
-	
+
 	public function findDungeonsInSpotRange(Character $character) {
 		return $this->findDungeonsNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findDungeonsInActionRange($character) {
 		return $this->findDungeonsNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -858,7 +860,7 @@ class Geography {
 		}
 		return array(false,false, false);
 	}
-	
+
 	public function findNearestHouse(Character $character) {
 		$query = $this->em->createQuery('SELECT f, ST_Distance(f.location, c.location) AS distance FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :char AND t.name = :type AND f.active = true ORDER BY distance ASC');
 		$query->setParameters(array('char'=> $character, 'type'=>'house'));
@@ -870,7 +872,7 @@ class Geography {
 			return false;
 		}
 	}
-	
+
 	public function findHousesNearMe(Character $character, $maxdistance=-1) {
 		if ($maxdistance==-1) {
 			$maxdistance = $this->calculateInteractionDistance($character);
@@ -879,11 +881,11 @@ class Geography {
 		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance, 'type'=>'house'));
 		return $query->getResult();
 	}
-	
+
 	public function findHousesInSpotRange(Character $character) {
 		return $this->findHousesNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findHousesInActionRange($character) {
 		return $this->findHousesNearMe($character);
 	}
