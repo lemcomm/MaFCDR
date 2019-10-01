@@ -149,27 +149,27 @@ class Dispatcher {
 
 		// these actions are hidden if not available
 		$has = $this->locationGiveShipTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$actions[] = $this->locationGiveGoldTest();
 		$has = $this->locationGiveArtifactTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$has = $this->personalSurrenderTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->personalEscapeTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$spy = $this->nearbySpyTest(true);
-		if (isset($spy['url'])) { 
+		if (isset($spy['url'])) {
 			$actions[] = $spy;
 		}
 		$has = $this->locationVisitHousesTest();
@@ -177,17 +177,17 @@ class Dispatcher {
 			$actions[] = $has;
 		}
 		$has = $this->locationDungeonsTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		} else {
 			$has = $this->personalPartyTest();
-			if (isset($has['url'])) { 
+			if (isset($has['url'])) {
 				$actions[] = $has;
 			} else {
 				$has = $this->personalDungeoncardsTest();
-				if (isset($has['url'])) { 
+				if (isset($has['url'])) {
 					$actions[] = $has;
-				}				
+				}
 			}
 		}
 
@@ -212,23 +212,23 @@ class Dispatcher {
 
 		$actions=array();
 		$has = $this->locationTavernTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationInnTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationLibraryTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationTempleTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationBarracksTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
@@ -360,7 +360,7 @@ class Dispatcher {
 			$actions[] = $this->militarySiegeJoinAttackTest();
 		}
 
-		$actions[] = $this->militaryLootSettlementTest(true);		
+		$actions[] = $this->militaryLootSettlementTest(true);
 
 		return array("name"=>"military.siege.name", "elements"=>$actions);
 	}
@@ -435,7 +435,7 @@ class Dispatcher {
 		}
 		return array("name"=>"personal.name", "elements"=>$actions);
 	}
-		
+
 	private function recruitActionsGenericTests(Settlement $settlement=null, $test='recruit') {
 		if ($this->getCharacter()->isNPC()) {
 			return 'npc';
@@ -463,7 +463,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"oath.view.name", "url"=>"bm2_site_politics_hierarchy", "description"=>"oath.view.description", "long"=>"oath.view.longdesc");
 		}
 		if ($this->getCharacter()->getVassals()) {
-			$actions[] = array("name"=>"vassals.view.name", "url"=>"bm2_site_politics_vassals", "description"=>"vassals.view.description", "long"=>"vassals.view.longdesc");			
+			$actions[] = array("name"=>"vassals.view.name", "url"=>"bm2_site_politics_vassals", "description"=>"vassals.view.description", "long"=>"vassals.view.longdesc");
 		}
 		$actions[] = $this->hierarchyOathTest();
 		$actions[] = $this->hierarchyIndependenceTest();
@@ -568,7 +568,7 @@ class Dispatcher {
 			return array("name"=>"places.name", "intro"=>"politics.intro", "elements"=>$actions);
 		}
 		$actions[] = $this->placeCreateTest();
-		
+
 		foreach ($this->geo->findPlacesInActionRange($this->getCharacter()) as $place) {
 			$this->setPlace($place);
 			$actions[] = array("title"=>$place->getFormalName());
@@ -576,7 +576,7 @@ class Dispatcher {
 			$actions[] = $this->placeManageTest();
 			$actions[] = $this->placeEnterTest();
 		}
-		
+
 		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
 	}
 
@@ -671,7 +671,7 @@ class Dispatcher {
 		}
 
 	}
-	
+
 	public function locationLeaveTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.$check");
@@ -791,7 +791,7 @@ class Dispatcher {
 			return array("name"=>"location.dungeons.name", "description"=>"unavailable.$check");
 		}
 		if ($this->getCharacter()->getDungeoneer() && $this->getCharacter()->getDungeoneer()->getParty()) {
-			return array("name"=>"location.dungeons.name", "description"=>"unavailable.already");		
+			return array("name"=>"location.dungeons.name", "description"=>"unavailable.already");
 		}
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"location.dungeons.name", "description"=>"unavailable.npc");
@@ -811,7 +811,7 @@ class Dispatcher {
 		}
 		return $this->action("location.dungeons", "bm2_dungeons");
 	}
-	
+
 	public function locationVisitHousesTest() {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.houses.name", "description"=>"unavailable.$check");
@@ -846,7 +846,7 @@ class Dispatcher {
 			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($this->getCharacter()->getAvailableEntourageOfType("spy")->count() <= 0) {
-			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nospies");			
+			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nospies");
 		}
 		return array("name"=>"nearby.spy.name", "url"=>"bm2_site_actions_spy", "description"=>"nearby.spy.description");
 	}
@@ -989,7 +989,7 @@ class Dispatcher {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($settlement->getOwner() == $this->getCharacter()) {
-			return $this->action("control.culture", "bm2_site_actions_changeculture");               
+			return $this->action("control.culture", "bm2_site_actions_changeculture");
 		} else {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.notyours2");
 		}
@@ -1135,7 +1135,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
@@ -1199,7 +1199,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
@@ -1274,7 +1274,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
@@ -1326,7 +1326,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
@@ -1390,7 +1390,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
 			# Too new.
@@ -1424,10 +1424,8 @@ class Dispatcher {
 		foreach ($siege->getGroups() as $group) {
 			if ($group->getCharacters()->contains($this->getCharacter())) {
 				$inSiege = TRUE;
-				if ($group->getLeader() == $this->getCharacter()) {
-					if ($group->isAttacker()) {
-						$isLeader = TRUE;
-					}
+				if ($siege->getAttacker()->getLeader() == $this->getCharacter()) {
+					$isLeader = TRUE;
 				}
 			}
 		}
@@ -1440,7 +1438,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.siege.disband", "bm2_site_war_siegesettlement", false, array('action'=>'disband'));
 	}
@@ -1461,10 +1459,14 @@ class Dispatcher {
 			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.nosiege");
 		}
 		$siege = $settlement->getSiege();
+		if ($siege->getAttacker()->getLeader() == $this->getCharacter()) {
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.areleader");
+		}
 		$inSiege = FALSE;
 		foreach ($siege->getGroups() as $group) {
 			if ($group->getCharacters()->contains($this->getCharacter())) {
 				$inSiege = TRUE;
+				break;
 			}
 		}
 		if (!$inSiege) {
@@ -1541,7 +1543,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.siege.attack", "bm2_site_war_siegesettlement", false, array('action'=>'attack'));
 	}
@@ -1590,7 +1592,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.siege.joinattack", "bm2_site_war_siegesettlement", false, array('action'=>'joinattack'));
 	}
@@ -1629,7 +1631,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
-			return array("name"=>"military.siege.join.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.siege.join", "bm2_site_war_siegesettlement", false, array('action'=>'joinsiege'));
 	}
@@ -1654,7 +1656,7 @@ class Dispatcher {
 			return array("name"=>"military.damage.name", "description"=>"unavailable.nofeatures");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.damage.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.damage.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.damage", "bm2_site_war_damage", true);
 	}
@@ -1816,7 +1818,7 @@ class Dispatcher {
 		}
 		$available = $this->milman->findAvailableEquipment($settlement, true);
 		if (empty($available)) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");			
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
 		}
 
 		return $this->action("recruit.troops", "bm2_site_actions_soldiers");
@@ -1966,31 +1968,31 @@ class Dispatcher {
 		if (!$this->place->getOwner != $this->getCharacter() OR !$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'describe')) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
 		} else {
-			return $this->action("place.manage", "bm2_site_place_manage", true, 
+			return $this->action("place.manage", "bm2_site_place_manage", true,
 				array('place'=>$this->place->getId()),
 				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
 			);
 		}
 	}
-	
+
 	public function placePermissionsTest() {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
 		if ($this->place != $this->getActionablePlace()) {
-			return array("name"=>"place.enter.name", 
+			return array("name"=>"place.enter.name",
 				     "description"=>"unavailable.noplace"
 				    );
 		}
 		if (!$this->place->getOwner != $this->getCharacter()) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
-		return $this->action("place.permissions", "bm2_site_place_permissions", true, 
+		return $this->action("place.permissions", "bm2_site_place_permissions", true,
 				array('place'=>$this->place->getId()),
 				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
 			);
 	}
-	
+
 	public function placeEnterTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
@@ -2021,39 +2023,39 @@ class Dispatcher {
 			return $this->action("place.enter", "bm2_site_actions_place", false, array('id'=>$place->getId()));
 		}
 	}
-	
+
 	public function placeLeaveTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.$check"
 				    );
 		}
 		if (!$this->getCharacter()->getInsidePlace()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.outside"
 				    );
 		}
 		if (!$place = $this->getActionablePlace()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.noplace"
 				    );
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.exit')) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.already"
 				    );
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.inbattle"
 				    );
 		}
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.prisoner"
 				    );
 		} else {
-			return $this->action("place.exit", 
+			return $this->action("place.exit",
 					     "bm2_site_actions_place_exit"
 					    );
 		}
@@ -2113,7 +2115,7 @@ class Dispatcher {
 			}
 			$settlements += $e;
 		}
-		return array($valid, $settlements);		
+		return array($valid, $settlements);
 	}
 
 	public function hierarchyManageRealmTest() {
@@ -2123,7 +2125,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.manage.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.manage", "bm2_site_realm_manage", true, 
+			return $this->action("realm.manage", "bm2_site_realm_manage", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -2137,7 +2139,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.description.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.description", "bm2_site_realm_description", true, 
+			return $this->action("realm.description", "bm2_site_realm_description", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -2151,7 +2153,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.abolish.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.abolish", "bm2_site_realm_abolish", true, 
+			return $this->action("realm.abolish", "bm2_site_realm_abolish", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -2165,7 +2167,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.abdicate.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.abdicate", "bm2_site_realm_abdicate", true, 
+			return $this->action("realm.abdicate", "bm2_site_realm_abdicate", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -2207,8 +2209,8 @@ class Dispatcher {
 		if ( ! $this->permission_manager->checkRealmPermission($this->realm, $this->getCharacter(), 'diplomacy')) {
 			return array("name"=>"war.name", "description"=>"unavailable.notdiplomat");
 		} else {
-			return $this->action("war", "bm2_site_war_declare", true, 
-				array('realm'=>$this->realm->getId()), 
+			return $this->action("war", "bm2_site_war_declare", true,
+				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
 		}
@@ -2221,8 +2223,8 @@ class Dispatcher {
 		if ( ! $this->permission_manager->checkRealmPermission($this->realm, $this->getCharacter(), 'diplomacy')) {
 			return array("name"=>"diplomacy.name", "description"=>"unavailable.notdiplomat");
 		} else {
-			return $this->action("diplomacy", "bm2_site_realm_diplomacy", true, 
-				array('realm'=>$this->realm->getId()), 
+			return $this->action("diplomacy", "bm2_site_realm_diplomacy", true,
+				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
 		}
@@ -2236,8 +2238,8 @@ class Dispatcher {
 			return array("name"=>"elections.name", "description"=>"unavailable.notmember");
 		}
 
-		return $this->action("elections", "bm2_site_realm_elections", false, 
-			array('realm'=>$this->realm->getId()), 
+		return $this->action("elections", "bm2_site_realm_elections", false,
+			array('realm'=>$this->realm->getId()),
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
 	}
@@ -2250,8 +2252,8 @@ class Dispatcher {
 			return array("name"=>"realm.capital.name1", "description"=>"unavailable.notleader");
 		}
 
-		return $this->action("realm.capital", "bm2_site_realm_capital", false, 
-			array('realm'=>$this->realm->getId()), 
+		return $this->action("realm.capital", "bm2_site_realm_capital", false,
+			array('realm'=>$this->realm->getId()),
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
 	}
@@ -2357,7 +2359,7 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.view.name", "description"=>"unavailable.$check");
 		} else {
-			return $this->action("house.view", "bm2_house", true, 
+			return $this->action("house.view", "bm2_house", true,
 				array('id'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2384,7 +2386,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.house", "bm2_house_manage", true, 
+			return $this->action("house.manage.house", "bm2_house_manage", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2408,7 +2410,7 @@ class Dispatcher {
 		if ($this->getCharacter()->getInsideSettlement() == $this->house->getInsideSettlement()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.househere");
 		} else {
-			return $this->action("house.manage.relocate", "bm2_house_relocate", true, 
+			return $this->action("house.manage.relocate", "bm2_house_relocate", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2422,7 +2424,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.applicants", "bm2_house_applicants", true, 
+			return $this->action("house.manage.applicants", "bm2_house_applicants", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2436,7 +2438,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.disown.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.disown", "bm2_house_disown", true, 
+			return $this->action("house.manage.disown", "bm2_house_disown", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2450,7 +2452,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.successor", "bm2_house_successor", true, 
+			return $this->action("house.manage.successor", "bm2_house_successor", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2619,11 +2621,11 @@ class Dispatcher {
 		}
 		return $this->actionableShip;
 	}
-	
+
 	public function getActionableHouses() {
 		if (is_object($this->actionableHouses) || $this->actionableHouses===null) return $this->actionableHouses;
 		$this->actionableHouses=null;
-		
+
 		if ($this->getCharacter() && $this->getCharacter()->getInsideSettlement()) {
 			$this->actionableHouses = $this->getCharacter()->getInsideSettlement()->getHousesPresent();
 		} else {
