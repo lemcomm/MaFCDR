@@ -28,6 +28,7 @@
 	-
 	{{ report.cycle|gametime('long') }}
 </p>
+<p>
 {% if report.defensebuildings is not empty %}
 	<ul class="shortlist">
 		{# FIXME: Quick hack to get this into one line #}
@@ -38,6 +39,8 @@
 	</ul>
 	<br />
 {% endif %}
+</p>
+<p>
 <table class="battlereport" align="left">
 	{% if version == 1 %}
 		<tr><td></td>
@@ -165,9 +168,9 @@
 		</tr>
 
 
-	{% else %}
+	{% elseif version == 2 %}
 		<tr>
-			<th colspan="{{ count|length }}" align="left"><h3>{{ 'battle.participants'|trans|title }}</h3></th>
+			<th colspan="{{ count }}"><h3>{{ 'battle.participants'|trans|title }}</h3></th>
 		</tr>
 		<tr>
 			{% for group in report.groups %}
@@ -181,24 +184,29 @@
 			{% endfor %}
 		</tr>
 		<tr>
-			<th colspan="{{ count|length }}" align="left"><h3>{{ 'battle.initial'|trans|title }}</h3></th>
+			<th colspan="{{ count }}"><h3>{{ 'battle.initial'|trans|title }}</h3></th>
 		</tr>
 		<tr>
-			{% for group in report.groups %}<td valign="top"><ul>
+			{% for group in report.groups %}
+				<td valign="top"><ul>
 				{% for soldiers, i in group.start %}
 						<li>{{ i }} {{ ('soldier.'~soldiers)|transchoice(i) }}</li>
 				{% endfor %}
-			</ul></td>{% endfor %}
+				</ul></td>
+			{% endfor %}
 		</tr>
-		<tr><th colspan="{{ count|length }}"><h3>{{ 'battle.combat'|trans|title }}</h3></th></tr>
+		<tr>
+			<th colspan="{{ count }}"><h3>{{ 'battle.combat'|trans|title }}</h3></th>
+		</tr>
 		{% for i in 1 .. roundcount %}
-			<tr><th colspan="{{ count|length }}"><h4>{{ 'battle.round.title'|trans({'%i%':i})|title }}</h4></th></tr>
+			<tr>
+				<th colspan="{{ count }}"><h4>{{ 'battle.round.title'|trans({'%i%':i})|title }}</h4></th></tr>
 			<tr>
 			{% for group in report.groups %}
 				<td>
 				{% for stage in group.combatStages if stage.round == i %}
 					{% for result, amount in stage.data if amount > 0 %}
-						<li>{{ ('battle.combat.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
+						<li>{{ ('battle.round.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
 					{% endfor %}
 					{{ macros.extras(stage.data, group) }}
 				{% endfor %}
@@ -207,97 +215,28 @@
 			</tr>
 		{% endfor %}
 		</tr>
-	{% endif %}
-{#
-
-
-
-
 		<tr>
-		{% for i, group in report.combat.ranged %}
-			<td valign="top">
-				{% if group.shots > 0 %}
-				<ul>
-					<li>{{ 'battle.ranged.shots'|transchoice(group.shots, {'%i%':group.shots}) }}</li>
-					<li>{{ 'battle.ranged.hits'|transchoice(group.hits, {'%i%':group.hits}) }}</li>
-					{% for result,amount in group.results if amount > 0 %}
-						<li>{{ ('battle.ranged.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
-					{% endfor %}
-					{% if group.routed > 0 %}
-						<li>{{ 'battle.ranged.routed'|transchoice(group.routed, {'%i%':group.routed}) }}</li>
-					{% endif %}
-				{% endif %}
-				{{ macros.extras(report.participants, group) }}
-				</ul>
-			</td>
-		{% endfor %}
+			<th colspan="{{ count }}"><h3>{{ 'battle.hunt.title'|trans|title }}</h3></th>
 		</tr>
-
-		{% for melee in report.combat.melee %}
-			<tr><th colspan="{{ start|length }}"><h4>{{ 'battle.melee.title'|trans({'%i%':loop.index})|title }}</h4></th></tr>
-			<tr>
-			{% for i, group in melee %}
-				<td valign="top">
-				<ul>
-					{% for result,amount in group if amount > 0 and result != 'fail' and result != 'extra' %}
-						<li>{{ ('battle.melee.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
-					{% endfor %}
-					{{ macros.extras(report.participants, group) }}
-				</ul>
-				</td>
-			{% endfor %}
-			</tr>
-		{% endfor %}
-
-
-
-
-
-
-
-
-			{% endfor %}
-		</tr><tr>
-			{% for group in report.groups %}
-
-			{% endfor %}
-		</tr><tr>
-			{% for group in report.groups %}
-
-			{% endfor %}
-		</tr><tr>
-			{% for group in report.groups %}
-
-			{% endfor %}
-		</tr><tr>
-			{% for group in report.groups %}
-
-			{% endfor %}
-		</tr>
-	{% endif %}
-
-
-		<tr><th colspan="{{ start|length }}"><h3>{{ 'battle.hunt.title'|trans|title }}</h3></th></tr>
 		<tr>
-		{% for i, group in report.hunt %}
-			<td valign="top">
-			<ul>
-				{% for result,amount in group if amount > 0 and result != 'extra' %}
+			{% for group in report.groups %}
+				<td valign="top"><ul>
+				{% for result,amount in group.hunt if amount > 0 and result != 'extra' %}
 					<li>{{ ('battle.hunt.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
 				{% endfor %}
-				{{ macros.extras(report.participants, group) }}
-			</ul>
-			</td>
-		{% endfor %}
+				{# TODO: Add logic for when nobles are killed while fleeing. #}
+				</ul></td>
+			{% endfor %}
 		</tr>
-
-		<tr><th colspan="{{ start|length }}"><h3>{{ 'battle.finish'|trans|title }}</h3></th></tr>
 		<tr>
-		{% for i, group in survivors %}
+			<th colspan="{{ count }}"><h3>{{ 'battle.finish'|trans|title }}</h3></th>
+		</tr>
+		<tr>
+		{% for group in report.groups %}
 			<td valign="top">
 			<ul>
-			{% for soldiers in group %}
-				<li>{{ soldiers.amount }} {{ soldiers.type }}</li>
+			{% for type, amount in group.finish %}
+				<li>{{ amount }} {{ type }}</li>
 			{% else %}
 				(none)
 			{% endfor %}
@@ -306,21 +245,23 @@
 		{% endfor %}
 		</tr>
 
-		<tr><th colspan="{{ start|length }}"><h3>{{ 'battle.fate.title'|trans|title }}</h3></th></tr>
 		<tr>
-		{% for i, group in nobles %}
+		<th colspan="{{ count }}"><h3>{{ 'battle.fate.title'|trans|title }}</h3></th></tr>
+		<tr>
+		{% for group in report.groups %}
 			<td valign="top">
 			<ul>
-			{% for noble in group %}
-				<li>{{ ('battle.fate.'~noble.fate)|trans({'%character%':link(noble.character)})|raw }}</li>
+			{% for i, fate in group.fates %}
+				<li>{{ ('battle.fate.'~fate)|trans({'%character%':character_link(i)})|raw }}</li>
 			{% endfor %}
 			</ul>
 			</td>
 		{% endfor %}
 		</tr>
-#}
+	{% endif %}
 
 </table>
+</p>
 
 {% if is_granted('ROLE_ADMIN') %}
 <h2>Raw Debug Output</h2>
