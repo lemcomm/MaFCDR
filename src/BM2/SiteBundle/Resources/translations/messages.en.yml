@@ -1162,8 +1162,9 @@ battle:
          panic:        %i% enemy routed|%i% enemies routed
          capture:      %i% enemy First One captured|%i% enemy First Ones captured
          fail:         %i% was unable to do any damage|%i% were unable to do any damage
-         missed:       %i% missed their target|%i% missed their targets
+         misses:       %i% missed their target|%i% missed their targets
          routed:       %i% soldier was routed|%i% soldiers were routed
+         strikes:      %i% melee hit|%i% melee hits
  hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
