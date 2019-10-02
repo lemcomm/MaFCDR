@@ -47,30 +47,30 @@ class SiegeType extends AbstractType {
 		$attCount = 0;
 		$defCount = 0;
 		$actionslist = array();
+
+		if ($siege->getAttacker()->getCharacters()->contains($character)) {
+			$isAttacker = TRUE;
+		} elseif ($siege->getDefender()->getCharacters()->contains($character)) {
+			$isDefender = TRUE;
+		}
+		if ($siege->getAttacker()->getLeader()) {
+			$attLeader = TRUE;
+			if ($siege->getAttacker()->getLeader() == $character) {
+				$isLeader = TRUE;
+			}
+		}
+		if ($siege->getDefender()->getLeader()) {
+			$defLeader = TRUE;
+			if ($siege->getDefender()->getLeader() == $character) {
+				$isLeader = TRUE;
+			}
+		}
+
 		#NOTE: $allactions = array('leadership', 'build', 'assault', 'disband', 'leave', 'join', 'assume');
 		# Figure out if we're the group leader, and while we're at it, if both groups have leaders.
 		if (!$action || $action == 'select') {
-			foreach ($siege->getGroups() as $group) {
-				if ($group->getCharacters()->contains($character) && $group->isAttacker()) {
-					$isAttacker = TRUE;
-				} elseif ($group->getCharacters()->contains($character) && $group->isDefender()) {
-					$isDefender = TRUE;
-				}
-				if ($character == $group->getLeader()) {
-					
-					$isLeader = TRUE;
-					if ($siege->getAttacker() == $group && $group->getLeader()) {
-						$attLeader = TRUE;
-						$attCount = $group->getCharacters()->count();
-						# Not used now, but later we'll set this up so other people can assume leadership of attackers in certain instances.
-					}
-					if ($siege->getAttacker() != $group && $group->getLeader()) {
-						$defLeader = TRUE;
-						# If this isn't TRUE, the lord can assume leadership of the siege.
-						$defCount = $group->getCharacters()->count();
-					}
-				}
-			}
+			$attCount = $siege->getAttacker()->getCharacters()->count();
+			$defCount = $siege->getDefender()->getCharacters()->count();
 			/* TODO: Originally the plan was to allow suicide runs, but they make siege battles *messy* with how the groups are handled. For now, no suicide runs.
 			if (!$character->isDoingAction('military.regroup')) {
 				$actionslist = array('attack' => 'siege.action.attack');
@@ -95,9 +95,9 @@ class SiegeType extends AbstractType {
 				$actionslist = array_merge($actionslist, array('leave' => 'siege.action.leave'));
 			}
 			if (
-				(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character && !$defLeader) 
-				|| (!$defLeader && !$settlement->getCharactersPresent()->contains($settlement->getOwner()) && $isDefender)
-				|| (!$attLeader && $isDefender)
+				(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character)
+				|| (!$defLeader && $isDefender && !$settlement->getCharactersPresent()->contains($settlement->getOwner()))
+				|| (!$attLeader && $isAttacker)
 			) {
 				# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
 				$actionslist = array_merge($actionslist, array('assume'=>'siege.action.assume'));
@@ -159,10 +159,17 @@ class SiegeType extends AbstractType {
 					$builder->add('subaction', HiddenType::class, array(
 						'data'=>'assault'
 					));
-					$builder->add('assault', CheckboxType::class, array(
-						'label' => 'siege.assault',
-						'required' => true
-					));
+					if ($isDefender) {
+						$builder->add('assault', CheckboxType::class, array(
+							'label' => 'siege.sortie',
+							'required' => true
+						));
+					} else {
+						$builder->add('assault', CheckboxType::class, array(
+							'label' => 'siege.assault',
+							'required' => true
+						));
+					}
 					break;
 				case 'disband':
 					$builder->add('subaction', HiddenType::class, array(
