@@ -64,7 +64,7 @@ class WarController extends Controller {
 		$me = array($realm->getId());
 
 		$form = $this->createForm(new WarType($me), $war);
-		$form->handleRequest($request);	
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($war);
@@ -159,7 +159,7 @@ class WarController extends Controller {
 				case 'assume':
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeAssumeTest', true);
 					break;
-				case 'select':	
+				case 'select':
 				default:
 					list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeGeneralTest', true);
 					break;
@@ -185,7 +185,7 @@ class WarController extends Controller {
 			$already = FALSE;
 			$form = $this->createForm(new AreYouSureType());
 		}
-		
+
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
@@ -218,7 +218,7 @@ class WarController extends Controller {
 				$siege->setMaxStage($maxstages); # Assuming we have everything, this will max out at 5.
 				$em->persist($siege);
 				$em->flush(); # We need this flushed in order to link to it below.
-				
+
 				$this->get('history')->logEvent(
 					$settlement,
 					'event.settlement.besieged',
@@ -233,6 +233,7 @@ class WarController extends Controller {
 				$attackers->setAttackingInSiege($siege);
 				$attackers->addCharacter($character);
 				$attackers->setLeader($character);
+				$attackers->setAttacker(true);
 				$siege->addGroup($attackers);
 				$siege->setAttacker($attackers);
 				$em->persist($attackers);
@@ -283,7 +284,7 @@ class WarController extends Controller {
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 			} else {
-				# Either request doesn't have AreYouSureType or data['sure'] did not equal true. 
+				# Either request doesn't have AreYouSureType or data['sure'] did not equal true.
 				if($data['action'] != 'selected') {
 					# if action is not already selected that means we shouldn't be here yet, rereoute the user to whatever action is.
 					switch($data['action']){
@@ -323,7 +324,7 @@ class WarController extends Controller {
 					switch($data['subaction']) {
 						case 'leadership':
 							if (($siege->getAttacker()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
-								# We already know they're *a* leader, now to figure out what group they lead. 
+								# We already know they're *a* leader, now to figure out what group they lead.
 								#TODO: Later when we add more sides to a battle, we'll need to expand this.
 								if ($siege->getAttacker()->getCharacters()->contains($character)) {
 									$group = $siege->getAttackers();
@@ -344,6 +345,7 @@ class WarController extends Controller {
 								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
 							}
 						case 'assault':
+							# We're either attackers assaulting or defenders sortieing! Battle type (assault vs sortie) is figured out by WarMan based on which group is passed as the attacker.
 							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'assault') {
 								$result = $this->get('war_manager')->createBattle($character, $settlement, null, $siege, $siege->getAttacker(), $siege->getDefender());
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
@@ -427,11 +429,12 @@ class WarController extends Controller {
 							break;
 						case 'assume':
 							# Someone is assuming leadership.
-							if ($data['action'] == 'assume') {
-								# First, make sure they're in a position to actually do this. 
+							if ($data['subaction'] == 'assume') {
+								# First, make sure they're in a position to actually do this.
 								#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
-								if ($siege->getDefenders()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
-									$siege->setLeader($character);
+								# TODO: expand this for attackers and other defenders. This is a good step 1 though.
+								if ($siege->getDefender()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
+									$siege->setLeader('defenders', $character);
 									$em->flush();
 								}
 								return $this->redirectToRoute('bm2_site_war_siegesettlement', array('action'=>'select'));
@@ -482,7 +485,7 @@ class WarController extends Controller {
 		}
 
 		$form = $this->createForm(new LootType($settlement, $em, $inside, $character->isNPC()));
-		$form->handleRequest($request);	
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 
 		// FIXME: shouldn't militia defend against looting?
@@ -508,7 +511,7 @@ class WarController extends Controller {
 					// check if target settlement allows slaves
 					if ($data['target']->getAllowThralls()==false) {
 						$form->addError(new FormError("loot.noslaves"));
-						return array('form'=>$form->createView());						
+						return array('form'=>$form->createView());
 					}
 				}
 			}
@@ -566,7 +569,7 @@ class WarController extends Controller {
 							} elseif ($cooldown <= -1) {
 								$mod = 0.225;
 							} elseif ($cooldown <= 0) {
-								$mod = 0.2; 
+								$mod = 0.2;
 							} elseif ($cooldown <= 6) {
 								$mod = 0.15;
 							} elseif ($cooldown <= 12) {
@@ -657,7 +660,7 @@ class WarController extends Controller {
 										if ($taken > 0) {
 											if ($follower->getSupply() < $max_supply) {
 												$items = floor($taken / $follower->getEquipment()->getResupplyCost());
-												if ($items > 0) { 
+												if ($items > 0) {
 													$follower->setSupply(min($max_supply, min($follower->getEquipment()->getResupplyCost()*$max_items, $follower->getSupply() + $items * $follower->getEquipment()->getResupplyCost() )));
 												}
 												if (!isset($result['supply'][$follower->getEquipment()->getName()])) {
@@ -820,7 +823,7 @@ class WarController extends Controller {
 	private function lootvalue($max) {
 		$a = max(rand(0, $max), rand(0, $max));
 		$b = max(rand(0, $max), rand(0, $max));
-		
+
 		if ($a < $b) {
 			return array($a, $b);
 		} else {
@@ -875,7 +878,7 @@ class WarController extends Controller {
 						}
 					}
 					if ($character->getActions()->exists(
-						function($key, $element) use ($bg) { 
+						function($key, $element) use ($bg) {
 							return ($element->getType() == 'military.intercepted' && $element->getTargetBattleGroup() == $bg);
 						}
 					)) {
@@ -887,7 +890,7 @@ class WarController extends Controller {
 			} else {
 				$bg = $engagements[0];
 				if ($character->getActions()->exists(
-					function($key, $element) use ($bg) { 
+					function($key, $element) use ($bg) {
 						return ($element->getType() == 'military.intercepted' && $element->getTargetBattleGroup() == $bg);
 					}
 				)) {
