@@ -143,7 +143,7 @@ class BattleRunner {
 				# So, this looks a bit weird, but stone stuff counts during stages 1 and 2, while wood stuff and moats only count during stage 1. Stage 3 gives you the fortress, and stage 4 gives the citadel bonus.
 				# If you're wondering why this looks different from how we figure out the max stage, that's because the final stage works differently.
 				foreach ($battle->getDefenseBuildings() as $building) {
-					switch (strtolower($building->getType()->getName())) {
+					switch (strtolower($building->getName())) {
 						case 'stone wall':
 						case 'stone towers':
 						case 'stone castle':
@@ -151,6 +151,7 @@ class BattleRunner {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
+							break;
 						case 'palisade':
 						case 'empty moat':
 						case 'filled moat':
@@ -697,7 +698,8 @@ class BattleRunner {
 						// Continure firing with a reduced hit chance in regular battle. If we skipped the ranged phase due to this being the last battle in a siege, we forego ranged combat to pure melee instead.
 						// TODO: friendly fire !
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
-						if (rand(0,100)<min(75,($soldier->RangedPower()+$bonus)*0.5)) {
+
+						if (rand(0,100)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 							// hit someone
 							$shots++;
 							$target = $this->getRandomSoldier($enemyCollection);
@@ -774,7 +776,7 @@ class BattleRunner {
 						$missed++;
 					}
 				}
-				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'strikes'=>$strikes, 'rangedHits'=>$rangedHits, 'misses'=>$missed, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
+				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
 			}
 			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
@@ -852,8 +854,9 @@ class BattleRunner {
 						$this->log(20, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())."\n");
 					}
 				}
-				$commbatResults = unseralize($stageResult->getData()); # Convert back to PHP Array.
-				$stageResult->setData($combatResults[] = array('routed'=>$routed)); # Add routed to array and save.
+				$combatResults = $stageResult->getData(); # CFetch original array.
+				$combatResults['routed'] = $routed; # Append routed info.
+				$stageResult->setData($combatResults); # Add routed to array and save.
 			}
 		}
 
@@ -912,8 +915,9 @@ class BattleRunner {
 
 			foreach ($groups as $group) {
 				$groupReport = $group->getActiveReport();
+				# For the life of me, I don't remember why I added this next bit.
 				if($groupReport->getHunt()) {
-					$huntReport = unserialize($groupReport->getHunt());
+					$huntReport = $groupReport->getHunt();
 				} else {
 					$huntReport = array('killed'=>0, 'entkilled'=>0, 'dropped'=>0);
 				}
@@ -1056,7 +1060,7 @@ class BattleRunner {
 
 		$noblefates=array();
 		$allNobles=array();
-		$noblegroup=array();
+		$nobleGroup=array();
 
 		$allGroups = $this->battle->getGroups();
 		$this->log(2, "Fate of First Ones:\n");
@@ -1332,18 +1336,18 @@ class BattleRunner {
 		}
 		// Updated siege assault contact scores. When we have siege engines, this will get ridiculously simpler to calculate. Defenders always get it slightly easier.
 		if ($this->battle->getType() == 'siegeassault') {
-			$newAttContacts == $this->attCurrentContacts - $this->attSlain;
-			$newDefContacts == $this->defCurrentContacts - $this->defSlain;
+			$newAttContacts = $this->attCurrentContacts - $this->attSlain;
+			$newDefContacts = $this->defCurrentContacts - $this->defSlain;
  			if ($newAttContacts < $this->attMinContacts) {
 				$this->attCurrentContacts = $this->attMinContacts;
 			} else {
-				$this->attCurrentContacts = $attCurrentContacts;
+				$this->attCurrentContacts = $newAttContacts;
 			}
 			if ($newDefContacts < $this->defMinContacts) {
 				if ($newDefContacts < $this->attCurrentContacts) {
 					$this->defCurrentContacts = $this->attCurrentContacts*1.1;
 				} else {
-					$this->defCurrentContacts = $this->defMinContacts;
+					$this->defCurrentContacts = $newDefContacts;
 				}
 			}
 			$this->defUsedContacts = 0;
