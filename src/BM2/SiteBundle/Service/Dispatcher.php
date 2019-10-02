@@ -1220,10 +1220,6 @@ class Dispatcher {
 			# Already doing.
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->getInsideSettlement()) {
-			# Already inside.
-			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.inside");
-		}
 		if (!$settlement) {
 			# Can't attack nothing.
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosettlement");
@@ -1242,19 +1238,19 @@ class Dispatcher {
 		foreach ($siege->getGroups() as $group) {
 			if ($group->getCharacters()->contains($this->getCharacter())) {
 				$inSiege = TRUE;
-				if ($group->isAttacker()) {
+				if ($group->isAttacker() && $isAttacker == FALSE) {
 					$isAttacker = TRUE;
 					if ($group->getLeader()) {
-						$attLeader = TRUE;
+						$attLeader = TRUE; # Attackers already have leader
 					}
-				} else {
+				} else if ($isDefender == FALSE) {
 					$isDefender = TRUE;
 					if ($group->getLeader()) {
-						$defLeader = TRUE;
+						$defLeader = TRUE; # Defenders already have leader
 					}
 				}
-				if ($group->getLeader() == $this->getCharacter()) {
-					$isLeader = TRUE;
+				if ($group->getLeader() == $this->getCharacter() && $isLeader == FALSE) {
+					$isLeader = TRUE; # We are a leader!
 				}
 			}
 		}
@@ -1342,13 +1338,9 @@ class Dispatcher {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.prisoner");
 		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+		if ($this->getCharacter()->isDoingAction('military.battle')) {
 			# Already doing.
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.already");
-		}
-		if ($this->getCharacter()->getInsideSettlement()) {
-			# Already inside.
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inside");
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inbattle");
 		}
 		if (!$settlement) {
 			# Can't attack nothing.
@@ -1372,6 +1364,9 @@ class Dispatcher {
 		if (!$inSiege) {
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notinsiege");
 		}
+		if (!$isLeader) {
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notleader");
+		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.regrouping");
@@ -1383,10 +1378,6 @@ class Dispatcher {
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.nosoldiers");
-		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
-			# No need to siege your own settlement.
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.location.yours");
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
