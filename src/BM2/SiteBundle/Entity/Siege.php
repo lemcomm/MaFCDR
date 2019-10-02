@@ -27,7 +27,6 @@ class Siege {
 				$group->setLeader($character);
 			}
 		}
-		$this->getDoctrine()->getManager()->flush();
 	}
 
 	public function getDefender() {
