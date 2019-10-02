@@ -46,6 +46,7 @@ class WarManager {
 		if ($siege) {
 			# Check for sieges first, because they'll always have settlements attached, but settlements won't always come with sieges.
 			$location = $siege->getSettlement()->getGeoData()->getCenter();
+			$battle->setSettlement($settlement);
 			$outside = false;
 
 			$battle->setSiege($siege);
@@ -217,35 +218,37 @@ class WarManager {
 		$character->setTravelLocked(true);
 
 		// notifications and counter-actions
-		foreach ($targets as $target) {
-			$act = new Action;
-			$act->setType($acttype)
-				->setCharacter($target)
-				->setTargetBattlegroup($defenders)
-				->setStringValue('forced')
-				->setCanCancel(false)
-				->setBlockTravel(true);
-			$this->actman->queue($act);
+		if ($targets) {
+			foreach ($targets as $target) {
+				$act = new Action;
+				$act->setType($acttype)
+					->setCharacter($target)
+					->setTargetBattlegroup($defenders)
+					->setStringValue('forced')
+					->setCanCancel(false)
+					->setBlockTravel(true);
+				$this->actman->queue($act);
 
-			if ($target->hasAction('military.evade')) {
-				// we have an evade action set, so automatically queue a disengage
-				$this->createDisengage($target, $defenders, $act);
-				// and notify
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.evading', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
-			} else {
-				// regular notififaction
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.targeted', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
+				if ($target->hasAction('military.evade')) {
+					// we have an evade action set, so automatically queue a disengage
+					$this->createDisengage($target, $defenders, $act);
+					// and notify
+					$this->history->logEvent(
+						$target,
+						'resolution.attack.evading', array("%time%"=>$this->gametime->realtimeFilter($time)),
+						History::HIGH, false, 25
+					);
+				} else {
+					// regular notififaction
+					$this->history->logEvent(
+						$target,
+						'resolution.attack.targeted', array("%time%"=>$this->gametime->realtimeFilter($time)),
+						History::HIGH, false, 25
+					);
+				}
+
+				$target->setTravelLocked(true);
 			}
-
-			$target->setTravelLocked(true);
 		}
 
 		return array('time'=>$time, 'outside'=>$outside, 'battle'=>$battle);
@@ -493,5 +496,44 @@ class WarManager {
 
 	public function buildSiegeTools() {
 	#TODO
+	}
+
+	public function progressSiege(Siege $siege, BattleGroup $victor) {
+		$current = $siege->getStage();
+		$max = $siege->getMaxStage();
+		$battle = $victor->getBattle();
+		$assault = FALSE;
+		$sortie = FALSE;
+		if ($battle->getType() == 'siegeassault') {
+			$assault = TRUE;
+		} elseif ($battle->getType() == 'siegesortie') {
+			$sortie = TRUE;
+		}
+		$attacker = $battle->getPrimaryAttacker();
+		if ($attacker == $victor && $assault) {
+			if ($current < $max) {
+				# Siege moves forward
+				$siege->setStage($current+1);
+			}
+			if ($current == $max) {
+				# Siege is over, attackers win.
+				# TODO: STUFF!
+			}
+		}
+		if ($attacker != $victor && $sortie) {
+			if ($current > 1) {
+				# Siege moves backwards.
+				$siege->setStage($current-1);
+			}
+			if ($current == 1) {
+				# Siege is over, defender victory.
+				# TODO: STUFF!
+			}
+		}
+		# Yes, this means that if attackers lose an assault or defenders lose an assault, nothing changes. This is intentional.
+
+		foreach ($siege->getGroups() as $group) {
+			$group->setBattle(NULL);
+		}
 	}
 }
