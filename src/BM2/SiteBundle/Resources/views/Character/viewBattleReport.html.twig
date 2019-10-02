@@ -41,7 +41,7 @@
 {% endif %}
 </p>
 <p>
-<table class="battlereport" align="left">
+<table class="battlereport" >
 	{% if version == 1 %}
 		<tr><td></td>
 			<th colspan="{{ start|length }}"><h3>{{ 'battle.participants'|trans|title }}</h3></th>
@@ -177,7 +177,14 @@
 				<td class="reportcolumn"><ul class="shortlist">
 				{% for participant in group.characters %}
 					{% if participant.character %}
-						<li>{{ link(participant.character) }}</li>
+						<li>
+						{% if participant.character.crest %}
+							{{ character_link(participant.character.id, '<img src="'~path("bm2_site_heraldry_crest", {"id":participant.character.crest.id})~'" width="60px" height="60px"/>') }}
+						{% else %}
+							{{ character_link(participant.character.id, '<img src="'~asset("bundles/bm2site/heraldry-svg/empty.svg")~'" width="60px" height="60px"/>') }}
+						{% endif %}
+						{{ link(participant.character) }}
+						</li>
 					{% endif %}
 				{% endfor %}
 				</ul></td>
@@ -263,9 +270,11 @@
 </table>
 </p>
 
+<p>
 {% if is_granted('ROLE_ADMIN') %}
 <h2>Raw Debug Output</h2>
 <pre>{{ report.debug }}</pre>
 {% endif %}
+</p>
 
 {% endblock %}
