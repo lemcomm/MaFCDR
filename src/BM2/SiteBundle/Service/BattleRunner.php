@@ -144,38 +144,41 @@ class BattleRunner {
 				# If you're wondering why this looks different from how we figure out the max stage, that's because the final stage works differently.
 				foreach ($battle->getDefenseBuildings() as $building) {
 					switch (strtolower($building->getName())) {
-						case 'stone wall':
-						case 'stone towers':
-						case 'stone castle':
+						case 'stone wall': # 10 points
+						case 'stone towers': # 5 points
+						case 'stone castle': # 5 points
 							if ($myStage < 3) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
-						case 'palisade':
-						case 'empty moat':
-						case 'filled moat':
-						case 'wood wall':
-						case 'wood towers':
-						case 'wood castle':
+						case 'palisade': # 10 points
+						case 'empty moat': # 5 points
+						case 'filled moat': # 5 points
+						case 'wood wall': # 10 points
+						case 'wood towers': # 5 points
+						case 'wood castle': # 5 points
 							if ($myStage < 2) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
-						case 'fortress':
+						case 'fortress': # 50 points
 							if ($myStage == 3) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
-						case 'citadel':
+						case 'citadel': # 70 points
 							if ($myStage == 4) {
 								$this->report->addDefenseBuilding($building);
 								$this->defenseBonus += $building->getDefenses();
 							}
 							break;
 						default:
+							# Seats of power are all 5 pts each.
+							# Apothercary and alchemist are also 5.
+							# This grants up to 30 points.
 							$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
 							$this->defenseBonus += $building->getDefenses();
 							break;
@@ -232,7 +235,8 @@ class BattleRunner {
 
 		$this->log(15, "preparing...\n");
 
-		if ($this->prepare()) {
+		$preparations = $this->prepare();
+		if ($preparations === TRUE) {
 			// the main call to actually run the battle:
 			$this->log(15, "Resolving Battle...\n");
 			$this->resolveBattle($myStage, $maxStage);
@@ -249,11 +253,6 @@ class BattleRunner {
 						array(),
 						History::MEDIUM, false, 20
 					);
-					# TODO Make this siege-aware.
-					// put winners inside settlement to prevent exploiting this.
-					if ($battle->getSettlement()) {
-						$char->setInsideSettlement($battle->getSettlement());
-					}
 				}
 			}
 		}
@@ -287,7 +286,8 @@ class BattleRunner {
 				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
 		} else {
-			$this->war_manager->progressSiege($battle->getSiege(), $victor);
+			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
+			$this->war_manager->progressSiege($battle->getSiege(), $victor, $preparations);
 		}
 		$this->em->remove($battle);
 	}
@@ -297,10 +297,13 @@ class BattleRunner {
 		$combatworthygroups = 0;
 		$enemy=null;
 		$this->nobility = new ArrayCollection;
+
 		if ($battle->getSiege()) {
 			$siege = $battle->getSiege();
 			$attGroup = $siege->getAttacker();
 			$defGroup = NULL;
+			$haveAttacker = FALSE;
+			$haveDefender = FALSE;
 		} else {
 			$siege = FALSE;
 			$attGroup = $battle->getPrimaryAttacker();
@@ -348,6 +351,13 @@ class BattleRunner {
 				# Groups that are reinforcing don't represent a primary combatant, and if we don't have atleast 2 primary combatants, there's no point.
 				# TODO: Add a check to make sure we don't have groups reinforcing another group that's no longer in the battle.
 				$combatworthygroups++;
+				if ($battle->getSiege()) {
+					if ($siege->getAttacker() == $group) {
+						$haveAttacekr = TRUE;
+					} else if ($siege->getDefender() == $group) {
+						$haveDefender = TRUE;
+					}
+				}
 			}
 			$groupReport->setStart($troops);
 		}
@@ -445,6 +455,13 @@ class BattleRunner {
 			$this->em->flush(); # Save all active reports for characters, and all character reports to their group reports.
 			return true;
 		} else {
+			if ($battle->getSiege()) {
+				if ($haveAttacker) {
+					return 'haveAttacker';
+				} else if ($haveDefender) {
+					return 'haveDefender';
+				}
+			}
 			return false;
 		}
 	}
@@ -541,17 +558,20 @@ class BattleRunner {
 			$kill = 0;
 			$fail = 0;
 			$missed = 0;
+			$crowded = 0;
 			$attSlain = $this->attSlain; # For Sieges.
 			$defSlain = $this->defSlain; # For Sieges.
 			$extras = array();
-			$rangedPenalty = $rangedPenaltyStart; #We need each group to reset their penalty.
+			$rangedPenalty = $rangedPenaltyStart; #We need each group to reset their rangedPenalty and defenseBonus.
+			$defBonus = $this->defenseBonus;
 			if ($battle->getType() == 'siegeassault') {
 				if ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker()) {
-					$rangedPenalty *= 0.3; # Defenders in seiges get a blanket defensive boost as they're harder to hit being on the walls. This affects the determination of a hit, not how bad the hit is.
+					$rangedPenalty = 1; # TODO: Make this dynamic. Right now this can lead to weird scenarios in regions with higher penalties where the defenders are actually easier to hit.
 					$siegeAttacker = TRUE;
 					$usedContacts = $this->attUsedContacts;
 					$currentContacts = $this->attCurrentContacts;
 				} else {
+					$defBonus = 0; # Siege defenders use pre-determined rangedPenalty.
 					$siegeAttacker = FALSE;
 					$usedContacts = $this->defUsedContacts;
 					$currentContacts = $this->defCurrentContacts;
@@ -599,7 +619,7 @@ class BattleRunner {
 						if ($target) {
 							$shots++;
 							$bonus = sqrt($enemies); // easier to hit if there are many enemies
-							if (rand(0,100)<min(95*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
+							if (rand(0,100+$defBonus)<min(95*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 								// target hit
 								$rangedHits++;
 								$result = $this->RangedHit($soldier, $target);
@@ -699,7 +719,7 @@ class BattleRunner {
 						// TODO: friendly fire !
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
 
-						if (rand(0,100)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
+						if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 							// hit someone
 							$shots++;
 							$target = $this->getRandomSoldier($enemyCollection);
@@ -738,9 +758,9 @@ class BattleRunner {
 						}
 					} else {
 						if ($battle->getType() == 'siegeassault') {
-							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack, contacts at ".$usedContacts." of ".$currentContacts);
+							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack, contacts at ".$usedContacts." of ".$currentContacts."\n");
 						} else {
-							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack");
+							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack\n");
 						}
 					}
 					if ($result) {
@@ -773,10 +793,14 @@ class BattleRunner {
 							$extras[] = $extra;
 						}
 					} else {
-						$missed++;
+						if ($battle->getType() == 'siegeassault' && $usedContacts >= $currentContacts) {
+							$crowded++; #Frontline is too crowded in the siege.
+						} else {
+							$missed++; #Just couldn't hit the target :(
+						}
 					}
 				}
-				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
+				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
 			}
 			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
@@ -1058,14 +1082,13 @@ class BattleRunner {
 			$group->getActiveReport()->setFinish($troops);
 		}
 
-		$noblefates=array();
 		$allNobles=array();
-		$nobleGroup=array();
 
 		$allGroups = $this->battle->getGroups();
 		$this->log(2, "Fate of First Ones:\n");
 		$primaryVictor = null;
 		foreach ($allGroups as $group) {
+			$nobleGroup=array();
 			$my_survivors = $group->getActiveSoldiers()->filter(
 				function($entry) {
 					return (!$entry->isNoble());
@@ -1111,10 +1134,6 @@ class BattleRunner {
 					} elseif ($soldier->isActive()) {
 						if ($victory) {
 							$nobleGroup[$id]='victory';
-							// victorious attackers get to enter the settlement
-							if ($this->battle->getSettlement() && $this->battle->getAttacker()->getCharacters()->contains($soldier->getCharacter())) {
-								$this->interactions->characterEnterSettlement($soldier->getCharacter(), $this->battle->getSettlement(), true);
-							}
 						} else {
 							$nobleGroup[$id]='retreat';
 						}
