@@ -32,7 +32,7 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->features as $name=>$data) {
-			$type = $manager->getRepository('BM2SiteBundle:SettlementType')->findOneByName($name)
+			$type = $manager->getRepository('BM2SiteBundle:FeatureType')->findOneByName($name);
 			if (!$type) {
 				$type = new FeatureType();
 				$manager->persist($type);
