@@ -830,6 +830,7 @@ charstatus:
  granting:     grant
  renaming:     rename
  reclaiming:   reclaim
+ sieging:     sieging
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 inside:       inside %place%
@@ -1153,18 +1154,19 @@ battle:
   panic:        %i% enemy routed|%i% enemies routed
   capture:      %i% enemy First One captured|%i% enemy First Ones captured
  round:
-         title: Combat Phase %i%
-         alive: %i% soldier fighting|%i% soldiers fighting
-         shots:        %i% shot fired|%i% shots fired
-         rangedHits:   %i% ranged hit|%i% ranged hits
-         kill:         %i% enemy killed|%i% enemies killed
-         wound:        %i% enemy wounded|%i% enemies wounded
-         panic:        %i% enemy routed|%i% enemies routed
-         capture:      %i% enemy First One captured|%i% enemy First Ones captured
-         fail:         %i% was unable to do any damage|%i% were unable to do any damage
-         misses:       %i% missed their target|%i% missed their targets
-         routed:       %i% soldier was routed|%i% soldiers were routed
-         strikes:      %i% melee hit|%i% melee hits
+  title: Combat Phase %i%
+  alive: %i% soldier fighting|%i% soldiers fighting
+  shots:        %i% shot fired|%i% shots fired
+  rangedHits:   %i% ranged hit|%i% ranged hits
+  kill:         %i% enemy killed|%i% enemies killed
+  wound:        %i% enemy wounded|%i% enemies wounded
+  panic:        %i% enemy routed|%i% enemies routed
+  capture:      %i% enemy First One captured|%i% enemy First Ones captured
+  fail:         %i% was unable to do any damage|%i% were unable to do any damage
+  misses:       %i% missed their target|%i% missed their targets
+  crowded:      %i% was unable to reach a target|%i% were unable to reach thier targets
+  routed:       %i% soldier was routed|%i% soldiers were routed
+  strikes:      %i% melee hit|%i% melee hits
  hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
