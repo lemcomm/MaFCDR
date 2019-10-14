@@ -22,7 +22,7 @@ event:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
   estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
- 
+
  description:
   updated:
    artifact:    The description of this artifact has changed.
@@ -108,6 +108,7 @@ event:
   death:        Died.
   death2:       Died in battle.
   retired:      Has retired from war and politics.
+  liegeretired: No longer has a liege after the retirement of %character%.
   npcdeath:     Without troops, disappeared and died.
   desertions:   %complaining% soldiers are complaining about being too far away from home. %gone% of them deserted.
   deathreclaim: %amount% soldiers returned to you upon the death of %character%, whom you had them assigned to.
@@ -195,7 +196,7 @@ event:
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
   newplace:     Formalized %place% by %link-character%.
-  joinhouse: 
+  joinhouse:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
   house:
@@ -230,7 +231,7 @@ event:
   settlement:   Attack on %settlement% started.
 
  realm:
-  founded:      Founded by %character%.  
+  founded:      Founded by %character%.
   inherited:    Rulership passed to %character-2% upon the death of %character-1%.
   inherifail:   Rulership disputed after the death of %character%, who left no heir.
   inheriteddeath:    Rulership passed to %character-2% upon the death of %character-1%.
@@ -260,7 +261,7 @@ event:
    superior:    By order of %character%, the realm's subrealm of %realm% has been dismantled.
    character:   Ordered the dismantling of the realm of %realm%.
    sovereign:
-    inferior:   
+    inferior:
      subrealm:  With the abolishment of %realm%, the realm has become autonomous.
      realm:     With the dismantling of the realm, the formal vassal of %realm% has gained it's autonomy.
     estate:     With the dismantling of %realm%, the estate is effectively rogue.
@@ -283,7 +284,7 @@ event:
  house:
   founded:      By decree of %character% the house has been formalized!
   newmember:    %character% has been accepted into the ranks.
-  subfounded:   By decree of %character-1%, the %house% has been formalized as a Cadet under leadership of %character-2% 
+  subfounded:   By decree of %character-1%, the %house% has been formalized as a Cadet under leadership of %character-2%
   subcreated:   By decree of %character-1% of the %house-1%, the %house-2% has been formalized under them with leadership granted to %character-2%.
   exile:
    ruler:       By decree of %character-1%, %character-2%, ruler of %realm% has been cast out of the House.
@@ -296,7 +297,7 @@ event:
    death:       After the passing of %character-1%, %character-2% has taken leadership as the designated successor or heir.
    retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
    slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
-  newhead:      
+  newhead:
    death:       After the passing of %character-1%, %character-2% has taken leadership as the eldest member.
    retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the eldest member.
    slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the eldest member.
@@ -306,7 +307,7 @@ event:
    slumber:     Unable to locate a successor after the slumber of its last head, the house has collapsed.
   relocated:
    settlement:  Relocated to the settlement of %settlement%.
- 
+
 
 report:
  building:
@@ -409,6 +410,17 @@ battle:
  participated:  Participated in %battle%.
  failed:        The battle failed to happen, most likely because all enemies evaded successfully.
 
+siege:
+ bypass:
+  attacker:     After the defenders failed to muster troops in %battle%, the siege concluded in a defender victory.
+  defender:     After the attackers failed to muster troops in %battle%, the siege concluded in an attacker victory.
+ advance:
+  attacker:     After the %battle%, the siege has advanced in favor of the attackers.
+  defender:     After the %battle%, the siege has advanced in favor of the defenders.
+ victor:
+  attacker:     After the final %battle%, the siege has concluded in favor of the attackers.
+  defender:     After the final %battle%, the siege has concluded in favor of the defenders.
+
 mail:
  sender:        Notification Service
  subject:       Might & Fealty Important Event Notice
@@ -483,7 +495,7 @@ news:
  subscribe:
   title:      Subscribe
   intro: >
-    If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the 
+    If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the
     edition to your readers list and you will be able to access it in the future. If the publication is set up as a periodical, you will also
     receive a notification and a copy of future editions.
   submit:     Subscribe now
@@ -533,4 +545,3 @@ trans:
    friend:        I am quite sorry, but I cannot accept your offer at this time.
    neutral:       I have to refuse your request.
    hostile:       You can have what is rightfully mine if you take it from my cold, dead hands.
-   
