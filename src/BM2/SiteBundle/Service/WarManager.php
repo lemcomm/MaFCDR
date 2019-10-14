@@ -10,8 +10,9 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Siege;
 
 use Doctrine\ORM\EntityManager;
-use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\ActionManager;
+use BM2\SiteBundle\Service\History;
+use BM2\SiteBundle\Service\Interactions;
 use BM2\SiteBundle\Service\MilitaryManager;
 use BM2\SiteBundle\Twig\GameTimeExtension;
 
@@ -27,13 +28,15 @@ class WarManager {
 	protected $history;
 	protected $milman;
 	protected $actman;
+	protected $interactions;
 
-	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime) {
+	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime, Interactions $interactions) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->milman = $milman;
 		$this->actman = $actman;
 		$this->gametime = $gametime;
+		$this->interactions = $interactions;
 	}
 
 	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
@@ -372,15 +375,19 @@ class WarManager {
 		$this->actman->queue($act, true);
 	}
 
-	public function disbandSiege(Siege $siege, Character $leader) {
+	public function disbandSiege(Siege $siege, Character $leader, $completed = FALSE) {
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
-				$this->history->logEvent(
-					$character,
-					'event.character.siege.disband',
-					array('%link-settlement%'=>$siege->getSettlement()->getId(), '%link-character%'=>$leader->getId()),
-					History::LOW, true
-				);
+				if (!$completed) {
+					$this->history->logEvent(
+						$character,
+						'event.character.siege.disband',
+						array('%link-settlement%'=>$siege->getSettlement()->getId(), '%link-character%'=>$leader->getId()),
+						History::LOW, true
+					);
+				} else {
+					# Do nothing, because this is already handled by the siege code. :)
+				}
 				$this->removeCharacterFromBattlegroup($character, $group);
 				$this->addRegroupAction(null, $character);
 			}
@@ -498,42 +505,146 @@ class WarManager {
 	#TODO
 	}
 
-	public function progressSiege(Siege $siege, BattleGroup $victor) {
+	public function progressSiege(Siege $siege, BattleGroup $victor, $flag) {
 		$current = $siege->getStage();
 		$max = $siege->getMaxStage();
 		$battle = $victor->getBattle();
 		$assault = FALSE;
 		$sortie = FALSE;
+		$bypass = FALSE;
 		if ($battle->getType() == 'siegeassault') {
 			$assault = TRUE;
 		} elseif ($battle->getType() == 'siegesortie') {
 			$sortie = TRUE;
 		}
 		$attacker = $battle->getPrimaryAttacker();
+		if ($flag == 'haveAttacker') {
+			$victor = $siege->getAttacker();
+			$bypass = TRUE; #Defenders failed to muster any defenders.
+		} else if ($flag == 'haveDefender') {
+			$victor = $siege->getDefender();
+			$bypass = TRUE; #Attackers failed to muster any attackers.
+		}
 		if ($attacker == $victor && $assault) {
-			if ($current < $max) {
+			if ($current < $max && !$bypass) {
 				# Siege moves forward
 				$siege->setStage($current+1);
+				# "After the [link], the siege has advanced in favor of the attackers"
+				$this->history->logEvent(
+					$settlement,
+					'siege.advance.attacker',
+					array('%link-battle%'=>$this->report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
 			}
-			if ($current == $max) {
+			if ($current == $max || $bypass) {
+				$completed = TRUE;
 				# Siege is over, attackers win.
-				# TODO: STUFF!
+				if (!$bypass) {
+					# "After the defenders failed to muster troops in [link], the siege concluded in attacker victory."
+					$this->history->logEvent(
+						$settlement,
+						'siege.victor.attacker',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					# "After the [link], the siege concluded in an attacker victory."
+					$this->history->logEvent(
+						$settlement,
+						'siege.bypass.attacker',
+						array('%link-battle%'=>$this->report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+
 			}
 		}
 		if ($attacker != $victor && $sortie) {
-			if ($current > 1) {
+			if ($current < $max && !$bypass) {
 				# Siege moves backwards.
 				$siege->setStage($current-1);
+				# "After the [link], the siege has advanced in favor of the defenders"
+				$this->history->logEvent(
+					$settlement,
+					'siege.advance.defender',
+					array('%link-battle%'=>$this->report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
 			}
-			if ($current == 1) {
+			if ($current == $max || $bypass) {
+				$completed = TRUE;
 				# Siege is over, defender victory.
-				# TODO: STUFF!
+				if (!$bypass) {
+					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
+					$this->history->logEvent(
+						$settlement,
+						'siege.victor.defender',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					# "After the [link], the siege concluded in a defender victory."
+					$this->history->logEvent(
+						$settlement,
+						'siege.bypass.defender',
+						array('%link-battle%'=>$this->report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
 			}
 		}
-		# Yes, this means that if attackers lose an assault or defenders lose an assault, nothing changes. This is intentional.
+		# Yes, this means that if attackers lose an assault or defenders lose a sortie, nothing changes. This is intentional.
 
 		foreach ($siege->getGroups() as $group) {
 			$group->setBattle(NULL);
 		}
+
+		if ($completed) {
+			if ($victor == $attacker) {
+				foreach ($victor->getCharacters() as $char) {
+					# Force move victorious attackers inside the settlement.
+					$this->interactions->characterEnterSettlement($char, $settlement, true);
+				}
+			}
+			$this->disbandSiege($siege, null, TRUE);
+		}
+
 	}
 }
