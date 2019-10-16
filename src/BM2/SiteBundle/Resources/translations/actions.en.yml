@@ -202,7 +202,7 @@ building:
     In the inn, you can hear rumours from abroad, especially about what other lords offer for prospective knights. And if
     you are looking for sell-swords, soldiers of fortune, men-at-arms - in a word: Mercenaries, the inn is where you will
     most likely find them.<br />
-    They are usually easy to spot as they are looking for employers the same way you are looking for them. Their services, 
+    They are usually easy to spot as they are looking for employers the same way you are looking for them. Their services,
     however, are less easy. They will follow you as long as you pay them well. You can also not retrain, assign or set them
     as militia. And you can only disband them all at once.
  library:
@@ -274,7 +274,7 @@ control:
     is very likely a much better idea.
   limit:      With a free account, you can control at most three estates with each character. Keep that in mind and select carefully, or support the game with a subscription.
   long: >
-    You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead, 
+    You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead,
     we won't stop you, but probably you should bring more troops, reduce the militia by attacking first or gain the support
     of allies who will aid you.
   owned:        This settlement is currently controlled by %owner%.
@@ -396,7 +396,7 @@ control:
  description:
   settlement:
    name:        Update Description
-   description: Change this settlement's description. 
+   description: Change this settlement's description.
    help: >
     From here you can change the description of this settlement, which will display publicly whenever someone views the settlement details.
     This will be displayed regardless of whether they are in spotting distance or interaction range, and can be viewed by anyone, even people
@@ -571,9 +571,9 @@ military:
     Obviously, this is most useful either at chokepoints such as bridges, passes, etc. or when working with others so you can cover a large area.<br />
     You cannot move while blocking. Your army will camp in the area and send patrols around. This allows you to automatically
     engage your targets at twice your normal interaction range.<br />
-    Target selection uses the <a href="%listsurl%">lists system</a> in order to allow you to create sophisticated orders.
+    Target selection uses the <a href=%listsurl%>lists system</a> in order to allow you to create sophisticated orders.
     Slumbering First Ones, however, will never be engaged. You can attack them normally, but for block area they will be ignored.<br />
-    Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself 
+    Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself
     in battle with a vastly superior enemy if you are not careful.<br />
     Blocking area can be cancelled at any time from your actions queue.
   mode:
@@ -582,18 +582,17 @@ military:
    attack:        Attack these, allow all others
   target:         Target
   submit:         Tssue block orders
-  success: >
-    Your men will now set up camp and patrol the area.
+  success:        Your men will now set up camp and patrol the area.
  damage:
   name:           Damage feature
   description:    Try to destroy a bridge or other feature.
   longdesc:       Use your soldiers to tear down or damage a bridge, watchtower or sign to disrupt enemy operations.
   intro: >
-    You can use your soldiers to tear apart features such as bridges, watchtowers or signs.<br />
+    "You can use your soldiers to tear apart features such as bridges, watchtowers or signs.<br />
     Typically, you do this to your enemy to disrupt them, but sometimes you may want to get rid of features in your own lands.<br />
     This action takes 4 hours, except for signs where it takes only 1 hour.<br />
     <br />
-    The following feature(s) is/are within range:
+    The following feature(s) is/are within range:"
   target:         Choose which feature to damage or destroy.
   inactive:       (inactive)
   submit:         Proceed with destruction
@@ -602,6 +601,8 @@ military:
   success3:       You have damaged the %featuretype%, by about %damage% % of the effort required to build it.
  siege:
   name:         Siege Actions
+  actions:      All Available Actions
+  no_action:    (Select an Action)
   start:
    name:        Declare a Siege
    description: Order a siege of this settlement.
@@ -629,7 +630,17 @@ military:
   joinattack:
    name:        Join a Pending Attack
    description: Order your men to join you in joining the pending attack.
-   
+  confirm:
+   leadership:  Who shall take command?
+   assume:      Confirm Assumption
+   build:       Lorem Ipsum Filler Cause this isn't active yet.
+   assault:     Confirm Assault
+   sortie:      Cofnirm Sortie
+   disband:     Really End the Siege
+   leave:       Confirm Departure
+   attack:      Cofnrim Individual Attackers
+   joinattacK:  They Shall Have Allies
+  submit:       Dispatch Orders!
 
 economy:
  name:          Settlement economy actions
@@ -898,7 +909,7 @@ meta:
   appearance:
    name:      Appearance
    desc: >
-    Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant - 
+    Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant -
     whatever those who encounter the character will recognize and remember.<br />
     <em>This field is publicly visible on your character page.</em>
   personality:
@@ -937,13 +948,13 @@ meta:
     a plausible, actual name.<br />
     All name changes are recorded in your character's public history.<br />
     <br />
-    You can also add a religious or political name or monicker that the character uses themselves or is being called 
-    by others. If you want your character to be known by something besides their name, this is the place to put it. 
+    You can also add a religious or political name or monicker that the character uses themselves or is being called
+    by others. If you want your character to be known by something besides their name, this is the place to put it.
     Alexander "The Great" as well as "Brother Gregory" are examples from the real world.<br />
     The "known as" can be more free-form than the character name, but should still pass a common sense "would someone really be called like that in a medieval world?"
     test. In other words: No silliness, no modern or Internet speak, something that passes the giggle test when you
     imagine composing a letter starting with "My esteemed (...)".<br />
-    If set, this name will be shown instead of the character name everywhere, but in <i>italics</i>. 
+    If set, this name will be shown instead of the character name everywhere, but in <i>italics</i>.
     The character details page will show both.<br />
   newname:      New Name
   knownas:      Add a "known as"
@@ -1095,4 +1106,3 @@ request:
   limit:       Maximum Amount
   sent:        Your request to receive food from %settlement% has been sent.
   limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
- 
