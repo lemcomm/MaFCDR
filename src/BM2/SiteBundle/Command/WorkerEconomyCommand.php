@@ -33,7 +33,6 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 		$this->generator = $container->get('generator');
 		$this->economy = $container->get('economy');
 		$history = $container->get('history');
-		$military = $container->get('military');
 		$start = $input->getArgument('start');
 		$end = $input->getArgument('end');
 
