@@ -117,7 +117,12 @@ class User extends BaseUser {
 		foreach ($this->getCharacters() as $character) {
 			$count += $character->getCreatedPlaces()->count();
 		}
-		return $months - $count;
+		if ($this->account_level >= 20) {
+			$mod = 1;
+		} else {
+			$mod = 0;
+		}
+		return $months - $count + $mod;
 	}
 	
 }
