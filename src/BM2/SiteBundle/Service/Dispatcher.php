@@ -140,8 +140,10 @@ class Dispatcher {
 		}
 
 		$actions[] = $this->placeListTest();
-		if ($newplace = $this->placeCreateTest(true)) {
-			$actions[] = $newplace;
+
+		$has = $this->placeCreateTest();
+		if (isset($has['url'])) {
+			$actions[] = $has;
 		}
 
 		$actions[] = $this->locationQuestsTest();
@@ -1399,7 +1401,7 @@ class Dispatcher {
 		}
 		if ($this->getCharacter()->getInsideSettlement()) {
 			# Those inside don't control the siege.
-			return array("name"=>"military.siege.disband.siege.name", "description"=>"unavailable.notbesieger");
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.notbesieger");
 		}
 		if (!$settlement) {
 			# Can't attack nothing.
