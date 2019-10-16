@@ -81,18 +81,25 @@ class SiegeType extends AbstractType {
 			# Once we add siege equipment, we'll give everyone the option to build it, regrouping or not.
 			# $actionslist = array('build' => 'siege.action.build', 'attack' => 'siege.action.attack');
 			if ($isLeader) {
-				# Leaders always have disband and transfer leadership actions.
-				$actionslist = array_merge($actionslist, array('disband'=>'siege.action.disband'));
+				# Leaders can always transfer leadership, if they're not alone.
 				if ($defCount > 1 || $attCount > 1) {
-					$actionslist = array_merge($actionslist, array('leadership'=>'siege.action.leadership'));
+					$actionslist = array_merge($actionslist, array('leadership'=>'military.siege.leadership.name'));
+				}
+				# Attacker leader can always disband.
+				if ($siege->getAttacker()->getLeader() == $character) {
+					$actionslist = array_merge($actionslist, array('disband'=>'military.siege.disband.name'));
 				}
 				if (!$character->isDoingAction('military.regroup')) {
 					# Not regrouping? Then you can call an assault if you'r the leader.
-					$actionslist = array_merge($actionslist, array('assault'=>'siege.action.assault'));
+					$actionslist = array_merge($actionslist, array('assault'=>'military.siege.assault.name'));
 				}
 			} else {
-				# Anyone that isn't the leader can opt to just leave.
-				$actionslist = array_merge($actionslist, array('leave' => 'siege.action.leave'));
+				# Anyone that isn't a leader can opt to just leave.
+				$actionslist = array_merge($actionslist, array('leave' => 'military.siege.leave.name'));
+			}
+			if ($isLeader && $siege->getAttacker()->getLeader() != $character) {
+				# Defender leader can also just leave, because he might be alone.
+				$actionslist = array_merge($actionslist, array('leave' => 'military.siege.leave.name'));
 			}
 			if (
 				(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character)
@@ -100,18 +107,18 @@ class SiegeType extends AbstractType {
 				|| (!$attLeader && $isAttacker)
 			) {
 				# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
-				$actionslist = array_merge($actionslist, array('assume'=>'siege.action.assume'));
+				$actionslist = array_merge($actionslist, array('assume'=>'military.siege.assume.name'));
 			}
 			if (!$siege->getBattles()->isEmpty()) {
 				# If there's a battle ongoing, anyone can opt to join it. If the leader does, they'll be able to call their entire force into action.
-				$actionslist = array_merge($actionslist, array('join'=>'siege.action.join'));
+				$actionslist = array_merge($actionslist, array('join'=>'military.siege.join.name'));
 			}
 			ksort($actionslist, 2); #Sort array as strings.
 			$builder->add('action', ChoiceType::class, array(
 				'required'=>true,
 				'choices' => $actionslist,
-				'placeholder'=>'siege.action.none',
-				'label'=> 'siege.actions',
+				'placeholder'=>'military.siege.no_action',
+				'label'=> 'military.siege.actions'
 			));
 		} else {
 			$builder->add('action', HiddenType::class, array(
@@ -123,7 +130,7 @@ class SiegeType extends AbstractType {
 						'data'=>'leadership'
 					));
 					$builder->add('newleader', 'entity', array(
-						'label'=>'siege.newleader',
+						'label'=>'military.siege.newleader',
 						'required'=>true,
 						'placeholder'=>'siege.character.none',
 						'attr'=>array('title'=>'siege.help.newleader'),
@@ -143,7 +150,7 @@ class SiegeType extends AbstractType {
 					));
 					/*
 					$form->add('type', 'entity', array(
-						'label'=>'siege.newequpment',
+						'label'=>'military.siege.newequpment',
 						'required'=>true,
 						'placeholder'=>'equipment.none'
 						'attr'=>array('title'=>'siege.help.equipmenttype'),
@@ -161,12 +168,12 @@ class SiegeType extends AbstractType {
 					));
 					if ($isDefender) {
 						$builder->add('assault', CheckboxType::class, array(
-							'label' => 'siege.sortie',
+							'label' => 'military.siege.confirm.sortie',
 							'required' => true
 						));
 					} else {
 						$builder->add('assault', CheckboxType::class, array(
-							'label' => 'siege.assault',
+							'label' => 'military.siege.confirm.assault',
 							'required' => true
 						));
 					}
@@ -176,7 +183,7 @@ class SiegeType extends AbstractType {
 						'data'=>'disband'
 					));
 					$builder->add('disband', CheckboxType::class, array(
-						'label' => 'siege.disband',
+						'label' => 'military.siege.disband',
 						'required' => true
 					));
 					break;
@@ -185,7 +192,7 @@ class SiegeType extends AbstractType {
 						'data'=>'leave'
 					));
 					$builder->add('leave', CheckboxType::class, array(
-						'label' => 'siege.leave',
+						'label' => 'military.siege.leave',
 						'required' => true
 					));
 					break;
@@ -194,7 +201,7 @@ class SiegeType extends AbstractType {
 						'data'=>'attack'
 					));
 					$builder->add('attack', CheckboxType::class, array(
-						'label' => 'siege.attack',
+						'label' => 'military.siege.confirm.attack',
 						'required' => true
 					));
 					break;
@@ -219,15 +226,15 @@ class SiegeType extends AbstractType {
 					));
 					# Later we'll extend this to include reinforcing parties, hence the arrays. Those looking to attack the attackers and those looking to attack the defenders but weren't part of the original siege (presumably because they showed up late).
 					if ($character->getInsideSettlement() == $settlement) {
-						$sides = array('defenders' => 'siege.side.defenders');
+						$sides = array('defenders' => 'military.siege.side.defenders');
 					} else {
-						$sides = array('attackers' => 'siege.side.attackers');
+						$sides = array('attackers' => 'military.siege.side.attackers');
 					}
 					$builder->add('side', ChoiceType::class, array(
 						'required'=>true,
 						'choices' => $sides,
-						'placeholder'=>'siege.sides.none',
-						'label'=> 'siege.joinside'
+						'placeholder'=>'military.siege.sides.none',
+						'label'=> 'military.siege.confirm.joinside'
 					));
 					break;
 				case 'assume':
@@ -235,14 +242,14 @@ class SiegeType extends AbstractType {
 						'data'=>'assume'
 					));
 					$builder->add('assume', CheckboxType::class, array(
-						'label' => 'siege.assume',
+						'label' => 'military.siege.confirm.assume',
 						'required' => true
 					));
 					break;
 			}
 		};
 
-		$builder->add('submit', SubmitType::class, array('label'=>'siege.submit'));
+		$builder->add('submit', SubmitType::class, array('label'=>'military.siege.submit'));
 
 	}
 
