@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBUndle\Entity\Character;
 use BM2\SiteBundle\Service\History;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -22,6 +23,9 @@ class QueueController extends Controller {
 	  */
 	public function manageAction() {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array("queue" => $character->getActions(), "now" => new \DateTime("now"));
 	}
@@ -32,6 +36,9 @@ class QueueController extends Controller {
 	  */
 	public function detailsAction($id) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$action = $em->getRepository('BM2SiteBundle:Action')->find($id);
@@ -61,6 +68,9 @@ class QueueController extends Controller {
 	  */
 	public function battleAction($id) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$battle = $em->getRepository('BM2SiteBundle:Battle')->find($id);
@@ -91,6 +101,9 @@ class QueueController extends Controller {
 	  */
 	public function updateAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$id = $this->get('request')->request->get('id');
 		$option = $this->get('request')->request->get('option');

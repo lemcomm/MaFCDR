@@ -54,7 +54,7 @@
 
 	<h3>{{ "economy.trade.resources"|trans({},"actions")|title }}</h3>
 	<table class="tsort"><thead><tr>
-		<th>{{ "estate"|transchoice(1) }}</th>
+		<th>{{ "settlement"|transchoice(1) }}</th>
 		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.production"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.demand"|trans({},"actions") }}</th>
@@ -62,10 +62,10 @@
 		<th>{{ "economy.trade.sum"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.transcost"|trans({},"actions") }}</th>
 	</tr></thead><tbody>
-	{% for estate in estates %}
-		{% for resource in estate.resources %}
+	{% for settlement in settlements %}
+		{% for resource in settlement.resources %}
 			<tr>
-				<td>{{ link(estate.settlement) }}</td>
+				<td>{{ link(settlement.settlement) }}</td>
 				<td>{{ resource.type.name|trans }}</td>
 				<td align="right">{{ resource.production }}</td>
 				<td align="right">{{ resource.demand }}</td>
@@ -121,7 +121,7 @@
 
 	<h3>{{ "economy.trade.resources"|trans({},"actions")|title }}</h3>
 	<table class="tsort"><thead><tr>
-		<th>{{ "estate"|transchoice(1) }}</th>
+		<th>{{ "settlement"|transchoice(1) }}</th>
 		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.production"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.demand"|trans({},"actions") }}</th>
@@ -129,10 +129,10 @@
 		<th>{{ "economy.trade.sum"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.transcost"|trans({},"actions") }}</th>
 	</tr></thead><tbody>
-	{% for estate in estates %}
-		{% for resource in estate.resources %}
+	{% for settlement in settlements %}
+		{% for resource in settlement.resources %}
 			<tr>
-				<td>{{ link(estate.settlement) }}</td>
+				<td>{{ link(settlement.settlement) }}</td>
 				<td>{{ resource.type.name|trans }}</td>
 				<td align="right">{{ resource.production }}</td>
 				<td align="right">{{ resource.demand }}</td>

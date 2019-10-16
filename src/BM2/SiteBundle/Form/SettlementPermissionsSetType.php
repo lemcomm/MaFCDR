@@ -39,6 +39,11 @@ class SettlementPermissionsSetType extends AbstractType {
 			'required' => false,
 		));
 
+		$builder->add('feed_soldiers', 'checkbox', array(
+			'label' => "control.permissions.feedsoldiers",
+			'required' => false,
+		));
+
 		$builder->add('permissions', 'collection', array(
 			'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em),
 			'allow_add'	=> true,

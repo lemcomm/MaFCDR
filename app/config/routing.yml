@@ -22,6 +22,12 @@ msg:
     defaults:
      _locale: en
 
+fos_user_security_detect:
+    prefix:  /{_locale}
+    pattern: /detect
+    defaults: { _controller: FOSUserBundle:Security:detect }
+    requirements:
+        _method: GET|POST
 
 _catcher:
  path:	/{url}
@@ -30,4 +36,3 @@ _catcher:
   url:			-
  requirements:
   url:			".+"
-

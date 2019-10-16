@@ -6,6 +6,7 @@
 		</id>
 		<field name="version" type="integer" version="true"/>
 		<field name="name" type="string"/>
+		<field name="battling" type="boolean" nullable="true"/>
 		<field name="known_as" type="string" nullable="true"/>
 		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
@@ -15,7 +16,7 @@
 		<field name="generation" type="smallint"/>
 		<field name="genome" type="string" length="2">
 			<options>
-				<option name="fixed">true</option> 
+				<option name="fixed">true</option>
 			</options>
 		</field>
 		<field name="magic" type="integer" nullable="true"/>
@@ -41,7 +42,7 @@
 
 		<field name="auto_read_realms" type="boolean" nullable="true"/>
 		<field name="non_hetero_options" type="boolean" nullable="true"/>
-		
+
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
 
@@ -83,7 +84,7 @@
 		<many-to-many field="partnerships" target-entity="Partnership" mapped-by="partners"/>
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
-		<one-to-many field="estates" target-entity="Settlement" mapped-by="owner"/>
+		<one-to-many field="owned_settlements" target-entity="Settlement" mapped-by="owner"/>
 		<one-to-many field="settlement_claims" target-entity="SettlementClaim" mapped-by="character" fetch="EXTRA_LAZY"/>
 
 		<many-to-one field="liege" target-entity="Character" inversed-by="vassals"/>
@@ -102,8 +103,9 @@
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
-		
+
 		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
+		<one-to-many field="created_places" target-entity="Place" mapped-by="creator"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
 
 		<many-to-one field="house" target-entity="House" inversed-by="members"/>
@@ -116,5 +118,10 @@
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
 
 		<one-to-one field="unit_settings" target-entity="UnitSettings" mapped-by="character"/>
+		<one-to-many field="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
+
+		<one-to-one field="active_report" target-entity="BattleReportCharacter"/>
+
+		<one-to-many field="siege_equipment" target-entity="SiegeEquipment" mapped-by="owner"/>
 	</entity>
 </doctrine-mapping>

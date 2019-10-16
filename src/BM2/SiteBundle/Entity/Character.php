@@ -30,6 +30,10 @@ class Character {
 		}
 	}
 
+	public function getListName() {
+		return $this->getName().' (ID: '.$this->id.')';
+	}
+
 	public function DaysInGame() {
 		return $this->created->diff(new \DateTime("now"), true)->days;
 	}
@@ -340,7 +344,7 @@ class Character {
 				$realms->add($position->getRealm());
 			}
 		}
-		foreach ($this->getEstates() as $estate) {
+		foreach ($this->getOwnedSettlements() as $estate) {
 			if ($realm = $estate->getRealm()) {
 				if (!$realms->contains($realm)) {
 					$realms->add($realm);
@@ -433,5 +437,6 @@ class Character {
 	public function hasAction($key) {
 		return ($this->findActions($key)->count()>0);
 	}
-
+	
+	
 }

@@ -15,6 +15,7 @@
 
 		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
+		<field name="feed_soldiers" type="boolean" nullable="true"/>
 		
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="settlement"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_settlement"/>
@@ -27,8 +28,8 @@
 		<one-to-many field="inferiors" target-entity="Settlement" mapped-by="superior"/>
 		-->
 		
-		<many-to-one field="owner" target-entity="Character" inversed-by="estates"/>
-		<many-to-one field="realm" target-entity="Realm" inversed-by="estates"/>
+		<many-to-one field="owner" target-entity="Character" inversed-by="owned_settlements"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="settlements"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital"/>
 		<one-to-one field="geo_data" target-entity="GeoData" inversed-by="settlement"/>
 		<one-to-one field="geo_marker" target-entity="GeoFeature"/>
@@ -58,6 +59,8 @@
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_settlement"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_settlement"/>
 
-		<one-to-many field="supplies_units" target-entity="UnitSettings" mapped-by="supplier"/>
+		<one-to-many field="supplied_units" target-entity="UnitSettings" mapped-by="supplier"/>
+
+		<one-to-one field="siege" target-entity="Siege" mapped-by="settlement"/>
 	</entity>
 </doctrine-mapping>

@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Building;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\Road;
 use BM2\SiteBundle\Form\BuildingconstructionType;
@@ -33,6 +34,9 @@ class ConstructionController extends Controller {
      */
 	public function roadsAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyRoadsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		// FIXME: This was a hack for alpha, where we didn't pre-populate the geofeatures - probably I can remove it?
@@ -182,6 +186,9 @@ class ConstructionController extends Controller {
 	public function featuresAction(Request $request) {
 		// TODO: add a way top remove / demolish features
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyFeaturesTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		list($features, $active, $building, $workhours) = $this->featureData($settlement);
 		$form = $this->createForm(new FeatureconstructionType($features, $settlement->getGeoData()->getRiver(), $settlement->getGeoData()->getCoast()));
@@ -356,6 +363,9 @@ class ConstructionController extends Controller {
      */
 	public function buildingsAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$available=array();
@@ -487,6 +497,9 @@ class ConstructionController extends Controller {
 	  */
 	public function abandonbuildingAction(Building $building, Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$building->abandon();
 		$this->getDoctrine()->getManager()->flush();
@@ -501,6 +514,9 @@ class ConstructionController extends Controller {
 	  */
 	public function focusAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$request->request->has("building") || !$request->request->has("focus")) {
 			throw new \Exception("invalid request");

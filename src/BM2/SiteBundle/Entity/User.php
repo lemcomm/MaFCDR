@@ -101,7 +101,7 @@ class User extends BaseUser {
 			return false;
 		}
 	}
-	
+
 	public function isVeryNewPlayer() {
 		$days = $this->getCreated()->diff(new \DateTime("now"), true)->days;
 		if ($days < 7) {
@@ -111,4 +111,13 @@ class User extends BaseUser {
 		}
 	}
 
+	public function getFreePlaces() {
+		$months = $this->getCreated()->diff(new \DateTime("now"), true)->m;
+		$count = 0;
+		foreach ($this->getCharacters() as $character) {
+			$count += $character->getCreatedPlaces()->count();
+		}
+		return $months - $count;
+	}
+	
 }

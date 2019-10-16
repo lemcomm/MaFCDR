@@ -168,11 +168,11 @@
 			{% if app.session.get('entourage') > 0 %}
 				<li><a href="{{ path('bm2_site_character_entourage') }}"><span class="value">{{ app.session.get('entourage') }}</span>{{ 'npc.entourage2'|transchoice(app.session.get('entourage')) }}</a></li>
 			{% endif %}
-			{% if app.session.get('estates') is not empty %}
+			{% if app.session.get('settlements') is not empty %}
 				<li class="drawer">
-					<a href="{{ path('bm2_estates') }}"><span class="value">{{ app.session.get('estates')|length }}</span>{{ 'estate'|transchoice(app.session.get('estates')|length) }}</a>
+					<a href="{{ path('bm2_estates') }}"><span class="value">{{ app.session.get('settlements')|length }}</span>{{ 'estate'|transchoice(app.session.get('settlements')|length) }}</a>
 					<ul>
-						{% for id,name in app.session.get('estates') %}
+						{% for id,name in app.session.get('settlements') %}
 						<li>{{ settlement_link(id, name) }}</li>
 						{% endfor %}
 					</ul>
@@ -195,6 +195,16 @@
 	<div style="clear: both"></div>
 
 	<div class="symfony-content" data-role="content">
+		{% for flashMessage in app.session.flashbag.get('error') %}
+		<div class="flash-message" data-role="header" data-theme="e">
+			{{ flashMessage|trans }}
+		</div>
+		{% endfor %}
+		{% for flashMessage in app.session.flashbag.get('warning') %}
+		<div class="flash-message" data-role="header" data-theme="e">
+			{{ flashMessage|trans }}
+		</div>
+		{% endfor %}
 		{% for flashMessage in app.session.flashbag.get('notice') %}
 		<div class="flash-message" data-role="header" data-theme="e">
 			{{ flashMessage|trans }}

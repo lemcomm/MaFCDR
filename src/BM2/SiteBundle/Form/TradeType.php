@@ -61,7 +61,7 @@ class TradeType extends AbstractType {
 		$character = $this->character;
 		$builder->add('source', 'entity', array(
 			'label' => 'source',
-			'placeholder' => ($character->getEstates()->count()>1?'form.choose':false),
+			'placeholder' => ($character->getOwnedSettlements()->count()>1?'form.choose':false),
 			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($character) {
 				$qb = $er->createQueryBuilder('s');
 				$qb->where('s.owner = :me');

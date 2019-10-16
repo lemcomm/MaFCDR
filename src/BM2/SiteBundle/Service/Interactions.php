@@ -94,7 +94,7 @@ class Interactions {
 		}
 
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsideSettlement($settlement);
 			$prisoner->setLocation($loc);
@@ -141,7 +141,7 @@ class Interactions {
 			History::LOW, true, 10
 		);
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsideSettlement(null);
 			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???
@@ -228,12 +228,12 @@ class Interactions {
 
 		return $details;
 	}
-	
+
 	public function characterEnterPlace(Character $character, Place $place, $force = false) {
 		if ($character->getInsidePlace() == $place) {
 			return true; // we are already inside
 		}
-		
+
 		if (!$this->pm->checkSettlementPermission($place, $character, 'visit')) {
 				return false;
 		}
@@ -307,7 +307,7 @@ class Interactions {
 		}
 		*/
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsidePlace($place);
 			$prisoner->setLocation($loc);
@@ -316,10 +316,10 @@ class Interactions {
 				$this->history->visitLog($place, $prisoner);
 			}
 		}
-		
+
 		// if you're a prisoner yourself, bring your captor with you
 		if ($captor = $character->getPrisonerOf()) {
-			$captor->setInsideSettlement($place);
+			$captor->setInsidePlace($place);
 			$captor->setLocation($loc);
 			$place->addCharactersPresent($captor);
 			if ($place->getOwner() != $captor) {
@@ -357,7 +357,7 @@ class Interactions {
 			History::LOW, true, 10
 		);
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsidePlace(null);
 			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???

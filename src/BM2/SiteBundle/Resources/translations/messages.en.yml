@@ -76,7 +76,7 @@ registration:
    Welcome to Might & Fealty - we are looking forward to your story and experience.<br />
  direct: >
    Please supply the required information below.<br />
-   You will then receive an e-mail with an activation link. We apologize for that additional step, 
+   You will then receive an e-mail with an activation link. We apologize for that additional step,
    but it keeps spammers and bots out.
  toslink: By registering, you agree to our <a href="%url%" target="_blank">Terms of Service</a>.
  complete:
@@ -169,7 +169,7 @@ vip:
  intro: >
    These players helped make Might & Fealty come into existence by contributing considerably to the crowdfunding campaign:
  status:
-  10:       Hero   
+  10:       Hero
   20:       Legend
   30:       Immortal
 
@@ -249,10 +249,10 @@ account:
   mail:
    expired:   "[Might & Fealty] Subscription Expired"
    expired2: >
-     <p>Your subscription for <a href="http://mightandfealty.com">Might &amp; Fealty</a> was to be renewed, 
+     <p>Your subscription for <a href="http://mightandfealty.com">Might &amp; Fealty</a> was to be renewed,
      but there were not enough credits left in your account.</p>
      <p>We have changed your subscription back to trial level.<br />
-     You can continue playing at this level as long as you wish, or renew your subscription by 
+     You can continue playing at this level as long as you wish, or renew your subscription by
      adding additional credits and choosing a subscription level.<br />
      To do so, simply log in and go to your profile page.</p>
  code:
@@ -291,8 +291,8 @@ account:
     Read more about our <a href="%url%" class="link_ajax">payment concept</a>.
   description2: >
     Developing and running Might & Fealty is not free, so we charge a small monthly fee to play.<br />
-    We believe in using a transparent, simple payment system instead of the various "Free2Play" or "Pay2Win" models that nag you about 
-    "premium features" constantly. In Might & Fealty, we want you to enjoy the game to the max without hiding features away into 
+    We believe in using a transparent, simple payment system instead of the various "Free2Play" or "Pay2Win" models that nag you about
+    "premium features" constantly. In Might & Fealty, we want you to enjoy the game to the max without hiding features away into
     parts you have to pay extra for. There are, however, a few small limitations on free accounts.<br />
     Read more about our <a href="%url%" class="link_ajax">payment concept</a>.
   description3: >
@@ -365,6 +365,7 @@ account:
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
    notarget:  No user with this e-mail address found.
+   insufficient: You don't have enough credits to send this gift.
   mail:
    subject:   Might & Fealty Gift
    body: >
@@ -386,20 +387,20 @@ account:
     <small>(You will get half of your gift or half of your friends' first subscription, whatever is lower. Limit of one code per new subscriber.)</small>
   success: >
     An invitation e-mail has been sent to your friend (and you in cc).<br />
-    When the code for %credits% credits gets redeemed and your friend later subscribes, you will get half of either it or the subscription value 
+    When the code for %credits% credits gets redeemed and your friend later subscribes, you will get half of either it or the subscription value
     of your friend credited to your account automatically.<br />
     You can also redeem the code yourself to cancel the invite.
   mail:
    subject:   Might & Fealty Friend Invite
    body: >
-     <p>Your friend (cc'ed in this e-mail) has invited you to play Might & Fealty. And to sweeten the deal, or maybe as a 
+     <p>Your friend (cc'ed in this e-mail) has invited you to play Might & Fealty. And to sweeten the deal, or maybe as a
      bribe to support some in-game ambitions, who knows, this invite comes with a code for <b>%credits% credits</b>. They also sent this message:</p>
      <hr /><p>%message%</p><hr />
      <p>Join your friend in creating history, check out the game here:</p>
      <p><a href="http://mightandfealty.com/">Might & Fealty</a></p>
      <p>or sign up directly through this link:</p>
      <p><a href="http://mightandfealty.com/register/">registration</a></p>
-     <p>If you register with this e-mail address, the game will automatically redeem the invite gift code for you. If not, 
+     <p>If you register with this e-mail address, the game will automatically redeem the invite gift code for you. If not,
      simply enter the code below under "get more credits" after registration.</p>
      <p><b>%code%</b></p>
      <p>Welcome to Might & Fealty - come and create history with us!</p>
@@ -419,7 +420,7 @@ newcharacter:
    should, obviously, share a surname unless their personal history provides a reason not to.<br />
    Your character <b>must</b> have a proper name, not a funny or silly or modern-Internet-speak one. It <b>must</b> be
    a plausible, actual name, not a title, codename or nom de guerre (titles, religious names and such can be added to your
-   character once in the game). This rule is both for the atmosphere of the game and for your own benefit as many players 
+   character once in the game). This rule is both for the atmosphere of the game and for your own benefit as many players
    frown upon silly names and diplomacy would be much harder. So please, proper names only.<br />
    Choosing a father and mother is optional, if you leave it empty then one or both of the parents will simply be
    people that don't exist as characters in the game. If you want to create a family tree, make sure to start
@@ -479,7 +480,7 @@ first:
  liege: >
    You have accepted the knight offer of %liege% and are now their vassal. This settlement belongs to %liege%, so you are in
    friendly territory at this time.<br />
-   If your knight offer included soldiers, they are being assigned to you already. If your knight offer included lordship 
+   If your knight offer included soldiers, they are being assigned to you already. If your knight offer included lordship
    of the settlement itself, the local steward is already drawing up the documents. Both of these will take a short time
    until they are ready and you can make full use of your new holdings.<br />
    Talk to your liege first to find out what the current political situation is and where you are needed. A welcome message
@@ -490,7 +491,7 @@ first:
    You have no troops and no income at this time, so finding allies should be your first priority. Serve a lord as a knight
    until you can secure an estate for yourself, for example.
  manual: >
-   Might & Fealty being a slow game, don't expect much action on your first day. If you haven't yet, check out 
+   Might & Fealty being a slow game, don't expect much action on your first day. If you haven't yet, check out
    <a href="%manual%">the game manual</a> for more information and basic concepts. There's also a link at the top, so you
    can check the manual for reference at any time.<br />
    Lastly, Might & Fealty is a game where communication with other players is very important. Check out the messages section
@@ -787,6 +788,7 @@ culture:
 status:       Status
 locked:       Locked
 dead:         Dead
+battling:     Battling
 inactive:     Inactive
 prisoner:     Prisoner|Prisoners
 wounded:      Wounded
@@ -828,6 +830,7 @@ charstatus:
  granting:     grant
  renaming:     rename
  reclaiming:   reclaim
+ sieging:     sieging
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 inside:       inside %place%
@@ -933,6 +936,7 @@ error:
   nohouse:      There are no houses here which to join.
   toofar:       You are too far away from what you are interacting with.
  noaccess:
+  battling:     This character is too busy battling for their life for you to interact with them. (A battle involving this character is actively being processed, please try again later.)
   character:    This character does not belong to you
   vassal:       This character is not a vassal of yours.
   busy:         This bandit has already been chosen by someone else.
@@ -952,7 +956,7 @@ error:
   location:     This character does not have a location, select a start location first.
   soul:         This character is dead and cannot affect the world of the living anymore.
   user:         You are not logged in or your session has expired. Please log in (again).
-  
+
  banned:
   multi:        The account you're logged into has been banned for using multiple free accounts.
 
@@ -1077,7 +1081,7 @@ events:
   medium:   Only interesting
   high:     Only important
   ultra:    Only very important
- soldierlog: 
+ soldierlog:
   title:     Soldier Log for link-soldier-name
  entry:      Log Entries
  time:       Date
@@ -1134,7 +1138,7 @@ battle:
  defenses:      an assault against a defended position with
  initial:       initial troops
  combat:        combat
- ranged:        
+ ranged:
   title:        ranged phase
   shots:        %i% shot fired|%i% shots fired
   hits:         %i% hit|%i% hits
@@ -1142,14 +1146,28 @@ battle:
   wound:        %i% enemy wounded|%i% enemies wounded
   routed:       %i% enemy routed|%i% enemies routed
   capture:      %i% enemy First One surrendered|%i% enemy First Ones surrendered
- melee:         
+ melee:
   title:        melee phase %i%
   alive:        %i% soldier fighting|%i% soldiers fighting
   kill:         %i% enemy killed|%i% enemies killed
   wound:        %i% enemy wounded|%i% enemies wounded
   panic:        %i% enemy routed|%i% enemies routed
   capture:      %i% enemy First One captured|%i% enemy First Ones captured
- hunt:          
+ round:
+  title: Combat Phase %i%
+  alive: %i% soldier fighting|%i% soldiers fighting
+  shots:        %i% shot fired|%i% shots fired
+  rangedHits:   %i% ranged hit|%i% ranged hits
+  kill:         %i% enemy killed|%i% enemies killed
+  wound:        %i% enemy wounded|%i% enemies wounded
+  panic:        %i% enemy routed|%i% enemies routed
+  capture:      %i% enemy First One captured|%i% enemy First Ones captured
+  fail:         %i% was unable to do any damage|%i% were unable to do any damage
+  misses:       %i% missed their target|%i% missed their targets
+  crowded:      %i% was unable to reach a target|%i% were unable to reach thier targets
+  routed:       %i% soldier was routed|%i% soldiers were routed
+  strikes:      %i% melee hit|%i% melee hits
+ hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
   entkilled:    %i% enemy entourage member was killed during the rout.|%i% enemy entourage members were killed during the rout.
@@ -1246,7 +1264,7 @@ paymentconcept: Payment Concept
 fiction:
  title:   Might & Fealty Fiction
  header: >
-   This collection of mythology pieces, short stories and other fiction is for your entertainment, as well as 
+   This collection of mythology pieces, short stories and other fiction is for your entertainment, as well as
    for the atmosphere and background of the world.
  intro:
   title:  Intro
@@ -1513,6 +1531,10 @@ unavailable:
   nooptions:    There are no possible trade/tribute deals you could make at this location.
  nohouses:      There are no houses established nearby. If you are at a settlement and they are inside, you must be inside as well.
  havehouse:     You already have a House.
+ isleader:      You are already the leader.
+ haveleader:    Your side already has a leader.
+ notbesieger:   Only the assaulting force's leader can cancel the siege.
+ notimplemented: This feature has not yet been implemented.
 
 marker:
  name:      Marker name
@@ -1545,13 +1567,13 @@ artifact:
   intro: >
     Here you can forge or create artifacts, unique items with a personal history.<br />
     Artifacts can be used for many purposes, from legendary weapons to hereditary crown jewels to items of
-    religious or cultural significance. The important thing about artifacts is that they are unique items 
+    religious or cultural significance. The important thing about artifacts is that they are unique items
     that can be given, stolen lost and found. They carry their own history.<br />
     As the creator of an artifact, you will always see if it is currently owned by someone and if so, by whom.
     When it is not in the posession of anyone, you can also reforge it, adding to it. But even you can never
     destroy it or change its past.<br />
     With artifacts, you directly contribute something permanent to the game world. To do so, give it a
-    catchy name and a description that should detail what the item is (a sword, a crown, a ring, an old scroll, etc. - 
+    catchy name and a description that should detail what the item is (a sword, a crown, a ring, an old scroll, etc. -
     in any case it should be something that can easily be carried) and how it looks and what is special about it.<br />
     If you want it to start with a history (an old, legendary item), we recommend you hint at legends told
     and history lost, as the artifact will start its "official" history with creation.<br />

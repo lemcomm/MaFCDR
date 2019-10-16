@@ -1,0 +1,37 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'personal.requests.name'|trans({},"actions") }}</h2>
+	<p>{{ 'personal.requests.intro'|trans({},"actions")|raw }}</p>
+
+	<h3> {{ 'personal.requests.list'|trans({},"actions")|title }}</h2>
+	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
+	{% for gamerequest in gamerequests %}
+		{% if gamerequest.type == 'soldier.food' %}
+			<hr>
+			{{ 'personal.request.soldierfood'|trans({"%character%":link(gamerequest.fromCharacter), "%settlement%":link(gamerequest.toSettlement)}, "actions")|raw }}
+			{{ 'personal.request.created'|trans({"%date%":gamerequest.created|date("D, d M Y H:i:s")}, "actions")|raw }}
+			{% if gamerequest.expires %}
+				{{ 'personal.request.expires'|trans({"%date%":gamerequest.expires|date("D, d M Y H:i:s")}, "actions")|raw }}
+			{% else %}
+				{{ 'personal.request.noexpire'|trans({}, "actions")|raw }}
+			{% endif %}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'personal.request.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'personal.request.deny'|trans({},"politics") }}</button></a>
+			</div>
+		{% elseif gamerequest.type == 'house.join' %}
+			<hr>
+			{{ 'house.manage.applicant.preamble'|trans({"%character%":link(gamerequest.fromCharacter), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'personal.request.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'personal.request.deny'|trans({},"politics") }}</button></a>
+			</div>
+		{% endif %}
+	{% else %}
+		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
+	{% endfor %}
+
+{% endblock %}

@@ -31,7 +31,7 @@ class GameRunner {
 	private $economy;
 	private $politics;
 	private $history;
-	private $military;
+	private $milman;
 	private $battlerunner;
 	private $interactions;
 	private $geography;
@@ -50,7 +50,7 @@ class GameRunner {
 	private $bandits_ok_distance = 50000;
 	private $seen;
 
-	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, Military $military, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
+	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, MilitaryManager $milman, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->logger = $logger;
@@ -58,7 +58,7 @@ class GameRunner {
 		$this->economy = $economy;
 		$this->politics = $politics;
 		$this->history = $history;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->battlerunner = $battlerunner;
 		$this->interactions = $interactions;
 		$this->geography = $geography;
@@ -250,8 +250,8 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getEstates()) {
-					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getOwnedSettlements()) {
+					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
 				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("Character set as known dead.");
@@ -311,8 +311,8 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getEstates()) {
-					#TODO: Add logic for transfering estates after we add realm laws (so we can check if the realm allows inheriting estates.
+				if ($character->getOwnedSettlements()) {
+					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
 				}
 				if ($character->getHeadOfHouse()) {
 					$house = $character->getHeadOfHouse();
@@ -476,7 +476,7 @@ class GameRunner {
 				//$chance = sqrt($chance); // because this runs every turn, leaving it high would lead to immediate loss
 				$chance = sqrt($chance/10); // because this runs every turn, leaving it high would lead to immediate loss
 				if (rand(0,100)<$chance) {
-					$this->military->disband($row['soldier'], $row['soldier']->getCharacter());
+					$this->milman->disband($row['soldier'], $row['soldier']->getCharacter());
 					$deserters[$index]['gone']++;
 				}
 			}
@@ -593,7 +593,7 @@ class GameRunner {
 		$i=1;
 		while ($row = $iterableResult->next()) {
 			$soldier = $row[0];
-			$this->military->resupply($soldier, $soldier->getBase()); 
+			$this->milman->resupply($soldier, $soldier->getBase()); 
 
 			if (($i++ % $this->batchsize) == 0) {
 				$this->em->flush();
@@ -636,7 +636,7 @@ class GameRunner {
 			}
 			if (rand(0,250) < $days) {
 				$disband_soldiers++;
-				$this->military->disband($soldier, $soldier->getCharacter());
+				$this->milman->disband($soldier, $soldier->getCharacter());
 			}
 
 			if (($i++ % $this->batchsize) == 0) {
@@ -662,7 +662,7 @@ class GameRunner {
 			}
 			if (rand(0,200) < ($days-20)) {
 				$disband_entourage++;
-				$this->military->disbandEntourage($entourage, $entourage->getCharacter());
+				$this->milman->disbandEntourage($entourage, $entourage->getCharacter());
 			}
 
 			if (($i++ % $this->batchsize) == 0) {
@@ -917,7 +917,24 @@ class GameRunner {
 				}
 			}
 		}
-
+		$this->logger->notice("Checking for inactive realms with conversations...");
+		$query = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
+		$count = $query->getSingleScalarResult();
+		if ($count > 0) {
+			$this->logger->notice($count." conversations found...");
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
+			$result = $query->getResult();
+			if ($result) {
+				foreach ($query->getResult() as $realm) {
+					foreach ($realm->getConversations() as $conv) {
+						$this->em->remove($conv);
+					}
+				}
+			}
+			$this->logger->notice("Conversations removed...");
+		} else {
+			$this->logger->notice("None found...");
+		}
 		$this->appstate->setGlobal('cycle.realm', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -1121,8 +1138,6 @@ class GameRunner {
 			}
 
 			$character = $row[0];
-			$soldiers = $character->getSoldiers()->count();
-			$entourage = $character->getEntourage()->count();
 
 			//	a) troops eat food from camp followers
 			// b) small chance of shipwreck and landing at nearby random beach (to prevent the eternal hiding at sea exploit I use myself)
@@ -1144,10 +1159,6 @@ class GameRunner {
 						);
 					}
 				}
-			}
-			if ($character->getTravelAtSea()) {
-				// we are still at sea, so let's eat some fish
-				$this->economy->feedSoldiers($character, 2);
 			}
 		}
 
@@ -1261,7 +1272,7 @@ class GameRunner {
 			$election->setMethod('banner');
 		}
 		$complete = new \DateTime("now");
-		$complete->add(new \DateInterval("P3D"));
+		$complete->add(new \DateInterval("P7D"));
 		$election->setComplete($complete);
 		$election->setName("Election number ".$counter." for ".$position->getName());
 		switch ($electiontype) {

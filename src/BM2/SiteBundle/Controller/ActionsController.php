@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\KnightOffer;
 use BM2\SiteBundle\Entity\Trade;
 use BM2\SiteBundle\Form\AssignedSoldiersType;
@@ -34,6 +35,9 @@ class ActionsController extends Controller {
      */
 	public function indexAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($settlement) {
 			$pagetitle = $this->get('translator')->trans('settlement.title', array(
@@ -45,8 +49,14 @@ class ActionsController extends Controller {
 			$pagetitle = $this->get('translator')->trans('settlement.area', array(
 				'%name%' => $this->get('twig.extension.links')->ObjectLink($settlement) ));
 		}
+		# I can't think of an instnace where we'd have a siege with no groups, but just in case...
+		if ($settlement->getSiege() && $settlement->getSiege()->getGroups()) {
+			$siege=$settlement->getSiege()->getCharacters()->contains($character);
+		} else {
+			$siege = FALSE;
+		}
 
-		return array('pagetitle'=>$pagetitle);
+		return array('pagetitle'=>$pagetitle, 'siege'=>$siege);
 	}
 
 	/**
@@ -55,6 +65,9 @@ class ActionsController extends Controller {
 	  */
 	public function supportAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -112,7 +125,9 @@ class ActionsController extends Controller {
 	  */
 	public function opposeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
-
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -167,6 +182,9 @@ class ActionsController extends Controller {
 	  */
 	public function enterAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEnterTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterEnterSettlement($character, $settlement)) {
@@ -185,6 +203,9 @@ class ActionsController extends Controller {
 	  */
 	public function exitAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = null;
 		if ($this->get('interactions')->characterLeaveSettlement($character)) {
@@ -196,67 +217,16 @@ class ActionsController extends Controller {
 		$this->getDoctrine()->getManager()->flush();
 		return array('settlement'=>$settlement, 'result'=>$result);
 	}
-	
-	/**
-	  * @Route("/places")
-	  * @Template
-	  */
-	public function placesAction() {
-		$character = $this->get('appstate')->getCharacter(true, true, true); # Ensure user has a character selected.
-		
-		$places[] = $this->get('geography')->findPlacesNearMe($character); # Find nearby places that we can see.
-		
-		foreach ($places as $place) {
-			$visit = false; # Create place.visit variable for each place in the twig.
-			if ($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
-				$visit = true; # Set place.visit = true for twig.
-			}
-		}
-		
-		return array('places'=>$places); # Pass places array to the twig for display.
-	}
-	
-	/**
-	  * @Route("/place/{id}/enter")
-	  * @Template
-	  */
-	public function enterPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
 
-		$result = null;
-		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
-			$result = 'entered';
-		} else {
-			$result = 'denied';
-		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
-	}
-
-	/**
-	  * @Route("/place/exit")
-	  * @Template
-	  */
-	public function exitPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
-
-		$result = null;
-		if ($this->get('interactions')->characterLeavePlace($character)) {
-			$result = 'left';
-		} else {
-			$result = 'denied';
-		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
-	}
 	   /**
 	     * @Route("/embark")
 	     * @Template
 	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$act = $this->get('geography')->calculateInteractionDistance($character);
 		$embark_ship = false;
@@ -304,6 +274,9 @@ class ActionsController extends Controller {
      */
 	public function giveGoldAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationGiveGoldTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('givegold', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -339,6 +312,9 @@ class ActionsController extends Controller {
      */
 	public function giveShipAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationGiveShipTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('giveship', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -377,6 +353,9 @@ class ActionsController extends Controller {
 	  */
 	public function spyAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('nearbySpyTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 
 		return array('settlement'=>$settlement);
@@ -389,6 +368,9 @@ class ActionsController extends Controller {
 	  */
 	public function takeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlTakeTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$realms = $character->findRealms();
 		if ($realms->isEmpty()) {
@@ -425,7 +407,7 @@ class ActionsController extends Controller {
 			$complete = new \DateTime("now");
 			$complete->add(new \DateInterval("PT".$time_to_take."S"));
 			$act->setComplete($complete);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			$this->get('history')->logEvent(
 				$settlement,
@@ -456,13 +438,17 @@ class ActionsController extends Controller {
      * @Template
      */
 	public function changeRealmAction($id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
 		$this->get('dispatcher')->setSettlement($settlement);
-		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
 
 		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changerealm'));
 		$form->handleRequest($request);
@@ -502,6 +488,9 @@ class ActionsController extends Controller {
      */
 	public function grantAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlGrantTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType(
 			$settlement->getRealm()?'grant':'grant2', 
@@ -524,7 +513,7 @@ class ActionsController extends Controller {
 			}
 
 			if ($data['target']) {
-				if ($data['target']->isTrial() && $data['target']->getEstates()->count() >= 3) {
+				if ($data['target']->isTrial() && $data['target']->getOwnedSettlements()->count() >= 3) {
 					$form->addError(new FormError("settlement.grant.free2"));
 				} elseif ($data['target']->isNPC()) {
 					$form->addError(new FormError("settlement.grant.npc"));
@@ -539,7 +528,7 @@ class ActionsController extends Controller {
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT".$time_to_grant."M"));
 					$act->setComplete($complete);
-					$result = $this->get('action_resolution')->queue($act);
+					$result = $this->get('action_manager')->queue($act);
 					return array('settlement'=>$settlement, 'result'=>$result, 'newowner'=>$data['target']);
 				}
 			}
@@ -555,6 +544,9 @@ class ActionsController extends Controller {
      */
 	public function renameAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlRenameTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions', 'attr'=>array('class'=>'wide')))
 			->add('name', 'text', array(
@@ -580,7 +572,7 @@ class ActionsController extends Controller {
 				$complete = new \DateTime("now");
 				$complete->add(new \DateInterval("PT6H"));
 				$act->setComplete($complete);
-				$result = $this->get('action_resolution')->queue($act);
+				$result = $this->get('action_manager')->queue($act);
 
 				return array('settlement'=>$settlement, 'result'=>$result, 'newname'=>$newname);
 			}
@@ -595,6 +587,9 @@ class ActionsController extends Controller {
      */
 	public function changecultureAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlCultureTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new CultureType($character->getUser(), true, $settlement->getCulture()));
 		$form->handleRequest($request);
@@ -617,6 +612,9 @@ class ActionsController extends Controller {
      */
 	public function tradeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyTradeTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$resources = $em->getRepository('BM2SiteBundle:ResourceType')->findAll();
@@ -629,7 +627,7 @@ class ActionsController extends Controller {
 
 		// FIXME: to get trade permissions working, this and the code in TradeType.php need to be refactored to include permissions
 		$sources = array();
-		foreach ($character->getEstates() as $e) {
+		foreach ($character->getOwnedSettlements() as $e) {
 			$sources[] = $e->getId();
 		}
 		foreach ($trades as $t) {
@@ -690,17 +688,17 @@ class ActionsController extends Controller {
 			}
 		}
 
-		$estatesdata = array();
-		foreach ($character->getEstates() as $estate) {
-			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $estate, $merchants->count()>0);
-			$estate_resources = array();
+		$settlementsdata = array();
+		foreach ($character->getOwnedSettlements() as $settlement) {
+			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $settlement, $merchants->count()>0);
+			$settlement_resources = array();
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
+				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
+				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
-					$estate_resources[] = array(
+					$settlement_resources[] = array(
 						'type' => $resource,
 						'production' => $production,
 						'demand' => $demand,
@@ -709,9 +707,9 @@ class ActionsController extends Controller {
 					);
 				}
 			}
-			$estatesdata[] = array(
-				'settlement' => $estate,
-				'resources' => $estate_resources
+			$settlementsdata[] = array(
+				'settlement' => $settlement,
+				'resources' => $settlement_resources
 			);
 		}
 
@@ -719,9 +717,9 @@ class ActionsController extends Controller {
 		if ($settlement->getOwner() == $character) {
 			// TODO: maybe require a merchant and/or prospector ?
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
+				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
+				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
 					$local_resources[] = array(
@@ -738,7 +736,7 @@ class ActionsController extends Controller {
 		return array(
 			'settlement'=>$settlement,
 			'owned' => ($settlement->getOwner()==$character?true:false),
-			'estates' => $estatesdata,
+			'settlements' => $settlementsdata,
 			'local' => $local_resources,
 			'trades' => $trades,
 			'form' => $form->createView(),
@@ -753,6 +751,9 @@ class ActionsController extends Controller {
      */
 	public function entourageAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalEntourageTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery('SELECT e as type, p as provider FROM BM2SiteBundle:EntourageType e LEFT JOIN e.provider p LEFT JOIN p.buildings b
@@ -826,13 +827,16 @@ class ActionsController extends Controller {
      */
 	public function soldiersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalSoldiersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required > 0');
 		$query->setParameter('here', $settlement);
 		$allocated = $query->getSingleResult();
 
-		$available = $this->get('military')->findAvailableEquipment($settlement, true);
+		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 		$form = $this->createForm(new SoldiersRecruitType($available));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -895,7 +899,7 @@ class ActionsController extends Controller {
 		return array(
 			'settlement'=>$settlement,
 			'allocated'=>$allocated,
-			'training'=>$this->get('military')->findAvailableEquipment($settlement, true),
+			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
 			'soldierscount' => $settlement->getSoldiers()->count(),
 
 			'form'=>$form->createView()
@@ -908,6 +912,9 @@ class ActionsController extends Controller {
      */
 	public function offersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$depth = 1;
 		if ($settlement->getRealm()->getSuperior()) {
@@ -997,6 +1004,9 @@ class ActionsController extends Controller {
 	  */
 	public function offerdeleteAction(KnightOffer $offer) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($offer->getSettlement() == $settlement) {
 			$em = $this->getDoctrine()->getManager();
@@ -1021,6 +1031,9 @@ class ActionsController extends Controller {
 	  */
 	public function assignedAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalAssignedSoldiersTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new AssignedSoldiersType($character));
 		$form->handleRequest($request);
@@ -1066,7 +1079,7 @@ class ActionsController extends Controller {
 				}
 				if (rand(0,99)<$desert) {
 					// deserts - vanish
-					$this->get('military')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
+					$this->get('military_manager')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
 					$deserting++;
 				} else if (rand(0,99) < ($days*2)) {
 					// stays with new lord
@@ -1078,21 +1091,21 @@ class ActionsController extends Controller {
 				} else {
 					// returns to liege
 					$settlement = $soldier->getBase();
-					$group = $this->get('military')->assign($soldier, $character);
+					$group = $this->get('military_manager')->assign($soldier, $character);
 					$soldier->setLiege(null)->setAssignedSince(null);
 					// in training - interrupt that and reset equipment
 					if ($soldier->getTrainingRequired() > 0) {
 						if ($soldier->getOldWeapon() || $soldier->getOldArmour() || $soldier->getOldEquipment()) {
 							if ($soldier->getOldWeapon() != $soldier->getWeapon()) {
-								$this->get('military')->returnItem($settlement, $soldier->getWeapon());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getWeapon());
 								$soldier->setWeapon($soldier->getOldWeapon());
 							}
 							if ($soldier->getOldArmour() != $soldier->getArmour()) {
-								$this->get('military')->returnItem($settlement, $soldier->getArmour());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getArmour());
 								$soldier->setArmour($soldier->getOldArmour());
 							}
 							if ($soldier->getOldEquipment() != $soldier->getEquipment()) {
-								$this->get('military')->returnItem($settlement, $soldier->getEquipment());
+								$this->get('military_manager')->returnItem($settlement, $soldier->getEquipment());
 								$soldier->setEquipment($soldier->getOldEquipment());
 							}
 						}
@@ -1110,7 +1123,7 @@ class ActionsController extends Controller {
 				$takes = 16;
 				$complete->add(new \DateInterval("PT".$takes."H"));
 				$act->setComplete($complete);
-				$this->get('action_resolution')->queue($act);
+				$this->get('action_manager')->queue($act);
 			}
 
 			foreach ($reclaimed as $rec) {
@@ -1144,6 +1157,9 @@ class ActionsController extends Controller {
 	  */
 	public function dungeonsAction() {
 		$character = $this->get('dispatcher')->gateway('locationDungeonsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('dungeons'=>$this->get('geography')->findDungeonsInActionRange($character));
 	}

@@ -12,6 +12,7 @@ class Soldier extends NPC {
 	protected $isFighting = false;
 	protected $attacks = 0;
 	protected $casualties = 0;
+	protected $xp_gained = 0;
 
 
 	public function __toString() {
@@ -70,6 +71,10 @@ class Soldier extends NPC {
 	}
 	public function resetAttacks() {
 		$this->attacks = 0;
+	}
+
+	public function addXP($xp) {
+		$this->xp_gained += $xp;
 	}
 
 	public function addCasualty() {
@@ -348,5 +353,4 @@ class Soldier extends NPC {
 			$this->getMercenary()->removeSoldier($this);
 		}
 	}
-
 }

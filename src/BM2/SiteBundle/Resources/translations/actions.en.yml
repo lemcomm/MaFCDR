@@ -105,6 +105,7 @@ queue:
   block:        Block area
   hire:         Hire mercenaries
   reclaim:      Reclaim soldiers
+  siege:        Conduct siege
  task:
   research:     Research journal
  dungeon:
@@ -370,6 +371,7 @@ control:
   specific:     Specific permissions
   spawn:        Allow new characters to spawn here?
   thralls:      Allow slavery (thralls) ?
+  feedsoldiers: Allow knights to pull food for their soldiers?
   submit:       Set new permissions
   success:      Your new permissions have been saved.
  quests:
@@ -457,7 +459,21 @@ military:
    submit:      Set up defenses
    queued: >
      Your soldiers are now preparing for an attack, and are ready to defend.
-
+  siege:
+   name:        Siege Settlement
+   description: Declare a siege of this settlement, in order to force an entry.
+   inactive: >
+     Order your soldiers to begin a siege of %settlement%.<br />
+     Depending on the number of soldiers you have, you might be able to fully encircle the settlement, and block entry and exit.<br />
+     To encircle this settlement you would need %number% soldiers.<br /><br />
+     Of course, it should go without saying that the settlement owner, and the defenders guarding it, will not like this, and this will constitute an act of war.<br />
+     After declaring a siege, you'll then be able to assault the settlement properly, construct siege equipment, or either pass control of the siege to another or, simply, disband the siege if you so wish.
+   active: >
+     From here you can manage your, and possibly other's, actions in regards to the siege of %settlement%.<br />
+     If you are the siege commander on either side, you will be able to order assaults or sorties of your collective force against that of your enemy, or if you so desire pass control of the forces to another.<br />
+     Alternatively, if you are not a commander, you could just call a sortie or assault of your own, though this would be inherently risky.<br />
+     You also have the ability to order the construction of siege equipment from here, which will be used as soon as completed or during any assault, if appropriate (refer to the manual for more information).
+     Lastly, if you tire of this siege altogether, you could decide to leave.
   attack:
    name:        Attack settlement
    description: Assault this settlement in order to kill or drive away its defenders.
@@ -493,6 +509,9 @@ military:
     wealth:     Steal wealth
     burn:       Burn down buildings
    submit:      Begin looting
+  food:
+   supplied:    You have authorized %character% to pull from %settlement%'s food stores.
+   rejected:    You have denied the request of %character% to pull food from %settlement%'s stores.
  battles:
   initiate:
    name:        Initiate battle
@@ -581,6 +600,36 @@ military:
   success:        You have destroyed the %featuretype%.
   success2:       You have damaged the %featuretype%, making it inoperative.
   success3:       You have damaged the %featuretype%, by about %damage% % of the effort required to build it.
+ siege:
+  name:         Siege Actions
+  start:
+   name:        Declare a Siege
+   description: Order a siege of this settlement.
+  leadership:
+   name:        Change Siege Leader
+   description: Hand off control of the siege to another.
+  assume:
+   name:        Take Siege Leadership
+   description: By the rights of your position, assume leadership.
+  build:
+   name:        Build Siege Equipment
+   description: Or rather, order your soldiers to do so.
+  assault:
+   name:        Order an Assault/Sortie
+   description: Lead the combined forces of your side into conflict.
+  disband:
+   name:        Disband Siege
+   description: For whatever reason, end the siege.
+  leave:
+   name:        Leave the Siege Forces
+   description: Though you may not neccessarily be able to leave altogether...
+  attack:
+   name:        Lead an Attack
+   description: Though others may not follow you...
+  joinattack:
+   name:        Join a Pending Attack
+   description: Order your men to join you in joining the pending attack.
+   
 
 economy:
  name:          Settlement economy actions
@@ -962,13 +1011,34 @@ surrender:
  success:       You have surrendered yourself and are now a prisoner of %character%.
 
 personal:
+ name:          Personal Actions
  party:
   name:         Dungeon Party
   description:  Check the status of your dungeon exploration group.
  dungeoncards:
   name:         Dungeon Actions
   description:  Review your available dungeon actions.
-
+ requests:
+  name:        Manage Requests
+  description: Handle any actional requests to you or your holdings.
+  intro: >
+    From here you can manage any of the requests that are pending to you, your lands, your house, or your realms, if applicable, to include canceling already agreed to requests, if you so desire.
+    Please be advised that requests are sorted primarily by whether or not it's already accepted, and then by the date it was received, so you may find a request for food for your soldiers right next to a request to join your house.
+  list:        Pending Requests
+  empty:       For better or worse, it doesn't look like you have any request to review.
+ request:
+  premable:    You've received a request from %link-character%, on %date%, as follows:
+  created:     Request received at %date%.
+  approve:     Approve
+  approved:    The request from %link-character% has been approved.
+  deny:        Deny
+  denied:      The request from %link-character% has been denied.
+  soldierfood: %character% has requested that they be allowed to use the food stores of %settlement% to feed their mobilized forces, and has provided the following message explaining their request.
+  expires:     This request allows this until %date%.
+  noexpire:    This request is good forever, or until circumstances change (see the manual).
+ soldierfood:
+  name:        Request Food for Your Unit
+  description: Formalize a request for provisions.
 
 mercenaries:
  title:     Available Mercenary Groups
@@ -1008,4 +1078,21 @@ quests:
  details:   Details
  current:   Current Quests
  past:      Past Quests
+
+request:
+ generic:
+  subject:     Subject
+  text:        Message
+  expires:     Expiration Date & Time
+  submit:      Send Request
+  help:
+   subject:    A title for your request, similar to those used in regular messages.
+   text:       Here you can put a message to go along with your request. The same formating that is useable in other text boxes in the game can be used here. For more details on that, please see the manual.
+   expires:    This will determine how long this request will be considered valid. Only valid requests will confer their benefits, like granting access or allowing food usage.
+ soldierfood:
+  estate:      Supplying Settlement
+  estatehelp:  The estate from which food will be drawn, up to the limit set in this request. This list is generated from all settlements of all realms you are part of.
+  limit:       Maximum Amount
+  sent:        Your request to receive food from %settlement% has been sent.
+  limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
  

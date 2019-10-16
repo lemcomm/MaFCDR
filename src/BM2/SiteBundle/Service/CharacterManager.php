@@ -21,23 +21,25 @@ class CharacterManager {
 
 	protected $em;
 	protected $appstate;
-	protected $military;
+	protected $milman;
 	protected $history;
 	protected $politics;
 	protected $realmmanager;
 	protected $messagemanager;
 	protected $dm;
+	protected $warman;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, Military $military, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm, WarManager $warman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->politics = $politics;
 		$this->realmmanager = $realmmanager;
 		$this->messagemanager = $messagemanager;
 		$this->dm = $dm;
+		$this->warman = $warman;
 	}
 
 
@@ -190,7 +192,7 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
 		// remove all votes
@@ -200,10 +202,10 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+			$this->milman->disband($soldier, $character);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// remove all claims
@@ -290,7 +292,7 @@ class CharacterManager {
 		// dead men are free - TODO: but a notice to the captor would be in order - unless he is the killer (no need for redundancy)
 
 		foreach ($character->getVassals() as $vassal) {
-			if ($vassal->getEstates() || $vassal->getPositions()) {
+			if ($vassal->getOwnedSettlements() || $vassal->getPositions()) {
 				$this->history->logEvent(
 					$vassal,
 					'event.character.liegedied',
@@ -345,15 +347,15 @@ class CharacterManager {
 		}
 
 		if ($heir) {
-			foreach ($character->getEstates() as $estate) {
-				$this->bequeathEstate($estate, $heir, $character, $via);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->bequeathEstate($settlement, $heir, $character, $via);
 			}
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
 		} else {
-			foreach ($character->getEstates() as $estate) {
-				$this->failInheritEstate($character, $estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->failInheritEstate($character, $settlement);
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
@@ -478,10 +480,10 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+			$this->milman->disband($soldier, $character);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// FIXME: Since they're not dead, do they lose their claims still? Hm.
@@ -533,7 +535,7 @@ class CharacterManager {
 		}
 
 		foreach ($character->getVassals() as $vassal) {
-			if ($vassal->getEstates() || $vassal->getPositions()) {
+			if ($vassal->getOwnedSettlements() || $vassal->getPositions()) {
 				$this->history->logEvent(
 					$vassal,
 					'event.character.liegeretired',
@@ -563,16 +565,16 @@ class CharacterManager {
 		// TODO: check for realm laws and decide if inheritance allowed
 
 		if ($heir) {
-			foreach ($character->getEstates() as $estate) {
-				$this->bequeathEstate($estate, $heir, $character, $via);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->bequeathEstate($settlement, $heir, $character, $via);
 			}
 
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
 		} else {
-			foreach ($character->getEstates() as $estate) {
-				$this->failInheritEstate($character, $estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->failInheritEstate($character, $settlement);
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
@@ -697,46 +699,46 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->war_manager->removeCharacterFromBattlegroup($character, $bg);
 		}
 		$captor = $character->getPrisonerOf();
 		$character->setLocation($captor->getLocation());
 		$character->setInsideSettlement($captor->getInsideSettlement());
 	}
 
-	public function bequeathEstate(Settlement $estate, Character $heir, Character $from, Character $via=null) {
-		$this->politics->changeSettlementOwner($estate, $heir);
+	public function bequeathEstate(Settlement $settlement, Character $heir, Character $from, Character $via=null) {
+		$this->politics->changeSettlementOwner($settlement, $heir);
 
-		$this->history->closeLog($estate, $from);
-		$this->history->openLog($estate, $heir);
+		$this->history->closeLog($settlement, $from);
+		$this->history->openLog($settlement, $heir);
 
 		// Note that this CAN leave a character the lord of estates in seperate realms.
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inherit.estate',
-				array('%link-settlement%'=>$estate->getId(), '%link-character%'=>$from->getId()),
+				array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$from->getId()),
 				HISTORY::HIGH, true
 			);
 		} else {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inheritvia.estate',
-				array('%link-settlement%'=>$estate->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				array('%link-settlement%'=>$settlement->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
 				History::HIGH, true
 			);
 		}
 		$this->history->logEvent(
-			$estate, 'event.settlement.inherited',
+			$settlement, 'event.settlement.inherited',
 			array('%link-character%'=>$from->getId()),
 			History::HIGH, true
 		);
 	}
 
-	private function failInheritEstate(Character $character, Settlement $estate) {
-		$this->politics->changeSettlementOwner($estate, null);
+	private function failInheritEstate(Character $character, Settlement $settlement) {
+		$this->politics->changeSettlementOwner($settlement, null);
 		$this->history->logEvent(
-			$estate, 'event.settlement.inherifail',
+			$settlement, 'event.settlement.inherifail',
 			array('%link-character%'=>$character->getId()),
 			HISTORY::HIGH, true
 		);

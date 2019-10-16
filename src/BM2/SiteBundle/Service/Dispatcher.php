@@ -18,14 +18,14 @@ class Dispatcher {
 
 	const FREE_ACCOUNT_ESTATE_LIMIT = 3;
 
-	private $character=false;
+	private $character;
 	private $realm;
 	private $house;
 	private $settlement;
 	private $appstate;
 	private $permission_manager;
 	private $geography;
-	private $military;
+	private $milman;
 	private $interactions;
 
 	// test results to store because they are expensive to calculate
@@ -36,16 +36,18 @@ class Dispatcher {
 	private $actionableShip=false;
 	private $actionableHouses=false;
 
-	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, Military $military, Interactions $interactions) {
+	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions) {
 		$this->appstate = $appstate;
 		$this->permission_manager = $pm;
 		$this->geography = $geo;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->interactions = $interactions;
 	}
 
 	public function getCharacter() {
-		if ($this->character) return $this->character;
+		if ($this->character instanceof Character) {
+			return $this->character;
+		}
 		return $this->appstate->getCharacter();
 	}
 
@@ -77,8 +79,18 @@ class Dispatcher {
 		and then applying any (optional) test on the whole thing.
 	*/
 	public function gateway($test=false, $getSettlement=false, $check_duplicate=true) {
-		if (!$this->getCharacter()) {
-			throw new AccessDeniedHttpException('error.nocharacter');
+		$character = $this->getCharacter();
+		if (!$character || ! $character instanceof Character) {
+			/* Yes, if it's not a character, we return it. We check this on the other side again, and redirect if it's not a character.
+			Would it make more sense to just redirect here? Probably. Symfony doesn't work that way though.
+			Services, like Dispatcher, do logic, not interaction. Redirection, though, is distinctly interactive.
+			When Dispatcher calls AppState to get the character, it adds a flash message explaining why it's not returning a character.
+			That flash will then generate on the route the calling Controller will redirect to, explaining to the user what's going on.*/
+			if ($getSettlement) {
+				return array($character, null);
+			} else {
+				return $character;
+			}
 		}
 		$settlement = null;
 		if ($test || $getSettlement) {
@@ -93,9 +105,9 @@ class Dispatcher {
 			}
 		}
 		if ($getSettlement) {
-			return array($this->getCharacter(), $settlement);
+			return array($character, $settlement);
 		} else {
-			return $this->getCharacter();
+			return $character;
 		}
 	}
 
@@ -118,53 +130,46 @@ class Dispatcher {
 		}
 
 		$actions=array();
+
 		if ($this->getLeaveableSettlement()) {
 			$actions[] = $this->locationLeaveTest(true);
-		} else if ($estate = $this->getActionableSettlement()) {
+		} else if ($settlement = $this->getActionableSettlement()) {
 			$actions[] = $this->locationEnterTest(true);
 		} else {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
-		/* Code not yet ready for deployment!
-		if ($actionableplace = $this->getActionablePlace()) {
-			$actions[] = array("name"=>"places.actionable.name", "description"=>"places.actionable.description");
-		} else if ($this->getLeaveablePlace()) {
-			$actions[] = $this->placeLeaveTest(true);
-		} else {
-			$actions[] = array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
-		}
+		$actions[] = $this->placeListTest();
 		if ($newplace = $this->placeCreateTest(true)) {
 			$actions[] = $newplace;
 		}
-		*/
 
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
 
 		// these actions are hidden if not available
 		$has = $this->locationGiveShipTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$actions[] = $this->locationGiveGoldTest();
 		$has = $this->locationGiveArtifactTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$has = $this->personalSurrenderTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->personalEscapeTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
 		$spy = $this->nearbySpyTest(true);
-		if (isset($spy['url'])) { 
+		if (isset($spy['url'])) {
 			$actions[] = $spy;
 		}
 		$has = $this->locationVisitHousesTest();
@@ -172,17 +177,17 @@ class Dispatcher {
 			$actions[] = $has;
 		}
 		$has = $this->locationDungeonsTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		} else {
 			$has = $this->personalPartyTest();
-			if (isset($has['url'])) { 
+			if (isset($has['url'])) {
 				$actions[] = $has;
 			} else {
 				$has = $this->personalDungeoncardsTest();
-				if (isset($has['url'])) { 
+				if (isset($has['url'])) {
 					$actions[] = $has;
-				}				
+				}
 			}
 		}
 
@@ -207,23 +212,23 @@ class Dispatcher {
 
 		$actions=array();
 		$has = $this->locationTavernTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationInnTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationLibraryTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationTempleTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 		$has = $this->locationBarracksTest();
-		if (isset($has['url'])) { 
+		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
 
@@ -277,7 +282,7 @@ class Dispatcher {
 	}
 
 	private function controlActionsGenericTests() {
-		if (!$estate = $this->getActionableSettlement()) {
+		if (!$settlement = $this->getActionableSettlement()) {
 			return 'notinside';
 		}
 		return $this->veryGenericTests();
@@ -311,34 +316,65 @@ class Dispatcher {
 
 		$actions[] = $this->militaryDamageFeatureTest(true);
 		$actions[] = $this->militaryLootSettlementTest(true);
-		if ($estate = $this->getActionableSettlement()) {
-			$actions[] = $this->militaryAttackSettlementTest(true);
-			$actions[] = $this->militaryDefendSettlementTest(true);
+		if ($settlement = $this->getActionableSettlement()) {
+			if (!$settlement->getSiege()) {
+				$actions[] = $this->militarySiegeSettlementTest();
+			} else {
+				$actions[] = $this->militarySiegeJoinSiegeTest();
+			}
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
-		/* Not ready yet!
-		if ($estate = $this->getActionableSettlement()) {
-			$actions[] = $this->militaryAttackPlaceTest(true);
-			$actions[] = $this->militaryDefendPlaceTest(true);
-		} else {
-			$actions[] = array("name"=>"military.other", "description"=>"unavailable.noplace");
-		}
-		*/
 
 		return array("name"=>"military.name", "elements"=>$actions);
 	}
 
+	public function siegeActions() {
+		$actions=array();
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.prisoner")));
+		}
+
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.name", "elements"=>array(
+				$this->militaryDisengageTest(true),
+				$this->militaryEvadeTest(true),
+				array("name"=>"military.all", "description"=>"unavailable.inbattle")
+			));
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+		}
+		if ($this->getCharacter()->getUser()->getRestricted()) {
+			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.restricted")));
+		}
+		if ($settlement = $this->getActionableSettlement()) {
+			$actions[] = $this->militarySiegeSettlementTest();
+			$actions[] = $this->militarySiegeLeadershipTest();
+			$actions[] = $this->militarySiegeAssumeTest();
+			$actions[] = $this->militarySiegeBuildTest();
+			$actions[] = $this->militarySiegeAssaultTest();
+			$actions[] = $this->militarySiegeDisbandTest();
+			$actions[] = $this->militarySiegeLeaveTest();
+			$actions[] = $this->militarySiegeAttackTest();
+			$actions[] = $this->militarySiegeJoinAttackTest();
+		}
+
+		$actions[] = $this->militaryLootSettlementTest(true);
+
+		return array("name"=>"military.siege.name", "elements"=>$actions);
+	}
+
 	public function economyActions() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.name", "elements"=>array(array("name"=>"economy.all", "description"=>"unavailable.$check")));
 		}
 
 		$actions=array();
 		$actions[] = $this->economyTradeTest();
 
-		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
+		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct')) {
 			$actions[] = $this->economyRoadsTest();
 			$actions[] = $this->economyFeaturesTest();
 			$actions[] = $this->economyBuildingsTest();
@@ -350,14 +386,14 @@ class Dispatcher {
 		return array("name"=>"economy.name", "elements"=>$actions);
 	}
 
-	private function economyActionsGenericTests(Settlement $estate=null) {
-		if (!$estate) {
+	private function economyActionsGenericTests(Settlement $settlement=null) {
+		if (!$settlement) {
 			return 'notinside';
 		}
 		return $this->veryGenericTests();
 	}
 
-	public function personalActions() {
+	public function recruitActions() {
 		$actions=array();
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return array("name"=>"recruit.name", "elements"=>array(array("name"=>"recruit.all", "description"=>"unavailable.restricted")));
@@ -365,10 +401,10 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"recruit.name", "description"=>"unavailable.npc");
 		}
-		if (! $estate = $this->getCharacter()->getInsideSettlement()) {
+		if (! $settlement = $this->getCharacter()->getInsideSettlement()) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
-		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'recruit')) {
+		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
 				$actions[] = $this->personalEntourageTest();
 				$actions[] = $this->personalSoldiersTest();
 				$actions[] = $this->personalMilitiaTest();
@@ -383,14 +419,31 @@ class Dispatcher {
 		return array("name"=>"recruit.name", "elements"=>$actions);
 	}
 
-	private function personalActionsGenericTests(Settlement $estate=null, $test='recruit') {
+	public function personalActions() {
+		$actions=array();
+
+		if ($this->getCharacter()->isNPC()) {
+			$actions[] = $this->metaUnitSettingsTest();
+			$actions[] = $this->metaKillTest();
+		} else {
+			$actions[] = $this->personalRequestsManageTest();
+			$actions[] = $this->personalRequestSoldierFoodTest();
+			$actions[] = $this->metaUnitSettingsTest();
+			if ($this->getCharacter()->getUser()->getCrests()) {
+				$actions[] = $this->metaHeraldryTest();
+			}
+		}
+		return array("name"=>"personal.name", "elements"=>$actions);
+	}
+
+	private function recruitActionsGenericTests(Settlement $settlement=null, $test='recruit') {
 		if ($this->getCharacter()->isNPC()) {
 			return 'npc';
 		}
-		if (!$estate) {
+		if (!$settlement) {
 			return 'notinside';
 		}
-		if (!$this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), $test)) {
+		if (!$this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), $test)) {
 			return 'notyours';
 		}
 
@@ -410,7 +463,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"oath.view.name", "url"=>"bm2_site_politics_hierarchy", "description"=>"oath.view.description", "long"=>"oath.view.longdesc");
 		}
 		if ($this->getCharacter()->getVassals()) {
-			$actions[] = array("name"=>"vassals.view.name", "url"=>"bm2_site_politics_vassals", "description"=>"vassals.view.description", "long"=>"vassals.view.longdesc");			
+			$actions[] = array("name"=>"vassals.view.name", "url"=>"bm2_site_politics_vassals", "description"=>"vassals.view.description", "long"=>"vassals.view.longdesc");
 		}
 		$actions[] = $this->hierarchyOathTest();
 		$actions[] = $this->hierarchyIndependenceTest();
@@ -507,7 +560,6 @@ class Dispatcher {
 	}
 
 	/* ========== Place Dispatchers ========= */
-	/* Code not yet ready for deployment!	
 
 	public function PlacesActions() {
 		$actions=array();
@@ -516,17 +568,26 @@ class Dispatcher {
 			return array("name"=>"places.name", "intro"=>"politics.intro", "elements"=>$actions);
 		}
 		$actions[] = $this->placeCreateTest();
-		
+
 		foreach ($this->geo->findPlacesInActionRange($this->getCharacter()) as $place) {
 			$this->setPlace($place);
 			$actions[] = array("title"=>$place->getFormalName());
 			$actions[] = array("name"=>"place.view.name", "url"=>"bm2_site_place_view", "parameters"=>array("id"=>$place->getId()), "description"=>"place.view.description", "long"=>"place.view.longdesc");
-			$actions[] = $this->placeCreateTest();
 			$actions[] = $this->placeManageTest();
 			$actions[] = $this->placeEnterTest();
 		}
-		
+
 		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
+	}
+
+	private function placeListTest() {
+		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
+			return $this->action("place.list", "bm2_place_actionable");
+		} else if ($this->getLeaveablePlace()) {
+			return $this->placeLeaveTest(true);
+		} else {
+			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
+		}
 	}
 
 	private function placeActionsGenericTests(Place $place=null) {
@@ -539,7 +600,6 @@ class Dispatcher {
 
 		return $this->veryGenericTests();
 	}
-	*/
 
 	/* ========== Meta Dispatchers ========== */
 
@@ -576,6 +636,7 @@ class Dispatcher {
 	}
 
 	public function locationEnterTest($check_duplicate=false) {
+		#TODO: Have this check to see if we actually have permission to enter. As it stands, that check is done separetly, which seems dumb.
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.$check");
 		}
@@ -585,8 +646,12 @@ class Dispatcher {
 		if ($this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inside");
 		}
-		if (!$estate = $this->getActionableSettlement()) {
+		$settlement = $this->getActionableSettlement();
+		if (!$settlement) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($settlement->getSiege()) {
+			return array("name"=>"location.enter.name", "description"=>"unavailable.besieged");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.enter')) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.already");
@@ -596,7 +661,7 @@ class Dispatcher {
 		}
 
 		if ($this->getCharacter()->isPrisoner()) {
-			if ($estate->getOwner() == $this->getCharacter()) {
+			if ($settlement->getOwner() == $this->getCharacter()) {
 				return array("name"=>"location.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"location.enter.description2");
 			} else {
 				return array("name"=>"location.enter.name", "description"=>"unavailable.enter.notyours");
@@ -606,7 +671,7 @@ class Dispatcher {
 		}
 
 	}
-	
+
 	public function locationLeaveTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.$check");
@@ -614,7 +679,10 @@ class Dispatcher {
 		if (!$this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.outside");
 		}
-		if (!$estate = $this->getActionableSettlement()) {
+		if ($this->getCharacter()->getInsideSettlement()->getSiege()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.besieged");
+		}
+		if (!$settlement = $this->getActionableSettlement()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.exit')) {
@@ -723,7 +791,7 @@ class Dispatcher {
 			return array("name"=>"location.dungeons.name", "description"=>"unavailable.$check");
 		}
 		if ($this->getCharacter()->getDungeoneer() && $this->getCharacter()->getDungeoneer()->getParty()) {
-			return array("name"=>"location.dungeons.name", "description"=>"unavailable.already");		
+			return array("name"=>"location.dungeons.name", "description"=>"unavailable.already");
 		}
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"location.dungeons.name", "description"=>"unavailable.npc");
@@ -743,7 +811,7 @@ class Dispatcher {
 		}
 		return $this->action("location.dungeons", "bm2_dungeons");
 	}
-	
+
 	public function locationVisitHousesTest() {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"location.houses.name", "description"=>"unavailable.$check");
@@ -774,11 +842,11 @@ class Dispatcher {
 
 
 	public function nearbySpyTest($check_duplicate=false) {
-		if (!$estate = $this->getActionableSettlement()) {
+		if (!$settlement = $this->getActionableSettlement()) {
 			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($this->getCharacter()->getAvailableEntourageOfType("spy")->count() <= 0) {
-			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nospies");			
+			return array("name"=>"nearby.spy.name", "description"=>"unavailable.nospies");
 		}
 		return array("name"=>"nearby.spy.name", "url"=>"bm2_site_actions_spy", "description"=>"nearby.spy.description");
 	}
@@ -793,10 +861,10 @@ class Dispatcher {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.prisoner");
 		}
-		if (!$estate = $this->getActionableSettlement()) {
+		if (!$settlement = $this->getActionableSettlement()) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->isFortified() && $this->getCharacter()->getInsideSettlement()!=$estate) {
+		if ($settlement->isFortified() && $this->getCharacter()->getInsideSettlement()!=$settlement) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.location.fortified");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.take')) {
@@ -814,20 +882,20 @@ class Dispatcher {
 			return array("name"=>"control.take.name", "description"=>"unavailable.supporting");
 		}
 
-		if ($this->getCharacter()->isTrial() && $this->getCharacter()->getEstates()->count() >= Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT) {
+		if ($this->getCharacter()->isTrial() && $this->getCharacter()->getOwnedSettlements()->count() >= Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.free2");
 		}
 
-		if ($estate->getOwner() == $this->getCharacter()) {
+		if ($settlement->getOwner() == $this->getCharacter()) {
 			// I control this settlement - defend if applicable
-			if ($estate->getRelatedActions()->exists(
+			if ($settlement->getRelatedActions()->exists(
 				function($key, $element) { return $element->getType() == 'settlement.take'; }
 			)) {
 				return $this->action("control.takeX", "bm2_site_actions_take");
 			} else {
 				return array("name"=>"control.take.name", "description"=>"unavailable.location.yours");
 			}
-		} elseif ($estate->getOwner()) {
+		} elseif ($settlement->getOwner()) {
 			// someone else controls this settlement
 			// TODO: different text?
 			return $this->action("control.take", "bm2_site_actions_take");
@@ -846,14 +914,14 @@ class Dispatcher {
 		}
 		// FIXME: this still sometimes gives a "you are not inside" message when it shouldn't, I think?
 		if ($this->settlement) {
-			$estate = $this->settlement;
+			$settlement = $this->settlement;
 		} else {
-			$estate = $this->getCharacter()->getInsideSettlement();
+			$settlement = $this->getCharacter()->getInsideSettlement();
 		}
-		if (!$estate) {
+		if (!$settlement) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notsettlement");
 		}
-		if ($estate->getOwner() != $this->getCharacter()) {
+		if ($settlement->getOwner() != $this->getCharacter()) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notyours2");
 		}
 
@@ -861,7 +929,7 @@ class Dispatcher {
 		if ($myrealms->isEmpty()) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.norealms");
 		}
-		return $this->action("control.changerealm", "bm2_site_actions_changerealm", false, array('id'=>$estate->getId()));
+		return $this->action("control.changerealm", "bm2_site_actions_changerealm", false, array('id'=>$settlement->getId()));
 	}
 
 	public function controlGrantTest($check_duplicate=false) {
@@ -871,10 +939,10 @@ class Dispatcher {
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.grant')) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.already");
 		}
-		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->getOwner() != $this->getCharacter()) {
+		if ($settlement->getOwner() != $this->getCharacter()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.notyours2");
 		}
 		if (!$this->getActionableCharacters()) {
@@ -888,10 +956,10 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.$check");
 		}
-		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->getOwner() == $this->getCharacter()) {
+		if ($settlement->getOwner() == $this->getCharacter()) {
 			return $this->action("control.rename", "bm2_site_actions_rename");
 		} else {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.notyours2");
@@ -903,11 +971,11 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.$check");
 		}
-		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$estate->getId()));
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.notyours2");
 		}
@@ -917,11 +985,11 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.$check");
 		}
-		if (!$estate = $this->getCharacter()->getInsideSettlement()) {
+		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return $this->action("control.culture", "bm2_site_actions_changeculture");               
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			return $this->action("control.culture", "bm2_site_actions_changeculture");
 		} else {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.notyours2");
 		}
@@ -931,9 +999,9 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.$check");
 		}
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$estate->getId()));
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.notyours2");
 		}
@@ -943,9 +1011,9 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.$check");
 		}
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return $this->action("control.quests", "bm2_site_settlement_quests", false, array('id'=>$estate->getId()));
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			return $this->action("control.quests", "bm2_site_settlement_quests", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.notyours2");
 		}
@@ -1030,128 +1098,533 @@ class Dispatcher {
 		return $this->action("military.block", "bm2_site_war_block", true);
 	}
 
-	public function militaryDefendSettlementTest($check_duplicate=false) {
+	public function militarySiegeSettlementTest() {
+		# Grants you access to the page in which you can start a siege.
+		$settlement = $this->getActionableSettlement();
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.prisoner");
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
 		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.defend')) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.already");
+		if ($this->getCharacter()->isDoingAction('military.siege')) {
+			# Already doing.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.already");
 		}
-		if ( ! $estate = $this->getCharacter()->getInsideSettlement()) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.notinside");
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Already inside.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
 		}
-		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.both");
-		}
-		if ($this->getCharacter()->isDoingAction('military.evade')) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.evading");
-		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.nosoldiers");
-		}
-		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.inbattle");			
-		}
-		return $this->action("military.settlement.defend", "bm2_site_war_defendsettlement");
-	}
-
-	public function militaryAttackSettlementTest($check_duplicate=false) {
-		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.prisoner");
-		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.already");
-		}
-		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.both");
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.regrouping");
+			# Busy regrouping.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
 		}
 		if ($this->getCharacter()->isDoingAction('military.evade')) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.evading");
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.evading");
 		}
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosoldiers");
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if (!$estate = $this->getActionableSettlement()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosettlement");
-		}
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.yours");
-		}
-		if (!$estate->isDefended()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			# No need to siege your own settlement.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.inbattle");			
+			# Busy fighting for life.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
-			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.fresh");
+			# Too new.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.settlement.attack", "bm2_site_war_attacksettlement");
-	}
-	
-		public function militaryDefendPlaceTest($check_duplicate=false) {
-		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.prisoner");
-		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.defend')) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.already");
-		}
-		if (!$estate = $this->getCharacter()->getInsidePlace()) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.notinside");
-		}
-		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.both");
-		}
-		if ($this->getCharacter()->isDoingAction('military.evade')) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.evading");
-		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.nosoldiers");
-		}
-		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.place.defend.name", "description"=>"unavailable.inbattle");			
-		}
-		return $this->action("military.place.defend", "bm2_site_war_defendplace");
+		return $this->action("military.siege.start", "bm2_site_war_siegesettlement", false, array('action'=>'start'));
 	}
 
-	public function militaryAttackPlaceTest($check_duplicate=false) {
+	public function militarySiegeLeadershipTest($check_duplicate=false) {
+		# Controls access to siege change of leadership page.
+		$settlement = $this->getActionableSettlement();
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.prisoner");
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.prisoner");
 		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.already");
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+			# Already doing.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.both");
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($this->getCharacter()->isDoingAction('military.regroup')) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.regrouping");
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosiege");
 		}
-		if ($this->getCharacter()->isDoingAction('military.evade')) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.evading");
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		$isLeader = FALSE;
+		$isAttacker = FALSE;
+		$isDefender = FALSE;
+		$attLeader = FALSE;
+		$defLeader = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+				if ($group->isAttacker()) {
+					$isAttacker = TRUE;
+					if ($group->getLeader()) {
+						$attLeader = TRUE;
+					}
+				} else {
+					$isDefender = TRUE;
+					if ($group->getLeader()) {
+						$defLeader = TRUE;
+					}
+				}
+				if ($group->getLeader() == $this->getCharacter()) {
+					$isLeader = TRUE;
+				}
+			}
+		}
+		if (!$isLeader) {
+			# Isn't leader.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
 		}
 		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.nosoldiers");
-		}
-		if (!$estate = $this->getActionablePlace()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.noplace");
-		}
-		if ($estate->getOwner() == $this->getCharacter()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.yours");
-		}
-		if (!$estate->isDefended()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.nodefenders");
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosoldiers");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.inbattle");			
+			# Busy fighting for life.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.inbattle");
 		}
 		if ($this->getCharacter()->DaysInGame()<2) {
-			return array("name"=>"military.place.attack.name", "description"=>"unavailable.fresh");
+			# Too new.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.place.attack", "bm2_site_war_attackplace");
+		return $this->action("military.siege.leadership", "bm2_site_war_siegesettlement", false, array('action'=>'leadership'));
+	}
+
+	public function militarySiegeAssumeTest($check_duplicate=false) {
+		# Controls access to siege assume leadership page.
+		# Normally, only defenders will have this issue, but just in case, we let attackers assume command as well if the opportunity presents itself.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+			# Already doing.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.already");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		$isLeader = FALSE;
+		$isAttacker = FALSE;
+		$isDefender = FALSE;
+		$attLeader = FALSE;
+		$defLeader = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+				if ($group->isAttacker() && $isAttacker == FALSE) {
+					$isAttacker = TRUE;
+					if ($group->getLeader()) {
+						$attLeader = TRUE; # Attackers already have leader
+					}
+				} else if ($isDefender == FALSE) {
+					$isDefender = TRUE;
+					if ($group->getLeader()) {
+						$defLeader = TRUE; # Defenders already have leader
+					}
+				}
+				if ($group->getLeader() == $this->getCharacter() && $isLeader == FALSE) {
+					$isLeader = TRUE; # We are a leader!
+				}
+			}
+		}
+		if ($isLeader) {
+			# Already leader.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.isleader");
+		} else if ($isAttacker && $attLeader) {
+			# Already have leader.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.haveleader");
+		} else if ($isDefender && $defLeader) {
+			# Already have leader.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.haveleader");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			# Too new.
+			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.siege.assume", "bm2_site_war_siegesettlement", false, array('action'=>'assume'));
+	}
+
+	public function militarySiegeBuildTest($check_duplicate=false) {
+		# Controls access to page for building siege equipment.
+		# TODO: Implement this.
+		return array("name"=>"military.siege.build.name", "description"=>"unavailable.notimplemented");
+		/*$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+			# Already doing.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Already inside.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inside");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosiege");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			# No need to siege your own settlement.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.location.yours");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			# Too new.
+			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.settlement.siege", "bm2_site_war_siegesettlement", false, array('action'=>'build'));*/
+	}
+
+	public function militarySiegeAssaultTest($check_duplicate=false) {
+		# Controls access to the siege page for calling assaults and sorties.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.prisoner");
+		}
+		if ($this->getCharacter()->isDoingAction('military.battle')) {
+			# Already doing.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inbattle");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		$isLeader = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+				if ($group->getLeader() == $this->getCharacter()) {
+					$isLeader = TRUE;
+				}
+			}
+		}
+		if (!$inSiege) {
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notinsiege");
+		}
+		if (!$isLeader) {
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notleader");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			# Too new.
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.siege.assault", "bm2_site_war_siegesettlement", false, array('action'=>'assault'));
+	}
+
+	public function militarySiegeDisbandTest($check_duplicate=false) {
+		# Controls access to the siege disband option.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.prisoner");
+		}
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Those inside don't control the siege.
+			return array("name"=>"military.siege.disband.siege.name", "description"=>"unavailable.notbesieger");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		$isLeader = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+				if ($siege->getAttacker()->getLeader() == $this->getCharacter()) {
+					$isLeader = TRUE;
+				}
+			}
+		}
+		if (!$inSiege) {
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.notinsiege");
+		}
+		if (!$isLeader) {
+			# Can't cancel a siege you didn't start.
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.notbesieger");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.siege.disband", "bm2_site_war_siegesettlement", false, array('action'=>'disband'));
+	}
+
+	public function militarySiegeLeaveTest($check_duplicate=false) {
+		# Controls access to the leave siege menu.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.prisoner");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		if ($siege->getAttacker()->getLeader() == $this->getCharacter()) {
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.areleader");
+		}
+		$inSiege = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+				break;
+			}
+		}
+		if (!$inSiege) {
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.notinsiege");
+		}
+		return $this->action("military.siege.leave", "bm2_site_war_siegesettlement", false, array('action'=>'leave'));
+	}
+
+	public function militarySiegeGeneralTest($check_duplicate=false) {
+		# Controls access to the siege action seleection menu.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.prisoner");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+			}
+		}
+		if (!$inSiege) {
+			# Not in the siege.
+			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.notinsiege");
+		}
+		return $this->action("military.siege.leave", "bm2_site_war_siegesettlement", false, array('action'=>'leave'));
+	}
+
+	public function militarySiegeAttackTest($check_duplicate=false) {
+		# Controls access to the suicide run menu for sieges.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.settlement.siege.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('military.battle')) {
+			# Already doing.
+			return array("name"=>"military.settlement.siege.attack.name", "description"=>"unavailable.already");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.settlement.siege.attack.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.settlement.siege.attack.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		foreach ($siege->getGroups() as $group) {
+			if ($group->getCharacters()->contains($this->getCharacter())) {
+				$inSiege = TRUE;
+			}
+		}
+		if (!$inSiege) {
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.notinsiege");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.siege.attack", "bm2_site_war_siegesettlement", false, array('action'=>'attack'));
+	}
+
+	public function militarySiegeJoinAttackTest($check_duplicate=false) {
+		# Controls access to the option to join someone elses suicide run in a siege.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('military.battle')) {
+			# Already doing.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.already");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		$inSiege = FALSE;
+		if ($siege->getCharacters()->contains($this->getCharacter())) {
+			$inSiege = TRUE;
+		}
+		if ($siege->getBattles()->isEmpty()) {
+			return array("name"=>"military.battles.join.name", "description"=>"unavailable.nobattles");
+		}
+		if (!$inSiege) {
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.notinsiege");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.siege.joinattack", "bm2_site_war_siegesettlement", false, array('action'=>'joinattack'));
+	}
+
+	public function militarySiegeJoinSiegeTest($check_duplicate=false) {
+		# Controls access to the ability to join an ongoing siege.
+		$settlement = $this->getActionableSettlement();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
+			# Already doing.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.already");
+		}
+		if (!$settlement) {
+			# Can't attack nothing.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosettlement");
+		}
+		if (!$settlement->getSiege()) {
+			# No siege.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
+		}
+		$siege = $settlement->getSiege();
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.siege.join", "bm2_site_war_siegesettlement", false, array('action'=>'joinsiege'));
 	}
 
 	public function militaryDamageFeatureTest($check_duplicate=false) {
@@ -1174,7 +1647,7 @@ class Dispatcher {
 			return array("name"=>"military.damage.name", "description"=>"unavailable.nofeatures");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.damage.name", "description"=>"unavailable.inbattle");			
+			return array("name"=>"military.damage.name", "description"=>"unavailable.inbattle");
 		}
 		return $this->action("military.damage", "bm2_site_war_damage", true);
 	}
@@ -1321,8 +1794,8 @@ class Dispatcher {
 	}
 
 	public function personalEntourageTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"recruit.entourage.name", "description"=>"unavailable.$check");
 		}
 
@@ -1330,46 +1803,46 @@ class Dispatcher {
 	}
 
 	public function personalSoldiersTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
 		}
-		$available = $this->military->findAvailableEquipment($estate, true);
+		$available = $this->milman->findAvailableEquipment($settlement, true);
 		if (empty($available)) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");			
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
 		}
 
 		return $this->action("recruit.troops", "bm2_site_actions_soldiers");
 	}
 
 	public function personalMilitiaTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement, 'mobilize')) !== true) {
 			return array("name"=>"recruit.militia.name", "description"=>"unavailable.$check");
 		}
-		if ($estate->getSoldiers()->isEmpty()) {
+		if ($settlement->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.militia.name", "description"=>"unavailable.nomilitia");
 		}
 
-		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$estate->getID()));
+		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$settlement->getID()));
 	}
 
 	public function personalOffersTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($estate, 'mobilize')) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement, 'mobilize')) !== true) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.$check");
 		}
-		if ($estate->getOwner() != $this->getCharacter()) {
+		if ($settlement->getOwner() != $this->getCharacter()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.notyours2");
 		}
-		if ($estate->getSoldiers()->isEmpty()) {
+		if ($settlement->getSoldiers()->isEmpty()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
 		}
-		if (!$estate->getRealm()) {
+		if (!$settlement->getRealm()) {
 			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
 		}
 
-		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$estate->getID()));
+		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$settlement->getID()));
 	}
 
 	public function personalAssignedSoldiersTest() {
@@ -1383,20 +1856,37 @@ class Dispatcher {
 		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
 
 	}
+
+	public function personalRequestsManageTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"personal.requests.name", "description"=>"unavailable.npc");
+		}
+
+		return $this->action("personal.requests", "bm2_gamerequest_manage");
+	}
+
+	public function personalRequestSoldierFoodTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"personal.soldierfood.name", "description"=>"unavailable.npc");
+		}
+
+		return $this->action("personal.soldierfood", "bm2_gamerequest_soldierfood");
+
+	}
 	/* ========== Economy Actions ========== */
 
 	public function economyTradeTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.trade.name", "description"=>"unavailable.$check");
 		}
 
 		// TODO: need a merchant in your entourage for trade options? or just foreign trade?
 
-		if ($this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'trade')) {
+		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'trade')) {
 			return array("name"=>"economy.trade.name", "url"=>"bm2_site_actions_trade", "description"=>"economy.trade.owner");
 		} else {
-			if ($this->getCharacter()->getEstates()->isEmpty()) {
+			if ($this->getCharacter()->getOwnedSettlements()->isEmpty()) {
 				return array("name"=>"economy.trade.name", "description"=>"unavailable.trade.noestate");
 			}
 			return array("name"=>"economy.trade.name", "url"=>"bm2_site_actions_trade", "description"=>"economy.trade.foreign");
@@ -1404,11 +1894,11 @@ class Dispatcher {
 	}
 
 	public function economyRoadsTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.notyours");
 		}
 
@@ -1416,11 +1906,11 @@ class Dispatcher {
 	}
 
 	public function economyFeaturesTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.notyours");
 		}
 
@@ -1428,11 +1918,11 @@ class Dispatcher {
 	}
 
 	public function economyBuildingsTest() {
-		$estate = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->economyActionsGenericTests($estate)) !== true) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.$check");
 		}
-		if ( ! $this->permission_manager->checkSettlementPermission($estate, $this->getCharacter(), 'construct')) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct')) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.notyours");
 		}
 
@@ -1440,14 +1930,24 @@ class Dispatcher {
 	}
 
 	/* ========== Place Actions ============== */
-	/* Code not yet ready for deployment!
 
 	public function placeCreateTest() {
-		if ($this->getCharacter()->isTrial()) {
+		$character = $this->getCharacter();
+		if ($character->isTrial()) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.free");
 		}
 		if ($check = $this->placeActionsGenericTests() !== true) {
 			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
+		}
+		if ($character->getUser()->getFreePlaces() < 1) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
+		}
+		if ($this->geography->checkPlacePlacement($character)) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
+		}
+		if (($character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside')) || (!$character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))) {
+			# It's a long line, but basically, are we inside a settlement with permission, or outside a settlement with permission. If neither, we don't get access :)
+			return array("name"=>"place.new.name", "description"=>"unavailable.nopermission");
 		}
 		return array("name"=>"place.new.name", "url"=>"bm2_site_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 	}
@@ -1459,34 +1959,37 @@ class Dispatcher {
 		if (!$this->place->getOwner != $this->getCharacter() OR !$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'describe')) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
 		} else {
-			return $this->action("place.manage", "bm2_site_place_manage", true, 
+			return $this->action("place.manage", "bm2_site_place_manage", true,
 				array('place'=>$this->place->getId()),
 				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
 			);
 		}
 	}
-	
+
 	public function placePermissionsTest() {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
 		if ($this->place != $this->getActionablePlace()) {
-			return array("name"=>"place.enter.name", 
+			return array("name"=>"place.enter.name",
 				     "description"=>"unavailable.noplace"
 				    );
 		}
 		if (!$this->place->getOwner != $this->getCharacter()) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
-		return $this->action("place.permissions", "bm2_site_place_permissions", true, 
+		return $this->action("place.permissions", "bm2_site_place_permissions", true,
 				array('place'=>$this->place->getId()),
 				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
 			);
 	}
-	
+
 	public function placeEnterTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'visit')) {
+			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
 		}
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
@@ -1502,7 +2005,7 @@ class Dispatcher {
 		}
 
 		if ($this->getCharacter()->isPrisoner()) {
-			if ($place->getOwner() == $this->getCharacter()) {
+			if ($place->getOwner() == $this->getCharacter()) { # FIXME: Wut?
 				return array("name"=>"place.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"place.enter.description2");
 			} else {
 				return array("name"=>"place.enter.name", "description"=>"unavailable.enter.notyours");
@@ -1511,44 +2014,43 @@ class Dispatcher {
 			return $this->action("place.enter", "bm2_site_actions_place", false, array('id'=>$place->getId()));
 		}
 	}
-	
+
 	public function placeLeaveTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.$check"
 				    );
 		}
 		if (!$this->getCharacter()->getInsidePlace()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.outside"
 				    );
 		}
 		if (!$place = $this->getActionablePlace()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.noplace"
 				    );
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.exit')) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.already"
 				    );
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.inbattle"
 				    );
 		}
 		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"place.exit.name", 
+			return array("name"=>"place.exit.name",
 				     "description"=>"unavailable.prisoner"
 				    );
 		} else {
-			return $this->action("place.exit", 
+			return $this->action("place.exit",
 					     "bm2_site_actions_place_exit"
 					    );
 		}
 	}
-	*/
 
 	/* ========== Political Actions ========== */
 
@@ -1581,11 +2083,11 @@ class Dispatcher {
 		if ($this->getCharacter()->isRuler()) {
 			return array("name"=>"realm.new.name", "description"=>"unavailable.haverealm");
 		}
-		list($valid, $estates) = $this->checkVassals($this->getCharacter());
+		list($valid, $settlements) = $this->checkVassals($this->getCharacter());
 		if (!$valid) {
 			return array("name"=>"realm.new.name", "description"=>"unavailable.novassals");
 		}
-		if ($estates < 2) {
+		if ($settlements < 2) {
 			return array("name"=>"realm.new.name", "description"=>"unavailable.fewestates");
 		}
 		return array("name"=>"realm.new.name", "url"=>"bm2_site_realm_new", "description"=>"realm.new.description", "long"=>"realm.new.longdesc");
@@ -1593,7 +2095,7 @@ class Dispatcher {
 
 	private function checkVassals(Character $char) {
 		$valid = false;
-		$estates = $char->getEstates()->count();
+		$settlements = $char->getOwnedSettlements()->count();
 		foreach ($char->getVassals() as $vassal) {
 			if ($vassal->getUser() != $char->getUser()) {
 				$valid=true;
@@ -1602,9 +2104,9 @@ class Dispatcher {
 			if ($v) {
 				$valid = true;
 			}
-			$estates += $e;
+			$settlements += $e;
 		}
-		return array($valid, $estates);		
+		return array($valid, $settlements);
 	}
 
 	public function hierarchyManageRealmTest() {
@@ -1614,7 +2116,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.manage.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.manage", "bm2_site_realm_manage", true, 
+			return $this->action("realm.manage", "bm2_site_realm_manage", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -1628,7 +2130,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.description.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.description", "bm2_site_realm_description", true, 
+			return $this->action("realm.description", "bm2_site_realm_description", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -1642,7 +2144,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.abolish.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.abolish", "bm2_site_realm_abolish", true, 
+			return $this->action("realm.abolish", "bm2_site_realm_abolish", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -1656,7 +2158,7 @@ class Dispatcher {
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
 			return array("name"=>"realm.abdicate.name", "description"=>"unavailable.notleader");
 		} else {
-			return $this->action("realm.abdicate", "bm2_site_realm_abdicate", true, 
+			return $this->action("realm.abdicate", "bm2_site_realm_abdicate", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
@@ -1698,8 +2200,8 @@ class Dispatcher {
 		if ( ! $this->permission_manager->checkRealmPermission($this->realm, $this->getCharacter(), 'diplomacy')) {
 			return array("name"=>"war.name", "description"=>"unavailable.notdiplomat");
 		} else {
-			return $this->action("war", "bm2_site_war_declare", true, 
-				array('realm'=>$this->realm->getId()), 
+			return $this->action("war", "bm2_site_war_declare", true,
+				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
 		}
@@ -1712,8 +2214,8 @@ class Dispatcher {
 		if ( ! $this->permission_manager->checkRealmPermission($this->realm, $this->getCharacter(), 'diplomacy')) {
 			return array("name"=>"diplomacy.name", "description"=>"unavailable.notdiplomat");
 		} else {
-			return $this->action("diplomacy", "bm2_site_realm_diplomacy", true, 
-				array('realm'=>$this->realm->getId()), 
+			return $this->action("diplomacy", "bm2_site_realm_diplomacy", true,
+				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
 		}
@@ -1727,8 +2229,8 @@ class Dispatcher {
 			return array("name"=>"elections.name", "description"=>"unavailable.notmember");
 		}
 
-		return $this->action("elections", "bm2_site_realm_elections", false, 
-			array('realm'=>$this->realm->getId()), 
+		return $this->action("elections", "bm2_site_realm_elections", false,
+			array('realm'=>$this->realm->getId()),
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
 	}
@@ -1741,8 +2243,8 @@ class Dispatcher {
 			return array("name"=>"realm.capital.name1", "description"=>"unavailable.notleader");
 		}
 
-		return $this->action("realm.capital", "bm2_site_realm_capital", false, 
-			array('realm'=>$this->realm->getId()), 
+		return $this->action("realm.capital", "bm2_site_realm_capital", false,
+			array('realm'=>$this->realm->getId()),
 			array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 		);
 	}
@@ -1792,7 +2294,7 @@ class Dispatcher {
 		if ($this->realm->getType()<=1) {
 			return array("name"=>"diplomacy.subrealm", "description"=>"unavailable.toolow");
 		}
-		if ($this->realm->getEstates()->count() < 2) {
+		if ($this->realm->getSettlements()->count() < 2) {
 			return array("name"=>"diplomacy.subrealm", "description"=>"unavailable.toosmall");
 		}
 		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
@@ -1848,7 +2350,7 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.view.name", "description"=>"unavailable.$check");
 		} else {
-			return $this->action("house.view", "bm2_house", true, 
+			return $this->action("house.view", "bm2_house", true,
 				array('id'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -1875,7 +2377,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.house", "bm2_house_manage", true, 
+			return $this->action("house.manage.house", "bm2_house_manage", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -1899,7 +2401,7 @@ class Dispatcher {
 		if ($this->getCharacter()->getInsideSettlement() == $this->house->getInsideSettlement()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.househere");
 		} else {
-			return $this->action("house.manage.relocate", "bm2_house_relocate", true, 
+			return $this->action("house.manage.relocate", "bm2_house_relocate", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -1913,7 +2415,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.applicants", "bm2_house_applicants", true, 
+			return $this->action("house.manage.applicants", "bm2_house_applicants", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -1927,7 +2429,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.disown.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.disown", "bm2_house_disown", true, 
+			return $this->action("house.manage.disown", "bm2_house_disown", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -1941,7 +2443,7 @@ class Dispatcher {
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.manage.successor", "bm2_house_successor", true, 
+			return $this->action("house.manage.successor", "bm2_house_successor", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
@@ -2029,7 +2531,7 @@ class Dispatcher {
 			return $this->getCharacter()->getInsideSettlement();
 		}
 	}
-	
+
 	public function getActionablePlace() {
 		if (is_object($this->actionablePlace) || $this->actionablePlace===null) return $this->actionablePlace;
 
@@ -2051,8 +2553,10 @@ class Dispatcher {
 	}
 
 	public function getLeaveablePlace() {
-		if ($this->getCharacter()->getInsidePlace()) {
+		if ($this->getCharacter() && $this->getCharacter()->getInsidePlace()) {
 			return $this->getCharacter()->getInsidePlace();
+		} else {
+			return false;
 		}
 	}
 
@@ -2067,12 +2571,12 @@ class Dispatcher {
 		if (!$this->getCharacter()) {
 			throw new AccessDeniedHttpException('error.nocharacter');
 		}
-		if ($estate = $this->getCharacter()->getInsideSettlement()) {
+		if ($settlement = $this->getCharacter()->getInsideSettlement()) {
 			// initially, this was all restricted to characters inside the settlement, but that makes attacks towards the outside, etc. impossible,
 			// and since we don't have a "leave settlement" action...
 			// FIXME: it should contain both - inside settlement and in action range
 			// FIXME: anyway this doesn't work and those outside are excluded
-//			return $this->geography->findCharactersInSettlement($estate, $this->getCharacter());
+//			return $this->geography->findCharactersInSettlement($settlement, $this->getCharacter());
 			return $this->geography->findCharactersInActionRange($this->getCharacter(), false, $match_battle);
 		} else {
 			return $this->geography->findCharactersInActionRange($this->getCharacter(), true, $match_battle);
@@ -2108,11 +2612,11 @@ class Dispatcher {
 		}
 		return $this->actionableShip;
 	}
-	
+
 	public function getActionableHouses() {
 		if (is_object($this->actionableHouses) || $this->actionableHouses===null) return $this->actionableHouses;
 		$this->actionableHouses=null;
-		
+
 		if ($this->getCharacter() && $this->getCharacter()->getInsideSettlement()) {
 			$this->actionableHouses = $this->getCharacter()->getInsideSettlement()->getHousesPresent();
 		} else {

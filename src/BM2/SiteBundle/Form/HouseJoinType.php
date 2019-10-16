@@ -30,7 +30,7 @@ class HouseJoinType extends AbstractType {
 			'required' => true
 		));
 
-		$builder->add('submit', 'submit', array('label'=>'settings.submit'));
+		$builder->add('submit', 'submit', array('label'=>'requet.generic.submit', 'translation_domain' => 'actions'));
 	}
 
 	public function getName() {

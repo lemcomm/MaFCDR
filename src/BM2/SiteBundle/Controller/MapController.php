@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\MapMarker;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Service\Geography;
@@ -31,7 +32,7 @@ class MapController extends Controller {
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			if ($character->getTravel()) {
 				$travel = $this->get('geography')->jsonTravelSegments($character);
 				$details = $this->get('geography')->travelDetails($character);
@@ -58,6 +59,9 @@ class MapController extends Controller {
 	  */
 	public function markerAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$my_realms = $character->findRealms();
 		if (!$my_realms) {
@@ -99,6 +103,9 @@ class MapController extends Controller {
 	  */
 	public function removemarkerAction(MapMarker $marker) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($marker->getOwner() == $character) {
 			$em = $this->getDoctrine()->getManager();
@@ -556,17 +563,23 @@ class MapController extends Controller {
 			}
 			
 			// mix in places
-			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
-				$features[] = array(
-					'type' => 'Place',
-//					'id' => 'dungeon_'.$d['id'],
-					'properties' => array(
-						'type' => $place->getType()->getName(),
-						'name' => $place->getName(),
-						'active' => true,
-						),
-					'geometry' => json_decode($place->getLocation())
-				);
+			$query = $em->createQuery('SELECT p.id, p.name, t.name as type, ST_asGeoJSON(p.location) as location FROM BM2SiteBundle:Place p JOIN p.type t, BM2SiteBundle:Character me WHERE me = :me AND p.settlement IS NULL AND ((p.visible=true AND ST_Distance(p.location, me.location) < :maxistance) OR p.owner = :me)');
+			$query->setParameters(array('me'=>$character, 'maxdistance'=>$this->get('geography')->calculateSpottingDistance($character)));
+			try {
+				$results = $query->getResults();	
+				foreach ($query->getResults() as $p) {
+					$features[] = array(
+						'type' => 'Place',
+						'properties' => array(
+							'type' => $p['type'],
+							'name' => $p['name'],
+							'active' => true,
+							),
+						'geometry' => json_decode($p->getLocation())
+					);
+				}
+			} catch (\Doctrine\DBAL\DBALException $e) {
+				# No results, don't care, move on!
 			}
 		}
 
@@ -596,7 +609,7 @@ class MapController extends Controller {
 			$data = $this->get('geography')->findRealmDataPolygons($realm);
 			foreach ($data as $row) {
 				$geo = json_decode($row['poly']);
-				$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+				$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 				$features[] = array(
 							'type' => 'Feature',
 //							'id' => $id++,
@@ -604,7 +617,7 @@ class MapController extends Controller {
 								'name' => $realm->getName(),
 								'colour_hex' => $realm->getColourHex(),
 								'colour_rgb' => $realm->getColourRgb(),
-								'estates' => $estates
+								'settlements' => $settlements
 								),
 							'geometry' => $geo
 						);
@@ -618,7 +631,7 @@ class MapController extends Controller {
 				$data = $this->get('geography')->findRealmDataPolygons($realm);
 				foreach ($data as $row) {
 					$geo = json_decode($row['poly']);
-					$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+					$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 					$features[] = array(
 								'type' => 'Feature',
 //								'id' => $id++,
@@ -626,7 +639,7 @@ class MapController extends Controller {
 									'name' => $realm->getName(),
 									'colour_hex' => $realm->getColourHex(),
 									'colour_rgb' => $realm->getColourRgb(),
-									'estates' => $estates
+									'settlements' => $settlements
 									),
 								'geometry' => $geo
 							);
@@ -638,7 +651,7 @@ class MapController extends Controller {
 	}
 
     // FIXME: this is not used anymore ?
-	private function realmdataArray($realm, $estates, $with_subs) {
+	private function realmdataArray($realm, $settlements, $with_subs) {
 		$data = json_decode($this->get('geography')->findRealmDataPolygons($realm));
 		var_dump($data);
 
@@ -650,7 +663,7 @@ class MapController extends Controller {
 				'name' => $realm->getName(),
 				'colour_hex' => $realm->getColourHex(),
 				'colour_rgb' => $realm->getColourRgb(),
-				'estates' => $estates
+				'settlements' => $settlements
 				),
 			'geometry' => json_decode($this->get('geography')->findRealmPolygon($realm, 'json', $with_subs))
 		);

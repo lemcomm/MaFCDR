@@ -25,17 +25,18 @@ class ActionResolution {
 	private $geography;
 	private $interactions;
 	private $politics;
-	private $military;
 	private $characters;
 	private $permissions;
 	private $gametime;
+	private $warman;
+	private $actman;
 
 	private $max_progress = 5; // maximum number of actions to resolve in each background progression call
 	private $debug=100;
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, Military $military, PermissionManager $permissions, GameTimeExtension $gametime) {
+	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->charman = $charman;
@@ -45,9 +46,10 @@ class ActionResolution {
 		$this->geography = $geography;
 		$this->interactions = $interactions;
 		$this->politics = $politics;
-		$this->military = $military;
 		$this->permissions = $permissions;
 		$this->gametime = $gametime;
+		$this->warman = $warman;
+		$this->actman = $actman;
 		$this->characters = new ArrayCollection();
 
 		$this->speedmod = (float)$this->appstate->getGlobal('travel.speedmod', 1.0);
@@ -60,42 +62,6 @@ class ActionResolution {
 		foreach ($query->getResult() as $action) {
 			$this->resolve($action);
 		}
-	}
-
-	public function queue(Action $action, $neverimmediate=false) {
-		$action->setStarted(new \DateTime("now"));
-
-		if ($neverimmediate || $action->getComplete() != null) {
-			$immediate=false;
-		} else {
-			$set = $this->appstate->getGlobal('immediateActions');
-			if ($set && in_array($set, array(true, 'true', 't', '1'))) { $immediate=true; } else { $immediate=false; }			
-		}
-		if ($immediate) {
-			// do if immediate actions are enabled
-			// FIXME: some actions cannot be resolved like this - like the battle and settlement attack ones!
-			$success = $this->resolve($action);
-		} else {
-			// store in database and queue
-			$success = true;
-			$max=0;
-			foreach ($action->getCharacter()->getActions() as $act) {
-				if ($act->getPriority()>$max) {
-					$max=$act->getPriority();
-				}
-			}
-			$action->setPriority($max+1);
-
-			// some defaults, otherwise I'd have to set it explicitly everywhere
-			if (null===$action->getHidden()) { $action->setHidden(false); }
-			if (null===$action->getHourly()) { $action->setHourly(false); }
-			if (null===$action->getCanCancel()) { $action->setCanCancel(true); }
-			$this->em->persist($action);
-		}
-
-		$this->em->flush();
-
-		return array('success'=>$success, 'immediate'=>$immediate);
 	}
 
 	public function resolve(Action $action) {
@@ -381,6 +347,16 @@ class ActionResolution {
 		$this->military_battle($action);
 	}
 
+	private function settlement_assault(Action $action) {
+		/* Just an alias for now, so we can differentiate these on creation. Later we can add more dynamic logic. */
+		$this->military_battle($action);
+	}
+
+	private function settlement_sortie(Action $action) {
+		/* Just an alias for now, so we can differentiate these on creation. Later we can add more dynamic logic. */
+		$this->military_battle($action);
+	}
+
 	private function update_settlement_defend(Action $action) {
 		if (!$action->getCharacter() || !$action->getTargetSettlement()) {
 			$this->log(0, 'invalid action '.$action->getId());
@@ -415,7 +391,7 @@ class ActionResolution {
 			if ($distance < $actiondistance && $character->getInsideSettlement() == $action->getTargetCharacter()->getInsideSettlement()) {
 				// join all battles on his side
 				foreach ($action->getTargetCharacter()->getBattlegroups() as $group) {
-					$this->military->joinBattle($character, $group);
+					$this->warman->joinBattle($character, $group);
 					$this->history->logEvent(
 						$character,
 						'resolution.aid.success',
@@ -496,9 +472,9 @@ class ActionResolution {
 				$complete = new \DateTime('now');
 				$complete->add(new \DateInterval('PT60M'));
 				$act->setComplete($complete);
-				$this->queue($act, true);
+				$this->actman->queue($act, true);
 			}
-			$this->military->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
+			$this->warman->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
 			$this->history->logEvent(
 				$char,
 				'resolution.disengage.success',
@@ -659,187 +635,6 @@ class ActionResolution {
 			echo $text."\n";
 			flush();			
 		}
-	}
-
-
-
-	public function createBattle(Character $character, Settlement $settlement=null, $targets=array()) {
-		if ($settlement) {
-			$location = $settlement->getGeoData()->getCenter();
-			$outside = false;
-		} else {
-			$x=0; $y=0; $count=0; $outside = false;
-			foreach ($targets as $target) {
-				$x+=$target->getLocation()->getX();
-				$y+=$target->getLocation()->getY();
-				$count++;
-				if (!$target->getInsideSettlement()) {
-					$outside = true;
-				}
-			}
-			$location = new Point($x/$count, $y/$count);
-		}
-		$battle = new Battle;
-		$battle->setLocation($location);
-		if ($settlement) {
-			// FIXME: this should also be set (but differently) if everyone involved is inside the settlement
-			$battle->setSettlement($settlement);
-			$this->history->logEvent(
-				$settlement,
-				'event.settlement.attacked',
-				array('%link-character%'=>$character->getId()),
-				History::MEDIUM, false, 60
-			);
-		}
-		$battle->setSiege(false); // TODO...
-		$battle->setStarted(new \DateTime('now'));
-
-		// setup attacker (i.e. me)
-		$attackers = new BattleGroup;
-		$attackers->setBattle($battle);
-		$attackers->setAttacker(true);
-		$attackers->addCharacter($character);
-		$battle->addGroup($attackers);
-
-		// setup defenders
-		$defenders = new BattleGroup;
-		$defenders->setBattle($battle);
-		$defenders->setAttacker(false);
-		$battle->addGroup($defenders);
-		foreach ($targets as $target) {
-			$defenders->addCharacter($target);
-		}
-
-		// now we have all involved set up we can calculate the preparation timer
-		$time = $this->military->calculatePreparationTime($battle);
-		$complete = new \DateTime('now');
-		$complete->add(new \DateInterval('PT'.$time.'S'));
-		$battle->setInitialComplete($complete)->setComplete($complete);
-
-		$this->em->persist($battle);
-		$this->em->persist($attackers);
-		$this->em->persist($defenders);
-
-		// setup actions and lock travel
-		$act = new Action;
-		if ($settlement) {
-			$act->setType('settlement.attack');
-		} else {
-			$act->setType('military.battle');
-		}
-		$act->setCharacter($character)
-			->setTargetSettlement($settlement)
-			->setTargetBattlegroup($attackers)
-			->setCanCancel(false)
-			->setBlockTravel(true);
-		$this->queue($act);
-
-		$character->setTravelLocked(true);
-
-		// notifications and counter-actions
-		foreach ($targets as $target) {
-			$act = new Action;
-			$act->setType('military.battle')
-				->setCharacter($target)
-				->setTargetBattlegroup($defenders)
-				->setStringValue('forced')
-				->setCanCancel(false)
-				->setBlockTravel(true);
-			$this->queue($act);
-
-			if ($target->hasAction('military.evade')) {
-				// we have an evade action set, so automatically queue a disengage
-				$this->createDisengage($target, $defenders, $act);
-				// and notify
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.evading', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
-			} else {
-				// regular notififaction
-				$this->history->logEvent(
-					$target,
-					'resolution.attack.targeted', array("%time%"=>$this->gametime->realtimeFilter($time)),
-					History::HIGH, false, 25
-				);
-			}
-
-			$target->setTravelLocked(true);
-		}
-
-		if ($settlement) {
-			// add everyone who has a "defend settlement" action set
-			foreach ($settlement->getRelatedActions() as $defender) {
-				if ($defender->getType()=='settlement.defend') {
-					$defenders->addCharacter($defender->getCharacter());
-
-					$act = new Action;
-					$act->setType('military.battle')
-						->setCharacter($defender->getCharacter())
-						->setTargetBattlegroup($defenders)
-						->setStringValue('forced')
-						->setCanCancel(false)
-						->setBlockTravel(true);
-					$this->queue($act);
-
-					// notify
-					$this->history->logEvent(
-						$defender->getCharacter(),
-						'resolution.defend.success', array(
-							"%link-settlement%"=>$settlement->getId(),
-							"%time%"=>$this->gametime->realtimeFilter($time)
-						),
-						History::HIGH, false, 25
-					);
-					$defender->getCharacter()->setTravelLocked(true);
-				}
-			}
-		}
-
-		return array('time'=>$time, 'outside'=>$outside, 'battle'=>$battle);
-	}
-
-
-
-	public function calculateDisengageTime(Character $character) {
-		$base = 15;
-		$base += sqrt($character->getEntourage()->count()*10);
-
-		$takes = $character->getSoldiers()->count() * 5;
-		foreach ($character->getSoldiers() as $soldier) {
-			if ($soldier->isWounded()) {
-				$takes += 5;
-			}
-			switch ($soldier->getType()) {
-				case 'cavalry':
-				case 'mounted archer':		$takes += 3;
-				case 'heavy infantry':		$takes += 2;
-			}
-		}
-
-		$base += sqrt($takes);
-
-		return $base*60;
-	}
-
-	public function createDisengage(Character $character, BattleGroup $bg, Action $attack) {
-		$takes = $this->calculateDisengageTime($character);
-		$complete = new \DateTime("now");
-		$complete->add(new \DateInterval("PT".round($takes)."S"));
-		// TODO: at most until just before the battle!
-
-		$act = new Action;
-		$act->setType('military.disengage')
-			->setCharacter($character)
-			->setTargetBattlegroup($bg)
-			->setCanCancel(true)
-			->setOpposedAction($attack)
-			->setComplete($complete)
-			->setBlockTravel(false);
-		$act->addOpposingAction($act);
-
-		return $this->queue($act);
 	}
 
 }

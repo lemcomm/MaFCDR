@@ -39,14 +39,31 @@ class AppState {
 	}
 
 	public function getCharacter($required=true, $ok_if_dead=false, $ok_if_notstarted=false) {
-		// check if we have a user first
+		/* This used to throw exceptions rather than adding flashes and returning strings.
+		The change was done in order to ensure that when you're somewhere you shouldn't be,
+		that the game is smart enough to redirect you to the right spot.
+		
+		Technically speaking, the first two returns don't actually do anything, because they're
+		intercepted by the Symfony Firewall and sent to the secuirty/detect route which does 
+		something similar. */
+		# Check if we have a user first
 		$token = $this->tokenStorage->getToken();
 		if (!$token) {
-			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.token'); }
+			if (!$required) {
+				return null;
+			} else {
+				$session->getFlashbag()->add('error.missing.token');
+				return 'fos_user_security_login';
+			}
 		}
 		$user = $token->getUser();
 		if (!$user || ! $user instanceof UserInterface) {
-			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.user'); }
+			if (!$required) {
+				return null;
+			} else {
+				$session->getFlashbag()->add('error.missing.user');
+				return 'fos_user_security_login';
+			}
 		}
 
 		# Let the ban checks begin...
@@ -54,18 +71,34 @@ class AppState {
 			if (!$required) { return null; } else { throw new AccessDeniedException('error.banned.multi'); }
 		}
 
-		// FIXME: these also redirect to the login page, which is bullshit, they should redirect to the characters page
-
+		# Check if we have a character, if not redirect to character list.
 		$character = $user->getCurrentCharacter();
+		$session = $this->session;
 		if (!$character) {
-			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.character'); }
+			if (!$required) { 
+				return null;
+			} else { 
+				$session->getFlashBag()->add('error', 'error.missing.character');
+				return 'bm2_characters';
+			}
 		}
+		# Check if it's okay that the character is dead. If not, then character list they go.
 		if (!$ok_if_dead && !$character->isAlive()) {
-			// TODO: redirect to obituary page (which should allow reading of logs, etc, until the time of death)
-			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.soul'); }
+			if (!$required) {
+				return null;
+			} else {
+				$session->getFlashBag()->add('error', 'error.missing.soul'); 
+				return 'bm2_characters';
+			}
 		}
+		# Check if it's okay that the character is not started. If not, then character list they go.
 		if (!$ok_if_notstarted && !$character->getLocation()) {
-			if (!$required) { return null; } else { throw new AccessDeniedException('error.missing.location'); }
+			if (!$required) {
+				return null;
+			} else {
+				$session->getFlashBag()->add('error', 'error.missing.location');
+				return 'bm2_characters';
+			}
 		}
 
 		if ($character->isAlive()) {
@@ -120,11 +153,11 @@ class AppState {
 			$this->session->set('entourage', $character->getLivingEntourage()->count());
 			$query = $this->em->createQuery('SELECT s.id, s.name FROM BM2SiteBundle:Settlement s WHERE s.owner = :me');
 			$query->setParameter('me', $character);
-			$estates = array();
+			$settlements = array();
 			foreach ($query->getResult() as $row) {
-				$estates[$row['id']] = $row['name'];
+				$settlements[$row['id']] = $row['name'];
 			}
-			$this->session->set('estates', $estates);
+			$this->session->set('settlements', $settlements);
 			$realms = array();
 			foreach ($character->findRulerships() as $realm) {
 				$realms[$realm->getId()] = $realm->getName();
@@ -143,4 +176,3 @@ class AppState {
 
 
 }
-

@@ -14,6 +14,10 @@ Table headers are handled as translation strings from the character.list databas
 		<td colspan="6">
 			<img src="{{ asset('bundles/bm2site/images/lock.svg') }}" alt="{{ 'locked'|trans }}" title="{{ 'locked'|trans }}" height="20px" />
 		</td>
+	{% elseif character.battling %}
+		<td colspan="6">
+			<center><i>{{ 'battling'|trans }}</i></center>
+		</td>		
 	{% elseif character.alive and not character.location and not character.retired %}
 		<td>
 			<!-- Status icon would normally be here. -->
@@ -55,8 +59,10 @@ Table headers are handled as translation strings from the character.list databas
 			{% endif %}
 		</td>
 		<td>
-			{% if character.inbattle %}
-				{{ 'charstatus.inbattle'|trans }}
+			{% if character.prebattle %}
+				{{ 'charstatus.prebattle'|trans }}
+			{% elseif character.sieging %}
+				{{ 'charstatus.sieging'|trans }}
 			{% elseif character.annexing %}
 				{{ 'charstatus.annexing'|trans }}
 			{% elseif character.supporting %}
@@ -113,6 +119,13 @@ Table headers are handled as translation strings from the character.list databas
 				<!-- Play button would normally be here. -->
 			</td>
 		{% endif %}
+	{% elseif not character.alive and character.location %}
+		<td colspan="4">
+			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
+		</td>
+		<td colspan="2">
+			<center><i>Awaiting Turn Processing</i></center>
+		</td>
 	{% else %}
 		<td colspan="4">
 			<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />

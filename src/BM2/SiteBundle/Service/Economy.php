@@ -557,31 +557,28 @@ class Economy {
 					}
 				}
 			}
-			foreach ($this->geo->findCharactersInArea($settlement->getGeoData()) as $char) {
-				if ($char->getInsideSettlement() == $settlement) {
-					$my_severity = $severity;
-				} else {
-					// outside settlement, it becomes very tricky in starvation times
-					// (this is mostly to balance sieges)
-					$my_severity = round($severity*1.75);
-				}
-				$this->feedSoldiers($char, $my_severity);
+			/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
+			foreach ($settlement->getSuppliedUnits() as $unit) {
+				$this->feedSoldiers($unit->getCharacter(), $severity);
 			}
+			*/
 		} else {
 			// got food
 			foreach ($settlement->getMilitia() as $militia) {
-				if ($militia->isAlive()) {		
+				if ($militia->isAlive()) {
 					$militia->feed();
 				}
 			}
-			foreach ($this->geo->findCharactersInArea($settlement->getGeoData()) as $char) {
-				foreach ($char->getLivingSoldiers() as $soldier) {
+			/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
+			foreach ($settlement->getSuppliedUnits() as $unit) {
+				foreach ($unit->getCharacter()->getLivingSoldiers() as $soldier) {
 					$soldier->feed();
 				}
-				foreach ($char->getLivingEntourage() as $ent) {
-					$ent->feed();
+				foreach ($unit->getCharacter()->getLivingEntourage() as $ent) {
+					$end->feed();
 				}
 			}
+			*/
 		}
 	}
 
@@ -708,8 +705,7 @@ class Economy {
 	}
 
 	public function ResourceFromBuildings(Settlement $settlement, ResourceType $resource) {
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:BuildingResource r JOIN r.resource_type t JOIN r.building_type bt JOIN bt.buildings b JOIN b.settlement s
-			WHERE s=:here AND t=:resource AND b.active=true AND (r.provides_operation>0 OR r.provides_operation_bonus>0)');
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:BuildingResource r JOIN r.resource_type t JOIN r.building_type bt JOIN bt.buildings b JOIN b.settlement s WHERE s=:here AND t=:resource AND b.active=true AND (r.provides_operation>0 OR r.provides_operation_bonus>0)');
 		$query->setParameters(array('here'=>$settlement, 'resource'=>$resource));
 		$base = 0; $bonus = 0;
 		foreach ($query->getResult() as $result) {
@@ -729,14 +725,13 @@ class Economy {
 
 		switch (strtolower($resource->getName())) {
 			case 'food':
-				$query = $this->em->createQuery('SELECT count(s) FROM BM2SiteBundle:Character c JOIN c.soldiers s, BM2SiteBundle:GeoData g WHERE ST_Contains(g.poly, c.location)=true AND g.id=:here AND s.base IS NULL AND s.alive=true');
-				$query->setParameter('here', $settlement->getGeoData());
-				$soldiers = $query->getSingleScalarResult();
-				$query = $this->em->createQuery('SELECT count(e) FROM BM2SiteBundle:Character c JOIN c.entourage e, BM2SiteBundle:GeoData g WHERE ST_Contains(g.poly, c.location)=true AND g.id=:here AND e.alive=true');
-				$query->setParameter('here', $settlement->getGeoData());
-				$entourage = $query->getSingleScalarResult();
-				// mobile soldiers and entourage take a little food "magically" from hunting and scavenging. Also, to reduce the impact of large armies marching through
-				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $militia + ($soldiers + $entourage)*0.8;
+				$suppliedNPCs = 0;
+				/* TODO: When settlements feeding remote goes live, uncomment this.
+				foreach ($settlement->getSuppliedUnits() as $unit) {
+					$suppliedNPCs += $unit->getCharacter()->getLivingSoldiers()->count();
+					$suppliedNPCs += $unit->getCharacter()->getLivingEntourage()->count();
+				} */
+				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $militia + $suppliedNPCs;
 				break;
 			case 'wood':
 				$base = sqrt($population) + exp(sqrt($population)/150) - 5;
@@ -879,7 +874,6 @@ class Economy {
 		return max(1.0, $security);
 	}
 
-
 	public function TradeBalance(Settlement $settlement, ResourceType $resource) {
 		$amount = 0;
 
@@ -887,15 +881,14 @@ class Economy {
 		$query->setParameters(array('resource'=>$resource, 'here'=>$settlement));
 
 		foreach ($query->getResult() as $trade) {
-			if ($trade->getDestination() == $settlement) {
-				// incoming trade
+			if ($trade->getDestination() == $settlement && (!$trade->getSource()->getSiege() || ($settlement->getSiege() && $settlement->getSiege()->getEncircled()))) {
+				// incoming trade; only counts if source isn't besieged AND we're not encircled.
 				$amount += $trade->getAmount();
-			} else {
-				// outgoing trade
+			} else if (!($settlement->getSiege() && $settlement->getSiege()->getEncircled())) {
+				// outgoing trade, only counts if we're not encircled.
 				$amount -= $trade->getAmount();
 			}
 		}
-
 		return $amount;
 	}
 
@@ -1062,14 +1055,14 @@ class Economy {
 
 	public function calculateCorruption(Settlement $settlement) {
 		if (false === $settlement->corruption) {
-			$estates = 0;
+			$settlements = 0;
 			if ($settlement->getOwner()) {
 				$user = $settlement->getOwner()->getUser();
 				$query = $this->em->createQuery('SELECT count(s) FROM BM2SiteBundle:Settlement s JOIN s.owner c WHERE c.user = :user');
 				$query->setParameter('user', $user);
-				$estates = $query->getSingleScalarResult();
+				$settlements = $query->getSingleScalarResult();
 			}
-			$settlement->corruption = $estates/500;
+			$settlement->corruption = $settlements/500;
 		}
 		return $settlement->corruption;
 	}

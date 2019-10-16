@@ -12,10 +12,13 @@ use BM2\SiteBundle\Entity\UnitSettings;
 class UnitSettingsType extends AbstractType {
 
 	private $char;
+	private $supply;
+	private $settlements;
 
-	public function __construct($char, $supply) {
+	public function __construct($char, $supply, $settlements) {
 		$this->char = $char;
 		$this->supply = $supply;
+		$this->settlements = $settlements;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -29,20 +32,25 @@ class UnitSettingsType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$char = $this->char;
 		$supply = $this->supply;
+		$settlements = $this->settlements;
 
 		$builder->add('name', 'text', array(
 			'label'=>'unit.name',
 			'required'=>true
 		));
 		if ($supply) {
+			# Find all settlements where we have permission to take food from.
 			$builder->add('supplier', 'entity', array(
 				'label' => 'unit.supplier',
 				'multiple'=>false,
 				'expanded'=>false,
-				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($char) {
-					$qb = $er->createQueryBuilder('e');
-					$qb->where('e.owner = :char')->setParameter('char', $char);
-					$qb->orderBy('e.name');
+				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($char, $settlements) {
+					$qb = $er->createQueryBuilder('s');
+					$qb->where('s.owner = :char')
+					->orWhere('s.feed_soldiers = TRUE and s.owner = :liege')
+					->orWhere('s IN (:settlements)')
+					->setParameters(array('char'=>$char, 'liege'=>$char->getLiege(), 'settlements'=>$settlements));
+					$qb->orderBy('s.name');
 					return $qb;
 				},
 			));

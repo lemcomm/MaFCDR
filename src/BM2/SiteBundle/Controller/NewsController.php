@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\NewsArticle;
 use BM2\SiteBundle\Entity\NewsEdition;
 use BM2\SiteBundle\Entity\NewsEditor;
@@ -46,6 +47,9 @@ class NewsController extends Controller {
 	  */
 	public function readAction(NewsEdition $edition, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$reader = $this->get('news_manager')->readEdition($edition, $character);
 		if (!$reader) {
@@ -77,6 +81,9 @@ class NewsController extends Controller {
 		 */
 	 public function subscribeAction(NewsEdition $edition) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// FIXME: catch exception if $paper can not be found and throw this:
 		//			throw $this->createNotFoundException('error.notfound.paper');
@@ -106,6 +113,9 @@ class NewsController extends Controller {
 		*/
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$this->get('news_manager')->canCreatePaper($character)) {
 			throw new AccessDeniedHttpException('error.noaccess.library');
@@ -139,6 +149,9 @@ class NewsController extends Controller {
 		 */
 	 public function editorAction(NewsPaper $paper, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($paper, $character);
 		if (!$editor) {
@@ -160,6 +173,9 @@ class NewsController extends Controller {
 		 */
 	 public function editorchangeAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST')) {
 			$paperId = $request->request->get('paper');
@@ -217,6 +233,9 @@ class NewsController extends Controller {
 		 */
 	 public function editoraddformAction($paperId, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$distance = $this->get('geography')->calculateInteractionDistance($character);
 		$form = $this->createForm(new InteractionType(
 			'publication',
@@ -236,6 +255,9 @@ class NewsController extends Controller {
 		 */
 	 public function editoraddAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST')) {
 			$paperId = $request->request->get('paper');
@@ -285,6 +307,9 @@ class NewsController extends Controller {
 		 */
 	 public function createeditionAction(NewsPaper $paper, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($paper, $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -321,6 +346,9 @@ class NewsController extends Controller {
 		 */
 	 public function editionAction(NewsEdition $edition, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($edition->getPaper(), $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -345,6 +373,9 @@ class NewsController extends Controller {
 	  */
 	public function publishAction(NewsEdition $edition) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($edition->getPaper(), $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -363,6 +394,9 @@ class NewsController extends Controller {
 	  */
 	 public function layoutAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editionId = $request->request->get('edition');
 		$layout_data = json_decode($request->request->get('layout'));
@@ -407,6 +441,9 @@ class NewsController extends Controller {
 	  */
 	public function newarticleAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$article = new NewsArticle;
 		$form = $this->createForm(new NewsArticleType, $article);
@@ -439,6 +476,9 @@ class NewsController extends Controller {
 	  */
 	public function editarticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new NewsArticleType, $article);
 		$form->handleRequest($request);
@@ -470,6 +510,9 @@ class NewsController extends Controller {
 	  */
 	public function storearticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {
@@ -504,6 +547,9 @@ class NewsController extends Controller {
 	  */
 	public function restorearticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {
@@ -543,6 +589,9 @@ class NewsController extends Controller {
 	  */
 	public function delarticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {

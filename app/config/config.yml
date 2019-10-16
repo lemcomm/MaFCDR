@@ -25,9 +25,12 @@ twig:
     exception_controller: BM2SiteBundle:Exception:exception
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    form:
-        resources:
-            - 'BM2SiteBundle:Form:form_theme.html.twig'
+    form_themes:
+         - 'BM2SiteBundle:Form:form_theme.html.twig'
+# Below is deprecated as of Symfony 2.6 --Andrew
+#    form:
+#        resources:
+#            - 'BM2SiteBundle:Form:form_theme.html.twig'
 
 # Assetic Configuration
 assetic:

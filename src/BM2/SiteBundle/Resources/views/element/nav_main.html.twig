@@ -21,8 +21,8 @@
 						{% if character.entourage is not empty %}
 							<li><a href="{{ path('bm2_site_character_entourage') }}">{{ 'npc.entourage2'|transchoice(10) }}</a></li>
 						{% endif %}
-						{% if character.estates is not empty %}
-							<li><a href="{{ path('bm2_estates') }}">{{ 'estate'|transchoice(character.estates|length) }}</a></li>
+						{% if character.ownedSettlements is not empty %}
+							<li><a href="{{ path('bm2_estates') }}">{{ 'estate'|transchoice(character.ownedSettlements|length) }}</a></li>
 						{% endif %}
 					</ul>
 				</li>

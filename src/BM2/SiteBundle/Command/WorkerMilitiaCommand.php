@@ -33,7 +33,7 @@ class WorkerMilitiaCommand extends ContainerAwareCommand {
 		$this->generator = $container->get('generator');
 		$this->economy = $container->get('economy');
 		$history = $container->get('history');
-		$military = $container->get('military');
+		$military = $container->get('military_manager');
 		$start = $input->getArgument('start');
 		$end = $input->getArgument('end');
 
@@ -46,11 +46,6 @@ class WorkerMilitiaCommand extends ContainerAwareCommand {
 			}
 
 			$military->TrainingCycle($settlement);
-
-			if ($settlement->getOwner()==null) {
-				// FIXME: do we still want that now that people can simply walk in and take the place anyways?
-				$this->recruitCitizenMilitia($settlement);
-			}
 		}
 
 		$this->em->flush();
@@ -74,8 +69,8 @@ class WorkerMilitiaCommand extends ContainerAwareCommand {
 	}
 
 	private function recruitCitizenMilitia(Settlement $settlement) {
-		if ($settlement->getPopulation() > 1000) { 
-			$want_soldiers = sqrt($settlement->getPopulation()/5); 
+		if ($settlement->getPopulation() > 1000) {
+			$want_soldiers = sqrt($settlement->getPopulation()/5);
 		} else {
 			$want_soldiers = 3;
 			if ($settlement->getPopulation() > 100) { $want_soldiers += 2; }

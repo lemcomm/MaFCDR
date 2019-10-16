@@ -15,7 +15,7 @@
 				</dl>
 			</p>
 
-			{% set url = path('bm2_play',{"id":character.id}) %}
+			{% set url = path('bm2_site_character_start',{"id":character.id, "logic":'new'}) %}
 			<p>{{ "meta.background.skip"|trans({"%url%":url},"actions")|raw }}</p>
 		{% else %}
 			{% set url = path('bm2_characters') %}

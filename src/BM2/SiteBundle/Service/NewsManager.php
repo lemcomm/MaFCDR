@@ -137,7 +137,7 @@ class NewsManager {
 	public function canCreatePaper(Character $character) {
 		// we need to be lord of at least one estate with a library
 		$library = $this->em->getRepository('BM2SiteBundle:BuildingType')->findOneByName('Library');
-		foreach ($character->getEstates() as $settlement) {
+		foreach ($character->getOwnedSettlements() as $settlement) {
 			if ($settlement->hasBuilding($library)) {
 				return true;
 			}

@@ -9,7 +9,7 @@
 {% block content %}
 <h2>Statistics for {{ link(realm) }}</h2>
 <ul>
-	<li class="plot" data-id="estates">estates</li>
+	<li class="plot" data-id="settlements">settlements</li>
 	<li class="plot" data-id="population">population</li>
 	<li class="plot" data-id="soldiers">soldiers</li>
 	<li class="plot" data-id="area">area</li>
@@ -31,8 +31,8 @@ $(".plot").click(function(){
 	var id = $(this).data("id");
 
 	switch (id) {
-		case "estates":
-			$.plot($("#graph"), [ {{data.estates|json_encode|raw}} ], options ); 
+		case "settlements":
+			$.plot($("#graph"), [ {{data.settlements|json_encode|raw}} ], options ); 
 			break;
 		case "population":
 			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options ); 

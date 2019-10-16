@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
@@ -31,10 +32,11 @@ class SettlementController extends Controller {
 
 		// check if we should be able to see details
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
+			$character = NULL; //Override Appstate's return so we don't need to tinker with the rest of this function.
 		}
 		$details = $this->get('interactions')->characterViewDetails($character, $settlement);
 		if (isset($details['startme'])) {
@@ -151,6 +153,9 @@ class SettlementController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
@@ -163,8 +168,8 @@ class SettlementController extends Controller {
 			$others = $this->get('dispatcher')->getActionableCharacters(true);
 		}
 
-		$resupply = $this->get('military')->findAvailableEquipment($settlement, false);
-		$training = $this->get('military')->findAvailableEquipment($settlement, true);
+		$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+		$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 
 		// this duplicates functionality from the Soldier Entity (e.g. determine who is militia and who recruit),
 		// but I think we need it for memory reasons, since loading all and then slicing is a ton less efficient
@@ -186,7 +191,7 @@ class SettlementController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			$this->get('military')->manage($militia_slice, $data, $settlement, $character);
+			$this->get('military_manager')->manage($militia_slice, $data, $settlement, $character);
 			$em->flush();
 			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
 			return $this->redirect($request->getUri());
@@ -213,6 +218,9 @@ class SettlementController extends Controller {
 	public function cancelTrainingAction(Request $request) {
 		if ($request->isMethod('POST') && $request->request->has("settlement") && $request->request->has("recruit")) {
 			list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+			if (! $character instanceof Character) {
+				return $this->redirectToRoute($character);
+			}
 
 			$em = $this->getDoctrine()->getManager();
 			$recruit = $em->getRepository('BM2SiteBundle:Soldier')->find($request->request->get('recruit'));
@@ -221,9 +229,9 @@ class SettlementController extends Controller {
 			}
 
 			// return his equipment to the stockpile:
-			$this->get('military')->returnItem($settlement, $recruit->getWeapon());
-			$this->get('military')->returnItem($settlement, $recruit->getArmour());
-			$this->get('military')->returnItem($settlement, $recruit->getEquipment());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
 
 			if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
 				// old soldier - return to militia with his old stuff
@@ -249,6 +257,9 @@ class SettlementController extends Controller {
 	  */
 	public function permissionsAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
@@ -299,6 +310,9 @@ class SettlementController extends Controller {
 	  */
 	public function questsAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {
@@ -316,6 +330,9 @@ class SettlementController extends Controller {
 	  */
 	public function descriptionAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 		if (!$settlement) {

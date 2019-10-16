@@ -1,0 +1,21 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'place.actionable.name'|trans({},"places") }}</h2>
+	<p>{{ 'place.actionable.intro'|trans({},"places")|raw }}</p>
+
+	<h3> {{ 'place.actionable.list'|trans({},"places")|title }}</h2>
+	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
+	{% for place in places %}
+		<hr>
+		<div class="subcontent inline_announcements" style="color:#460702">
+		<h4>{{ place.name|title }}</h4>
+		{{ place.description }}
+		{% if place.canEnter %}
+			<a href="{{path('bm2_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
+		{% endif %}
+		{% if place.canManage %}
+			<a href="{{path('bm2_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage'|trans({}, "places")|raw }}</button></a>
+		{% endif %}
+	{% endfor %}
+{% endblock %}

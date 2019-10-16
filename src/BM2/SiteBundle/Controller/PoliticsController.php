@@ -34,7 +34,10 @@ class PoliticsController extends Controller {
      * @Template("BM2SiteBundle:Politics:politics.html.twig")
      */
 	public function indexAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array();
 	}
@@ -44,7 +47,10 @@ class PoliticsController extends Controller {
      * @Template("BM2SiteBundle:Politics:realms.html.twig")
      */
 	public function realmsAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array();
 	}
@@ -54,7 +60,10 @@ class PoliticsController extends Controller {
      * @Template("BM2SiteBundle:Politics:relations.html.twig")
      */
 	public function relationsAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array();
 	}
@@ -65,6 +74,9 @@ class PoliticsController extends Controller {
      */
 	public function hierarchyAction() {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$this->addToHierarchy($character);
 
@@ -109,6 +121,9 @@ class PoliticsController extends Controller {
 	  */
 	public function vassalsAction() {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('vassals'=>$character->getVassals());
 	}
@@ -119,6 +134,9 @@ class PoliticsController extends Controller {
 	  */
 	public function disownAction(Request $request, Character $vassal) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($vassal->getLiege() != $character) {
 			throw new AccessDeniedHttpException("error.noaccess.vassal");
@@ -144,6 +162,9 @@ class PoliticsController extends Controller {
      */
 	public function oathAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('hierarchyOathTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$others = $this->get('dispatcher')->getActionableCharacters();
@@ -170,8 +191,8 @@ class PoliticsController extends Controller {
 						$realms->add($realm);
 					}
 				}
-				foreach ($lord->getEstates() as $estate) {
-					if ($realm = $estate->getRealm()) {
+				foreach ($lord->getOwnedSettlements() as $settlement) {
+					if ($realm = $settlement->getRealm()) {
 						if (!$realms->contains($realm)) {
 							$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
 							$realms->add($realm);
@@ -226,6 +247,9 @@ class PoliticsController extends Controller {
      */
 	public function breakoathAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('hierarchyIndependenceTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($request->isMethod('POST')) {
 			$this->get('politics')->breakoath($character);
 			$em = $this->getDoctrine()->getManager();
@@ -242,6 +266,9 @@ class PoliticsController extends Controller {
      */
 	public function successorAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('InheritanceSuccessorTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$others = $this->get('dispatcher')->getActionableCharacters();
@@ -252,13 +279,13 @@ class PoliticsController extends Controller {
 			}
 		}
 		foreach ($character->getUser()->getCharacters() as $mychar) {
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
 		foreach ($character->getPartnerships() as $partnership) {
 			$mychar = $partnership->getOtherPartner($character);
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
@@ -321,6 +348,9 @@ class PoliticsController extends Controller {
      */
 	public function partnersAction(Request $request, $type=null) {
 		$character = $this->get('dispatcher')->gateway('partnershipsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$newavailable = false;
 		$form_old_view=null; $form_new_view=null;
@@ -479,6 +509,9 @@ class PoliticsController extends Controller {
      */
 	public function listsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		return array(
 			'listings' => $character->getUser()->getListings(),
 		);
@@ -490,6 +523,9 @@ class PoliticsController extends Controller {
 	  */
 	public function listAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$using = false;
 
@@ -620,6 +656,9 @@ class PoliticsController extends Controller {
 	  */
 	public function prisonersAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalPrisonersTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$results = array();
 		$others = $this->get('dispatcher')->getActionableCharacters();
@@ -672,7 +711,7 @@ class PoliticsController extends Controller {
 							$complete->add(new \DateInterval("PT2H"));
 							$act->setComplete($complete);
 							$act->setBlockTravel(false);
-							$this->get('action_resolution')->queue($act);
+							$this->get('action_manager')->queue($act);
 
 							$this->get('history')->logEvent(
 								$prisoner,
@@ -710,6 +749,9 @@ class PoliticsController extends Controller {
 	  */
 	public function claimsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalClaimsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		return array('claims'=>$character->getSettlementClaims());
 	}
@@ -722,6 +764,9 @@ class PoliticsController extends Controller {
 	  */
 	public function claimaddAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
@@ -757,6 +802,9 @@ class PoliticsController extends Controller {
 	  */
 	public function claimcancelAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');

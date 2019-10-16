@@ -108,6 +108,7 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
@@ -118,7 +119,7 @@ class AccountController extends Controller {
 
 		$now = new \DateTime("now");
 		$a_week_ago = $now->sub(new \DateInterval("P7D"));
-				
+		
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
 			$annexing = false;
@@ -130,7 +131,10 @@ class AccountController extends Controller {
 			$renaming = false;
 			$reclaiming = false;
 			$unretirable = false;
-			if ($character->getLocation()) {
+			$preBattle = false;
+			$siege = false;
+			$alive = $character->getAlive();
+			if ($alive && $character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
 				$at_settlement = ($nearest['distance'] < $this->get('geography')->calculateActionDistance($settlement));
@@ -147,9 +151,14 @@ class AccountController extends Controller {
 				$unread = 0;
 				$events = 0;
 			}
+			if ($character->getBattling() && $character->getBattleGroups()->isEmpty() == TRUE) {
+				# NOTE: Because sometimes, battling isn't reset after a battle. May be related to entity locking.
+				$character->setBattling(false);
+				$em->flush();
+			}
 			
 			// This adds in functionality for detecting character actions on this page. --Andrew
-			if ($character->getActions()) {
+			if ($alive && $character->getActions()) {
 				foreach ($character->getActions() as $actions) {
 					switch($actions->getType()) {
 						case 'settlement.take':
@@ -179,10 +188,20 @@ class AccountController extends Controller {
 					}
 				}
 			}
-			if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
+			if ($alive && !is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
 				$unretirable = true;
 			} else {
 				$unretirable = false;
+			}
+			if ($alive && !$character->getBattleGroups()->isEmpty()) {
+				foreach ($character->getBattleGroups() as $group) {
+					if ($group->getBattle()) {
+						$preBattle = true;
+					}
+					if ($group->getSiege()) {
+						$siege = true;
+					}
+				}
 			}
 
 			$data = array(
@@ -190,6 +209,7 @@ class AccountController extends Controller {
 				'name' => $character->getName(),
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
+				'battling' => $character->getBattling(),
 				'retired' => $character->getRetired(),
 				'unretirable' => $unretirable,
 				'npc' => $character->isNPC(),
@@ -200,7 +220,8 @@ class AccountController extends Controller {
 				'at_settlement' => $at_settlement,
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
-				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'prebattle' => $preBattle,
+				'sieging' => $siege,
 				'annexing' => $annexing,
 				'supporting' => $supporting,
 				'opposing' => $opposing,
@@ -254,6 +275,21 @@ class AccountController extends Controller {
 
 		$list_form = $this->createForm(new ListSelectType);
 
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+
+		if ($user->getIp() != $ip) {
+			$user->setIp($ip);
+			$em->flush();
+		}
+
 		return array(
 			'announcements' => $announcements,
 			'notices' => $notices,
@@ -289,12 +325,12 @@ class AccountController extends Controller {
 		$user = $this->getUser();
 
 		$characters = array();
-		$estates = new ArrayCollection;
+		$settlements = new ArrayCollection;
 		$claims = new ArrayCollection;
 		foreach ($user->getLivingCharacters() as $character) {
 
-			foreach ($character->getEstates() as $estate) {
-				$estates->add($estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$settlements->add($settlement);
 			}
 			foreach ($character->getSettlementClaims() as $claim) {
 				$claims->add($claim->getSettlement());
@@ -310,7 +346,7 @@ class AccountController extends Controller {
 
 		return array(
 			'characters' => $characters,
-			'estates' => $this->get('geography')->findRegionsPolygon($estates),
+			'settlements' => $this->get('geography')->findRegionsPolygon($settlements),
 			'claims' => $this->get('geography')->findRegionsPolygon($claims)
 		);
 	}
@@ -363,6 +399,10 @@ class AccountController extends Controller {
 				));
 				if ($query->getResult()) {
 					$form->addError(new FormError("character.burst"));
+					$works = false;
+				}
+				if (preg_match('/[01234567890\!\@\#\$\%\^\&\*\(\)_\+\-\=\[\]\{\}\:\;\<\>\.\?\/\\\|\~\"]/', $data['name'])) {
+					$form->addError(new FormError("character.illegaltext"));
 					$works = false;
 				}
 
@@ -588,6 +628,9 @@ class AccountController extends Controller {
 		$character = $em->getRepository('BM2SiteBundle:Character')->find($id);
 		if (!$character) {
 			throw $this->createAccessDeniedException('error.notfound.character');
+		}
+		if ($character->getBattling()) {
+			throw $this->createAccessDeniedException('error.noaccess.battling');
 		}
 		if ($character->getUser() != $user) {
 			throw $this->createAccessDeniedException('error.noaccess.character');

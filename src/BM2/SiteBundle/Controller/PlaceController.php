@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
@@ -33,31 +34,36 @@ class PlaceController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		$character = $this->get('appstate')->getCharacter(false, true, true);
-		
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		if ($character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
 		}
-		
+
 		# Check if we should be able to view any details on this place. A lot of places won't return much! :)
-		$details = $this->get('interactions')->characterViewDetails($character, $place);
+		if ($character instanceof Character) {
+			$details = $this->get('interactions')->characterViewDetails($character, $place);
+		}
 
 		/* Leaving this here for later implementation...
 		if ($details['spy'] || $place->getOwner() == $character) {
 			$militia = $place->getActiveMilitiaByType();
 		} else {
 			$militia = null;
-		} 
+		}
 		When we add this, get rid of $militia below this. */
 		$militia = null;
-		
+
 		if ($character->getInsidePlace() == $place) {
 			$inside = true;
 		} else {
 			$inside = false;
 		}
-		
+
 		return array(
 			'place' => $place,
 			'details' => $details,
@@ -68,11 +74,103 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
+	  * @Route("/actionable", name="bm2_place_actionable")
 	  * @Template
 	  */
+
+	public function actionableAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('placeListTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		$placeList = $this->get('geography')->findPlacesInActionRange($character);
+		$places = array();
+		foreach ($placeList as $place) {
+			$data = array(
+				'id' => $place->getId(),
+				'name' => $place->getName(),
+				'description' => $place->getShortDescription(),
+				'canManage' => $this->canManage($place, $character),
+				'canEnter' => $this->canEnter($place, $character)
+			);
+			$places[] = $data;
+		}
+		return array(
+			'places' => $places
+		);
+	}
+
+	private function canManage(Place $place, Character $character) {
+		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'describe')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private function canEnter(Place $place, Character $character) {
+		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	  * @Route("/{id}/enter", name="bm2_place_enter")
+	  * @Template
+	  */
+
+	public function enterPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$result = null;
+		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
+			$result = 'entered';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/exit", name="bm2_place_exit")
+	  * @Template
+	  */
+
+	public function exitPlaceAction() {
+		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$result = null;
+		if ($this->get('interactions')->characterLeavePlace($character)) {
+			$result = 'left';
+		} else {
+			$result = 'denied';
+		}
+
+		$this->getDoctrine()->getManager()->flush();
+		return array('place'=>$place, 'result'=>$result);
+	}
+
+	/**
+	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="bm2_place_manage")
+	  * @Template
+	  */
+
 	public function permissionsAction(Place $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway($place, 'placePermissionsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		/* Not sure if we'll need this just yet.
 		$place = $em->getRepository('BM2SiteBundle:Place')->find($id);
@@ -106,7 +204,7 @@ class PlaceController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('control.permissions.success', array(), 'actions'));
 			return $this->redirect($request->getUri());
 		}
-	
+
 		return array(
 			'place' => $place,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('place'),
@@ -120,34 +218,42 @@ class PlaceController extends Controller {
 	  */
 	public function newAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
-		
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		# Build the list of requirements we have.
 		$rights[] = NULL;
-		$settlement = $character->getInsideSettlement();
-		if ($settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside')) {
-			if ($character == $settlement->getOwner()) {
-				$rights[] = 'lord';
-				if ($settlement->hasBuildingNamed('Wood Castle')) {
-					$rights[] = 'castle';
-				}
-				if ($settlement->getRealm()->findRulers()->contains($character)) {
-					$rights[] = 'ruler';
-				}
+		if ($character->getInsideSettlement()) {
+			$settlement = $character->getInsideSettlement();
+		} else if ($region = $this->get('geography')->findMyRegion($character)) {
+			$settlement = $region->getSettlement();
+		} else {
+			# FIXME: Throw error.
+		}
+
+		if ($character == $settlement->getOwner()) {
+			$rights[] = 'lord';
+			if ($settlement->hasBuildingNamed('Wood Castle')) {
+				$rights[] = 'castle';
 			}
-			$realm = $settlement->getRealm();
-			if ($settlement->getCapitalOf() == $realm) {
-				if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
-					$rights[] = 'ruler';
-				} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
-					$rights[] = 'ruler';
-				}
+			if ($settlement->getRealm()->findRulers()->contains($character)) {
+				$rights[] = 'ruler';
 			}
-			if ($settlement->hasBuildingNamed('Library')) {
-				$rights[] = 'library';
+		}
+		$realm = $settlement->getRealm();
+		if ($settlement->getCapitalOf() == $realm) {
+			if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
+				$rights[] = 'ruler';
+			} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
+				$rights[] = 'ruler';
 			}
-			if ($settlement->hasBuildingNamed('Academy')) {
-				$rights[] = 'academy';
-			}
+		}
+		if ($settlement->hasBuildingNamed('Library')) {
+			$rights[] = 'library';
+		}
+		if ($settlement->hasBuildingNamed('Academy')) {
+			$rights[] = 'academy';
 		}
 		if ($character->getMagic() > 0) {
 			$rights[] = 'magic';
@@ -157,21 +263,25 @@ class PlaceController extends Controller {
 			$rights[] = 'warren';
 		}
 		*/
-		
+
 		#Now generate the list of things we can build!
 		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where (r.requires in (:rights) OR r.requires IS NULL) AND r.visible = TRUE")->setParameter('rights', $rights);
-		
+
 		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name']);
+			if ($this->get('geography')->checkPlacePlacement($character)) {
+				$fail = TRUE; #You shouldn't even have access but players will be players, best check anyways.
+			}
 			if (!$fail) {
 				$place = new Place();
 				$this->getDoctrine()->getManager()->persist($place);
 				$place->setName($data['name']);
 				$place->setFormalName($data['formal_name']);
 				$place->setShortDescription($data['short_description']);
+				$place->setCreator($character);
 				$place->setOwner($character);
 				if ($settlement) {
 					$place->setSettlement($settlement);
@@ -183,7 +293,7 @@ class PlaceController extends Controller {
 				$place->setVisible($data['type']->getVisible());
 				$this->getDoctrine()->getManager()->flush($place); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
-					$place, 
+					$place,
 					'event.place.formalized',
 					array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$character->getId()),
 					History::HIGH, true
@@ -193,14 +303,14 @@ class PlaceController extends Controller {
 						$settlement,
 						'event.settlement.newplace',
 						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
-						History::MEDIUM, 
+						History::MEDIUM,
 						true
 					);
 					$this->get('history')->logEvent(
 						$character,
 						'event.character.newplace',
 						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
-						History::HIGH, 
+						History::HIGH,
 						true
 					);
 				} else {
@@ -208,7 +318,7 @@ class PlaceController extends Controller {
 						$character,
 						'event.character.newplace',
 						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
-						History::MEDIUM, 
+						History::MEDIUM,
 						false
 					);
 				}
@@ -228,8 +338,11 @@ class PlaceController extends Controller {
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('appstate')->getCharacter(false, true, true);
-		
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		$olddescription = $place->getDescription()->getText();
 		if ($place->getOwner() == $character) {
 			$isowner = true;
@@ -259,7 +372,7 @@ class PlaceController extends Controller {
 			}
 		}
 		return array(
-			'place'=>$place, 
+			'place'=>$place,
 			'form'=>$form->createView()
 		);
 	}
