@@ -17,7 +17,7 @@
 		</div>
 	</div>
 	{% endif %}
-	<h1>{{ pagetitle|title|raw }}</h1>
+	<h1>{{ pagetitle|raw }}</h1>
 	<button id="style">{{ 'togglelist'|trans }}</button>
 	<div id="actionlist" class="boxlist">
 	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.personalActions, "domain":'actions'} only %}
