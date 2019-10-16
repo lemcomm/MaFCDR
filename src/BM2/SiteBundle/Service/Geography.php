@@ -445,6 +445,7 @@ class Geography {
 			*/
 		}
 		if ($results) {
+			$places = array();
 			foreach ($results as $result) {
 				if($result->getOwner() == $character OR $this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible()) {
 					$places[] = $result;
