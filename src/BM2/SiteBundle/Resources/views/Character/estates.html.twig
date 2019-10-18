@@ -1,7 +1,7 @@
 {% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::plain.html.twig" : "BM2SiteBundle::layout.html.twig" %}
 
 {% block content %}
-<h3>{{ 'estate'|transchoice(estates|length)|title }}</h3>
+<h3>{{ 'estate'|transchoice(settlements|length)|title }}</h3>
 <table id="estates">
 	<thead>
 		<tr>
@@ -19,39 +19,39 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for estate in estates %}
+		{% for settlement in settlements %}
 			<tr>
-				<td>{{ settlement_link(estate.id, estate.name) }}</td>
-				<td>{% if estate.realm is defined %}{{ realm_link(estate.realm.id, estate.realm.name) }}{% endif %}</td>
-				<td>{% if estate.ultimate is defined %}{{ realm_link(estate.ultimate.id, estate.ultimate.name) }}{% endif %}</td>
-				<td>{{ ('settlement.size.'~estate.size)|trans }}</td>
-				<td align="right">{{ estate.pop }}</td>
-				<td align="right">{{ estate.peasants }}</td>
-				<td align="right">{{ estate.thralls }}</td>
+				<td>{{ settlement_link(settlement.id, settlement.name) }}</td>
+				<td>{% if settlement.realm is defined %}{{ realm_link(settlement.realm.id, settlement.realm.name) }}{% endif %}</td>
+				<td>{% if settlement.ultimate is defined %}{{ realm_link(settlement.ultimate.id, settlement.ultimate.name) }}{% endif %}</td>
+				<td>{{ ('settlement.size.'~settlement.size)|trans }}</td>
+				<td align="right">{{ settlement.pop }}</td>
+				<td align="right">{{ settlement.peasants }}</td>
+				<td align="right">{{ settlement.thralls }}</td>
 				<td>
-					{% if estate.popchange/estate.pop > 0.1 %}
+					{% if settlement.popchange/settlement.pop > 0.1 %}
 						{{ ('settlement.pop.grow.3')|trans }}
-					{% elseif estate.popchange/estate.pop > 0.05 %}
+					{% elseif settlement.popchange/settlement.pop > 0.05 %}
 						{{ ('settlement.pop.grow.2')|trans }}
-					{% elseif estate.popchange/estate.pop > 0.01 %}
+					{% elseif settlement.popchange/settlement.pop > 0.01 %}
 						{{ ('settlement.pop.grow.1')|trans }}
-					{% elseif estate.popchange/estate.pop < - 0.1 %}
+					{% elseif settlement.popchange/settlement.pop < - 0.1 %}
 						{{ ('settlement.pop.shrink.4')|trans }}
-					{% elseif estate.popchange/estate.pop < - 0.05 %}
+					{% elseif settlement.popchange/settlement.pop < - 0.05 %}
 						{{ ('settlement.pop.shrink.3')|trans }}
-					{% elseif estate.popchange/estate.pop < - 0.02 %}
+					{% elseif settlement.popchange/settlement.pop < - 0.02 %}
 						{{ ('settlement.pop.shrink.2')|trans }}
-					{% elseif estate.popchange/estate.pop < - 0.01 %}
+					{% elseif settlement.popchange/settlement.pop < - 0.01 %}
 						{{ ('settlement.pop.shrink.1')|trans }}
 					{% else %}
 						{{ ('settlement.pop.stable')|trans }}
 					{% endif %}
 				</td>
-				<td align="right">{{ estate.militia }}</td>
-				<td align="right">{{ estate.recruits }}</td>
+				<td align="right">{{ settlement.militia }}</td>
+				<td align="right">{{ settlement.recruits }}</td>
 				<td>
 					<ul class="shortlist">
-						{% for build in estate.build %}
+						{% for build in settlement.build %}
 							<li>{{ building_link(build.id, build.name) }}</li>
 						{% endfor %}
 					</ul>
@@ -87,4 +87,3 @@
 		addoutline('{{ poly }}', '#cccc20', 3, '#cccc20', 0.4);
 	{% endblock %}
 {% endif %}
-
