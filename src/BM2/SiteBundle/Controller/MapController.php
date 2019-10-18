@@ -255,7 +255,7 @@ class MapController extends Controller {
 					$targets[$id]['current'] = true;
 				}
 				if (! in_array($row['location'], $targets[$id]['line']->getPoints())) {
-					$targets[$id]['line']->addPoint($row['location']);					
+					$targets[$id]['line']->addPoint($row['location']);
 				}
 			}
 
@@ -306,7 +306,7 @@ class MapController extends Controller {
 				$qb->setParameter('towers', $towers)
 					->setParameter('towerspot', $this->get('appstate')->getGlobal('spot.towerdistance', 2500));
 			} else {
-				$qb->where('ST_Distance(c.location, me.location) < :spotting');				
+				$qb->where('ST_Distance(c.location, me.location) < :spotting');
 			}
 			$qb->andWhere('me = :me')
 				->andWhere('c != :me')
@@ -561,31 +561,25 @@ class MapController extends Controller {
 				);
 				$em->clear();
 			}
-			
+
 			// mix in places
-			$query = $em->createQuery('SELECT p.id, p.name, t.name as type, ST_asGeoJSON(p.location) as location FROM BM2SiteBundle:Place p JOIN p.type t, BM2SiteBundle:Character me WHERE me = :me AND p.settlement IS NULL AND ((p.visible=true AND ST_Distance(p.location, me.location) < :maxistance) OR p.owner = :me)');
-			$query->setParameters(array('me'=>$character, 'maxdistance'=>$this->get('geography')->calculateSpottingDistance($character)));
-			try {
-				$results = $query->getResults();	
-				foreach ($query->getResults() as $p) {
+			$results = $this->get('geography')->findPlacesInSpotRange($character);
+			if ($results != null) {
+				foreach ($results as $p) {
 					$features[] = array(
 						'type' => 'Place',
 						'properties' => array(
-							'type' => $p['type'],
-							'name' => $p['name'],
+							'type' => $p->getType()->getName(),
+							'name' => $p->getName(),
 							'active' => true,
 							),
 						'geometry' => json_decode($p->getLocation())
 					);
 				}
-			} catch (\Doctrine\DBAL\DBALException $e) {
-				# No results, don't care, move on!
 			}
 		}
-
 		return $features;
 	}
-
 
 	private function dataRealms($mode) {
 		$features = array();
@@ -599,7 +593,7 @@ class MapController extends Controller {
 				$query = $em->createQuery('SELECT r FROM BM2SiteBundle:Realm r JOIN r.superior s WHERE s.superior IS NULL');
 				$realms = $query->getResult();
 				break;
-			case '1': case '2': case '3': case '4': case '5': case '6': case '7': 
+			case '1': case '2': case '3': case '4': case '5': case '6': case '7':
 				$realms = $em->getRepository('BM2SiteBundle:Realm')->findByType($mode);
 				break;
 			default:
