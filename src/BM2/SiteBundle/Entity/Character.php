@@ -437,6 +437,23 @@ class Character {
 	public function hasAction($key) {
 		return ($this->findActions($key)->count()>0);
 	}
+
+	public function isDiplomat() {
+		$realms = array();
+		foreach ($this->getPositions() as $pos) {
+			if ($pos->getRuler()) {
+				$realms[] = $pos->getRealm()->getId();
+			}
+			if ($pos->getType() && $pos->getType()->getName() == 'foreign affairs') {
+				$realms[] = $pos->getRealm()->getId();
+			}
+		}
+		if (empty($realms)) {
+			return null;
+		} else {
+			return $realms;
+		}
+	}
 	
 	
 }
