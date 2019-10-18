@@ -217,6 +217,8 @@ class PlaceController extends Controller {
 	  * @Template
 	  */
 	public function newAction(Request $request) {
+
+		return false;
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -231,14 +233,34 @@ class PlaceController extends Controller {
 		} else {
 			# FIXME: Throw error.
 		}
+		$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
 
-		if ($character == $settlement->getOwner()) {
-			$rights[] = 'lord';
-			if ($settlement->hasBuildingNamed('Wood Castle')) {
-				$rights[] = 'castle';
+		if ($character->getInsideSettlement()) {
+			if ($character == $settlement->getOwner()) {
+				$rights[] = 'lord';
+				if ($settlement->hasBuildingNamed('Wood Castle')) {
+					$rights[] = 'castle';
+				}
 			}
-			if ($settlement->getRealm()->findRulers()->contains($character)) {
-				$rights[] = 'ruler';
+			if ($character->getMagic() > 0 && $canPlace) {
+				$rights[] = 'magic';
+			}
+			if ($settlement->hasBuildingNamed('Library') && $canPlace) {
+				$rights[] = 'library';
+			}
+		}
+
+		$found = false;
+		foreach ($settlement->getCapitalOf() as $realm) {
+			if (!$found) {
+				foreach ($realm->findRulers() as $ruler) {
+					if ($ruler == $character && $canPlace) {
+						$rights[] = 'ruler';
+						break; #No need to continue.
+					}
+				}
+			} else {
+				break; #No need to continue.
 			}
 		}
 		$realm = $settlement->getRealm();
@@ -249,20 +271,14 @@ class PlaceController extends Controller {
 				$rights[] = 'ruler';
 			}
 		}
-		if ($settlement->hasBuildingNamed('Library')) {
-			$rights[] = 'library';
-		}
 		if ($settlement->hasBuildingNamed('Academy')) {
 			$rights[] = 'academy';
 		}
-		if ($character->getMagic() > 0) {
-			$rights[] = 'magic';
+		$diplomacy = $character->isDiplomat();
+		if ($diplomacy) {
+			$rights[] = 'diplomat';
 		}
-		/* TODO: Not yet implemented yet, but it's an idea what this query may one day look like.
-		if ($character->getWorldLevel() < 1) {
-			$rights[] = 'warren';
-		}
-		*/
+
 
 		#Now generate the list of things we can build!
 		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where (r.requires in (:rights) OR r.requires IS NULL) AND r.visible = TRUE")->setParameter('rights', $rights);
@@ -270,6 +286,7 @@ class PlaceController extends Controller {
 		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$em = $this->getDoctrine()->getManager();
 			$data = $form->getData();
 			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name']);
 			if ($this->get('geography')->checkPlacePlacement($character)) {
@@ -283,15 +300,28 @@ class PlaceController extends Controller {
 				$place->setShortDescription($data['short_description']);
 				$place->setCreator($character);
 				$place->setOwner($character);
-				if ($settlement) {
-					$place->setSettlement($settlement);
-					$place->setGeoData($settlement->getGeoData());
+				if ($character->getInsideSettlement()) {
+					$place->setSettlement($character->getInsideSettlement());
+					$place->setGeoData($character->getInsideSettlement()->getGeoData());
 				} else {
-					$place->setLocation($character->getLocation());
-					$place->setGeoData($this->get('geography')->findMyRegion($character));
+					$geoData = $this->get('geography')->findMyRegion($character);
+					$loc = $character->getLocation();
+					$feat = new GeoFeature;
+					$feat->setLocation($loc);
+					$feat->setGeoData($geoData);
+					$feat->setName($data['name']);
+					$feat->setActive(true);
+					$feat->setWorkers(0);
+					$feat->setCondition(0);
+					$feat->setType($em->getRepository('BM2SiteBundle:GeoFeatureType')->findOneByName('place'));
+					$em->flush(); #We need the above to set the below and do relations.
+					$place->setGeoFeature($feat);
+					$place->setLocation($loc);
+					#Arguably, we could just get location from the geofeature, but this leaves more possibilities open.
+					$place->setGeoData($geoData);
 				}
 				$place->setVisible($data['type']->getVisible());
-				$this->getDoctrine()->getManager()->flush($place); # We can't create history for something that doesn't exist yet.
+				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
 					$place,
 					'event.place.formalized',
