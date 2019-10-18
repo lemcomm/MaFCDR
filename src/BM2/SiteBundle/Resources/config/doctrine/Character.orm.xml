@@ -123,5 +123,8 @@
 		<one-to-one field="active_report" target-entity="BattleReportCharacter"/>
 
 		<one-to-many field="siege_equipment" target-entity="SiegeEquipment" mapped-by="owner"/>
+
+		<one-to-many field="portals" target-entity="Portal" mapped-by="maintainer"/>
+		<many-to-one field="used_portal" target-entity="Portal" inversed-by="recently_used_by"/>
 	</entity>
 </doctrine-mapping>
