@@ -1106,3 +1106,13 @@ request:
   limit:       Maximum Amount
   sent:        Your request to receive food from %settlement% has been sent.
   limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
+
+place:
+ actionable:
+  name:   Visit A Place of Interest
+ new:
+  name:   Create Place of Interest
+  description:   Formalize a place of interest at your current location
+  longdesc:       With the permission of the regional lord, you can formalize a new place of interest that others can visit. The creation is instant, but future upgrades will take time and resources.
+ enter:
+  name:   Enter Place
