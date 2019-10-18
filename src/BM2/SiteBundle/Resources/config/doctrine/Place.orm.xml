@@ -12,8 +12,11 @@
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="creator" target-entity="Character" inversed-by="created_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
+
 		<field name="location" type="point" nullable="true"/>
+		<one-to-one field="geo_marker" target-entity="GeoFeature" inversed-by="place"/>
 		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="places"/>
+
 		<field name="short_description" type="text" nullable="true"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_place"/>
 
@@ -30,5 +33,8 @@
 		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_place"/>
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_place"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_place"/>
+
+		<one-to-many field="outbound_portals" target-entity="Portal" mapped-by="origin"/>
+		<one-to-many field="inbound_portals" target-entity="Portal" mapped-by="destination"/>
 	</entity>
 </doctrine-mapping>
