@@ -566,15 +566,17 @@ class MapController extends Controller {
 			$results = $this->get('geography')->findPlacesInSpotRange($character);
 			if ($results != null) {
 				foreach ($results as $p) {
-					$features[] = array(
-						'type' => 'Place',
-						'properties' => array(
-							'type' => $p->getType()->getName(),
-							'name' => $p->getName(),
-							'active' => true,
-							),
-						'geometry' => json_decode($p->getLocation())
-					);
+					if ($p->getLocation()) {
+						$features[] = array(
+							'type' => 'Place',
+							'properties' => array(
+								'type' => $p->getType()->getName(),
+								'name' => $p->getName(),
+								'active' => true,
+								),
+							'geometry' => json_decode($p->getLocation())
+						);
+					}
 				}
 			}
 		}
