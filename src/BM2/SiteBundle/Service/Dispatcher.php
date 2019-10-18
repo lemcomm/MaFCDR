@@ -566,8 +566,8 @@ class Dispatcher {
 	public function PlacesActions() {
 		$actions=array();
 		if (($check = $this->placesActionsGenericTests()) !== true) {
-			$actions[] = array("name"=>"places.all", "description"=>"unavailable.$check");
-			return array("name"=>"places.name", "intro"=>"politics.intro", "elements"=>$actions);
+			$actions[] = array("name"=>"place.all", "description"=>"unavailable.$check");
+			return array("name"=>"place.name", "intro"=>"politics.intro", "elements"=>$actions);
 		}
 		$actions[] = $this->placeCreateTest();
 
@@ -579,17 +579,7 @@ class Dispatcher {
 			$actions[] = $this->placeEnterTest();
 		}
 
-		return array("name"=>"places.name", "intro"=>"places.intro", "elements"=>$actions);
-	}
-
-	private function placeListTest() {
-		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
-			return $this->action("place.list", "bm2_place_actionable");
-		} else if ($this->getLeaveablePlace()) {
-			return $this->placeLeaveTest(true);
-		} else {
-			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
-		}
+		return array("name"=>"place.name", "intro"=>"place.intro", "elements"=>$actions);
 	}
 
 	private function placeActionsGenericTests(Place $place=null) {
@@ -1933,6 +1923,16 @@ class Dispatcher {
 
 	/* ========== Place Actions ============== */
 
+	private function placeListTest() {
+		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
+			return $this->action("place.list", "bm2_place_actionable");
+		} else if ($this->getLeaveablePlace()) {
+			return $this->placeLeaveTest(true);
+		} else {
+			return array("name"=>"place.actionable.name", "description"=>"unavailable.noplace");
+		}
+	}
+
 	public function placeCreateTest() {
 		$character = $this->getCharacter();
 		if ($character->isTrial()) {
@@ -1970,10 +1970,10 @@ class Dispatcher {
 
 	public function placePermissionsTest() {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
-			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
+			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
 		if ($this->place != $this->getActionablePlace()) {
-			return array("name"=>"place.enter.name",
+			return array("name"=>"place.permissions.name",
 				     "description"=>"unavailable.noplace"
 				    );
 		}
