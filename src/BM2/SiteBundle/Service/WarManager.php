@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Siege;
 
@@ -39,7 +40,7 @@ class WarManager {
 		$this->interactions = $interactions;
 	}
 
-	public function createBattle(Character $character, Settlement $settlement=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
+	public function createBattle(Character $character, Settlement $settlement=null, Place $place=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
 		/* for future reference, $outside is used to determine whether or not attackers need to leave the settlement in order to attack someone.
 		It's used by attackOthersAction of WarCon. --Andrew */
 		$bothinside = false;
@@ -47,68 +48,161 @@ class WarManager {
 
 		$battle = new Battle;
 		if ($siege) {
-			# Check for sieges first, because they'll always have settlements attached, but settlements won't always come with sieges.
-			$location = $siege->getSettlement()->getGeoData()->getCenter();
-			$battle->setSettlement($settlement);
-			$outside = false;
-
+			# Check for sieges first, because they'll always have settlements or places attached, but settlements and places won't always come with sieges.
+			if ($settlement) {
+				$location = $siege->getSettlement()->getGeoData()->getCenter();
+				$battle->setSettlement($settlement);
+				$outside = false;
+			} elseif ($place) {
+				if ($place->getSettlement()) {
+					$location = $siege->getPlace()->getSettlement()->getGeoData()->getCenter();
+					$battle->setSettlement($place->getSettlement());
+					$battle->setPlace($place);
+					$outside = false;
+				} else {
+					$location = $place->getLocation();
+					$battle->setPlace($place);
+					$outside = true;
+				}
+			}
 			$battle->setSiege($siege);
 			if ($siege->getAttacker() == $attackers) {
 				# If they are the siege attackers and attacking in this battle, then they're assaulting. If not, they're sallying. It affects defensive bonuses.
 				$battle->setType('siegeassault');
 				$type = 'assault';
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.siege.assault',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
+				if ($settlement) {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.siege.assault',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} elseif ($place && $place->getSettlement()) {
+					$this->history->logEvent(
+						$place->getSettlement(),
+						'event.settlement.place.assault',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, false, 60
+					);
+					$this->history->logEvent(
+						$place,
+						'event.place.siege.assault',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} else {
+					$this->history->logEvent(
+						$place,
+						'event.place.siege.assault',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				}
 			} else {
 				$battle->setType('siegesortie');
 				$type = 'sortie';
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.siege.sortie',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
+				if ($settlement) {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.siege.sortie',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} elseif ($place && $place->getSettlement()) {
+					$this->history->logEvent(
+						$place->getSettlement(),
+						'event.settlement.place.sortie',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, false, 60
+					);
+					$this->history->logEvent(
+						$place,
+						'event.place.siege.sortie',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} else {
+					$this->history->logEvent(
+						$place,
+						'event.place.siege.sortie',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				}
 			}
-		} else if ($settlement) {
-			$battle->setSettlement($settlement);
+		} else if ($settlement || $place) {
+			if ($settlement) {
+				$battle->setSettlement($settlement);
+			} else {
+				$battle->setPlace($place);
+			}
 			$foundinside = false;
 			$foundoutside = false;
 			$foundboth = false;
-			/* Because you can only attack a settlement during a siege, that means that if we're doing this we must be attacking FROM a settlement without a siege.
+			/* Because you can only attack a settlement/place during a siege, that means that if we're doing this we must be attacking FROM a settlement/place without a siege.
 			Outside of a siege this is only set if you start a battle
 			So we need to figure out if our targets are inside or outside. If we find a mismatch, we drop the outsiders and only attack those inside. */
-			foreach ($targets as $target) {
-				if ($target->getInsideSettlement()) {
-					$foundinside = true;
-				} else {
-					$foundoutside = true;
+			if ($place) {
+				foreach ($targets as $target) {
+					if ($target->getInsidePlace()) {
+						$foundinside = true;
+					} else {
+						$foundoutside = true;
+					}
+				}
+			} else {
+				foreach ($targets as $target) {
+					if ($target->getInsideSettlement()) {
+						$foundinside = true;
+					} else {
+						$foundoutside = true;
+					}
 				}
 			}
 			if ($foundinside && $foundoutside) {
 				# Found people inside and outside, prioritize inside. Battle type is urban.
 				$foundboth = true;
 				$battle->setType('urban');
-				$location = $settlement->getGeoData()->getCenter();
-				foreach ($targets as $target) {
-					# Logic to remove people outside from target list.
-					if (!$target->getInsideSettlement()) {
-						$key = array_search($target, $targets);
-						if($key!==false){
-						    unset($targets[$key]);
+				$type = 'skirmish';
+				if ($settlement) {
+					$location = $settlement->getGeoData()->getCenter();
+					foreach ($targets as $target) {
+						# Logic to remove people outside from target list.
+						if (!$target->getInsideSettlement()) {
+							$key = array_search($target, $targets);
+							if($key!==false){
+							    unset($targets[$key]);
+							}
 						}
 					}
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.skirmish',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} else {
+					if ($place->getInsideSettlement()) {
+						$location = $place->getInsideSettlement()->getGeoData()->getCenter();
+					} else {
+						$location = $place->getLocation();
+					}
+					foreach ($targets as $target) {
+						# Logic to remove people outside from target list.
+						if (!$target->getInsidePlace()) {
+							$key = array_search($target, $targets);
+							if($key!==false){
+							    unset($targets[$key]);
+							}
+						}
+					}
+					$this->history->logEvent(
+						$place,
+						'event.place.skirmish',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
 				}
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.skirmish',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-				$type = 'skirmish';
 			} else if ($foundinside && !$foundoutside) {
 				# Only people inside. Urban battle.
 				$battle->setType('urban');
@@ -122,24 +216,37 @@ class WarManager {
 				);
 				$type = 'skirmish';
 			} else if (!$foundinside && $foundoutside) {
-				# Only people outside. Battle type is field. Collect location data.
-				$battle->setType('field');
-				$outside = true;
-				$x=0; $y=0; $count=0;
-				foreach ($targets as $target) {
-					$x+=$target->getLocation()->getX();
-					$y+=$target->getLocation()->getY();
-					$count++;
+				if ($place->getSettlement()) {
+					$battle->setType('urban');
+					# Outside the place, but inside a settlement.
+					$outside = false;
+					$location = $place->getSettlement()->getGeoData()->getCenter();
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.skirmish',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} else {
+					$battle->setType('field');
+					# Only people outside. Battle type is field. Collect location data.
+					$outside = true;
+					$x=0; $y=0; $count=0;
+					foreach ($targets as $target) {
+						$x+=$target->getLocation()->getX();
+						$y+=$target->getLocation()->getY();
+						$count++;
+					}
+					$location = new Point($x/$count, $y/$count);
+					# Yes, we are literally just averaging the X and Y coords of the participants.
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.sortie',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+					$type = 'sortie';
 				}
-				$location = new Point($x/$count, $y/$count);
-				# Yes, we are literally just averaging the X and Y coords of the participants.
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.sortie',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, false, 60
-				);
-				$type = 'sortie';
 			} else {
 				# You've somehow broke the laws of space, and appear to exist in neither inside nor outside. Congrats.
 			}
@@ -485,12 +592,19 @@ class WarManager {
 			#This should only ever be one, but just in case, and because findActions returns an ArrayCollection...
 			$this->em->remove($action);
 		}
+		$attacker = false;
+		if ($siege->getAttacker()->getCharacters()->contains($character)) {
+			$attacker = true;
+		}
 		foreach ($siege->getGroups() as $group) {
 			if ($group->getCharacters()->contains($character)) {
 				$character->removeBattlegroup($group);
 				$group->removeCharacter($character);
 				$this->addRegroupAction(null, $character);
 			}
+		}
+		if ($attacker) {
+			$siege->updateEncirclement();
 		}
 		return true;
 	}
