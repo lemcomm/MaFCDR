@@ -8,10 +8,28 @@
 		<field name="formal_name" type="string"/>
 		<field name="visible" type="boolean" nullable="true"/>
 		<field name="allow_spawn" type="boolean" nullable="true"/>
+		<field name="workers" type="integer" nullable="true"/>
+		<field name="active" type="boolean" nullable="true"/>
+
 		<many-to-one field="type" target-entity="PlaceType"/>
+		<many-to-one field="sub_type" target-entity="PlaceSubType"/>
+		<many-to-many field="upgrades" target-entity="PlaceUpgradeType">
+			<join-table name="placeupgrades">
+				<join-columns>
+					<join-column name="place_id" referenced-column-name="id" />
+				</join-columns>
+				<inverse-join-columns>
+					<join-column name="place_upgrade_type_id" referenced-column-name="id" />
+				</inverse-join-columns>
+			</join-table>
+		</many-to-many>
+
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="creator" target-entity="Character" inversed-by="created_places"/>
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
+		<many-to-one field="owning_realm" target-entity="Realm" inversed-by="embassies_abroad"/>
+		<many-to-one field="hosting_realm" target-entity="Realm" inversed-by="hosted_embassies"/>
+		<one-to-one field="house" target-entity="House" inversed-by="home"/>
 
 		<field name="location" type="point" nullable="true"/>
 		<one-to-one field="geo_marker" target-entity="GeoFeature" inversed-by="place"/>
@@ -30,11 +48,16 @@
 
 		<one-to-many field="houses_present" target-entity="House" mapped-by="inside_place"/>
 
-		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_place"/>
-		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_place"/>
-		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_place"/>
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_place" fetch="EXTRA_LAZY"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_place" fetch="EXTRA_LAZY"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_place" fetch="EXTRA_LAZY"/>
 
 		<one-to-many field="outbound_portals" target-entity="Portal" mapped-by="origin"/>
 		<one-to-many field="inbound_portals" target-entity="Portal" mapped-by="destination"/>
+
+		<one-to-one field="siege" target-entity="Siege" mapped-by="place"/>
+
+		<one-to-many field="related_actions" target-entity="Action" mapped-by="target_place"/>
+
 	</entity>
 </doctrine-mapping>
