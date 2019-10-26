@@ -35,9 +35,12 @@
 
 		<one-to-many field="conversations" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
 
-		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_realm"/>
-		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm"/>
-		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm"/>
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="embassies_abroad" target-entity="Place" mapped-by="owning_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="hosted_embassies" target-entity="Place" mapped-by="hosting_realm" fetch="EXTRA_LAZY"/>
 
 	</entity>
 </doctrine-mapping>
