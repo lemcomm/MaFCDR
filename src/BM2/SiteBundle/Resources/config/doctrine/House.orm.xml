@@ -12,7 +12,7 @@
 		<many-to-one field="founder" target-entity="Character" inversed-by="founded_houses"/>
 		<one-to-one field="head" target-entity="Character" inversed-by="head_of_house"/>
 		<many-to-one field="successor" target-entity="Character" inversed-by="successor_to_houses"/>
-		
+
 		<one-to-many field="members" target-entity="Character" mapped-by="house"/>
 
 		<many-to-one field="superior" target-entity="House" inversed-by="cadets"/>
@@ -33,5 +33,7 @@
 		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_house"/>
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_house"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_house"/>
+
+		<one-to-one field="home" target-entity="Place" mapped-by="house"/>
 	</entity>
 </doctrine-mapping>
