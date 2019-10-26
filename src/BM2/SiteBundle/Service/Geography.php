@@ -288,8 +288,16 @@ class Geography {
 	}
 
 	public function findNearestPlace(Character $character) {
-		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
+		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char AND p.location IS NOT NULL ORDER BY distance ASC');
 		$query->setParameter('char', $character);
+		$query->setMaxResults(1);
+		return $query->getOneOrNullResult();
+	}
+
+	public function findNearestActionablePlace(Character $character) {
+		$maxdistance = $this->calculateInteractionDistance($character);
+		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char AND p.location IS NOT NULL AND ST_Distance(c.location, p.location) < :maxdistance ORDER BY distance ASC');
+		$query->setParameters(array('char'=>$character, 'maxdistance'=>$maxdistance));
 		$query->setMaxResults(1);
 		return $query->getOneOrNullResult();
 	}
@@ -814,8 +822,6 @@ class Geography {
 		return true;
 	}
 
-
-
 	public function findRandomPoint() {
 		// FIXME: this should run on the database using the passable check and code from here: http://trac.osgeo.org/postgis/wiki/UserWikiRandomPoint
 		$iterations = 0;
@@ -861,35 +867,6 @@ class Geography {
 			$iterations++;
 		}
 		return array(false,false, false);
-	}
-
-	public function findNearestHouse(Character $character) {
-		$query = $this->em->createQuery('SELECT f, ST_Distance(f.location, c.location) AS distance FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :char AND t.name = :type AND f.active = true ORDER BY distance ASC');
-		$query->setParameters(array('char'=> $character, 'type'=>'house'));
-		$query->setMaxResults(1);
-		$results = $query->getResult();
-		if ($results) {
-			return $results[0];
-		} else {
-			return false;
-		}
-	}
-
-	public function findHousesNearMe(Character $character, $maxdistance=-1) {
-		if ($maxdistance==-1) {
-			$maxdistance = $this->calculateInteractionDistance($character);
-		}
-		$query = $this->em->createQuery('SELECT f as feature FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :me AND t.hidden = false AND t.name = :type AND ST_DWithin(f.location, c.location, :maxdistance) = true');
-		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance, 'type'=>'house'));
-		return $query->getResult();
-	}
-
-	public function findHousesInSpotRange(Character $character) {
-		return $this->findHousesNearMe($character, $this->calculateSpottingDistance($character));
-	}
-
-	public function findHousesInActionRange($character) {
-		return $this->findHousesNearMe($character);
 	}
 
 	public function getDistance($locA, $locB) {
