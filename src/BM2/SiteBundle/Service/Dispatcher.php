@@ -78,7 +78,7 @@ class Dispatcher {
 		this is our main entrance, fetching the character data from the appstate as well as the nearest settlement
 		and then applying any (optional) test on the whole thing.
 	*/
-	public function gateway($test=false, $getSettlement=false, $check_duplicate=true) {
+	public function gateway($test=false, $getSettlement=false, $check_duplicate=true, $getPlaces=false) {
 		$character = $this->getCharacter();
 		if (!$character || ! $character instanceof Character) {
 			/* Yes, if it's not a character, we return it. We check this on the other side again, and redirect if it's not a character.
@@ -87,7 +87,11 @@ class Dispatcher {
 			When Dispatcher calls AppState to get the character, it adds a flash message explaining why it's not returning a character.
 			That flash will then generate on the route the calling Controller will redirect to, explaining to the user what's going on.*/
 			if ($getSettlement) {
-				return array($character, null);
+				if (!$getPlaces) {
+					return array($character, null); #Most common first.
+				} else {
+					return array($character, null, null);
+				}
 			} else {
 				return $character;
 			}
@@ -102,10 +106,17 @@ class Dispatcher {
 			}
 			if ($getSettlement) {
 				$settlement = $this->getActionableSettlement();
+				if ($getPlaces) {
+					$place = $this->geography->findNearestActionablePlace($character);
+				}
 			}
 		}
 		if ($getSettlement) {
-			return array($character, $settlement);
+			if (!$getPlaces) {
+				return array($character, $settlement); #Most common first.
+			} else {
+				return array($character, $settlement, $place); #This is currently used on a single page. Should be rarest of three.
+			}
 		} else {
 			return $character;
 		}
