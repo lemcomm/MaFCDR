@@ -7,8 +7,10 @@
 		<field name="stage" type="integer"/>
 		<field name="max_stage" type="integer"/>
 		<field name="encircled" type="boolean"/>
+		<field name="encirclement" type="integer" nullable="true"/>
 
 		<one-to-one field="settlement" target-entity="Settlement" inversed-by="siege"/>
+		<one-to-one field="place" target-entity="Place" inversed-by="siege"/>
 		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="siege"/>
 		<one-to-one field="attacker" target-entity="BattleGroup" inversed-by="attacking_in_siege"/>
 		<one-to-many field="battles" target-entity="Battle" mapped-by="siege"/>
