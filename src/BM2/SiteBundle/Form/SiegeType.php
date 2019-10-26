@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Form;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Siege;
 
@@ -20,9 +21,9 @@ use Doctrine\ORM\EntityRepository;
 
 class SiegeType extends AbstractType {
 
-	public function __construct(Character $character, Settlement $settlement, Siege $siege, $action = null) {
+	public function __construct(Character $character, $location, Siege $siege, $action = null) {
 		$this->character = $character;
-		$this->settlement = $settlement;
+		$this->location = $location;
 		$this->siege = $siege;
 		$this->action = $action;
 	}
@@ -36,6 +37,7 @@ class SiegeType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$siege = $this->siege;
+		$location = $this->location;
 		$settlement = $this->settlement;
 		$character = $this->character;
 		$action = $this->action;
@@ -101,13 +103,24 @@ class SiegeType extends AbstractType {
 				# Defender leader can also just leave, because he might be alone.
 				$actionslist = array_merge($actionslist, array('leave' => 'military.siege.leave.name'));
 			}
-			if (
-				(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character)
-				|| (!$defLeader && $isDefender && !$settlement->getCharactersPresent()->contains($settlement->getOwner()))
-				|| (!$attLeader && $isAttacker)
-			) {
-				# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
-				$actionslist = array_merge($actionslist, array('assume'=>'military.siege.assume.name'));
+			if ($location instanceof Settlement) {
+				if (
+					(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character)
+					|| (!$defLeader && $isDefender && !$settlement->getCharactersPresent()->contains($settlement->getOwner()))
+					|| (!$attLeader && $isAttacker)
+				) {
+					# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
+					$actionslist = array_merge($actionslist, array('assume'=>'military.siege.assume.name'));
+				}
+			} elseif ($location instanceof Place) {
+				if (
+					(!$defLeader && $isDefender && $character->getInsidePlace() == $settlement && $place->getOwner() == $character)
+					|| (!$defLeader && $isDefender && !$place->getCharactersPresent()->contains($place->getOwner()))
+					|| (!$attLeader && $isAttacker)
+				) {
+					# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
+					$actionslist = array_merge($actionslist, array('assume'=>'military.siege.assume.name'));
+				}
 			}
 			if (!$siege->getBattles()->isEmpty()) {
 				# If there's a battle ongoing, anyone can opt to join it. If the leader does, they'll be able to call their entire force into action.
@@ -225,7 +238,7 @@ class SiegeType extends AbstractType {
 						'data'=>'joinsiege'
 					));
 					# Later we'll extend this to include reinforcing parties, hence the arrays. Those looking to attack the attackers and those looking to attack the defenders but weren't part of the original siege (presumably because they showed up late).
-					if ($character->getInsideSettlement() == $settlement) {
+					if ($character->getInsideSettlement() == $location || $character->getInsidePlace() == $location) {
 						$sides = array('defenders' => 'military.siege.side.defenders');
 					} else {
 						$sides = array('attackers' => 'military.siege.side.attackers');
