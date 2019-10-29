@@ -132,7 +132,7 @@ class BattleRunner {
 				$this->report->setAssault(TRUE);
 				$myStage = $battle->getSiege()->getStage();
 				$maxStage = $battle->getSiege()->getMaxStage();
-				if ($myStage > 1 && $myStage == $maxStage) {
+				if ($myStage > 2 && $myStage == $maxStage) {
 					$location = array('key'=>'battle.location.castle', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
 					$this->siegeFinale = TRUE;
 				} else {
