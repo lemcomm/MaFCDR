@@ -168,14 +168,14 @@ class Economy {
 			}
                         $workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
-				// Just how many people are we short!? All we have left is defenses... 
+				// Just how many people are we short!? All we have left is defenses...
 				foreach ($settlement->getBuildings() as $building) {
 					if ($building->isActive()) {
 						$building->setActive(false);
 						$building->setCondition(-rand(10,200));
 					}
 				}
-			} 
+			}
 			$workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
 				// This should be utterly impossible to ever happen (but it does, occasionally), so log if it does because that means something is really wrong
@@ -323,7 +323,7 @@ class Economy {
 				/* TODO: I don't think I want these implemented quite yet.
 				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
 					return false;
-				} 
+				}
 				*/
 				return false;
 				break;
@@ -476,10 +476,10 @@ class Economy {
 					);
 				}
 			}
-			
+
 			if ($settlement->getStarvation() < 10) {
 				// starvation effect = (x/10)^2 - meaning that the first few days it's barely noticeable, and full effect after 10 days of 0 food or the equivalent of some shortage
-				$starvation = pow($settlement->getStarvation()/10,2); 
+				$starvation = pow($settlement->getStarvation()/10,2);
 				if ($settlement->getStarvation() >= 9) {
 					$this->history->logEvent(
 						$settlement,
@@ -511,7 +511,7 @@ class Economy {
 		}
 
 		// TODO: take other resources, especially goods, into consideration as well
-		// TODO: only grow when we've had a bit of a surplus for some days, otherwise we will never have a reserve, I think. 
+		// TODO: only grow when we've had a bit of a surplus for some days, otherwise we will never have a reserve, I think.
 		//			Basically, population should not follow food production so closely as it does now
 		//			we could code this by checking for the surplus storage
 		$growth = sqrt(1-exp(-pow($shortage,2)))*$sign;
@@ -664,8 +664,8 @@ class Economy {
 			return 0;
 		}
 
-		// formula is y=ln(y*(x+1/y)) with 
-		// x = workforce/baseresource and y an arbitrary growth factor. 
+		// formula is y=ln(y*(x+1/y)) with
+		// x = workforce/baseresource and y an arbitrary growth factor.
 		// 3 seems to work out to about 2x food = sustainable population
 		// the +1/3 is just to ensure that 0 = 0
 		if ($resource->getName() == 'food') {
@@ -674,7 +674,7 @@ class Economy {
 		} else {
 			$production = log(3 * (($workforce / $baseresource) + 1/3));
 		}
-		
+
 		switch ($resource->getName()) {
 			case 'food':	// security bonus - only for food and money
 			case 'money':
@@ -685,7 +685,7 @@ class Economy {
 				break;
 		}
 
-		/* TODO: 
+		/* TODO:
 			land-intensive resources (food, to a lesser extent wood, even less metal) should decline
 			with increasing population density as more and more land is used as living space
 			basically: production *= min(1, x/density);
@@ -695,7 +695,7 @@ class Economy {
 
 			one idea would be to actually calculate an "arabale land area" value for a geodata. but that would only make sense for food, at least using that term.
 
-			One or more of these ideas would make regions possible that create constant amounts of surplus food without simply growing 
+			One or more of these ideas would make regions possible that create constant amounts of surplus food without simply growing
 			because of it (or rather, which have an equilibrium point with surplus food).
 		*/
 
@@ -753,9 +753,9 @@ class Economy {
 		$corruption = $this->calculateCorruption($settlement);
 		if ($split_results) {
 			return array(
-				'base' => round($need), 
-				'operation' => round($buildings_operation), 
-				'construction' => round($buildings_construction), 
+				'base' => round($need),
+				'operation' => round($buildings_operation),
+				'construction' => round($buildings_construction),
 				'corruption' => round($total * $corruption)
 			);
 		} else {
@@ -813,7 +813,7 @@ class Economy {
 		if ($militia >= 100) {
 			$security += 0.1;
 		} else {
-			$security += sqrt($militia/100)/10; 
+			$security += sqrt($militia/100)/10;
 		}
 
 		$thralls = $settlement->getThralls();
@@ -881,8 +881,8 @@ class Economy {
 		$query->setParameters(array('resource'=>$resource, 'here'=>$settlement));
 
 		foreach ($query->getResult() as $trade) {
-			if ($trade->getDestination() == $settlement && (!$trade->getSource()->getSiege() || ($settlement->getSiege() && $settlement->getSiege()->getEncircled()))) {
-				// incoming trade; only counts if source isn't besieged AND we're not encircled.
+			if ($trade->getDestination() == $settlement && ((!$trade->getSource()->getSiege() || ($trade->getSource()->getSiege() && !$trade->getSource()->getSiege()->getEncirlced())) || ($settlement->getSiege() && $settlement->getSiege()->getEncircled()))) {
+				// incoming trade; only counts if source isn't encirlced AND we're not encircled.
 				$amount += $trade->getAmount();
 			} else if (!($settlement->getSiege() && $settlement->getSiege()->getEncircled())) {
 				// outgoing trade, only counts if we're not encircled.
@@ -1021,7 +1021,7 @@ class Economy {
 		if ($feature->getCondition() + $workhours >= 0) {
 			$feature->setActive(true);
 			$feature->setCondition(0);
-			$feature->setWorkers(0);			
+			$feature->setWorkers(0);
 			return true;
 		} else {
 			$feature->setCondition($feature->getCondition()+round($workhours));
