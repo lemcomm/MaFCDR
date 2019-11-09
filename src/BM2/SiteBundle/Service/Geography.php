@@ -23,7 +23,7 @@ class Geography {
 
 	private $embark_distance = 200;
 	private $road_buffer = 200;
-	private $place_separation = 1000;
+	private $place_separation = 500;
 
 	private $base_speed = 12000; // 12km a day base speed
 	private $spotBase = -1;
@@ -475,7 +475,11 @@ class Geography {
 	}
 
 	public function checkPlacePlacement(Character $character) {
-		return $this->findPlacesnearMe($character, $this->place_separation);
+		if ($this->findPlacesNearMe($character, $this->place_separation)) {
+			return false; #Too close!
+		} else {
+			return true; #Good to go!
+		}
 	}
 
 	public function findBattlesNearMe(Character $character, $maxdistance) {
