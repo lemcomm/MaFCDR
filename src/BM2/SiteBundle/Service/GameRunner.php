@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Building;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\GeoData;
+use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
@@ -14,6 +15,8 @@ use BM2\SiteBundle\Entity\Ship;
 use Calitarus\MessagingBundle\Service\MessageManager;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -84,7 +87,7 @@ class GameRunner {
 		}
 
 		switch ($type) {
-			case 'update':		$pattern = '/^update(.+)$/'; 
+			case 'update':		$pattern = '/^update(.+)$/';
 									$this->speedmod = 1/6; // since this happens every hour and not just every 6 hours
 									break;
 			case 'turn':
@@ -121,7 +124,7 @@ class GameRunner {
 		$query->setParameter('cycle', 'cycle.'.'%');
 		$query->execute();
 		$this->em->flush();
-		return true;		
+		return true;
 	}
 
 	/*
@@ -132,6 +135,68 @@ class GameRunner {
 
 		all of these return true if cycle complete, false otherwise
 	*/
+
+	# Due to the nature of GameRequests, we need them to be checked before anything else, as they can invalidate the results of other turn/update checks. Hence, theyr'e first in the list.
+	public function runGameRequestCycle() {
+		$last = $this->appstate->getGlobal('cycle.gamerequest', 0);
+		if ($last==='complete') return true;
+		$this->logger->info("Game Request Cycle...");
+
+		$now = new \DateTime("now");
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.expires <= :now')->setParameter('now', $now);
+		$result = $query->iterate();
+		while ($row = $result->next()) {
+			if ($row->getFromCharacter()->getUnitSettings()->getSupplier() == $row->getToSettlement()) {
+				$char = $row->getFromCharacter();
+				$this->logger->info("Character ".$char->getName()." (".$char->getId().") may be using request for food...");
+				# Character supplier matches target settlement, we need to see if this is still a valid food source.
+
+				# Get all character realms.
+				$myRealms = $char->findRealms();
+				$settlements = new ArrayCollection;
+
+				foreach ($myRealms as $realm) {
+					if ($realm->getCapital()) {
+						$settlements->add($realm->getCapital());
+					}
+				}
+				if ($char->getLiege()) {
+					$liege = $character->getLiege();
+					foreach ($liege->getOwnedSettlements() as $settlement) {
+						if ($settlement->getPermissions()->getFeedSoldiers()) {
+							$settlements->add($settlement);
+						}
+					}
+				}
+				$expr = new Comparison('type', '=', 'soldier.food');
+				$expr2 = new Comparison('accepted', '=', true);
+				$expr3 = new Comparison('expires', '<=', $now);
+				$criteria = new Critera();
+				$criteria->where($expr)->andWhere($expr2);
+				# Basically, we only care about accepted, non-expired requests about food.
+				if ($char->getRequests()->count() > 1) {
+					$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
+					foreach ($filtered as $req) {
+						if ($req != $row) {
+							$settlements->add($req->getToSettlement());
+						}
+					}
+				}
+				if (!$settlements->contains($row->getToSettlement())) {
+					$row->getToSettlement()->getSuppliedUnits()->remove($char->getUnitSettings());
+					$char->getUnitSettings()->setSupplier(null);
+				}
+			}
+			$this->em->remove($row);
+			# We're doing it this way as a direct delete request skips a lot of the doctrine cascades and relation updates.
+			# Yes, this is slower than just a DQL delete, but it's also a bit more resilient and less likely to break things down the line.
+		}
+		$this->em->flush();
+		$this->em->clear();
+
+		$this->appstate->setGlobal('cycle.gamerequest', 'complete');
+		return true;
+	}
 
 	public function runCharactersUpdatesCycle() {
 		$last = $this->appstate->getGlobal('cycle.characters', 0);
@@ -239,7 +304,7 @@ class GameRunner {
 						} else {
 							$this->logger->info("No inheritance. Removing them from ".$position->getName());
 							$this->history->logEvent(
-								$position->getRealm(), 
+								$position->getRealm(),
 								'event.position.death',
 								array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 								History::LOW, true
@@ -261,9 +326,9 @@ class GameRunner {
 		}
 		foreach ($slumbered as $character) {
 			if ($character->getSystem() != 'procd_inactive') {
-				$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");	
+				$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");
 				$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
-				if ($character->getPositions()) {			
+				if ($character->getPositions()) {
 					foreach ($character->getPositions() as $position) {
 						if ($position->getRuler()) {
 							$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
@@ -382,7 +447,7 @@ class GameRunner {
 								array(),
 								History::ULTRA, true
 							);
-						}	
+						}
 					}
 				}
 				$character->setSystem('procd_inactive');
@@ -410,10 +475,10 @@ class GameRunner {
 		$players = $query->getSingleScalarResult();
 		# $want = ceil($players/8);
 		$want = 0;
-		
+
 		$active_npcs = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true')->getSingleScalarResult();
 		$cullability = $this->em->createQuery('SELECT count(c) FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true and c.user IS NULL')->getSingleScalarResult();
-		
+
 		$this->logger->info("we want $want NPCs for $players players, we have $active_npcs");
 		if (0 < $active_npcs AND $active_npcs < $want) {
 			$npc = $this->npc->createNPC();
@@ -424,7 +489,7 @@ class GameRunner {
 			$culled = 0;
 			$this->logger->info("Too many NPCs, attempting to cull $cullcount NPCs");
 			$this->logger->info("If players have NPC's already, it's not possible to cull them, so don't freak out if you see this every turn.");
-			
+
 			while ($cullability > 0 AND $culled < $cullcount) {
 				$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true AND c.alive = true AND c.user IS NULL');
 				foreach ($query->getResult() as $potentialculling) {
@@ -443,7 +508,7 @@ class GameRunner {
 			}
 		}
 
-		if ($active_npcs > 0) {		
+		if ($active_npcs > 0) {
 			$this->logger->info("Proceeding to check for recyclable NPCs...");
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.npc = true');
 			foreach ($query->getResult() as $npc) {
@@ -490,7 +555,7 @@ class GameRunner {
 					} else {
 						$importance = HISTORY::LOW;
 					}
-					$this->history->logEvent( 
+					$this->history->logEvent(
 						$des['character'],
 						'event.character.desertions',
 						array('%complaining%'=>$des['complaining'], '%gone%'=>$des['gone']),
@@ -574,7 +639,7 @@ class GameRunner {
 		$query->execute();
 
 		// militia
-		// dead militia is auto-buried 
+		// dead militia is auto-buried
 		// need to manually delete this because the cascade doesn't work if I delete by DQL, we also use the opportunity to clean up orphaned records
 		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:SoldierLog l WHERE l.soldier IS NULL OR l.soldier IN (SELECT s.id FROM BM2SiteBundle:Soldier s WHERE s.base IS NOT NULL AND s.alive=false)');
 		$query->execute();
@@ -587,13 +652,13 @@ class GameRunner {
 		$query->execute();
 
 		// militia auto-resupply
-		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Soldier s WHERE s.base IS NOT NULL AND s.alive=true AND s.wounded=0 AND s.routed=false AND 
+		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Soldier s WHERE s.base IS NOT NULL AND s.alive=true AND s.wounded=0 AND s.routed=false AND
 			(s.has_weapon=false OR s.has_armour=false OR s.has_equipment=false)');
 		$iterableResult = $query->iterate();
 		$i=1;
 		while ($row = $iterableResult->next()) {
 			$soldier = $row[0];
-			$this->milman->resupply($soldier, $soldier->getBase()); 
+			$this->milman->resupply($soldier, $soldier->getBase());
 
 			if (($i++ % $this->batchsize) == 0) {
 				$this->em->flush();
@@ -632,7 +697,7 @@ class GameRunner {
 				$days = $s['days'];
 			} else {
 				$d = array_shift($row);
-				$days = $d['days'];				
+				$days = $d['days'];
 			}
 			if (rand(0,250) < $days) {
 				$disband_soldiers++;
@@ -658,7 +723,7 @@ class GameRunner {
 				$days = $e['days'];
 			} else {
 				$d = array_shift($row);
-				$days = $d['days'];				
+				$days = $d['days'];
 			}
 			if (rand(0,200) < ($days-20)) {
 				$disband_entourage++;
@@ -673,7 +738,7 @@ class GameRunner {
 
 		if ($disband_soldiers > 0 || $disband_entourage > 0) {
 			$this->logger->info("disbanded $disband_soldiers soldiers and $disband_entourage entourage.");
-		} 
+		}
 
 		// clean out knight offers that have gone empty
 		$query = $this->em->createQuery('SELECT o as offer, count(s) as soldiers FROM BM2SiteBundle:KnightOffer o LEFT JOIN o.soldiers s WHERE o.give_settlement=false GROUP BY o');
@@ -738,7 +803,7 @@ class GameRunner {
 			}
 		}
 
-		if ($complete) {	
+		if ($complete) {
 			$this->appstate->setGlobal('cycle.action', 'complete');
 		} else {
 			$this->appstate->setGlobal('cycle.action', $lastid);
@@ -835,10 +900,10 @@ class GameRunner {
 		if ($last==='complete') return true;
         	$last=(int)$last;
 		$this->logger->info("Realms Cycle...");
-		
+
 		$timeout = new \DateTime("now");
 		$timeout->sub(new \DateInterval("P7D"));
-		
+
 		$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p JOIN p.realm r LEFT JOIN p.holders h WHERE r.active = true AND p.ruler = true AND h.id IS NULL AND p NOT IN (SELECT y FROM BM2SiteBundle:Election x JOIN x.position y WHERE x.closed=false) GROUP BY p');
 		$result = $query->getResult();
 		$this->logger->notice("Checking for inactive realms...");
@@ -851,10 +916,10 @@ class GameRunner {
 				$this->logger->notice("-- realm deserted, making inactive.");
 				$realm = $position->getRealm();
 				$this->rm->abandon($realm);
-			} 
+			}
 		}
 		$this->logger->info("Checking for missing realm conversations...");
-		
+
 		$realmquery = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
 		$realms = $realmquery->getResult();
 		foreach ($realms as $realm) {
@@ -952,19 +1017,19 @@ class GameRunner {
 		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
 		$query->setParameter('now', new \DateTime("now"));
 		$seenpositions = [];
-	    
-		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections, 
-		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old. 
-		Mind you, this will only drop holders if the election has $routine = true set. 
+
+		/* The following 2 foreach cycles drop all incumbents from a position before an election is counted and then count all elections,
+		ensuring that the old is removed before the new arrives, so we don't accidentally remove the new with the old.
+		Mind you, this will only drop holders if the election has $routine = true set.
 		Or rather, if the election was caused by the game itself. All other elections are ignored. --Andrew */
-	    
+
 		foreach ($query->getResult() as $election) {
 			$this->logger->info("-Reviewing election ".$election->getId());
-			
+
 			/* dropIncumbents will drop ALL incumbents, so we don't care to do this mutliple times for the same position--it's a waste of processing cycles.
 			It's worth nothing that dropIncumbents only does anything on elections called by the game itself,
 			Which you can see if you go look at the method in the realm manager. */
-			
+
 			if($election->getPosition()) {
 				$this->logger->info("--Position detected");
 				if(!in_array($election->getPosition()->getId(), $seenpositions)) {
@@ -987,7 +1052,7 @@ class GameRunner {
 			2. Ensure all vacant AND elected positions have a holder.
 			3. Ensure all positions that should have more than one holder do.
 		These things will only happen if there is not already an election running for a given position though. */
-	    
+
 		$this->logger->info("Checking realm rulers, vacant electeds, and minholders...");
 		$timeout = new \DateTime("now");
 		$timeout->sub(new \DateInterval("P7D")); // hardcoded to 7 day intervals between election attempts
@@ -1010,7 +1075,7 @@ class GameRunner {
 						$this->logger->notice("-- election triggered.");
 						$electiontype = 'noruler';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
-			
+
 						$msg = "Automatic election number ".$counter." has been triggered for the position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
 						$systemflag = 'announcements';
 						$this->postToRealm($position, $systemflag, $msg);
@@ -1175,11 +1240,11 @@ class GameRunner {
 
 	public function findHeir(Character $character, Character $from=null) {
 		// NOTE: This should match the implemenation on CharacterManager.php
-		if (!$from) { 
-			$from = $character; 
+		if (!$from) {
+			$from = $character;
 		}
 
-		if ($this->seen) { 
+		if ($this->seen) {
 			// loops back to someone we've already checked
 			return array(false, false);
 		} else {
@@ -1249,7 +1314,7 @@ class GameRunner {
 			case 'general':
 				$query->setParameter('system', 'general');
 				break;
-		}				
+		}
 		$query->setParameter('realm', $position->getRealm());
 		$targetconvo = $query->getResult();
 
@@ -1260,7 +1325,7 @@ class GameRunner {
 	}
 
 	public function setupElection(RealmPosition $position, $electiontype=null, $routine=false, $counter=null) {
-		$election = new Election;				
+		$election = new Election;
 		$election->setRealm($position->getRealm());
 		$election->setPosition($position);
 		$election->setOwner(null);
