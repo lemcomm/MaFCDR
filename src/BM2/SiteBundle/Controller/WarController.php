@@ -115,12 +115,56 @@ class WarController extends Controller {
 	}
 
 	/**
+	  * @Route("/settlement/defend")
+	  * @Template
+	  */
+	public function defendSettlementAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryDefendSettlementTest', true);
+		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
+			->add('submit', 'submit', array(
+				'label'=>'military.settlement.defend.submit',
+				))
+			->getForm();
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$act = new Action;
+			$act->setType('settlement.defend')->setCharacter($character)->setTargetSettlement($settlement);
+			$act->setBlockTravel(false);
+			$result = $this->get('action_manager')->queue($act);
+			return array('settlement'=>$settlement, 'result'=>$result);
+		}
+		return array('settlement'=>$settlement, 'form'=>$form->createView());
+	}
+
+	/**
+	  * @Route("/place/defend")
+	  * @Template
+	  */
+	public function defendPlaceAction(Request $request) {
+		list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militaryDefendPlaceTest', true, null, true);
+		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
+			->add('submit', 'submit', array(
+				'label'=>'military.place.defend.submit',
+				))
+			->getForm();
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$act = new Action;
+			$act->setType('place.defend')->setCharacter($character)->setTargetPlace($place);
+			$act->setBlockTravel(false);
+			$result = $this->get('action_manager')->queue($act);
+			return array('place'=>$settlement, 'result'=>$result);
+		}
+		return array('place'=>$place, 'form'=>$form->createView());
+	}
+
+	/**
 	  * @Route("/siege")
 	  * @Template
 	  */
 	public function siegeAction(Request $request) {
 		# Security check.
-		list($character, $settlement, $places) = $this->get('dispatcher')->gateway(false, true, null, true); # Welcome to the only place in the game to ask for a place. :P
+		list($character, $settlement, $places) = $this->get('dispatcher')->gateway(false, true, null, true); # Welcome to the original place in the game to ask for a place. :P
 
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
