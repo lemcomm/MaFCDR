@@ -47,5 +47,17 @@ class Siege {
 
 		return $allsiegers;
 	}
+
+	public function updateEncirclement() {
+		$chars = $this->getCharacters();
+		$count = 0;
+		foreach ($chars as $char) {
+			$count = $count + $char->getActiveSoldiers()->count();
+		}
+		if ($count >= $this->encirclement) {
+			$this->encirlced = TRUE;
+		}
+		return TRUE;
+	}
 	
 }
