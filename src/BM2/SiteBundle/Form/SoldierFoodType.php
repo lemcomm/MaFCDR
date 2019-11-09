@@ -17,11 +17,10 @@ use Doctrine\ORM\EntityRepository;
 
 class SoldierFoodType extends AbstractType {
 
-	private $realms;
+	private $settlements;
 
-	public function __construct($realms, $char) {
-		$this->realms = $realms;
-		$this->char = $char;
+	public function __construct($settlements) {
+		$this->settlements = $settlements;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -32,8 +31,7 @@ class SoldierFoodType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$realms = $this->realms;
-		$char = $this->char;
+		$settlements = $this->settlements;
 
 		if (date("m") == 12) {
 			$year = date("Y")+1;
@@ -60,12 +58,18 @@ class SoldierFoodType extends AbstractType {
 			'label' => 'request.soldierfood.estate',
 			'class'=>'BM2SiteBundle:Settlement',
 			'choice_label'=>'name',
-			'query_builder'=>function(EntityRepository $er) use ($realms) {
-				$qb = $er->createQueryBuilder('e');
-				$qb->where('e.realm IN (:realms)')->join('e.realm', 'r')->andWhere('s.owner != :char')->setParameters(array('realms'=>$realms, 'char'=>$char));
-				$qb->orderBy('r.name')->addOrderBy('e.name');
+			'choices'=>$settlements,
+			'query_builder'=>function(EntityRepository $er) use ($settlements) {
+				$qb = $er->createQueryBuilder('s');
+				$qb->where('s in :settlements')->setParameter('settlements', $settlements)->orderBy('s.realm.name', 'ASC')->addOrderBy('s.name');
 				return $qb;
-			},
+				},
+			#'query_builder'=>function(EntityRepository $er) use ($settlements, $char) {
+			#	$qb = $er->createQueryBuilder('s');
+			#	$qb->join('s.realm', 'r')->where('s.realm IN (:realms)')->andWhere('s.owner != :char')->setParameters(array('realms'=>$realms, 'char'=>$char));
+			#	$qb->orderBy('r.name')->addOrderBy('s.name');
+			#	return $qb;
+			#},
 			'group_by' => function($val, $key, $index) {
 				return $val->getRealm()->getName();
 			},
