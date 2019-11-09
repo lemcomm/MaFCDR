@@ -42,6 +42,11 @@ class Interactions {
 			if ($character->isInBattle()) {
 				return false;
 			}
+
+			// if there is a siege going on and they've encircled the place, we can't enter
+			if ($settlement->getSiege() && $settlement->getSiege()->getEncircled()) {
+				return false;
+			}
 		}
 
 		// TODO: check if settlement in action range
@@ -125,6 +130,11 @@ class Interactions {
 			return false;
 		}
 
+		if ($settlement->getSiege() && $settlement->getSiege()->getEncircled()) {
+			// the large army outside the gate (and the gatekeepers protecting you) laugh at your attempts to leave.
+			return false;
+		}
+
 		// don't ask me why, but the below two lines work in this order and FAIL if reversed. Yeah. Fuck Doctrine.
 		// $settlement->removeCharactersPresent($character); => Symfony 2.7 turns this into a DELETE - WTF ???
 		$character->setInsideSettlement(null);
@@ -132,6 +142,14 @@ class Interactions {
 		// close history log
 		if ($settlement->getOwner() != $character) {
 			$this->history->closeLog($settlement, $character);
+		}
+
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getSettlement()) {
+			# If you leave a settlement while in a place in the settlement, you leave the place as well. How logical. :P
+			$leftPlace = $this->characterLeavePlace($character);
+			if (!$leftPlace) {
+				return false; # We appear to be trapped in the Place!
+			}
 		}
 
 		$this->history->logEvent(
@@ -234,14 +252,13 @@ class Interactions {
 			return true; // we are already inside
 		}
 
-		if (!$this->pm->checkSettlementPermission($place, $character, 'visit')) {
+		if (!$this->pm->checkPlacePermission($place, $character, 'visit')) {
 				return false;
 		}
 
-		/* Leaving this here for when we make Places defensible.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($place->isFortified() && !$this->pm->checkPlacePermission($place, $character, 'visit')) {
 				return false;
 			}
 
@@ -250,9 +267,13 @@ class Interactions {
 				return false;
 			}
 		}
-		*/
 
-		// TODO: check if settlement in action range
+		if ($place->getSettlement() != $character->getInsideSettlement()) {
+			// Not in the settlement the place is in.
+			return false;
+		}
+
+		// TODO: check if place in action range
 		$character->setInsidePlace($place);
 		$place->addCharactersPresent($character);
 
@@ -287,7 +308,6 @@ class Interactions {
 			$this->history->visitLog($place, $character);
 		}
 
-		/* Leaving this here for when we make places defensible.
 		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
 		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
 		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
@@ -305,7 +325,6 @@ class Interactions {
 				History::LOW, true, 10
 			);
 		}
-		*/
 
 		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
@@ -334,12 +353,10 @@ class Interactions {
 		$place = $character->getInsidePlace();
 		if (!$place) return false;
 
-		/* Leaving this for when Places are defensible.
-		if ($force && (!$settlement->isFortified() || $this->pm->checkSettlementPermission($settlement, $character, 'visit'))) {
+		if ($force && (!$place->isFortified() || $this->pm->checkPlacePermission($settlement, $character, 'visit'))) {
 			// people with visiting permission cannot be forced out
 			return false;
 		}
-		*/
 
 		// don't ask me why, but the below two lines work in this order and FAIL if reversed. Yeah. Fuck Doctrine.
 		// $settlement->removeCharactersPresent($character); => Symfony 2.7 turns this into a DELETE - WTF ???
