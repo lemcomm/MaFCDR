@@ -307,7 +307,7 @@ class CharacterController extends Controller {
 				// sign up with a lord by taking his offer
 				$data = $form_offer->getData();
 				if (!$data['offer']) {
-					throw $this->createNotFoundException('error.notfound.offer');				
+					throw $this->createNotFoundException('error.notfound.offer');
 				}
 
 				$startlocation = $data['offer']->getSettlement();
@@ -801,7 +801,7 @@ class CharacterController extends Controller {
 
 		return array('form'=>$form->createView());
 	}
-	
+
    /**
      * @Route("/settings")
      * @Template
@@ -820,16 +820,16 @@ class CharacterController extends Controller {
 			$data = $form->getData();
 #			$character->setAutoReadRealms($data->getAutoReadRealms());
 			$em->flush();
-			
+
 
 			$this->addFlash('notice', $this->get('translator')->trans('update.success', array(), 'settings'));
 
 			return $this->redirectToRoute('bm2_recent');
 		}
-			
+
 		return array('form'=>$form->createView());
 	}
-	
+
    /**
      * @Route("/kill")
      * @Template
@@ -903,7 +903,7 @@ class CharacterController extends Controller {
 		}
 		return array('form'=>$form->createView());
 	}
-	
+
    /**
      * @Route("/retire")
      * @Template
@@ -1067,12 +1067,12 @@ class CharacterController extends Controller {
 		}
 
 		$available = array();
-		
+
 		# Get all crests for the current user.
 		foreach ($character->getUser()->getCrests() as $crest) {
 			$available[] = $crest->getId();
 		}
-		
+
                 # Check for parents having different crests.
                 foreach ($character->getParents() as $parent) {
                         if ($parent->getCrest()) {
@@ -1266,7 +1266,7 @@ class CharacterController extends Controller {
 			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100)
 		);
 	}
-	
+
    /**
      * @Route("/unitsettings")
      * @Template
@@ -1292,13 +1292,13 @@ class CharacterController extends Controller {
 		# Build the list of settlements we can get food from...
 		$query = $em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$character, 'type'=>'soldier.food'));
 		$results = $query->getResult();
-		# Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'. 
-		# Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0. 
+		# Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'.
+		# Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0.
 		# Which will never happen.
 		if (count($results) < 1) {
 			$settlements = 0;
 		} else {
-			$settlements = array();		
+			$settlements = array();
 			foreach ($query->getResult() as $result) {
 				$settlements[] = $result->getToSettlement()->getId();
 			}
@@ -1314,7 +1314,7 @@ class CharacterController extends Controller {
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('unit.success', array('%name%'=>$data->getName()), 'settings'));
 		}
-			
+
 		return array('form'=>$form->createView());
 	}
 
@@ -1332,7 +1332,7 @@ class CharacterController extends Controller {
 				return new Response(json_encode(array('turns'=>0, 'prisoner'=>true)));
 			}
 			if ($character->getUser()->getRestricted()) {
-				return new Response(json_encode(array('turns'=>0, 'restricted'=>true)));				
+				return new Response(json_encode(array('turns'=>0, 'restricted'=>true)));
 			}
 			$em = $this->getDoctrine()->getManager();
 			$points = $request->request->get('route');
