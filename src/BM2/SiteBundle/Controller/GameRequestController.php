@@ -31,7 +31,7 @@ class GameRequestController extends Controller {
 
 	private function security(Character $char, GameRequest $id) {
 		/* Most other places in the game have a single dispatcher call to do security. Unfortunately, for GameRequests, it's not that easy, as this file handles *ALL* processing of the request itself.
-		That means, we need a way to check whether or not a given user has rights to do things, when the things in questions could vary every time this controller is called. 
+		That means, we need a way to check whether or not a given user has rights to do things, when the things in questions could vary every time this controller is called.
 		Yes, I realize this is a massive bastardization of how Symfony says Symfony is supposed to handle things, mainly that they say this should be in a Service as it's all back-end stuff, but if it works, it works.
 		Maybe in the future, when I'm looking to refine things, we can move it around then. Really, all that'd change is these being moved to the service and returning a true or false--personally I like all the logic being in one place though.*/
 		$result;
@@ -57,7 +57,7 @@ class GameRequestController extends Controller {
 	/**
 	  * @Route("/{id}/approve", name="bm2_gamerequest_approve", requirements={"id"="\d+"})
 	  */
-	
+
 	public function approveAction(GameRequest $id) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -121,14 +121,14 @@ class GameRequestController extends Controller {
 				}
 				break;
 		}
-		
+
 		return new Response();
 	}
 
 	/**
 	  * @Route("/{id}/deny", name="bm2_gamerequest_deny", requirements={"id"="\d+"})
 	  */
-	
+
 	public function denyAction(GameRequest $id) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -177,7 +177,7 @@ class GameRequestController extends Controller {
 				}
 				break;
 		}
-		
+
 		return new Response();
 	}
 
@@ -206,29 +206,33 @@ class GameRequestController extends Controller {
 	  */
 
 	public function soldierfoodAction(Request $request) {
-		# Get player character from security and check their access.		
+		# Get player character from security and check their access.
 		$character = $this->get('dispatcher')->gateway('personalRequestSoldierFoodTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 		# Get all character realms.
 		$myRealms = $character->findRealms();
-		$topRealms = new ArrayCollection;
-		# Sort through all realms and compile collection of top realms.
+		$settlements = new ArrayCollection;
+
 		foreach ($myRealms as $realm) {
-			if (!$topRealms->contains($realm->findUltimate())) {
-				$topRealms->add($realm->findUltimate());
+			if ($realm->getCapital()) {
+				$settlements->add($realm->getCapital());
 			}
 		}
-		# Establish realm IDs array, go through all top realms to find all inferior realms (including self, hence the 'true') and add the realm IDs to $realms.
-		$realms = array();
-		foreach ($topRealms as $topRealm) {
-			foreach ($topRealm->findAllInferiors(true) as $indRealm) {
-				$realms[] = $indRealm->getId();
+		if ($character->getLiege()) {
+			$liege = $character->getLiege();
+			foreach ($liege->getOwnedSettlements() as $settlement) {
+				if ($settlement->getFeedSoldiers()) {
+					$settlements->add($settlement);
+				}
 			}
+		}
+		if ($character->getInsideSettlement()) {
+			$settlements->add($character->getInsideSettlement());
 		}
 
-		$form = $this->createForm(new SoldierFoodType($realms, $character));
+		$form = $this->createForm(new SoldierFoodType($settlements, $character));
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
