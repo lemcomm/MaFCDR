@@ -606,6 +606,7 @@ class WarManager {
 		if ($attacker) {
 			$siege->updateEncirclement();
 		}
+		$this->em->flush();
 		return true;
 	}
 
