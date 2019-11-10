@@ -12,22 +12,22 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
 		'academy'	=> array('requires' => 'academy',	'visible' => false),
-		'arena'		=> array('requires' => 'arena',		'visible' => true),
+		'arena'		=> array('requires' => 'arena',		'visible' => false),
 		'capital'	=> array('requires' => 'ruler',		'visible' => true),
 		'castle'	=> array('requires' => 'castle',	'visible' => true),
 		'cave'		=> array('requires' => '',		'visible' => true),
 		'embassy'	=> array('requires' => 'ambassador',	'visible' => true, 'pop' =>	2)
 		'fort'		=> array('requires' => 'fort',		'visible' => true),
-		'home'		=> array('requires' => 'dynasty head',	'visible' => false),
-		'inn'		=> array('requires' => '',		'visible' => true),
+		'home'		=> array('requires' => 'dynasty head',	'visible' => true),
+		'inn'		=> array('requires' => 'inn',		'visible' => true),
 		'library'	=> array('requires' => '',		'visible' => true),
 		'monument'	=> array('requires' => 'lord',		'visible' => true),
 		'plaza'		=> array('requires' => 'lord',		'visible' => true),
 		'portal' 	=> array('requires' => 'magic',		'visible' => false),
 		'passage'	=> array('requires' => 'warren',	'visible' => false),
 		'track'		=> array('requires' => 'track',		'visible' => true),
-		'tavern'	=> array('requires' => '',		'visible' => true),
-		'tournament'	=> array('requires' => '',		'visible' => true, 'pop' =>	10)
+		'tavern'	=> array('requires' => 'tavern',	'visible' => true),
+		'tournament'	=> array('requires' => 'lord',		'visible' => false, 'pop' =>	10)
 	);
 
 	private $placesubtypes = array(
@@ -37,7 +37,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'market'	=> array('type' =>	'plaza'),
 		'scenic'	=> array('type' =>	'plaza'),
 		'event'		=> array('type' =>	'plaza'),
-	)
+	);
 
 	private $placeupgradetypes = array(
 		'horses'		=> array('type' =>	'track'),
@@ -55,7 +55,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'regional guard'	=> array('type' =>	'embassy',	'pop' =>	50, 'requires' =>	'local guard'),
 		'royal guard'		=> array('type' =>	'embassy',	'pop' =>	125, 'requires' =>	'regional guard'),
 		'imperial guard'	=> array('type' =>	'embassy',	'pop' =>	200, 'requires' =>	'royal guard')
-	)
+	);
 
 	/**
 	 * {@inheritDoc}
