@@ -228,25 +228,39 @@ class PlaceController extends Controller {
 		$rights[] = NULL;
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
-		} else if ($region = $this->get('geography')->findMyRegion($character)) {
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
+		} elseif ($region = $this->get('geography')->findMyRegion($character)) {
 			$settlement = $region->getSettlement();
-		} else {
-			# FIXME: Throw error.
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_outside');
 		}
-		$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
 
+		if (!$canPlace) {
+			throw new AccessDeniedHttpException('unavailable.nopermission');
+		}
+
+		# Check for lord and castles...
+		if ($character == $settlement->getOwner()) {
+			$rights[] = 'lord';
+			if ($character->getInsideSettlement() && $settlement->hasBuildingNamed('Wood Castle')) {
+				$rights[] = 'castle';
+			}
+		}
+
+		# Check for GMs
+		if ($character->getMagic() > 0) {
+			$rights[] = 'magic';
+		}
+
+		# Check for inside settlement...
 		if ($character->getInsideSettlement()) {
-			if ($character == $settlement->getOwner()) {
-				$rights[] = 'lord';
-				if ($settlement->hasBuildingNamed('Wood Castle')) {
-					$rights[] = 'castle';
-				}
-			}
-			if ($character->getMagic() > 0 && $canPlace) {
-				$rights[] = 'magic';
-			}
-			if ($settlement->hasBuildingNamed('Library') && $canPlace) {
+			if ($settlement->hasBuildingNamed('Library')) {
 				$rights[] = 'library';
+			}
+			if ($settlement->hasBuildingNamed('Inn')) {
+				$rights[] = 'inn';
+			}
+			if ($settlement->hasBuildingNamed('Tavern')) {
+				$rights[] = 'tavern';
 			}
 		}
 
@@ -265,9 +279,7 @@ class PlaceController extends Controller {
 		}
 		$realm = $settlement->getRealm();
 		if ($settlement->getCapitalOf() == $realm) {
-			if (is_array($realm->findRulers()) && in_array($settlement->getOwner(), $realm->findRulers())) {
-				$rights[] = 'ruler';
-			} else if (!is_array($realm->findRulers()) && $settlement->getOwner() == $realm->findRulers()) {
+			if ($realm->findRulers()->contains($settlement->getOwner())) {
 				$rights[] = 'ruler';
 			}
 		}
@@ -281,7 +293,7 @@ class PlaceController extends Controller {
 
 
 		#Now generate the list of things we can build!
-		$query = $this->getDoctrine()->getManager()->createQuery("select r from BM2SiteBundle:PlaceType r where (r.requires in (:rights) OR r.requires IS NULL) AND r.visible = TRUE")->setParameter('rights', $rights);
+		$query = $this->getDoctrine()->getManager()->createQuery("select p from BM2SiteBundle:PlaceType p where (p.requires in (:rights) OR p.requires IS NULL) AND p.visible = TRUE")->setParameter('rights', $rights);
 
 		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
