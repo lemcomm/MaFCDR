@@ -599,6 +599,7 @@ achievements:
   escaped:    Successful Escapes
   escapees:   Escaped Prisoners
   failedescapes: Failed Escapes
+  dragons:    Dragons Slain
 
   kills:
    soldiers:  Mortals Slain
@@ -1303,6 +1304,7 @@ manual:
  soldiers:    Soldiers
  entourage:   Entourage
  settlements: Settlements
+ places:      Places of Interest
  claims:      Claims
  realms:      Realms
  travel:      Travel
