@@ -26,6 +26,10 @@
 			<dt>{{ 'house.view.head'|trans({},"politics") }}</dt>
 			<dd>{{ link(house.head) }}</dd>
 		{% endif %}
+		{% if house.motto %}
+			<dt>{{ 'house.view.motto' }}</dt>
+			<dd>{{ house.motto }} </dd>
+		{% endif %}
 		<dt>{{ 'house.view.home'|trans({},"politics") }}</dt>
 		<dd>{{ link(house.insideSettlement) }}</dt>
 	</dl>
@@ -36,7 +40,6 @@
 	{% if house.description is not null and house.description.text is not null %}
 		<h3>{{ 'house.background.description.name'|trans({},"politics")|title }}</h3>
 		{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
-	{# Add logic here to handle people being in the house, and the head/founder viewing the page, so their private one also displays  #}
 	{% endif %}
 	{% if head %}
 		<h3>{{ 'house.background.secret.name'|trans({},"politics")|title }}</h3>
