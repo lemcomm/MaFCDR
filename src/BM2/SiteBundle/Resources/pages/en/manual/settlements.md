@@ -4,6 +4,7 @@ Settlements are dynamic, they can grow or shrink, buildings can be constructed o
 
 Settlements are usually controlled by a lord and his or her knights. This includes the military, the economy and the political aspects.
 
+Sometimes, players will have taken some time to create [places] within a settlement or outside of it that you can visit.
 
 Geography
 ---------
@@ -76,3 +77,4 @@ Related Topics
 * [soldiers], [looting] and [supply]
 * [permissions]
 * [location]
+* [places]
