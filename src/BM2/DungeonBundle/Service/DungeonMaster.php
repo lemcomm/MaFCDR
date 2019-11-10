@@ -30,7 +30,6 @@ class DungeonMaster {
 	private $history;
 	private $logger;
 	private $router;
-	private $charman;
 
 
 	private $initial_random_cards = 3;
@@ -50,7 +49,7 @@ class DungeonMaster {
 		'basic.fight'		=> 5
 	);
 
-	public function __construct(EntityManager $em, DungeonCreator $creator, History $history, Logger $logger, Router $router, CharacterManager $charman) {
+	public function __construct(EntityManager $em, DungeonCreator $creator, History $history, Logger $logger, Router $router) {
 		$this->em = $em;
 		$this->creator = $creator;
 		$this->history = $history;
@@ -641,7 +640,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 				$target->setAmount(max(0,$target->getAmount()-1));
 				$wounds-=$target->getType()->getWounds();
 				if ($target->getType()->getName()=='dragon') {
-					$this->addAchievement($dungeoneer->getCharacter(), 'dragons', 1)
+					$this->addAchievement($dungeoneer->getCharacter(), 'dragons', 1);
 				}
 			}
 			if ($wounds>0) {
