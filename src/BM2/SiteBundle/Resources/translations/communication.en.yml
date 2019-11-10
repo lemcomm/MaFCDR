@@ -200,10 +200,10 @@ event:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
   house:
-   founded:     By your words, the %house% has been formalized.
-   subcreated:  By your words, the %house% has been formalized as a cadet of your house, under leadership of %character%.
-   subfouned:   By the decree of %character% from the %link-house-1%, you have been made the first heirarch of the %house-2%.
-   newhead:     You have been made the new head of %house% after the death of %character%.
+   founded:     Formalized the %house%.
+   subcreated:  Formalized the %house% as a cadet of %house-2%.
+   subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
+   newhead:     Took over leadership of the house after the passing of %character%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -282,31 +282,30 @@ event:
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
  house:
-  founded:      By decree of %character% the house has been formalized!
-  newmember:    %character% has been accepted into the ranks.
-  subfounded:   By decree of %character-1%, the %house% has been formalized as a Cadet under leadership of %character-2%
-  subcreated:   By decree of %character-1% of the %house-1%, the %house-2% has been formalized under them with leadership granted to %character-2%.
-  exile:
-   ruler:       By decree of %character-1%, %character-2%, ruler of %realm% has been cast out of the House.
-   knight:      By decree of %character-1%, %character-2% has been cast out of of the House.
+  founded:      By decree of %character% the house was formalized!
+  newmember:    %character% was accepted into the ranks.
+  subfounded:   By decree of %house%, the house was formalized.
+  subcreated:   By decree of %character%, the house was formalized as a cadet of %house%.
+  exile:        By decree of %character-1%, %character-2% has been cast out of of the House.
   merged:
-   death:       After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
-   retire:      After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
-   slumber:     After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
+   death:       After the passing of it's leader, due to another house taking leadership, became a cadet of %house%.
+   retire:      After the retirement of it's leader, due to another house taking leadership, became a cadet of %house%.
+   slumber:     After the slumber of it's leader, due to another house taking leadership, became a cadet of %house%.
   inherited:
-   death:       After the passing of %character-1%, %character-2% has taken leadership as the designated successor or heir.
-   retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
-   slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
+   death:       After the passing of it's leader, %character% has inherited leadership.
+   retire:      After the retirement of it's leader, %character% has inherited leadership.
+   slumber:     After the slumbering of it's leader, %character% has inherited leadership.
   newhead:
-   death:       After the passing of %character-1%, %character-2% has taken leadership as the eldest member.
-   retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the eldest member.
-   slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the eldest member.
+   death:       After the passing of it's leader, %character% has assumed leadership.
+   retire:      After the retirement of it's leader, %character% has assumed leadership.
+   slumber:     After the slumbering of it's leader, %character% has assumed leadership.
   collapsed:
    death:       Unable to locate a successor after the passing of its last head, the house has collapsed.
    retire:	Unable to locate a successor after the retiring of its last head, the house has collapsed.
    slumber:     Unable to locate a successor after the slumber of its last head, the house has collapsed.
   relocated:
    settlement:  Relocated to the settlement of %settlement%.
+  newname:      Changed it's name to %name%.
 
 
 report:
