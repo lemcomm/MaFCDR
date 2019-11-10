@@ -37,7 +37,7 @@ class HouseController extends Controller {
 	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:House:view.html.twig")
 	  */
-	
+
 	public function viewAction(House $house) {
 		$details = false;
 		$head = false;
@@ -50,7 +50,7 @@ class HouseController extends Controller {
 				}
 			}
 		}
-		
+
 		return array(
 			'house' => $house,
 			'details' => $details,
@@ -62,7 +62,7 @@ class HouseController extends Controller {
 	  * @Route("/nearby", name="bm2_house_nearby")
 	  * @Template
 	  */
-	
+
 	public function nearbyAction() {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -78,7 +78,7 @@ class HouseController extends Controller {
 		if ($character->getHouse()) {
 			$already = true;
 		}
-		
+
 		foreach ($houses as $house) {
 			$member = false;
 			$head = false;
@@ -99,8 +99,8 @@ class HouseController extends Controller {
 	/**
 	  * @Route("/create", name="bm2_house_create")
 	  * @Template
-	  */	
-	
+	  */
+
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -136,19 +136,19 @@ class HouseController extends Controller {
 			'form' => $form->createView()
 		);
 	}
-	
+
 	/**
 	  * @Route("/{house}/manage", name="bm2_house_manage", requirements={"house"="\d+"})
 	  * @Template
 	  */
-		
+
 	public function manageAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		
+
 		$name = $house->getName();
 		$motto = $house->getMotto();
 		if ($house->getDescription()) {
@@ -168,9 +168,15 @@ class HouseController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$change = FALSE;
-			if ($data['name'] != $motto) {
+			if ($data['name'] != $name) {
 				$change = TRUE;
-				$house->setMotto($data['name']);
+				$house->setName($data['name']);
+				$this->get('history')->logEvent(
+					$house,
+					'event.house.newname',
+					array('%name%'=>$data['name']),
+					History::ULTRA, true
+				);
 			}
 			if ($data['motto'] != $motto) {
 				$change = TRUE;
@@ -201,19 +207,19 @@ class HouseController extends Controller {
 			'form' => $form->createView()
 		);
 	}
-					  
+
 	/**
 	  * @Route("/{house}/join", name="bm2_house_join", requirements={"house"="\d+"})
 	  * @Template
 	  */
-	
+
 	public function joinAction(House $house, Request $request) {
 		$hashouse = FALSE;
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		
+
 		# TODO: Rework this later to allow for Houses at Places.
 		# TODO: Rework this to use dispatcher.
 		if (!$character->getInsideSettlement()) {
@@ -249,7 +255,7 @@ class HouseController extends Controller {
 	  * @Route("/{house}/applicants", name="bm2_house_applicants", requirements={"house"="\d+"})
 	  * @Template
 	  */
-	
+
 	public function applicantsAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -280,7 +286,7 @@ class HouseController extends Controller {
 	  * @Route("/{house}/disown", name="bm2_house_disown", requirements={"house"="\d+"})
 	  * @Template
 	  */
-	
+
 	public function disownAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -324,7 +330,7 @@ class HouseController extends Controller {
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
-		
+
 		return array(
 			'name' => $house->getName(),
 			'form' => $form->createView(),
@@ -335,7 +341,7 @@ class HouseController extends Controller {
 	  * @Route("/{house}/successor", name="bm2_house_successor", requirements={"house"="\d+"})
 	  * @Template
 	  */
-	
+
 	public function successorAction(House $house, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -363,7 +369,7 @@ class HouseController extends Controller {
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
-		
+
 		return array(
 			'name' => $house->getName(),
 			'form' => $form->createView(),
@@ -373,8 +379,8 @@ class HouseController extends Controller {
 	/**
 	  * @Route("/relocate", name="bm2_house_relocate")
 	  * @Template
-	  */	
-	
+	  */
+
 	public function relocateAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -397,7 +403,7 @@ class HouseController extends Controller {
 		#Impossible to relocate a house if you don't belong to one.
 		if (!$character->getHouse()) {
 			throw $this->createNotFoundException('error.found.house');
-		} 
+		}
 		#Only the Head of a house can relocate.
 		if ($character->getHouse()->getHead() != $character) {
 			throw $this->createNotFoundException('error.noaccess.nothead');
