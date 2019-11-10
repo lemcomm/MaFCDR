@@ -18,6 +18,7 @@ Entities
 * [Realms](realms)
 * [Houses](houses)
 * [Settlements](settlements)
+* [Places](places)
 * [Characters](characters)
 * [Soldiers](soldiers)
 * [Entourage](entourage)
