@@ -30,20 +30,28 @@ var results = regex.exec( window.location.href );
 if (results != null) {
 	var env = results[1];
 }
-var url = window.location.href;
-url = url.replace("http://", "");
+
+if (location.protocol === 'https:') {
+	var security = 'https:';
+	var url = window.location.href;
+	url = url.replace("https://", "");
+} else {
+	var security = 'http:';
+	var url = window.location.href;
+	url = url.replace("http://", "");
+}
 
 var urlExplode = url.split("/");
 var host = urlExplode[0];
 
 if (env == 'prod')  {
-	var basepath = "http://"+host+"/en/map/";
+	var basepath = security+"//"+host+"/en/map/";
 } else {
-	var basepath = "http://"+host+"/app_"+env+".php/en/map/";
+	var basepath = security+"//"+host+"/app_"+env+".php/en/map/";
 }
 
-var tilecache_url = "http://maps.mightandfealty.com/tilecache";
-var imgpath = "http://"+host+"/bundles/bm2site/images/";
+var tilecache_url = security+"//maps.mightandfealty.com/tilecache";
+var imgpath = security+"//"+host+"/bundles/bm2site/images/";
 var loadimg = imgpath+'loader.png';
 var tooltip;
 // FIXME: these should be taken from the database!
@@ -295,11 +303,11 @@ function addoffers() {
 	map.addLayer(offerslayer);
 	map.setLayerIndex(offerslayer, 8);
 
-	clickSelectOffer = new OpenLayers.Control.SelectFeature(offerslayer, { 
+	clickSelectOffer = new OpenLayers.Control.SelectFeature(offerslayer, {
 		hover: false,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: OfferSelect,
 		}
 	});
@@ -359,11 +367,11 @@ function addmarkers() {
 		})
 	});
 
-	clickSelectMarker = new OpenLayers.Control.SelectFeature(markerslayer, { 
+	clickSelectMarker = new OpenLayers.Control.SelectFeature(markerslayer, {
 		hover: false,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: MarkerSelect,
 		}
 	});
@@ -569,20 +577,20 @@ function addsettlements(mode) {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 20);
 
-	hoverSelectPlace = new OpenLayers.Control.SelectFeature(layer, { 
+	hoverSelectPlace = new OpenLayers.Control.SelectFeature(layer, {
 		hover: true,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: SettlementSelect,
 		}
 	});
 	map.addControl(hoverSelectPlace);
-	clickSelectPlace = new OpenLayers.Control.SelectFeature(layer, { 
+	clickSelectPlace = new OpenLayers.Control.SelectFeature(layer, {
 		hover: false,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: SettlementSelect,
 		}
 	});
@@ -635,15 +643,15 @@ function SettlementSelect(evt) {
 		$("#sd").dialog("option", "title", $("#sd_name").html());
 		$("#sd_name").hide();
 		if (typeof startbutton != "undefined") {
-			$("#sd").dialog("option", "buttons", [ 
+			$("#sd").dialog("option", "buttons", [
 				{ text: $("#sd_details a").html(), click: function() { window.location.href = $("#sd_details a").attr("href"); } },
 				{ text: startbutton, click: function() { $("#form_map").submit(); } },
 			] );
 			var id = $("#sd_id").html();
 			$("#form_settlement_id").val(id);
 		} else {
-			$("#sd").dialog("option", "buttons", [ 
-				{ text: $("#sd_details a").html(), click: function() { window.location.href = $("#sd_details a").attr("href"); } } 
+			$("#sd").dialog("option", "buttons", [
+				{ text: $("#sd_details a").html(), click: function() { window.location.href = $("#sd_details a").attr("href"); } }
 			] );
 		}
 		$("#sd_details").hide();
@@ -731,23 +739,23 @@ function addcharacters() {
 		})
 	});
 	layer.setVisibility(true);
-	map.addLayer(layer);	
+	map.addLayer(layer);
 	map.setLayerIndex(layer, 30);
 
-	hoverSelectChars = new OpenLayers.Control.SelectFeature(layer, { 
+	hoverSelectChars = new OpenLayers.Control.SelectFeature(layer, {
 		hover: true,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: CharacterSelect,
 		}
 	});
 	map.addControl(hoverSelectChars);
-	clickSelectChars = new OpenLayers.Control.SelectFeature(layer, { 
+	clickSelectChars = new OpenLayers.Control.SelectFeature(layer, {
 		hover: false,
 		highlightOnly: true,
 		renderIntent: "temporary",
-		eventListeners: { 
+		eventListeners: {
 			featurehighlighted: CharacterSelect,
 		}
 	});
@@ -799,7 +807,7 @@ var zoomSupport = {
 			case 1: return '#d0a040';
 			case 2: return '#b09040';
 			case 3: return '#805020';
-			case 4: return '#705040'; 
+			case 4: return '#705040';
 			case 5: return '#606066';
 		}
 		return '#ff0000';
@@ -846,9 +854,9 @@ var zoomSupport = {
 				case 'roguefort':		return imgpath+'rpg_map/ruins.svg';
 				case 'flooded':			return imgpath+'rpg_map/obelisk.svg';
 				case 'shipgrave':		return imgpath+'rpg_map/shipwreck.svg';
-					
+
 				// places
-				case 'academy':			return imgpath+'rpg_map/university.svg';				
+				case 'academy':			return imgpath+'rpg_map/university.svg';
 				case 'arena':			return imgpath+'rpg_map/statue.svg';
 				case 'capital':			return imgpath+'rpg_map/fountain.svg';
 				case 'castle':			return imgpath+'rpg_map/fort.svg';
@@ -978,7 +986,7 @@ var zoomSupport = {
 		}
 	},
 	markerStrokeWidth: function(feature) {
-		return 80/scale();	
+		return 80/scale();
 	},
 
 	actRadius: function(feature) {
@@ -1024,7 +1032,7 @@ function addmylocation(x, y) {
 	my_y = y;
 
 	var lookup = {
-		"location": { 
+		"location": {
 			externalGraphic: imgpath+'marker-green.png',
 			fillOpacity: 1.0,
 			graphicWith: 32,
@@ -1084,7 +1092,7 @@ function addmylocation(x, y) {
 		features[2] = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(my_x, my_y), { type: "spot_near" });
 		features[3] = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(my_x, my_y), { type: "spot_far" });
 		this.addFeatures(features);
-	});        
+	});
 
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 29); // just under other characters, so our circles don't overlay them
@@ -1094,7 +1102,7 @@ function addmylocation(x, y) {
 function addrouting() {
 	/* drawing on the map */
 	routelayer = new OpenLayers.Layer.Vector(mapstrings.route, {
-		displayInLayerSwitcher: false		
+		displayInLayerSwitcher: false
 	});
 	var routeFeature = routeline();
 
@@ -1294,7 +1302,6 @@ function loader_off(tag) {
 	$("#loader_"+tag).animate({color: "#3ed130"}).delay(200).fadeOut(200, function(){ $(this).remove() });
 }
 
-/* 
+/*
 onresize=function(){ resize(); };
 */
-
