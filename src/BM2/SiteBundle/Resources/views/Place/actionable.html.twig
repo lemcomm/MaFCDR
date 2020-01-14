@@ -15,7 +15,9 @@
 			<a href="{{path('bm2_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
 		{% endif %}
 		{% if place.canManage %}
-			<a href="{{path('bm2_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage'|trans({}, "places")|raw }}</button></a>
+			<a href="{{path('bm2_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 		{% endif %}
+		</div>
 	{% endfor %}
+	<hr>
 {% endblock %}
