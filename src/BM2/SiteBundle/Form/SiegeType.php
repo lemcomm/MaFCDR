@@ -21,6 +21,11 @@ use Doctrine\ORM\EntityRepository;
 
 class SiegeType extends AbstractType {
 
+	private $character;
+	private $location;
+	private $siege;
+	private $action;
+
 	public function __construct(Character $character, $location, Siege $siege, $action = null) {
 		$this->character = $character;
 		$this->location = $location;
@@ -38,7 +43,6 @@ class SiegeType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$siege = $this->siege;
 		$location = $this->location;
-		$settlement = $this->settlement;
 		$character = $this->character;
 		$action = $this->action;
 		$isLeader = FALSE;
@@ -105,8 +109,8 @@ class SiegeType extends AbstractType {
 			}
 			if ($location instanceof Settlement) {
 				if (
-					(!$defLeader && $isDefender && $character->getInsideSettlement() == $settlement && $settlement->getOwner() == $character)
-					|| (!$defLeader && $isDefender && !$settlement->getCharactersPresent()->contains($settlement->getOwner()))
+					(!$defLeader && $isDefender && $character->getInsideSettlement() == $location && $location->getOwner() == $character)
+					|| (!$defLeader && $isDefender && !$location->getCharactersPresent()->contains($location->getOwner()))
 					|| (!$attLeader && $isAttacker)
 				) {
 					# No leader of your group? Defending lord can assume if present, otherwise any defender can. Any attacker can take control of leaderless attackers.
@@ -114,7 +118,7 @@ class SiegeType extends AbstractType {
 				}
 			} elseif ($location instanceof Place) {
 				if (
-					(!$defLeader && $isDefender && $character->getInsidePlace() == $settlement && $place->getOwner() == $character)
+					(!$defLeader && $isDefender && $character->getInsidePlace() == $location && $place->getOwner() == $character)
 					|| (!$defLeader && $isDefender && !$place->getCharactersPresent()->contains($place->getOwner()))
 					|| (!$attLeader && $isAttacker)
 				) {
