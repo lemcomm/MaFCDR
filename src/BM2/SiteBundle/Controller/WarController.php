@@ -225,8 +225,7 @@ class WarController extends Controller {
 		}
 
 		# Prepare other variables.
-		$siege = null;
-		$leader = null;
+		$leader = null; #TODO: Do we actually use this at all?
 		# Prepare entity manager referencing.
 		$em = $this->getDoctrine()->getManager();
 
@@ -254,7 +253,6 @@ class WarController extends Controller {
 				$em->persist($siege);
 				$siege->setStage(1);
 				if ($data['settlement']) {
-					$settlement = $data['settlement'];
 					$place = FALSE;
 					$siege->setSettlement($settlement);
 					$settlement->setSiege($siege);
