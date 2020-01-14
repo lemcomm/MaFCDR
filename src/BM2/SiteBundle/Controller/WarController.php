@@ -17,6 +17,7 @@ use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\LootType;
 use BM2\SiteBundle\Form\SiegeType;
+use BM2\SiteBundle\Form\SiegeStartType;
 use BM2\SiteBundle\Form\WarType;
 
 use BM2\SiteBundle\Service\History;
@@ -164,7 +165,7 @@ class WarController extends Controller {
 	  */
 	public function siegeAction(Request $request) {
 		# Security check.
-		list($character, $settlement, $places) = $this->get('dispatcher')->gateway(false, true, null, true); # Welcome to the original place in the game to ask for a place. :P
+		list($character, $settlement, $place) = $this->get('dispatcher')->gateway(false, true, null, true); # Welcome to the original place in the game to ask for a place. :P
 
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -175,9 +176,10 @@ class WarController extends Controller {
 		} else {
 			$action = 'select';
 		}
-		if($settlement->getSiege()) {
+		$siege = null;
+		if($settlement && $settlement->getSiege()) {
 			$siege = $settlement->getSiege();
-		} elseif($place->getSiege()) {
+		} elseif($place && $place->getSiege()) {
 			$siege = $place->getSiege();
 		}
 		if($siege) {
@@ -239,19 +241,20 @@ class WarController extends Controller {
 			}
 		} else {
 			$already = FALSE;
-			$form = $this->createForm(new SiegeStartType($settlement, $place));
+			$form = $this->createForm(new SiegeStartType($settlement, $this->get('geography')->findPlacesInActionRange($character)));
 		}
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
 			# Figure out which form is being submitted.
-			if ($request->request->has('siegestart') && $data['sure'] == true) {
+			if ($request->request->has('siegestart')) {
 				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
 				$siege = new Siege;
+				$em->persist($siege);
 				$siege->setStage(1);
-				if ($data['target'] instanceof Settlement) {
-					$settlement = $data['target'];
+				if ($data['settlement']) {
+					$settlement = $data['settlement'];
 					$place = FALSE;
 					$siege->setSettlement($settlement);
 					$settlement->setSiege($siege);
@@ -276,14 +279,13 @@ class WarController extends Controller {
 						$maxstages++; # At this point, our castle has a large, enclosed compound of it's own, usually built at the same strength as the primary walls.
 					}
 					$siege->setMaxStage($maxstages); # Assuming we have everything, this will max out at 5.
-				} elseif ($data['target'] instanceof Place) {
-					$place = $data['target'];
+				} elseif ($data['place'] instanceof Place) {
+					$place = $data['place'];
 					$settlement = FALSE;
 					$siege->setPlace($data['target']);
 					$place->setSiege($siege);
 					$siege->setMaxStage(1);
 				}
-				$em->persist($siege);
 				$em->flush(); # We need this flushed in order to link to it below.
 
 				if ($settlement) {
@@ -295,7 +297,7 @@ class WarController extends Controller {
 					);
 				} elseif ($place) {
 					$this->get('history')->logEvent(
-						$settlement,
+						$place,
 						'event.place.besieged',
 						array('%link-character%'=>$character->getId()),
 						History::MEDIUM, false, 60
