@@ -162,7 +162,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="bm2_place_manage")
+	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="bm2_place_permissions")
 	  * @Template
 	  */
 
@@ -217,8 +217,6 @@ class PlaceController extends Controller {
 	  * @Template
 	  */
 	public function newAction(Request $request) {
-
-		return false;
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -226,16 +224,22 @@ class PlaceController extends Controller {
 
 		# Build the list of requirements we have.
 		$rights[] = NULL;
+		$notTooClose = false;
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
 			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
+			$notTooClose = true;
 		} elseif ($region = $this->get('geography')->findMyRegion($character)) {
 			$settlement = $region->getSettlement();
 			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_outside');
+			$notTooClose = $this->get('geography')->checkPlacePlacement($character); #Too close? Returns false. Too close is under 500 meteres to nearest place or settlement.
 		}
 
 		if (!$canPlace) {
 			throw new AccessDeniedHttpException('unavailable.nopermission');
+		}
+		if (!$notTooClose) {
+			throw new AccessDeniedHttpException('unavailable.tooclose');
 		}
 
 		# Check for lord and castles...
@@ -375,7 +379,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/manage", requirements={"id"="\d+"})
+	  * @Route("/{id}/manage", requirements={"id"="\d+"}, name="bm2_place_manage")
 	  * @Template
 	  */
 	public function manageAction(Place $id, Request $request) {
