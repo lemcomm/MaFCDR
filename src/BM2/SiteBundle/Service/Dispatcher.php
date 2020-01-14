@@ -79,7 +79,7 @@ class Dispatcher {
 		this is our main entrance, fetching the character data from the appstate as well as the nearest settlement
 		and then applying any (optional) test on the whole thing.
 	*/
-	public function gateway($test=false, $getSettlement=false, $check_duplicate=true, $getPlaces=false) {
+	public function gateway($test=false, $getSettlement=false, $check_duplicate=true, $getPlace=false) {
 		$character = $this->getCharacter();
 		if (!$character || ! $character instanceof Character) {
 			/* Yes, if it's not a character, we return it. We check this on the other side again, and redirect if it's not a character.
@@ -88,7 +88,7 @@ class Dispatcher {
 			When Dispatcher calls AppState to get the character, it adds a flash message explaining why it's not returning a character.
 			That flash will then generate on the route the calling Controller will redirect to, explaining to the user what's going on.*/
 			if ($getSettlement) {
-				if (!$getPlaces) {
+				if (!$getPlace) {
 					return array($character, null); #Most common first.
 				} else {
 					return array($character, null, null);
@@ -107,13 +107,13 @@ class Dispatcher {
 			}
 			if ($getSettlement) {
 				$settlement = $this->getActionableSettlement();
-				if ($getPlaces) {
+				if ($getPlace) {
 					$place = $this->geography->findNearestActionablePlace($character);
 				}
 			}
 		}
 		if ($getSettlement) {
-			if (!$getPlaces) {
+			if (!$getPlace) {
 				return array($character, $settlement); #Most common first.
 			} else {
 				return array($character, $settlement, $place); #This is currently used on a couple pages. Should be rarest of three.
@@ -152,11 +152,7 @@ class Dispatcher {
 		}
 
 		$actions[] = $this->placeListTest();
-
-		$has = $this->placeCreateTest();
-		if (isset($has['url'])) {
-			$actions[] = $has;
-		}
+		$actions[] = $this->placeCreateTest();
 
 		$actions[] = $this->locationQuestsTest();
 		$actions[] = $this->locationEmbarkTest();
@@ -340,7 +336,7 @@ class Dispatcher {
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
-		if ($place = $this->findNearestActionablePlace()) {
+		if ($place = $this->getActionablePlace()) {
 			$actions[] = $this->militaryDefendPlaceTest();
 			if (!$place->getSiege()) {
 				$actions[] = $this->MilitarySiegeSettlementTest();
@@ -1111,6 +1107,56 @@ class Dispatcher {
 		return $this->action("military.block", "bm2_site_war_block", true);
 	}
 
+	public function militaryDefendSettlementTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.defend')) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.already");
+		}
+		if ( ! $estate = $this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.notinside");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.settlement.defend", "bm2_site_war_defendsettlement");
+	}
+
+	public function militaryDefendPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.defend')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.already");
+		}
+		if ( ! $estate = $this->getCharacter()->getInsidePlace()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.notinside");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.defend.name", "description"=>"unavailable.inbattle");
+		}
+		return $this->action("military.place.defend", "bm2_site_war_defendplace");
+	}
+
 	public function militarySiegeSettlementTest() {
 		# Grants you access to the page in which you can start a siege.
 		$settlement = $this->getActionableSettlement();
@@ -1506,7 +1552,7 @@ class Dispatcher {
 	}
 
 	public function militarySiegeGeneralTest($check_duplicate=false) {
-		# Controls access to the siege action seleection menu.
+		# Controls access to the siege action selection menu.
 		$settlement = $this->getActionableSettlement();
 		$place = $this->getActionablePlace();
 		if ($this->getCharacter()->isPrisoner()) {
@@ -2008,7 +2054,7 @@ class Dispatcher {
 		if ($character->getUser()->getFreePlaces() < 1) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
 		}
-		if ($this->geography->checkPlacePlacement($character)) {
+		if (!$this->geography->checkPlacePlacement($character)) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
 		}
 		if (($character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside')) || (!$character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))) {
