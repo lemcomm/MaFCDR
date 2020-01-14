@@ -477,9 +477,13 @@ class Geography {
 	public function checkPlacePlacement(Character $character) {
 		if ($this->findPlacesNearMe($character, $this->place_separation)) {
 			return false; #Too close!
-		} else {
-			return true; #Good to go!
 		}
+		$settlement = $this->findNearestSettlement($character)[0];
+		$distance = $this->calculateDistancetoSettlement($character, $settlement);
+		if ($distance < $this->place_separation) {
+			return false; #Too close!
+		}
+		return true; #Good to go!
 	}
 
 	public function findBattlesNearMe(Character $character, $maxdistance) {
