@@ -1116,3 +1116,7 @@ place:
   longdesc:       With the permission of the regional lord, you can formalize a new place of interest that others can visit. The creation is instant, but future upgrades will take time and resources.
  enter:
   name:   Enter Place
+ list:
+  name:   View Local Places
+  description:   Perhaps one of them will be interesting?
+  longdesc:      Places of interest can exist either inside or outside settlements, and can be created by anyone with permission of the local lord.
