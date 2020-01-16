@@ -1,13 +1,34 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
 {% block content %}
-	<h2>{{ "military.settlement.siege.name"|trans({},"actions")|title }}</h2>
 	{% if siege %}
 		{# Build siege display! #}
-		<p>{{ "military.settlement.siege.active"|trans({"%settlement%":settlement.name}, "actions")|raw }}
+		{% if action == "leave" %}
+			<h2>{{ "military.siege.actions.leave.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.leave.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% elseif action == 'joinsiege' %}
+			<h2>{{ "military.siege.actions.join.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.join.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% elseif action == 'assault' %}
+			<h2>{{ "military.siege.actions.assault.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.assault.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% elseif action == 'disband' %}
+			<h2>{{ "military.siege.actions.disband.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.disband.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% elseif action == 'assume' %}
+			<h2>{{ "military.siege.actions.assume.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.assume.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% elseif action == 'leadership' %}
+			<h2>{{ "military.siege.actions.leadership.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.actions.leadership.description"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% else %}
+			<h2>{{ "military.siege.menu.name"|trans({},"actions")|title }}</h2>
+			<p>{{ "military.siege.menu.active"|trans({"%settlement%":settlement.name}, "actions")|raw }}</p>
+		{% endif %}
 		{{ form(form) }}
 	{% else %}
-		<p>{{ "military.settlement.siege.inactive"|trans({"%settlement%":settlement.name},"actions")|raw }}</p>
+		<h2>{{ "military.siege.menu.name"|trans({},"actions")|title }}</h2>
+		<p>{{ "military.siege.menu.inactive"|trans({"%settlement%":settlement.name},"actions")|raw }}</p>
 		{{ form(form) }}
 	{% endif %}
 
