@@ -147,7 +147,7 @@ class SiegeType extends AbstractType {
 						'data'=>'leadership'
 					));
 					$builder->add('newleader', 'entity', array(
-						'label'=>'military.siege.newleader',
+						'label'=>'military.siege.actions.leadership.form',
 						'required'=>true,
 						'placeholder'=>'siege.character.none',
 						'attr'=>array('title'=>'siege.help.newleader'),
@@ -185,12 +185,12 @@ class SiegeType extends AbstractType {
 					));
 					if ($isDefender) {
 						$builder->add('assault', CheckboxType::class, array(
-							'label' => 'military.siege.confirm.sortie',
+							'label' => 'military.siege.actions.sortie.confirm',
 							'required' => true
 						));
 					} else {
 						$builder->add('assault', CheckboxType::class, array(
-							'label' => 'military.siege.confirm.assault',
+							'label' => 'military.siege.actions.assault.confirm',
 							'required' => true
 						));
 					}
@@ -200,7 +200,7 @@ class SiegeType extends AbstractType {
 						'data'=>'disband'
 					));
 					$builder->add('disband', CheckboxType::class, array(
-						'label' => 'military.siege.disband',
+						'label' => 'military.siege.actions.disband.confirm',
 						'required' => true
 					));
 					break;
@@ -209,11 +209,11 @@ class SiegeType extends AbstractType {
 						'data'=>'leave'
 					));
 					$builder->add('leave', CheckboxType::class, array(
-						'label' => 'military.siege.leave',
+						'label' => 'military.siege.actions.leave.confirm',
 						'required' => true
 					));
 					break;
-				case 'attack':
+				/*case 'attack':
 					$builder->add('subaction', HiddenType::class, array(
 						'data'=>'attack'
 					));
@@ -222,7 +222,7 @@ class SiegeType extends AbstractType {
 						'required' => true
 					));
 					break;
-				/*case 'joinattack':
+				case 'joinattack':
 					$builder->add('subaction', HiddenType::class, array(
 						'data'=>'joinattack'
 					));
@@ -251,7 +251,7 @@ class SiegeType extends AbstractType {
 						'required'=>true,
 						'choices' => $sides,
 						'placeholder'=>'military.siege.sides.none',
-						'label'=> 'military.siege.confirm.joinside'
+						'label'=> 'military.siege.actions.join.form'
 					));
 					break;
 				case 'assume':
@@ -259,7 +259,7 @@ class SiegeType extends AbstractType {
 						'data'=>'assume'
 					));
 					$builder->add('assume', CheckboxType::class, array(
-						'label' => 'military.siege.confirm.assume',
+						'label' => 'military.siege.actions.assume.confirm',
 						'required' => true
 					));
 					break;
