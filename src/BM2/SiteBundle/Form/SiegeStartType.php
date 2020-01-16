@@ -35,7 +35,7 @@ class SiegeStartType extends AbstractType {
 		if ($settlement) {
 			$builder->add('settlement', CheckboxType::class, array(
 				'required'=>false,
-				'label'=> 'military.siege.locations.name'
+				'label'=> 'military.siege.menu.confirm'
 			));
 		} else {
 			$builder->add('settlement', HiddenType::class, array(
@@ -48,8 +48,8 @@ class SiegeStartType extends AbstractType {
 				'required'=>false,
 				'choices' => $places,
 				'choice_label' => 'name',
-				'placeholder'=>'military.siege.locations.none',
-				'label'=> 'military.siege.locations.name'
+				'placeholder'=>'military.siege.menu.none',
+				'label'=> 'military.siege.menu.places'
 			));
 		} else {
 			$builder->add('places', HiddenType::class, array(
@@ -58,7 +58,7 @@ class SiegeStartType extends AbstractType {
 		}
 
 		if ($settlement || $places) {
-			$builder->add('submit', 'submit', array('label'=>'button.submit'));
+			$builder->add('submit', 'submit', array('label'=>'military.siege.submit'));
 		}
 	}
 
