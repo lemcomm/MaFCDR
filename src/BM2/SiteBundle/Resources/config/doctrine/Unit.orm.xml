@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Unit">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+                <field name="row" type="integer" nullable="true"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="units"/>
+                <many-to-one field="settlement" target-entity="Settlement" inversed-by="units"/>
+                <many-to-one field="place" target-entity="Place" inversed-by="units"/>
+		<one-to-one field="settings" target-entity="UnitSettings" inversed-by="unit" fetch="EAGER"/>
+		<many-to-one field="supplier" target-entity="Settlement" inversed-by="supplied_units"/>
+
+	</entity>
+</doctrine-mapping>
