@@ -64,6 +64,14 @@ class BattleGroup {
 		);
 	}
 
+	public function getActiveMeleeSoldiers() {
+		return $this->getActiveSoldiers()->filter(
+			function($entry) {
+				return (!$entry->isRanged());
+			}
+		);
+	}
+
 	public function getFightingSoldiers() {
 		return $this->getSoldiers()->filter(
 			function($entry) {
