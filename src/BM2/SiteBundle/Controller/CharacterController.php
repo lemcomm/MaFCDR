@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
+use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\CharacterBackgroundType;
@@ -1268,6 +1269,34 @@ class CharacterController extends Controller {
 	}
 
    /**
+     * @Route("/units")
+     * @Template
+     */
+
+     	public function unitsAction(Request $request) {
+		# Get the current character, setup Doctrine EntityManager.
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+
+		# MaF2 conversion code
+		if (!$character->getSoldiers()->isEmpty()) {
+			# Legacy soldier assignements detected by way of soldiers being assigned to this character.
+			$settlements = array();
+			foreach ($character->getSoldiers() as $soldier) {
+				$settlement = $soldier->getSettlement();
+				if (!in_array($settlement->getId(), $settlements)) {
+					$settlements[] = $settlement->getId();
+					$unit = $this->get('military_manager')->newUnit($character, $settlement);
+				}
+			}
+		}
+
+	}
+
+   /**
      * @Route("/unitsettings")
      * @Template
      */
@@ -1476,7 +1505,12 @@ class CharacterController extends Controller {
 			$query->setParameters(array('br'=>$report, 'me'=>$character));
 			$check = $query->getOneOrNullResult();
 			if (!$check) {
-				throw $this->createNotFoundException('error.noaccess.battlereport');
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleReportCharacter p JOIN p.group_report g WHERE p.character = :me AND g.battle_report = :br');
+				$query->setParameters(array('br'=>$report, 'me'=>$character));
+				$check = $query->getOneOrNullResult();
+				if (!$check) {
+					throw $this->createNotFoundException('error.noaccess.battlereport');
+				}
 			}
 		}
 
