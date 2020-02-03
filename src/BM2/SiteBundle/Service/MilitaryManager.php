@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\Entourage;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Soldier;
+use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use Doctrine\ORM\EntityManager;
@@ -30,7 +31,7 @@ class MilitaryManager {
 	private $group_militia=0;
 	private $group_soldier=0;
 	private $max_group=25; // a=0 ... z=25
-	
+
 	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, AppState $appstate) {
 		$this->em = $em;
 		$this->logger = $logger;
@@ -43,7 +44,7 @@ class MilitaryManager {
 		if ($settlement->getRecruits()->isEmpty()) return;
 		$training = min($settlement->getSingleTrainingPoints(), $settlement->getTrainingPoints()/$settlement->getRecruits()->count());
 
-		// TODO: add the speed (efficiency) of the training building here, at least with some effect 
+		// TODO: add the speed (efficiency) of the training building here, at least with some effect
 		// (not full, because you can't focus them)
 		foreach ($settlement->getRecruits() as $recruit) {
 			if ($recruit->getExperience()>0) {
@@ -80,7 +81,7 @@ class MilitaryManager {
 			case 'Place':
 				return null;
 		}
-		
+
 	}
 
 	public function groupByType($soldiers) {
@@ -131,7 +132,7 @@ class MilitaryManager {
 		foreach ($npcs as $npc) {
 			$change = $data['npcs'][$npc->getId()];
 			if (isset($change['group'])) {
-				$npc->setGroup($change['group']); // must be prior to the below because some of the actions have auto-group functionality				
+				$npc->setGroup($change['group']); // must be prior to the below because some of the actions have auto-group functionality
 			}
 			if (!isset($change['supply']) && $npc->isEntourage() && $npc->getEquipment()) {
 				// changing back to food - since we use food as the empty value, we need a seperate test, the one below doesn't work
@@ -145,8 +146,8 @@ class MilitaryManager {
 			if (isset($change['action'])) {
 				$this->logger->debug("applying action ".$change['action']." to soldier #".$npc->getId()." (".$npc->getName().")");
 				switch ($change['action']) {
-					case 'assign':			
-						if ($data['assignto']) { 
+					case 'assign':
+						if ($data['assignto']) {
 							$tg = $this->assign($npc, $data['assignto']);
 							if ($tg != "") {
 								$targetgroup = $tg;
@@ -154,8 +155,8 @@ class MilitaryManager {
 							}
 						}
 						break;
-					case 'assign2':		
-						if ($data['assignto']) { 
+					case 'assign2':
+						if ($data['assignto']) {
 							if ($this->assignEntourage($npc, $data['assignto'])) {
 								$assigned_entourage++;
 							}
@@ -234,7 +235,7 @@ class MilitaryManager {
 						$success = false;
 					}
 				}
-			} 
+			}
 		}
 		return $success;
 	}
@@ -249,7 +250,7 @@ class MilitaryManager {
 		if ($test_trainer) {
 			$trainer = $settlement->getBuildingByType($item->getTrainer());
 			if (!$trainer) return false;
-			if (!$trainer->isActive()) return false;			
+			if (!$trainer->isActive()) return false;
 		}
 
 		if ($item->getResupplyCost() > $provider->getResupply()) return false;
@@ -267,7 +268,7 @@ class MilitaryManager {
 			$provider->setResupply($left);
 		}
 		return true;
-	} 
+	}
 
 	public function returnItem(Settlement $settlement=null, EquipmentType $item=null) {
 		if ($settlement==null) return true;
@@ -277,7 +278,7 @@ class MilitaryManager {
 		if (!$provider) return false;
 
 		// TODO: max stockpile!
-		$provider->setResupply($provider->getResupply() + $item->getResupplyCost());			
+		$provider->setResupply($provider->getResupply() + $item->getResupplyCost());
 		return true;
 	}
 
@@ -323,7 +324,7 @@ class MilitaryManager {
 			if ($this->acquireItem($settlement, $armour)) {
 				$train += $armour->getTrainingRequired();
 				$soldier->setArmour($armour)->setHasArmour(true);
-				$change = true;			
+				$change = true;
 			}
 		}
 		if ($equipment && $equipment != $soldier->getTrainedEquipment()) {
@@ -345,9 +346,9 @@ class MilitaryManager {
 
 			$this->history->addToSoldierLog(
 				$soldier, 'retrain',
-				array('%link-settlement%'=>$settlement->getId(), 
-					'%link-item-1%'=>$weapon?$weapon->getId():0, 
-					'%link-item-2%'=>$armour?$armour->getId():0, 
+				array('%link-settlement%'=>$settlement->getId(),
+					'%link-item-1%'=>$weapon?$weapon->getId():0,
+					'%link-item-2%'=>$armour?$armour->getId():0,
 					'%link-item-3%'=>$equipment?$equipment->getId():0
 				)
 			);
@@ -387,7 +388,7 @@ class MilitaryManager {
 		$current->removeEntourage($entourage);
 		if ($entourage->getType()->getName() == 'follower' && $entourage->getSupply() > 0) {
 			$this->salvageItem($current, $entourage->getEquipment(), $entourage->getSupply());
-		} // TODO: if not, reclaim by settlement? 
+		} // TODO: if not, reclaim by settlement?
 		$this->em->remove($entourage);
 	}
 
@@ -397,7 +398,7 @@ class MilitaryManager {
 		$classname = strtolower(end($full_classname));
 //		$this->logger->info("walkHome to $classname ".$current->getId());
 		if ($classname=="character") {
-			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.location) as distance 
+			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.location) as distance
 				FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:Character c, BM2SiteBundle:GeoData h
 				WHERE c = :me AND h = :home AND ST_Intersects(g.poly, ST_MakeLine(h.center, c.location))=true ORDER BY distance ASC');
 			$query->setParameters(array('me'=>$current->getId(), 'home'=>$home->getGeoData()->getId()));
@@ -407,7 +408,7 @@ class MilitaryManager {
 			} else {
 				$geo = $current->getGeoData();
 			}
-			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.center) as distance 
+			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.center) as distance
 				FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:GeoData c, BM2SiteBundle:GeoData h
 				WHERE c = :here AND h = :home AND ST_Intersects(g.poly, ST_MakeLine(h.center, c.center))=true ORDER BY distance ASC');
 			$query->setParameters(array('here'=>$geo, 'home'=>$home->getGeoData()));
@@ -594,15 +595,26 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function newUnitSettings($unit, Character $character) {
+	public function newUnit(Character $character=null, Settlement $home) {
+		$unit = new Unit();
+		$this->em->persist($unit);
+		if ($character) {
+			$unit->setCharacter($character);
+		}
+		$unit->setSettlement($home);
+		$this->em->flush();
+		$settings = $this->newUnitSettings($unit, $character);
+		return $unit;
+	}
+
+	public function newUnitSettings(Unit $unit, Character $character=null) {
 		$settings = new UnitSettings();
 		$this->em->persist($settings);
+		$settings->setUnit($unit);
 		if ($character) {
-			$character->setUnitSettings($settings);
-			$settings->setCharacter($character);
 			$settings->setName($character->getName()."'s Unit");
 		} else {
-			$settings->setUnit($unit);
+			$settings->setName("Militia of ".$unit->getSettlement()->getName());
 		}
 		$this->em->flush();
 		return $settings;
