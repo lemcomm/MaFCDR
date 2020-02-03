@@ -40,7 +40,7 @@
 
 		<one-to-many field="buildings" target-entity="Building" mapped-by="place"/>
 		<one-to-many field="characters_present" target-entity="Character" mapped-by="inside_place"/>
-		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="place" index-by="id" fetch="EXTRA_LAZY"/>
+		<one-to-many field="units" target-entity="Unit" mapped-by="place"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="place"/>
 		<one-to-many field="permissions" target-entity="PlacePermission" mapped-by="place" fetch="EXTRA_LAZY"/>
