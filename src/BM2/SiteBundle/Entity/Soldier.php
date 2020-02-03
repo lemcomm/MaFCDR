@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -92,7 +92,7 @@ class Soldier extends NPC {
 	public function reduceMorale($value=1) { $this->morale-=$value; return $this; }
 	public function gainMorale($value=1) { $this->morale+=$value; return $this; }
 
-	public function getUnit() {
+	public function getAllInUnit() {
 		if ($this->getCharacter()) {
 			return $this->getCharacter()->getSoldiers();
 		} elseif ($this->getBase()) {
@@ -174,15 +174,15 @@ class Soldier extends NPC {
 
 	public function getWeapon() {
 		if ($this->has_weapon) return $this->weapon;
-		return null; 
+		return null;
 	}
 	public function getArmour() {
 		if ($this->has_armour) return $this->armour;
-		return null; 
+		return null;
 	}
 	public function getEquipment() {
 		if ($this->has_equipment) return $this->equipment;
-		return null; 
+		return null;
 	}
 	public function getTrainedWeapon() {
 		return $this->weapon;
@@ -277,7 +277,7 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this quite a bit
 
-		$fighters = $this->getUnit()->count();
+		$fighters = $this->getAllInUnit()->count();
 		if ($fighters>1) {
 			$this->ranged = $power * pow($fighters, 0.96)/$fighters;
 		} else {
@@ -306,7 +306,7 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this a little
 
-		$fighters = $this->getUnit()->count();
+		$fighters = $this->getAllInUnit()->count();
 		if ($fighters>1) {
 			$this->melee = $power * pow($fighters, 0.96)/$fighters;
 		} else {
@@ -347,10 +347,11 @@ class Soldier extends NPC {
 			$this->getBase()->removeSoldier($this);
 		}
 		if ($this->getLiege()) {
-			$this->getLiege()->removeSoldier($this);			
+			$this->getLiege()->removeSoldier($this);
 		}
 		if ($this->getMercenary()) {
 			$this->getMercenary()->removeSoldier($this);
 		}
 	}
+	
 }
