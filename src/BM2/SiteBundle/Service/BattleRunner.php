@@ -380,14 +380,14 @@ class BattleRunner {
 				}
 
 				if ($battle->getSiege() && !$this->siegeFinale && $group == $attGroup) {
-					$totalAttackers = $group->getActiveSoldiers()->count();
+					$totalAttackers = $group->getActiveMeleeSoldiers()->count();
 					if ($group->getReinforcedBy()) {
 						foreach ($group->getReinforcedBy() as $reinforcers) {
-							$totalAttackers += $reinforcers->getActiveSoldiers()->count();
+							$totalAttackers += $reinforcers->getActiveMeleeSoldiers()->count();
 						}
 					}
-					$this->attMinContacts = floor($totalAttackers / 10);
-					$this->defMinContacts = floor($totalAttackers / 9);
+					$this->attMinContacts = floor($totalAttackers/4);
+					$this->defMinContacts = floor(($totalAttackers/4*1.2);
 				}
 				if ($battle->getSiege() && ($battle->getSiege()->getAttacker() != $group && !$battle->getSiege()->getAttacker()->getReinforcedBy()->contains($group))) {
 					// if we're on defense, we feel like we're more
@@ -545,6 +545,36 @@ class BattleRunner {
 		$hunt = $this->runStage('hunt', $rangedPenalty, $phase, $doRanged);
 	}
 
+	private function prepareRound() {
+		// store who is active, because this changes with hits and would give the first group to resolve the initiative while we want things to be resolved simultaneously
+		foreach ($this->battle->getGroups() as $group) {
+			foreach ($group->getSoldiers() as $soldier) {
+				$soldier->setFighting($soldier->isActive());
+				$soldier->resetAttacks();
+			}
+		}
+		// Updated siege assault contact scores. When we have siege engines, this will get ridiculously simpler to calculate. Defenders always get it slightly easier.
+		if ($this->battle->getType() == 'siegeassault') {
+			$newAttContacts = $this->attCurrentContacts - $this->attSlain;
+			$newDefContacts = $this->defCurrentContacts - $this->defSlain;
+ 			if ($newAttContacts < $this->attMinContacts) {
+				$this->attCurrentContacts = $this->attMinContacts;
+			} else {
+				$this->attCurrentContacts = $newAttContacts;
+			}
+			if ($newDefContacts < $this->defMinContacts) {
+				if ($newDefContacts < $this->attCurrentContacts) {
+					$this->defCurrentContacts = $this->attCurrentContacts*1.3;
+				} else {
+					$this->defCurrentContacts = $newDefContacts;
+				}
+			}
+			$this->defUsedContacts = 0;
+			$this->attusedContacts = 0;
+		}
+
+	}
+
 	private function runStage($type = 'normal', $rangedPenaltyStart, $phase, $doRanged) {
 		$groups = $this->battle->getGroups();
 		$battle = $this->battle;
@@ -568,12 +598,12 @@ class BattleRunner {
 				if ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker()) {
 					$rangedPenalty = 1; # TODO: Make this dynamic. Right now this can lead to weird scenarios in regions with higher penalties where the defenders are actually easier to hit.
 					$siegeAttacker = TRUE;
-					$usedContacts = $this->attUsedContacts;
+					$usedContacts = 0;
 					$currentContacts = $this->attCurrentContacts;
 				} else {
 					$defBonus = 0; # Siege defenders use pre-determined rangedPenalty.
 					$siegeAttacker = FALSE;
-					$usedContacts = $this->defUsedContacts;
+					$usedContacts = 0;
 					$currentContacts = $this->defCurrentContacts;
 				}
 			}
@@ -719,21 +749,19 @@ class BattleRunner {
 						// TODO: friendly fire !
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
 
-						if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
-							// hit someone
+						$target = $this->getRandomSoldier($enemyCollection);
+						if ($target) {
 							$shots++;
-							$target = $this->getRandomSoldier($enemyCollection);
-							if ($target) {
+							if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 								$rangedHits++;
-								$result = $this->RangedHit($soldier, $target, 'melee');
+								$result = $this->RangedHit($solder, $target);
 							} else {
-								// no more targets
-								$this->log(10, "no more targets\n");
+								$missed++;
+								$this->log(10, "missed\n");
 							}
 						} else {
-							// missed
-							$this->log(10, "missed\n");
-							$missed++;
+							// no more targets
+							$this->log(10, "no more targets\n");
 						}
 					} else if ($soldier->MeleePower() > 0 && (($battle->getType() == 'siegeassault' && $usedContacts < $currentContacts) || ($battle->getType() != 'siegeassault'))) {
 						// We are either in a siege assault and we have contact points left, OR we are not in a siege assault. We are a melee unit or ranged unit with melee capabilities in final siege battle.
@@ -810,8 +838,10 @@ class BattleRunner {
 			$this->attSlain += $attSlain;
 			if ($battle->getType() == 'siegeassault') {
 				if ($siegeAttacker) {
+					$this->log(10, "Used "$usedContacts" contacts.\n");
 					$this->attUsedContacts += $usedContacts;
 				} else {
+					$this->log(10, "Used "$usedContacts" contacts.\n");
 					$this->defUsedContacts += $usedContacts;
 				}
 			}
@@ -1188,7 +1218,7 @@ class BattleRunner {
 		return $primaryVictor;
 	}
 
-	private function MeleeAttack(Soldier $soldier, Soldier $target, $phase) {
+	private function MeleeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		$soldier->gainExperience(1*$xpMod);
 		$result='miss';
@@ -1220,7 +1250,7 @@ class BattleRunner {
 		return $result;
 	}
 
-	private function RangedHit(Soldier $soldier, Soldier $target, $phase='ranged') {
+	private function RangedHit(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		$soldier->gainExperience(1*$xpMod);
 		$result='miss';
@@ -1336,43 +1366,13 @@ class BattleRunner {
 		// FIXME: these need to take unit sizes into account!
 		// FIXME: maybe we can optimize this by counting morale damage per unit and looping over all soldiers only once?!?!
 		// every casualty reduces the morale of other soldiers in the same unit
-		foreach ($target->getUnit() as $s) { $s->reduceMorale(1); }
+		foreach ($target->getAllInUnit() as $s) { $s->reduceMorale(1); }
 		// enemy casualties make us happy - +5 for the killer, +1 for everyone in his unit
-		foreach ($soldier->getUnit() as $s) { $s->gainMorale(1); }
+		foreach ($soldier->getAllInUnit() as $s) { $s->gainMorale(1); }
 		$soldier->gainMorale(4); // this is +5 because the above includes myself
 
 		// FIXME: since nobles can be wounded more than once, this can/will count them multiple times
 		return $result;
-	}
-
-	private function prepareRound() {
-		// store who is active, because this changes with hits and would give the first group to resolve the initiative while we want things to be resolved simultaneously
-		foreach ($this->battle->getGroups() as $group) {
-			foreach ($group->getSoldiers() as $soldier) {
-				$soldier->setFighting($soldier->isActive());
-				$soldier->resetAttacks();
-			}
-		}
-		// Updated siege assault contact scores. When we have siege engines, this will get ridiculously simpler to calculate. Defenders always get it slightly easier.
-		if ($this->battle->getType() == 'siegeassault') {
-			$newAttContacts = $this->attCurrentContacts - $this->attSlain;
-			$newDefContacts = $this->defCurrentContacts - $this->defSlain;
- 			if ($newAttContacts < $this->attMinContacts) {
-				$this->attCurrentContacts = $this->attMinContacts;
-			} else {
-				$this->attCurrentContacts = $newAttContacts;
-			}
-			if ($newDefContacts < $this->defMinContacts) {
-				if ($newDefContacts < $this->attCurrentContacts) {
-					$this->defCurrentContacts = $this->attCurrentContacts*1.1;
-				} else {
-					$this->defCurrentContacts = $newDefContacts;
-				}
-			}
-			$this->defUsedContacts = 0;
-			$this->attusedContacts = 0;
-		}
-
 	}
 
 	public function addLootToken() {
