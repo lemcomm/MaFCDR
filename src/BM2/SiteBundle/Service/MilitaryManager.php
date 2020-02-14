@@ -595,26 +595,61 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function newUnit(Character $character=null, Settlement $home) {
+	public function newUnit(Character $character=null, Settlement $home = null, $isMilitia = false, $data = null) {
 		$unit = new Unit();
 		$this->em->persist($unit);
 		if ($character) {
 			$unit->setCharacter($character);
 		}
-		$unit->setSettlement($home);
+		if ($isMilitia) {
+			$unit->setMilitia($isMilitia);
+		}
+		if ($home) {
+			$unit->setSettlement($home);
+		}
+		if ($data && $data['supplier']) {
+			$unit->setSupplier($data['supplier']);
+		}
 		$this->em->flush();
-		$settings = $this->newUnitSettings($unit, $character);
+		$settings = $this->newUnitSettings($unit, $character, $data);
 		return $unit;
 	}
 
-	public function newUnitSettings(Unit $unit, Character $character=null) {
+	public function newUnitSettings(Unit $unit, Character $character=null, $data = null) {
 		$settings = new UnitSettings();
 		$this->em->persist($settings);
 		$settings->setUnit($unit);
-		if ($character) {
-			$settings->setName($character->getName()."'s Unit");
+		if ($data) {
+			$settings->setName($data['name']);
+			if ($data['strategy']) {
+				$settings->setStrategy($data['strategy']);
+			}
+			if ($data['tactic']) {
+				$settings->setTactic($data['tactic']);
+			}
+			if ($data['respect_fort']) {
+				$settings->setRespectFort($data['respect_fort']);
+			}
+			if ($data['line']) {
+				$settings->setLine($data['line']);
+			}
+			if ($data['siege_orders']) {
+				$settings->setSiegeOrders($data['siege_orders']);
+			}
+			if ($data['renamable']) {
+				$settings->setRenamable($data['renamable']);
+			}
+			if ($data['retreat_threshold']) {
+				$settings->setRetreatThreshold($data['retreat_threshold']);
+			}
 		} else {
-			$settings->setName("Militia of ".$unit->getSettlement()->getName());
+			if ($character) {
+				$settings->setName($character->getName()."'s Unit");
+			} elseif ($unit->getSettlement()) {
+				$settings->setName("Militia of ".$unit->getSettlement()->getName());
+			} else {
+				$settings->setName("A Unit of Unknown Origin");
+			}
 		}
 		$this->em->flush();
 		return $settings;
