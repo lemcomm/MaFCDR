@@ -65,20 +65,20 @@ class GameRequestManager {
 		3. This service builds the GameRequest and stores it in the database.
 		4. Another route, likely the bm2_gamerequest_manage route allows the receiving user to interact with pending/active requests.
 		5. That controller presents the approve/deny actions to the user.
-		6. When a user accepts/denies a request, it is handled by the GameRequest Controller, either by the bm2_gamerequest_approve or the bm2_gamerequest_deny routes, respectively. 
+		6. When a user accepts/denies a request, it is handled by the GameRequest Controller, either by the bm2_gamerequest_approve or the bm2_gamerequest_deny routes, respectively.
 		   These routes verify the user has authority to handle that request, carry out all actions of the request, and reroute the user to the appropriate page afterwards.
 		7. When an approved request reaches it's expiration date OR a week after a denied request was denied has been reached, GameRunner will purge that request from the database on the next hourly turn.
 
 	If you need more detailed information on these, contact a M&F developer--we recommend Andrew. */
 
 	protected $em;
-	
+
 	public function __construct(EntityManager $em) {
 		$this->em = $em;
 	}
 
 	public function findAllManageableRequests(Character $char) {
-		# Build a list of all realms we are in, using their IDs.		
+		# Build a list of all realms we are in, using their IDs.
 		$realms = $char->findRealms();
 		$realmIDs =  [];
 		foreach ($realms as $realm) {
@@ -282,5 +282,23 @@ class GameRequestManager {
 			$GR->setToSettlement($toSettlement);
 		}
 		$this->em->flush();
+	}
+
+	public function getAvailableFoodSuppliers(Character $char) {
+		# Build the list of settlements we can get food from...
+                $query = $em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$character, 'type'=>'soldier.food'));
+                $results = $query->getResult();
+                # Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'.
+                # Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0.
+                # Which will never happen.
+                if (count($results) < 1) {
+                        $settlements = 0;
+                } else {
+                        $settlements = array();
+                        foreach ($query->getResult() as $result) {
+                                $settlements[] = $result->getToSettlement()->getId();
+                        }
+                }
+		return $settlements;
 	}
 }
