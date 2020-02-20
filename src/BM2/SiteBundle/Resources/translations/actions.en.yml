@@ -1153,3 +1153,12 @@ place:
   name:   View Local Places
   description:   Perhaps one of them will be interesting?
   longdesc:      Places of interest can exist either inside or outside settlements, and can be created by anyone with permission of the local lord.
+
+unit:
+ list:
+  name:     Manage Units
+  intro:    Placeholder text intro for managing units!
+  list:     Your Units
+  soldiers: Comprised of
+  count:    %soldiers% Soldiers
+  manage:   Manage Unit Settings
