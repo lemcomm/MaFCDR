@@ -1,0 +1,25 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'unit.list.name'|trans({},"actions") }}</h2>
+	<p>{{ 'unit.list.intro'|trans({},"actions")|raw }}</p>
+
+	<h3> {{ 'unit.list.list'|trans({},"actions")|title }}</h3>
+        {% for unit in units %}
+                {% if unit.character == character %}
+                        <hr>
+                        <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
+                        {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br /><br />
+                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
+                {% else %}
+                        <hr>
+                        <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
+                        {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br />
+                        {{ 'unit.list.commander'|trans({"%character%":link(unit.character)}, "actions")|raw }}<br /><br />
+                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
+                {% endif %}
+        {% else %}
+                {{ 'unit.list.empty' |trans({},"actions")|raw }}
+        {% endfor %}
+
+{% endblock %}
