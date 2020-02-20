@@ -48,17 +48,19 @@ class UnitController extends Controller {
 
                 $em = $this->getDoctrine()->getManager();
 
+                #TODO: Group DQL results by character assigned to. 'u.character'
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.character = :char OR (u.settlement = :settlement AND u.is_militia = TRUE) ORDER BY u.name ASC');
+                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement AND u.is_militia = TRUE) ORDER BY s.name ASC');
                    $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
-                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.character = :char ORDER BY u.name ASC');
+                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
                    $query->setParameter('char', $character);
                 }
-                $units = $query->getResults();
+                $units = $query->getResult();
 
                 return array(
-                   'units' => $units
+                   'units' => $units,
+                   'character' => $character
            );
         }
 
@@ -74,6 +76,7 @@ class UnitController extends Controller {
                 }
 		$em = $this->getDoctrine()->getManager();
 
+                #TODO: Move to dispatcher.
                 if (!$character->getInsideSettlement()) {
                         throw new AccessDeniedHttpException('unavailable.notinside');
                 }
@@ -82,7 +85,7 @@ class UnitController extends Controller {
                 }
 
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
-                $form = $this->createForm(new UnitSettingsType($character, true, $settlements));
+                $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
 
                 $form->handelRequest($request);
                 if ($form-isValid()) {
@@ -95,13 +98,13 @@ class UnitController extends Controller {
                 }
 
                 return array(
-                        'form' => $form
+                        'form' => $form->createView()
                 );
         }
 
         /**
 	  * @Route("/{unit}/manage", name="maf_unit_manage", requirements={"unit"="\d+"})
-	  * @Template
+	  * @Template("BM2SiteBundle:Unit:manage.html.twig")
 	  */
 
         public function unitManageAction(Request $request, Unit $unit) {
@@ -118,6 +121,8 @@ class UnitController extends Controller {
                 if ($character->getInsideSettlement() && $character == $character->getInsideSettlement()->getOwner()) {
                         $lord = true;
                 }
+
+                #TODO: Move to dispatcher.
                 if (!$character->getUnits()->contains($unit)) {
                         throw new AccessDeniedHttpException('unavailable.notyourunit');
                 }
@@ -130,10 +135,10 @@ class UnitController extends Controller {
                 }
 
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
-                $form = $this->createForm(new UnitSettingsType($character, true, $settlements, $unit->getSettings()));
+                $form = $this->createForm(new UnitSettingsType($character, true, $settlements, $unit->getSettings(), $lord));
 
-                $form->handelRequest($request);
-                if ($form-isValid()) {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
                         $data = $form->getData();
                         $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), false, $data);
                         if ($unit) {
@@ -143,7 +148,7 @@ class UnitController extends Controller {
                 }
 
                 return array(
-                        'form' => $form
+                        'form' => $form->createView()
                 );
 
         }
