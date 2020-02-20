@@ -4,7 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<one-to-one field="unit" target-entity="Unit" mapped-by="settings"/>
+		<one-to-one field="unit" target-entity="Unit" inversed-by="settings" fetch="EAGER"/>
 		<field name="name" type="string"/>
 		<field name="strategy" type="string" nullable="true"/>
 		<field name="tactic" type="string" nullable="true"/>
