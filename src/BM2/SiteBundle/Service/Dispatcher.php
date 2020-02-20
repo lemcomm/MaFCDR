@@ -442,12 +442,12 @@ class Dispatcher {
 		$actions=array();
 
 		if ($this->getCharacter()->isNPC()) {
-			$actions[] = $this->metaUnitSettingsTest();
+			# $actions[] = $this->metaUnitSettingsTest(); TODO: Redirect to new unit management page
 			$actions[] = $this->metaKillTest();
 		} else {
 			$actions[] = $this->personalRequestsManageTest();
 			$actions[] = $this->personalRequestSoldierFoodTest();
-			$actions[] = $this->metaUnitSettingsTest();
+			# $actions[] = $this->metaUnitSettingsTest(); TODO: Redirect to new unit management page
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
 			}
@@ -616,10 +616,10 @@ class Dispatcher {
 		$actions=array();
 
 		if ($this->getCharacter()->isNPC()) {
-			$actions[] = $this->metaUnitSettingsTest();
+			# $actions[] = $this->metaUnitSettingsTest();
 			$actions[] = $this->metaKillTest();
 		} else {
-			$actions[] = $this->metaUnitSettingsTest();
+			# $actions[] = $this->metaUnitSettingsTest();
 			$actions[] = $this->metaBackgroundTest();
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
@@ -2613,10 +2613,10 @@ class Dispatcher {
 		return array("name"=>"meta.heraldry.name", "url"=>"bm2_site_character_heraldry", "description"=>"meta.heraldry.description");
 	}
 
-	public function metaUnitSettingsTest() {
+	/*public function metaUnitSettingsTest() {
 		# Not even sure there's a reason to have this here besides standardization. --Andrew
 		return array("name"=>"meta.unitsettings.name", "url"=>"bm2_site_character_unitsettings", "description"=>"meta.unitsettings.description");
-	}
+	}*/
 
 	/* ========== various tests and helpers ========== */
 
