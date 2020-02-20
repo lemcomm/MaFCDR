@@ -286,7 +286,7 @@ class GameRequestManager {
 
 	public function getAvailableFoodSuppliers(Character $char) {
 		# Build the list of settlements we can get food from...
-                $query = $em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$character, 'type'=>'soldier.food'));
+                $query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$char, 'type'=>'soldier.food'));
                 $results = $query->getResult();
                 # Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'.
                 # Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0.
