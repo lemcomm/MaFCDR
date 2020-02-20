@@ -9,9 +9,9 @@ use Doctrine\ORM\EntityRepository;
 
 use BM2\SiteBundle\Entity\UnitSettings;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,12 +21,15 @@ class UnitSettingsType extends AbstractType {
 	private $char;
 	private $supply;
 	private $settlements;
+	private $settings;
+	private $lord;
 
-	public function __construct($char, $supply, $settlements, UnitSettings $settings) {
+	public function __construct($char, $supply, $settlements, UnitSettings $settings, $lord) {
 		$this->char = $char;
 		$this->supply = $supply;
 		$this->settlements = $settlements;
 		$this->settings = $settings;
+		$this->lord = $lord;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -42,6 +45,7 @@ class UnitSettingsType extends AbstractType {
 		$supply = $this->supply;
 		$settlements = $this->settlements;
 		$settings = $this->settings;
+		$lord = $this->lord;
 
 		$name = null;
 		$supplier = null;
@@ -81,7 +85,7 @@ class UnitSettingsType extends AbstractType {
 			}
 		}
 		if($renamable !== false) {
-			$builder->add('name', TextType::class array(
+			$builder->add('name', TextType::class, array(
 				'label'=>'unit.name',
 				'required'=>true
 			));
@@ -126,8 +130,7 @@ class UnitSettingsType extends AbstractType {
 		));
 		$builder->add('respect_fort', CheckboxType::class, array(
 			'label'=>'unit.usefort',
-			'required'=>false,
-			'placeholder'=>$respect
+			'required'=>false
 		));
 		$builder->add('line', ChoiceType::class, array(
 			'label'=>'unit.line.name',
@@ -153,20 +156,21 @@ class UnitSettingsType extends AbstractType {
 			),
 			'placeholder'=>$siege
 		));
-		$builder->add('renamable', ChoiceType::class, array(
-			'label'=>'unit.renamable.name',
-			'required'=>false,
-			'choices'=>array(
-				true => 'unit.renamable.true',
-				false => 'unit.renamable.false'
-			),
-			'placeholder'=>$renamable
-		));
+		if ($lord) {
+			$builder->add('renamable', ChoiceType::class, array(
+				'label'=>'unit.renamable.name',
+				'required'=>false,
+				'choices'=>array(
+					true => 'unit.renamable.true',
+					false => 'unit.renamable.false'
+				),
+				'placeholder'=>$renamable
+			));
+		}
 		$builder->add('retreat_threshold', NumberType::class, array(
 			'label'=>'unit.retreat.name',
-			'required'=>false,
-			'placeholder'=>$retreat
-		))
+			'required'=>false
+		));
 		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
 	}
 
