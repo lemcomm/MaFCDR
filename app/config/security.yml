@@ -32,7 +32,7 @@ security:
                 lifetime:       7776000 # 90 days in seconds
                 path:           /
                 domain:         ~ # Defaults to the current domain from $_SERVER
-            logout:     
+            logout:
                 path:           fos_user_security_logout
                 target:         bm2_homepage
 
@@ -52,6 +52,7 @@ security:
         - { path: ^/(../)?messages, roles: ROLE_USER }
         - { path: ^/(../)?settlement, roles: ROLE_USER }
         - { path: ^/(../)?translator, roles: ROLE_USER }
+        - { path: ^/(../)?unit, roles: ROLE_USER }
         - { path: ^/(../)?login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?resetting$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
