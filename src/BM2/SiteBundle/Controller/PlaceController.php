@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class PlaceController extends Controller {
 
 	/**
-	  * @Route("/{id}", name="bm2_place", requirements={"id"="\d+"})
+	  * @Route("/{id}", name="maf_place", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:Place:view.html.twig")
 	  */
 	public function indexAction(Place $id) {
@@ -74,7 +74,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/actionable", name="bm2_place_actionable")
+	  * @Route("/actionable", name="maf_place_actionable")
 	  * @Template
 	  */
 
@@ -118,7 +118,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/enter", name="bm2_place_enter")
+	  * @Route("/{id}/enter", name="maf_place_enter")
 	  * @Template
 	  */
 
@@ -140,7 +140,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/exit", name="bm2_place_exit")
+	  * @Route("/exit", name="maf_place_exit")
 	  * @Template
 	  */
 
@@ -162,7 +162,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="bm2_place_permissions")
+	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="maf_place_permissions")
 	  * @Template
 	  */
 
@@ -213,7 +213,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/new")
+	  * @Route("/new", name="maf_place_new")
 	  * @Template
 	  */
 	public function newAction(Request $request) {
@@ -379,12 +379,12 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/manage", requirements={"id"="\d+"}, name="bm2_place_manage")
+	  * @Route("/{id}/manage", requirements={"id"="\d+"}, name="maf_place_manage")
 	  * @Template
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('placeManageTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
