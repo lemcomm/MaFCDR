@@ -34,7 +34,7 @@ class HouseController extends Controller {
 	private $house;
 
 	/**
-	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
+	  * @Route("/{id}", name="maf_house", requirements={"id"="\d+"})
 	  * @Template("BM2SiteBundle:House:view.html.twig")
 	  */
 
@@ -59,7 +59,7 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/nearby", name="bm2_house_nearby")
+	  * @Route("/nearby", name="maf_house_nearby")
 	  * @Template
 	  */
 
@@ -97,24 +97,15 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/create", name="bm2_house_create")
+	  * @Route("/create", name="maf_house_create")
 	  * @Template
 	  */
 
 	public function createAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseCreateHouseTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		if ($character->getInsideSettlement()) {
-			$settlement = $character->getInsideSettlement();
-		} else {
-			throw $this->createNotFoundException('unvailable.notinside');
-		}
-		if ($character->getHouse()) {
-			throw $this->createNotFoundException('error.found.house');
-		}
-		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$crest = $character->getCrest();
 		$form = $this->createForm(new HouseCreationType());
@@ -130,7 +121,7 @@ class HouseController extends Controller {
 			$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
 			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
@@ -138,12 +129,12 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{house}/manage", name="bm2_house_manage", requirements={"house"="\d+"})
+	  * @Route("/{house}/manage", name="maf_house_manage", requirements={"house"="\d+"})
 	  * @Template
 	  */
 
 	public function manageAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseManageHouseTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -161,10 +152,6 @@ class HouseController extends Controller {
 
 		$form = $this->createForm(new HouseCreationType($name, $motto, $desc, $priv, $secret));
 		$form->handleRequest($request);
-		# TODO: Rework this to use dispatcher.
-		if ($character != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$change = FALSE;
@@ -201,7 +188,7 @@ class HouseController extends Controller {
 				$em->flush();
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
@@ -209,25 +196,17 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{house}/join", name="bm2_house_join", requirements={"house"="\d+"})
+	  * @Route("/{house}/join", name="maf_house_join", requirements={"house"="\d+"})
 	  * @Template
 	  */
 
 	public function joinAction(House $house, Request $request) {
-		$hashouse = FALSE;
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('dispatcher')->gateway('houseJoinHouseTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
-		# TODO: Rework this later to allow for Houses at Places.
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getInsideSettlement()) {
-			throw $this->createNotFoundException('unvailable.notinside');
-		}
-		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
-			throw $this->createNotFoundException('error.notfound.housenothere');
-		}
+		$hashouse = FALSE;
 		$form = $this->createForm(new HouseJoinType());
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -252,23 +231,16 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{house}/applicants", name="bm2_house_applicants", requirements={"house"="\d+"})
+	  * @Route("/{house}/applicants", name="maf_house_applicants", requirements={"house"="\d+"})
 	  * @Template
 	  */
 
 	public function applicantsAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseManageApplicantsTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$joinrequests = $em->getRepository('BM2SiteBundle:GameRequest')->findBy(array('type' => 'house.join', 'to_house' => $house));
 
 		foreach ($joinrequests as $joinrequest) {
@@ -283,23 +255,16 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{house}/disown", name="bm2_house_disown", requirements={"house"="\d+"})
+	  * @Route("/{house}/disown", name="maf_house_disown", requirements={"house"="\d+"})
 	  * @Template
 	  */
 
 	public function disownAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseManageDisownTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$members = $house->findAllMembers();
 
 		$form = $this->createForm(new HouseMembersType($members));
@@ -338,23 +303,17 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/{house}/successor", name="bm2_house_successor", requirements={"house"="\d+"})
+	  * @Route("/{house}/successor", name="maf_house_successor", requirements={"house"="\d+"})
 	  * @Template
 	  */
 
 	public function successorAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseManageSuccessorTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
+
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$members = $house->findAllMembers();
 
 		$form = $this->createForm(new HouseMembersType($members));
@@ -377,39 +336,19 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/relocate", name="bm2_house_relocate")
+	  * @Route("/relocate", name="maf_house_relocate")
 	  * @Template
 	  */
 
 	public function relocateAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('houseManageRelocateTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		$settlement = null;
-		$house = null;
-		#Character must be inside a settlement in order to relocate the house
-		if ($character->getInsideSettlement()) {
-			$settlement = $character->getInsideSettlement();
-			#Can only relocate a house if you own the target settlement
-			if ($settlement->getOwner() != $character) {
-				throw $this->createNotFOundException('unavailable.notyours2');
-			} else {
-				$settlement = $character->getInsideSettlement();
-			}
-		} else {
-			throw $this->createNotFoundException('unvailable.notinside');
-		}
-		#Impossible to relocate a house if you don't belong to one.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.found.house');
-		}
-		#Only the Head of a house can relocate.
-		if ($character->getHouse()->getHead() != $character) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		} else {
-			$house = $character->getHouse();
-		}
+
+		$settlement = $character->getInsideSettlement();
+		$place = $character->getInsidePlace();
+		$house = $charcter->getHouse();
 		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$form = $this->createForm(new AreYouSureType());
@@ -422,14 +361,27 @@ class HouseController extends Controller {
 			}
 			if (!$fail) {
 				#Update House location
-				$house->setInsideSettlement($settlement);
-				#Create relocation event in House's event log
-				$this->get('history')->logEvent(
-					$house,
-					'event.house.relocated.settlement',
-					array('%link-settlement%'=>$settlement->getId()),
-					History::HIGH, true
-				);
+				if (!$place) {
+					$house->setInsidePlace(null);
+					$house->setInsideSettlement($settlement);
+					#Create relocation event in House's event log
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.relocated.settlement',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$house->setInsidePlace($place);
+					$house->setInsideSettlement(null);
+					#Create relocation event in House's event log
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.relocated.place',
+						array('%link-place%'=>$place->getId()),
+						History::HIGH, true
+					);
+				}
 				$em->flush();
 				#Add "success" flash message to the top of the redirected page for feedback.
 				$this->addFlash('notice', $this->get('translator')->trans('house.updated.relocated', array(), 'messages'));
