@@ -18,9 +18,9 @@ class HouseManager {
 		$this->descman = $descman;
 	}
 
-	public function create($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement=null, $crest = null, Character $founder) {
-		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, null, $settlement, $crest, $founder);
+	public function create($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $superior = null, $place=null, $settlement=null, $crest = null, Character $founder) {
+		# _create(name, description, private description, secret description, superior house, place, settlement, crest, and founder)
+		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, null, $place, $settlement, $crest, $founder);
 
 		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
@@ -44,7 +44,7 @@ class HouseManager {
 		$private_description = null;
 		$secret_description = null;
 		$crest = $founder->getCrest();
-		
+
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
 		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, $id, $crest, $settlement, $founder);
 
@@ -76,7 +76,7 @@ class HouseManager {
 		return $house;
 	}
 
-	private function _create($name, $motto, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement = null, $crest = null, Character $founder) {
+	private function _create($name, $motto, $description = null, $private_description = null, $secret_description = null, $superior = null, $place = null, $settlement = null, $crest = null, Character $founder) {
 		$house = new House;
 		$this->em->persist($house);
 		$house->setName($name);
@@ -87,7 +87,11 @@ class HouseManager {
 			$house->setSuperior($superior);
 			$superior->addCadet($house);
 		}
-		$house->setInsideSettlement($settlement);
+		if ($place) {
+			$house->setInsidePlace($place);
+		} else {
+			$house->setInsideSettlement($settlement);
+		}
 		$house->setCrest($crest);
 		$house->setFounder($founder);
 		$house->setHead($founder);
@@ -100,5 +104,5 @@ class HouseManager {
 
 		return $house;
 	}
-	
+
 }
