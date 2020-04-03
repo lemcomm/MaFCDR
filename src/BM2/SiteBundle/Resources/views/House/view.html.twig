@@ -31,7 +31,15 @@
 			<dd>{{ house.motto }} </dd>
 		{% endif %}
 		<dt>{{ 'house.view.home'|trans({},"politics") }}</dt>
-		<dd>{{ link(house.insideSettlement) }}</dt>
+		{% if house.insidePlace %}
+			{% if house.insidePlace.insideSettlement %}
+				<dd> {{ link(house.insidePlace) }}, {{ link(house.insidePlace.insideSettlement) }}</dd>
+			{% else %}
+				<dd> {{ link(house.insidePlace) }}</dd>
+			{% endif %}
+		{% else %}
+			<dd>{{ link(house.insideSettlement) }}</dt>
+		{% endif %}
 	</dl>
 	{% if details %}
 		<h3>{{ 'house.background.private.name'|trans({},"politics")|title }}</h3>
