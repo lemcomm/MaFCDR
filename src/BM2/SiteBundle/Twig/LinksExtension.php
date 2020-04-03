@@ -172,7 +172,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'artifact':	return 'bm2_site_artifacts_details';
 			case 'war':		return 'bm2_site_war_view';
 			case 'newsedition':	return 'bm2_site_news_read';
-			case 'house':		return 'bm2_house';
+			case 'house':		return 'maf_house';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
