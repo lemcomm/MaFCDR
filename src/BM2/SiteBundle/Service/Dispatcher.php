@@ -2072,7 +2072,7 @@ class Dispatcher {
 			# It's a long line, but basically, are we inside a settlement with permission, or outside a settlement with permission. If neither, we don't get access :)
 			return array("name"=>"place.new.name", "description"=>"unavailable.nopermission");
 		}
-		return array("name"=>"place.new.name", "url"=>"maf_site_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
+		return array("name"=>"place.new.name", "url"=>"maf_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 	}
 
 	public function placeManageTest() {
