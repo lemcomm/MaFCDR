@@ -36,13 +36,13 @@ class UnitController extends Controller {
           */
 
         public function indexAction(Request $request) {
-                $character = $this->get('appstate')->getCharacter();
-                if (! $character instanceof Character) {
-                   return $this->redirectToRoute($character);
-                }
+		$character = $this->get('dispatcher')->gateway('personalAssignedUnitsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-                if ($character->getUnits()->isEmpty()) {
-                   # Chosen character has no units, make a new default unit.
+                if (($character->getUnits()->isEmpty() && !$character->getSoldiers()->isEmpty()) OR (!$character->getUnits()->isEmpty() && !$character->getSoldiers()->isEmpty())) {
+                   # Chosen character has no units, make a new default unit, or has both units and soldiers directly, so make another one because something clearly went wrong.
                    $unit = $this->get('military_manager')->newUnit($character, null);
                 }
 
@@ -70,19 +70,11 @@ class UnitController extends Controller {
           */
 
         public function createAction(Request $request) {
-                $character = $this->get('appstate')->getCharacter();
-                if (! $character instanceof Character) {
-                   return $this->redirectToRoute($character);
-                }
+		$character = $this->get('dispatcher')->gateway('personalUnitNewTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
-
-                #TODO: Move to dispatcher.
-                if (!$character->getInsideSettlement()) {
-                        throw new AccessDeniedHttpException('unavailable.notinside');
-                }
-                if ($character != $character->getInsideSettlement()->getOwner()) {
-                        throw new AccessDeniedHttpException('unavailable.notlord');
-                }
 
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
@@ -96,7 +88,6 @@ class UnitController extends Controller {
                                 return $this->redirectToRoute('maf_units');
                         }
                 }
-
                 return array(
                         'form' => $form->createView()
                 );
@@ -108,10 +99,11 @@ class UnitController extends Controller {
 	  */
 
         public function unitManageAction(Request $request, Unit $unit) {
-                $character = $this->get('appstate')->getCharacter();
-                if (! $character instanceof Character) {
-                        return $this->redirectToRoute($character);
-                }
+		$character = $this->get('dispatcher')->gateway('personalUnitManageTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
                 /*
                 Character -> Lead units
@@ -120,18 +112,6 @@ class UnitController extends Controller {
                 $lord = false;
                 if ($character->getInsideSettlement() && $character == $character->getInsideSettlement()->getOwner()) {
                         $lord = true;
-                }
-
-                #TODO: Move to dispatcher.
-                if (!$character->getUnits()->contains($unit)) {
-                        throw new AccessDeniedHttpException('unavailable.notyourunit');
-                }
-                if (!$unit->getCharacter()) {
-                        if ($unit->getSettlement()->getOwner() != $character) {
-                                throw new AccessDeniedHttpException('unavailable.notlord');
-                        } elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-                                throw new AccessDeniedHttpException('unvailable.notinside');
-                        }
                 }
 
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
