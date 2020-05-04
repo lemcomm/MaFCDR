@@ -612,6 +612,12 @@ class MilitaryManager {
 		}
 		$this->em->flush();
 		$settings = $this->newUnitSettings($unit, $character, $data);
+		foreach($character->getSoldiers() as $soldier) {
+			$character->removeSoldier($soldier);
+			$soldier->setCharacter(null);
+			$soldier->setUnit($unit);
+		}
+		$this->em->flush();
 		return $unit;
 	}
 
