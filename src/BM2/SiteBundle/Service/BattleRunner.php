@@ -387,7 +387,7 @@ class BattleRunner {
 						}
 					}
 					$this->attMinContacts = floor($totalAttackers/4);
-					$this->defMinContacts = floor(($totalAttackers/4*1.2);
+					$this->defMinContacts = floor(($totalAttackers/4*1.2));
 				}
 				if ($battle->getSiege() && ($battle->getSiege()->getAttacker() != $group && !$battle->getSiege()->getAttacker()->getReinforcedBy()->contains($group))) {
 					// if we're on defense, we feel like we're more
@@ -838,10 +838,10 @@ class BattleRunner {
 			$this->attSlain += $attSlain;
 			if ($battle->getType() == 'siegeassault') {
 				if ($siegeAttacker) {
-					$this->log(10, "Used "$usedContacts" contacts.\n");
+					$this->log(10, "Used ".$usedContacts." contacts.\n");
 					$this->attUsedContacts += $usedContacts;
 				} else {
-					$this->log(10, "Used "$usedContacts" contacts.\n");
+					$this->log(10, "Used ".$usedContacts." contacts.\n");
 					$this->defUsedContacts += $usedContacts;
 				}
 			}
