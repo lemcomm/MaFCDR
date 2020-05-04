@@ -87,7 +87,7 @@ class Dispatcher {
 		this is our main entrance, fetching the character data from the appstate as well as the nearest settlement
 		and then applying any (optional) test on the whole thing.
 	*/
-	public function gateway($test=false, $getSettlement=false, $check_duplicate=true, $getPlace=false) {
+	public function gateway($test=false, $getSettlement=false, $check_duplicate=true, $getPlace=false, $option=null) {
 		$character = $this->getCharacter();
 		if (!$character || ! $character instanceof Character) {
 			/* Yes, if it's not a character, we return it. We check this on the other side again, and redirect if it's not a character.
@@ -108,7 +108,7 @@ class Dispatcher {
 		$settlement = null;
 		if ($test || $getSettlement) {
 			if ($test) {
-				$test = $this->$test($check_duplicate);
+				$test = $this->$test($check_duplicate, $option);
 				if (!isset($test['url'])) {
 					throw new AccessDeniedHttpException("messages::unavailable.intro::".$test['description']);
 				}
@@ -431,7 +431,9 @@ class Dispatcher {
 		if (! $settlement = $this->getCharacter()->getInsideSettlement()) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
-		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
+			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
+				$actions[] = $this->personalUnitNewTest();
+				$actions[] = $this->personalUnitManageTest();
 				$actions[] = $this->personalEntourageTest();
 				$actions[] = $this->personalSoldiersTest();
 				$actions[] = $this->personalMilitiaTest();
@@ -442,6 +444,7 @@ class Dispatcher {
 		}
 
 		$actions[] = $this->personalAssignedSoldiersTest();
+		$actions[] = $this->personalAssignedUnitsTest();
 
 		return array("name"=>"recruit.name", "elements"=>$actions);
 	}
@@ -1912,6 +1915,34 @@ class Dispatcher {
 		return $this->action("recruit.entourage", "bm2_site_actions_entourage");
 	}
 
+	public function personalUnitNewTest() {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"unit.new.name", "description"=>"unavailable.$check");
+		}
+		if ($settlement->getOwner() != $this->getCharacter()) {
+			return array("name"=>"unit.new.name", "description"=>"unavailable.notyours2");
+		}
+
+		return $this->action("unit.new.name", "maf_unit_new");
+	}
+
+	public function personalUnitManageTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"unit.manage.name", "description"=>"unavailable.$check");
+		}
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
+			}
+		}
+		return $this->action("unit.manage.name", "maf_unit_manage");
+	}
+
 	public function personalSoldiersTest() {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
@@ -1964,7 +1995,17 @@ class Dispatcher {
 		}
 
 		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
+	}
 
+	public function personalAssignedUnitsTest() {
+		if ($this->getCharacter()->getSoldiersGiven()->isEmpty()) {
+			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.noassigned");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.inbattle");
+		}
+
+		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
 	}
 
 	public function personalRequestsManageTest() {
