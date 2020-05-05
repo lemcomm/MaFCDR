@@ -241,13 +241,6 @@ class Soldier extends NPC {
 		return ($this->getTrainingRequired()>0);
 	}
 
-	public function cleanOffers() {
-		if ($this->getOfferedAs()) {
-			$this->getOfferedAs()->removeSoldier($this);
-			$this->setOfferedAs(null);
-		}
-	}
-
 	public function isRanged() {
 		if ($this->getWeapon() && $this->getWeapon()->getRanged() > $this->getWeapon()->getMelee()) {
 			return true;
@@ -339,7 +332,6 @@ class Soldier extends NPC {
 
 
 	public function onPreRemove() {
-		$this->cleanOffers();
 		if ($this->getCharacter()) {
 			$this->getCharacter()->removeSoldier($this);
 		}
