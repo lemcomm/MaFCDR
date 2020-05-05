@@ -9,6 +9,7 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
+use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 
 use BM2\SiteBundle\Service\GameRequestManager;
@@ -23,15 +24,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-
-/**
- * @Route("/unit")
- */
-
 class UnitController extends Controller {
 
         /**
-          * @Route("/", name="maf_units")
+          * @Route("/units", name="maf_units")
           * @Template("BM2SiteBundle:Unit:units.html.twig")
           */
 
@@ -48,9 +44,8 @@ class UnitController extends Controller {
 
                 $em = $this->getDoctrine()->getManager();
 
-                #TODO: Group DQL results by character assigned to. 'u.character'
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement AND u.is_militia = TRUE) ORDER BY s.name ASC');
+                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement AND u.is_militia = TRUE) GROUP BY u.character ORDER BY s.name ASC');
                    $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
                    $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
@@ -65,7 +60,7 @@ class UnitController extends Controller {
         }
 
         /**
-          * @Route("/new", name="maf_unit_new")
+          * @Route("/units/new", name="maf_unit_new")
           * @Template
           */
 
@@ -94,7 +89,7 @@ class UnitController extends Controller {
         }
 
         /**
-	  * @Route("/{unit}/manage", name="maf_unit_manage", requirements={"unit"="\d+"})
+	  * @Route("/units/{unit}/manage", name="maf_unit_manage", requirements={"unit"="\d+"})
 	  * @Template("BM2SiteBundle:Unit:manage.html.twig")
 	  */
 
@@ -132,4 +127,120 @@ class UnitController extends Controller {
                 );
 
         }
+
+	/**
+	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
+	  * @Template
+	  */
+	public function soldiersAction(Request $request, Unit $unit) {
+		# TODO: An AppState call followed by a Dispatcher call. Can we combine these? --Andrew 20181210
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+
+		$resupply=array();
+		$training=array();
+                $units=false;
+                $canResupply=false;
+                $canRecruit=false;
+                $canReassign=false;
+		if ($settlement = $character->getInsideSettlement()) {
+			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
+                                $canResupply = true;
+				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+			}
+			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
+                                $canRecruit = true;
+				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
+			}
+                        if ($settlement->getLocalUnits()->contains($unit)) {
+                                if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
+                                        foreach ($settlement->getLocalUnits() as $localUnit) {
+                                                if ($unit != $localUnit) {
+                                                        $units[] = $localUnit;
+                                                }
+                                        }
+                                        $canReassign=true;
+                                }
+			} else {
+                                #This unit not available for reassining soldiers due to not being local.
+                        }
+		} else {
+			foreach ($character->getEntourage() as $entourage) {
+				if ($entourage->getEquipment()) {
+					$item = $entourage->getEquipment()->getId();
+					if (!isset($resupply[$item])) {
+						$resupply[$item] = array('item'=>$entourage->getEquipment(), 'resupply'=>0);
+					}
+					$resupply[$item]['resupply'] += $entourage->getSupply();
+				}
+			}
+		}
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getSoldiers(), $resupply, $training, $units, $settlement));
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+
+			list($success, $fail) = $this->get('military_manager')->manageUnit($character->getSoldiers(), $data, $settlement, $character, $canResupply, $canRecruit, $canReassign);
+			// TODO: notice with result
+
+			$em = $this->getDoctrine()->getManager();
+			$em->flush();
+			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
+			return $this->redirect($request->getUri());
+		}
+
+		return array(
+			'soldiers' => $unit->getSoldiers(),
+			'recruits' => $unit->getRecruits(),
+			'resupply' => $resupply,
+			'settlement' => $settlement,
+			'training' => $training,
+			'form' => $form->createView(),
+			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100),
+                        'unit' => $unit,
+		);
+	}
+
+	/**
+	  * @Route("/units/{unit}/canceltraining", name="maf_unit_soldiers", requirements={"unit"="\d+", "recruit"="\d+"})
+	  */
+	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
+		if ($request->isMethod('POST')) {
+			list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+			if (! $character instanceof Character) {
+				return $this->redirectToRoute($character);
+			}
+
+			$em = $this->getDoctrine()->getManager();
+			$recruit = $em->getRepository('BM2SiteBundle:Soldier')->find($request->request->get('recruit'));
+			if (!$recruit || !$recruit->isRecruit() || $recruit->getBase()!=$settlement) {
+				throw $this->createNotFoundException('error.notfound.recruit');
+			}
+
+			// return his equipment to the stockpile:
+			$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+			$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
+
+			if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
+				// old soldier - return to militia with his old stuff
+				$recruit->setWeapon($recruit->getOldWeapon());
+				$recruit->setArmour($recruit->getOldArmour());
+				$recruit->setEquipment($recruit->getOldEquipment());
+				$recruit->setTraining(0)->setTrainingRequired(0);
+				$this->get('history')->addToSoldierLog($recruit, 'traincancel');
+			} else {
+				// fresh recruit - return to workforce
+				$settlement->setPopulation($settlement->getPopulation()+1);
+				$em->remove($recruit);
+			}
+			$em->flush();
+		}
+		return new Response();
+	}
 }
