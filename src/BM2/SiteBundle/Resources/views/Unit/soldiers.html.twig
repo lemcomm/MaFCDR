@@ -1,0 +1,22 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/tablesorter/parsers/parser-input-select.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<h2>{{ 'npc.soldier'|transchoice(10)|capitalize }}</h2>
+	<p>{{ 'recruit.manage.intro'|trans({},"actions") }}</p>
+	{% if character.isinbattle or character.islooting %}
+		<p>{{ 'recruit.manage.limited'|trans({},"actions") }}</p>
+	{% endif %}
+
+	{% include "BM2SiteBundle:element:soldierslist.html.twig" with {
+		"settlement":settlement,
+		"submitpath":path('maf_unit_soldiers', {"unit":unit.id}),
+		"listpath":path('maf_unit_soldiers', {"unit":unit.id})
+	} %}
+
+{% endblock %}
