@@ -146,10 +146,9 @@ class UnitSoldiersType extends AbstractType {
 				'placeholder' => 'form.choose',
 				'label' => 'recruit.manage.assignto',
 				'required' => false,
-				'class'=>'BM2SiteBundle:Character', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($others) {
-					$qb = $er->createQueryBuilder('c');
-					$qb->where('c IN (:others)');
-					$qb->andWhere('c.npc = false');
+				'class'=>'BM2SiteBundle:Unit', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($others) {
+					$qb = $er->createQueryBuilder('u');
+					$qb->where('u IN (:others)');
 					$qb->setParameter('others', $others);
 					return $qb;
 				},
