@@ -37,8 +37,8 @@
 #}
 		<script src="{{ asset('bundles/bm2site/js/jquery.hoverintent.js') }}"></script>
 	{% endblock %}
-{#  mobile: 
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+{#  mobile:
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 #}
@@ -159,6 +159,7 @@
 		{% endif %}
 	</div>
 
+	{#
 	{% if character and app.session.get('soldiers') is defined %}
 	<div class="symfony-shortcuts" data-role="navbar">
 		<ul>
@@ -191,6 +192,7 @@
 		</ul>
 	</div>
 	{% endif %}
+	#}
 
 	<div style="clear: both"></div>
 
@@ -258,7 +260,7 @@ $("#viewer").dialog({
 var ajaxlink = function(event){
 	event.preventDefault();
 	if ($("#viewer").dialog("isOpen")) {
-		$("#viewer").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');       
+		$("#viewer").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');
 	};
 	var url = $(this).attr("href");
 	$.get(url, function(data){
@@ -275,29 +277,29 @@ function megaHoverOver(){
 	$(this).find(".sub").stop().fadeTo('fast', 1).show();
 }
 
-function megaHoverOut(){ 
+function megaHoverOut(){
 	$(this).find(".sub").stop().fadeTo('fast', 0, function() {
-		$(this).hide(); 
+		$(this).hide();
 	});
 }
 
-var nav_config = {    
-	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)    
-	interval: 100, // number = milliseconds for onMouseOver polling interval    
-	over: megaHoverOver, // function = onMouseOver callback (REQUIRED)    
-	timeout: 300, // number = milliseconds delay before onMouseOut    
-	out: megaHoverOut // function = onMouseOut callback (REQUIRED)    
+var nav_config = {
+	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)
+	interval: 100, // number = milliseconds for onMouseOver polling interval
+	over: megaHoverOver, // function = onMouseOver callback (REQUIRED)
+	timeout: 300, // number = milliseconds delay before onMouseOut
+	out: megaHoverOut // function = onMouseOut callback (REQUIRED)
 };
 
 $("#symfony-navigation ul li .sub").css({'opacity':'0'});
 $("#symfony-navigation ul li").hoverIntent(nav_config);
 
-var short_config = {    
-	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)    
-	interval: 100, // number = milliseconds for onMouseOver polling interval    
-	over: shortcutHoverOver, // function = onMouseOver callback (REQUIRED)    
-	timeout: 300, // number = milliseconds delay before onMouseOut    
-	out: shortcutHoverOut // function = onMouseOut callback (REQUIRED)    
+var short_config = {
+	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)
+	interval: 100, // number = milliseconds for onMouseOver polling interval
+	over: shortcutHoverOver, // function = onMouseOver callback (REQUIRED)
+	timeout: 300, // number = milliseconds delay before onMouseOut
+	out: shortcutHoverOut // function = onMouseOut callback (REQUIRED)
 };
 
 $("li.drawer").hoverIntent(short_config)
@@ -306,8 +308,8 @@ function shortcutHoverOver(){
 	$(this).find("ul").stop().show("slide", {direction: 'right'});
 }
 
-function shortcutHoverOut(){ 
-	$(this).find("ul").stop().hide("slide", {direction: 'right'}); 
+function shortcutHoverOut(){
+	$(this).find("ul").stop().hide("slide", {direction: 'right'});
 }
 
 {% if not simple %}
