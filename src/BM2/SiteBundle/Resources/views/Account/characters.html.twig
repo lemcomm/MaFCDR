@@ -1,6 +1,6 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
-{# This macro builds the table rows for each character on the list. If you want to change the rows, change the logic in the table. 
+{# This macro builds the table rows for each character on the list. If you want to change the rows, change the logic in the table.
 Table headers are handled as translation strings from the character.list database entry. #}
 {% macro characterrow(character, locked) %}
 <tr class="characterrow">
@@ -17,7 +17,7 @@ Table headers are handled as translation strings from the character.list databas
 	{% elseif character.battling %}
 		<td colspan="6">
 			<center><i>{{ 'battling'|trans }}</i></center>
-		</td>		
+		</td>
 	{% elseif character.alive and not character.location and not character.retired %}
 		<td>
 			<!-- Status icon would normally be here. -->
@@ -199,9 +199,6 @@ Table headers are handled as translation strings from the character.list databas
 		<div class="warning leftmain">{{ 'account.abovelimit'|trans }}</div>
 	{% endif %}
 	{# FIXME: instead of hardcoded, should depend on character count, like NPCs #}
-	{% if offers < 10 %}
-		<div class="warning leftmain">{{ 'fewoffers'|trans({"%count%":offers}) }}</div>
-	{% endif %}
 	<table class="leftmain">
 	{% set current_list = 999999 %}
 	{% for character in characters %}
