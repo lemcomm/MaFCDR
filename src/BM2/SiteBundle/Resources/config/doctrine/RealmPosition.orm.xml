@@ -22,8 +22,6 @@
 		<field name="keeponslumber" type="boolean" nullable="true"/>
 		<field name="minholders" type="integer" nullable="true"/>
 		<field name="welcomer" type="boolean" nullable="true"/>
-		
-		<one-to-many field="welcoming_offers" target-entity="KnightOffer" mapped-by="welcomers"/>
 
 		<many-to-one field="realm" target-entity="Realm" inversed-by="positions"/>
 		<many-to-many field="permissions" target-entity="Permission"/>
