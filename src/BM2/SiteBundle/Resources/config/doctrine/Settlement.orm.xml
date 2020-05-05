@@ -40,7 +40,6 @@
 		<one-to-many field="houses_present" target-entity="House" mapped-by="inside_settlement"/>
 
 		<one-to-many field="claims" target-entity="SettlementClaim" mapped-by="settlement" fetch="EXTRA_LAZY"/>
-		<one-to-many field="knight_offers" target-entity="KnightOffer" mapped-by="settlement"/>
 
 		<one-to-many field="trades_outbound" target-entity="Trade" mapped-by="source"/>
 		<one-to-many field="trades_inbound" target-entity="Trade" mapped-by="destination"/>
