@@ -12,6 +12,7 @@
 						<li><a href="{{ path('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}) }}">{{ 'menu.rss'|trans }}</a></li>
 					</ul>
 				</li>
+				{# Commenting this out until we figure out what we want to do with Units.
 				<li class="part">
 					<h3>{{ 'menu.your'|trans|title }}</h3>
 					<ul>
@@ -26,10 +27,11 @@
 						{% endif %}
 					</ul>
 				</li>
+				#}
 			</ul>
 		</div>
 	</li>
-	
+
 	<li>
 		<a href="{{ path('bm2_events') }}"{% if character.hasnewevents %} class="new"{% endif %}>{{ 'menu.events'|trans }}</a>
 	</li>
