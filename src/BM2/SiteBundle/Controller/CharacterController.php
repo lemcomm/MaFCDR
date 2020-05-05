@@ -14,7 +14,6 @@ use BM2\SiteBundle\Form\CharacterPlacementType;
 use BM2\SiteBundle\Form\CharacterRatingType;
 use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
-use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 
@@ -86,7 +85,7 @@ class CharacterController extends Controller {
 			'others' => $this->get('geography')->findCharactersInSpotRange($character),
 			'spottings' => $this->getSpottings($character),
 			'entourage' => $character->getActiveEntourageByType(),
-			'soldiers' => $character->getActiveSoldiersByType(),
+			'units' => $character->getUnits(),
 			'dead_entourage' => $character->getDeadEntourage()->count(),
 			'dead_soldiers' => $character->getDeadSoldiers()->count(),
 		);
@@ -275,10 +274,10 @@ class CharacterController extends Controller {
 		);
 	}
 
-   /**
-     * @Route("/start")
-     * @Template
-     */
+	/**
+	  * @Route("/start")
+	  * @Template
+	  */
 	public function startAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, false, true);
 		if (! $character instanceof Character) {
@@ -295,7 +294,6 @@ class CharacterController extends Controller {
 		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
 		$this->get('character_manager')->checkReturnability($character);
 
-		$form_offer = $this->createForm(new CharacterPlacementType('offer', $character));
 		$form_existing = $this->createForm(new CharacterPlacementType('family', $character));
 		$form_map = $this->createFormBuilder()->add('settlement_id', 'hidden')->getForm();
 		if ($request->isMethod('POST')) {
@@ -303,117 +301,7 @@ class CharacterController extends Controller {
 			$historydone=false;
 			$em = $this->getDoctrine()->getManager();
 
-			$form_offer->bind($request);
-			if ($form_offer->isValid()) {
-				// sign up with a lord by taking his offer
-				$data = $form_offer->getData();
-				if (!$data['offer']) {
-					throw $this->createNotFoundException('error.notfound.offer');
-				}
-
-				$startlocation = $data['offer']->getSettlement();
-				$liege = $startlocation->getOwner();
-				$welcomingcommittee = false;
-				if ($data['offer']->getWelcomers()) {
-					$welcomingcommittee = true;
-				}
-				if (!$liege) {
-					// invalid offer, should never happen, but catch it anyways
-					throw $this->createNotFoundException('error.notfound.newliege');
-				}
-				if ($data['offer']->getGiveSettlement()) {
-					$act = new Action;
-					$act->setType('settlement.grant')->setStringValue('keep_claim')->setCharacter($liege);
-					$act->setTargetSettlement($startlocation)->setTargetCharacter($character);
-					$act->setBlockTravel(false);
-					$complete = new \DateTime("now");
-					$complete->add(new \DateInterval("PT15M"));
-					$act->setComplete($complete);
-					$this->get('action_manager')->queue($act);
-
-					// pseudo-action to prevent that he moves away in this time
-					$act->setType('settlement.receive')->setCharacter($character);
-					$act->setTargetSettlement($startlocation);
-					$act->setBlockTravel(true);
-					$complete = new \DateTime("now");
-					$complete->add(new \DateInterval("PT15M"));
-					$act->setComplete($complete);
-					$this->get('action_manager')->queue($act);
-
-					$this->get('history')->logEvent(
-						$character,
-						'politics.oath.taken2',
-						array('%link-character%'=>$liege->getId(), '%link-settlement%'=>$startlocation->getId()),
-						History::HIGH, true
-					);
-				} else {
-					foreach ($data['offer']->getSoldiers() as $soldier) {
-						$this->get('military_manager')->assign($soldier, $character);
-					}
-					$this->get('history')->logEvent(
-						$character,
-						'politics.oath.taken',
-						array('%link-character%'=>$liege->getId(), '%link-settlement%'=>$startlocation->getId()),
-						History::HIGH, true
-					);
-				}
-				$character->setLiege($liege);
-				$historydone=true;
-
-				// TODO: propagate downwards through all vassals, their vassals, etc.
-
-				// message to new liege - set to high so it triggers a notification
-				$this->get('history')->logEvent(
-					$liege,
-					'politics.oath.offer2',
-					array('%link-character%'=>$character->getId(), '%link-settlement%'=>$startlocation->getId()),
-					History::HIGH
-				);
-				$welcomers = $data['offer']->getWelcomers();
-				$em->remove($data['offer']);
-				echo $welcomers;
-
-				$em->flush(); // because some DQL below needs it, probably
-
-				// join realm conversations
-				$msg_user = $this->get('message_manager')->getMsgUser($character);
-
-				$my_realms = $character->findRealms();
-				if ($my_realms) {
-					$query = $em->createQuery("SELECT c FROM MsgBundle:Conversation c JOIN c.app_reference r WHERE r IN (:realms)");
-					$query->setParameter('realms', $my_realms->toArray());
-					foreach ($query->getResult() as $conversation) {
-						$this->get('message_manager')->updateMembers($conversation);
-					}
-				}
-
-				// TODO: announce to lowest-level realm - that's easy to get because it's the realm of our settlement. :-)
-				// also TODO: allow "join-as-vassal" for the other join options, with the same announcement to realm and liege,
-				//					so basically a lot of this would then shift to the more general and out of this branch
-
-				// create a conversation with my new liege
-				// TODO: this should be configurable
-				$topic = 'Welcome from '.$liege->getName().' to '.$character->getName();
-				if (!$welcomingcommittee) {
-					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
-				} else {
-					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm()->getId().'], will let you know what you can do to earn your stay.';
-				}
-				if (!$welcomingcommittee) {
-					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
-				} else {
-					$recipients = array();
-					$recipients[] = $this->get('message_manager')->getMsgUser($liege);
-					foreach($welcomers->getHolders() as $welcomechar) {
-						if ($welcomechar != $liege) {
-							$recipients[] = $this->get('message_manager')->getMsgUser($welcomechar);
-						}
-					}
-					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, $topic, $content);
-				}
-				$this->get('message_manager')->setAllUnread($msg_user);
-
-			}
+			#TODO: Add code for realm arrival places here.
 
 			$form_existing->bind($request);
 			if ($form_existing->isValid()) {
@@ -1202,70 +1090,6 @@ class CharacterController extends Controller {
 		$this->addFlash('notice', $this->get('translator')->trans('recruit.manage.grouped', array(), 'actions'));
 
 		return $this->redirectToRoute('bm2_site_character_soldiers');
-	}
-
-	/**
-	  * @Route("/soldiers")
-	  * @Template
-	  */
-	public function soldiersAction(Request $request) {
-		# TODO: An AppState call followed by a Dispatcher call. Can we combine these? --Andrew 20181210
-		$character = $this->get('appstate')->getCharacter();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		$settlement = $this->get('dispatcher')->getActionableSettlement();
-		if ($character->getPrisonerOf()) {
-			$others = array($character->getPrisonerOf());
-		} else {
-			$others = $this->get('dispatcher')->getActionableCharacters(true);
-		}
-
-		$em = $this->getDoctrine()->getManager();
-
-		$resupply=array();
-		$training=array();
-		if ($settlement) {
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
-				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
-			}
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
-				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
-			}
-		} else {
-			foreach ($character->getEntourage() as $entourage) {
-				if ($entourage->getEquipment()) {
-					$item = $entourage->getEquipment()->getId();
-					if (!isset($resupply[$item])) {
-						$resupply[$item] = array('item'=>$entourage->getEquipment(), 'resupply'=>0);
-					}
-					$resupply[$item]['resupply'] += $entourage->getSupply();
-				}
-			}
-		}
-		$form = $this->createForm(new SoldiersManageType($em, $character->getSoldiers(), $resupply, $training, $others, $settlement));
-
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-
-			list($success, $fail) = $this->get('military_manager')->manage($character->getSoldiers(), $data, $settlement, $character);
-			// TODO: notice with result
-
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
-			return $this->redirect($request->getUri());
-		}
-
-		return array(
-			'soldiers' => $character->getSoldiers(),
-			'resupply' => $resupply,
-			'settlement' => $settlement,
-			'training' => $training,
-			'form' => $form->createView(),
-			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100)
-		);
 	}
 
    /**
