@@ -114,12 +114,12 @@ class AccountController extends Controller {
 		$user->setCurrentCharacter(null);
 		$this->getDoctrine()->getManager()->flush();
 
-		$characters = array(); 
+		$characters = array();
 		$npcs = array();
 
 		$now = new \DateTime("now");
 		$a_week_ago = $now->sub(new \DateInterval("P7D"));
-		
+
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
 			$annexing = false;
@@ -145,7 +145,7 @@ class AccountController extends Controller {
 			}
 			if ($character->getList()<100) {
 				$unread = $character->countNewMessages();
-				$events = $character->countNewEvents();				
+				$events = $character->countNewEvents();
 			} else {
 				// dead characters don't have events or messages...
 				$unread = 0;
@@ -156,7 +156,7 @@ class AccountController extends Controller {
 				$character->setBattling(false);
 				$em->flush();
 			}
-			
+
 			// This adds in functionality for detecting character actions on this page. --Andrew
 			if ($alive && $character->getActions()) {
 				foreach ($character->getActions() as $actions) {
@@ -260,9 +260,6 @@ class AccountController extends Controller {
 			$free_npcs = array();
 		}
 
-		$query = $this->getDoctrine()->getManager()->createQuery('SELECT count(o.id) FROM BM2SiteBundle:KnightOffer o');
-		$offers = $query->getSingleScalarResult();
-
 		// check when our next payment is due and if we have enough to pay it
 		$now = new \DateTime("now");
 		$daysleft = (int)$now->diff($user->getPaidUntil())->format("%r%a");
@@ -293,7 +290,6 @@ class AccountController extends Controller {
 		return array(
 			'announcements' => $announcements,
 			'notices' => $notices,
-			'offers' => $offers,
 			'locked' => ($user->getAccountLevel()==0),
 			'list_form' => $list_form->createView(),
 			'characters' => $characters,
@@ -377,7 +373,7 @@ class AccountController extends Controller {
 		if ($unspawned->count() >= 2) {
 			$spawnlimit = true;
 		} else {
-			$spawnlimit = false;			
+			$spawnlimit = false;
 		}
 
 		if ($request->isMethod('POST') && $request->request->has("charactercreation")) {
@@ -385,7 +381,7 @@ class AccountController extends Controller {
 			if ($form->isValid()) {
 				$data = $form->getData();
 				if ($user->getNewCharsLimit() <= 0) { $data['dead']=true; } // validation doesn't catch this because the field is disabled
-				
+
 				$em = $this->getDoctrine()->getManager();
 				$works = true;
 
@@ -434,7 +430,7 @@ class AccountController extends Controller {
 						}
 						if (!$havesex) {
 							$form->addError(new FormError("character.nosex"));
-							$works = false;							
+							$works = false;
 						}
 					}
 				} else if ($data['father']) {
@@ -658,7 +654,7 @@ class AccountController extends Controller {
 					if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
 						return $this->redirectToRoute('bm2_dungeon_dungeon_index');
 					}
-				} 
+				}
 				return $this->redirectToRoute('bm2_recent');
 				break;
 			case 'placenew':
@@ -679,8 +675,8 @@ class AccountController extends Controller {
 				return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
 				break;
 			case 'edithist':
-				$em->flush(); 
-				/* I don't have words for how stupid I think this is. 
+				$em->flush();
+				/* I don't have words for how stupid I think this is.
 				Apparently, if you don't flush after setting session data, the game has no idea which character you're trying to edit the background of.
 				Which is super odd to me, because session data doesn't involve the database... --Andrew, 20180213 */
 				return $this->redirectToRoute('bm2_site_character_background');
@@ -694,7 +690,7 @@ class AccountController extends Controller {
 				}
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
-				break;				
+				break;
 			default:
 				throw new AccessDeniedHttpException('error.notfound.playlogic');
 				return $this->redirectToRoute('bm2_characters');
@@ -729,7 +725,7 @@ class AccountController extends Controller {
 			$character = $data['npc'];
 			$character->setUser($user);
 			$this->get('npc_manager')->spawnNPC($character);
-			$this->getDoctrine()->getManager()->flush();			
+			$this->getDoctrine()->getManager()->flush();
 			return $this->playAction($character->getId());
 		} else {
 			return $this->charactersAction();
@@ -742,7 +738,7 @@ class AccountController extends Controller {
 	  */
 	public function familytreeAction() {
 		$descriptorspec = array(
-			0 => array("pipe", "r"),  // stdin 
+			0 => array("pipe", "r"),  // stdin
 			1 => array("pipe", "w"),  // stdout
 			2 => array("pipe", "w") // stderr
 		);
