@@ -125,6 +125,57 @@ class MilitaryManager {
 		}
 	}
 
+	public function manageUnit($npcs, $data, Settlement $settlement=null, Character $character=null, $canResupply, $canRecruit, $canReassign) {
+		$assigned_soldiers = 0;
+		$success=0; $fail=0;
+		foreach ($npcs as $npc) {
+			$change = $data['npcs'][$npc->getId()];
+			if (isset($change['action'])) {
+				$this->logger->debug("applying action ".$change['action']." to soldier #".$npc->getId()." (".$npc->getName().")");
+				switch ($change['action']) {
+					case 'reassign':
+						if ($canReassign && $data['assignto']) {
+							$npc->setUnit($data['assignto']);
+						}
+						break;
+					case 'disband':
+						if ($canReassign) {
+							$this->disband($npc, $character);
+						}
+						break;
+					case 'bury':
+						$this->bury($npc);
+						break;
+					case 'makemilitia':
+						if ($settlement) {
+							$this->makeMilitia($npc, $settlement);
+						}
+						break;
+					case 'makesoldier':
+						if ($settlement) {
+							$this->makeSoldier($npc, $character);
+						}
+						break;
+					case 'resupply':
+						if ($canResupply && $this->resupply($npc, $settlement)) {
+							$success++;
+						} else {
+							$fail++;
+						}
+						break;
+					case 'retrain':
+						if ($canRecruit) {
+							$this->retrain($npc, $settlement, $data['weapon'], $data['armour'], $data['equipment']);
+						}
+						break;
+				}
+			}
+			$this->em->flush();
+		}
+
+		return array($success, $fail);
+	}
+
 	public function manage($npcs, $data, Settlement $settlement=null, Character $character=null) {
 		$assigned_soldiers = 0; $targetgroup='(no)';
 		$assigned_entourage = 0;
@@ -614,7 +665,14 @@ class MilitaryManager {
 		$settings = $this->newUnitSettings($unit, $character, $data);
 		foreach($character->getSoldiers() as $soldier) {
 			$character->removeSoldier($soldier);
+			if($soldier->getLiege()) {
+				$soldier->getLiege()-removeSoliderGive($soldier);
+				$soldier->setLiege(null);
+			}
 			$soldier->setCharacter(null);
+			$soldier->setBase(null);
+			$soldier->setGroup(null);
+			$soldier->setAssignedSince(null);
 			$soldier->setUnit($unit);
 		}
 		$this->em->flush();
