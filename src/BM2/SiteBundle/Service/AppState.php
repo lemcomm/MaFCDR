@@ -42,9 +42,9 @@ class AppState {
 		/* This used to throw exceptions rather than adding flashes and returning strings.
 		The change was done in order to ensure that when you're somewhere you shouldn't be,
 		that the game is smart enough to redirect you to the right spot.
-		
+
 		Technically speaking, the first two returns don't actually do anything, because they're
-		intercepted by the Symfony Firewall and sent to the secuirty/detect route which does 
+		intercepted by the Symfony Firewall and sent to the secuirty/detect route which does
 		something similar. */
 		# Check if we have a user first
 		$token = $this->tokenStorage->getToken();
@@ -75,9 +75,9 @@ class AppState {
 		$character = $user->getCurrentCharacter();
 		$session = $this->session;
 		if (!$character) {
-			if (!$required) { 
+			if (!$required) {
 				return null;
-			} else { 
+			} else {
 				$session->getFlashBag()->add('error', 'error.missing.character');
 				return 'bm2_characters';
 			}
@@ -87,7 +87,7 @@ class AppState {
 			if (!$required) {
 				return null;
 			} else {
-				$session->getFlashBag()->add('error', 'error.missing.soul'); 
+				$session->getFlashBag()->add('error', 'error.missing.soul');
 				return 'bm2_characters';
 			}
 		}
@@ -149,8 +149,8 @@ class AppState {
 				$near = $this->findNearestSettlement($character);
 				$this->session->set('nearest_settlement', $near[0]);
 			}
-			$this->session->set('soldiers', $character->getLivingSoldiers()->count());
-			$this->session->set('entourage', $character->getLivingEntourage()->count());
+			#$this->session->set('soldiers', $character->getLivingSoldiers()->count());
+			#$this->session->set('entourage', $character->getLivingEntourage()->count());
 			$query = $this->em->createQuery('SELECT s.id, s.name FROM BM2SiteBundle:Settlement s WHERE s.owner = :me');
 			$query->setParameter('me', $character);
 			$settlements = array();
