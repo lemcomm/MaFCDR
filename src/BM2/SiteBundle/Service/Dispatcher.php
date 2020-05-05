@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\Unit;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 
@@ -433,11 +434,9 @@ class Dispatcher {
 		} else {
 			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
 				$actions[] = $this->personalUnitNewTest();
-				$actions[] = $this->personalUnitManageTest();
 				$actions[] = $this->personalEntourageTest();
 				$actions[] = $this->personalSoldiersTest();
 				$actions[] = $this->personalMilitiaTest();
-				$actions[] = $this->personalOffersTest();
 			} else {
 				$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notyours");
 			}
@@ -843,7 +842,7 @@ class Dispatcher {
 		if (!$houses) {
 			return array("name"=>"location.houses.name", "description"=>"unavaibable.nohouses");
 		}
-		return array("name"=>"location.houses.name", "url"=>"bm2_house_nearby", "description"=>"location.houses.description");
+		return array("name"=>"location.houses.name", "url"=>"maf_house_nearby", "description"=>"location.houses.description");
 	}
 
 	public function personalPartyTest() {
@@ -1968,24 +1967,6 @@ class Dispatcher {
 		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$settlement->getID()));
 	}
 
-	public function personalOffersTest() {
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement, 'mobilize')) !== true) {
-			return array("name"=>"recruit.offers.name", "description"=>"unavailable.$check");
-		}
-		if ($settlement->getOwner() != $this->getCharacter()) {
-			return array("name"=>"recruit.offers.name", "description"=>"unavailable.notyours2");
-		}
-		if ($settlement->getSoldiers()->isEmpty()) {
-			return array("name"=>"recruit.offers.name", "description"=>"unavailable.nooffers");
-		}
-		if (!$settlement->getRealm()) {
-			return array("name"=>"recruit.offers.name", "description"=>"unavailable.norealm");
-		}
-
-		return $this->action("recruit.offers", "bm2_site_actions_offers", false, array('id'=>$settlement->getID()));
-	}
-
 	public function personalAssignedSoldiersTest() {
 		if ($this->getCharacter()->getSoldiersGiven()->isEmpty()) {
 			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.noassigned");
@@ -1999,13 +1980,13 @@ class Dispatcher {
 
 	public function personalAssignedUnitsTest() {
 		if ($this->getCharacter()->getSoldiersGiven()->isEmpty()) {
-			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.noassigned");
+			return array("name"=>"unit.assigned.name", "description"=>"unavailable.noassigned");
 		}
 		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.inbattle");
+			return array("name"=>"unit.assigned.name", "description"=>"unavailable.inbattle");
 		}
 
-		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
+		return $this->action("unit.assigned", "bm2_site_actions_assigned");
 	}
 
 	public function personalRequestsManageTest() {
