@@ -65,8 +65,6 @@
 				<td>
 					{% if man.mercenary %}
 						{{ link(man.mercenary) }}
-					{% elseif man.alive and soldier.group is defined %}
-						{{ form_widget(soldier.group) }}
 					{% endif %}
 				</td>
 				{% if man.weapon %}
@@ -107,39 +105,7 @@
 <hr />
 
 <div class="actionsbar">
-	<button type="button" id="toggle_all">{{ 'soldier.toggleall'|trans }}</button>
-	{% if groupurl %}
-		{{ 'soldier.groupby.intro'|trans }}
-		<a href="{{ path(groupurl, {'by':'type'}) }}" class="tt_bot" title="{{ 'soldier.groupby.type_desc'|trans }}">
-			<button type="button">{{ 'soldier.groupby.type'|trans }}</button>
-		</a>
-		<a href="{{ path(groupurl, {'by':'items'}) }}" class="tt_bot" title="{{ 'soldier.groupby.items_desc'|trans }}">
-			<button type="button">{{ 'soldier.groupby.items'|trans }}</button>
-		</a>
-		<hr />
-	{% endif %}
-	{{ 'soldier.allin'|trans }}
-	<select id="group_select">
-		<option value=""></option>
-		<option value="-1">{{ 'soldier.allin3'|trans }}</option>
-		{% for i in 'a'..'z' %}
-			<option value="{{ loop.index0 }}">{{ i }}</option>
-		{% endfor %}
-	</select>
-	{{ 'soldier.allin2'|trans }}
-	<select id="group_option">
-		<option value="nothing">{{ 'recruit.manage.nothing'|trans({},"actions") }}</option>
-		<option value="nothing">no action</option>
-		<option value="disband">{{ 'recruit.manage.disband'|trans({},"actions") }}</option>
-		<option value="assign">{{ 'recruit.manage.assign'|trans({},"actions") }}</option>
-		<option value="makemilitia">{{ 'recruit.manage.makemilitia'|trans({},"actions") }}</option>
-		<option value="makesoldier">{{ 'recruit.manage.makesoldier'|trans({},"actions") }}</option>
-		<option value="retrain">{{ 'recruit.manage.retrain'|trans({},"actions") }}</option>
-		<option value="resupply">{{ 'recruit.manage.resupply'|trans({},"actions") }}</option>
-	</select>
-	<button type="button" id="group_apply">{{ 'recruit.manage.apply'|trans({},"actions") }}</button>
-
-	<br />
+	<button type="button" id="toggle_all">{{ 'soldier.toggleall'|trans }}</button><br />
 
 	<button type="button" id="bury_all">{{ 'soldier.buryall'|trans }}</button>
 	<button type="button" id="resupply_all">{{ 'soldier.resupplyall'|trans }}</button>
