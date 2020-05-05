@@ -112,17 +112,13 @@
 		</ul>
 	{% endif %}
 
-	<h2>{{ 'npc.soldier'|transchoice(10)|capitalize }}</h2>
-	{% if soldiers is not empty %}
+	<h2>{{ 'npc.units'|transchoice(10)|capitalize }}</h2>
+	{% if units is not empty %}
 		<ul>
-		{% for type,number in soldiers %}
-			<li>{{number}} {{ ("soldier."~type)|transchoice(number) }}</li>
+		{% for unit in units %}
+			<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
 		{% endfor %}
-		{% if dead_soldiers > 0 %}
-			<li>{{ dead_soldiers }} {{ "dead"|trans }}</li>
-		{% endif %}
 		</ul>
-		<a href="{{ path('bm2_site_character_soldiers') }}">{{ 'viewdetails'|trans|title }}</a>
 	{% endif %}
 
 	<h2>{{ 'npc.entourage'|transchoice(10)|capitalize }}</h2>
