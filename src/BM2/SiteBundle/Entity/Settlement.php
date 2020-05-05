@@ -377,5 +377,21 @@ class Settlement {
 		return $total;
 	}*/
 	
+	public function getLocalUnits() {
+		$local = new ArrayCollection;
+		foreach($this->getUnits() as $unit) {
+			if (!$unit->getCharacter()) {
+				#Unassigned units are always available.
+				#TODO: Add restrictions for traveling units.
+				$local->add($unit);
+			} else {
+				if ($unit->getChracter()->getInsideSettlement == $this) {
+					# Assigned units that are local can be assigned to as well.
+					$local->add($unit);
+				}
+			}
+		}
+		return $local;
+	}
 	
 }
