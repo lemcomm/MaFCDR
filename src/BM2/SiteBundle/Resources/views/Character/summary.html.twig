@@ -67,61 +67,6 @@
 	</div>
 {% endif %}
 
-{% if soldiers.hungry > 10 or soldiers.wounded > 10 or soldiers.lost > 10 %}
-	<h4>{{ 'summary.soldiers.title'|trans|title }}</h4>
-	<ul>
-	{% if soldiers.starving > 80 %}
-		<li>{{ 'summary.soldiers.starving.3'|trans }}</li>
-	{% elseif soldiers.starving > 50 %}
-		<li>{{ 'summary.soldiers.starving.2'|trans }}</li>
-	{% elseif soldiers.starving > 15 %}
-		<li>{{ 'summary.soldiers.starving.1'|trans }}</li>
-	{% endif %}
-
-	{% if soldiers.hungry > 80 %}
-		<li>{{ 'summary.soldiers.hungry.3'|trans }}</li>
-	{% elseif soldiers.hungry > 50 %}
-		<li>{{ 'summary.soldiers.hungry.2'|trans }}</li>
-	{% elseif soldiers.hungry > 15 %}
-		<li>{{ 'summary.soldiers.hungry.1'|trans }}</li>
-	{% endif %}
-
-	{% if soldiers.dead > soldiers.alive %}
-		<li>{{ 'summary.soldiers.dead.2'|trans }}</li>
-	{% elseif soldiers.dead > soldiers.alive * 0.333 %}
-		<li>{{ 'summary.soldiers.dead.1'|trans }}</li>
-	{% endif %}
-
-	{% if soldiers.wounded > 80 %}
-		<li>{{ 'summary.soldiers.wounded.3'|trans }}</li>
-	{% elseif soldiers.wounded > 50 %}
-		<li>{{ 'summary.soldiers.wounded.2'|trans }}</li>
-	{% elseif soldiers.wounded > 15 %}
-		<li>{{ 'summary.soldiers.wounded.1'|trans }}</li>
-	{% endif %}
-
-	{% if soldiers.lost > 80 %}
-		<li>{{ 'summary.soldiers.lost.3'|trans }}</li>
-	{% elseif soldiers.lost > 50 %}
-		<li>{{ 'summary.soldiers.lost.2'|trans }}</li>
-	{% elseif soldiers.lost > 15 %}
-		<li>{{ 'summary.soldiers.lost.1'|trans }}</li>
-	{% endif %}
-
-	{% if soldiers.distance > 20 %}
-		<li>{{ 'summary.soldiers.distance.3'|trans }}</li>
-	{% elseif soldiers.distance > 15 %}
-		<li>{{ 'summary.soldiers.distance.2'|trans }}</li>
-	{% elseif soldiers.distance > 10 %}
-		<li>{{ 'summary.soldiers.distance.1'|trans }}</li>
-	{% elseif soldiers.distance < 5 %}
-		<li>{{ 'summary.soldiers.distance.0'|trans }}</li>
-	{% endif %}
-
-	</ul>
-	<a href="{{ path('bm2_site_character_soldiers') }}">{{ 'viewdetails'|trans|title }}</a>
-{% endif %}
-
 <h3>{{ 'unread.title'|trans({}, "MsgBundle")|title }}</h3>
 {# add a simple form - hidden input field with id, button to click "mark as read" #}
 <ul>
