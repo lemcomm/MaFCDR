@@ -106,37 +106,15 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_site_character_start');
 		}
 
-		// FIXME: this auto-gathers all our soldiers. we want that automatic, but not immediate (hidden action at turn?)
-		$hungry = 0; $starving = 0; $wounded = 0; $lost = 0; $dead = 0; $alive = 0; $distance = 0;
-		foreach ($character->getSoldiers() as $soldier) {
-			$soldier->setRouted(false);
-			if ($soldier->isAlive()) {
-				$distance += sqrt($soldier->getDistanceHome()/1000);
-				$alive++;
-				if ($soldier->getHungry()>50) {
-					$hungry++;
-					if ($soldier->getHungry()>90) {
-						$starving++;
-					}
-				}
-				if ($soldier->getWounded()>10) {
-					$wounded++;
-				}
-				if (!$soldier->getHasWeapon() || !$soldier->getHasArmour() || !$soldier->getHasEquipment()) {
-					$lost++;
-				}
-			} else {
-				$dead++;
+		$em = $this->getDoctrine()->getManager();
+
+		# TODO: This should really be somewhere else, like at the end of battles.
+		foreach ($character->getUnits() as $unit) {
+			foreach ($unit->getSoldiers() as $soldier) {
+				$soldier->setRouted(false);
 			}
 		}
-		if ($alive > 0) {
-			$hungry = ($hungry*100) / $alive;
-			$starving = ($starving*100) / $alive;
-			$wounded = ($wounded*100) / $alive;
-			$lost = ($lost*100) / $alive;
-			$distance = $distance / $alive;
-		}
-		$this->getDoctrine()->getManager()->flush();
+		$em->flush();
 
 		$msguser = $this->get('message_manager')->getCurrentUser();
 
@@ -148,8 +126,7 @@ class CharacterController extends Controller {
 			'battles' => $this->get('geography')->findBattlesNearMe($character, Geography::DISTANCE_BATTLE),
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
-			'actrange' => $this->get('geography')->calculateInteractionDistance($character),
-			'soldiers' => array('hungry'=>$hungry, 'starving'=>$starving, 'wounded'=>$wounded, 'lost'=>$lost, 'alive'=>$alive, 'dead'=>$dead, 'distance'=>$distance)
+			'actrange' => $this->get('geography')->calculateInteractionDistance($character)
 		);
 	}
 
