@@ -17,7 +17,7 @@
 					<h3>{{ 'menu.your'|trans|title }}</h3>
 					<ul>
 						{% if character.soldiers is not empty %}
-							<li><a href="{{ path('bm2_site_character_soldiers') }}">{{ 'npc.soldier'|transchoice(10) }}</a></li>
+							<li><a href="{{ path('maf_unit_soldiers') }}">{{ 'npc.soldier'|transchoice(10) }}</a></li>
 						{% endif %}
 						{% if character.entourage is not empty %}
 							<li><a href="{{ path('bm2_site_character_entourage') }}">{{ 'npc.entourage2'|transchoice(10) }}</a></li>
@@ -123,17 +123,13 @@
 						{% if check.url is defined %}
 							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 						{% endif %}
-						{% set check = dispatcher.personalSoldiersTest() %}
+						{% set check = dispatcher.personalUnitManageTest() %}
 						{% if check.url is defined %}
 							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 						{% endif %}
-						{% set check = dispatcher.personalMilitiaTest() %}
+						{% set check = dispatcher.personalUnitNewTest() %}
 						{% if check.url is defined %}
-							<li><a href="{{ path(check.url, check.parameters) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.personalOffersTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url, check.parameters) }}">{{ check.name|trans({},"actions") }}</a></li>
+							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 						{% endif %}
 					</ul>
 				</li>
