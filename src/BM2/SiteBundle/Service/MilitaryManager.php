@@ -646,40 +646,60 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function newUnit(Character $character=null, Settlement $home = null, $isMilitia = false, $data = null) {
-		$unit = new Unit();
-		$this->em->persist($unit);
+	public function newUnit(Character $character=null, Settlement $home = null, $data = null, $bulk = false) {
 		if ($character) {
-			$unit->setCharacter($character);
+			$source = $character;
+		} else {
+			$source = $home;
 		}
-		if ($isMilitia) {
-			$unit->setMilitia($isMilitia);
+		$total = ceil($source->getSoldiers()->count()/200);
+		if ($total > 0) {
+			$change = true;
+		} else {
+			$change = false;
 		}
-		if ($home) {
-			$unit->setSettlement($home);
-		}
-		if ($data && $data['supplier']) {
-			$unit->setSupplier($data['supplier']);
-		}
-		$this->em->flush();
-		$settings = $this->newUnitSettings($unit, $character, $data);
-		foreach($character->getSoldiers() as $soldier) {
-			$character->removeSoldier($soldier);
-			if($soldier->getLiege()) {
-				$soldier->getLiege()-removeSoliderGive($soldier);
-				$soldier->setLiege(null);
+		for ($i=1; $i <= $total; $i++) {
+			#For everyone 200 soldiers, rounded up to the next 200, we make a new unit.
+			$counter = 1;
+			$unit = new Unit();
+			$this->em->persist($unit);
+			if ($source instanceof Character) {
+				$unit->setCharacter($character);
+			} else {
+				$unit->setSettlement($home);
 			}
-			$soldier->setCharacter(null);
-			$soldier->setBase(null);
-			$soldier->setGroup(null);
-			$soldier->setAssignedSince(null);
-			$soldier->setUnit($unit);
+			if ($data && $data['supplier']) {
+				$unit->setSupplier($data['supplier']);
+			}
+			$settings = $this->newUnitSettings($unit, $character, $data, $bulk);
+			foreach ($source->getSoldiers() as $soldier) {
+				$soldier->setCharacter(null);
+				$soldier->setBase(null);
+				if (!$bulk) {
+					$source->removeSoldier($soldier);
+					if($soldier->getLiege()) {
+						$soldier->getLiege()->removeSoldiersGiven($soldier);
+						$soldier->setLiege(null);
+					}
+					$soldier->setGroup(null);
+					$soldier->setAssignedSince(null);
+				}
+				$soldier->setUnit($unit);
+				$counter++;
+				if ($counter > 200) {
+					# If we're over 200 now, we've filled up this unit, so break the foreach loop and return to the above for loop
+					break;
+				}
+			}
 		}
-		$this->em->flush();
-		return $unit;
+		if ($change) {
+			# So if we for some reason pass a character or settlement with no soldiers to this, we don't wast execution time calling doctrine to do nothing.
+			$this->em->flush();
+		}
+		return $total;
 	}
 
-	public function newUnitSettings(Unit $unit, Character $character=null, $data = null) {
+	public function newUnitSettings(Unit $unit, Character $character=null, $data = null, $bulk = false) {
 		$settings = new UnitSettings();
 		$this->em->persist($settings);
 		$settings->setUnit($unit);
@@ -714,8 +734,17 @@ class MilitaryManager {
 			} else {
 				$settings->setName("A Unit of Unknown Origin");
 			}
+			$settings->setStrategy('advance');
+			$settings->setTactic('mixed');
+			$settings->setRespectFort(true);
+			$settings->setLine(4);
+			$settings->setSiegeorders('hold');
+			$settings->setRetreatThreshold(50);
+			$settings->setRenamable(true);
 		}
-		$this->em->flush();
+		if (!$bulk) {
+			$this->em->flush();
+		}
 		return $settings;
 	}
 }
