@@ -32,31 +32,30 @@ class UnitController extends Controller {
           */
 
         public function indexAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('personalAssignedUnitsTest');
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-                if (($character->getUnits()->isEmpty() && !$character->getSoldiers()->isEmpty()) OR (!$character->getUnits()->isEmpty() && !$character->getSoldiers()->isEmpty())) {
-                   # Chosen character has no units, make a new default unit, or has both units and soldiers directly, so make another one because something clearly went wrong.
-                   $unit = $this->get('military_manager')->newUnit($character, null);
+                $character = $this->get('dispatcher')->gateway('personalAssignedUnitsTest');
+                if (! $character instanceof Character) {
+                        return $this->redirectToRoute($character);
                 }
 
+                if (!$character->getSoldiers()->isEmpty()) {
+                        # Chosen character has no units, make a new default unit, or has both units and soldiers directly, so make another one because something clearly went wrong.
+                        $this->get('military_manager')->newUnit($character, null);
+                }
                 $em = $this->getDoctrine()->getManager();
 
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement AND u.is_militia = TRUE) GROUP BY u.character ORDER BY s.name ASC');
-                   $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
+                        $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
-                   $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
-                   $query->setParameter('char', $character);
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
+                        $query->setParameter('char', $character);
                 }
                 $units = $query->getResult();
 
                 return array(
-                   'units' => $units,
-                   'character' => $character
-           );
+                'units' => $units,
+                'character' => $character
+                );
         }
 
         /**
