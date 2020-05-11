@@ -1923,7 +1923,7 @@ class Dispatcher {
 			return array("name"=>"unit.new.name", "description"=>"unavailable.notyours2");
 		}
 
-		return $this->action("unit.new.name", "maf_unit_new");
+		return $this->action("unit.new", "maf_unit_new");
 	}
 
 	public function personalUnitManageTest($ignored, Unit $unit) {
@@ -1979,14 +1979,8 @@ class Dispatcher {
 	}
 
 	public function personalAssignedUnitsTest() {
-		if ($this->getCharacter()->getSoldiersGiven()->isEmpty()) {
-			return array("name"=>"unit.assigned.name", "description"=>"unavailable.noassigned");
-		}
-		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"unit.assigned.name", "description"=>"unavailable.inbattle");
-		}
-
-		return $this->action("unit.assigned", "bm2_site_actions_assigned");
+		# No restrictions on this page, yet.
+		return $this->action("unit.assigned", "maf_units");
 	}
 
 	public function personalRequestsManageTest() {
