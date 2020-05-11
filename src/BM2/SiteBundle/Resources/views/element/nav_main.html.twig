@@ -123,7 +123,7 @@
 						{% if check.url is defined %}
 							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 						{% endif %}
-						{% set check = dispatcher.personalUnitManageTest() %}
+						{% set check = dispatcher.personalAssignedUnitsTest() %}
 						{% if check.url is defined %}
 							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 						{% endif %}
