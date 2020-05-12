@@ -547,14 +547,17 @@ class Economy {
 			if ($shortage>0.5 || $real_shortage>0.5) $severity++;
 			if ($shortage>0.75 || $real_shortage>0.75) $severity++;
 			$severity += min(3, round($settlement->getStarvation()/10));
-			foreach ($settlement->getSoldiers() as $militia) {
-				if ($militia->isAlive()) {
-					$militia->makeHungry($severity);
-					// militia can take several days of starvation without danger of death
-					if (rand(100, 200) < $militia->getHungry()) {
-						$militia->kill();
-						$this->history->addToSoldierLog($militia, 'starved');
+			foreach ($settlement->getLocalUnits() as $unit) {
+				foreach ($unit->getSoldiers() as $militia) {
+					if ($militia->isAlive()) {
+						$militia->makeHungry($severity);
+						// militia can take several days of starvation without danger of death
+						if (rand(100, 200) < $militia->getHungry()) {
+							$militia->kill();
+							$this->history->addToSoldierLog($militia, 'starved');
+						}
 					}
+
 				}
 			}
 			/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
@@ -717,7 +720,11 @@ class Economy {
 
 	public function ResourceDemand(Settlement $settlement, ResourceType $resource, $split_results=false) {
 		// this is the population used for all resources except food, which has its own calculation
-		$militia = $settlement->getSoldiers()->count();
+		$militiaCount = 0;
+		foreach ($settlement->getLocalUnits() as $unit) {
+			$militiaCount += $unit->getSoldiers()->count();
+		}
+		$militia = $militiaCount;
 		$population = $settlement->getPopulation() + $settlement->getThralls()/2 + $militia/2;
 
 		$buildings_operation = $this->ResourceForBuildingOperation($settlement, $resource);
