@@ -10,7 +10,6 @@
 		<field name="routed" type="boolean"/>
 		<field name="assigned_since" type="integer" nullable="true"/>
 
-		<many-to-one field="mercenary" target-entity="Mercenaries" inversed-by="soldiers"/>
 		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="armour" target-entity="EquipmentType"/>
 		<many-to-one field="equipment" target-entity="EquipmentType"/>
@@ -20,8 +19,8 @@
 		<many-to-one field="old_weapon" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_armour" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_equipment" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
-		<many-to-one field="character" target-entity="Character" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
-		<many-to-one field="base" target-entity="Settlement" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
+		<many-to-one field="character" target-entity="Character" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
+		<many-to-one field="base" target-entity="Settlement" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
 		<many-to-one field="liege" target-entity="Character" inversed-by="soldiers_given" fetch="EXTRA_LAZY"/>
 
 		<many-to-one field="unit" target-entity="Unit" inversed-by="soldiers"/>
