@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -13,15 +13,19 @@ class BattleGroup {
 	public function setupSoldiers() {
 		$this->soldiers = new ArrayCollection;
 		foreach ($this->getCharacters() as $char) {
-			foreach ($char->getActiveSoldiers() as $soldier) {
-				$this->soldiers->add($soldier);
+			foreach ($char->getUnits() as $unit) {
+				foreach ($char->getActiveSoldiers() as $soldier) {
+					$this->soldiers->add($soldier);
+				}
 			}
 		}
 
 		if ($this->battle->getSettlement() && $this->isDefender() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() == $this->battle->getSettlement()) {
-			foreach ($this->battle->getSettlement()->getActiveMilitia() as $soldier) {
-				if ($soldier->isActive()) {
-					$this->soldiers->add($soldier);
+			foreach ($this->battle->getSettlement()->getLocalUnits() as $unit) {
+				foreach ($unit->getActiveSoldiers() as $soldier) {
+					if ($soldier->isActive()) {
+						$this->soldiers->add($soldier);
+					}
 				}
 			}
 		}
