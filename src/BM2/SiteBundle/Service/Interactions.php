@@ -82,13 +82,19 @@ class Interactions {
 
 		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
 		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
-		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
-			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered2':'event.settlement.entered2',
-				array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
-				History::LOW, true, 10
-			);
+		if ($character->getUnits()) {
+			$count = 0;
+			foreach ($character->getUnits() as $unit) {
+				$count += $unit->getLivingSoldiers()->count();
+			}
+			if ($count > 5) {
+				$this->history->logEvent(
+					$settlement,
+					$force?'event.settlement.forceentered2':'event.settlement.entered2',
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
+					History::LOW, true, 10
+				);
+			}
 		} else {
 			$this->history->logEvent(
 				$settlement,
