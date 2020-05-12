@@ -93,23 +93,7 @@ class Soldier extends NPC {
 	public function gainMorale($value=1) { $this->morale+=$value; return $this; }
 
 	public function getAllInUnit() {
-		if ($this->getCharacter()) {
-			return $this->getCharacter()->getSoldiers();
-		} elseif ($this->getBase()) {
-			return $this->getBase()->getSoldiers();
-		} else {
-			return null;
-		}
-	}
-
-	public function getGroupName() {
-		if ($this->group!==null) {
-			$groups = range('a','z');
-			return $groups[$this->group];
-		} else {
-			return '';
-		}
-
+		return $this->getUnit()->getSoldiers();
 	}
 
 	public function getType() {
@@ -332,6 +316,9 @@ class Soldier extends NPC {
 
 
 	public function onPreRemove() {
+		if ($this->getUnit()) {
+			$this->getUnit()->removeSoldier($this);
+		}
 		if ($this->getCharacter()) {
 			$this->getCharacter()->removeSoldier($this);
 		}
