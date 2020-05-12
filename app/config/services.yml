@@ -45,7 +45,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@logger']
     military_manager:
         class:      BM2\SiteBundle\Service\MilitaryManager
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
     war_manager:
         class:      BM2\SiteBundle\Service\WarManager
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager', '@twig.extension.gametime', '@interactions']
