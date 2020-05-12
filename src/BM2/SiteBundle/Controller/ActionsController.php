@@ -524,7 +524,11 @@ class ActionsController extends Controller {
 					$act->setBlockTravel(true);
 					// depending on size of settlement and soldiers count, this gives values roughly between
 					// an hour for a small village and 10 hours for a large city with many soldiers
-					$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($settlement->getSoldiers()->count()))*3);
+					$soldiers = 0;
+					foreach ($settlement->getUnits() as $unit) {
+						$soldiers += $unit->getSoldiers()->count();
+					}
+					$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT".$time_to_grant."M"));
 					$act->setComplete($complete);
@@ -837,7 +841,7 @@ class ActionsController extends Controller {
      		$allocated = $query->getSingleResult();
 
      		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
-     		$form = $this->createForm(new SoldiersRecruitType($available));
+     		$form = $this->createForm(new SoldiersRecruitType($available, $units));
      		$form->handleRequest($request);
      		if ($form->isValid()) {
      			$data = $form->getData();
@@ -871,9 +875,13 @@ class ActionsController extends Controller {
      				}
      			}
      			$count = 0;
+			if ($data['unit']->getAvailable() < $data['number']) {
+				$data['number'] = $data['unit']->getAvailable();
+				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getName()), 'actions'));
+			}
      			$corruption = $this->get('economy')->calculateCorruption($settlement);
      			for ($i=0; $i<$data['number']; $i++) {
-     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $corruption)) {
+     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $data['unit'], $corruption)) {
      					$this->get('history')->addToSoldierLog(
      						$soldier, 'recruited',
      						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(),
@@ -895,265 +903,20 @@ class ActionsController extends Controller {
      			$em->flush();
      			return $this->redirectToRoute('bm2_site_settlement_soldiers', array('id'=>$settlement->getId()));
      		}
+		$soldiercount = 0;
+		foreach ($settlement->getUntits() as $unit) {
+			$soldiercount += $unit->getSoldiers()->count();
+		}
 
      		return array(
      			'settlement'=>$settlement,
      			'allocated'=>$allocated,
      			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
-     			'soldierscount' => $settlement->getSoldiers()->count(),
+     			'soldierscount' => $soldiercount,
 
      			'form'=>$form->createView()
      		);
      	}
-
-	/**
-	  * @Route("/offers")
-	  * @Template
-	  */
-	public function offersAction(Request $request) {
-      #TODO: Remove this route.
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		$em = $this->getDoctrine()->getManager();
-		$depth = 1;
-		if ($settlement->getRealm()->getSuperior()) {
-			$depth = 2;
-			if (($settlement->getRealm()->findUltimate() != $settlement->getRealm()) AND ($settlement->getRealm()->findUltimate() != $settlement->getRealm()->getSuperior())) {
-				$depth = 3;
-			}
-		}
-		switch ($depth) {
-			case 3:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true) OR (p.realm = :ultimate AND p.welcomer = true)');
-				$query->setParameter('realm', $settlement->getRealm());
-				$query->setParameter('superior', $settlement->getRealm()->getSuperior());
-				$query->setParameter('ultimate', $settlement->getRealm()->findUltimate());
-				break;
-			case 2:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true)');
-				$query->setParameter('realm', $settlement->getRealm());
-				$query->setParameter('superior', $settlement->getRealm()->findUltimate());
-				break;
-			case 1:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE p.realm = :realm AND p.welcomer = true');
-				$query->setParameter('realm', $settlement->getRealm());
-				break;
-		}
-
-		$form = $this->createForm(new KnightOfferType($settlement, $query->getResult()));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			if ($data['givesettlement']==false && count($data['soldiers']) < 1) {
-				$form->addError(new FormError("recruit.offer.empty"));
-			} else {
-				$ok = true;
-				if ($data['givesettlement']) {
-					$already = false;
-					foreach ($settlement->getKnightOffers() as $offer) {
-						if ($offer->getGiveSettlement()) {
-							$already = true;
-							break;
-						}
-					}
-					if ($already) {
-						$ok = false;
-						$form->addError(new FormError("recruit.offer.givealready"));
-					}
-				}
-				if ($ok) {
-					$em = $this->getDoctrine()->getManager();
-
-					$offer = new KnightOffer;
-					$offer->setSettlement($settlement);
-					$offer->setDescription($data['intro']);
-					$offer->setGiveSettlement($data['givesettlement']);
-					$offer->setWelcomers($data['welcomers']);
-					$em->persist($offer);
-					if ($data['givesettlement'] == false) {
-						foreach ($data['soldiers'] as $soldier) {
-							$soldier->setOfferedAs($offer);
-						}
-					}
-					$em->flush();
-					return $this->redirect($request->getUri());
-				}
-			}
-		}
-
-		return array(
-			'settlement'=>$settlement,
-			'militia'=>$settlement->getSoldiers(),
-			'offers'=>$settlement->getKnightOffers(),
-			'form'=>$form->createView()
-		);
-	}
-
-	/**
-	  * @Route("/offerdetails/{offer}")
-	  * @Template
-	  */
-	public function offerdetailsAction(KnightOffer $offer) {
-      #TODO: Remove this route.
-		return array('offer'=>$offer);
-	}
-
-	/**
-	  * @Route("/offerdelete/{offer}")
-	  * @Template
-	  */
-	public function offerdeleteAction(KnightOffer $offer) {
-      #TODO: Remove this route.
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		if ($offer->getSettlement() == $settlement) {
-			$em = $this->getDoctrine()->getManager();
-			$settlement->removeKnightOffer($offer);
-			foreach ($offer->getSoldiers() as $soldier) {
-				$soldier->setOfferedAs(null);
-			}
-			foreach ($offer->getEntourage() as $entourage) {
-				$entourage->setOfferedAs(null);
-			}
-			$em->remove($offer);
-			$em->flush();
-		}
-
-		return $this->redirectToRoute('bm2_site_actions_offers');
-	}
-
-
-	/**
-	  * @Route("/assigned")
-	  * @Template
-	  */
-	public function assignedAction(Request $request) {
-      #TODO: Remove this route.
-		$character = $this->get('dispatcher')->gateway('personalAssignedSoldiersTest');
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		$form = $this->createForm(new AssignedSoldiersType($character));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			$em = $this->getDoctrine()->getManager();
-
-			$cycle = $this->get('appstate')->getCycle();
-			$deserting = 0;
-			$returning = 0;
-			$staying = 0;
-			$reclaimed = array();
-			$group = '(no)';
-
-			foreach ($data['soldiers'] as $soldier) {
-				if (!$soldier->isAlive()) continue; // skip dead soldiers
-				// FIXME: if in battle, can't recall but there should be a message
-				if ($soldier->getCharacter() && $soldier->getCharacter()->isInBattle()) continue;
-				if ($soldier->getCharacter() && $soldier->getCharacter()->isDoingAction('military.regroup')) continue;
-				// FIXME: can't recall from your own estates or characters, but there should also be a message:
-				// if ($soldier->getCharacter() && $soldier->getCharacter()->getUser() == $character->getUser()) continue;
-				// if ($soldier->getBase() && $soldier->getBase()->getOwner() && $soldier->getBase()->getOwner()->getUser() == $character->getUser()) continue;
-
-				if ($soldier->getAssignedSince() == -1) {
-					$days = 0;
-				} else {
-					$days = $cycle - $soldier->getAssignedSince();
-				}
-				if ($days<=0 || $days>=50) {
-					$desert = 0;
-				} else {
-					if ($days <= 25) {
-						$desert = round($days/1.25);
-					} else {
-						$desert = round((50-$days)/1.25);
-					}
-				}
-				if ($soldier->getCharacter()) {
-					if (!isset($reclaimed[$soldier->getCharacter()->getId()])) {
-						$reclaimed[$soldier->getCharacter()->getId()] = array('char'=>$soldier->getCharacter(), 'total'=>0, 'stay'=>0);
-					}
-					$reclaimed[$soldier->getCharacter()->getId()]['total']++;
-				}
-				if (rand(0,99)<$desert) {
-					// deserts - vanish
-					$this->get('military_manager')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
-					$deserting++;
-				} else if (rand(0,99) < ($days*2)) {
-					// stays with new lord
-					$soldier->setLiege(null)->setAssignedSince(null);
-					$staying++;
-					if ($soldier->getCharacter()) {
-						$reclaimed[$soldier->getCharacter()->getId()]['stay']++;
-					}
-				} else {
-					// returns to liege
-					$settlement = $soldier->getBase();
-					$group = $this->get('military_manager')->assign($soldier, $character);
-					$soldier->setLiege(null)->setAssignedSince(null);
-					// in training - interrupt that and reset equipment
-					if ($soldier->getTrainingRequired() > 0) {
-						if ($soldier->getOldWeapon() || $soldier->getOldArmour() || $soldier->getOldEquipment()) {
-							if ($soldier->getOldWeapon() != $soldier->getWeapon()) {
-								$this->get('military_manager')->returnItem($settlement, $soldier->getWeapon());
-								$soldier->setWeapon($soldier->getOldWeapon());
-							}
-							if ($soldier->getOldArmour() != $soldier->getArmour()) {
-								$this->get('military_manager')->returnItem($settlement, $soldier->getArmour());
-								$soldier->setArmour($soldier->getOldArmour());
-							}
-							if ($soldier->getOldEquipment() != $soldier->getEquipment()) {
-								$this->get('military_manager')->returnItem($settlement, $soldier->getEquipment());
-								$soldier->setEquipment($soldier->getOldEquipment());
-							}
-						}
-						$soldier->setTraining(0)->setTrainingRequired(0);
-					}
-					$returning++;
-				}
-			}
-
-			if ($returning > 0) {
-				$act = new Action;
-				$act->setType('military.reclaim')->setCharacter($character);
-				$act->setBlockTravel(true);
-				$complete = new \DateTime("now");
-				$takes = 16;
-				$complete->add(new \DateInterval("PT".$takes."H"));
-				$act->setComplete($complete);
-				$this->get('action_manager')->queue($act);
-			}
-
-			foreach ($reclaimed as $rec) {
-				$this->get('history')->logEvent(
-					$rec['char'],
-					'event.military.reclaimed',
-					array('%link-character%'=>$character->getId(),'%count%'=>$rec['total'],'%stay%'=>$rec['stay']),
-					History::MEDIUM, false, 40
-				);
-			}
-
-			$em->flush();
-
-			return array(
-				'return' => $returning,
-				'lost' => $deserting+$staying,
-				'group' => $group
-			);
-		}
-
-		return array(
-			'assigned' => $character->getSoldiersGiven(),
-			'form'=>$form->createView()
-		);
-	}
-
 
 	/**
 	  * @Route("/dungeons", name="bm2_dungeons"))
