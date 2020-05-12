@@ -26,18 +26,20 @@ class MilitaryManager {
 	private $history;
 	private $pm;
 	private $appstate;
+	private $geo;
 
 	private $group_assign=0;
 	private $group_militia=0;
 	private $group_soldier=0;
 	private $max_group=25; // a=0 ... z=25
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, AppState $appstate) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, PermissionManager $pm, AppState $appstate, Geography $geo) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
 		$this->pm = $pm;
 		$this->appstate = $appstate;
+		$this->geo = $geo;
 	}
 
 	public function TrainingCycle(Settlement $settlement) {
@@ -176,7 +178,7 @@ class MilitaryManager {
 		return array($success, $fail);
 	}
 
-	public function manage($npcs, $data, Settlement $settlement=null, Character $character=null) {
+	public function manageEntourage($npcs, $data, Settlement $settlement=null, Character $character=null) {
 		$assigned_soldiers = 0; $targetgroup='(no)';
 		$assigned_entourage = 0;
 		$success=0; $fail=0;
@@ -746,5 +748,14 @@ class MilitaryManager {
 			$this->em->flush();
 		}
 		return $settings;
+	}
+
+	public function returnUnitHome (Unit $unit, $reason='recalled', $origin) {
+		$distance = $this->geo->getDistance($origin, $unit->getSettlement()->getGeoMarker()->getLocation());
+		$count = $unit->getSoldiers()->count();
+		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
+		$days = $distance / $speed;
+		$final = $days*0.925; #Average travel speed of all region types.
+		$unit->setTravelDays($final);
 	}
 }
