@@ -640,7 +640,11 @@ class Geography {
 		$actScout = $this->appstate->getGlobal('act.scoutmod');
 
 		$act = $actBase; // base distance a noble on his own has
-		$act += sqrt($character->getSoldiers()->count()); // add a tiny amount for his troops
+		$count = 0;
+		foreach ($character->getUnits() as $unit) {
+			$count += $unit->getSoldiers()->count();
+		}
+		$act += sqrt($count); // add a tiny amount for his troops
 
 		// add in scouts
 		$scouts = $character->getEntourageOfType('scout')->count();
@@ -794,10 +798,18 @@ class Geography {
 			$prisonercount = 0;
 			if ($character->getPrisoners()) {
 				foreach ($character->getPrisoners() as $prisoner) {
-					$prisonercount += $prisoner->getSoldiers()->count() + ($prisoner->getEntourage()->count()/2);
+					$prisonerSoldiers = 0;
+					foreach ($prisoner->getUnit() as $unit) {
+						$prisonerSoldiers += $unit->getSoldiers()->count();
+					}
+					$prisonercount += $prisonerSoldiers + ($prisoner->getEntourage()->count()/2);
 				}
 			}
-			$men = $character->getSoldiers()->count() + $prisonercount + ($character->getEntourage()->count()/2);
+			$charSoldiers = 0;
+			foreach ($character->getUnits() as $unit) {
+				$charSoldiers += $unit->getSoldiers()->count();
+			}
+			$men = $charSoldiers + $prisonercount + ($character->getEntourage()->count()/2);
 			$base_speed = $this->base_speed / exp(sqrt($men/200));
 			if ($prisonercount > 0) {
 				$base_speed *= 0.9;
@@ -878,7 +890,14 @@ class Geography {
 	}
 
 	public function getDistance($locA, $locB) {
-		$query = $this->em->createQuery('SELECT ST_Distance(:locA, :locB)'); #Yes, this is a PHP wrapper for checking distance between points in PostGIS.
+		$query = $this->em->createQuery('SELECT ST_Distance(:locA, :locB)');
+		#Yes, this is a PHP wrapper for checking distance between points in PostGIS.
+		$query->addParameters(array('locA'=>$locA, 'locB'=>$locB));
+		return $query->getResult();
+	}
+
+	public function getBaseSpeed() {
+		return $this->base_speed;
 	}
 
 }
