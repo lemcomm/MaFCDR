@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -66,12 +66,19 @@ class Settlement {
 	}
 
 	public function getFullPopulation() {
-		return $this->population + $this->thralls + $this->soldiers->count();
+		$soldiers = 0;
+		foreach ($this->units as $unit) {
+			$soldiers += $unit->getSoldiers()->count();
+		}
+		return $this->population + $this->thralls + $soldiers;
 	}
 
 	public function getTimeToTake(Character $taker, $attackers=-1, $additional_defenders=0) {
 		if ($attackers == -1) {
-			$attackers = $taker->getActiveSoldiers()->count();
+			$attackers = 0;
+			foreach ($taker->getUnits() as $unit) {
+				$attackers += $unit->getActiveSoldiers()->count();
+			}
 		}
 		$enforce_claim = false;
 		foreach ($this->getClaims() as $claim) {
@@ -142,61 +149,6 @@ class Settlement {
 		}
 	}
 
-	public function getMilitia() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isMilitia());
-			}
-		);
-	}
-	public function getActiveMilitia() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isActive() && $entry->isMilitia());
-			}
-		);
-	}
-	public function getRecruits() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isRecruit());
-			}
-		);
-	}
-
-	public function getActiveMilitiaByType() {
-		return $this->getSoldiersByType(true, true);
-	}
-	public function getMilitiaByType($active_only=false) {
-		return $this->getSoldiersByType(true, false);
-	}
-	public function getRecruitsByType() {
-		return $this->getSoldiersByType(false, false);
-	}
-
-	public function getSoldiersByType($militia=true, $active_only=false) {
-		$data = array();
-		if ($militia) {
-			if ($active_only) {
-				$soldiers = $this->getActiveMilitia();
-			} else {
-				$soldiers = $this->getMilitia();
-			}			
-		} else {
-			$soldiers = $this->getRecruits();
-		}
-		foreach ($soldiers as $soldier) {
-			$type = $soldier->getType();
-			if (isset($data[$type])) {
-				$data[$type]++;
-			} else {
-				$data[$type] = 1;
-			}
-		}
-		return $data;
-	}
-
-
 	public function findDefenders() {
 		// anyone with a "defend settlement" action who is nearby
 		$defenders = new ArrayCollection;
@@ -210,10 +162,15 @@ class Settlement {
 
 	public function countDefenders() {
 		$defenders = 0;
+		$militia = 0;
 		foreach ($this->findDefenders() as $char) {
-			$defenders += $char->getActiveSoldiers()->count();
+			foreach ($char->getUnits() as $unit) {
+				$defenders += $unit->getActiveSoldiers()->count();
+			}
 		}
-		$militia = $this->getActiveMilitia()->count();
+		foreach ($this->getUnits() as $unit) {
+			$militia += $unit->getActiveSoldiers()->count();
+		}
 		return $militia + $defenders;
 	}
 
@@ -300,7 +257,7 @@ class Settlement {
 	}
 	public function getBuildingWorkers() {
 		return round($this->getBuildingWorkersPercent() * $this->getPopulation());
-	}	
+	}
 	public function getFeatureWorkersPercent($force_recalc=false) {
 		if ($force_recalc) $this->assignedFeatures=-1;
 		if ($this->assignedFeatures==-1) {
@@ -343,12 +300,12 @@ class Settlement {
 	/* Leftover code from when we were planning to make settlements subordinate to each other.
 	Doing this would make calculating region resources and the like a literal pain, as we'd have to add a bunch of conditions
 	that help the game determine if the settlement is supposed to have resources or not.
-	
+
 	The better idea is to make places entirely NOT settlements, and have them operate on separate code.
-	
+
 	public function getMinorSettlementWorkers($include_me=true) {
 		$total;
-		# $include_me set to true will include the settlement we're looking at. 
+		# $include_me set to true will include the settlement we're looking at.
 		if ($include_me) {
 			$total += round($this->getBuildingWorkers() * $this->getPopulation());
 			foreach ($settlement->getInferiors() as $minor) {
@@ -361,7 +318,7 @@ class Settlement {
 		}
 		return $total;
 	}
-	
+
 	public function getMinorSettlementWorkersPercent($include_me=true) {
 		$total;
 		if ($include_me) {
@@ -376,7 +333,7 @@ class Settlement {
 		}
 		return $total;
 	}*/
-	
+
 	public function getLocalUnits() {
 		$local = new ArrayCollection;
 		foreach($this->getUnits() as $unit) {
