@@ -146,45 +146,45 @@ class GameRunner {
 		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.expires <= :now')->setParameter('now', $now);
 		$result = $query->iterate();
 		while ($row = $result->next()) {
-			if ($row->getFromCharacter()->getUnitSettings()->getSupplier() == $row->getToSettlement()) {
-				$char = $row->getFromCharacter();
-				$this->logger->info("Character ".$char->getName()." (".$char->getId().") may be using request for food...");
-				# Character supplier matches target settlement, we need to see if this is still a valid food source.
+			$allUnits = array();
+			foreach($row->getFromCharacter()->getUnits() as $unit) {
+				if ($unit->getSupplier()==$row->getToSettlement()) {
+					$char = $row->getFromCharacter();
+					$this->logger->info("Character ".$char->getName()." (".$char->getId().") may be using request for food...");
+					# Character supplier matches target settlement, we need to see if this is still a valid food source.
 
-				# Get all character realms.
-				$myRealms = $char->findRealms();
-				$settlements = new ArrayCollection;
-
-				foreach ($myRealms as $realm) {
-					if ($realm->getCapital()) {
-						$settlements->add($realm->getCapital());
+					# Get all character realms.
+					$myRealms = $char->findRealms();
+					$settlements = new ArrayCollection;
+					foreach ($char->getSettlements() as $settlement) {
+						$settlements->add($settlement);
 					}
-				}
-				if ($char->getLiege()) {
-					$liege = $character->getLiege();
-					foreach ($liege->getOwnedSettlements() as $settlement) {
-						if ($settlement->getPermissions()->getFeedSoldiers()) {
-							$settlements->add($settlement);
+					if ($char->getLiege()) {
+						$liege = $char->getLiege();
+						foreach ($liege->getOwnedSettlements() as $settlement) {
+							if ($settlement->getPermissions()->getFeedSoldiers()) {
+								$settlements->add($settlement);
+							}
 						}
 					}
-				}
-				$expr = new Comparison('type', '=', 'soldier.food');
-				$expr2 = new Comparison('accepted', '=', true);
-				$expr3 = new Comparison('expires', '<=', $now);
-				$criteria = new Critera();
-				$criteria->where($expr)->andWhere($expr2);
-				# Basically, we only care about accepted, non-expired requests about food.
-				if ($char->getRequests()->count() > 1) {
-					$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
-					foreach ($filtered as $req) {
-						if ($req != $row) {
-							$settlements->add($req->getToSettlement());
+					$expr = new Comparison('type', '=', 'soldier.food');
+					$expr2 = new Comparison('accepted', '=', true);
+					$expr3 = new Comparison('expires', '<=', $now);
+					$criteria = new Critera();
+					$criteria->where($expr)->andWhere($expr2);
+					# Basically, we only care about accepted, non-expired requests about food.
+					if ($char->getRequests()->count() > 1) {
+						$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
+						foreach ($filtered as $req) {
+							if ($req != $row) {
+								$settlements->add($req->getToSettlement());
+							}
 						}
 					}
-				}
-				if (!$settlements->contains($row->getToSettlement())) {
-					$row->getToSettlement()->getSuppliedUnits()->remove($char->getUnitSettings());
-					$char->getUnitSettings()->setSupplier(null);
+					if (!$settlements->contains($row->getToSettlement())) {
+						$row->getToSettlement()->getSuppliedUnits()->remove($unit);
+						$unit->setSupplier(null);
+					}
 				}
 			}
 			$this->em->remove($row);
@@ -567,36 +567,6 @@ class GameRunner {
 			$this->logger->info("No active NPCs.");
 		}
 
-		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Mercenaries m SET m.wait = m.wait +1 WHERE m.active = true AND m.hired_by IS NULL');
-		$query->execute();
-		$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Mercenaries m WHERE m.active = true AND m.hired_by IS NULL AND m.wait > 30');
-		foreach ($query->getResult() as $mercs) {
-			// enough waiting, let's move somewhere else
-			$this->logger->info("Mercenary group ".$mercs->getName()." moving somewhere else.");
-			$this->npc->relocateMercenaries($mercs);
-		}
-
-
-
-		if ($this->cycle % 6 == 0) {
-			// once a week, pay for all hired mercenaries
-			$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Mercenaries m WHERE m.active = true AND m.hired_by IS NOT NULL');
-			foreach ($query->getResult() as $mercs) {
-				$this->npc->payMercenaries($mercs);
-			}
-		}
-
-		$mercenaries = $this->em->createQuery('SELECT count(m) FROM BM2SiteBundle:Mercenaries m WHERE m.active = true')->getSingleScalarResult();
-		$want = ceil($players/6);
-		$this->logger->info("we want $want mercenary groups for $players players, we have $mercenaries");
-		if ($mercenaries < $want) {
-			$this->logger->info("creating new group.");
-			$mercenary = $this->npc->createMercenaries();
-			$this->logger->info("created mercenary group ".$mercenary->getName());
-		}
-
-		// TODO: what to do with inactive mercenary groups?
-
 		$this->appstate->setGlobal('cycle.npcs', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -628,15 +598,6 @@ class GameRunner {
 		$this->logger->info("$rotting soldiers rotting, $deleted were deleted");
 
 		$this->em->flush();
-
-		// assignment counters
-		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.assigned_since = :cycle where s.assigned_since = -1');
-		$query->setParameter('cycle', $this->cycle);
-		$query->execute();
-
-		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.assigned_since = null, s.liege = null where s.assigned_since < :old');
-		$query->setParameter('old', $this->cycle-50);
-		$query->execute();
 
 		// militia
 		// dead militia is auto-buried
@@ -685,6 +646,7 @@ class GameRunner {
 		$this->em->clear();
 
 		$this->logger->info("disbanding...");
+		#FIXME: Rewrite this for units.
 		$disband_soldiers = 0;
 		$query = $this->em->createQuery('SELECT s, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Soldier s JOIN s.character c WHERE c.slumbering = true');
 		$iterableResult = $query->iterate();
