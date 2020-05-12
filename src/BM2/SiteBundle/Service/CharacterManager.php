@@ -172,6 +172,7 @@ class CharacterManager {
 	}
 
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
+		$origin = $character->getLocation();
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		$character->setSystem(null);
@@ -201,8 +202,8 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getSoldiers() as $soldier) {
-			$this->milman->disband($soldier, $character);
+		foreach ($character->getUnits() as $unit) {
+			$this->milman->returnUnitHome($unit, 'death', $origin);
 		}
 		foreach ($character->getEntourage() as $entourage) {
 			$this->milman->disbandEntourage($entourage, $character);
@@ -323,7 +324,7 @@ class CharacterManager {
 				$killer,
 				'event.character.killgold',
 				array("%link-character%"=>$character->getId(), "%gold%"=>$character->getGold()),
-				History::MEDIUM, false, 20 
+				History::MEDIUM, false, 20
 			);
 		}
 		$character->setGold(0);
@@ -431,7 +432,7 @@ class CharacterManager {
 				}
 			}
 		}
-		
+
 
 		// close all logs except my personal one
 		foreach ($character->getReadableLogs() as $log) {
@@ -441,7 +442,7 @@ class CharacterManager {
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
-		
+
 
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
@@ -454,6 +455,7 @@ class CharacterManager {
 	public function retire(Character $character) {
 		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
 		// List is set to 90 as this sorts them to the retired listing on the account character list.
+		$origin = $character->getLocation();
 		$character->setRetired(true)->setList(90)->setSlumbering(true);
 		// remove from map and hiearchy
 		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
@@ -479,15 +481,15 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getSoldiers() as $soldier) {
-			$this->milman->disband($soldier, $character);
+		foreach ($character->getUnits() as $unit) {
+			$this->milman->returnUnitHome($unit, 'retire', $origin);
 		}
 		foreach ($character->getEntourage() as $entourage) {
 			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// FIXME: Since they're not dead, do they lose their claims still? Hm.
-		/* 
+		/*
 		foreach ($character->getSettlementClaims() as $claim) {
 			if ($claim->getEnforceable()) {
 				// TODO: enforceable claims are inherited
@@ -495,7 +497,7 @@ class CharacterManager {
 			$claim->getSettlement()->removeClaim($claim);
 			$character->removeSettlementClaim($claim);
 			$this->em->remove($claim);
-		} 
+		}
 		*/
 
 		// assigned troops now can't be reclaimed anymore, as character is retired
@@ -652,16 +654,16 @@ class CharacterManager {
 		}
 
 		// FIXME: Do we want to close logs for a character that could come back?
-		/* 
+		/*
 		foreach ($character->getReadableLogs() as $log) {
 			if ($log != $character->getLog()) {
 				$this->history->closeLog($log, $character);
 			}
-		} 
+		}
 		*/
 
 		// TODO: permission lists - plus clear out those of old dead characters!
-		
+
 
 		// clean out dungeon stuff
 		$this->dm->retireDungeoneer($character);
@@ -752,8 +754,8 @@ class CharacterManager {
 
 	public function findHeir(Character $character, Character $from=null) {
 		// NOTE: This should match the implemenation on GameRunner.php
-		if (!$from) { 
-			$from = $character; 
+		if (!$from) {
+			$from = $character;
 		}
 
 		if ($this->seen->contains($character)) {
@@ -854,18 +856,18 @@ class CharacterManager {
 			);
 		}
 	}
-	
+
 	public function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
 		if ($why == 'death') {
 			$this->history->logEvent(
-				$position->getRealm(), 
+				$position->getRealm(),
 				'event.position.death',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);
 		} else if ($why == 'slumber') {
 			$this->history->logEvent(
-				$position->getRealm(), 
+				$position->getRealm(),
 				'event.position.inactive',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
