@@ -37,10 +37,6 @@ class ProcessEconomyCommand extends AbstractProcessCommand {
 		$this->process('economy', 'Settlement');
 		$this->finish('economy');
 
-		$this->start('militia');
-		$this->process('militia', 'Settlement');
-		$this->finish('militia');
-
 		$this->start('construction');
 		$this->process('construction:buildings', 'Settlement');
 		$this->process('construction:features', 'GeoData');
@@ -78,5 +74,4 @@ class ProcessEconomyCommand extends AbstractProcessCommand {
 			$building->setWorkers(0);
 		}
 	}
-
 }
