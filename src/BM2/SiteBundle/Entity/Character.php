@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -181,8 +181,8 @@ class Character {
 
 	public function getVisualSize() {
 		$size = 5; // the default visual size for nobles, we're not added as a pseudo-soldier like we are in battle groups
-		foreach ($this->soldiers as $soldier) {
-			$size += $soldier->getVisualSize();
+		foreach ($this->units as $unit) {
+			$size += $unit->getVisualSize();
 		}
 		return $size;
 	}
@@ -216,30 +216,6 @@ class Character {
 		return $this->getEntourageOfType($type, true);
 	}
 
-	public function getActiveSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isActive());
-			}
-		);
-	}
-
-	public function getLivingSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isAlive());
-			}
-		);
-	}
-
-	public function getDeadSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return (!$entry->isAlive());
-			}
-		);
-	}
-
 	public function getLivingEntourage() {
 		return $this->getEntourage()->filter(
 			function($entry) {
@@ -265,32 +241,10 @@ class Character {
 		if ($active_only) {
 			$npcs = $this->getLivingEntourage();
 		} else {
-			$npcs = $this->getEntourage();		
+			$npcs = $this->getEntourage();
 		}
 		foreach ($npcs as $npc) {
 			$type = $npc->getType()->getName();
-			if (isset($data[$type])) {
-				$data[$type]++;
-			} else {
-				$data[$type] = 1;
-			}
-		}
-		return $data;
-	}
-
-
-	public function getActiveSoldiersByType() {
-		return $this->getSoldiersByType(true);
-	}
-	public function getSoldiersByType($active_only=false) {
-		$data = array();
-		if ($active_only) {
-			$soldiers = $this->getActiveSoldiers();
-		} else {
-			$soldiers = $this->getSoldiers();
-		}
-		foreach ($soldiers as $soldier) {
-			$type = $soldier->getType();
 			if (isset($data[$type])) {
 				$data[$type]++;
 			} else {
@@ -325,7 +279,7 @@ class Character {
 			while ($liege->getLiege()) {
 				$liege=$liege->getLiege();
 			}
-			$this->ultimate=$liege;			
+			$this->ultimate=$liege;
 		}
 		return $this->ultimate;
 	}
@@ -367,7 +321,7 @@ class Character {
 			}
 		}
 		$this->my_realms = $realms;
-		
+
 		return $realms;
 	}
 
@@ -387,7 +341,6 @@ class Character {
 		$this->my_houses = $houses;
 		return $houses;
 	}
-
 
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
@@ -428,10 +381,10 @@ class Character {
 				if (is_array($key)) {
 					return in_array($entry->getType(), $key);
 				} else {
-					return ($entry->getType()==$key);					
+					return ($entry->getType()==$key);
 				}
 			}
-		);		
+		);
 	}
 
 	public function hasAction($key) {
@@ -454,6 +407,5 @@ class Character {
 			return $realms;
 		}
 	}
-	
 	
 }
