@@ -725,6 +725,7 @@ class CharacterController extends Controller {
 			$fail = false;
 			$id = $character->getId();
 			$data = $form->getData();
+			$mm = $this->get('military_manager');
 			$em = $this->getDoctrine()->getManager();
 			if ($data['sure'] != true) {
 				$fail = true;
@@ -733,16 +734,8 @@ class CharacterController extends Controller {
 				// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
 				// TODO: we should somehow store that it was a suicide, to catch various exploits
 				$reclaimed = array();
-				foreach ($character->getSoldiers() as $soldier) {
-					if ($liege = $soldier->getLiege()) {
-						if (!isset($reclaimed[$liege->getId()])) {
-							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
-						}
-						$reclaimed[$liege->getId()]['number']++;
-						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-						$soldier->setCharacter($liege);
-						$soldier->setLiege(null)->setAssignedSince(null);
-					}
+				foreach ($character->getUnits() as $unit) {
+					$mm->returnUnitHome($unit, 'suicide', $character->getLocation());
 				}
 				$em->flush();
 				if ($data['death']) {
@@ -804,17 +797,8 @@ class CharacterController extends Controller {
 				$fail = true;
 			}
 			if (!$fail) {
-				$reclaimed = array();
-				foreach ($character->getSoldiers() as $soldier) {
-					if ($liege = $soldier->getLiege()) {
-						if (!isset($reclaimed[$liege->getId()])) {
-							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
-						}
-						$reclaimed[$liege->getId()]['number']++;
-						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-						$soldier->setCharacter($liege);
-						$soldier->setLiege(null)->setAssignedSince(null);
-					}
+				foreach ($character->getUnits() as $unit) {
+					$mm->returnUnitHome($unit, 'retired', $character->getLocation());
 				}
 				$em->flush();
 				if ($data['retirement']) {
@@ -1007,7 +991,7 @@ class CharacterController extends Controller {
 			$data = $form->getData();
 
 			$settlement = $this->get('dispatcher')->getActionableSettlement();
-			$this->get('military_manager')->manage($character->getEntourage(), $data, $settlement, $character);
+			$this->get('military_manager')->manageEntourage($character->getEntourage(), $data, $settlement, $character);
 
 			$em->flush();
 			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our entourage count
@@ -1045,28 +1029,6 @@ class CharacterController extends Controller {
 			'can_resupply' => $character->getInsideSettlement()?$this->get('permission_manager')->checkSettlementPermission($character->getInsideSettlement(), $character, 'resupply'):false,
 			'resupply' => $resupply
 		);
-	}
-
-
-	/**
-	  * @Route("/groupby/{by}")
-	  */
-	public function groupsoldiersAction($by) {
-		$character = $this->get('appstate')->getCharacter();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		if ($by=="type") {
-			$this->get('military_manager')->groupByType($character->getSoldiers());
-		} else {
-			$this->get('military_manager')->groupByEquipment($character->getSoldiers());
-		}
-		$this->getDoctrine()->getManager()->flush();
-
-		$this->addFlash('notice', $this->get('translator')->trans('recruit.manage.grouped', array(), 'actions'));
-
-		return $this->redirectToRoute('bm2_site_character_soldiers');
 	}
 
    /**
