@@ -434,7 +434,11 @@ class ActionResolution {
 
 		$chance = 40;
 		// the larger my army, the less chance I have to evade (with 500 people, -50 %)
-		$chance -= sqrt( ($char->getSoldiers()->count() + $char->getEntourage()->count()) * 5);
+		$soldiercount = 0;
+		foreach ($character->getUnits() as $unit) {
+			$soldiercount += $unit->getSoldiers()->count();
+		}
+		$chance -= sqrt( ($soldiercount + $char->getEntourage()->count()) * 5);
 
 		// biome - we re-use spotting here
 		$biome = $this->geography->getLocalBiome($char);
@@ -633,7 +637,7 @@ class ActionResolution {
 	public function log($level, $text) {
 		if ($level <= $this->debug) {
 			echo $text."\n";
-			flush();			
+			flush();
 		}
 	}
 
