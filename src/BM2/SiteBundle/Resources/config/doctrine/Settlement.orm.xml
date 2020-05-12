@@ -35,7 +35,7 @@
 		<one-to-one field="geo_marker" target-entity="GeoFeature" inversed-by="settlement"/>
 		<one-to-many field="resources" target-entity="GeoResource" mapped-by="settlement"/>
 		<one-to-many field="buildings" target-entity="Building" mapped-by="settlement" index-by="type"/>
-		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="base" index-by="id" fetch="EXTRA_LAZY"/>
+		<one-to-many field="soldiers_old" target-entity="Soldier" mapped-by="base" index-by="id" fetch="EXTRA_LAZY"/>
 
 		<one-to-many field="houses_present" target-entity="House" mapped-by="inside_settlement"/>
 
