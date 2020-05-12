@@ -234,10 +234,6 @@ class Dispatcher {
 		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
-		$has = $this->locationInnTest();
-		if (isset($has['url'])) {
-			$actions[] = $has;
-		}
 		$has = $this->locationLibraryTest();
 		if (isset($has['url'])) {
 			$actions[] = $has;
@@ -255,7 +251,6 @@ class Dispatcher {
 	}
 
 	public function locationTavernTest() { return $this->locationHasBuildingTest("Tavern"); }
-	public function locationInnTest() { return $this->locationHasBuildingTest("Inn"); }
 	public function locationLibraryTest() { return $this->locationHasBuildingTest("Library"); }
 	public function locationTempleTest() { return $this->locationHasBuildingTest("Temple"); }
 	public function locationBarracksTest() { return $this->locationHasBuildingTest("Barracks"); }
@@ -435,14 +430,12 @@ class Dispatcher {
 			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
 				$actions[] = $this->personalUnitNewTest();
 				$actions[] = $this->personalEntourageTest();
-				$actions[] = $this->personalSoldiersTest();
-				$actions[] = $this->personalMilitiaTest();
+				$actions[] = $this->personalSoldiersTest(); #This page handles recruiting.
 			} else {
 				$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notyours");
 			}
 		}
 
-		$actions[] = $this->personalAssignedSoldiersTest();
 		$actions[] = $this->personalAssignedUnitsTest();
 
 		return array("name"=>"recruit.name", "elements"=>$actions);
@@ -1953,29 +1946,6 @@ class Dispatcher {
 		}
 
 		return $this->action("recruit.troops", "bm2_site_actions_soldiers");
-	}
-
-	public function personalMilitiaTest() {
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement, 'mobilize')) !== true) {
-			return array("name"=>"recruit.militia.name", "description"=>"unavailable.$check");
-		}
-		if ($settlement->getSoldiers()->isEmpty()) {
-			return array("name"=>"recruit.militia.name", "description"=>"unavailable.nomilitia");
-		}
-
-		return $this->action("recruit.militia", "bm2_site_settlement_soldiers", false, array('id'=>$settlement->getID()));
-	}
-
-	public function personalAssignedSoldiersTest() {
-		if ($this->getCharacter()->getSoldiersGiven()->isEmpty()) {
-			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.noassigned");
-		}
-		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"recruit.assigned.name", "description"=>"unavailable.inbattle");
-		}
-
-		return $this->action("recruit.assigned", "bm2_site_actions_assigned");
 	}
 
 	public function personalAssignedUnitsTest() {
