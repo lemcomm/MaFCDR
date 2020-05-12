@@ -99,7 +99,7 @@
 
 		<one-to-many field="entourage" target-entity="Entourage" mapped-by="character" index-by="id"/>
 		<one-to-many field="entourage_given" target-entity="Entourage" mapped-by="liege" index-by="id"/>
-		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="character" index-by="id"/>
+		<one-to-many field="soldiers_old" target-entity="Soldier" mapped-by="character" index-by="id"/>
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
@@ -116,7 +116,7 @@
 		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_character"/>
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_character"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
-		
+
 		<one-to-many field="units" target-entity="Unit" mapped-by="character"/>
 		<one-to-many field="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
 
