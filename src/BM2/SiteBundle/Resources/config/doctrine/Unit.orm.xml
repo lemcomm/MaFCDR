@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
                 <field name="line" type="integer" nullable="true"/>
+		<field name="travel_days" type="smallint" nullable="true"/>
 
 		<many-to-one field="character" target-entity="Character" inversed-by="units"/>
                 <many-to-one field="settlement" target-entity="Settlement" inversed-by="units"/>
