@@ -53,13 +53,13 @@ class Generator {
 		return $name->getName();
 	}
 
-	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, Settlement $home=null, $corruption=0) {
+	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, Settlement $home=null, $corruption=0, Unit $unit) {
 		$soldier = new Soldier;
 		$soldier->setName($this->randomName($home));
 		$soldier->setLocked(false);
 		$soldier->setRouted(false)->setHungry(0)->setWounded(0);
 		$soldier->setHasWeapon(true)->setHasArmour(true)->setHasEquipment(true);
-	
+
 		$soldier->setExperience(0)->setTraining(0);
 		if ($home) {
 			if ($this->milman->acquireItem($home, $weapon, true, false)
@@ -92,7 +92,8 @@ class Generator {
 
 		$soldier->setTrainingRequired(max(1,$train));
 
-		$soldier->setHome($home)->setDistanceHome(0)->setBase($home);
+		$soldier->setHome($home)->setDistanceHome(0);
+		$soldier->setUnit($unit);
 		$soldier->setAlive(true);
 
 		$this->em->persist($soldier);
