@@ -564,7 +564,8 @@ class Geography {
 				->from('BM2SiteBundle:GeoData', 'g')
 				->join('g.biome', 'b')
 				->from('BM2SiteBundle:Character', 'c')
-				->leftJoin('c.soldiers', 's', 'WITH', 's.alive=true')
+				->leftJoin('c.units', 'u')
+				->leftJoin('u.soldiers', 's', 'WITH', 's.alive=true')
 				->leftJoin('c.entourage', 'e', 'WITH', '(e.type = :scout AND e.alive=true)')
 				->where($qb->expr()->eq('ST_Contains(g.poly, c.location)', 'true'))
 				->andWhere($qb->expr()->eq('c', ':me'))
@@ -611,7 +612,8 @@ class Geography {
 			$qb->select(array('c as spotter', '(:base + SQRT(count(DISTINCT e))*:mod + POW(count(DISTINCT s), 0.3333333)) as spotdistance'));
 		}
 		$qb->from('BM2SiteBundle:Character', 'c')
-			->leftJoin('c.soldiers', 's', 'WITH', 's.alive=true')
+			->leftJoin('c.units', 'u')
+			->leftJoin('u.soldiers', 's', 'WITH', 's.alive=true')
 			->leftJoin('c.entourage', 'e', 'WITH', '(e.type = :scout AND e.alive=true)')->setParameter('scout', $scout)
 			->where($qb->expr()->eq('ST_Contains(g.poly, c.location)', 'true'))
 			->groupBy('c')
