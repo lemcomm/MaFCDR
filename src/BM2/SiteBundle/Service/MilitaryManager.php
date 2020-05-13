@@ -648,13 +648,22 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function newUnit(Character $character=null, Settlement $home = null, $data = null, $bulk = false) {
+	public function newUnit(Character $character=null, Settlement $home = null, $data) {
+		$unit = new Unit();
+		$this->em->persist($unit);
+		$unit->setSupplier($data['supplier']);
+		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
+		$this->em->flush();
+		return $unit;
+	}
+
+	public function convertToUnit(Character $character=null, Settlement $home = null, $data = null, $bulk = false) {
 		if ($character) {
 			$source = $character;
 		} else {
 			$source = $home;
 		}
-		$total = ceil($source->getSoldiers()->count()/200);
+		$total = ceil($source->getSoldiersOld()->count()/200);
 		if ($total > 0) {
 			$change = true;
 		} else {
@@ -748,6 +757,53 @@ class MilitaryManager {
 			$this->em->flush();
 		}
 		return $settings;
+	}
+
+	public function updateSettings(Unit $unit, $data, Character $char) {
+		if (!$unit->getSettings()) {
+			$settings = new UnitSettings;
+		} else {
+			$settings = $unit->getSettings();
+		}
+		if ($char == $unit->getSettlement()->getOwner()) {
+			$lord = true;
+		} else {
+			$lord = false;
+		}
+		if ($unit->getCharacter() == $char) {
+			$commander = true;
+		} else {
+			$commander = false;
+		}
+		if (!$lord && !$commander) {
+			return false;
+		}
+		if ($lord OR ($commander && $unit->getRenamable())) {
+			$settings->setName($data['name']);
+		}
+		if ($data['strategy']) {
+			$settings->setStrategy($data['strategy']);
+		}
+		if ($data['tactic']) {
+			$settings->setTactic($data['tactic']);
+		}
+		if ($data['respect_fort']) {
+			$settings->setRespectFort($data['respect_fort']);
+		}
+		if ($data['line']) {
+			$settings->setLine($data['line']);
+		}
+		if ($data['siege_orders']) {
+			$settings->setSiegeOrders($data['siege_orders']);
+		}
+		if ($lord && $data['renamable']) {
+			$settings->setRenamable($data['renamable']);
+		}
+		if ($data['retreat_threshold']) {
+			$settings->setRetreatThreshold($data['retreat_threshold']);
+		}
+		$this->em->flush();
+		return true;
 	}
 
 	public function returnUnitHome (Unit $unit, $reason='recalled', $origin) {
