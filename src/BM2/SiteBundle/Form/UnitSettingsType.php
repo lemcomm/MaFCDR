@@ -24,7 +24,7 @@ class UnitSettingsType extends AbstractType {
 	private $settings;
 	private $lord;
 
-	public function __construct($char, $supply, $settlements, UnitSettings $settings, $lord) {
+	public function __construct($char, $supply, $settlements, UnitSettings $settings=null, $lord) {
 		$this->char = $char;
 		$this->supply = $supply;
 		$this->settlements = $settlements;
@@ -87,13 +87,14 @@ class UnitSettingsType extends AbstractType {
 		if($renamable !== false) {
 			$builder->add('name', TextType::class, array(
 				'label'=>'unit.name',
+				'data'=>$name,
 				'required'=>true
 			));
 		}
 		if ($supply) {
 			# Find all settlements where we have permission to take food from.
 			$builder->add('supplier', EntityType::class, array(
-				'label' => 'unit.supplier',
+				'label' => 'unit.supplier.name',
 				'multiple'=>false,
 				'expanded'=>false,
 				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($char, $settlements) {
@@ -105,7 +106,8 @@ class UnitSettingsType extends AbstractType {
 					$qb->orderBy('s.name');
 					return $qb;
 				},
-				'placeholder' => $supplier
+				'placeholder' => 'unit.supplier.empty',
+				'data'=>$supplier,
 			));
 		}
 		$builder->add('strategy', ChoiceType::class, array(
@@ -116,7 +118,8 @@ class UnitSettingsType extends AbstractType {
 				'hold' => 'unit.strategy.hold',
 				'distance' => 'unit.strategy.distance'
 			),
-			'placeholder'=>$strategy
+			'placeholder'=>'unit.strategy.empty',
+			'data'=>$strategy
 		));
 		$builder->add('tactic', ChoiceType::class, array(
 			'label'=>'unit.tactic.name',
@@ -126,15 +129,18 @@ class UnitSettingsType extends AbstractType {
 				'ranged' => 'unit.tactic.ranged',
 				'mixed' => 'unit.tactic.mixed'
 			),
-			'placeholder'=>$tactic
+			'placeholder'=>'unit.tactic.empty',
+			'data'=>$tactic
 		));
 		$builder->add('respect_fort', CheckboxType::class, array(
 			'label'=>'unit.usefort',
+			'data'=>$respect,
 			'required'=>false
 		));
 		$builder->add('line', ChoiceType::class, array(
 			'label'=>'unit.line.name',
 			'required'=>false,
+			'data'=>$line,
 			'choices'=>array(
 				'1' => 'unit.line.1',
 				'2' => 'unit.line.2',
@@ -149,26 +155,29 @@ class UnitSettingsType extends AbstractType {
 		$builder->add('siege_orders', ChoiceType::class, array(
 			'label'=>'unit.siege_orders.name',
 			'required'=>false,
+			'data'=>$siege,
 			'choices'=>array(
 				'assault' => 'unit.siege_orders.assault',
 				'hold' => 'unit.siege_orders.hold',
 				'equipment' => 'unit.siege_orders.equipment'
 			),
-			'placeholder'=>$siege
+			'placeholder'=>'unit.siege_orders.empty'
 		));
 		if ($lord) {
 			$builder->add('renamable', ChoiceType::class, array(
 				'label'=>'unit.renamable.name',
 				'required'=>false,
+				'data'=>$renamable,
 				'choices'=>array(
 					true => 'unit.renamable.true',
 					false => 'unit.renamable.false'
 				),
-				'placeholder'=>$renamable
+				'placeholder'=>'unit.renamable.empty'
 			));
 		}
 		$builder->add('retreat_threshold', NumberType::class, array(
 			'label'=>'unit.retreat.name',
+			'data'=>$retreat,
 			'required'=>false
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
