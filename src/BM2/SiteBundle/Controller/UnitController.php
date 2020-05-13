@@ -28,18 +28,12 @@ class UnitController extends Controller {
 
         /**
           * @Route("/units", name="maf_units")
-          * @Template("BM2SiteBundle:Unit:units.html.twig")
           */
 
         public function indexAction(Request $request) {
                 $character = $this->get('dispatcher')->gateway('personalAssignedUnitsTest');
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
-                }
-
-                if (!$character->getSoldiers()->isEmpty()) {
-                        # Chosen character has no units, make a new default unit, or has both units and soldiers directly, so make another one because something clearly went wrong.
-                        $this->get('military_manager')->newUnit($character, null);
                 }
                 $em = $this->getDoctrine()->getManager();
 
@@ -52,15 +46,14 @@ class UnitController extends Controller {
                 }
                 $units = $query->getResult();
 
-                return array(
-                'units' => $units,
-                'character' => $character
-                );
+                return $this->render('Unit/units.html.twig', [
+                        'units' => $units,
+                        'character' => $character
+                ]);
         }
 
         /**
           * @Route("/units/new", name="maf_unit_new")
-          * @Template
           */
 
         public function createAction(Request $request) {
@@ -73,18 +66,19 @@ class UnitController extends Controller {
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
 
-                $form->handelRequest($request);
-                if ($form-isValid()) {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
                         $data = $form->getData();
-                        $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), false, $data);
+                        $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), $data);
                         if ($unit) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.manage.created', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
                         }
                 }
-                return array(
-                        'form' => $form->createView()
-                );
+
+                return $this->render('Unit/create.html.twig', [
+                        'form'=>$form->createView()
+                ]);
         }
 
         /**
@@ -114,17 +108,18 @@ class UnitController extends Controller {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
                         $data = $form->getData();
-                        $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), false, $data);
-                        if ($unit) {
-                                $this->addFlash('notice', $this->get('translator')->trans('unit.manage.created', array(), 'actions'));
+                        $success = $this->get('military_manager')->updateSettings($unit, $data, $character);
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('unit.manage.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.manage.failed', array(), 'actions'));
                         }
                 }
 
-                return array(
-                        'form' => $form->createView()
-                );
-
+                return $this->render('Unit/manage.html.twig', [
+                        'form'=>$form->createView()
+                ]);
         }
 
 	/**
@@ -132,7 +127,6 @@ class UnitController extends Controller {
 	  * @Template
 	  */
 	public function soldiersAction(Request $request, Unit $unit) {
-		# TODO: An AppState call followed by a Dispatcher call. Can we combine these? --Andrew 20181210
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -193,7 +187,7 @@ class UnitController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array(
+                return $this->render('Unit/manage.html.twig', [
 			'soldiers' => $unit->getSoldiers(),
 			'recruits' => $unit->getRecruits(),
 			'resupply' => $resupply,
@@ -202,7 +196,7 @@ class UnitController extends Controller {
 			'form' => $form->createView(),
 			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100),
                         'unit' => $unit,
-		);
+                ]);
 	}
 
 	/**
