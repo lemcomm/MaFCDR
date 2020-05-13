@@ -57,7 +57,7 @@ class UpdateSoldiersCommand extends ContainerAwareCommand {
                         } else {
                                 $progress++;
                                 $output->writeln('Creating unit(s) for '.$c->getName().'... ('.$progress.'/'.$allcount.')');
-                                $total = $mm->newUnit($c, null, null, true);
+                                $total = $mm->convertToUnit($c, null, null, true);
                                 $unitcount += $total;
                                 $output->writeln('Created '.$total.' units. '.$unitcount.' so far this execution.');
                                 $alter = true;
