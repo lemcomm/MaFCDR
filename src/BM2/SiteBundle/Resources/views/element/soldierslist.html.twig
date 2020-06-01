@@ -9,7 +9,6 @@
 		<th data-sorter="false"></th>
 		<th>{{ 'experience'|trans }}</th>
 		<th data-sorter="false"></th>
-		<th data-sorter="select">{{ 'group'|trans }}</th>
 		<th>{{ 'weapon'|trans }}</th>
 		<th>{{ 'armour'|trans }}</th>
 		<th>{{ 'equipment'|trans }}</th>
@@ -20,13 +19,10 @@
 	{% for soldier in form.npcs %}
 		{% set id = soldier.vars.name %}
 		{% set man = soldiers[id] %}
-		<tr has_changed="false" merc="{{ man.mercenary?man.mercenary.id:0 }}">
+		<tr has_changed="false">
 			<td><input type="checkbox" class="check_soldier" data-id="{{ man.id }}"/></td>
 			<td{% if not man.alive %} class="disabled"{% endif %}>{{ man.name }}</td>
 			<td>
-				{% if man.mercenary %}
-					<img class="tt" src="{{ asset('bundles/bm2site/images/saco.svg') }}" alt="{{ 'mercenaries.label'|trans({}, 'actions') }}" title="{{ 'mercenaries.label'|trans({}, 'actions') }}" height="16px" />
-				{% endif %}
 				{% if not man.alive %}
 					<img class="tt" src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
 				{% else %}
@@ -47,12 +43,6 @@
 					{% elseif man.hungry > 50 %}
 						<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery.svg') }}" alt="{{ 'hungry'|trans }}" title="{{ 'hungry'|trans }}" height="16px" />
 					{% endif %}
-					{% if man.offeredas %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/nametag.svg') }}" alt="{{ 'offered'|trans }}" title="{{ 'offered'|trans }}" height="16px" />
-					{% endif %}
-					{% if man.liege %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/nametag-red.svg') }}" alt="{{ 'assigned'|trans({"%from%":man.liege.name}) }}" title="{{ 'assigned'|trans({"%from%":man.liege.name}) }}" height="16px" />
-					{% endif %}
 				{% endif %}
 			</td>
 			<td align="right">{{ man.experience }}</td>
@@ -60,11 +50,6 @@
 				<td>
 					{% if soldier.action is defined %}
 						{{ form_widget(soldier.action) }}
-					{% endif %}
-				</td>
-				<td>
-					{% if man.mercenary %}
-						{{ link(man.mercenary) }}
 					{% endif %}
 				</td>
 				{% if man.weapon %}
@@ -253,18 +238,6 @@ $(document).ready(function() {
 			$("#assigntarget").show();
 		} else if (actionselect.val() == "retrain") {
 			$("#retrain").show();
-		} else if (actionselect.val() == "disband") {
-			var merc = actionselect.closest("tr").attr("merc");
-			if (merc > 0) {
-				$("#soldiers tr[merc="+merc+"] [id$=_action] option[value='disband']").parent().val("disband");
-				$("#soldiers tr[merc="+merc+"]").attr("has_changed", "true");
-			}
-		} else if (actionselect.val() == "") {
-			var merc = actionselect.closest("tr").attr("merc");
-			if (merc > 0) {
-				$("#soldiers tr[merc="+merc+"] [id$=_action] option[value='disband']").parent().val("");
-				$("#soldiers tr[merc="+merc+"]").attr("has_changed", "false");
-			}
 		}
 
 	}
