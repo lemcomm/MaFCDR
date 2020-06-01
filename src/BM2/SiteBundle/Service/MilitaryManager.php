@@ -765,7 +765,7 @@ class MilitaryManager {
 		} else {
 			$settings = $unit->getSettings();
 		}
-		if ($char == $unit->getSettlement()->getOwner()) {
+		if ($unit->getSettlement() && $char == $unit->getSettlement()->getOwner()) {
 			$lord = true;
 		} else {
 			$lord = false;
@@ -778,7 +778,7 @@ class MilitaryManager {
 		if (!$lord && !$commander) {
 			return false;
 		}
-		if ($lord OR ($commander && $unit->getRenamable())) {
+		if ($lord OR ($commander && $settings->getRenamable())) {
 			$settings->setName($data['name']);
 		}
 		if ($data['strategy']) {
@@ -802,6 +802,9 @@ class MilitaryManager {
 		if ($data['retreat_threshold']) {
 			$settings->setRetreatThreshold($data['retreat_threshold']);
 		}
+		if ($data['supplier']) {
+			$settings->getUnit()->setSupplier($data['supplier']);
+		}
 		$this->em->flush();
 		return true;
 	}
@@ -812,6 +815,31 @@ class MilitaryManager {
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
 		$final = $days*0.925; #Average travel speed of all region types.
-		$unit->setTravelDays($final);
+		$unit->setTravelDays(ceil($final));
+	}
+
+	public function rebaseUnit ($data, $options, Unit $unit) {
+		if ($options->contains($data['settlement']) && !$unit->getTravelDays()) {
+			$origin = $unit->getSettlement();
+			$unit->setSettlement($data['settlement']);
+			if (!$unit->getCharacter() && $origin) {
+				$this->returnUnitHome($unit, 'rebase', $origin);
+			}
+			if ((
+				$origin && $unit->getSupplier() == $data['settlement']
+			) OR (
+				$origin && $data['settlement']->getOwner() == $origin->getOwner()
+			) OR (
+				$unit->getCharacter() && $data['settlement']->getOwner() == $unit->getCharacter()
+			)) {
+				# Nada. It's just easier to rule out the positives.
+			} else {
+				$unit->setSupplier(null);
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
