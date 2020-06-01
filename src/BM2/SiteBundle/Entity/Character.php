@@ -407,5 +407,18 @@ class Character {
 			return $realms;
 		}
 	}
+
+	public function hasNoSoldiers() {
+		$noSoldiers = true;
+		if (!$this->getUnits()->isEmpty()) {
+			foreach ($this->getUnits() as $unit) {
+				if ($unit->getActiveSoldiers()->count() > 0) {
+					$noSoldiers = false;
+					break;
+				}
+			}
+		}
+		return $noSoldiers;
+	}
 	
 }
