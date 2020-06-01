@@ -11,6 +11,7 @@ use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\UnitSettingsType;
+use BM2\SiteBundle\Form\UnitSoldiersType;
 
 use BM2\SiteBundle\Service\GameRequestManager;
 use BM2\SiteBundle\Service\MilitaryManager;
@@ -83,7 +84,6 @@ class UnitController extends Controller {
 
         /**
 	  * @Route("/units/{unit}/manage", name="maf_unit_manage", requirements={"unit"="\d+"})
-	  * @Template("BM2SiteBundle:Unit:manage.html.twig")
 	  */
 
         public function unitManageAction(Request $request, Unit $unit) {
@@ -124,9 +124,8 @@ class UnitController extends Controller {
 
 	/**
 	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
-	  * @Template
 	  */
-	public function soldiersAction(Request $request, Unit $unit) {
+	public function unitSoldiersAction(Request $request, Unit $unit) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -172,7 +171,7 @@ class UnitController extends Controller {
 				}
 			}
 		}
-		$form = $this->createForm(new UnitSoldiersType($em, $unit->getSoldiers(), $resupply, $training, $units, $settlement));
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getSoldiers(), $resupply, $training, $units, $settlement, $canReassign));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -187,20 +186,19 @@ class UnitController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-                return $this->render('Unit/manage.html.twig', [
+                return $this->render('Unit/soldiers.html.twig', [
 			'soldiers' => $unit->getSoldiers(),
 			'recruits' => $unit->getRecruits(),
 			'resupply' => $resupply,
 			'settlement' => $settlement,
 			'training' => $training,
 			'form' => $form->createView(),
-			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100),
                         'unit' => $unit,
                 ]);
 	}
 
 	/**
-	  * @Route("/units/{unit}/canceltraining", name="maf_unit_soldiers", requirements={"unit"="\d+", "recruit"="\d+"})
+	  * @Route("/units/{unit}/canceltraining", name="maf_unit_cancel_training", requirements={"unit"="\d+", "recruit"="\d+"})
 	  */
 	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
 		if ($request->isMethod('POST')) {
@@ -236,4 +234,43 @@ class UnitController extends Controller {
 		}
 		return new Response();
 	}
+
+        /**
+	  * @Route("/units/{unit}/rebase", name="maf_unit_rebase", requirements={"unit"="\d+"})
+	  */
+
+        public function unitRebaseAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('personalUnitRebaseTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+                $options = new ArrayCollection();
+                foreach ($character->getSettlements() as $settlement) {
+                        $options->add($settlement);
+                }
+                if ($settlement = $charcter->getInsideSettlement()) {
+                        if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
+                                $options->add($settlement);
+                        }
+                }
+
+                $form = $this->createForm(new UnitRebaseType($options));
+
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                        $data = $form->getData();
+                        $success = $this->get('military_manager')->rebaseUnit($data, $options, $unit);
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('unit.rebase.success', array(), 'actions'));
+                                return $this->redirectToRoute('maf_units');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.rebase.failed', array(), 'actions'));
+                        }
+                }
+
+                return $this->render('Unit/rebase.html.twig', [
+                        'form'=>$form->createView()
+                ]);
+        }
 }
