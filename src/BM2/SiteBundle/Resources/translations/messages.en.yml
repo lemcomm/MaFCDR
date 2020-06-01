@@ -996,6 +996,7 @@ npc:
  translator:   translator|translators
  scholar:      scholar|scholars
  soldier:      soldier|soldiers
+ soldiers:     Soldiers of %name%
  soldiershere: soldiers present
  intraining:   recruits in training
 
