@@ -21,7 +21,7 @@
 			{% else %}
 				{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}<br /><br />
 			{% endif %}
-                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
+                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> | <a href="{{ path('maf_unit_rebase', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a> 
                 {% endif %}
         {% else %}
                 {{ 'unit.list.empty' |trans({},"actions")|raw }}
