@@ -2,7 +2,11 @@
 
 namespace BM2\SiteBundle\Form;
 
+use BM2\SiteBundle\Entity\EquipmentType;
+use BM2\SiteBundle\Entity\Unit;
+
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
@@ -17,8 +21,9 @@ class UnitSoldiersType extends AbstractType {
 	private $available_training;
 	private $others;
 	private $settlement;
+	private $reassign;
 
-	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement) {
+	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement, $reassign) {
 		$this->em = $em;
 		if (is_array($soldiers)) {
 			$this->soldiers = $soldiers;
@@ -35,12 +40,9 @@ class UnitSoldiersType extends AbstractType {
 			$this->available_training->add($a['item']);
 		}
 
-		$this->units = $units;
+		$this->others = $units;
 		$this->settlement = $settlement;
-	}
-
-	public function getName() {
-		return 'soldiersmanage';
+		$this->reassign = $reassign;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -86,53 +88,29 @@ class UnitSoldiersType extends AbstractType {
 						$actions = array('disband'=>'recruit.manage.disband');
 					}
 
-					if (!$soldier->getMercenary()) {
-						if (!$in_battle) {
-							if (!empty($this->others) && !($soldier->getCharacter() && $soldier->getCharacter()->isDoingAction('military.regroup'))) {
-								$actions['assign'] = 'recruit.manage.assign';
-							}
-							if ($soldier->getCharacter()) {
-								if ($this->settlement!=null && !$soldier->getCharacter()->isInBattle() && !$soldier->getCharacter()->isDoingAction('military.regroup')) {
-									$actions['makemilitia'] = 'recruit.manage.makemilitia';
-								}
-								if ($soldier->getCharacter()->isNPC()) {
-									// bandits cannot assign soldiers or set them as militia
-									unset($actions['assign'], $actions['makemilitia']);
-								}
-							} else {
-								$actions['makesoldier'] = 'recruit.manage.makesoldier';
-							}
-							if (!empty($avail_train) && $soldier->isActive()) {
-								$actions['retrain'] = 'recruit.manage.retrain';
-							}
+					if (!$in_battle) {
+						if (!empty($avail_train) && $soldier->isActive()) {
+							$actions['retrain'] = 'recruit.manage.retrain';
 						}
-						$resupply = false;
-						if (!empty($this->available_resupply)) {
-							if ( (!$soldier->getHasWeapon() && $this->available_resupply->contains($soldier->getTrainedWeapon()))
-								|| (!$soldier->getHasArmour() && $this->available_resupply->contains($soldier->getTrainedArmour()))
-								|| (!$soldier->getHasEquipment() && $this->available_resupply->contains($soldier->getTrainedEquipment()))
-							) {
-								$resupply = true;
-							}
+					}
+					$resupply = false;
+					if (!empty($this->available_resupply)) {
+						if ( (!$soldier->getHasWeapon() && $this->available_resupply->contains($soldier->getTrainedWeapon()))
+							|| (!$soldier->getHasArmour() && $this->available_resupply->contains($soldier->getTrainedArmour()))
+							|| (!$soldier->getHasEquipment() && $this->available_resupply->contains($soldier->getTrainedEquipment()))
+						) {
+							$resupply = true;
 						}
-						if ($resupply) {
-							$actions['resupply'] = 'recruit.manage.resupply';
-						}
-
-						$groups = range('a','z');
-						$field->add('group', 'choice', array(
-							'choices' => $groups,
-							'required' => false,
-							'attr' => array('class'=>'action'),
-							'data' => $soldier->getGroup()
-						));
+					}
+					if ($resupply) {
+						$actions['resupply'] = 'recruit.manage.resupply';
 					}
 				} else {
 					$actions = array('bury' => 'recruit.manage.bury');
 				}
 			} // endif locked
 			if ($actions) {
-				$field->add('action', 'choice', array(
+				$field->add('action', ChoiceType::class, array(
 					'choices' => $actions,
 					'required' => false,
 					'attr' => array('class'=>'action')
@@ -140,13 +118,14 @@ class UnitSoldiersType extends AbstractType {
 			}
 		}
 
-		if (!empty($this->others)) {
+		if (!empty($this->others) && $this->reassign) {
 			$others = $this->others;
-			$builder->add('assignto', 'entity', array(
+			$builder->add('assignto', Unit::class, array(
 				'placeholder' => 'form.choose',
 				'label' => 'recruit.manage.assignto',
 				'required' => false,
-				'class'=>'BM2SiteBundle:Unit', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($others) {
+				'choice_label'=>'name',
+				'query_builder'=>function(EntityRepository $er) use ($others) {
 					$qb = $er->createQueryBuilder('u');
 					$qb->where('u IN (:others)');
 					$qb->setParameter('others', $others);
@@ -158,9 +137,8 @@ class UnitSoldiersType extends AbstractType {
 		if (!empty($avail_train)) {
 			$fields = array('weapon', 'armour', 'equipment');
 			foreach ($fields as $field) {
-				$builder->add($field, 'entity', array(
+				$builder->add($field, EquipmentType::class, array(
 					'label'=>$field,
-					'class'=>'BM2SiteBundle:EquipmentType',
 					'placeholder'=>'item.current',
 					'required'=>false,
 					'translation_domain'=>'messages',
