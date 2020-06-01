@@ -150,7 +150,7 @@ class UnitSettingsType extends AbstractType {
 				'6' => 'unit.line.6',
 				'7' => 'unit.line.7',
 			),
-			'placeholder'=>$line
+			'placeholder'=> 'unit.line.empty'
 		));
 		$builder->add('siege_orders', ChoiceType::class, array(
 			'label'=>'unit.siege_orders.name',
