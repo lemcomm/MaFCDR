@@ -10,9 +10,9 @@
 		<many-to-one field="character" target-entity="Character" inversed-by="units"/>
                 <many-to-one field="settlement" target-entity="Settlement" inversed-by="units"/>
                 <many-to-one field="place" target-entity="Place" inversed-by="units"/>
-		<one-to-one field="settings" target-entity="UnitSettings" mapped-by="unit"/>
+		<one-to-one field="settings" target-entity="UnitSettings" mapped-by="unit" fetch="EAGER"/>
 		<many-to-one field="supplier" target-entity="Settlement" inversed-by="supplied_units"/>
-		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="unit"/>
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="unit" index-by="id" fetch="EXTRA_LAZY"/>
 
 	</entity>
 </doctrine-mapping>
