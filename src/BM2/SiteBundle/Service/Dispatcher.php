@@ -316,7 +316,7 @@ class Dispatcher {
 				array("name"=>"military.all", "description"=>"unavailable.inbattle")
 			));
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
 		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
@@ -365,7 +365,7 @@ class Dispatcher {
 				array("name"=>"military.all", "description"=>"unavailable.inbattle")
 			));
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
 		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
@@ -1086,7 +1086,7 @@ class Dispatcher {
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('military.block')) {
 			return array("name"=>"military.block.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.block.name", "description"=>"unavailable.nosoldiers");
 		}
 		if ($this->getCharacter()->isDoingAction('settlement.attack')) {
@@ -1126,7 +1126,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isDoingAction('military.evade')) {
 			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.nosoldiers");
 		}
 		if ($this->getCharacter()->isInBattle()) {
@@ -1151,7 +1151,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isDoingAction('military.evade')) {
 			return array("name"=>"military.place.defend.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.place.defend.name", "description"=>"unavailable.nosoldiers");
 		}
 		if ($this->getCharacter()->isInBattle()) {
@@ -1188,7 +1188,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1261,7 +1261,7 @@ class Dispatcher {
 			# Isn't leader.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1337,7 +1337,7 @@ class Dispatcher {
 			# Already have leader.
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.haveleader");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1385,7 +1385,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.settlement.siege.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1453,7 +1453,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1627,7 +1627,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.attack.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1681,7 +1681,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.joinattack.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1721,7 +1721,7 @@ class Dispatcher {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosoldiers");
 		}
@@ -1745,7 +1745,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isDoingAction('military.evade')) {
 			return array("name"=>"military.damage.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.damage.name", "description"=>"unavailable.nosoldiers");
 		}
 		if (!$this->geography->findFeaturesNearMe($this->getCharacter())) {
@@ -1773,7 +1773,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isDoingAction('military.evade')) {
 			return array("name"=>"military.settlement.loot.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+		if ($this->getCharacter()->hasNoSoldiers()) {
 			return array("name"=>"military.settlement.loot.name", "description"=>"unavailable.nosoldiers");
 		}
 		if (!$this->getActionableRegion()) {
@@ -1922,15 +1922,28 @@ class Dispatcher {
 	public function personalUnitManageTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
-			return array("name"=>"unit.manage.name", "description"=>"unavailable.$check");
-		}
 		if (!$character->getUnits()->contains($unit)) {
 			if($unit->getSettlement()->getOwner() != $character) {
 				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
 			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
 				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
 			}
+		}
+		return $this->action("unit.manage.name", "maf_unit_manage");
+	}
+
+	public function personalUnitRebaseTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
+			}
+		}
+		if ($unit->getTravelDays() > 0) {
+			return array("name"=>"unit.manage.name", "description"=>"unavailable.rebasing");
 		}
 		return $this->action("unit.manage.name", "maf_unit_manage");
 	}
