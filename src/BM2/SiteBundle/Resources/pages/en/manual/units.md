@@ -1,16 +1,16 @@
-### This manual page is detailing a highly experimental and incomplete feature that is in the process of being implemented. Everything on this page, while as detailed as it may be, is subject to change. ###
+### This manual page is detailing an upcoming feature to be added in the next update. Units and Unit Settings will be implemented next update, but many settings won't take effect until the battle overhaul (Soon(tm)) ###
 
 Units are the primary unit of organization between you and your soldiers, allowing you to set orders and manage hundreds of individuals soldiers at once. Each unit under your command will have it's own supply source, battle strategy, tactics, name, and deployment settings, allowing you as their leader to maximize their use on the field.
 
-Generally speaking, units are best when homogenous, or made up of soldiers all using relatively the same equipment. Archers with archers, cavalry with cavalry. In battle a unit will only move as slow as it's slowest soldier, and while it can be said that a disorganized mess is hard to fight against, it's also hard to deploy effectively.
+Generally speaking, units are best when made up of soldiers all using relatively the same equipment. Archers with archers, cavalry with cavalry. In battle a unit will only move as slow as it's slowest soldier, and while it can be said that a disorganized mess is hard to fight against, it's also hard to deploy effectively.
 
 For more detailed guidance on how exactly units work in the field, we recommend you read the [new battles](battles2) page.
 
 Supplies
 --------
-Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, or the settlement of the Unit's origin (TODO). Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
+Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, or the settlement of the Unit's origin. Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
 
-Strategy & Tactics (TODO)
+Strategy & Tactics (Planned Feature)
 ------------------
 Past Supplies, there are two main things you'll concern yourself with in regards to Units: Strategy and Tactics.
 
@@ -20,16 +20,22 @@ Past Supplies, there are two main things you'll concern yourself with in regards
 * Hold position - The Unit will stay in it's current position, where it originally deployed. Unless morale breaks (perhaps from watching their allies get slaughtered), it won't move, even if engaged. Best for mixed forces (infantry + archers, for instance).
 * Avoid enemies - The Unit will seek to distance itself from any nearby melees or enemy Units until all non-routed units on it's side only have "Avoid enemeis" as their strategy. At that point they'll begin retreating. If all units on a side are set to "Avoid enemies", the attacking side will default to "Charge enemy", while defenders will swap to "Hold Position", in order to prevent griefing.
 
-**Tactics**, on the other hand, is how they will engage the enemy. Will they use ranged weapons? Melee? Or whatever is appropriate? The game will default to "Use Best" if not otherwise declared.
+**Tactics**, on the other hand, is how they will engage the enemy. Will they use ranged weapons? Melee? Or whatever is appropriate? "Use Best" is normally the best choice but we're sure there are strategies out there that say otherwise.
 
-Line Settings & Fortifications
+Line Settings & Fortifications (Planned Feature)
 ------------------------------
 Simply put, these control where your forces deploy in relation to their allies and enemies and whether or not they'll leave fortifications to attack an enemy. They let you fine tune your forces time to encounter as well as make effective use of walls (which give a handy bonus to defenders). This defaults to Line 4, the middle, if not set.
 
-Militia versus Professional
----------------------------
-Lastly, while not yet a configurable options, you'll be able to define a unit as militia or not. 
+Reinforcements, Recalls, Rebasing & Disbanding
+--------------
+Units will always have a home base, and the lord of their home base is the person who has final say on whether a unit remains deployed or not. The lord of a unit's base will be able to train new soldiers for a distant unit or outright recall them. Both of these actions will involve travel times that will prevent a unit from being assigned otherwise.
 
-Militia units will contribute to their home settlement's economy while there and will be able to bolster their numbers significanlty faster. Their training may include some basic weapon usage, but in times of emergency (like when under siege) it may just be giving them whatever weapons are available and hoping for the best. Lastly, they take penalties when going too far afield. You can march them across the continent, but it's not what they "signed up for".
+Units being recalled to a besieged settlement will maintain a safe distance outside of the siege until an assault or sortie happens, at which point they'll join the defenders as external reinforcements (possibly giving flanking bonuses).
 
-Professional Units will trade that off for a passive experience gain and combat effectiveness bonus, being more likely to hold together in combat, and less likely to retreat when a fellow unit breaks or a First One falls in combat on their side. Their bonuses bolster both attack and defense, as well as maintaining morale and resisting opportunities to break and run. They're also the only forces capable of operating siege equipment afield.
+If you find that your soldiers would be better based elsewhere, you can order them to any settlement you have permissions in, or generate a request for a nearby lord or the lord of the settlement you're in to take on basing them. As with reinforcements and recalls, the unit will require some travel time between settlements and will likely not be immediately available.
+
+Finally, a unit with soldiers cannot be disbanded, so you'll have to recall them first, reassign or disband the individual soldiers, and then you'll be able to disband the unit as a whole.
+
+Captivity
+---------
+Taking a first one captive will also take their units captive. However, units and their leader are handled separately for captivity purposes, and captive soldiers cannot be reinforced or recalled, and the captor will gain some limited setting management. It is entirely possible to release the units to go back to their base while keeping the first one, or releasing the first ones while holding their soldiers captive. 
