@@ -13,6 +13,7 @@
 		<field name="siege_orders" type="string" nullable="true"/>
 		<field name="renamable" type="boolean" nullable="true"/>
 		<field name="retreat_threshold" type="float" nullable="true"/>
+		<field name="reinforcements" type="boolean" nullable="true"/>
 
 	</entity>
 </doctrine-mapping>
