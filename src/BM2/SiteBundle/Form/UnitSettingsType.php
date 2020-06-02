@@ -56,6 +56,7 @@ class UnitSettingsType extends AbstractType {
 		$siege = null;
 		$renamable = null;
 		$retreat = null;
+		$reinforcements = null;
 
 		if ($settings) {
 			$name = $settings->getName();
@@ -81,6 +82,9 @@ class UnitSettingsType extends AbstractType {
 				$renamable = $settings->getRenamable();
 			}
 			if ($settings->getRetreatThreshold()) {
+				$retreat = $settings->getRetreatThreshold();
+			}
+			if ($settings->getReinforcements()) {
 				$retreat = $settings->getRetreatThreshold();
 			}
 		}
@@ -178,6 +182,11 @@ class UnitSettingsType extends AbstractType {
 		$builder->add('retreat_threshold', NumberType::class, array(
 			'label'=>'unit.retreat.name',
 			'data'=>$retreat,
+			'required'=>false
+		));
+		$builder->add('reinforcements', CheckboxType::class, array(
+			'label'=>'unit.usefort',
+			'data'=>$reinforcements,
 			'required'=>false
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
