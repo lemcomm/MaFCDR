@@ -428,9 +428,9 @@ class Dispatcher {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
 			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
-				$actions[] = $this->personalUnitNewTest();
+				$actions[] = $this->unitNewTest();
 				$actions[] = $this->personalEntourageTest();
-				$actions[] = $this->personalSoldiersTest(); #This page handles recruiting.
+				$actions[] = $this->unitSoldiersTest(); #This page handles recruiting.
 			} else {
 				$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notyours");
 			}
@@ -1907,60 +1907,6 @@ class Dispatcher {
 		return $this->action("recruit.entourage", "bm2_site_actions_entourage");
 	}
 
-	public function personalUnitNewTest() {
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
-			return array("name"=>"unit.new.name", "description"=>"unavailable.$check");
-		}
-		if ($settlement->getOwner() != $this->getCharacter()) {
-			return array("name"=>"unit.new.name", "description"=>"unavailable.notyours2");
-		}
-
-		return $this->action("unit.new", "maf_unit_new");
-	}
-
-	public function personalUnitManageTest($ignored, Unit $unit) {
-		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
-			}
-		}
-		return $this->action("unit.manage.name", "maf_unit_manage");
-	}
-
-	public function personalUnitRebaseTest($ignored, Unit $unit) {
-		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
-			}
-		}
-		if ($unit->getTravelDays() > 0) {
-			return array("name"=>"unit.manage.name", "description"=>"unavailable.rebasing");
-		}
-		return $this->action("unit.manage.name", "maf_unit_manage");
-	}
-
-	public function personalSoldiersTest() {
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
-		}
-		$available = $this->milman->findAvailableEquipment($settlement, true);
-		if (empty($available)) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
-		}
-
-		return $this->action("recruit.troops", "bm2_site_actions_soldiers");
-	}
-
 	public function personalAssignedUnitsTest() {
 		# No restrictions on this page, yet.
 		return $this->action("unit.assigned", "maf_units");
@@ -2172,6 +2118,88 @@ class Dispatcher {
 					     "maf_place_exit"
 					    );
 		}
+	}
+
+	/* ========== Unit Actions ========== */
+
+	public function unitNewTest() {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"unit.new.name", "description"=>"unavailable.$check");
+		}
+		if ($settlement->getOwner() != $this->getCharacter()) {
+			return array("name"=>"unit.new.name", "description"=>"unavailable.notyours2");
+		}
+
+		return $this->action("unit.new", "maf_unit_new");
+	}
+
+	public function unitManageTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
+			}
+		}
+		return $this->action("unit.manage.name", "maf_unit_manage");
+	}
+
+	public function unitRebaseTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
+			}
+		}
+		if ($unit->getTravelDays() > 0) {
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.rebasing");
+		}
+		return $this->action("unit.rebase.name", "maf_unit_rebase");
+	}
+
+	public function unitSoldiersTest() {
+		return $this->action("recruit.troops", "maf_unit_soldiers");
+	}
+
+	public function unitCancelTrainingTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notinside");
+			}
+		}
+		if ($unit->getTravelDays() > 0) {
+			return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.rebasing");
+		}
+		return $this->action("unit.canceltraining.name", "maf_unit_cancel_training");
+	}
+
+	public function unitDisbandTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
+			}
+		}
+		if ($unit->getSoldiers()->count() > 0) {
+			return array("name"=>"unit.disband.name", "description"=>"unavailable.hassoldiers");
+		}
+		if ($unit->getTravelDays() > 0) {
+			return array("name"=>"unit.disband.name", "description"=>"unavailable.rebasing");
+		}
+		return $this->action("unit.disband.name", "maf_unit_disband");
 	}
 
 	/* ========== Political Actions ========== */
