@@ -9,6 +9,7 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 use BM2\SiteBundle\Form\UnitSoldiersType;
@@ -58,7 +59,7 @@ class UnitController extends Controller {
           */
 
         public function createAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('personalUnitNewTest');
+		$character = $this->get('dispatcher')->gateway('unitNewTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -87,7 +88,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitManageAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('personalUnitManageTest', false, true, false, $unit);
+		$character = $this->get('dispatcher')->gateway('unitManageTest', false, true, false, $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -126,10 +127,10 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
 	  */
 	public function unitSoldiersAction(Request $request, Unit $unit) {
-		$character = $this->get('appstate')->getCharacter();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
+                list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true);
+                if (! $character instanceof Character) {
+                        return $this->redirectToRoute($character);
+                }
 
 		$em = $this->getDoctrine()->getManager();
 
@@ -202,7 +203,7 @@ class UnitController extends Controller {
 	  */
 	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
 		if ($request->isMethod('POST')) {
-			list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
+			list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
 			if (! $character instanceof Character) {
 				return $this->redirectToRoute($character);
 			}
@@ -240,7 +241,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitRebaseAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('personalUnitRebaseTest', false, true, false, $unit);
+		$character = $this->get('dispatcher')->gateway('unitRebaseTest', false, true, false, $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -270,6 +271,35 @@ class UnitController extends Controller {
                 }
 
                 return $this->render('Unit/rebase.html.twig', [
+                        'form'=>$form->createView()
+                ]);
+        }
+
+        /**
+	  * @Route("/units/{unit}/disband", name="maf_unit_disband", requirements={"unit"="\d+"})
+	  */
+
+        public function uniDisbandAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitDisbandTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+                $form = $this->createForm(new AreYouSureType());
+
+                $form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $success = $this->get('military_manager')->disbandUnit($unit);
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('unit.disband.success', array(), 'actions'));
+                                return $this->redirectToRoute('maf_units');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.disband.failed', array(), 'actions'));
+                        }
+                }
+
+                return $this->render('Unit/disband.html.twig', [
                         'form'=>$form->createView()
                 ]);
         }
