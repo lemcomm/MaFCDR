@@ -737,6 +737,9 @@ class MilitaryManager {
 			if ($data['retreat_threshold']) {
 				$settings->setRetreatThreshold($data['retreat_threshold']);
 			}
+			if ($data['reinforcements']) {
+				$settings->setReinforcements($data['reinforcements']);
+			}
 		} else {
 			if ($character) {
 				$settings->setName($character->getName()."'s Unit");
@@ -752,6 +755,7 @@ class MilitaryManager {
 			$settings->setSiegeorders('hold');
 			$settings->setRetreatThreshold(50);
 			$settings->setRenamable(true);
+			$settings->setReinforcements(true);
 		}
 		if (!$bulk) {
 			$this->em->flush();
@@ -841,5 +845,12 @@ class MilitaryManager {
 		} else {
 			return false;
 		}
+	}
+
+	public function disbandUnit (Unit $unit) {
+		$this->em->remove($unit->getSettings());
+		$this->em->remove($unit);
+		$this->em->flush();
+		return true;
 	}
 }
