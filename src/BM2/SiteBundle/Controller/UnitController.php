@@ -202,7 +202,7 @@ class UnitController extends Controller {
 	}
 
 	/**
-	  * @Route("/units/{unit}/canceltraining", name="maf_unit_cancel_training", requirements={"unit"="\d+", "recruit"="\d+"})
+	  * @Route("/units/{unit}/cancel/{recruit}", name="maf_unit_cancel_training", requirements={"unit"="\d+", "recruit"="\d+"})
 	  */
 	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
 		if ($request->isMethod('POST')) {
@@ -282,7 +282,7 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/disband", name="maf_unit_disband", requirements={"unit"="\d+"})
 	  */
 
-        public function uniDisbandAction(Request $request, Unit $unit) {
+        public function unitDisbandAction(Request $request, Unit $unit) {
 		$character = $this->get('dispatcher')->gateway('unitDisbandTest', false, true, false, $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
@@ -299,6 +299,64 @@ class UnitController extends Controller {
                                 return $this->redirectToRoute('maf_units');
                         } else {
                                 $this->addFlash('error', $this->get('translator')->trans('unit.disband.failed', array(), 'actions'));
+                        }
+                }
+
+                return $this->render('Unit/disband.html.twig', [
+                        'form'=>$form->createView()
+                ]);
+        }
+
+        /**
+	  * @Route("/units/{unit}/return", name="maf_unit_return", requirements={"unit"="\d+"})
+	  */
+
+        public function unitReturnAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitReturnTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+                $form = $this->createForm(new AreYouSureType());
+
+                $form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character->getLocation());
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('unit.return.success', array(), 'actions'));
+                                return $this->redirectToRoute('maf_units');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.return.failed', array(), 'actions'));
+                        }
+                }
+
+                return $this->render('Unit/disband.html.twig', [
+                        'form'=>$form->createView()
+                ]);
+        }
+
+        /**
+	  * @Route("/units/{unit}/recall", name="maf_unit_recall", requirements={"unit"="\d+"})
+	  */
+
+        public function unitRecallAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitRecallTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+                $form = $this->createForm(new AreYouSureType());
+
+                $form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter()->getLocation());
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('unit.recall.success', array(), 'actions'));
+                                return $this->redirectToRoute('maf_units');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.recall.failed', array(), 'actions'));
                         }
                 }
 
