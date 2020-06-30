@@ -2188,9 +2188,9 @@ class Dispatcher {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (!$character->getUnits()->contains($unit)) {
 			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+				return array("name"=>"unit.disband.name", "description"=>"unavailable.notlord");
 			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
+				return array("name"=>"unit.disband.name", "description"=>"unavailable.notinside");
 			}
 		}
 		if ($unit->getSoldiers()->count() > 0) {
@@ -2206,12 +2206,12 @@ class Dispatcher {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (!$character->getUnits()->contains($unit)) {
-			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notassigned");
+			return array("name"=>"unit.return.name", "description"=>"unavailable.notassigned");
 		}
 		if (!$unit->getSettlement()) {
-			return array("name"=>"unit.disband.name", "description"=>"unavailable.nobase");
+			return array("name"=>"unit.return.name", "description"=>"unavailable.nobase");
 		}
-		return $this->action("unit.disband.name", "maf_unit_return");
+		return $this->action("unit.return.name", "maf_unit_return");
 	}
 
 	public function unitRecallTest($ignored, Unit $unit) {
@@ -2219,17 +2219,17 @@ class Dispatcher {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (!$character->getUnits()->contains($unit)) {
 			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+				return array("name"=>"unit.recall.name", "description"=>"unavailable.notlord");
 			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
+				return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
 			}
 		}
 
 		if ($unit->getTravelDays() > 0) {
-			return array("name"=>"unit.disband.name", "description"=>"unavailable.rebasing");
+			return array("name"=>"unit.recall.name", "description"=>"unavailable.rebasing");
 		}
 		if ($unit->getTravelDays() == 0 && !$unit->getCharacter())
-		return $this->action("unit.disband.name", "maf_unit_disband");
+		return $this->action("unit.recall.name", "maf_unit_recall");
 	}
 
 	/* ========== Political Actions ========== */
