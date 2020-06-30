@@ -412,24 +412,6 @@ class MilitaryManager {
 	}
 
 	public function disband(Soldier $soldier, $current) {
-		// disband soldiers, who will then move towards their home
-		// wounded soldiers run an accelerated heal-or-die cycle
-
-/* disabled because I suspect it might be causing an infinite loop somehow
-		while ($soldier->isWounded()) {
-			$soldier->HealOrDie();
-		}
-*/
-		// TODO: if he can still be reclaimed - maybe he will return home. But to do that, I have to move the entire logic out of ActionsController / assignedAction()
-		// TODO: disband() is also run when the character dies, which is good, but a bit tricky - this part should only trigger on suicide
-
-
-		if ($soldier->isAlive()) {
-			if ($current && $soldier->getHome()) {
-				$this->walkHome($soldier->getHome(), $current);
-			}
-		}
-
 		$this->em->remove($soldier);
 	}
 
@@ -443,73 +425,6 @@ class MilitaryManager {
 			$this->salvageItem($current, $entourage->getEquipment(), $entourage->getSupply());
 		} // TODO: if not, reclaim by settlement?
 		$this->em->remove($entourage);
-	}
-
-	private function walkHome($home, $current) {
-		// FIXME: if recently acquired, return to militia or liege ?
-		$full_classname = explode('\\', get_class($current));
-		$classname = strtolower(end($full_classname));
-//		$this->logger->info("walkHome to $classname ".$current->getId());
-		if ($classname=="character") {
-			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.location) as distance
-				FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:Character c, BM2SiteBundle:GeoData h
-				WHERE c = :me AND h = :home AND ST_Intersects(g.poly, ST_MakeLine(h.center, c.location))=true ORDER BY distance ASC');
-			$query->setParameters(array('me'=>$current->getId(), 'home'=>$home->getGeoData()->getId()));
-		} else if (in_array($classname, array('geodata', 'settlement'))) {
-			if ($classname=='geodata') {
-				$geo = $current;
-			} else {
-				$geo = $current->getGeoData();
-			}
-			$query = $this->em->createQuery('SELECT s as settlement, ST_Distance(g.center, c.center) as distance
-				FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:GeoData c, BM2SiteBundle:GeoData h
-				WHERE c = :here AND h = :home AND ST_Intersects(g.poly, ST_MakeLine(h.center, c.center))=true ORDER BY distance ASC');
-			$query->setParameters(array('here'=>$geo, 'home'=>$home->getGeoData()));
-		} else {
-			// FIXME error, this should never happen!
-			$this->logger->error("walHome() called with invalid class $classname");
-			return false;
-		}
-		$result = $query->getResult();
-		$count = count($result);
-//		$this->logger->info("count = $count");
-		if ($count<2) {
-			// we're still in our home region, so we will almost always just go back to our family
-			if (rand(0,100)<95) {
-				$home->setPopulation($home->getPopulation()+1);
-			}
-		} else {
-//			$this->logger->info("marching through $count regions...");
-			// let's march home, checking at every point if we want to stay here
-			$rate = $count+$count/4; // this is the bonus values for the start region - the further away from home, the more likely we'll just stay here
-			$marching = true;
-			$i=0;
-			while ($marching && $place=current($result)) {
-				$i++;
-//				$this->logger->info("$i: ".$place['settlement']->getId());
-				if ($i==$count) {
-					// we have arrived back home
-					$place['settlement']->setPopulation($place['settlement']->getPopulation()+1);
-					$marching=false;
-				} else {
-					$myrate = 1;
-					if ($i==1) { $myrate+=$count/4; }
-					$settle_here = $myrate*100/$rate;
-					if (rand(0,100)<$settle_here) {
-						$place['settlement']->setPopulation($place['settlement']->getPopulation()+1);
-						$marching=false;
-					} else {
-						// chance that something bad happens to us
-						if (rand(0,100)<10) {
-							$marching=false;
-						}
-					}
-				}
-				next($result);
-			}
-		}
-//		$this->logger->info("walkHome() finished");
-        return true;
 	}
 
 	// no type-hinting because it can be a soldier or entourage, and we don't use inheritance, yet.
@@ -819,7 +734,21 @@ class MilitaryManager {
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
 		$final = $days*0.925; #Average travel speed of all region types.
+
+		# Send recall event to old troop leader.
+		if($reason == 'recalled') {
+			$this->history->logEvent(
+				$unit->getCharacter(),
+				'event.military.recalled',
+				array('%link-settlement%'=>$unit->getSettlement()->getId()),
+				History::MEDIUM, false, 30
+			);
+		}
+
 		$unit->setTravelDays(ceil($final));
+		$unit->setCharacter(null);
+		$this->em->flush();
+		return true;
 	}
 
 	public function rebaseUnit ($data, $options, Unit $unit) {
