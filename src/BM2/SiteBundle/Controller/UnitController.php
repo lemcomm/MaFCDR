@@ -42,13 +42,16 @@ class UnitController extends Controller {
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
+                        $lord = true;
                 } else {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
                         $query->setParameter('char', $character);
+                        $lord = false;
                 }
                 $units = $query->getResult();
 
                 return $this->render('Unit/units.html.twig', [
+                        'lord' => $lord,
                         'units' => $units,
                         'character' => $character
                 ]);
