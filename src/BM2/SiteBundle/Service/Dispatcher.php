@@ -2202,6 +2202,36 @@ class Dispatcher {
 		return $this->action("unit.disband.name", "maf_unit_disband");
 	}
 
+	public function unitReturnTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notassigned");
+		}
+		if (!$unit->getSettlement()) {
+			return array("name"=>"unit.disband.name", "description"=>"unavailable.nobase");
+		}
+		return $this->action("unit.disband.name", "maf_unit_return");
+	}
+
+	public function unitRecallTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$character->getUnits()->contains($unit)) {
+			if($unit->getSettlement()->getOwner() != $character) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
+			}
+		}
+
+		if ($unit->getTravelDays() > 0) {
+			return array("name"=>"unit.disband.name", "description"=>"unavailable.rebasing");
+		}
+		if ($unit->getTravelDays() == 0 && !$unit->getCharacter())
+		return $this->action("unit.disband.name", "maf_unit_disband");
+	}
+
 	/* ========== Political Actions ========== */
 
 	public function hierarchyOathTest() {
