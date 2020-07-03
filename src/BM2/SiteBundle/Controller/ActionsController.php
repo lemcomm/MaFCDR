@@ -6,13 +6,10 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\KnightOffer;
 use BM2\SiteBundle\Entity\Trade;
-use BM2\SiteBundle\Form\AssignedSoldiersType;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\EntourageRecruitType;
 use BM2\SiteBundle\Form\InteractionType;
-use BM2\SiteBundle\Form\KnightOfferType;
 use BM2\SiteBundle\Form\RealmSelectType;
-use BM2\SiteBundle\Form\SoldiersRecruitType;
 use BM2\SiteBundle\Form\TradeCancelType;
 use BM2\SiteBundle\Form\TradeType;
 use BM2\SiteBundle\Service\Geography;
@@ -824,99 +821,6 @@ class ActionsController extends Controller {
 
 		return array('settlement'=>$settlement, 'entourage'=>$entourage, 'form'=>$form->createView());
 	}
-
-        /**
-          * @Route("/soldiers")
-          * @Template
-          */
-     	public function soldiersAction(Request $request) {
-     		list($character, $settlement) = $this->get('dispatcher')->gateway('personalSoldiersTest', true);
-     		if (! $character instanceof Character) {
-     			return $this->redirectToRoute($character);
-     		}
-     		$em = $this->getDoctrine()->getManager();
-
-     		$query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required > 0');
-     		$query->setParameter('here', $settlement);
-     		$allocated = $query->getSingleResult();
-
-     		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
-     		$form = $this->createForm(new SoldiersRecruitType($available, $units));
-     		$form->handleRequest($request);
-     		if ($form->isValid()) {
-     			$data = $form->getData();
-     			$generator = $this->get('generator');
-
-     			if ($data['number'] > $settlement->getPopulation()) {
-     				$form->addError(new FormError("recruit.troops.toomany"));
-     				return array(
-     					'settlement'=>$settlement,
-     					'allocated'=>$allocated,
-     					'form'=>$form->createView()
-     				);
-     			}
-     			if ($data['number'] > $settlement->getRecruitLimit()) {
-     				$form->addError(new FormError($this->get('translator')->trans("recruit.troops.toomany2"), null, array('%max%'=>$settlement->getRecruitLimit(true))));
-     				return array(
-     					'settlement'=>$settlement,
-     					'allocated'=>$allocated,
-     					'form'=>$form->createView()
-     				);
-     			}
-
-     			for ($i=0; $i<$data['number']; $i++) {
-     				if (!$data['weapon']) {
-     					$form->addError(new FormError("recruit.troops.noweapon"));
-     					return array(
-     						'settlement'=>$settlement,
-     						'allocated'=>$allocated,
-     						'form'=>$form->createView()
-     					);
-     				}
-     			}
-     			$count = 0;
-			if ($data['unit']->getAvailable() < $data['number']) {
-				$data['number'] = $data['unit']->getAvailable();
-				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getName()), 'actions'));
-			}
-     			$corruption = $this->get('economy')->calculateCorruption($settlement);
-     			for ($i=0; $i<$data['number']; $i++) {
-     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $data['unit'], $corruption)) {
-     					$this->get('history')->addToSoldierLog(
-     						$soldier, 'recruited',
-     						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(),
-     							'%link-item-1%'=>$data['weapon']?$data['weapon']->getId():0,
-     							'%link-item-2%'=>$data['armour']?$data['armour']->getId():0,
-     							'%link-item-3%'=>$data['equipment']?$data['equipment']->getId():0
-     						)
-     					);
-     					$count++;
-     				}
-     			}
-     			// TODO: if $count < $data['number'] then some couldn't be recruited
-     			if ($count < $data['number']) {
-     				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.supply', array('%only%'=> $count, '%planned%'=>$data['number']), 'actions'));
-     			}
-
-     			$settlement->setPopulation($settlement->getPopulation()-$count);
-     			$settlement->setRecruited($settlement->getRecruited()+$count);
-     			$em->flush();
-     			return $this->redirectToRoute('bm2_site_settlement_soldiers', array('id'=>$settlement->getId()));
-     		}
-		$soldiercount = 0;
-		foreach ($settlement->getUntits() as $unit) {
-			$soldiercount += $unit->getSoldiers()->count();
-		}
-
-     		return array(
-     			'settlement'=>$settlement,
-     			'allocated'=>$allocated,
-     			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
-     			'soldierscount' => $soldiercount,
-
-     			'form'=>$form->createView()
-     		);
-     	}
 
 	/**
 	  * @Route("/dungeons", name="bm2_dungeons"))
