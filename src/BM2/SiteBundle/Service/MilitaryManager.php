@@ -45,20 +45,27 @@ class MilitaryManager {
 	public function TrainingCycle(Settlement $settlement) {
 		if ($settlement->getRecruits()->isEmpty()) return;
 		$training = min($settlement->getSingleTrainingPoints(), $settlement->getTrainingPoints()/$settlement->getRecruits()->count());
+		$startLoc = $settlement->getGeoMarker()->getLocation();
 
 		// TODO: add the speed (efficiency) of the training building here, at least with some effect
 		// (not full, because you can't focus them)
-		foreach ($settlement->getRecruits() as $recruit) {
-			if ($recruit->getExperience()>0) {
-				$bonus = round(sqrt($recruit->getExperience())/5);
-			} else {
-				$bonus = 0;
-			}
-			$recruit->setTraining($recruit->getTraining()+$training+$bonus);
-			if ($recruit->getTraining() >= $recruit->getTrainingRequired()) {
-				// training finished
-				$recruit->setTraining(0)->setTrainingRequired(0);
-				$this->history->addToSoldierLog($recruit, 'traincomplete');
+		foreach ($settlement->getUnits() as $unit) {
+			foreach ($unit->getRecruits() as $recruit) {
+				if ($recruit->getExperience()>0) {
+					$bonus = round(sqrt($recruit->getExperience())/5);
+				} else {
+					$bonus = 0;
+				}
+				$recruit->setTraining($recruit->getTraining()+$training+$bonus);
+				if ($recruit->getTraining() >= $recruit->getTrainingRequired()) {
+					// training finished
+					$recruit->setTraining(0)->setTrainingRequired(0);
+					$this->history->addToSoldierLog($recruit, 'traincomplete');
+					if ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() != $settlement) {
+						$recruit->setTravelDays($this->getSoldierTravelTime($startLoc, $unit->getCharacter()->getLocation()));
+						$recruit->setDestination('unit');
+					}
+				}
 			}
 		}
 	}
@@ -728,7 +735,30 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function returnUnitHome (Unit $unit, $reason='recalled', $origin) {
+	public function getSoldierTravelTime($start, $end) {
+		$distance = $this->geo->getDistance($start, $end);
+		$speed = $this->geo->getbaseSpeed() / exp(sqrt(1/200)); #This is the regular travel speed for M&F.
+		$days = $distance / $speed;
+		return $days*0.925; #Average travel speed of all region types.
+	}
+
+	public function returnUnitHome (Unit $unit, $reason='recalled', $origin, $bulk = false) {
+		if ($unit->getSettlement()) {
+			$dest = $unit->getSettlement();
+			$toHome = true;
+			$toSupplier = false;
+		} elseif ($unit->getSupplier()) {
+			$dest = $unit->getSupplier();
+			$toHome = false;
+			$toSupplier = true;
+		} else {
+			// Someone never set the settlement or supplier for thier unit. All soldiers disbanded, and unit disbanded.
+			foreach ($unit->getSoldiers() as $soldier) {
+				$this->disband($soldier);
+			}
+			$this->disbandUnit($unit, true);
+			return true;
+		}
 		$distance = $this->geo->getDistance($origin, $unit->getSettlement()->getGeoMarker()->getLocation());
 		$count = $unit->getSoldiers()->count();
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
@@ -747,7 +777,9 @@ class MilitaryManager {
 
 		$unit->setTravelDays(ceil($final));
 		$unit->setCharacter(null);
-		$this->em->flush();
+		if (!$bulk) {
+			$this->em->flush();
+		}
 		return true;
 	}
 
@@ -776,10 +808,12 @@ class MilitaryManager {
 		}
 	}
 
-	public function disbandUnit (Unit $unit) {
+	public function disbandUnit (Unit $unit, $bulk = false) {
 		$this->em->remove($unit->getSettings());
 		$this->em->remove($unit);
-		$this->em->flush();
+		if (!$bulk) {
+			$this->em->flush();
+		}
 		return true;
 	}
 }
