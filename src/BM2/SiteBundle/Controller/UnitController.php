@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\SoldiersRecruitType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 use BM2\SiteBundle\Form\UnitSoldiersType;
@@ -322,7 +323,7 @@ class UnitController extends Controller {
 
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character->getLocation());
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character->getLocation(), false);
                         if ($success) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.return.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
@@ -342,7 +343,7 @@ class UnitController extends Controller {
 
         public function unitRecallAction(Request $request, Unit $unit) {
 		$character = $this->get('dispatcher')->gateway('unitRecallTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', default, default, default, UnitId)
+                # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -351,7 +352,7 @@ class UnitController extends Controller {
 
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter()->getLocation());
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter()->getLocation(), false);
                         if ($success) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.recall.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
@@ -364,4 +365,102 @@ class UnitController extends Controller {
                         'form'=>$form->createView()
                 ]);
         }
+
+
+
+        /**
+          * @Route("/unit/{unit}/recruit", name="maf_unit_recruit", requirements={"unit"="\d+"})
+          */
+     	public function unitRecruitAction(Request $request, Unit $unit) {
+     		list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true, true, false, $unit);
+                # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
+     		if (! $character instanceof Character) {
+     			return $this->redirectToRoute($character);
+     		}
+     		$em = $this->getDoctrine()->getManager();
+
+                $query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBunlde:Soldier s JOIN s.unit u WHERE u.settlement = :here AND s.training_required > 0');
+     		$query->setParameter('here', $settlement);
+     		$allocated = $query->getSingleResult();
+
+     		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
+     		$form = $this->createForm(new SoldiersRecruitType($available, $units));
+     		$form->handleRequest($request);
+     		if ($form->isValid()) {
+     			$data = $form->getData();
+     			$generator = $this->get('generator');
+
+     			if ($data['number'] > $settlement->getPopulation()) {
+     				$form->addError(new FormError("recruit.troops.toomany"));
+     				return array(
+     					'settlement'=>$settlement,
+     					'allocated'=>$allocated,
+     					'form'=>$form->createView()
+     				);
+     			}
+     			if ($data['number'] > $settlement->getRecruitLimit()) {
+     				$form->addError(new FormError($this->get('translator')->trans("recruit.troops.toomany2"), null, array('%max%'=>$settlement->getRecruitLimit(true))));
+     				return array(
+     					'settlement'=>$settlement,
+     					'allocated'=>$allocated,
+     					'form'=>$form->createView()
+     				);
+     			}
+                        if ($data['number'] > $remaining = 200 - $unit->getSoldirs()->count()) {
+                                $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
+                                $data['number'] = $remaining;
+                        }
+
+     			for ($i=0; $i<$data['number']; $i++) {
+     				if (!$data['weapon']) {
+     					$form->addError(new FormError("recruit.troops.noweapon"));
+     					return array(
+     						'settlement'=>$settlement,
+     						'allocated'=>$allocated,
+     						'form'=>$form->createView()
+     					);
+     				}
+     			}
+     			$count = 0;
+			if ($data['unit']->getAvailable() < $data['number']) {
+				$data['number'] = $data['unit']->getAvailable();
+				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getName()), 'actions'));
+			}
+     			$corruption = $this->get('economy')->calculateCorruption($settlement);
+     			for ($i=0; $i<$data['number']; $i++) {
+     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $data['unit'], $corruption, $unit)) {
+     					$this->get('history')->addToSoldierLog(
+     						$soldier, 'recruited',
+     						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(),
+     							'%link-item-1%'=>$data['weapon']?$data['weapon']->getId():0,
+     							'%link-item-2%'=>$data['armour']?$data['armour']->getId():0,
+     							'%link-item-3%'=>$data['equipment']?$data['equipment']->getId():0
+     						)
+     					);
+     					$count++;
+     				}
+     			}
+     			if ($count < $data['number']) {
+     				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.supply', array('%only%'=> $count, '%planned%'=>$data['number']), 'actions'));
+     			}
+
+     			$settlement->setPopulation($settlement->getPopulation()-$count);
+     			$settlement->setRecruited($settlement->getRecruited()+$count);
+     			$em->flush();
+     			return $this->redirectToRoute('bm2_site_settlement_soldiers', array('id'=>$settlement->getId()));
+     		}
+		$soldiercount = 0;
+		foreach ($settlement->getUntits() as $unit) {
+			$soldiercount += $unit->getSoldiers()->count();
+		}
+
+     		return array(
+     			'settlement'=>$settlement,
+     			'allocated'=>$allocated,
+     			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
+     			'soldierscount' => $soldiercount,
+
+     			'form'=>$form->createView()
+     		);
+     	}
 }
