@@ -1,0 +1,8 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'unit.recall.name'|trans({"%name%":unit.settings.name},"military")|title }}</h2>
+<p>{{ 'unit.recall.intro'|trans({"%name%":unit.settings.name},"military")|raw }}</p>
+	{{ form(form) }}
+
+{% endblock %}
