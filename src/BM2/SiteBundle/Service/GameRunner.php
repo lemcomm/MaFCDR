@@ -646,6 +646,15 @@ class GameRunner {
 		$this->em->clear();
 
 		$this->logger->info("disbanding...");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN u.character c WHERE c.slumbering = true');
+		$result = $query->getResult();
+		foreach ($result as $unit) {
+			if ($unit->getSettlement()) {
+				$this->milman->returnUnitHome($unit->getCharacter()->getLocation(), $unit->getSettlement())
+			}
+		}
+
+
 		#FIXME: Rewrite this for units.
 		$disband_soldiers = 0;
 		$query = $this->em->createQuery('SELECT s, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Soldier s JOIN s.character c WHERE c.slumbering = true');
@@ -702,13 +711,51 @@ class GameRunner {
 			$this->logger->info("disbanded $disband_soldiers soldiers and $disband_entourage entourage.");
 		}
 
-		// clean out knight offers that have gone empty
-		$query = $this->em->createQuery('SELECT o as offer, count(s) as soldiers FROM BM2SiteBundle:KnightOffer o LEFT JOIN o.soldiers s WHERE o.give_settlement=false GROUP BY o');
-		foreach ($query->getResult() as $row) {
-			if ($row['soldiers']==0) {
-				$this->em->remove($row['offer']);
+		// Update Soldier travel times.
+		$this->logger->info("deducting a day from soldier travel times...");
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.travel_days = (s.travel_days - 1) WHERE s.travel_days IS NOT NULL');
+		$query->execute();
+
+		// Update soldier recruit training times. This will also set the training times for units, so this and the above affect whether travel starts same day or next (I'm going with next day).
+		$this->logger->info("checking on recruits...");
+		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id >= :start AND s.id <= :end');
+		$query->setParameters(array('start'=>$start, 'end'=>$end));
+		foreach ($query->getResult() as $settlement) {
+			$this->milman->TrainingCycle($settlement);
+		}
+
+		// Update soldier arrivals to units based on travel times being at or below zero.
+		$this->logger->info("checking if soldiers have arrived...");
+		$count = 0;
+		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Soldier s WHERE s.travel_days <= 0');
+		$units = [];
+		foreach ($query->getResult() as $soldier) {
+			$count++;
+			$soldier->setTravelDays(null);
+			$soldier->setDestination(null);
+			if (!in_array($solder->getUnit()->getId(), $units)) {
+				$units[] = $soldier->getUnit()->getId();
 			}
 		}
+		if ($count) {
+			foreach ($units as $each) {
+				$unit = $this->em->getRepository('BM2SiteBundle:Unit')->findOneById($each);
+				if ($unit && $character = $unit->getCharacter()) {
+					$this->history->logEvent(
+						$character,
+						'event.military.soldierarrivals',
+						array('%link-unit%'=>$unit->getId()),
+						History::MEDIUM, false, 30
+					);
+				} else {
+					if (!$unit) {
+						$this->logger->alert("No unit found for ".$unit);
+					}
+					# We can also reach this because the character wasn't found, which can happen when a soldier arrives to a leaderless unit, which can happen for any number of legit reasons.
+				}
+			}
+		}
+		$this->em->flush();
 
 		$this->appstate->setGlobal('cycle.soldiers', 'complete');
 		$this->em->flush();
