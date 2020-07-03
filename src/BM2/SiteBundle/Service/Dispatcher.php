@@ -2139,9 +2139,11 @@ class Dispatcher {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (!$character->getUnits()->contains($unit)) {
 			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
+				if($unit->getSettlement() != $character->getInsideSettlement()) {
+					return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
+				} elseif ($unit->getSettlement()->getOwner() != $character) {
+					return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
+				}
 			}
 		}
 		return $this->action("unit.manage.name", "maf_unit_manage");
@@ -2150,12 +2152,11 @@ class Dispatcher {
 	public function unitRebaseTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
-			}
+		if($unit->getSettlement()->getOwner() != $character) {
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+		}
+		if(!$settlement) {
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
 		}
 		if ($unit->getTravelDays() > 0) {
 			return array("name"=>"unit.rebase.name", "description"=>"unavailable.rebasing");
@@ -2163,7 +2164,19 @@ class Dispatcher {
 		return $this->action("unit.rebase.name", "maf_unit_rebase");
 	}
 
-	public function unitSoldiersTest() {
+	public function unitSoldiersTest($ignored, Unit $unit) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->personalActionsGenericTests($settlement, 'recruit')) !== true) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
+		}
+
+		if ($unit->getSoldiers()->count() >= 200) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.unitfull");
+		}
+		$available = $this->military->findAvailableEquipment($settlement, true);
+		if (empty($available)) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
+		}
 		return $this->action("recruit.troops", "maf_unit_soldiers");
 	}
 
