@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\EntourageType;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Soldier;
+use BM2\SiteBundle\Entity\Unit;
 use Doctrine\ORM\EntityManager;
 
 
