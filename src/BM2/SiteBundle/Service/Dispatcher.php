@@ -2173,6 +2173,9 @@ class Dispatcher {
 		if ($unit->getSoldiers()->count() >= 200) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.unitfull");
 		}
+		if ($unit->getSettings()->getReinforcements() == false) {
+			return array("name"=>"recruit.troops.name", "description"=>"unvailabile.unitdeclines");
+		}
 		$available = $this->military->findAvailableEquipment($settlement, true);
 		if (empty($available)) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
