@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\MessageTag">
+                <id name="character" association-key="true"/>
+                <id name="message" association-key="true"/>
+                <many-to-one field="character" target-entity="Character" inversed-by="tagged_messages"/>
+                <many-to-one field="message" target-entity="Message" inversed-by="tags"/>
+                <field name="type" type="string"/>
+	</entity>
+</doctrine-mapping>
