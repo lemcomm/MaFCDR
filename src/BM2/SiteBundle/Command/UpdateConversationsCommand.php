@@ -13,6 +13,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\ConversationPermission;
+use Calitarus\MessageBundle\Entity\Conversation as OldConv;
 
 class UpdateConversationsCommand extends ContainerAwareCommand {
 
@@ -51,7 +52,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 			$microMsgCount = 0;
 			$query = $em->createQuery('SELECT c FROM MsgBundle:Conversation c ORDER BY c.id DESC');
 			$result = $query->iterate();
-			while ((($row = $result->next()) !== false AND $executions < 100) OR !$row) {
+			while (($row = $result->next()) !== false AND $executions < 100) {
 	                        # Prepare loop.
 				$oldConv = $row[0];
 	                        $participants = new ArrayCollection();
@@ -61,7 +62,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 				$microCounter++;
 				$executions++;
 
-				$output->writeln("Converting old conversation (ID: ".$oldConv->getId().") :".$oldConv->getTopic().". Counter at ".$counter."/".$msgCount." (C/M).");
+				$output->writeln("Converting old conversation (ID: ".$oldConv->getId()."): '".$oldConv->getTopic()."'. Counter at ".$counter."/".$msgCount." (C/M).");
 				if ($oldConv->getMessages()->count() != 0) {
 		                        # Create new conversation.
 		                        $newConv = new Conversation();
