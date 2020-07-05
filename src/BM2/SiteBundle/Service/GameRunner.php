@@ -147,7 +147,7 @@ class GameRunner {
 		$result = $query->iterate();
 		while ($row = $result->next()) {
 			$allUnits = array();
-			foreach($row->getFromCharacter()->getUnits() as $unit) {
+			foreach($row[0]->getFromCharacter()->getUnits() as $unit) {
 				if ($unit->getSupplier()==$row->getToSettlement()) {
 					$char = $row->getFromCharacter();
 					$this->logger->info("Character ".$char->getName()." (".$char->getId().") may be using request for food...");
