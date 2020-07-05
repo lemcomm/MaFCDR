@@ -36,85 +36,114 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
                         $output->writeln("Incorrect confirmation string. String must be 'all'.");
                         return false;
                 }
+                $stopwatch->start('updateConversations');
 
                 $counter = 0;
                 $msgCount = 0;
-                $all = $em->getRepository('MsgBundle:Conversation')->findAll();
-                foreach ($all as $oldConv) {
-                        $stopwatch->start('updateConversations');
-                        # Prepare loop.
-                        $participants = new ArrayCollection();
-                        $foundStart = false;
-                        $foundOwner = false;
+		$skipped = 0;
+		#$query = $em->createQuery('SELECT c FROM MsgBundle:Conversation c ORDER BY c.id DESC')->setMaxResults(100);
 
-                        # Create new conversation.
-                        $newConv = new Conversation();
-                        $em->persist($newConv);
+		while ($em->createQuery('SELECT count(c.id) FROM MsgBundle:Conversation c')->getSingleScalarResult() != 0) {
+			$output->writeln("Beginning execution loop...");
+			$em->clear();
+			$executions = 0;
+			$microCounter = 0;
+			$microMsgCount = 0;
+			$query = $em->createQuery('SELECT c FROM MsgBundle:Conversation c ORDER BY c.id DESC');
+			$result = $query->iterate();
+			while ((($row = $result->next()) !== false AND $executions < 100) OR !$row) {
+	                        # Prepare loop.
+				$oldConv = $row[0];
+	                        $participants = new ArrayCollection();
+	                        $foundStart = false;
+	                        $foundOwner = false;
+				$counter++;
+				$microCounter++;
+				$executions++;
 
-                        # Carryover topic.
-                        $newConv->setTopic($oldConv->getTopic());
+				$output->writeln("Converting old conversation (ID: ".$oldConv->getId().") :".$oldConv->getTopic().". Counter at ".$counter."/".$msgCount." (C/M).");
+				if ($oldConv->getMessages()->count() != 0) {
+		                        # Create new conversation.
+		                        $newConv = new Conversation();
+		                        $em->persist($newConv);
 
-                        # Check for system flag and carry over.
-                        if ($oldConv->getSystem()) {
-                                $newConv->setSystem($oldConv->getSystem());
-                        }
+		                        # Carryover topic.
+		                        $newConv->setTopic($oldConv->getTopic());
 
-                        # Check for Realm association and carry over.
-                        if ($oldConv->getAppReference()) {
-                                $newConv->setRealm($oldConv->getAppReference());
-                        }
+		                        # Check for system flag and carry over.
+		                        if ($oldConv->getSystem()) {
+		                                $newConv->setSystem($oldConv->getSystem());
+		                        }
 
-                        # Flag this as a legacy conversation.
-                        $newConv->setType('legacy');
+		                        # Check for Realm association and carry over.
+		                        if ($oldConv->getAppReference()) {
+		                                $newConv->setRealm($oldConv->getAppReference());
+		                        }
 
-                        # Start sorting through messages...
-                        foreach ($oldConv->getMessages() as $oldMsg) {
-                                $newMsg = new Message();
-                                $em->persist($newMsg);
+		                        # Flag this as a legacy conversation.
+		                        $newConv->setType('legacy');
 
-                                # Check if we have conversation start date yet and set if don't.
-                                if (!$foundStart) {
-                                        # Due to how the old message system calls messages, the first message returned by getMessages() is the first in that convo.
-                                        $newConv->setCreated($oldMsg->getTs());
-                                        $foundStart = true;
-                                }
+		                        # Start sorting through messages...
+		                        foreach ($oldConv->getMessages() as $oldMsg) {
+						$output->writeln("Found new message, converting...");
+		                                $newMsg = new Message();
+		                                $em->persist($newMsg);
 
-                                # Carryover old msg send date.
-                                $newMsg->setSent($oldMsg->getTs());
+		                                # Check if we have conversation start date yet and set if don't.
+		                                if (!$foundStart) {
+		                                        # Due to how the old message system calls messages, the first message returned by getMessages() is the first in that convo.
+		                                        $newConv->setCreated($oldMsg->getTs());
+		                                        $foundStart = true;
+		                                }
 
-                                # Check if we've already seen this participant and build permissions if not. System messages will not have a participant, and thus we skip this.
-                                if ($oldMsg->getSender()) {
-                                        $newMsg->setSender($oldMsg->getSender()->getAppUser());
-                                        if (!$participants->contains($oldMsg->getSender()->getAppUser())) {
-                                                $participants->add($oldMsg->getSender()->getAppUser());
-                                                $perm = new ConversationPermission();
-                                                $perm->setCharacter($oldMsg->getSender()->getAppUser());
-                                                $perm->setConversation($newConv);
-                                                $em->persist($perm);
+		                                # Carryover old msg send date.
+		                                $newMsg->setSent($oldMsg->getTs());
 
-                                                $perm->setStart($oldMsg->getTs());
-                                                if (!$foundOwner && !$oldConv->getSystem()) {
-                                                        # We don't have an owner yet, and this isn't a system-managed conversation, so we need one.
-                                                        $perm->setOwner($oldMsg->getSender()->getAppUser());
-                                                        $foundOwner = true;
-                                                }
-                                                $perm->setUnread(0);
-                                        }
-                                }
-                                $newMsg->setContent($oldMsg->getContent());
-                                $newMsg->setType('legacy');
-                                $msgCount++;
-                        }
+		                                # Check if we've already seen this participant and build permissions if not. System messages will not have a participant, and thus we skip this.
+		                                if ($oldMsg->getSender()) {
+		                                        $newMsg->setSender($oldMsg->getSender()->getAppUser());
+		                                        if (!$participants->contains($oldMsg->getSender()->getAppUser())) {
+								$output->writeln("Creating new permission...");
+		                                                $participants->add($oldMsg->getSender()->getAppUser());
+		                                                $perm = new ConversationPermission();
+		                                                $perm->setCharacter($oldMsg->getSender()->getAppUser());
+		                                                $perm->setConversation($newConv);
+		                                                $em->persist($perm);
 
-                        $em->remove($oldConv);
-                        #$counter++;
-                        $count = 1000;
-                        if ($counter == 1000) {
-                                $event = $stopwatch->stop('updateConversations');
-                                break;
-                                $output->writeln('Execution limit reached. 1000 conversations, incuding '.$msgCount.' messages updated in '.($event->getDuration()/1000).' seconds.');
-                        }
-                }
-                $em->flush();
+		                                                $perm->setStartTime($oldMsg->getTs());
+		                                                if (!$foundOwner && !$oldConv->getSystem()) {
+		                                                        # We don't have an owner yet, and this isn't a system-managed conversation, so we need one.
+		                                                        $perm->setOwner(true);
+		                                                        $foundOwner = true;
+		                                                } else {
+									$perm->setOwner(false);
+								}
+								$perm->setManager(false);
+		                                                $perm->setUnread(0);
+		                                        }
+		                                }
+		                                $newMsg->setContent($oldMsg->getContent());
+		                                $newMsg->setType('legacy');
+		                                $msgCount++;
+						$microMsgCount++;
+		                        }
+					if (!$foundStart) {
+						$newConv->setCreated(new \DateTime("now")); #Sigh.
+					}
+		                        $em->remove($oldConv); #Cascade delete via entity removes all children objects. :)
+				} else {
+					$output->writeln("Skipping empty conversation...");
+					$em->remove($oldConv);
+					$skipped++;
+				}
+		                $em->flush();
+	                }
+			if ($executions == 100) {
+				$output->writeln('End of execution loop reached. '.$microCounter.' conversations, incuding '.$microMsgCount.' messages.');
+			}
+
+		}
+		$event = $stopwatch->stop('updateConversations');
+		$output->writeln('End of update reached. '.$counter.' conversations, incuding '.$msgCount.' messages updated in '.($event->getDuration()/1000).' seconds. '.$skipped.' conversations were skipped this run.');
 	}
 }
