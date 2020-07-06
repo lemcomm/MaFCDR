@@ -6,6 +6,7 @@
 		</id>
                 <field name="type" type="string" nullable="true"/>
                 <field name="sent" type="datetime"/>
+		<field name="cycle" type="integer" nullable="true"/>
                 <field name="system_content" type="text" nullable="true"/>
                 <many-to-one field="conversation" target-entity="Conversation" inversed-by="messages"/>
                 <many-to-one field="sender" target-entity="Character" inversed-by="messages"/>
