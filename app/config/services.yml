@@ -68,6 +68,9 @@ services:
     message_manager:
         class:      Calitarus\MessagingBundle\Service\MessageManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
+    conversation_manager:
+        class:      BM2\SiteBundle\Service\ConversationManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
     character_manager:
         class:      BM2\SiteBundle\Service\CharacterManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@message_manager', '@dungeon_master', '@war_manager']
