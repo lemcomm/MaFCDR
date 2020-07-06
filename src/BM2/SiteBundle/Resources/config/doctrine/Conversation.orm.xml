@@ -8,9 +8,14 @@
 		<field name="system" type="string" nullable="true"/>
                 <field name="type" type="string" nullable="true"/>
                 <field name="created" type="datetime"/>
+		<field name="cycle" type="integer" nullable="true"/>
+		<field name="updated" type="datetime" nullable="true"/>
                 <field name="active" type="boolean"/>
                 <many-to-one field="owner" target-entity="Character" inversed-by="owned_conversations"/>
                 <one-to-many field="messages" target-entity="Message" mapped-by="conversation" on-delete="CASCADE">
+			<order-by>
+				<order-by-field name="sent" direction="ASC" />
+			</order-by>
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
                 <one-to-many field="permissions" target-entity="ConversationPermission" mapped-by="conversation" on-delete="CASCADE">
