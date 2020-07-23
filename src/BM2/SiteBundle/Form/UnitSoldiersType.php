@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Form;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Unit;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -133,11 +134,10 @@ class UnitSoldiersType extends AbstractType {
 				},
 			));
 		}
-
 		if (!empty($avail_train)) {
 			$fields = array('weapon', 'armour', 'equipment');
 			foreach ($fields as $field) {
-				$builder->add($field, EquipmentType::class, array(
+				$builder->add($field, EntityType::class, array(
 					'label'=>$field,
 					'placeholder'=>'item.current',
 					'required'=>false,
