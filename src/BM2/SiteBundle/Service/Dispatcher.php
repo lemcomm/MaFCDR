@@ -2166,7 +2166,7 @@ class Dispatcher {
 
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->personalActionsGenericTests($settlement, 'recruit')) !== true) {
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
 		}
 
@@ -2176,7 +2176,7 @@ class Dispatcher {
 		if ($unit->getSettings()->getReinforcements() == false) {
 			return array("name"=>"recruit.troops.name", "description"=>"unvailabile.unitdeclines");
 		}
-		$available = $this->military->findAvailableEquipment($settlement, true);
+		$available = $this->milman->findAvailableEquipment($settlement, true);
 		if (empty($available)) {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
 		}
