@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 use BM2\SiteBundle\Entity\Character;
 
@@ -27,53 +28,72 @@ class UpdateSoldiersCommand extends ContainerAwareCommand {
 		$em = $this->getContainer()->get('doctrine')->getManager();
 		$mm = $this->getContainer()->get('military_manager');
                 $source = $input->getArgument('target');
+                $stopwatch = new Stopwatch();
+		$execLimit = 50;
 
+		$distinctQuery = $em->createQuery('SELECT DISTINCT(s.character) FROM BM2SiteBundle:Soldier s WHERE s.character IS NOT NULL');
+		$commanders = $distinctQuery->getResult();
                 if ($source != 'all') {
-                        $output->writeln("Looking for Settlement #".$source);
-                        $target = $em->getRepository('BM2SiteBundle:Character')->findOneById($source);
-                        if ($target instanceof Character) {
+                        $output->writeln("Looking for Character #".$source);
+                        /*$target = $em->getRepository('BM2SiteBundle:Character')->findOneById($source);*/
+			$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.id = :id AND c.id IN (:commanders)');
+			$query->setParameters(['id' => $source, 'commanders' => $commanders]);
+			$countQuery = $em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Character c WHERE c.id = :id AND c.id IN (:commanders)');
+			$countQuery->setParameters(['id' => $source, 'commanders' => $commanders]);
+                        /*if ($target instanceof Character) {
                                 $output->writeln('Character found...');
                         } else {
                                 throw new \Exception("Cannot find settlement. Please check the id and try again.");
                         }
                         $all = new ArrayCollection();
-                        $all->add($target);
+                        $all->add($target);*/
                 } else {
                         $output->writeln('All detected, fetching repository...');
-                        $all = new ArrayCollection($em->getRepository('BM2SiteBundle:Character')->findBy(array('alive' => true)));
+			$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.alive = true AND c.id IN (:commanders)');
+			$query->setParameters(['commanders' => $commanders]);
+			$countQuery = $em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Character c WHERE c.alive = true AND c.id IN (:commanders)');
+			$countQuery->setParameters(['commanders' => $commanders]);
                 }
 
-                $allcount = $all->count();
-                $output->writeln('Generating units for '.$allcount.' settlements.');
-                $progress = 0;
-                $unitcount = 0;
-                $counter = 1;
+		$stopwatch->start('updateSoldiers');
+		$allCount = $countQuery->getSingleScalarResult();
+		$total = 0;
+		$progress = 0;
+                $output->writeln('Generating units for '.$allCount.' characters.');
+		while ($progress < $allCount) {
+			$output->writeln("Beginning execution loop...");
+			$em->clear();
+	                $unitCount = 0;
+	                $executions = 0;
 
-                foreach ($all as $c) {
-                        if ($c->getSoldiers()->isEmpty()) {
-                                $progress++;
-                                $output->writeln('No units needed for '.$c->getName().'. ('.$progress.'/'.$allcount.')');
-                                $alter = false;
-                        } else {
-                                $progress++;
-                                $output->writeln('Creating unit(s) for '.$c->getName().'... ('.$progress.'/'.$allcount.')');
-                                $total = $mm->convertToUnit($c, null, null, true);
-                                $unitcount += $total;
-                                $output->writeln('Created '.$total.' units. '.$unitcount.' so far this execution.');
-                                $alter = true;
-                        }
-                        if ($alter) {
-                                $counter++;
-                                $alter = false;
-                        }
-                        if ($counter == 200) {
-                                $output->writeln('Execution optimization limit reached. Rerun this command to continue.');
-                                break;
-                        }
-
-                }
-
+			$result = $query->iterate();
+			while (($row = $result->next()) !== false AND $executions < $execLimit AND $progress <= $allCount) {
+				$c = $row[0];
+	                        if ($c->getSoldiersOld()->isEmpty()) {
+	                                $output->writeln('No units needed for '.$c->getName().'. ('.$progress.'/'.$allCount.')');
+					$executions++;
+	                                $progress++;
+	                        } else {
+	                                $output->writeln('Creating unit(s) for '.$c->getName().'... ('.$progress.'/'.$allCount.')');
+	                                $total = $mm->convertToUnit($c, null, null, true);
+	                                $unitCount += $total;
+	                                $output->writeln('Created '.$total.' units. '.$unitCount.' so far this execution.');
+	                                $executions++;
+	                                $progress++;
+	                        }
+	                }
+			$em->flush();
+			if ($progress >= $allCount) {
+				break;
+			}
+		}
+		$output->writeln('Removing character associations for soldiers now assigned to units.');
                 $query = $em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.liege = NULL, s.character = NULL, s.base = NULL, s.group = NULL, s.assigned_since = NULL WHERE s.unit IS NOT NULL AND s.character IS NOT NULL');
                 $query->execute();
+		$output->writeln('Removing orphaned unit settings (those that lack a unit association)');
+		$query= $em->createQuery('DELETE FROM BM2SiteBundle:UnitSettings s WHERE s.unit IS NULL');
+		$query->execute();
+		$event = $stopwatch->stop('updateSoldiers');
+		$output->writeln('End of update reached. '.$unitCount.' Units for '.$progress.' Characters in '.($event->getDuration()/1000).' seconds.');
 	}
 }
