@@ -30,6 +30,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$em = $this->getContainer()->get('doctrine')->getManager();
                 $stopwatch = new Stopwatch();
+		$execLimit = 25;
 
                 if ($input->getArgument('all') == 'all') {
                         $output->writeln("Beginning conversation update...");
@@ -41,6 +42,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 
                 $counter = 0;
                 $msgCount = 0;
+		$permCount = 0;
 		$skipped = 0;
 		#$query = $em->createQuery('SELECT c FROM MsgBundle:Conversation c ORDER BY c.id DESC')->setMaxResults(100);
 
@@ -50,9 +52,10 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 			$executions = 0;
 			$microCounter = 0;
 			$microMsgCount = 0;
+			$microPermCount = 0;
 			$query = $em->createQuery('SELECT c FROM MsgBundle:Conversation c ORDER BY c.id DESC');
 			$result = $query->iterate();
-			while (($row = $result->next()) !== false AND $executions < 100) {
+			while (($row = $result->next()) !== false AND $executions < $execLimit) {
 	                        # Prepare loop.
 				$oldConv = $row[0];
 	                        $participants = new ArrayCollection();
@@ -62,7 +65,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 				$microCounter++;
 				$executions++;
 
-				$output->writeln("Converting old conversation (ID: ".$oldConv->getId()."): '".$oldConv->getTopic()."'. Counter at ".$counter."/".$msgCount." (C/M).");
+				$output->writeln("Converting old conversation (ID: ".$oldConv->getId()."): '".$oldConv->getTopic()."'. Counter at ".$counter."/".$msgCount."/".$permCount." (C/M/P).");
 				if ($oldConv->getMessages()->count() != 0) {
 		                        # Create new conversation.
 		                        $newConv = new Conversation();
@@ -85,8 +88,9 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 		                        $newConv->setType('legacy');
 
 		                        # Start sorting through messages...
+					$output->write("Converting messages");
 		                        foreach ($oldConv->getMessages() as $oldMsg) {
-						$output->writeln("Found new message, converting...");
+						$output->writeln("Found message ".$oldMsg->getId().", converting...");
 		                                $newMsg = new Message();
 		                                $em->persist($newMsg);
 
@@ -99,6 +103,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 
 		                                # Carryover old msg send date.
 		                                $newMsg->setSent($oldMsg->getTs());
+						$newMsg->setCycle($oldMsg->getCycle());
 
 		                                # Check if we've already seen this participant and build permissions if not. System messages will not have a participant, and thus we skip this.
 		                                if ($oldMsg->getSender()) {
@@ -121,6 +126,8 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 								}
 								$perm->setManager(false);
 		                                                $perm->setUnread(0);
+								$permCount++;
+								$microPermCount++;
 		                                        }
 		                                }
 		                                $newMsg->setContent($oldMsg->getContent());
@@ -137,14 +144,18 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 					$em->remove($oldConv);
 					$skipped++;
 				}
-		                $em->flush();
 	                }
-			if ($executions == 100) {
-				$output->writeln('End of execution loop reached. '.$microCounter.' conversations, incuding '.$microMsgCount.' messages.');
+			$output->writeln("Inserting '.$microCounter.' conversations, '.$microMsgCount.' messages and '.$microPermCount.' permissions to database...");
+			$em->flush();
+			if ($executions == $execLimit) {
+				$output->writeln('Execution limit reached. Resetting doctrine...');
 			}
 
 		}
+		#$output->writeln('Cleaning up messages left over from the old tower link message system Tom tried out.');
+		#$query = $em->createQuery('DELETE FROM BM2SiteBundle:Message m WHERE m.conversation IS NULL');
+		#$query->execute();
 		$event = $stopwatch->stop('updateConversations');
-		$output->writeln('End of update reached. '.$counter.' conversations, incuding '.$msgCount.' messages updated in '.($event->getDuration()/1000).' seconds. '.$skipped.' conversations were skipped this run.');
+		$output->writeln('End of update reached. '.$counter.' conversations, incuding '.$msgCount.' messages and '.$permCount.' permissions, updated in '.($event->getDuration()/1000).' seconds. '.$skipped.' conversations were skipped this run.');
 	}
 }
