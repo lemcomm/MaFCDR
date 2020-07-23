@@ -130,7 +130,7 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
 	  */
 	public function unitSoldiersAction(Request $request, Unit $unit) {
-                list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true);
+                list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true, true, false, $unit);
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
