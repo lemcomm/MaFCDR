@@ -533,7 +533,7 @@ class MilitaryManager {
 			}
 		}
 		$soldier->setCharacter($to);
-		$to->getSoldiers()->add($soldier);
+		$to->getSoldiersOld()->add($soldier);
 		if ($soldier->getCharacter() == $soldier->getLiege()) {
 			// clean out if a soldier has been re-assigned to us after some time
 			$soldier->setLiege(null)->setAssignedSince(null);
@@ -605,7 +605,7 @@ class MilitaryManager {
 				$unit->setSupplier($data['supplier']);
 			}
 			$settings = $this->newUnitSettings($unit, $character, $data, $bulk);
-			foreach ($source->getSoldiers() as $soldier) {
+			foreach ($source->getSoldiersOld() as $soldier) {
 				$soldier->setCharacter(null);
 				$soldier->setBase(null);
 				if (!$bulk) {
