@@ -3,7 +3,7 @@
 {% macro conversationrow(conv, char) %}
 <tr data-id="{{ conv.id }}">
 	<td><a href="{{ path('maf_conv_read', {'conv':conv.id}) }}">{{ conv.topic }}</a></td>
-	<td align="right">{{ conv.messages.count }}</td>
+	<td align="right">{{ conv.findMessages(char).count }}</td>
 	<td align="right">{{ conv.findUnread(char) }}</td>
 	<td align="right">{{ conv.findActivePermissions.count }}</td>
 	<td align="right">
