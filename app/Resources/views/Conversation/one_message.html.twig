@@ -10,11 +10,16 @@
 			<a id="{{message.id}}"></a>
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			{% if message.replyTo %}
+				 --
 				<a href="#{{message.replyTo.id}}">
-					{{ 'index.reply' |trans({"%sender%":message.replyTo.sender, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+					{% if message.replyTo.sender %}
+						{{ 'index.reply' |trans({"%sender%":message.replyTo.sender.name, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+					{% else %}
+						{{ 'index.reply' |trans({"%sender%":'<i>The System</i>', "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+					{% endif %}
 				</a>
-			{% else %}
 			{% endif %}
+			-- {{ message.id }}
 
 			{% if show_conversation is defined %}
 				{{ 'flagged.msg'|trans({"%url%":path("maf_conv_read", {"conv":message.conversation.id}), "%topic%":message.conversation.topic}, "conversations")|raw }}
