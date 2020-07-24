@@ -59,15 +59,15 @@ class UpdateSoldiersCommand extends ContainerAwareCommand {
 		$allCount = $countQuery->getSingleScalarResult();
 		$total = 0;
 		$progress = 0;
+		$unitCount = 0;
+		$executions = 0;
                 $output->writeln('Generating units for '.$allCount.' characters.');
-		while ($progress < $allCount) {
+		$result = $query->iterate();
+		while ($progress < $allCount AND $executions < $execLimit) {
 			$output->writeln("Beginning execution loop...");
 			$em->clear();
-	                $unitCount = 0;
-	                $executions = 0;
 
-			$result = $query->iterate();
-			while (($row = $result->next()) !== false AND $executions < $execLimit AND $progress <= $allCount) {
+			while (($row = $result->next()) !== false) {
 				$c = $row[0];
 	                        if ($c->getSoldiersOld()->isEmpty()) {
 	                                $output->writeln('No units needed for '.$c->getName().'. ('.$progress.'/'.$allCount.')');
