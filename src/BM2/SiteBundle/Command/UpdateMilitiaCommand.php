@@ -31,6 +31,8 @@ class UpdateMilitiaCommand extends ContainerAwareCommand {
                 $stopwatch = new Stopwatch();
 		$execLimit = 50;
 
+		$distinctQuery = $em->createQuery('SELECT DISTINCT(s.base) FROM BM2SiteBundle:Soldier s WHERE s.base IS NOT NULL');
+		$garrisons = $distinctQuery->getResult();
                 if ($source != 'all') {
                         $output->writeln("Looking for Settlement #".$source);
 			$target = $em->getRepository('BM2SiteBundle:Settlement')->findOneById($source);
@@ -41,14 +43,18 @@ class UpdateMilitiaCommand extends ContainerAwareCommand {
                         }
 			$output->writeln("Converting selection to script expectations...");
 			# The way this script is written, we have to do a DQL query so we can iterate.
-			$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id = :id');
+			$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id = :id AND s.id IN (:garrisons) ORDER BY s.id ASC')->setParameters(['garrisons' => $garrisons]);
 			$query->setParameters(["id"=>$source]);
-			$countQuery = $em->createQuery('SELECT COUNT(s.id) FROM BM2SiteBundle:Settlement s WHERE s.id = :id');
+			$countQuery = $em->createQuery('SELECT COUNT(s.id) FROM BM2SiteBundle:Settlement s WHERE s.id = :id AND s.id IN (:garrisons)')->setParameters(['garrisons' => $garrisons]);
 			$countQuery->setParameters(["id"=>$source]);
                 } else {
                         $output->writeln('All detected, fetching repository...');
-			$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s');
-			$countQuery = $em->createQuery('SELECT COUNT(s.id) FROM BM2SiteBundle:Settlement s');
+
+			#$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s ORDER BY s.id ASC');
+			#$countQuery = $em->createQuery('SELECT COUNT(s.id) FROM BM2SiteBundle:Settlement s');
+
+			$query = $em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id IN (:garrisons) ORDER BY s.id ASC')->setParameters(['garrisons' => $garrisons]);
+			$countQuery = $em->createQuery('SELECT COUNT(s.id) FROM BM2SiteBundle:Settlement s WHERE s.id IN (:garrisons)')->setParameters(['garrisons' => $garrisons]);
                 }
 		$stopwatch->start('updateSoldiers');
 
@@ -57,22 +63,23 @@ class UpdateMilitiaCommand extends ContainerAwareCommand {
 		$total = 0;
                 $progress = 0;
                 $unitCount = 0;
+		$executions = 0;
+		$result = $query->iterate();
 
-		while ($progress < $allCount) {
+		while ($progress < $allCount && $executions < $execLimit) {
 			$output->writeln("Beginning execution loop...");
 			$em->clear();
-			$executions = 0;
 
-			$result = $query->iterate();
-			while (($row = $result->next()) !== false AND $executions < $execLimit AND $progress < $allCount) {
+			while (($row = $result->next()) !== false) {
+			#while (($row = $result->next()) !== false AND $executions < $execLimit AND $progress < $allCount) {
 				$s = $row[0];
 	                        if ($s->getSoldiersOld()->isEmpty()) {
 	                                $progress++;
-	                                $output->writeln('No units needed for '.$s->getName().'. ('.$progress.'/'.$allCount.')');
+	                                $output->writeln('No units needed for '.$s->getName().', ID# '.$s->getId().'. ('.$progress.'/'.$allCount.')');
 					$executions++;
 	                        } else {
 	                                $progress++;
-	                                $output->writeln('Creating unit(s) for '.$s->getName().'... ('.$progress.'/'.$allCount.')');
+	                                $output->writeln('Creating unit(s) for '.$s->getName().', ID# '.$s->getId().'... ('.$progress.'/'.$allCount.')');
 	                                $total = $mm->convertToUnit(null, $s, null, true);
 	                                $unitCount += $total;
 	                                $output->writeln('Created '.$total.' units. '.$unitCount.' so far this execution.');
