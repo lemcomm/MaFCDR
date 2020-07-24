@@ -1,0 +1,14 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'contacts.title'|trans({}, "conversations")|title }}</h2>
+
+<ul>
+{% for contact in contacts %}
+	{% if not contact.blocked %}
+		<li>{{ link(contact.character) }}</li>
+	{% endif %}
+{% endfor %}
+</ul>
+
+{% endblock %}
