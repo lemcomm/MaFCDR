@@ -70,7 +70,7 @@ class UpdateMilitiaCommand extends ContainerAwareCommand {
 			$output->writeln("Beginning execution loop...");
 			$em->clear();
 
-			while (($row = $result->next()) !== false) {
+			while (($row = $result->next()) !== false AND $executions < $execLimit) {
 			#while (($row = $result->next()) !== false AND $executions < $execLimit AND $progress < $allCount) {
 				$s = $row[0];
 	                        if ($s->getSoldiersOld()->isEmpty()) {
