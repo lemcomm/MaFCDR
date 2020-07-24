@@ -19,6 +19,9 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
                 <one-to-many field="permissions" target-entity="ConversationPermission" mapped-by="conversation" on-delete="CASCADE">
+			<order-by>
+				<order-by-field name="start_time" direction="ASC" />
+			</order-by>
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
                 <many-to-one field="realm" target-entity="Realm" inversed-by="conversations"/>
