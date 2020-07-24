@@ -1,0 +1,48 @@
+{% set participants = conversation.findActivePermissions %}
+{% macro general(conversation, participants) %}
+	<div class="cmsg_general">
+		<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button>
+
+		<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %}
+		 class="tt" title="{% for p in conversation.participants %}{{ p.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"
+		 {% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
+
+		{% if conversation.realm is null %}
+			<button class="convo_leave cmsg_button" data-id="{{ conversation.id }}" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button>
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{% import _self as macros %}
+
+<div class="cmsg_conversation">
+	{% if conversation.realm %}
+	<h3>{{ conversation.realm.name }}: {{ conversation.topic }}</h3>
+	{% else %}
+	<h3>{{ conversation.topic }}</h3>
+	{% endif %}
+
+	{{ macros.general(conversation, participants) }}
+
+	{% set in_hidden = false %}
+	{% for msg in messages %}
+		{% if in_hidden == false and msg.sent < veryold %}
+			<button id="hidetoggle" class="cmsg_button">{{ 'conversation.old.show'|trans({},"conversations") }}</button>
+			<div id="oldmessages">
+			{% set in_hidden = true %}
+		{% elseif in_hidden == true and msg.sent > veryold %}
+			</div>
+			{% set in_hidden = false %}
+		{% endif %}
+		{% include "Conversation/one_message.html.twig" with {"last":last, "message":msg} only %}
+	{% endfor %}
+	{% if in_hidden == true %}
+		</div>
+	{% endif %}
+
+	{# FIXME: this only counts top-level messages, for some reason #}
+	{% if messages.count > 5 %}
+	<br/>
+	{{ macros.general(conversation, participants) }}
+	{% endif %}
+</div>
