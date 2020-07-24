@@ -38,7 +38,7 @@ summary:
  new:			You have %messages% new messages in %conversations% conversations.
  new2:    %new% new messages
  nonew:		You have no new messages.
- total:   You are participating in a total of %conversations% conversations.
+ total:   You are participating in %conversations% conversations, %active% of them actively.
  nototal: You are not participating in any conversations currently.
  flagged: You have flagged %messages% messages.
  noflagged: You have no flagged messages.
