@@ -83,11 +83,6 @@ function characterchange(id, name) {
 	search_insert("[c:"+id+"]");
 }
 
-var unread = $(".cmsg_message:not(.cmsg_old)").first();
-if (unread.length) {
-	$("html, body").scrollTop(unread.offset().top);
-}
-
 $("#syntaxhelp").click(function(){
 	$("#help").toggle();
 });
@@ -122,19 +117,9 @@ function replyform(title, conversation, reply_to) {
 	$("#message_reply_conversation").val(conversation);
 	$("#message_reply_reply_to").val(reply_to);
 
-	$("#replydialog form").attr('action', '{{ path('cmsg_reply') }}');
+	$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
 }
 
-$("#replydialog form").ajaxForm(function(response){
-	if (redirect) {
-		window.location.replace(response);
-	} else {
-		console.log(insert);
-		insert.after(response);
-		$("#message_reply_content").val("");
-		$("#replydialog").dialog("close");
-	}
-});
 
 var request;
 var target;
