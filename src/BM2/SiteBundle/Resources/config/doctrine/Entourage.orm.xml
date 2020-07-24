@@ -9,6 +9,7 @@
 		<many-to-one field="type" target-entity="EntourageType"/>
 		<many-to-one field="action" target-entity="Action" inversed-by="assigned_entourage"/>
 		<many-to-one field="character" target-entity="Character" inversed-by="entourage"/>
+		<many-to-one field="liege" target-entity="Character" inversed-by="entourage_given"/>
 
 		<many-to-one field="equipment" target-entity="EquipmentType"/>
 
