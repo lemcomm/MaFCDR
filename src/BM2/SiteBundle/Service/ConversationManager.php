@@ -2,16 +2,22 @@
 
 namespace BM2\SiteBundle\Service;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
 use BM2\SiteBundle\Service\AppState;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
+use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Realm;
 
 class ConversationManager {
+
+        private $em;
+        private $appstate;
+        private $logger;
 
         public function __construct(EntityManager $em, AppState $appstate, Logger $logger) {
                 $this->em = $em;
@@ -25,6 +31,12 @@ class ConversationManager {
                 return $query->getResult();
         }
 
+        public function getConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
         public function getLegacyContacts(Character $char) {
                 $query1 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me');
                 $query1->setParameter('me', $char);
@@ -34,14 +46,14 @@ class ConversationManager {
                 return $query2->getResult();
 	}
 
-        public function getUnreadConversations(Character $char) {
-                $unread = new ArrayCollection();
-                foreach ($char->getConvPermissions() as $perm) {
-                        if ($perm->getUnread() > 0) {
-                                $unread->add($perm->getConversation());
-                        }
-                }
-                return $unread;
+        public function getUnreadConvPermissions(Character $char) {
+                $criteria = Criteria::create()->where(Criteria::expr()->gt("unread", 0));
+                return $char->getConvPermissions()->matching($criteria);
+        }
+
+        public function getActiveConvPermissions(Character $char) {
+                $criteria = Criteria::create()->where(Criteria::expr()->eq("active", true));
+                return $char->getConvPermissions()->matching($criteria);
         }
 
         public function getAllRecentMessages(Character $char, string $freq) {
@@ -189,6 +201,30 @@ class ConversationManager {
                                 }
                                 $bestOpt->setOwner(true);
                         }
+                }
+        }
+
+        public function writeMessage(Conversation $conv, $msg = null, Character $char, $text, $type) {
+                $valid = $conv->findActiveCharPermission($char);
+                if ($valid) {
+                        $new = new Message();
+                        $this->em->persist($new);
+                        $new->setType($type);
+                        $new->setCycle($this->appstate->getCycle());
+                        $new->setSent(new \DateTime("now"));
+                        $new->setContent($text);
+                        $new->setSender($char);
+                        if ($msg !== NULL) {
+                                $target = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($msg);
+                                if ($target) {
+                                        $new->setReplyTo($target);
+                                }
+                        }
+                        $new->setConversation($conv);
+                        $this->em->flush();
+                        return $new;
+                } else {
+                        return 'noActivePerm';
                 }
         }
 }
