@@ -68,18 +68,7 @@
 {% endif %}
 
 <h3>{{ 'unread.title'|trans({}, "conversations")|title }}</h3>
-{# add a simple form - hidden input field with id, button to click "mark as read" #}
-<ul>
-{% for perm in unread %}
-	{% if perm.conversation.realm %}
-		<li><a href="{{ path('maf_conv_read', {'conv':perm.conversation.id}) }}">{{ perm.conversation.conversation.realm.name }}: {{ perm.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":perm.unread}, "conversations") }})
-	{% else %}
-		<li><a href="{{ path('maf_conv_read', {'conv':perm.conversation.id}) }}">{{ perm.conversation.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":perm.unread}, "conversations") }})</li>
-	{% endif %}
-{% else %}
-	<li>{{ 'summary.nonew'|trans({}, "conversations") }}</li>
-{% endfor %}
-</ul>
+{% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
 
 {% if others %}
 <div id="nearbyothers">
