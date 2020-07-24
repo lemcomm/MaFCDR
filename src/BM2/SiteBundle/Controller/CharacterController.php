@@ -87,7 +87,6 @@ class CharacterController extends Controller {
 			'entourage' => $character->getActiveEntourageByType(),
 			'units' => $character->getUnits(),
 			'dead_entourage' => $character->getDeadEntourage()->count(),
-			'dead_soldiers' => $character->getDeadSoldiers()->count(),
 		);
 
 	}
@@ -120,7 +119,7 @@ class CharacterController extends Controller {
 
 		return array(
 			'events' => $this->get('character_manager')->findEvents($character),
-			'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
+			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 			'others' => $this->get('geography')->findCharactersInSpotRange($character),
 			'spottings' => $this->getSpottings($character),
 			'battles' => $this->get('geography')->findBattlesNearMe($character, Geography::DISTANCE_BATTLE),
