@@ -67,7 +67,7 @@ class UpdateSoldiersCommand extends ContainerAwareCommand {
 			$output->writeln("Beginning execution loop...");
 			$em->clear();
 
-			while (($row = $result->next()) !== false) {
+			while (($row = $result->next()) !== false AND $executions < $execLimit) {
 				$c = $row[0];
 	                        if ($c->getSoldiersOld()->isEmpty()) {
 	                                $output->writeln('No units needed for '.$c->getName().'. ('.$progress.'/'.$allCount.')');
