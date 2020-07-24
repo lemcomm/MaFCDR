@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -2725,6 +2726,34 @@ class Dispatcher {
 		# Not even sure there's a reason to have this here besides standardization. --Andrew
 		return array("name"=>"meta.unitsettings.name", "url"=>"bm2_site_character_unitsettings", "description"=>"meta.unitsettings.description");
 	}*/
+
+	/* ========== Conversation Tests ========== */
+
+	public function conversationListTest() {
+		return ["name"=>"conv.list.name", "url"=>"maf_convs", "description"=>"conv.list.description"];
+	}
+
+	public function conversationSummaryTest() {
+		return ["name"=>"conv.summary.name", "url"=>"maf_conv_summary", "description"=>"conv.summary.description"];
+	}
+
+	public function conversationUnreadTest() {
+		return ["name"=>"conv.unread.name", "url"=>"maf_conv_unread", "description"=>"conv.unread.description"];
+	}
+
+	public function conversationSingleTest($ignored, Conversation $conv) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
+	}
+
+	public function conversationReplyTest($ignored, Conversation $conv) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.reply.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.reply.name", "url"=>"maf_conv_read", "description"=>"conv.reply.description"];
+	}
 
 	/* ========== various tests and helpers ========== */
 
