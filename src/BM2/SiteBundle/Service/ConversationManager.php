@@ -20,7 +20,7 @@ class ConversationManager {
         }
 
         public function getConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT m,c FROM BM2SiteBundle:Conversation c JOIN c.permission p WHERE p.character = :me ORDER BY c.realm ASC, c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me ORDER BY c.realm ASC, c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
@@ -29,7 +29,7 @@ class ConversationManager {
                 $query1 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me');
                 $query1->setParameter('me', $char);
                 $result1 = $query1->getResult();
-                $query2 = $this->em->createQuery('SELECT DISTINCT c FROM BM2SiteBundle:Character c JOIN c.conv_permission p JOIN p.conversation t WHERE t IN :conv');
+                $query2 = $this->em->createQuery('SELECT DISTINCT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN :conv');
                 $query2->setParameter('conv', $result1);
                 return $query2->getResult();
 	}
@@ -113,7 +113,7 @@ class ConversationManager {
         }
 
         public function countFlaggedMessages(Character $char) {
-                
+
         }
 
         public function leaveConversation(Character $char, Converastion $conv) {
