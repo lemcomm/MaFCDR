@@ -1,0 +1,62 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'summary.title'|trans({}, "conversations")|title }}</h2>
+
+<div id="actionlist" class="boxlist">
+	<ul>
+		{% if total > 0 %}
+			<li>
+				<a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a>
+				{{ 'summary.total'|trans({"%conversations%":total, "%active%":active}, "conversations") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'index.title'|trans({}, "conversations") }}</span>
+				{{ 'summary.nototal'|trans({}, "conversations") }}
+			</li>
+		{% endif %}
+		{% if flagged > 0 %}
+			<li>
+				<a href="{{ path('maf_conv_flagged') }}">{{ 'flagged.title'|trans({}, "conversations") }}</a>
+				{{ 'summary.flagged'|trans({"%messages%":flagged}, "conversations") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'flagged.title'|trans({}, "conversations") }}</span>
+				{{ 'summary.noflagged'|trans({}, "conversations") }}
+			</li>
+		{% endif %}
+		<li>
+			<a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.label'|trans({}, "conversations") }}</a>
+			{{ 'conversation.new.desc'|trans({}, "conversations") }}
+		</li>
+	</ul>
+</div>
+<br class="clear"/>
+
+
+{# FIXME: this is a code-duplication from unread.html.twig - there is a way to include it without the layout, but I don't remember #}
+<h2>{{ 'unread.title'|trans({}, "conversations")|title }}</h2>
+<p>
+{% if new.messages > 0 %}
+	{{ 'summary.new'|trans({"%messages%":new.messages, "%conversations%":new.conversations}, "conversations") }}
+{% else %}
+	{{ 'unread.title'|trans({}, "conversations") }}
+{% endif %}
+</p>
+<ul>
+{% for perm in unread %}
+	{% if perm.conversation.realm %}
+		<li><a href="{{ path('maf_conv_read', {'conv':perm.conversation.id}) }}">{{ perm.conversation.conversation.realm.name }}: {{ perm.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":perm.unread}, "conversations") }})
+	{% else %}
+		<li><a href="{{ path('maf_conv_read', {'conv':perm.conversation.id}) }}">{{ perm.conversation.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":perm.unread}, "conversations") }})</li>
+	{% endif %}
+{% endfor %}
+</ul>
+
+{% if not local_news.isempty %}
+	{% include "BM2SiteBundle:element:newslist.html.twig" with {"title":"news.local2"|trans({},"communication")|title, "list":local_news} only %}
+{% endif %}
+
+{% endblock %}
