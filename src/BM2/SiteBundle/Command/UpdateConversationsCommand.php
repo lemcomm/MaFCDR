@@ -61,6 +61,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 	                        $participants = new ArrayCollection();
 	                        $foundStart = false;
 	                        $foundOwner = false;
+				$start = null;
 				$counter++;
 				$microCounter++;
 				$executions++;
@@ -80,24 +81,26 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 		                        }
 
 		                        # Check for Realm association and carry over.
-		                        if ($oldConv->getAppReference()) {
-		                                $newConv->setRealm($oldConv->getAppReference());
+		                        if ($realm = $oldConv->getAppReference()) {
+		                                $newConv->setRealm($realm);
 		                        }
 
 		                        # Flag this as a legacy conversation.
 		                        $newConv->setType('legacy');
 
 		                        # Start sorting through messages...
-					$output->write("Converting messages");
+					$output->writeln("Converting messages...");
 		                        foreach ($oldConv->getMessages() as $oldMsg) {
 						$output->writeln("Found message ".$oldMsg->getId().", converting...");
 		                                $newMsg = new Message();
 		                                $em->persist($newMsg);
+						$newMsg->setConversation($newConv);
 
 		                                # Check if we have conversation start date yet and set if don't.
 		                                if (!$foundStart) {
 		                                        # Due to how the old message system calls messages, the first message returned by getMessages() is the first in that convo.
-		                                        $newConv->setCreated($oldMsg->getTs());
+							$start = $oldMsg->getTs();
+							$newConv->setCreated($start);
 		                                        $foundStart = true;
 		                                }
 
@@ -105,30 +108,35 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 		                                $newMsg->setSent($oldMsg->getTs());
 						$newMsg->setCycle($oldMsg->getCycle());
 
-		                                # Check if we've already seen this participant and build permissions if not. System messages will not have a participant, and thus we skip this.
+						# System messages will not have a participant, and thus we skip this.
 		                                if ($oldMsg->getSender()) {
-		                                        $newMsg->setSender($oldMsg->getSender()->getAppUser());
-		                                        if (!$participants->contains($oldMsg->getSender()->getAppUser())) {
-								$output->writeln("Creating new permission...");
-		                                                $participants->add($oldMsg->getSender()->getAppUser());
-		                                                $perm = new ConversationPermission();
-		                                                $perm->setCharacter($oldMsg->getSender()->getAppUser());
-		                                                $perm->setConversation($newConv);
-		                                                $em->persist($perm);
+							$char = $oldMsg->getSender()->getAppUser();
+		                                        $newMsg->setSender($char);
+			                                # Check if we've already seen this participant and build permissions if not.
+							if (!$realm) {
+			                                        if (!$participants->contains($char)) {
+									$output->writeln("... creating private permission for ".$char->getName()." (".$char->getId().")...");
+			                                                $participants->add($char);
+			                                                $perm = new ConversationPermission();
+			                                                $perm->setCharacter($char);
+			                                                $perm->setConversation($newConv);
+									$perm->setActive(true);
+			                                                $em->persist($perm);
 
-		                                                $perm->setStartTime($oldMsg->getTs());
-		                                                if (!$foundOwner && !$oldConv->getSystem()) {
-		                                                        # We don't have an owner yet, and this isn't a system-managed conversation, so we need one.
-		                                                        $perm->setOwner(true);
-		                                                        $foundOwner = true;
-		                                                } else {
-									$perm->setOwner(false);
-								}
-								$perm->setManager(false);
-		                                                $perm->setUnread(0);
-								$permCount++;
-								$microPermCount++;
-		                                        }
+			                                                $perm->setStartTime($oldMsg->getTs());
+			                                                if (!$foundOwner && !$oldConv->getSystem()) {
+			                                                        # We don't have an owner yet, and this isn't a system-managed or realmconversation, so we need one.
+			                                                        $perm->setOwner(true);
+			                                                        $foundOwner = true;
+			                                                } else {
+										$perm->setOwner(false);
+									}
+									$perm->setManager(false);
+			                                                $perm->setUnread(0);
+									$permCount++;
+									$microPermCount++;
+			                                        }
+							}
 		                                }
 		                                $newMsg->setContent($oldMsg->getContent());
 		                                $newMsg->setType('legacy');
@@ -138,6 +146,23 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 					if (!$foundStart) {
 						$newConv->setCreated(new \DateTime("now")); #Sigh.
 					}
+					if ($realm) {
+						$output->writeln("Creating new realm conversation permissions...");
+						foreach ($realm->findMembers() as $char) {
+							$output->writeln("... creating permission for ".$char->getName()." (".$char->getId().")...");
+							$perm = new ConversationPermission();
+							$em->persist($perm);
+							$perm->setCharacter($char);
+							$perm->setConversation($newConv);
+							$perm->setStartTime($start);
+							$perm->setActive(true);
+							$perm->setOwner(false);
+							$perm->setManager(false);
+							$perm->setUnread(0);
+							$permCount++;
+							$microPermCount++;
+						}
+					}
 		                        $em->remove($oldConv); #Cascade delete via entity removes all children objects. :)
 				} else {
 					$output->writeln("Skipping empty conversation...");
@@ -145,7 +170,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 					$skipped++;
 				}
 	                }
-			$output->writeln("Inserting '.$microCounter.' conversations, '.$microMsgCount.' messages and '.$microPermCount.' permissions to database...");
+			$output->writeln("Inserting ".$microCounter." conversations, ".$microMsgCount." messages and ".$microPermCount." permissions to database...");
 			$em->flush();
 			if ($executions == $execLimit) {
 				$output->writeln('Execution limit reached. Resetting doctrine...');
