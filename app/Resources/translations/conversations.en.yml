@@ -89,10 +89,12 @@ conversation:
  old:
   show:     show older messages
   hide:     hide old messages
+ created:   Your message has been created. You can view it <a href="%url%">here</a>.
 
 message:
  content:
   label:		Content
+  type:   Type
  reply:
   title:		Reply to Message
   submit:	  send reply
