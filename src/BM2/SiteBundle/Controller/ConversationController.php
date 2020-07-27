@@ -5,7 +5,9 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Message;
+use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Form\MessageReplyType;
+use BM2\SiteBundle\Form\NewConversationType;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -14,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @Route("/conv")
@@ -83,13 +86,13 @@ class ConversationController extends Controller {
 	  * @Route("/contacts", name="maf_contacts")
 	  */
 	public function contactsAction() {
-		# TODO: All of this function. And all the supporting code because, lol.
+		return new Response("Feature not yet implemented. Try again later.");
                 $char = $this->get('dispatcher')->gateway('conversationContactsTest');
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
 
-		return array('contacts' => $this->get('conversation_manager')->getLegacyContacts($char));
+		return new Response(['contacts' => $this->get('conversation_manager')->getLegacyContacts($char)]);
 	}
 
 	/**
@@ -108,7 +111,7 @@ class ConversationController extends Controller {
 		$total = $messages->count();
 
 		if ($unread) {
-			$lastPerm->setUnread(NULL);
+			$lastPerm->setUnread(0);
 			$i = 0;
 			foreach ($messages as $m) {
 				$i++;
@@ -120,6 +123,9 @@ class ConversationController extends Controller {
 		} else {
 			$unread = 0;
 			$last = NULL;
+		}
+		if ($lastPerm->getActive()) {
+			$lastPerm->setLastAccess(new \DateTime('now'));
 		}
 
 		#Find the timestamp of the last read message.
@@ -140,35 +146,54 @@ class ConversationController extends Controller {
 	/**
 	  * @Route("/participants/{conv}", name="maf_conv_participants", requirements={"conv"="\d+"})
 	  */
-	public function participantsAction(ConversationMetadata $meta) {
-		# TODO: All of this function.
-		$user = $this->get('message_manager')->getCurrentUser();
+	public function participantsAction(Conversation $conv) {
+                $char = $this->get('dispatcher')->gateway('conversationManageTest', false, true, false, $conv);
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
 
-		if ($meta->getUser() != $user) {
-			throw new AccessDeniedHttpException($this->get('translator')->trans('error.conversation.noaccess', array(), "MsgBundle"));
+		#TODO: Make this only list the permissions we can see with our own. Because it'd be neat.
+
+		$perms = $conv->findRelevantPermissions($char);
+
+		return $this->render('Conversation/participants.html.twig', [
+			'conv' =>$conv,
+			'perms'=>$perms,
+		]);
+	}
+
+	/**
+	  * @Route("{conv}/demote/{perm}/{var}", name="maf_conv_manage", requirements={"conv"="\d+", "perm"="\d+", "var"="\d+"})
+	  */
+	public function changePermissionAction(Conversation $conv, ConversationPermission $perm, $var) {
+                $char = $this->get('dispatcher')->gateway('conversationChangeTest', false, true, false, $conv);
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		if ($conv->findActivePermissions($char)) {
+
 		}
 
-		$metas = $meta->getConversation()->getMetadata();
+		$active = $conv->findActivePermissions();
 
-		$em = $this->getDoctrine()->getManager();
-		$rights = $em->getRepository('MsgBundle:Right')->findAll();
-
-		return array('metas'=>$metas, 'rights'=>$rights, 'my_meta'=>$meta);
+		return $this->render('Conversation/conversation.html.twig', [
+			'perms'=>$active,
+			'my_meta'=>$meta
+		]);
 	}
 
 	/**
 		* @Route("/new", name="maf_conv_new")
-		* @Route("/new/{realm}", name="maf_conv_realm_new")
+		* @Route("/new/r/{realm}", name="maf_conv_realm_new")
 		*/
-	public function newconversationAction(Request $request, Realm $realm=null) {
-		# TODO: All of this function.
-		$user = $this->get('message_manager')->getCurrentUser();
-		$character = $this->get('appstate')->getCharacter();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
+	public function newConversationAction(Request $request, Realm $realm=null) {
+                $char = $this->get('dispatcher')->gateway('conversationNewTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
 
-		if ($realm && !$character->findRealms()->contains($realm)) {
+		if ($realm && !$char->findRealms()->contains($realm)) {
 			$realm = null;
 		}
 
@@ -177,17 +202,17 @@ class ConversationController extends Controller {
 			$distance = null;
 			$settlement = null;
 		} else {
-			if ($character->getAvailableEntourageOfType("herald")->isEmpty()) {
-				$distance = $this->get('geography')->calculateInteractionDistance($character);
+			if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
+				$distance = $this->get('geography')->calculateInteractionDistance($char);
 			} else {
-				$distance = $this->get('geography')->calculateSpottingDistance($character);
+				$distance = $this->get('geography')->calculateSpottingDistance($char);
 			}
-			$this->get('dispatcher')->setCharacter($character);
+			$this->get('dispatcher')->setCharacter($char);
 			$settlement = $this->get('dispatcher')->getActionableSettlement();
-			$contacts = $this->get('message_manager')->getContactsList();
+			$contacts = $this->get('conversation_manager')->getLegacyContacts($char);
 		}
 
-		$form = $this->createForm(new NewConversationType($contacts, $distance, $character, $settlement, $realm));
+		$form = $this->createForm(new NewConversationType($contacts, $distance, $char, $settlement, $realm));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -195,39 +220,36 @@ class ConversationController extends Controller {
 
 			$recipients = new ArrayCollection;
 			if (isset($data['nearby'])) foreach ($data['nearby'] as $rec) {
-				$r = $this->get('message_manager')->getMsgUser($rec);
-				if (!$recipients->contains($r)) {
-					$recipients->add($r);
+				if (!$recipients->contains($rec)) {
+					$recipients->add($rec);
 				}
 			}
 			if (isset($data['captor'])) foreach ($data['captor'] as $rec) {
-				$r = $this->get('message_manager')->getMsgUser($rec);
-				if (!$recipients->contains($r)) {
-					$recipients->add($r);
+				if (!$recipients->contains($rec)) {
+					$recipients->add($rec);
 				}
 			}
 			if (isset($data['contacts'])) foreach ($data['contacts'] as $rec) {
-				$r = $this->get('message_manager')->getMsgUser($rec);
-				if (!$recipients->contains($r)) {
-					$recipients->add($r);
+				if (!$recipients->contains($rec)) {
+					$recipients->add($rec);
 				}
 			}
 			if (isset($data['owner'])) foreach ($data['owner'] as $rec) {
-				$r = $this->get('message_manager')->getMsgUser($rec);
-				if (!$recipients->contains($r)) {
-					$recipients->add($r);
+				if (!$recipients->contains($rec)) {
+					$recipients->add($rec);
 				}
 			}
-/*
-	FIXME: parent is disabled until fixed in NewConversationType
-			$this->get('message_manager')->newConversation($user, $recipients, $data['topic'], $data['content'], $data['parent'], $realm);
-*/
-			$this->get('message_manager')->newConversation($user, $recipients, $data['topic'], $data['content'], null, $realm);
-			$this->getDoctrine()->getManager()->flush();
-			return $this->redirectToRoute('cmsg_summary');
+
+			$conv = $this->get('conversation_manager')->newConversation($char, $recipients, $data['topic'], $data['type'], $data['content'], $realm);
+			if ($conv === 'no recipients') {
+				#TODO: Throw exception!
+			}
+			$url = $this->generateUrl('maf_conv_read', ['conv' => $conv->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
+			return $this->redirectToRoute('maf_conv_summary');
 		}
 
-		return $this->render('Conversation/conversation.html.twig', [
+		return $this->render('Conversation/new.html.twig', [
 			'form' => $form->createView(),
 			'realm' => $realm
 		]);
