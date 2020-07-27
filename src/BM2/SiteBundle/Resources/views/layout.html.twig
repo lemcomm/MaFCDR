@@ -199,17 +199,17 @@
 	<div class="symfony-content" data-role="content">
 		{% for flashMessage in app.session.flashbag.get('error') %}
 		<div class="flash-message" data-role="header" data-theme="e">
-			{{ flashMessage|trans }}
+			{{ flashMessage|trans|raw }}
 		</div>
 		{% endfor %}
 		{% for flashMessage in app.session.flashbag.get('warning') %}
 		<div class="flash-message" data-role="header" data-theme="e">
-			{{ flashMessage|trans }}
+			{{ flashMessage|trans|raw }}
 		</div>
 		{% endfor %}
 		{% for flashMessage in app.session.flashbag.get('notice') %}
 		<div class="flash-message" data-role="header" data-theme="e">
-			{{ flashMessage|trans }}
+			{{ flashMessage|trans|raw }}
 		</div>
 		{% endfor %}
 		{% block content %}
