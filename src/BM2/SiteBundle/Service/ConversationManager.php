@@ -10,6 +10,7 @@ use Monolog\Logger;
 use BM2\SiteBundle\Service\AppState;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
+use BM2\SiteBundle\Entity\ConversationPermission;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Realm;
 
@@ -38,10 +39,12 @@ class ConversationManager {
         }
 
         public function getLegacyContacts(Character $char) {
-                $query1 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me');
+                # Fetch all conversations in which I have an active permission...
+                $query1 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = TRUE');
                 $query1->setParameter('me', $char);
                 $result1 = $query1->getResult();
-                $query2 = $this->em->createQuery('SELECT DISTINCT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN :conv');
+                # Fetch all distinct characters who have permissions in a conversation I'm part of.
+                $query2 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (:conv)');
                 $query2->setParameter('conv', $result1);
                 return $query2->getResult();
 	}
@@ -226,5 +229,60 @@ class ConversationManager {
                 } else {
                         return 'noActivePerm';
                 }
+        }
+
+        public function newConversation(Character $char, $recipients=null, $topic, $type, $content, Realm $realm = null) {
+                if ($recipients === NULL && $realm === NULL) {
+                        return 'no recipients';
+                }
+                $now = new \DateTime("now");
+                $cycle = $this->appstate->getCycle();
+
+                $conv = new Conversation();
+                $this->em->persist($conv);
+                $conv->setTopic($topic);
+                $conv->setCreated($now);
+                $conv->setActive(true);
+                $conv->setCycle($cycle);
+                $conv->setUpdated($now);
+
+                $msg = new Message();
+                $this->em->persist($msg);
+                $msg->setConversation($conv);
+                $msg->setSender($char);
+                $msg->setSent($now);
+                $msg->setType($type);
+                $msg->setCycle($cycle);
+                $msg->setContent($content);
+
+                $creator = new ConversationPermission();
+                $this->em->persist($creator);
+                if (!$realm) {
+                        $creator->setOwner(true);
+                        $creator->setManager(true);
+                } else {
+                        $conv->setRealm($realm);
+                        $recipients = $realm->findMembers();
+                }
+                $creator->setStartTime($now);
+                $creator->setActive(true);
+                $creator->setUnread(0);
+                $creator->setConversation($conv);
+                $creator->setCharacter($char);
+                $creator->setLastAccess($now);
+                foreach ($recipients as $recipient) {
+                        $perm = new ConversationPermission();
+                        $this->em->persist($perm);
+                        $perm->setStartTime($now);
+                        $perm->setCharacter($recipient);
+                        $perm->setConversation($conv);
+                        $perm->setOwner(false);
+                        $perm->setManager(false);
+                        $perm->setActive(true);
+                        $perm->setUnread(1);
+                }
+
+                $this->em->flush();
+                return $conv;
         }
 }
