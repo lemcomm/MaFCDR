@@ -29,7 +29,34 @@ class Conversation {
 
         public function findActiveCharPermission($char) {
                 $criteria = Criteria::create()->where(Criteria::expr()->eq("character", $char))->andWhere(Criteria::expr()->eq("active", true));
-                return $this->getPermissions()->matching($criteria);
+                return $this->getPermissions()->matching($criteria)->first();
+        }
+
+        public function findRelevantPermissions($char) {
+                $all = $this->getPermissions();
+                $mine = $this->findCharPermissions($char);
+                $return = new ArrayCollection();
+                foreach ($all as $perm) {
+                        foreach ($mine as $each) {
+                                if ($mine == $perm) {
+                                        if (!$return->contains($mine)) {
+                                                $return->add($mine);
+                                        }
+                                        break;
+                                }
+                                if (
+                                        ($perm->getActive() && $each->getActive()) ||
+                                        ($perm->getStartTime() > $each->getStartTime() && (($perm->getStartTime() < $each->getEndTime()) || $each->getActive())) &&
+                                        (($perm->getEndTime() < $each->getEndTime()) || $perm->getEndTime() && $each->getActive())
+                                ) {
+                                        if (!$return->contains($perm)) {
+                                                $return->add($perm);
+                                        }
+                                        break;
+                                }
+                        }
+                }
+                return $return;
         }
 
         public function findMessages($char) {
