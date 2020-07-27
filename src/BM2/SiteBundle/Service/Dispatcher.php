@@ -2741,9 +2741,35 @@ class Dispatcher {
 		return ["name"=>"conv.unread.name", "url"=>"maf_conv_unread", "description"=>"conv.unread.description"];
 	}
 
+	public function conversationContactsTest() {
+		return ["name"=>"conv.contacts.name", "url"=>"maf_conv_contacts", "description"=>"conv.unrcontactsead.description"];
+	}
+
+	public function conversationNewTest() {
+		return ["name"=>"conv.new.name", "url"=>"maf_conv_new", "description"=>"conv.new.description"];
+	}
+
 	public function conversationSingleTest($ignored, Conversation $conv) {
 		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
 			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
+	}
+
+	public function conversationManageTest($ignored, Conversation $conv) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
+	}
+
+	public function conversationChangeTest($ignored, Conversation $conv) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		$perm = $conv->findActiveCharPermission($this->getCharacter());
+		if (!$perm->getManager() OR !$perm->getOwner()) {
+			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.notmanager"];
 		}
 		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
 	}
