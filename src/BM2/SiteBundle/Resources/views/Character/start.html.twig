@@ -45,7 +45,7 @@
 			{{ form_widget(form_existing) }}
 		</form>
 
-		{% if not character.user.isverynewplayer %}
+		{% if not character.user.isverynewplayer or (character.user.isverynewplayer and not count) %}
 			<h3>{{ 'character.start.selection'|trans|title }}</h3>
 			<p>{{ 'character.start.mapintro'|trans|raw }}</p>
 
