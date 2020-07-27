@@ -1,0 +1,41 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'participants.title'|trans({}, "conversations")|title }}</h2>
+{% if conv.realm %}
+	<p>{{ 'participants.managed'|trans({"%reference%":link(conv.realm)}, "conversations")|raw }}</p>
+{% endif %}
+<table>
+	{# <thead>
+		<tr>
+			<th></th>
+			{% for right in rights %}
+				<th>{{ ('right.'~right.name)|trans({}, "conversations") }}</th>
+			{% endfor %}
+		</tr>
+	</thead> #}
+	<tbody>
+	{% for perm in perms %}
+		<tr>
+			<td>{{ link(perm.character) }}</td>
+			{# Disabled for testing...
+			{% for right in rights %}
+				<td align="center">
+				{% if meta.hasright(right) %}
+					<span class="cmsg_on icon-checkmark">&nbsp;</span>
+				{% else %}
+					<span class="cmsg_off icon-blocked">&nbsp;</span>
+				{% endif %}
+				</td>
+			{% endfor %}
+			{% if my_meta.hasRightByName("owner") or my_meta.hasRightByName("remove") %}
+				<td align="center">
+					<button class="action_remove" data-id="{{ meta.user.id }}">{{ ('participants.do.remove')|trans({}, "conversations") }}</button>
+				</td>
+			{% endif %}
+			#}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
