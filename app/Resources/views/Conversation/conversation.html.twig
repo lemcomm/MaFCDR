@@ -2,6 +2,11 @@
 
 {% block content %}
 <h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
+{% if conversation.realm is null %}
+	<p align="right">
+		<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
+	</p>
+{% endif %}
 
 {% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last} %}
 
@@ -28,37 +33,15 @@
 	{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
 </div>
 
+{% if conversation.realm is null %}
+	<p align="right">
+		<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
+	</p>
+{% endif %}
+
 {% endblock %}
 
 {% block jquery %}
-var request;
-$("button.convo_leave").click(function(){
-	var id = $(this).data('id');
-
-	// abort any pending request
-	if (request) {
-		request.abort();
-	}
-
-	var target = $(this).parent();
-	// fire off the request
-	request = $.ajax({
-		url: "{{ path('cmsg_leave') }}",
-		type: "post",
-		data: { 'id': id },
-	});
-
-	// callback handler that will be called on success
-	request.done(function (response, textStatus, jqXHR){
-		window.location = "{{ path('cmsg_index') }}";
-	});
-
-	// callback handler that will be called on failure
-	request.fail(function (jqXHR, textStatus, errorThrown){
-		$("#ajax_errors").html(textStatus);
-	});
-
-});
 
 realmselect($("#realmsearch"), realmchange);
 settlementselect($("#settlementsearch"), settlementchange);
