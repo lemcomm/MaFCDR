@@ -285,4 +285,51 @@ class ConversationManager {
                 $this->em->flush();
                 return $conv;
         }
+
+        public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data, Character $data2, $flush=true) {
+                $now = new \DateTime("now");
+                $cycle = $this->appstate->getCycle();
+                if ($type == 'newperms') {
+                        $content = $data2->getName().' has added the following people to the conversation: ';
+                        $count = $data->count();
+                        $i = 0;
+                        foreach ($data as $char) {
+                                $i++;
+                                if ($i == $count) {
+                                        $content .= 'and '.$char->getName().'.';
+                                } else {
+                                        $content .= $char->getName().', ';
+                                }
+                        }
+                } elseif ($type == 'delperms') {
+                        $content = $data2->getName().' has removed the following people from the conversation: ';
+                        $count = $data->count();
+                        $i = 0;
+                        foreach ($data as $char) {
+                                $i++;
+                                if ($i == $count) {
+                                        $content .= 'and '.$char->getName().'.';
+                                } else {
+                                        $content .= $char->getName().', ';
+                                }
+                        }
+                }
+
+                $msg = new Message();
+                $this->em->persist($msg);
+                $msg->setConversation($conv);
+                $msg->setSent($now);
+                $msg->setType('system');
+                $msg->setCycle($cycle);
+                $msg->setContent($content);
+                if (!$conv->getRealm()) {
+                        foreach ($conv->getActiveConvPermissions() as $perm) {
+                                $perm->setUnread($perm->getUnread()+1);
+                        }
+                }
+
+                if ($flush) {
+                        $this->em->flush();
+                }
+        }
 }
