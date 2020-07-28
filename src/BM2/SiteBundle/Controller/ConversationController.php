@@ -69,7 +69,7 @@ class ConversationController extends Controller {
 	}
 
 	/**
-	  * @Route("/unread", name="maf_unread")
+	  * @Route("/unread", name="maf_conv_unread")
 	  */
 	public function unreadAction() {
                 $char = $this->get('dispatcher')->gateway('conversationUnreadTest');
@@ -152,21 +152,143 @@ class ConversationController extends Controller {
                         return $this->redirectToRoute($char);
                 }
 
-		#TODO: Make this only list the permissions we can see with our own. Because it'd be neat.
+		$perms = $conv->findRelevantPermissions($char); #Get what permissions we're aware of.
 
-		$perms = $conv->findRelevantPermissions($char);
+		$manager = false;
+		$owner = false;
+		$form = null;
+		if (!$conv->getRealm()) {
+			if ($me = $conv->findActiveCharpermission($char)) {
+				$manager = $me->getManager();
+				$owner = $me->getOwner();
+			}
+			if ($manager) {
+				$contacts = $this->get('conversation_manager')->getLegacyContacts($char);
+				foreach ($perms as $perm) {
+					if ($contacts->contains($perm->getCharacter())) {
+						$contacts->remove($perm->getCharacter()); #Remove people who already have permissions.
+					}
+				}
+				$form = new AddParticipantType($contacts);
+			}
+		}
 
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$em = $this->getDoctrine()->getManager();
+			$now = new \DateTime("now");
+			$added = new ArrayCollection();
+			foreach($data['characters'] as $char) {
+				# Double check we can actually add this person.
+				if ($contacts->contains($char)) {
+					$perm = new ConversatioNPermission();
+					$em->persist($perm);
+					$perm->setConversation($conv);
+					$perm->setCharacter($char);
+					$perm->setStartTime($now);
+					$perm->setActive(true);
+					$perm->setUnread(0);
+					$perm->setManager(false);
+					$perm->setOwner(false);
+					$added->add($char);
+				}
+			}
+			$message = $this->get('conversation_manager')->addSystemMessage($conv, 'newperms', $added, $char, false);
+			$this->em->flush();
+			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
+		}
 		return $this->render('Conversation/participants.html.twig', [
 			'conv' =>$conv,
 			'perms'=>$perms,
+			'manager'=>$manager,
+			'owner'=>$owner,
+			'form'=>$form,
 		]);
 	}
 
 	/**
-	  * @Route("{conv}/demote/{perm}/{var}", name="maf_conv_manage", requirements={"conv"="\d+", "perm"="\d+", "var"="\d+"})
+	  * @Route("/{conv}/demote/{perm}/{var}", name="maf_conv_manage", requirements={"conv"="\d+", "perm"="\d+", "var"="\d+"})
 	  */
 	public function changePermissionAction(Conversation $conv, ConversationPermission $perm, $var) {
                 $char = $this->get('dispatcher')->gateway('conversationChangeTest', false, true, false, $conv);
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		if ($me = $conv->findActivePermissions($char)) {
+			if ($me->getOwner()) {
+				if (!$perm->getManager()) {
+					if ($var === 0) {
+						$perm->setActive(false);
+						$change = 'permission.demoted.removed';
+					} elseif ($var === 1) {
+						$perm->setManager(true);
+						$change = 'permission.promoted.manager';
+					}
+				} elseif ($perm->getOwner()) {
+					if ($var === 0) {
+						$perm->setOwner(false);
+						$change = 'permission.demoted.owner';
+					} elseif ($var === 1) {
+						$change = 'permission.promoted.invalid';
+					}
+				} else {
+					if ($var === 0) {
+						$perm->setManager(false);
+						$change = 'permission.demoted.manager';
+					} elseif ($var === 1) {
+						$perm->setOwner(true);
+						$change = 'permission.promoted.owner';
+					}
+				}
+			} elseif ($me->getManager()) {
+				if ($perm->getOwner() || $perm->getManager()) {
+					$change = 'permission.invalidrequest';
+				} else {
+					if ($var === 0) {
+						$perm->setActive(false);
+						$change = 'permission.demoted.removed';
+					} elseif ($var === 1) {
+						$change = 'permission.nopromoteright';
+					}
+				}
+			} else {
+				$change = 'permission.invalidrequest';
+			}
+		}
+
+		$this->addFlash('notice', $this->get('translator')->trans($change, ["%name%"=>$perm->getCharacter()->getName()], 'conversations'));
+
+		return $this->redirectToRoute('maf_conv_participants', ['conv'=>$conv->getId()]);
+	}
+
+	/**
+	  * @Route("/{conv}/leave", name="maf_conv_leave", requirements={"conv"="\d+"})
+	  */
+	public function leaveAction(Conversation $conv) {
+                $char = $this->get('dispatcher')->gateway('conversationLeaveTest', false, true, false, $conv);
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		if ($conv->findActivePermissions($char)) {
+
+		}
+
+		$active = $conv->findActivePermissions();
+
+		return $this->render('Conversation/conversation.html.twig', [
+			'perms'=>$active,
+			'my_meta'=>$meta
+		]);
+	}
+
+	/**
+	  * @Route("/{conv}/remove", name="maf_conv_remove", requirements={"conv"="\d+"})
+	  */
+	public function removeAction(Conversation $conv) {
+                $char = $this->get('dispatcher')->gateway('conversationRemoveTest', false, true, false, $conv);
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
