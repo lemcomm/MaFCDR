@@ -6,10 +6,6 @@
 		<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %}
 		 class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"
 		 {% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
-
-		{% if conversation.realm is null %}
-			<button class="convo_leave cmsg_button" data-id="{{ conversation.id }}" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button>
-		{% endif %}
 	</div>
 {% endmacro %}
 
