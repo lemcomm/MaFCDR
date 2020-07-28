@@ -360,19 +360,27 @@ class Character {
 	}
 
 	public function hasNewMessages() {
-		if ($this->getMsgUser()) {
-			return $this->getMsgUser()->hasNewMessages();
-		} else {
-			return false;
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getActive() == true;});
+		if ($permissions->count() > 0) {
+			foreach ($permissions as $perm) {
+				if ($perm->getUnread() > 0) {
+					return true;
+				}
+			}
 		}
+		return false;
 	}
 
 	public function countNewMessages() {
-		if ($this->getMsgUser()) {
-			return $this->getMsgUser()->countNewMessages();
-		} else {
-			return 0;
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getActive() == true;});
+		$total = 0;
+		if ($permissions->count() > 0) {
+			foreach ($permissions as $perm) {
+				$total += $perm->getUnread();
+			}
+			return $total;
 		}
+		return $total;
 	}
 
 	public function findActions($key) {
