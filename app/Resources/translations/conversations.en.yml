@@ -85,7 +85,10 @@ conversation:
   label:    %count% participants
  leave:
   label:    leave conversation
-  help:     remove yourself from this conversation and all sub-topics it might have.
+  help:     remove yourself from this conversation.
+ remove:
+  label:    remove conversation
+  help:     leave the conversation and delete your copies of it.
  old:
   show:     show older messages
   hide:     hide old messages
@@ -133,3 +136,15 @@ flag:
  act:         action required
  remind:      remind later
  keep:        keep/archive
+
+permission:
+ promoted:
+  manager:    %name% has been promoted to conversation manager.
+  owner:      %name% has been given conversation ownership rights.
+  invalid:    %name% can't be promoted past owner.
+ demoted:
+  removed:    %name% has been removed from the conversation.
+  user:       %name% has been demoted from their manager role.
+  manager:    %name% no longer has ownership rights.
+ invalidrequest:  You do not have rights to change roles for %name%.
+ nopromoteright:  You do not have rights to promote this member.
