@@ -85,7 +85,7 @@ class Conversation {
                 $all = new ArrayCollection();
                 foreach ($this->getMessages() as $msg) {
                         foreach ($perms as $perm) {
-                                if ($perm->getStart() <= $msg->getSent() AND ($msg->getSent() <= $perm->getEnd() OR $perm->getActive())) {
+                                if ($perm->getStartTime() <= $msg->getSent() AND ($msg->getSent() <= $perm->getEndTime() OR $perm->getActive())) {
                                         $all->add($msg);
                                         break;
                                 }
