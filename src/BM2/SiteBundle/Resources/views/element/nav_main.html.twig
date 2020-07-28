@@ -43,10 +43,10 @@
 				<li class="part">
 					<h3>{{ 'menu.messages'|trans|title }}</h3>
 					<ul>
-						<li><a href="{{ path('cmsg_summary') }}">{{ 'summary.title'|trans({}, "MsgBundle") }}</a></li>
-						<li><a href="{{ path('cmsg_unread') }}">{{ 'unread.short'|trans({}, "MsgBundle") }}</a></li>
-						<li><a href="{{ path('cmsg_index') }}">{{ 'index.title'|trans({}, "MsgBundle") }}</a></li>
-						<li><a href="{{ path('cmsg_new_conversation') }}">{{ 'conversation.new.title'|trans({}, "MsgBundle") }}</a></li>
+						<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.title'|trans({}, "conversations") }}</a></li>
 					</ul>
 				</li>
 				<li class="part">
