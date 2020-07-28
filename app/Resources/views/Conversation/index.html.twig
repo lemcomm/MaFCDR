@@ -2,25 +2,21 @@
 
 {% macro conversationrow(conv, char) %}
 <tr data-id="{{ conv.id }}">
+	{% set msgs = conv.findMessages(char) %}
 	<td><a href="{{ path('maf_conv_read', {'conv':conv.id}) }}">{{ conv.topic }}</a></td>
-	<td align="right">{{ conv.findMessages(char).count }}</td>
+	<td align="right">{{ msgs.count }}</td>
 	<td align="right">{{ conv.findUnread(char) }}</td>
 	<td align="right">{{ conv.findActivePermissions.count }}</td>
 	<td align="right">
-		{% set msg = conv.messages.first %}
+		{% set msg = msgs.first %}
 		{% if msg %}
 			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
 		{% endif %}
 	</td>
 	<td align="right">
-		{% set msg = conv.messages.last %}
+		{% set msg = msgs.last %}
 		{% if msg %}
 			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
-		{% endif %}
-	</td>
-	<td>
-		{% if conv.realm is null %}
-			<button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button>
 		{% endif %}
 	</td>
 </tr>
@@ -52,7 +48,7 @@
 					<td colspan="7" class="cmsg_header">
 						{% if conv.realm %}
 							{{ "index.ref"|trans({"%ref%":link(conv.realm)}, "conversations")|raw }}
-							<a href="{{ path("cmsg_new_conversation_in_group", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+							<a href="{{ path("maf_conv_realm_new", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
 						{% else %}
 							{{ 'index.ref2'|trans({}, "conversations") }}
 						{% endif %}
@@ -65,7 +61,6 @@
 					<th>{{ 'index.participants'|trans({}, "conversations") }}</th>
 					<th>{{ 'index.first'|trans({}, "conversations") }}</th>
 					<th>{{ 'index.last'|trans({}, "conversations") }}</th>
-					<th style="width:12em" data-sorter="false"></th>{# FIXME: this is a kludge to prevent the buttons from wrapping #}
 				</tr>
 			</thead>
 			<tbody>
@@ -83,34 +78,4 @@ $(".cmsg_table").bind("sortStart",function() {
 	$(".icon-forward").remove();
 });
 
-var request;
-$("button.convo_leave").click(function(){
-	var id = $(this).closest("tr").data('id');
-
-	// abort any pending request
-	if (request) {
-		request.abort();
-	}
-
-	var target = $(this).parent();
-	// fire off the request
-	request = $.ajax({
-		url: "{{ path('cmsg_leave') }}",
-		type: "post",
-		data: { 'id': id },
-	});
-
-	// callback handler that will be called on success
-	request.done(function (response, textStatus, jqXHR){
-		for (var key in response) {
-			$('tr[data-id="'+response[key]+'"]').remove();
-		}
-	});
-
-	// callback handler that will be called on failure
-	request.fail(function (jqXHR, textStatus, errorThrown){
-		$("#ajax_errors").html(textStatus);
-	});
-
-});
 {% endblock %}
