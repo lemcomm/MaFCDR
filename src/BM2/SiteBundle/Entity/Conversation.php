@@ -32,34 +32,55 @@ class Conversation {
                 return $this->getPermissions()->matching($criteria)->first();
         }
 
-        public function findRelevantPermissions($char) {
+        public function findRelevantPermissions(Character $char, $admin=false) {
                 $all = $this->getPermissions();
-                $mine = $this->findCharPermissions($char);
+                if ($admin) {
+                        # Admin debug override. Admin view also displays start/end times for permissions.
+                        return $all;
+                }
+                $allmine = $this->findCharPermissions($char);
                 $return = new ArrayCollection();
                 foreach ($all as $perm) {
-                        foreach ($mine as $each) {
-                                if ($mine == $perm) {
-                                        if (!$return->contains($mine)) {
-                                                $return->add($mine);
-                                        }
+                        foreach ($allmine as $mine) {
+                                if ($perm == $mine) {
+                                        $return->add($perm); #We can always see our own.
                                         break;
                                 }
-                                if (
-                                        ($perm->getActive() && $each->getActive()) ||
-                                        ($perm->getStartTime() > $each->getStartTime() && (($perm->getStartTime() < $each->getEndTime()) || $each->getActive())) &&
-                                        (($perm->getEndTime() < $each->getEndTime()) || $perm->getEndTime() && $each->getActive())
-                                ) {
-                                        if (!$return->contains($perm)) {
+                                #Crosscheck permissions. If no if statement resolves true, we can't see it.
+                                if($perm->getActive()) {
+                                        # If we're both active, I can see it.
+                                        if ($mine->getActive()) {
                                                 $return->add($perm);
+                                                break;
                                         }
-                                        break;
+                                        # Check if theirs started while mine was active.
+                                        if ($mine->getStartTime() < $perm->getStartTime() && $perm->getStartTime() < $mine->getEndTime()) {
+                                                $return->add($perm);
+                                                break;
+                                        }
+                                } else {
+                                        # If mine is active, and started before theirs ended, I can see it.
+                                        if ($mine->getActive() && $mine->getStartTime() < $perm->getEndTime()) {
+                                                $return->add($perm);
+                                                break;
+                                        }
+                                        # Check if their's ended while mine was active.
+                                        if ($mine->getStartTime() < $perm->getEndTime() && $perm->getEndTime() < $mine->getEndTime()) {
+                                                $return->add($perm);
+                                                break;
+                                        }
+                                        # Check if their's started while mine was active.
+                                        if ($mine->getStartTime() < $perm->getStartTime() && $perm->getStartTime() < $mine->getEndTime()) {
+                                                $return->add($perm);
+                                                break;
+                                        }
                                 }
                         }
                 }
                 return $return;
         }
 
-        public function findMessages($char) {
+        public function findMessages(Character $char) {
                 $perms = $this->findCharPermissions($char);
                 $all = new ArrayCollection();
                 foreach ($this->getMessages() as $msg) {
