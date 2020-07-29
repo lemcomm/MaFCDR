@@ -93,6 +93,15 @@ conversation:
   show:     show older messages
   hide:     hide old messages
  created:   Your message has been created. You can view it <a href="%url%">here</a>.
+ kick:
+  label:    Remove participant
+  help:     Remove this character from the conversation.
+ demote:
+  label:    Demote participant
+  help:     Demote this character's role in the conversation (owner to manager, or manager to participant)
+ promote:
+  label:    Promote Participant
+  help:     Promote this character from participant to manager or manager to owner.
 
 message:
  content:
@@ -112,6 +121,17 @@ participants:
  managed:   This conversation is linked to %reference% and its participants list is automatically updated.
  do:
   remove:   remove this participant
+ table:
+  names:   Character Name
+  start:  Permission Start Time
+  end:    Permission End Time
+  current:   Current Role
+ role:
+  owner:    Owner
+  manager:  Manager
+  regular:  Participant
+  self:     This is You
+
 
 right:
  owner:                 owner
@@ -147,4 +167,4 @@ permission:
   user:       %name% has been demoted from their manager role.
   manager:    %name% no longer has ownership rights.
  invalidrequest:  You do not have rights to change roles for %name%.
- nopromoteright:  You do not have rights to promote this member.
+ nopromoteright:  You do not have rights to promote %name%.
