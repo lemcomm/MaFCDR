@@ -2765,20 +2765,37 @@ class Dispatcher {
 
 	public function conversationChangeTest($ignored, Conversation $conv) {
 		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
-			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		if ($conv->getRealm()) {
+			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.ismanaged"];
 		}
 		$perm = $conv->findActiveCharPermission($this->getCharacter());
 		if (!$perm->getManager() OR !$perm->getOwner()) {
-			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.notmanager"];
+			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.notmanager"];
 		}
-		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
+		return ["name"=>"conv.change.name", "url"=>"maf_conv_read", "description"=>"conv.change.description"];
+	}
+
+	public function conversationAddTest($ignored, Conversation $conv) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.add.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		if ($conv->getRealm()) {
+			return ["name"=>"conv.add.name", "description"=>"unavailable.conv.ismanaged"];
+		}
+		$perm = $conv->findActiveCharPermission($this->getCharacter());
+		if (!$perm->getManager() OR !$perm->getOwner()) {
+			return ["name"=>"conv.add.name", "description"=>"unavailable.conv.notmanager"];
+		}
+		return ["name"=>"conv.add.name", "url"=>"maf_conv_read", "description"=>"conv.change.description"];
 	}
 
 	public function conversationReplyTest($ignored, Conversation $conv) {
 		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
 			return ["name"=>"conv.reply.name", "description"=>"unavailable.conv.nopermission"];
 		}
-		return ["name"=>"conv.reply.name", "url"=>"maf_conv_read", "description"=>"conv.reply.description"];
+		return ["name"=>"conv.reply.name", "url"=>"maf_conv_change", "description"=>"conv.reply.description"];
 	}
 
 	/* ========== various tests and helpers ========== */
