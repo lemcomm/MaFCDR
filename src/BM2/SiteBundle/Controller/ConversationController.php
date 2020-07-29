@@ -162,16 +162,35 @@ class ConversationController extends Controller {
 				$manager = $me->getManager();
 				$owner = $me->getOwner();
 			}
-			if ($manager) {
-				$contacts = $this->get('conversation_manager')->getLegacyContacts($char);
-				foreach ($perms as $perm) {
-					if ($contacts->contains($perm->getCharacter())) {
-						$contacts->remove($perm->getCharacter()); #Remove people who already have permissions.
-					}
-				}
-				$form = new AddParticipantType($contacts);
+		}
+
+		return $this->render('Conversation/participants.html.twig', [
+			'conv' =>$conv,
+			'perms'=>$perms,
+			'manager'=>$manager,
+			'owner'=>$owner,
+			'me'=>$char,
+		]);
+	}
+
+	/**
+	  * @Route("/{conv}/add", name="maf_conv_add", requirements={"conv"="\d+"})
+	  */
+	public function addParticipantsAction(Conversation $conv) {
+                $char = $this->get('dispatcher')->gateway('conversationAddTest', false, true, false, $conv);
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		# Dispatcher means we already know this user is either a manager or an owner, thus, they have add rights.
+		$perms = $conv->findRelevantPermissions($char);
+		$contacts = $this->get('conversation_manager')->getLegacyContacts($char);
+		foreach ($perms as $perm) {
+			if ($contacts->contains($perm->getCharacter())) {
+				$contacts->remove($perm->getCharacter()); #Remove people who already have permissions.
 			}
 		}
+		$form = new AddParticipantType($contacts);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -182,7 +201,7 @@ class ConversationController extends Controller {
 			foreach($data['characters'] as $char) {
 				# Double check we can actually add this person.
 				if ($contacts->contains($char)) {
-					$perm = new ConversatioNPermission();
+					$perm = new ConversationPermission();
 					$em->persist($perm);
 					$perm->setConversation($conv);
 					$perm->setCharacter($char);
@@ -198,17 +217,16 @@ class ConversationController extends Controller {
 			$this->em->flush();
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
 		}
-		return $this->render('Conversation/participants.html.twig', [
+		return $this->render('Conversation/add.html.twig', [
 			'conv' =>$conv,
 			'perms'=>$perms,
 			'manager'=>$manager,
 			'owner'=>$owner,
-			'form'=>$form,
 		]);
 	}
 
 	/**
-	  * @Route("/{conv}/demote/{perm}/{var}", name="maf_conv_manage", requirements={"conv"="\d+", "perm"="\d+", "var"="\d+"})
+	  * @Route("/{conv}/change/{perm}/{var}", name="maf_conv_change", requirements={"conv"="\d+", "perm"="\d+", "var"="\d+"})
 	  */
 	public function changePermissionAction(Conversation $conv, ConversationPermission $perm, $var) {
                 $char = $this->get('dispatcher')->gateway('conversationChangeTest', false, true, false, $conv);
@@ -217,18 +235,24 @@ class ConversationController extends Controller {
                 }
 
 		if ($me = $conv->findActivePermissions($char)) {
+			$em = $this->getDoctrine()->getManager();
 			if ($me->getOwner()) {
 				if (!$perm->getManager()) {
 					if ($var === 0) {
 						$perm->setActive(false);
 						$change = 'permission.demoted.removed';
+						$flush = true;
+						$message = $this->get('conversation_manager')->addSystemMessage($conv, 'removal', $perm->getCharacter(), $char, false);
+
 					} elseif ($var === 1) {
 						$perm->setManager(true);
+						$flush = true;
 						$change = 'permission.promoted.manager';
 					}
 				} elseif ($perm->getOwner()) {
 					if ($var === 0) {
 						$perm->setOwner(false);
+						$flush = true;
 						$change = 'permission.demoted.owner';
 					} elseif ($var === 1) {
 						$change = 'permission.promoted.invalid';
@@ -236,9 +260,11 @@ class ConversationController extends Controller {
 				} else {
 					if ($var === 0) {
 						$perm->setManager(false);
+						$flush = true;
 						$change = 'permission.demoted.manager';
 					} elseif ($var === 1) {
 						$perm->setOwner(true);
+						$flush = true;
 						$change = 'permission.promoted.owner';
 					}
 				}
@@ -248,6 +274,7 @@ class ConversationController extends Controller {
 				} else {
 					if ($var === 0) {
 						$perm->setActive(false);
+						$flush = true;
 						$change = 'permission.demoted.removed';
 					} elseif ($var === 1) {
 						$change = 'permission.nopromoteright';
@@ -255,6 +282,9 @@ class ConversationController extends Controller {
 				}
 			} else {
 				$change = 'permission.invalidrequest';
+			}
+			if ($flush) {
+				$em->flush();
 			}
 		}
 
