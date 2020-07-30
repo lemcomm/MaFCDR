@@ -7,7 +7,6 @@ use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmLaw;
 use BM2\SiteBundle\Entity\RealmPosition;
-use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\ORM\EntityManager;
 
 
@@ -16,16 +15,16 @@ class RealmManager {
 	protected $em;
 	protected $history;
 	protected $politics;
-	protected $messagemanager;
+	protected $convman;
 
 	public $available_ruler_election = array('banner', 'spears', 'swords', 'land', 'heads');
 
 
-	public function __construct(EntityManager $em, History $history, Politics $politics, MessageManager $messagemanager) {
+	public function __construct(EntityManager $em, History $history, Politics $politics, ConversationManager $convman) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->politics = $politics;
-		$this->messagemanager = $messagemanager;
+		$this->convman = $convman;
 	}
 
 	public function create($name, $formalname, $type, Character $founder) {
@@ -132,10 +131,10 @@ class RealmManager {
 		// everyone on here gets unlimited access, because the realm just got founded
 		$this->history->openLog($realm, $char);
 
-		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c WHERE c.realm = :realm');
 		$query->setParameter('realm', $realm);
 		foreach ($query->getResult() as $conversation) {
-			$this->messagemanager->updateMembers($conversation);
+			$this->convman->updateMembers($conversation);
 		}
 
 		if ($setrealm) {
@@ -210,8 +209,8 @@ class RealmManager {
 
 		$this->removeRulerLiege($realm, $newruler);
 	}
-	
-	
+
+
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
 			$this->history->logEvent(
@@ -222,7 +221,7 @@ class RealmManager {
 			);
 			$liege->removeVassal($newruler);
 			$newruler->setLiege(null);
-		}		
+		}
 	}
 
 	public function getVoteWeight(Election $election, Character $character) {
@@ -319,7 +318,7 @@ class RealmManager {
 			$election->setWinner($winner);
 			if ($election->getPosition()) {
 				if (!$election->getPosition()->getHolders()->contains($winner)) {
-					/* Yes, this ranks up there as one of the more stupid checks. 
+					/* Yes, this ranks up there as one of the more stupid checks.
 					The game is supposed to remove existing holders, but sometimes, it doesn't.
 					No idea why not. If we do this though, the code can carry on carrying on.
 					*/
@@ -350,13 +349,13 @@ class RealmManager {
 		if ($election->getRoutine()) {
 			$position = $election->getPosition();
 			$holders = $position->getHolders();
-			foreach ($holders as $character) {		
+			foreach ($holders as $character) {
 				$position->removeHolder($character);
 				$character->removePosition($position);
 			}
 		}
 	}
-	
+
 	public function dismantleRealm(Character $character, Realm $realm, $sovereign=false) {
 		$this->history->logEvent(
 			$realm,
