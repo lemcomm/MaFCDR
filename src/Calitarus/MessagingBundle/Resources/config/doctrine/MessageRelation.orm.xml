@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="Calitarus\MessagingBundle\Entity\MessageRelation" table="cmsg_message_relation">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name='type' type='string'/>
+
+		<many-to-one field="source" target-entity="Message" inversed-by="related_messages"/>
+		<many-to-one field="target" target-entity="Message" inversed-by="related_to_me"/>
+
+	</entity>
+</doctrine-mapping>
