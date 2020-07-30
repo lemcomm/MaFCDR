@@ -2184,6 +2184,18 @@ button.cmsg_icon:hover {
 	-webkit-column-rule: 1px solid rgba(0,0,0,0.25);
 }
 
+#add_participant_contacts {
+	column-width: 20em;
+	column-gap: 2em;
+	column-rule: 1px solid rgba(0,0,0,0.25);
+	-moz-column-width: 20em;
+	-moz-column-gap: 2em;
+	-moz-column-rule: 1px solid rgba(0,0,0,0.25);
+	-webkit-column-width: 20em;
+	-webkit-column-gap: 2em;
+	-webkit-column-rule: 1px solid rgba(0,0,0,0.25);
+}
+
 button#hidetoggle {
 	margin: 0.5em 2em;
 }
