@@ -1,11 +1,11 @@
 {% set participants = conversation.findActivePermissions %}
 {% macro general(conversation, participants) %}
 	<div class="cmsg_general">
-		<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button>
-
+		<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> |
 		<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %}
 		 class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"
-		 {% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
+		 {% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a> |
+	 	<a href="{{path('maf_conv_add', {"conv":conversation.id}) }}"><button class="convo_add cmsg_button" title="{{ 'conversation.add.help'|trans({}, "conversations") }}">{{ 'conversation.add.label'|trans({}, "conversations") }}</button></a>
 	</div>
 {% endmacro %}
 
