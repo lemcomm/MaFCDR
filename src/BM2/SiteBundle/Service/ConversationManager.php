@@ -202,7 +202,7 @@ class ConversationManager {
                 }
         }
 
-        public function newConversation(Character $char, $recipients=null, $topic, $type, $content, Realm $realm = null) {
+        public function newConversation(Character $char=null, $recipients=null, $topic, $type, $content, Realm $realm = null, $system = null) {
                 if ($recipients === NULL && $realm === NULL) {
                         return 'no recipients';
                 }
@@ -216,31 +216,36 @@ class ConversationManager {
                 $conv->setActive(true);
                 $conv->setCycle($cycle);
                 $conv->setUpdated($now);
+                if ($system) {
+                        $conv->setSystem($system);
+                }
 
-                $msg = new Message();
-                $this->em->persist($msg);
-                $msg->setConversation($conv);
-                $msg->setSender($char);
-                $msg->setSent($now);
-                $msg->setType($type);
-                $msg->setCycle($cycle);
-                $msg->setContent($content);
+                if ($content) {
+                        $msg = new Message();
+                        $this->em->persist($msg);
+                        $msg->setConversation($conv);
+                        $msg->setSender($char);
+                        $msg->setSent($now);
+                        $msg->setType($type);
+                        $msg->setCycle($cycle);
+                        $msg->setContent($content);
+                }
 
-                $creator = new ConversationPermission();
-                $this->em->persist($creator);
                 if (!$realm) {
+                        $creator = new ConversationPermission();
+                        $this->em->persist($creator);
                         $creator->setOwner(true);
                         $creator->setManager(true);
+                        $creator->setStartTime($now);
+                        $creator->setActive(true);
+                        $creator->setUnread(0);
+                        $creator->setConversation($conv);
+                        $creator->setCharacter($char);
+                        $creator->setLastAccess($now);
                 } else {
                         $conv->setRealm($realm);
                         $recipients = $realm->findMembers();
                 }
-                $creator->setStartTime($now);
-                $creator->setActive(true);
-                $creator->setUnread(0);
-                $creator->setConversation($conv);
-                $creator->setCharacter($char);
-                $creator->setLastAccess($now);
                 foreach ($recipients as $recipient) {
                         $perm = new ConversationPermission();
                         $this->em->persist($perm);
@@ -353,5 +358,55 @@ class ConversationManager {
                         $this->em->flush();
                 }
                 return true;
+        }
+
+        public function leaveAllConversations(Character $char) {
+                #TODO: Stuff.
+        }
+
+        public function removeAllConversations(Character $char) {
+                #TODO: Stuff.
+        }
+
+        public function updateMembers(Conversation $conv) {
+                #TODO: This function is supposed to update all realm conversations with the correct participants. Legacy code follows.
+                /*
+                $realm = $conversation->getAppReference();
+                $added = 0;
+                $removed = 0;
+
+                if ($realm) {
+                        $members = $realm->findMembers();
+
+                        if ($members && !$members->isEmpty()) {
+                                $query = $this->em->createQuery('SELECT u FROM MsgBundle:User u WHERE u.app_user IN (:members)');
+                                $query->setParameter('members', $members->toArray());
+                                $users = new ArrayCollection($query->getResult());
+
+                                $query = $this->em->createQuery('SELECT u FROM MsgBundle:User u JOIN u.conversations_metadata m WHERE m.conversation = :conversation');
+                                $query->setParameter('conversation', $conversation);
+                                $participants = new ArrayCollection($query->getResult());
+
+                                foreach ($users as $user) {
+                                        if (!$participants->contains($user)) {
+                                                // this user is missing from the conversation, but should be there
+                                                $this->addParticipant($conversation, $user);
+                                                $participants->add($user); // make sure we don't add anyone twice
+                                                $added++;
+                                        }
+                                }
+
+                                foreach ($participants as $part) {
+                                        if (!$users->contains($part)) {
+                                                // this user is in the conversation, but shouldn't - remove him
+                                                $this->removeParticipant($conversation, $part);
+                                                $participants->removeElement($part);
+                                                $removed++;
+                                        }
+                                }
+                        }
+                }
+                return array('added'=>$added, 'removed'=>$removed);
+                */
         }
 }
