@@ -65,21 +65,18 @@ services:
         arguments:  ['@dispatcher']
         tags:
             - { name: twig.extension }
-    message_manager:
-        class:      Calitarus\MessagingBundle\Service\MessageManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
     conversation_manager:
         class:      BM2\SiteBundle\Service\ConversationManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
     character_manager:
         class:      BM2\SiteBundle\Service\CharacterManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@message_manager', '@dungeon_master', '@war_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager']
     npc_manager:
         class:      BM2\SiteBundle\Service\NpcManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
     realm_manager:
         class:      BM2\SiteBundle\Service\RealmManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@message_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager']
     news_manager:
         class:      BM2\SiteBundle\Service\NewsManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@geography']
@@ -102,7 +99,7 @@ services:
             - { name: monolog.logger, channel: turn }
     game_runner:
         class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@message_manager', '@permission_manager', '@npc_manager', '@character_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@conversation_manager', '@permission_manager', '@npc_manager', '@character_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     game_request_manager:
