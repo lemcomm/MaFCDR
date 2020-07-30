@@ -1,0 +1,6 @@
+Calitarus\MessagingBundle\Entity\Conversation:
+   properties:
+      topic:
+         - NotBlank: ~
+         - Length:
+            min: 3
