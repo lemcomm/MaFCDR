@@ -2771,10 +2771,34 @@ class Dispatcher {
 			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.ismanaged"];
 		}
 		$perm = $conv->findActiveCharPermission($this->getCharacter());
-		if (!$perm->getManager() OR !$perm->getOwner()) {
+		if (!$perm->getManager() AND !$perm->getOwner()) {
 			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.notmanager"];
 		}
 		return ["name"=>"conv.change.name", "url"=>"maf_conv_read", "description"=>"conv.change.description"];
+	}
+
+	public function conversationLeaveTest($ignored, Conversation $conv) {
+		if ($conv->getRealm()) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.ismanaged"];
+		}
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		$perm = $conv->findActiveCharPermission($this->getCharacter());
+		if (!$perm) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.notactive"];
+		}
+		return ["name"=>"conv.leave.name", "url"=>"maf_conv_leave", "description"=>"conv.leave.description"];
+	}
+
+	public function conversationRemoveTest($ignored, Conversation $conv) {
+		if ($conv->getRealm()) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.ismanaged"];
+		}
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.leave.name", "url"=>"maf_conv_leave", "description"=>"conv.leave.description"];
 	}
 
 	public function conversationAddTest($ignored, Conversation $conv) {
@@ -2785,7 +2809,7 @@ class Dispatcher {
 			return ["name"=>"conv.add.name", "description"=>"unavailable.conv.ismanaged"];
 		}
 		$perm = $conv->findActiveCharPermission($this->getCharacter());
-		if (!$perm->getManager() OR !$perm->getOwner()) {
+		if (!$perm->getManager() AND !$perm->getOwner()) {
 			return ["name"=>"conv.add.name", "description"=>"unavailable.conv.notmanager"];
 		}
 		return ["name"=>"conv.add.name", "url"=>"maf_conv_read", "description"=>"conv.change.description"];
