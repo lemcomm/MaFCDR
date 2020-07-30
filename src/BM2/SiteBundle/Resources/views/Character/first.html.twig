@@ -5,14 +5,8 @@
 {% if character.liege %}
 	<p>{{ "first.liege"|trans({"%liege%":link(character.liege)})|raw }}</p>
 
-	<h3>{{ 'unread.title'|trans({}, "MsgBundle")|title }}</h3>
-	<ul>
-	{% for meta in unread %}
-		<li><a href="{{ path('cmsg_conversation', {'meta':meta.id}) }}">{{ meta.conversation.topic }}</a> ({{ 'summary.new2'|trans({"%new%":meta.unread}, "MsgBundle") }})</li>
-	{% else %}
-		<li>{{ 'summary.nonew'|trans({}, "MsgBundle") }}</li>
-	{% endfor %}
-	</ul>
+	<h3>{{ 'unread.title'|trans({}, "conversations")|title }}</h3>
+	{% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
 {% else %}
 	<p>{{ "first.free"|trans|raw }}</p>
 {% endif %}
