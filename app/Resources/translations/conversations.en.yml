@@ -102,6 +102,12 @@ conversation:
  promote:
   label:    Promote Participant
   help:     Promote this character from participant to manager or manager to owner.
+ removed:   You have been removed from the "%name%" conversation.
+ badremoved: You do not have access to conversation id %id%.
+ left:      You have left the conversation.
+ add:
+  label:    Add Participants
+  help:     Add one or more people to this conversation.
 
 message:
  content:
@@ -126,6 +132,7 @@ participants:
   start:  Permission Start Time
   end:    Permission End Time
   current:   Current Role
+  unknown:  Time Unknown
  role:
   owner:    Owner
   manager:  Manager
@@ -168,3 +175,9 @@ permission:
   manager:    %name% no longer has ownership rights.
  invalidrequest:  You do not have rights to change roles for %name%.
  nopromoteright:  You do not have rights to promote %name%.
+
+add:
+ title: Add Participants to the "%name%" Conversation
+ description: From here you can select any of your contacts to add to this conversation.
+ empty: You don't seem to have any contacts you can add. Maybe they're all already part of the conversation?
+ submit: Add Selected
