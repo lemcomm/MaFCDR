@@ -12,16 +12,6 @@ _bm2_intl:
     defaults:
      _locale: en
 
-msg:
-    resource: "@MsgBundle/Resources/config/routing.yml"
-#    prefix:   /
-# should work, but doesn't
-    prefix:   /{_locale}
-    requirements:
-     _locale: en|de|fr|it|es|ru
-    defaults:
-     _locale: en
-
 fos_user_security_detect:
     prefix:  /{_locale}
     pattern: /detect
