@@ -25,12 +25,17 @@
 	{% for perm in perms %}
 		<tr>
 			<td>{{ link(perm.character) }}</td>
-			<td>{{ perm.startTime|date('Y-m-d H:i:s') }}</td>
-			<td>
-				{% if perm.endTime %}
-					{{ perm.endTime|date('Y-m-d H:i:s') }}
-				{% endif %}
-			</td>
+			{% if active or perm.character == me %}
+				<td>{{ perm.startTime|date('Y-m-d H:i:s') }}</td>
+				<td>
+					{% if perm.endTime %}
+						{{ perm.endTime|date('Y-m-d H:i:s') }}
+					{% endif %}
+				</td>
+			{% else %}
+				<td><i>{{ 'participants.table.unknown'|trans({}, 'conversations')|raw }}</i></td>
+				<td><i>{{ 'participants.table.unknown'|trans({}, 'conversations')|raw }}</i></td>
+			{% endif %}
 			<td align="center">
 				{% if perm.owner %}
 					{{ 'participants.role.owner'|trans({}, 'conversations')|raw }}
@@ -40,14 +45,14 @@
 					{{ 'participants.role.regular'|trans({}, 'conversations')|raw }}
 				{% endif %}
 			</td>
-			{% if owner and perm.character != me %}
+			{% if owner and perm.character != me and perm.active %}
 				{% if not perm.manager %}
 					<td align="center"/>
-						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'1'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.kick.help'|trans({}, "conversations") }}">{{ 'conversation.kick.label'|trans({}, "conversations") }}</button></a>
+						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.kick.help'|trans({}, "conversations") }}">{{ 'conversation.kick.label'|trans({}, "conversations") }}</button></a>
 					</td>
 				{% else %}
 					<td align="center"/>
-						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'1'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.demote.help'|trans({}, "conversations") }}">{{ 'conversation.demote.label'|trans({}, "conversations") }}</button></a>
+						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.demote.help'|trans({}, "conversations") }}">{{ 'conversation.demote.label'|trans({}, "conversations") }}</button></a>
 					</td>
 				{% endif %}
 				{% if not perm.owner %}
@@ -55,7 +60,7 @@
 					<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'1'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.promote.help'|trans({}, "conversations") }}">{{ 'conversation.promote.label'|trans({}, "conversations") }}</button></a>
 				</td>
 				{% endif %}
-			{% elseif manager and perm.character != me %}
+			{% elseif manager and perm.character != me and perm.active %}
 				{% if not perm.manager %}
 					<td align="center">
 						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_demote cmsg_button" title="{{ 'conversation.kick.help'|trans({}, "conversations") }}">{{ 'conversation.kick.label'|trans({}, "conversations") }}</button></a>
