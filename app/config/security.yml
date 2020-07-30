@@ -51,6 +51,7 @@ security:
         - { path: ^/(../)?artifacts, roles: ROLE_USER }
         - { path: ^/(../)?messages, roles: ROLE_USER }
         - { path: ^/(../)?settlement, roles: ROLE_USER }
+        - { path: ^/(../)?conv, roles: ROLE_USER }
         - { path: ^/(../)?translator, roles: ROLE_USER }
         - { path: ^/(../)?unit, roles: ROLE_USER }
         - { path: ^/(../)?login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
