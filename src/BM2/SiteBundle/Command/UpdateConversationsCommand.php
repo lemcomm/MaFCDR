@@ -123,7 +123,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 									$perm->setActive(true);
 			                                                $em->persist($perm);
 
-			                                                $perm->setStartTime($oldMsg->getTs());
+			                                                $perm->setStartTime($start);
 			                                                if (!$foundOwner && !$oldConv->getSystem()) {
 			                                                        # We don't have an owner yet, and this isn't a system-managed or realmconversation, so we need one.
 			                                                        $perm->setOwner(true);
