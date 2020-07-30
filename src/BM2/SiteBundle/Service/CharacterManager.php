@@ -12,7 +12,6 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\User;
-use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -25,19 +24,19 @@ class CharacterManager {
 	protected $history;
 	protected $politics;
 	protected $realmmanager;
-	protected $messagemanager;
+	protected $convman;
 	protected $dm;
 	protected $warman;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm, WarManager $warman) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
 		$this->milman = $milman;
 		$this->politics = $politics;
 		$this->realmmanager = $realmmanager;
-		$this->messagemanager = $messagemanager;
+		$this->convman = $convman;
 		$this->dm = $dm;
 		$this->warman = $warman;
 	}
@@ -447,7 +446,7 @@ class CharacterManager {
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
 
-		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+		$this->convman->leaveAllConversations($character);
 
 		return true;
 	}
@@ -669,7 +668,7 @@ class CharacterManager {
 		$this->dm->retireDungeoneer($character);
 		$character->setRetiredOn(new \DateTime("now"));
 
-		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+		$this->convman->leaveAllConversations($character);
 
 		return true;
 	}
