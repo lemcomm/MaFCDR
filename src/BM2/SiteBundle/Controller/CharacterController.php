@@ -115,8 +115,6 @@ class CharacterController extends Controller {
 		}
 		$em->flush();
 
-		$msguser = $this->get('message_manager')->getCurrentUser();
-
 		return array(
 			'events' => $this->get('character_manager')->findEvents($character),
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
@@ -243,10 +241,8 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_site_character_start');
 		}
 
-		$msguser = $this->get('message_manager')->getCurrentUser();
-
 		return array(
-			'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
+			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($char),
 		);
 	}
 
