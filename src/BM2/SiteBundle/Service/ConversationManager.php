@@ -127,24 +127,6 @@ class ConversationManager {
                 }
         }
 
-        public function countFlaggedMessages(Character $char) {
-
-        }
-
-        public function leaveConversation(Character $char, Converastion $conv) {
-                $target = $conv->getPermissions()->findOneBy(['active'=>true, 'end'=>null, 'char'=>$char]);
-                if ($target) {
-                        if ($target->getOwner()) {
-                                $this->findNewOwner($conv, $char);
-                        }
-                        if ($target->getManager()) {
-                                $target->setManager(false);
-                        }
-                        $target->setEnd(new \DateTime('now'));
-                        $target->setActive(false);
-                }
-        }
-
         public function removePlayerConversation(Character $char, Conversation $conv) {
                 $perms = $conv->getPermissions()->findBy(['char' => $char]);
                 foreach ($perms as $perm) {
@@ -164,46 +146,35 @@ class ConversationManager {
                 return $count;
         }
 
-        public function findNewOwner(Conversation $conv, Character $char) {
+        public function findNewOwner(Conversation $conv, Character $char, $flush=true) {
                 if ($conv->getSystem() !== null) {
                         return true; #System conversations are managed separately.
                 }
                 if ($conv->getRealm() !== null) {
                         return true; #Realm conversations are managed separately.
                 }
-                $options = $conv->getPermissions()->findBy(['active'=>true, 'end'=>null, 'manager'=>true]);
-                if ($options->count() > 0) {
-                        $bestOpt = null;
-                        $bestDate = null;
-                        foreach ($options as $opt) {
-                                if (!$bestDate) {
-                                        $bestOpt = $opt;
-                                        $bestDate = $opt->getStartTime();
-                                }
-                                if ($opt->getStartTime() < $bestDate) {
-                                        $bestOpt = $opt;
-                                        $bestDate = $opt->getStartTime();
-                                }
-                        }
-                        $bestOpt->setOwner(true);
-                        $bestOpt->setManager(false);
+
+                $query = $this->em->createQuery('SELECT count(p.id) FROM BM2SiteBundle:ConversationPermission p WHERE p.character != :me AND p.conversation = :conv AND p.owner = true AND p.active = true');
+                $query->setParameters(['me'=>$char, 'conv'=>$conv]);
+                if ($query->getSingleScalarResult() > 0) {
+                        return true; # We already have another owner.
+                }
+
+                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p WHERE p.character != :me AND p.conversation = :conv AND p.manager = true AND p.active = true ORDER BY p.start_time ASC');
+                $query->setParameters(['me'=>$char, 'conv'=>$conv]);
+                $options = $query->getResult();
+                if (count($options) > 0) {
+                        $options[0]->setOwner(true);
                 } else {
-                        $options = $conv->getPermissions()->findBy(['active'=>true, 'end'=>null]);
-                        if ($options->count() > 0) {
-                                $bestOpt = null;
-                                $bestDate = null;
-                                foreach ($options as $opt) {
-                                        if (!$bestDate) {
-                                                $bestOpt = $opt;
-                                                $bestDate = $opt->getStartTime();
-                                        }
-                                        if ($opt->getStartTime() < $bestDate) {
-                                                $bestOpt = $opt;
-                                                $bestDate = $opt->getStartTime();
-                                        }
-                                }
-                                $bestOpt->setOwner(true);
+                        $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p WHERE p.character != :me AND p.conversation = :conv AND p.active = true ORDER BY p.start_time ASC');
+                        $query->setParameters(['me'=>$char, 'conv'=>$conv]);
+                        $options = $query->getResult();
+                        if (count($options) > 0) {
+                                $options[0]->setOwner(true);
                         }
+                }
+                if($flush) {
+                        $this->em->flush();
                 }
         }
 
@@ -286,33 +257,43 @@ class ConversationManager {
                 return $conv;
         }
 
-        public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data, Character $data2, $flush=true) {
+        public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true) {
                 $now = new \DateTime("now");
                 $cycle = $this->appstate->getCycle();
                 if ($type == 'newperms') {
-                        $content = $data2->getName().' has added the following people to the conversation: ';
+                        $content = $originator->getName().' has added the following people to the conversation: ';
                         $count = $data->count();
-                        $i = 0;
-                        foreach ($data as $char) {
-                                $i++;
-                                if ($i == $count) {
-                                        $content .= 'and '.$char->getName().'.';
-                                } else {
-                                        $content .= $char->getName().', ';
+                        if ($count == 1) {
+                                $content .= $data[0]->getName();
+                        } else {
+                                $i = 0;
+                                foreach ($data as $char) {
+                                        $i++;
+                                        if ($i == $count) {
+                                                $content .= 'and '.$char->getName().'.';
+                                        } else {
+                                                $content .= $char->getName().', ';
+                                        }
                                 }
                         }
-                } elseif ($type == 'delperms') {
-                        $content = $data2->getName().' has removed the following people from the conversation: ';
+                } elseif ($type == 'removal') {
+                        $content = $originator->getName().' has removed the following people from the conversation: ';
                         $count = $data->count();
-                        $i = 0;
-                        foreach ($data as $char) {
-                                $i++;
-                                if ($i == $count) {
-                                        $content .= 'and '.$char->getName().'.';
-                                } else {
-                                        $content .= $char->getName().', ';
+                        if ($count == 1) {
+                                $content .= $data[0]->getName().'.';
+                        } else {
+                                $i = 0;
+                                foreach ($data as $char) {
+                                        $i++;
+                                        if ($i == $count) {
+                                                $content .= 'and '.$char->getName().'.';
+                                        } else {
+                                                $content .= $char->getName().', ';
+                                        }
                                 }
                         }
+                } elseif ($type == 'left') {
+                        $content = $originator->getName().' has left the conversation.';
                 }
 
                 $msg = new Message();
@@ -323,7 +304,7 @@ class ConversationManager {
                 $msg->setCycle($cycle);
                 $msg->setContent($content);
                 if (!$conv->getRealm()) {
-                        foreach ($conv->getActiveConvPermissions() as $perm) {
+                        foreach ($conv->findActivePermissions() as $perm) {
                                 $perm->setUnread($perm->getUnread()+1);
                         }
                 }
@@ -331,5 +312,46 @@ class ConversationManager {
                 if ($flush) {
                         $this->em->flush();
                 }
+
+                return $msg;
+        }
+
+        public function pruneConversation(Conversation $conv) {
+                $keep = new ArrayCollection();
+                $all = $conv->getMessages();
+                # Grab all conversation messages and go through each of them.
+                foreach ($all as $msg) {
+                        # Grab all conversation permissions and go through each of them.
+                        $perms = $conv->getPermissions();
+                        if ($perms->count() > 0) {
+                                foreach ($perms as $perm) {
+                                        # If the message exists within the bounds of a permission, add it to $keep.
+                                        if ($perm->getStartTime() <= $msg->getSent() AND ($msg->getSent() <= $perm->getEndTime() OR $perm->getActive())) {
+                                                $keep->add($msg);
+                                                break;
+                                        }
+                                }
+                                # Go through all messages. If they don't exist in the Keep array, remove it.
+                                foreach ($all as $msg) {
+                                        if (!$keep->contains($msg)) {
+                                                $this->em->remove($msg);
+                                        }
+                                }
+                        } else {
+                                foreach ($all as $msg) {
+                                        $this->em->remove($msg);
+                                }
+                        }
+                }
+                $this->em->flush();
+                if ($conv->findActivePermissions()->count() == 0 && $conv->getMessages()->count() == 0) {
+                        foreach ($conv->getpermissions() as $perm) {
+                                $this->em->remove($perm);
+                                $this->em->flush();
+                        }
+                        $this->em->remove($conv);
+                        $this->em->flush();
+                }
+                return true;
         }
 }
