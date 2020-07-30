@@ -12,7 +12,6 @@ use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Ship;
-use Calitarus\MessagingBundle\Service\MessageManager;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -40,7 +39,7 @@ class GameRunner {
 	private $geography;
 	private $generator;
 	private $rm;
-	private $mm;
+	private $convman;
 	private $pm;
 	private $npc;
 	private $cm;
@@ -53,7 +52,7 @@ class GameRunner {
 	private $bandits_ok_distance = 50000;
 	private $seen;
 
-	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, MilitaryManager $milman, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, MessageManager $mm, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
+	public function __construct(EntityManager $em, AppState $appstate, Logger $logger, ActionResolution $resolver, Economy $economy, Politics $politics, History $history, MilitaryManager $milman, BattleRunner $battlerunner, Interactions $interactions, Geography $geography, Generator $generator, RealmManager $rm, ConversationManager $convman, PermissionManager $pm, NpcManager $npc, CharacterManager $cm) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->logger = $logger;
@@ -67,7 +66,7 @@ class GameRunner {
 		$this->geography = $geography;
 		$this->generator = $generator;
 		$this->rm = $rm;
-		$this->mm = $mm;
+		$this->convman = $convman;
 		$this->pm = $pm;
 		$this->npc = $npc;
 		$this->cm = $cm;
@@ -210,24 +209,12 @@ class GameRunner {
 		$query->execute();
 
 		// TODO: this probably deserves its own update cycle soon...
-		// message conversations update
-		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference IS NOT NULL');
+		// conversations update
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c WHERE c.realm IS NOT NULL');
 		$iterableResult = $query->iterate();
 		while ($row = $iterableResult->next()) {
 			$conversation = $row[0];
-			$this->mm->updateMembers($conversation);
-
-			// 30 days after the last posting, realm conversations stop being auto-managed so people can leave and the conversation can be cleaned up
-			$subquery = $this->em->createQuery('SELECT MAX(m.ts) FROM MsgBundle:Message m WHERE m.conversation = :conversation');
-			$subquery->setParameter('conversation', $conversation);
-			$last_message_ts = $subquery->getSingleScalarResult();
-			if ($last_message_ts) {
-				$last_message = new \DateTime($last_message_ts);
-				$days = $last_message->diff(new \DateTime("now"), true)->days;
-				if ($days > 30) { // FIXME: ugly hardcoded value
-					$conversation->setAppReference(null);
-				}
-			}
+			$this->convman->updateMembers($conversation);
 		}
 
 		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
@@ -932,7 +919,7 @@ class GameRunner {
 		$realmquery = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r WHERE r.active = true');
 		$realms = $realmquery->getResult();
 		foreach ($realms as $realm) {
-			$convoquery = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm');
+			$convoquery = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c WHERE c.realm = :realm AND c.system IS NOT NULL');
 			$convoquery->setParameter('realm', $realm);
 			$convos = $convoquery->getResult();
 			$announcements = false;
@@ -949,13 +936,14 @@ class GameRunner {
 				}
 			}
 			if (!$announcements) {
+				#newConversation(Character $char, $recipients=null, $topic, $type, $content, Realm $realm = null, $system=null)
 				$rulers = $realm->findRulers();
 				if (!$rulers->isEmpty()) {
-					$msguser = $this->mm->getMsgUser($rulers->first());
+					$msguser = $rulers->first();
 				} else {
 					$members = $realm->findMembers(true);
-					if (!$members->isEmpty()) {
-						$msguser = $this->mm->getMsgUser($members->first());
+					if ($members->isEmpty()) {
+						$msguser = $members->first();
 					} else {
 						$this->logger->notice($realm->getName()." deserted, making inactive.");
 						$deserted = true;
@@ -963,51 +951,28 @@ class GameRunner {
 						$msguser = false;
 					}
 				}
-				$topic = $realm->getName().' Announcements';
 				if ($msguser) {
-					list($meta,$conversation) = $this->mm->createConversation($msguser, $topic, null, $realm);
-					$this->em->flush(); // because the below needs this flushed
-					$this->mm->updateMembers($conversation);
-					$conversation->setSystem('announcements');
+					$topic = $realm->getName().' Announcements';
+					$conversation = $this->conv->createConversation(null, null, $topic, null, $realm, 'announcements');
 					$this->logger->notice($realm->getName()." announcements created");
 				}
 			}
 			if (!$general && !$deserted) {
 				$rulers = $realm->findRulers();
 				if (!$rulers->isEmpty()) {
-					$msguser = $this->mm->getMsgUser($rulers->first());
+					$msguser = $rulers->first();
 				} else {
 					$members = $realm->findMembers(true);
-					if (!$members->isEmpty()) {
-						$msguser = $this->mm->getMsgUser($members->first());
+					if ($members->isEmpty()) {
+						$msguser = $members->first();
 					}
 				}
 				if ($msguser) {
-					list($meta,$conversation) = $this->mm->createConversation($msguser, $realm->getFormalName(), null, $realm);
-					$this->em->flush(); // because the below needs this flushed
-					$this->mm->updateMembers($conversation);
-					$conversation->setSystem('general');
+					$topic = $realm->getName().' General Discussion';
+					$conversation = $this->conv->createConversation(null, null, $topic, null, $realm, 'general');
 					$this->logger->notice($realm->getName()." discussion created");
 				}
 			}
-		}
-		$this->logger->notice("Checking for inactive realms with conversations...");
-		$query = $this->em->createQuery('SELECT COUNT(r) FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
-		$count = $query->getSingleScalarResult();
-		if ($count > 0) {
-			$this->logger->notice($count." conversations found...");
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = FALSE AND c.id > 0');
-			$result = $query->getResult();
-			if ($result) {
-				foreach ($query->getResult() as $realm) {
-					foreach ($realm->getConversations() as $conv) {
-						$this->em->remove($conv);
-					}
-				}
-			}
-			$this->logger->notice("Conversations removed...");
-		} else {
-			$this->logger->notice("None found...");
 		}
 		$this->appstate->setGlobal('cycle.realm', 'complete');
 		$this->em->flush();
@@ -1315,7 +1280,7 @@ class GameRunner {
 	}
 
 	public function postToRealm(RealmPosition $position, $systemflag, $msg) {
-		$query = $this->em->createQuery('SELECT c FROM MsgBundle:Conversation c WHERE c.app_reference = :realm AND c.system = :system');
+		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c WHERE c.realm = :realm AND c.system = :system');
 		switch ($systemflag) {
 			case 'announcements':
 				$query->setParameter('system', 'announcements');
@@ -1328,7 +1293,7 @@ class GameRunner {
 		$targetconvo = $query->getResult();
 
 		foreach ($targetconvo as $topic) {
-			$this->mm->writeMessage($topic, null, $msg);
+			$this->convman->writeMessage($topic, null, $msg);
 		}
 
 	}
