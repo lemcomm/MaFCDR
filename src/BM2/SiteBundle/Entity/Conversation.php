@@ -93,5 +93,19 @@ class Conversation {
                 }
                 return $all;
         }
+
+        public function findMessagesInWindow(Character $char, $window) {
+                $perms = $this->findCharPermissions($char);
+                $all = new ArrayCollection();
+                foreach ($this->getMessages() as $msg) {
+                        foreach ($perms as $perm) {
+                                if (($perm->getStartTime() <= $msg->getSent() AND ($msg->getSent() <= $perm->getEndTime() OR $perm->getActive())) AND $msg->getSent() > $window) {
+                                        $all->add($msg);
+                                        break;
+                                }
+                        }
+                }
+                return $all;
+        }
         
 }
