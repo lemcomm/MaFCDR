@@ -9,6 +9,8 @@
 
 			<a id="{{message.id}}"></a>
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
+			--
+			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic}, "conversations")|raw }}
 			{% if message.replyTo %}
 				 --
 				<a href="#{{message.replyTo.id}}">
