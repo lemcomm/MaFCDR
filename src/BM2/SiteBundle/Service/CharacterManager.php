@@ -446,7 +446,7 @@ class CharacterManager {
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
 
-		$this->convman->leaveAllConversations($character);
+		$this->convman->removeAllConversations($character);
 
 		return true;
 	}
