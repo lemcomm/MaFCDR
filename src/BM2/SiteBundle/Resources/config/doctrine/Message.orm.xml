@@ -18,5 +18,6 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
                 <field name="content" type="text" nullable="true"/>
+		<field name="recipients" type="integer" nullable="true"/>
 	</entity>
 </doctrine-mapping>
