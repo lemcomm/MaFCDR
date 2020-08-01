@@ -59,43 +59,45 @@ class ConversationManager {
                 return $char->getConvPermissions()->matching($criteria);
         }
 
-        public function getAllRecentMessages(Character $char, string $freq) {
-                switch ($freq) {
-                        case '12h':
-                                $endTime = new DateTime("-12 hours");
-                                break;
-                        case '24h':
-                                $endTime = new DateTime("-24 hours");
-                                break;
-                        case '3d':
-                                $endTime = new DateTime("-3 days");
-                                break;
-                        case '7d':
-                                $endTime = new DateTime("-7 days");
-                                break;
-                        case '14d':
-                                $endTime = new DateTime("-14 days");
-                                break;
-                        case '1m':
-                                $endTime = new DateTime("-1 month");
-                                break;
-                }
+        public function getAllRecentMessages(Character $char, string $string) {
+                #TODO: This function is possibly one of the slowest in the game. Like the conversation list, it scales with the number of conversations and permissions we have.
+                # The main thing slowing it down is that you have to check every message against the character permissions to see if should be rendered or not.
+                # If it was just "you're in this conversation or not" we could do this in two queries. Because you can be in the conversation historically but not actively participating though, we have to sort things out.
+                $endTime = new \DateTime($string);
                 $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p WHERE p.character = :me AND (p.end_time > :end_time OR p.end_time IS NULL)');
                 $query->setParameters(['end_time' => $endTime, 'me' => $char]);
                 $allConv = [];
                 foreach ($query->getResult() as $perm) {
-                        if (!in_array($perm->getConversation()->getId(), $allConv)) {
-                                $allConv[] = $perm->getConversation()->getId();
+                        if ($perm->getUnread() > 0) {
+                                $perm->setUnread(0);
+                        }
+                        $perm->setLastAccess(new \DateTime("now"));
+                        if (!in_array($perm->getConversation(), $allConv)) {
+                                $allConv[] = $perm->getConversation();
                         }
                 }
-                $query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Message m WHERE m.conversation in :all AND m.sent > :end_time ORDER BY m.sent ASC');
-                $query->setParameters(['end_time' => $endTime, 'all' => $allConv]);
-                return $query->getResult();
+
+                $allMsg = new ArrayCollection();
+                foreach ($allConv as $conv) {
+                        foreach ($conv->findMessagesInWindow($char, $endTime) as $msg) {
+                                $allMsg->add($msg);
+                        }
+                }
+                $iterator = $allMsg->getIterator();
+                $iterator->uasort(function($a, $b) {
+                        return ($a->getSent() > $b->getSent()) ? 1 : -1 ;
+                });
+                $this->em->flush();
+                return new ArrayCollection(iterator_to_array($iterator));
         }
 
         public function getAllUnreadMessages(Character $char) {
                 $unread = new ArrayCollection();
                 foreach ($char->getConvPermissions()->filter(function($entry) {return $entry->getActive() == true;}) as $perm) {
+                        if ($perm->getUnread() > 0) {
+                                $perm->setUnread(0);
+                        }
+                        $perm->setLastAccess(new \DateTime("now"));
                         if ($total = $perm->getUnread() > 0) {
                                 $counter = 0;
                                 foreach ($perm->getConversation()->getMessages() as $message) {
@@ -110,6 +112,7 @@ class ConversationManager {
                 $iterator->uasort(function($a, $b) {
                         return ($a->getSent() > $b->getSent()) ? -1 : 1 ;
                 });
+                $this->em->flush();
                 return new ArrayCollection(iterator_to_array($iterator));
         }
 
@@ -194,6 +197,8 @@ class ConversationManager {
                                         $new->setReplyTo($target);
                                 }
                         }
+                        $count = $conv->findActivePermissions()->count();
+                        $new->setRecipients($count);
                         $new->setConversation($conv);
                         $this->em->flush();
                         return $new;
@@ -220,17 +225,6 @@ class ConversationManager {
                         $conv->setSystem($system);
                 }
 
-                if ($content) {
-                        $msg = new Message();
-                        $this->em->persist($msg);
-                        $msg->setConversation($conv);
-                        $msg->setSender($char);
-                        $msg->setSent($now);
-                        $msg->setType($type);
-                        $msg->setCycle($cycle);
-                        $msg->setContent($content);
-                }
-
                 if (!$realm) {
                         $creator = new ConversationPermission();
                         $this->em->persist($creator);
@@ -246,7 +240,9 @@ class ConversationManager {
                         $conv->setRealm($realm);
                         $recipients = $realm->findMembers();
                 }
+                $counter = 0;
                 foreach ($recipients as $recipient) {
+                        $counter++;
                         $perm = new ConversationPermission();
                         $this->em->persist($perm);
                         $perm->setStartTime($now);
@@ -256,6 +252,18 @@ class ConversationManager {
                         $perm->setManager(false);
                         $perm->setActive(true);
                         $perm->setUnread(1);
+                }
+
+                if ($content) {
+                        $msg = new Message();
+                        $this->em->persist($msg);
+                        $msg->setConversation($conv);
+                        $msg->setSender($char);
+                        $msg->setSent($now);
+                        $msg->setType($type);
+                        $msg->setCycle($cycle);
+                        $msg->setContent($content);
+                        $new->setRecipients($counter);
                 }
 
                 $this->em->flush();
@@ -361,11 +369,33 @@ class ConversationManager {
         }
 
         public function leaveAllConversations(Character $char) {
-                #TODO: Stuff.
+                $change = false;
+                foreach ($char->getConvPermissions() as $perm) {
+                        if ($perm->getActive()) {
+                                $perm->setActive(false);
+                                if (!$change) {
+                                        $change = true;
+                                }
+                        }
+                }
+                if ($change) {
+                        $this->em->flush();
+                }
         }
 
         public function removeAllConversations(Character $char) {
-                #TODO: Stuff.
+                $change = false;
+                $allConvs = new ArrayCollection();
+                foreach ($char->getConvPermissions() as $perm) {
+                        $allConvs->add($perm->getConversation());
+                        $this->em->remove($perm);
+                        if (!$change) {
+                                $change = true;
+                        }
+                }
+                foreach ($allConvs as $conv) {
+                        $this->pruneConversation($conv);
+                }                
         }
 
         public function updateMembers(Conversation $conv) {
