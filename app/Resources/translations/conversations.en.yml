@@ -22,6 +22,8 @@ index:
  request:   Request from %sender% on %day% (%ts%)
  rp:        Roleplay from %sender% on %day% (%ts%)
  reply:     replying to %sender% on %day% (%ts%)
+ conversation: Sent to "%conv%" (%i% recipients)
+ conversation2: Sent to "%conv%"
 
 type:
  letter: Letter
@@ -108,6 +110,7 @@ conversation:
  add:
   label:    Add Participants
   help:     Add one or more people to this conversation.
+ recent:    Recent Messages
 
 message:
  content:
@@ -181,3 +184,8 @@ add:
  description: From here you can select any of your contacts to add to this conversation.
  empty: You don't seem to have any contacts you can add. Maybe they're all already part of the conversation?
  submit: Add Selected
+
+reply:
+ title: Write a Reply
+ intro: From here you can write a reply to the below message, included here for your convenience.
+ outro: Below, you can select your message type, formulate your response, and send it.
