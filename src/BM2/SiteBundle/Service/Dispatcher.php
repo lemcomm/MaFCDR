@@ -2737,6 +2737,10 @@ class Dispatcher {
 		return ["name"=>"conv.summary.name", "url"=>"maf_conv_summary", "description"=>"conv.summary.description"];
 	}
 
+	public function conversationRecentTest() {
+		return ["name"=>"conv.unread.name", "url"=>"maf_conv_unread", "description"=>"conv.unread.description"];
+	}
+
 	public function conversationUnreadTest() {
 		return ["name"=>"conv.unread.name", "url"=>"maf_conv_unread", "description"=>"conv.unread.description"];
 	}
