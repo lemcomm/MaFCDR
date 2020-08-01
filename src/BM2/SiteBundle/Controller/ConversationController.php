@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Form\AddParticipantType;
 use BM2\SiteBundle\Form\MessageReplyType;
 use BM2\SiteBundle\Form\NewConversationType;
+use BM2\SiteBundle\Form\RecentReplyType;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -166,6 +167,58 @@ class ConversationController extends Controller {
 		return $this->render('Conversation/new.html.twig', [
 			'form' => $form->createView(),
 			'realm' => $realm
+		]);
+	}
+
+	/**
+	  * @Route("/recent")
+	  * @Route("/recent/")
+	  * @Route("/recent/{window}", name="maf_conv_recent")
+	  */
+	public function recentAction(string $window='0') {
+                $char = $this->get('dispatcher')->gateway('conversationRecentTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+		$search = null;
+		switch ($window) {
+			case '0':
+				$search = 'unread';
+				break;
+			case '1':
+				$search = '-1 month';
+				break;
+			case '2':
+				$search = '-14 days';
+				break;
+			case '3':
+				$search = '-7 days';
+				break;
+			case '4':
+				$search = '-3 days';
+				break;
+			case '5':
+				$search = '-1 day';
+				break;
+			case '6':
+				$search = '-12 hours';
+				break;
+			case '7':
+				$search = '-2 months';
+				break;
+			default:
+			case '8':
+				$search = '-3 months';
+				break;
+		}
+		if ($search == 'unread') {
+			$all = $this->get('conversation_manager')->getAllUnreadMessages($char);
+		} else {
+			$all = $this->get('conversation_manager')->getAllRecentMessages($char, $search);
+		}
+		return $this->render('Conversation/recent.html.twig', [
+			'messages' => $all,
+			'string' => $window
 		]);
 	}
 
@@ -439,7 +492,6 @@ class ConversationController extends Controller {
 		return new RedirectResponse($this->generateUrl('maf_conv_summary'));
 	}
 
-
 	/**
 	  * @Route("/{conv}/reply", name="maf_conv_reply", requirements={"conv"="\d+"})
 	  */
@@ -460,13 +512,40 @@ class ConversationController extends Controller {
 			$message = $this->get('conversation_manager')->writeMessage($conv, $replyTo, $char, $data['content'], $data['type']);
 
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
-			/*
-			When we move past Symfony 3.1, use the below:
-			reutrn new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId(), '_fragment' => $message->getId()]));
-			*/
 		}
 
 		return $this->render('Conversation/reply.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+
+	/**
+	  * @Route("/recent/reply/{msg}", requirements={"msg"="\d+"})
+	  * @Route("/recent/reply/{msg}/", requirements={"msg"="\d+"})
+	  * @Route("/recent/reply/{msg}/{string}", name="maf_conv_recent_reply", requirements={"msg"="\d+"})
+	  */
+	public function replyRecentAction(Message $msg, Request $request, string $string='0') {
+		$conv = $msg->getConversation();
+                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		$form = $this->createForm(new RecentReplyType());
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$em = $this->getDoctrine()->getManager();
+
+			$message = $this->get('conversation_manager')->writeMessage($conv, $msg, $char, $data['content'], $data['type']);
+
+			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $string]).'#'.$message->getId());
+		}
+
+		return $this->render('Conversation/recentreply.html.twig', [
+			'message' => $msg,
 			'form' => $form->createView()
 		]);
 	}
