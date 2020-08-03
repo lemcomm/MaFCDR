@@ -42,6 +42,8 @@ menu:
  rss:       RSS feed
  events:    Events
  messages:  Messages
+ messages2: Messages (Chronological)
+ messages3: Messages (Topical)
  news:      Publications
  relations: Relations
  politics:  Politics
