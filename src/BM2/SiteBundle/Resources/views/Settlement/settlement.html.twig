@@ -33,7 +33,7 @@
 		{% if isowner %}
 			<li class="tt_botleft">{{ 'settlement.population'|trans }}: {{ settlement.fullpopulation }}
 			<br />({{ settlement.population }} {{ 'settlement.civilians'|trans }}
-			{% if settlement.soldiers|length > 0 %}, {{ settlement.soldiers|length }} {{ 'settlement.militia2'|trans }}{% endif %}
+			{% if settlement.countDefenders > 0 %}, {{ settlement.countDefenders }} {{ 'settlement.militia2'|trans }}{% endif %}
 			{% if settlement.thralls > 0 %}, {{ settlement.thralls }} {{ 'settlement.thralls'|trans }}{% endif %})</li>
 			<li>{{ 'settlement.pop.change'|trans }}:
 				{% if popchange/settlement.population > 0.1 %}
@@ -136,8 +136,8 @@
 
 	{% if details.spot or isowner %}
 		<h2>{{ 'npc.soldier'|transchoice(10)|capitalize }}</h2>
-		{% if settlement.activemilitia|length > 0 %}
-			{{ 'settlement.militiacount'|trans({"%count%":settlement.activemilitia|length}) }}
+		{% if settlement.countDefenders > 0 %}
+			{{ 'settlement.militiacount'|trans({"%count%":settlement.countDefenders}) }}
 		{% else %}
 			{{ 'none'|trans }}
 		{% endif %}
@@ -152,9 +152,9 @@
 			</ul>
 		{% endif %}
 		{% if details.spot and isowner %}
-			<a href="{{ path('bm2_site_settlement_soldiers', {'id':settlement.id}) }}">{{ 'viewdetails'|trans|title }}</a>
+			<a href="{{ path('maf_units') }}">{{ 'viewdetails'|trans|title }}</a>
 			--
-			<a href="{{ path('bm2_site_actions_soldiers') }}">{{ 'recruit.troops.name'|trans({},"actions")|title }}</a>
+			<a href="{{ path('maf_recruit') }}">{{ 'recruit.troops.name'|trans({},"actions")|title }}</a>
 		{% endif %}
 	{% endif %}
 
@@ -337,7 +337,7 @@
 	<h2>{{ 'settlement.neighbours'|trans|title }}</h2>
 	<ul>
 	{% for neighbour in neighbours %}
-		<li><a href="{{ path('bm2_settlement', {'id':neighbour.id})}}">{{ neighbour.name }}</a> - 
+		<li><a href="{{ path('bm2_settlement', {'id':neighbour.id})}}">{{ neighbour.name }}</a> -
 			{{ neighbour.distance|distance }}, {{ neighbour.direction|direction(true)|trans }}</li>
 	{% endfor %}
 	</ul>
