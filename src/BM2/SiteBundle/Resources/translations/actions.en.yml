@@ -1157,8 +1157,16 @@ place:
 unit:
  list:
   name:     Manage Units
-  intro:    Placeholder text intro for managing units!
+  intro:    From here you can manage those Units you command, marshall, or own, as appropriate.
   list:     Your Units
+  rebase:   Rebase this Unit
+  review:   Review Soldiers
   soldiers: Comprised of
   count:    %soldiers% Soldiers
   manage:   Manage Unit Settings
+  youcommand: Under your direct command.
+  commander: Under comamnd of %name%.
+  nocommander: Not currently under anyone's command.
+  marshall: Can be marshalled by %name%.
+  nomarshall: Marshalling of this unit is reserved by the settlement's owner.
+ assigned:
