@@ -28,6 +28,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UnitController extends Controller {
 
+        private function findUnits(Character $character) {
+                if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
+                        $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
+                } else {
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
+                        $query->setParameter('char', $character);
+                }
+                return $query->getResult();
+        }
+
         /**
           * @Route("/units", name="maf_units")
           */
@@ -40,15 +51,11 @@ class UnitController extends Controller {
                 $em = $this->getDoctrine()->getManager();
 
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
-                        $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                         $lord = true;
                 } else {
-                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
-                        $query->setParameter('char', $character);
                         $lord = false;
                 }
-                $units = $query->getResult();
+                $units = $this->findUnits($character);
 
                 return $this->render('Unit/units.html.twig', [
                         'lord' => $lord,
@@ -250,7 +257,7 @@ class UnitController extends Controller {
 			return $this->redirectToRoute($character);
 		}
                 $options = new ArrayCollection();
-                foreach ($character->getSettlements() as $settlement) {
+                foreach ($character->getOwnedSettlements() as $settlement) {
                         $options->add($settlement);
                 }
                 if ($settlement = $charcter->getInsideSettlement()) {
@@ -368,10 +375,10 @@ class UnitController extends Controller {
 
 
         /**
-          * @Route("/unit/{unit}/recruit", name="maf_unit_recruit", requirements={"unit"="\d+"})
+          * @Route("/unit/recruit", name="maf_recruit")
           */
      	public function unitRecruitAction(Request $request, Unit $unit) {
-     		list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true, true, false, $unit);
+     		list($character, $settlement) = $this->get('dispatcher')->gateway('unitRecruitTest', true);
                 # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
      		if (! $character instanceof Character) {
      			return $this->redirectToRoute($character);
@@ -381,6 +388,13 @@ class UnitController extends Controller {
                 $query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBunlde:Soldier s JOIN s.unit u WHERE u.settlement = :here AND s.training_required > 0');
      		$query->setParameter('here', $settlement);
      		$allocated = $query->getSingleResult();
+                $allUnits = $this->findUnits($character);
+                $units = [];
+                foreach ($allUnits as $unit) {
+                        if($unit->getSoldiers()->count() < 200 && $unit->getSettings()->getReinforcements()) {
+                                $units[] = $unit;
+                        }
+                }
 
      		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
      		$form = $this->createForm(new SoldiersRecruitType($available, $units));
