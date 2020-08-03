@@ -189,3 +189,14 @@ reply:
  title: Write a Reply
  intro: From here you can write a reply to the below message, included here for your convenience.
  outro: Below, you can select your message type, formulate your response, and send it.
+
+recent:
+ unread: Unread
+ 12h: 12 Hours
+ 24h: 1 Day
+ 3d: 3 Days
+ 1w: 1 Week
+ 2w: 2 Weeks
+ 1m: 1 Month
+ 2m: 2 Months
+ 3m: 3 Months
