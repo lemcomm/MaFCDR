@@ -169,7 +169,9 @@ class Settlement {
 			}
 		}
 		foreach ($this->getUnits() as $unit) {
-			$militia += $unit->getActiveSoldiers()->count();
+			if ($unit->isLocal()) {
+				$militia += $unit->getActiveSoldiers()->count();
+			}
 		}
 		return $militia + $defenders;
 	}
@@ -296,59 +298,6 @@ class Settlement {
 	public function isDefended() {
 		if ($this->countDefenders()>0) return true;
 		return false;
-	}
-	/* Leftover code from when we were planning to make settlements subordinate to each other.
-	Doing this would make calculating region resources and the like a literal pain, as we'd have to add a bunch of conditions
-	that help the game determine if the settlement is supposed to have resources or not.
-
-	The better idea is to make places entirely NOT settlements, and have them operate on separate code.
-
-	public function getMinorSettlementWorkers($include_me=true) {
-		$total;
-		# $include_me set to true will include the settlement we're looking at.
-		if ($include_me) {
-			$total += round($this->getBuildingWorkers() * $this->getPopulation());
-			foreach ($settlement->getInferiors() as $minor) {
-				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
-			}
-		} else {
-			foreach ($settlement->getInferiors() as $minor) {
-				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
-			}
-		}
-		return $total;
-	}
-
-	public function getMinorSettlementWorkersPercent($include_me=true) {
-		$total;
-		if ($include_me) {
-			$total += $this->getBuildingWorkersPercent();
-			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
-				$total =+ $minor->getBuildingWorkersPercent();
-			}
-		} else {
-			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
-				$total =+ $minor->getBuildingWorkersPercent();
-			}
-		}
-		return $total;
-	}*/
-
-	public function getLocalUnits() {
-		$local = new ArrayCollection;
-		foreach($this->getUnits() as $unit) {
-			if (!$unit->getCharacter()) {
-				#Unassigned units are always available.
-				#TODO: Add restrictions for traveling units.
-				$local->add($unit);
-			} else {
-				if ($unit->getChracter()->getInsideSettlement == $this) {
-					# Assigned units that are local can be assigned to as well.
-					$local->add($unit);
-				}
-			}
-		}
-		return $local;
 	}
 	
 }
