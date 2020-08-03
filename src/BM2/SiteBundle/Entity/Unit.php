@@ -62,5 +62,20 @@ class Unit {
 	public function getAvailable() {
 		return $this->maxSize - $this->getSoldiers()->count();
 	}
+
+	public function getRecruits() {
+		return $this->getSoldiers()->filter(
+			function($entry) {
+				return ($entry->isRecruit());
+			}
+		);
+	}
+
+	public function isLocal() {
+		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace()) {
+			return true;
+		}
+		return false;
+	}
 	
 }
