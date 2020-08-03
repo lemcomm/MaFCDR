@@ -431,7 +431,7 @@ class Dispatcher {
 			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit')) {
 				$actions[] = $this->unitNewTest();
 				$actions[] = $this->personalEntourageTest();
-				$actions[] = $this->unitSoldiersTest(); #This page handles recruiting.
+				$actions[] = $this->unitRecruitTest(); #This page handles recruiting.
 			} else {
 				$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notyours");
 			}
@@ -1910,7 +1910,7 @@ class Dispatcher {
 
 	public function personalAssignedUnitsTest() {
 		# No restrictions on this page, yet.
-		return $this->action("unit.assigned", "maf_units");
+		return $this->action("unit.list", "maf_units");
 	}
 
 	public function personalRequestsManageTest() {
@@ -2153,7 +2153,7 @@ class Dispatcher {
 	public function unitRebaseTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement()->getOwner() != $character) {
+		if($unit->getSettlement() && $unit->getSettlement()->getOwner() != $character) {
 			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
 		}
 		if(!$settlement) {
@@ -2182,6 +2182,18 @@ class Dispatcher {
 			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
 		}
 		return $this->action("recruit.troops", "maf_unit_soldiers");
+	}
+
+	public function unitRecruitTest() {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
+		}
+		$available = $this->milman->findAvailableEquipment($settlement, true);
+		if (empty($available)) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
+		}
+		return $this->action("recruit.troops", "maf_recruit");
 	}
 
 	public function unitCancelTrainingTest($ignored, Unit $unit) {
