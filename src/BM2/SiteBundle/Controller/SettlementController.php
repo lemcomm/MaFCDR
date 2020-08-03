@@ -6,6 +6,8 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -52,8 +54,22 @@ class SettlementController extends Controller {
 		$query->setParameter('here', $settlement);
 		$neighbours = $query->getArrayResult();
 
+		$militia = [];
+		$recruits = 0;
 		if ($details['spy'] || $settlement->getOwner() == $character) {
-			$militia = $settlement->getActiveMilitiaByType();
+			foreach ($settlement->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
+						if (array_key_exists($key, $militia)) {
+							$militia[$key] += $type;
+						} else {
+							$militia[$key] = $type;
+						}
+					}
+				}
+				$recruits += $unit->getRecruits()->count();
+				#$militia = $settlement->getActiveMilitiaByType();
+			}
 		} else {
 			$militia = null;
 		}
@@ -137,7 +153,7 @@ class SettlementController extends Controller {
 			'regionpoly'=> $this->get('geography')->findRegionPolygon($settlement),
 			'neighbours' => $neighbours,
 			'militia' => $militia,
-			'recruits' => $settlement->getRecruits()->count(),
+			'recruits' => $recruits,
 			'security' => round(($this->get('economy')->EconomicSecurity($settlement)-1.0)*16),
 			'heralds' => $heralds
 		);
