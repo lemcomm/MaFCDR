@@ -1610,3 +1610,8 @@ house:
   created:     You have formalized your House!
   background:  The details of your House have been udpated.
   relocated:   You have relocated your House!
+
+unit:
+ manage:
+  success:     Unit Settings have been updated!
+  failed:      Unit Settings not updated.
