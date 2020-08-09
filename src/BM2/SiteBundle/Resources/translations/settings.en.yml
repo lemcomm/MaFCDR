@@ -6,7 +6,7 @@
 areyousure: Confirm Your Decision
 button:
  submit:  Submit
- 
+
 character:
  title:              Character Settings
  description:        Using this menu you can choose to enable or disable different character level settings aimed at making your gameplay more enjoyable. One example of this is the ability to automatically set new realm messages as read for your character.
@@ -21,17 +21,21 @@ unit:
   All of this is presently not implemented, but will be fully tied into the rest of the game in short order, starting with supply sources, as things are completed. Full information can be found on the manual's "Units" page.
  yourown:   Settings for your personal force
  name:      Unit Name?
- supplier:  Where are they supplied from?
+ supplier:
+  name:     Where are they supplied from?
+  empty:    (Select a Source)
  strategy:
   name:     Battle Strategy?
   advance:  Charge enemy
   hold:     Hold position
   distance: Avoid enemies
+  empty:    (Select a Strategy)
  tactic:
   name:     Engagement Tactic?
   melee:    Melee only
   ranged:   Ranged only
   mixed:    Use best
+  empty:    (Select a Tactic)
  usefort:   Respect fortifications?
  line:
   name:     On which line shall they deploy?
@@ -42,12 +46,24 @@ unit:
   5:        5th Row
   6:        6th Row
   7:        7th Row (Very back)
+  empty:    (Select a Line)
  siege:
   name:     How should siege teams act outside of sieges?
   engage:   Join in combat
   stayback: Reserve only
   avoid:    Avoid combat
+ siege_orders:
+  name:       Orders during sieges?
+  empty:      (Select an Order)
+  assault:    Join Assault
+  hold:       Hold Back
+  equipment:  Man Equipment
  success:   Settings for the %name% have been updated!
+ renamable:
+  name:     Can this unit be renamed?
+ retreat:
+  name:     Withdraw/Retreat Percentage
+
 
 update:
  success:  Settings updated successfully!
