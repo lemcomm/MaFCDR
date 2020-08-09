@@ -12,6 +12,7 @@ use BM2\SiteBundle\Entity\UnitSettings;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\SoldiersRecruitType;
 use BM2\SiteBundle\Form\SoldiersManageType;
+use BM2\SiteBundle\Form\UnitRebaseType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 use BM2\SiteBundle\Form\UnitSoldiersType;
 
@@ -29,6 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 class UnitController extends Controller {
 
         private function findUnits(Character $character) {
+                $em = $this->getDoctrine()->getManager();
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
@@ -159,9 +161,24 @@ class UnitController extends Controller {
                                 $canRecruit = true;
 				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 			}
-                        if ($settlement->getLocalUnits()->contains($unit)) {
+                        $local = new ArrayCollection();
+                        foreach ($settlement->getUnits() as $each) {
+                                if (!$each->getCharacter() && !$each->getPlace()) {
+                                        $local->add($each);
+                                }
+                        }
+                        foreach ($character->getUnits() as $mine) {
+                                if (!$mine->getSettlement()) {
+                                        # Units created from legacy soldiers that don't have a base act as if they ALWAYS are at their base.
+                                        $local->add($mine);
+                                }
+                        }
+                        # So we get all local units, check if our unit is in it, if it is we see if we have unit management here and build a list of all other units if we do,
+                        # along with set the flag enabling reassignment of soldiers.
+                        # Yes, I wrote this because I stared at this for several minutes trying to figure it out.
+                        if ($local->contains($unit)) {
                                 if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
-                                        foreach ($settlement->getLocalUnits() as $localUnit) {
+                                        foreach ($local as $localUnit) {
                                                 if ($unit != $localUnit) {
                                                         $units[] = $localUnit;
                                                 }
@@ -188,7 +205,7 @@ class UnitController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			list($success, $fail) = $this->get('military_manager')->manageUnit($character->getSoldiers(), $data, $settlement, $character, $canResupply, $canRecruit, $canReassign);
+			list($success, $fail) = $this->get('military_manager')->manageUnit($unit->getSoldiers(), $data, $settlement, $character, $canResupply, $canRecruit, $canReassign);
 			// TODO: notice with result
 
 			$em = $this->getDoctrine()->getManager();
@@ -247,6 +264,36 @@ class UnitController extends Controller {
 	}
 
         /**
+	  * @Route("/units/{unit}/assign", name="maf_unit_assign", requirements={"unit"="\d+"})
+	  */
+
+        public function unitAssignAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitAssignTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+                $options = $this->get('dispatcher')->getActionableCharacters(true);
+
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'button.submit', 'settings'));
+
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                        $data = $form->getData();
+                        $em = $this->getDoctrine()->getManager();
+                        $unit->setCharater($data['target']);
+                        $em->flush();
+                        $this->addFlash('notice', $this->get('translator')->trans('unit.assign.success', array(), 'actions'));
+                        return $this->redirectToRoute('maf_units');
+                }
+
+                return $this->render('Unit/assign.html.twig', [
+                        'unit'=>$unit,
+                        'form'=>$form->createView()
+                ]);
+        }
+
+        /**
 	  * @Route("/units/{unit}/rebase", name="maf_unit_rebase", requirements={"unit"="\d+"})
 	  */
 
@@ -260,13 +307,13 @@ class UnitController extends Controller {
                 foreach ($character->getOwnedSettlements() as $settlement) {
                         $options->add($settlement);
                 }
-                if ($settlement = $charcter->getInsideSettlement()) {
+                if ($settlement = $character->getInsideSettlement() && !$options->contains($settlement)) {
                         if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
                                 $options->add($settlement);
                         }
                 }
 
-                $form = $this->createForm(new UnitRebaseType($options));
+                $form = $this->createForm(new UnitRebaseType($options->toArray()));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
@@ -281,6 +328,7 @@ class UnitController extends Controller {
                 }
 
                 return $this->render('Unit/rebase.html.twig', [
+                        'unit'=>$unit,
                         'form'=>$form->createView()
                 ]);
         }
