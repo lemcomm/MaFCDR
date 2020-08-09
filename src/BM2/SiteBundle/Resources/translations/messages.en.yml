@@ -152,8 +152,8 @@ map:
  rmlast:    Remove last
  enter:     Enter destination
  clear:     Clear
- newroute:  Your new route has been set. It will take you about %duration% days to complete.
- disembark: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% days considers the route until that point. Red lines show the invalid travel section.</small>
+ newroute:  Your new route has been set. It will take you about %duration% game days, about %days% real day(s) and %hours% hour(s), to complete.
+ disembark: Your new route has been set. It crosses into land, so you will disembark at the red dot.<br /><small>The travel time estimate of %duration% game days, about %days% real day(s) and %hours% hour(s), considers the route until that point. Red lines show the invalid travel section.</small> 
  crossings:
   title:    River crossings
   river:    The %river% at the bridge "%bridge%" near %nearby%.
