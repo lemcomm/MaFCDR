@@ -87,11 +87,11 @@ class UnitSoldiersType extends AbstractType {
 				if ($soldier->isAlive()) {
 					if (!$in_battle) {
 						$actions = array('disband'=>'recruit.manage.disband');
-					}
-
-					if (!$in_battle) {
 						if (!empty($avail_train) && $soldier->isActive()) {
 							$actions['retrain'] = 'recruit.manage.retrain';
+						}
+						if ($this->reassign) {
+							$actions['assignto'] = 'recruit.manage.reassign';
 						}
 					}
 					$resupply = false;
@@ -106,6 +106,7 @@ class UnitSoldiersType extends AbstractType {
 					if ($resupply) {
 						$actions['resupply'] = 'recruit.manage.resupply';
 					}
+
 				} else {
 					$actions = array('bury' => 'recruit.manage.bury');
 				}
@@ -121,11 +122,12 @@ class UnitSoldiersType extends AbstractType {
 
 		if (!empty($this->others) && $this->reassign) {
 			$others = $this->others;
-			$builder->add('assignto', Unit::class, array(
+			$builder->add('assignto', EntityType::class, array(
 				'placeholder' => 'form.choose',
 				'label' => 'recruit.manage.assignto',
 				'required' => false,
-				'choice_label'=>'name',
+				'choice_label'=>'settings.name',
+				'class'=>'BM2SiteBundle:Unit',
 				'query_builder'=>function(EntityRepository $er) use ($others) {
 					$qb = $er->createQueryBuilder('u');
 					$qb->where('u IN (:others)');
@@ -142,6 +144,7 @@ class UnitSoldiersType extends AbstractType {
 					'placeholder'=>'item.current',
 					'required'=>false,
 					'translation_domain'=>'messages',
+					'class'=>'BM2SiteBundle:EquipmentType',
 					'choice_label'=>'nameTrans',
 					'choice_translation_domain'=>'messages',
 					'query_builder'=>function(EntityRepository $er) use ($avail_train, $field) {
