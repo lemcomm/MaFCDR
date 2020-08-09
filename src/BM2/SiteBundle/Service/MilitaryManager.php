@@ -142,7 +142,7 @@ class MilitaryManager {
 			if (isset($change['action'])) {
 				$this->logger->debug("applying action ".$change['action']." to soldier #".$npc->getId()." (".$npc->getName().")");
 				switch ($change['action']) {
-					case 'reassign':
+					case 'assignto':
 						if ($canReassign && $data['assignto']) {
 							$npc->setUnit($data['assignto']);
 						}
