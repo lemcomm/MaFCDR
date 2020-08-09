@@ -101,7 +101,9 @@ class UnitSettingsType extends AbstractType {
 				'label' => 'unit.supplier.name',
 				'multiple'=>false,
 				'expanded'=>false,
-				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($char, $settlements) {
+				'class'=>'BM2SiteBundle:Settlement',
+				'choice_label'=>'name',
+				'query_builder'=>function(EntityRepository $er) use ($char, $settlements) {
 					$qb = $er->createQueryBuilder('s');
 					$qb->where('s.owner = :char')
 					->orWhere('s.feed_soldiers = TRUE and s.owner = :liege')
@@ -168,15 +170,10 @@ class UnitSettingsType extends AbstractType {
 			'placeholder'=>'unit.siege_orders.empty'
 		));
 		if ($lord) {
-			$builder->add('renamable', ChoiceType::class, array(
+			$builder->add('renamable', CheckboxType::class, array(
 				'label'=>'unit.renamable.name',
 				'required'=>false,
 				'data'=>$renamable,
-				'choices'=>array(
-					true => 'unit.renamable.true',
-					false => 'unit.renamable.false'
-				),
-				'placeholder'=>'unit.renamable.empty'
 			));
 		}
 		$builder->add('retreat_threshold', NumberType::class, array(
@@ -189,7 +186,7 @@ class UnitSettingsType extends AbstractType {
 			'data'=>$reinforcements,
 			'required'=>false
 		));
-		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
+		$builder->add('submit', SubmitType::class, array('label'=>'button.submit'));
 	}
 
 	public function getName() {
