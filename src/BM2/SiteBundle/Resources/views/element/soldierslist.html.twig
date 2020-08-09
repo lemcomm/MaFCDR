@@ -191,8 +191,8 @@ $(document).ready(function() {
 	if ($("#soldierslist select[id$=_action] option[value='disband']").length == 0) {
 		$("#group_option option[value='disband']").remove();
 	}
-	if ($("#soldierslist select[id$=_action] option[value='assign']").length == 0) {
-		$("#group_option option[value='assign']").remove();
+	if ($("#soldierslist select[id$=_action] option[value='assignto']").length == 0) {
+		$("#group_option option[value='assignto']").remove();
 	}
 	if ($("#soldierslist select[id$=_action] option[value='makemilitia']").length == 0) {
 		$("#group_option option[value='makemilitia']").remove();
@@ -234,7 +234,7 @@ $(document).ready(function() {
 
 	function UpdateSoldierRow(actionselect) {
 		actionselect.closest("tr").attr("has_changed", "true");
-		if (actionselect.val() == "assign") {
+		if (actionselect.val() == "assignto") {
 			$("#assigntarget").show();
 		} else if (actionselect.val() == "retrain") {
 			$("#retrain").show();
