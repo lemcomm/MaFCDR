@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Form;
 
 use BM2\SiteBund\Entity\Settlement;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,7 +27,7 @@ class UnitRebaseType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$options = $this->options;
 
-		$builder->add('settlement', Settlement::class, array(
+		$builder->add('settlement', EntityType::class, array(
 			'label' => 'unit.rebase.settlement',
 			'multiple'=>false,
 			'expanded'=>false,
