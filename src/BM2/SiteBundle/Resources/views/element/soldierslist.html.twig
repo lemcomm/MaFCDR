@@ -90,7 +90,19 @@
 <hr />
 
 <div class="actionsbar">
-	<button type="button" id="toggle_all">{{ 'soldier.toggleall'|trans }}</button><br />
+	<button type="button" id="toggle_all">{{ 'soldier.toggleall'|trans }}</button>
+	{{ 'soldier.allin4'|trans }}
+	<select id="group_option">
+		<option value="nothing">{{ 'recruit.manage.nothing'|trans({},"actions") }}</option>
+		<option value="nothing">no action</option>
+		<option value="disband">{{ 'recruit.manage.disband'|trans({},"actions") }}</option>
+		<option value="assignto">{{ 'recruit.manage.reassign'|trans({},"actions") }}</option>
+		<option value="retrain">{{ 'recruit.manage.retrain'|trans({},"actions") }}</option>
+		<option value="resupply">{{ 'recruit.manage.resupply'|trans({},"actions") }}</option>
+	</select>
+	<button type="button" id="group_apply">{{ 'recruit.manage.apply'|trans({},"actions") }}</button>
+
+	<br />
 
 	<button type="button" id="bury_all">{{ 'soldier.buryall'|trans }}</button>
 	<button type="button" id="resupply_all">{{ 'soldier.resupplyall'|trans }}</button>
@@ -194,12 +206,6 @@ $(document).ready(function() {
 	if ($("#soldierslist select[id$=_action] option[value='assignto']").length == 0) {
 		$("#group_option option[value='assignto']").remove();
 	}
-	if ($("#soldierslist select[id$=_action] option[value='makemilitia']").length == 0) {
-		$("#group_option option[value='makemilitia']").remove();
-	}
-	if ($("#soldierslist select[id$=_action] option[value='makesoldier']").length == 0) {
-		$("#group_option option[value='makesoldier']").remove();
-	}
 	if ($("#soldierslist select[id$=_action] option[value='retrain']").length == 0) {
 		$("#group_option option[value='retrain']").remove();
 	}
@@ -252,22 +258,12 @@ $(document).ready(function() {
 
 
 	$("#group_apply").click(function(){
-		var group = $("#group_select").val();
 		var action = $("#group_option").val();
 
-		if (group == -1) {
-			$("#soldierslist input.check_soldier:checked").each(function(){
-				$(this).closest("tr").find("[id$=_action]").val(action);
-				UpdateSoldierRow($(this).closest("tr").find("[id$=_action]"));
- 			});
-		} else {
-			$("[id$=_group]").each(function(){
-				if ($(this).val() == group) {
-					$(this).closest("tr").find("[id$=_action]").val(action);
-					UpdateSoldierRow($(this).closest("tr").find("[id$=_action]"));
-				}
-			});
-		}
+		$("#soldierslist input.check_soldier:checked").each(function(){
+			$(this).closest("tr").find("[id$=_action]").val(action);
+			UpdateSoldierRow($(this).closest("tr").find("[id$=_action]"));
+		});
 	});
 
 	$("#do_submit").click(function(event){
@@ -279,5 +275,4 @@ $(document).ready(function() {
 	});
 });
 </script>
-
 </div>
