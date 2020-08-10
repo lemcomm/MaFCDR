@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\CharacterSelectType;
 use BM2\SiteBundle\Form\SoldiersRecruitType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\UnitRebaseType;
@@ -275,7 +276,7 @@ class UnitController extends Controller {
 		}
                 $options = $this->get('dispatcher')->getActionableCharacters(true);
 
-                $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'button.submit', 'settings'));
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'button.submit', 'actions'));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
@@ -288,6 +289,46 @@ class UnitController extends Controller {
                 }
 
                 return $this->render('Unit/assign.html.twig', [
+                        'unit'=>$unit,
+                        'form'=>$form->createView()
+                ]);
+        }
+
+        /**
+	  * @Route("/units/{unit}/appoint", name="maf_unit_appoint", requirements={"unit"="\d+"})
+	  */
+
+        public function unitAppointAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitAssignTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+                $options = $this->get('dispatcher')->getActionableCharacters(true); # Returns an array.
+                # Check if the unit has a settlement, and if so, set $realm to the realm of that settlement, if any, and check if realm exists.
+                if ($unit->getSettlement() && $realm = $unit->getSettlement()->getRealm()) {
+                        # Get all members of the ultimate realm of the settlement.
+                        foreach ($realm->findUltimate()->findMembers() as $char) {
+                                # Check if we already have them, if not: add.
+                                if (!in_array($char, $options)) {
+                                        $options[] = $char;
+                                }
+                        }
+                }
+
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.appoint.empty', 'unit.appoint.select', 'button.submit', 'actions'));
+
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                        $data = $form->getData();
+                        $em = $this->getDoctrine()->getManager();
+                        $unit->setMarshal($data['target']);
+                        $em->flush();
+                        $this->addFlash('notice', $this->get('translator')->trans('unit.appoint.success', array(), 'actions'));
+                        return $this->redirectToRoute('maf_units');
+                }
+
+                return $this->render('Unit/appoint.html.twig', [
                         'unit'=>$unit,
                         'form'=>$form->createView()
                 ]);
@@ -386,7 +427,7 @@ class UnitController extends Controller {
                         }
                 }
 
-                return $this->render('Unit/disband.html.twig', [
+                return $this->render('Unit/return.html.twig', [
                         'form'=>$form->createView()
                 ]);
         }
@@ -415,7 +456,7 @@ class UnitController extends Controller {
                         }
                 }
 
-                return $this->render('Unit/disband.html.twig', [
+                return $this->render('Unit/recall.html.twig', [
                         'form'=>$form->createView()
                 ]);
         }
