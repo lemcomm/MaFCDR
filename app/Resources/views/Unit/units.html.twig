@@ -6,21 +6,38 @@
 
 	<h3> {{ 'unit.list.list'|trans({},"actions")|title }}</h3>
         {% for unit in units %}
-                {% if unit.settlement == null or unit.settlement.owner == character %}
+                {% if unit.settlement == null or unit.settlement.owner == character or unit.marshal == character %}
                         <hr>
                         <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
                         {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br />
-                	{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}<br /><br />
-                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> | <a href="{{ path('maf_unit_rebase', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a> | <a href="{{ path('maf_unit_soldiers', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
+                	{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}
+			{% if unit.marshal %}
+				<br />{{ 'unit.list.marshal'|trans({"%character%":link(unit.character)}, "actions")|raw }}
+			{% else %}
+				<br />{{ 'unit.list.nomarshal'|trans({"%character%":link(unit.character)}, "actions")|raw }}
+			{% endif %}
+			<br /><br />
+                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> |
+			<a href="{{ path('maf_unit_soldiers', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a> |
+			<a href="{{ path('maf_unit_assign', {"unit":unit.id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a> |
+			<a href="{{ path('maf_unit_rebase', {"unit":unit.id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>{% if unit.settlement == null or unit.settlement.owner == character %} |
+			<a href="{{ path('maf_unit_appoint', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.appoint'|trans({},"actions") }}</button></a> |
+			<a href="{{ path('maf_unit_disband', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.disband'|trans({},"actions") }}</button></a>{% endif %}
                 {% else %}
                         <hr>
                         <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
                         {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br />
 			{% if unit.character %}
-                        	{{ 'unit.list.commander'|trans({"%character%":link(unit.character)}, "actions")|raw }}<br /><br />
+                        	{{ 'unit.list.commander'|trans({"%character%":link(unit.character)}, "actions")|raw }}
 			{% else %}
-				{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}<br /><br />
+				{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}
 			{% endif %}
+			{% if unit.marshal %}
+				<br />{{ 'unit.list.marshal'|trans({"%character%":link(unit.character)}, "actions")|raw }}
+			{% else %}
+				<br />{{ 'unit.list.nomarshal'|trans({"%character%":link(unit.character)}, "actions")|raw }}
+			{% endif %}
+			<br /><br />
                         <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> | <a href="{{ path('maf_unit_soldiers', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
                 {% endif %}
         {% else %}
