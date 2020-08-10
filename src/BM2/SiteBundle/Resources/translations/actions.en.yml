@@ -854,11 +854,12 @@ recruit:
   limited:      Due to your current ongoing actions (such as battle or looting), your management options are limited.
   choose:       -- Action --
   nothing:      (No action)
-  apply:        Apply to group
+  apply:        Apply to Selected
   disband:      Disband
   assign:       Assign...
   assignto:     Assign selected soldiers to:
   assignto2:    Assign selected entourage to:
+  reassign:     Reassign
   bury:         Bury
   bury2:        Leave corpse
   makesoldier:  Mobilize
@@ -1167,6 +1168,16 @@ unit:
   youcommand: Under your direct command.
   commander: Under comamnd of %name%.
   nocommander: Not currently under anyone's command.
-  marshall: Can be marshalled by %name%.
-  nomarshall: Marshalling of this unit is reserved by the settlement's owner.
+  marshal: Can be marshalled by %name%.
+  nomarshal: Marshalling of this unit is reserved by the settlement's owner.
+  assign:   Assign a Leader
+  appoint:  Appoint a Marshal
+  disband:  Disband Unit
+  return:   Send Unit Home
+  recall:   Recall Unit
  assigned:
+ assign:
+  name:     Assign a Leader to %name%
+  intro:    From here you can select any of the nearby characters to take control of %name%, letting them lead them to other locations and/or lead them into battle.
+  empty:    (Select a Character)
+  select:   "Assign this unit to:"
