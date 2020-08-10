@@ -118,6 +118,7 @@
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
 
 		<one-to-many field="units" target-entity="Unit" mapped-by="character"/>
+		<one-to-many field="marshalling_units" target-entity="Unit" mapped-by="marshal"/>
 		<one-to-many field="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
 
 		<one-to-one field="active_report" target-entity="BattleReportCharacter"/>
