@@ -217,6 +217,10 @@ event:
     start:      %character% has authorized you to pull food from their storehouses at %settlement% for your troops.
     rejected:   Your request for food to be supplied from %settlement% was rejected by the lord.
     end:        Your ability to draw food from %settlement% has reached the agreed upon conclusion.
+ unit:
+  assigned:     %character% has given you command of %unit%.
+  appointed:    %character% has appointed you marshal of %unit%.
+  recalled:     %character% has recalled %unit% from your command.
 
  quest:
   created:      Quest created.
