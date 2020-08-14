@@ -18,6 +18,7 @@ use BM2\SiteBundle\Form\UnitSettingsType;
 use BM2\SiteBundle\Form\UnitSoldiersType;
 
 use BM2\SiteBundle\Service\GameRequestManager;
+use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\MilitaryManager;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -42,6 +43,17 @@ class UnitController extends Controller {
                 return $query->getResult();
         }
 
+        private function findMarshalledUnits(Character $character) {
+                $em = $this->getDoctrine()->getManager();
+                if ($character->getInsideSettlement()) {
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.marshal = :char AND u.settlement = :settlement ORDER BY s.name ASC');
+                        $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
+                        return $query->getResult();
+                } else {
+                        return null;
+                }
+        }
+
         /**
           * @Route("/units", name="maf_units")
           */
@@ -55,8 +67,10 @@ class UnitController extends Controller {
 
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
                         $lord = true;
+                        $marshalled = null;
                 } else {
                         $lord = false;
+                        $marshalled = $this->findMarshalledUnits($character);
                 }
                 $units = $this->findUnits($character);
 
@@ -276,14 +290,20 @@ class UnitController extends Controller {
 		}
                 $options = $this->get('dispatcher')->getActionableCharacters(true);
 
-                $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'button.submit', 'actions'));
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'unit.assign.submit', 'actions'));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
                         $data = $form->getData();
                         $em = $this->getDoctrine()->getManager();
-                        $unit->setCharater($data['target']);
+                        $unit->setCharacter($data['target']);
                         $em->flush();
+                        $this->get('history')->logEvent(
+				$data['target'],
+				'event.unit.assigned',
+				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
+				History::MEDIUM, false, 30
+			);
                         $this->addFlash('notice', $this->get('translator')->trans('unit.assign.success', array(), 'actions'));
                         return $this->redirectToRoute('maf_units');
                 }
@@ -316,7 +336,7 @@ class UnitController extends Controller {
                         }
                 }
 
-                $form = $this->createForm(new CharacterSelectType($options, 'unit.appoint.empty', 'unit.appoint.select', 'button.submit', 'actions'));
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.appoint.empty', 'unit.appoint.select', 'unit.appoint.submit', 'actions'));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
@@ -324,6 +344,12 @@ class UnitController extends Controller {
                         $em = $this->getDoctrine()->getManager();
                         $unit->setMarshal($data['target']);
                         $em->flush();
+                        $this->get('history')->logEvent(
+				$data['target'],
+				'event.unit.appointed',
+				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
+				History::MEDIUM, false, 30
+			);
                         $this->addFlash('notice', $this->get('translator')->trans('unit.appoint.success', array(), 'actions'));
                         return $this->redirectToRoute('maf_units');
                 }
@@ -361,6 +387,7 @@ class UnitController extends Controller {
                         $data = $form->getData();
                         $success = $this->get('military_manager')->rebaseUnit($data, $options, $unit);
                         if ($success) {
+                                $this->getDoctrine()->getManager()->flush();
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.rebase.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
                         } else {
@@ -449,6 +476,12 @@ class UnitController extends Controller {
                 if ($form->isValid() && $form->isSubmitted()) {
                         $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter()->getLocation(), false);
                         if ($success) {
+                                $this->get('history')->logEvent(
+        				$data['target'],
+        				'event.unit.recalled',
+        				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
+        				History::MEDIUM, false, 30
+        			);
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.recall.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
                         } else {
@@ -460,8 +493,6 @@ class UnitController extends Controller {
                         'form'=>$form->createView()
                 ]);
         }
-
-
 
         /**
           * @Route("/unit/recruit", name="maf_recruit")
@@ -483,6 +514,9 @@ class UnitController extends Controller {
                         if($unit->getSoldiers()->count() < 200 && $unit->getSettings()->getReinforcements()) {
                                 $units[] = $unit;
                         }
+                }
+                if (count($units) < 1) {
+                        $units[] = $this->get('military_manager')->newUnit(null, $settlement, null); #Ensure we always have atleast 1!
                 }
 
      		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
