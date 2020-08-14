@@ -763,17 +763,7 @@ class MilitaryManager {
 		$count = $unit->getSoldiers()->count();
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
-		$final = $days*0.925; #Average travel speed of all region types.
-
-		# Send recall event to old troop leader.
-		if($reason == 'recalled') {
-			$this->history->logEvent(
-				$unit->getCharacter(),
-				'event.military.recalled',
-				array('%link-settlement%'=>$unit->getSettlement()->getId()),
-				History::MEDIUM, false, 30
-			);
-		}
+		$final = $days*0.925*0.66; #Average travel speed of all region types mulitiplied by .66 so it deliberately moves slower than everything else.
 
 		$unit->setTravelDays(ceil($final));
 		$unit->setCharacter(null);
