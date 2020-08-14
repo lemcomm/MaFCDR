@@ -1018,7 +1018,7 @@ soldier:
  allin:            all soldiers in group
  allin2:           set to
  allin3:           selection
- allin4:           set all selected soldiers to 
+ allin4:           set all selected soldiers to
  groupby:
   intro:           re-group all soldiers
   type:            by type
@@ -1546,6 +1546,8 @@ unavailable:
   ismanaged:    This conversation is managed by the System.
   notmanager:   You don't have manager permissions in this conversation.
   notactive:    You don't have an active permission to this conversation.
+ noplace:       There are no Places of Interest here.
+ nopermission:  You don't have permissions to do that here.
 
 marker:
  name:      Marker name
