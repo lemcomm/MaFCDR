@@ -1158,6 +1158,7 @@ place:
 unit:
  list:
   name:     Manage Units
+  description: Oversee the units under your authority.
   intro:    From here you can manage those Units you command, marshall, or own, as appropriate.
   list:     Your Units
   rebase:   Rebase this Unit
@@ -1168,7 +1169,13 @@ unit:
   youcommand: Under your direct command.
   commander: Under comamnd of %name%.
   nocommander: Not currently under anyone's command.
-  marshal: Can be marshalled by %name%.
+  supplied: Supplied by
+  source:  %settlement%
+  nosource: Nowhere
+  base:     Based out of
+  based:    %settlement%
+  nobase:   <i>Your Camp</i>
+  marshal:  Can be marshalled by %name%.
   nomarshal: Marshalling of this unit is reserved by the settlement's owner.
   assign:   Assign a Leader
   appoint:  Appoint a Marshal
@@ -1181,3 +1188,32 @@ unit:
   intro:    From here you can select any of the nearby characters to take control of %name%, letting them lead them to other locations and/or lead them into battle.
   empty:    (Select a Character)
   select:   "Assign this unit to:"
+  submit:   Assign Unit
+  success:  Unit has been assigned!
+  fail:     Unit assignment failed!
+ appoint:
+  name:     Appoint a Marshal for %name%
+  intro:    This menu allows you to appoint a marshal for this unit, granting them the ability to assignt his unit to others, recall it from abroad, or even disband it. Recruitment will require they have permissions to do that with the settlement's own permissions list.
+  empty:    (Select a Character)
+  select:   "Available Characters:"
+  submit:   Appoint Marshal
+ new:
+  name:     Create A Unit
+  description: Organize a new unit under your authority.
+ rebase:
+  name:     Rebase %name%
+  intro:    A unit's base determined the settlement that owns it. Changing it will grant full authority of %name% to whomever the lord of the new base is.
+  settlement: "New Base:"
+  success:  Unit has been rebased!
+  fail:     Rebasing has failed.
+ recall:
+  name:     Recall %name%
+  intro:    Decide it is time to call a Unit back? Simply confirm your choice below and the message will be sent, recalling %name% from whatever distant land they may be in.
+ return:
+  name:     Return %name%
+  intro:    Sometimes, you just don't need as many soldiers. From here you can send %name% back home.
+ disband:
+  name:     Disband %name%
+  intro:    From here you can choose to completely disband a unit, sending all the soldiers on home and reliquishing %name% to the annals of history.
+  success:  Unit has been disbanded.
+  fail:     Unit disbandment has failed.
