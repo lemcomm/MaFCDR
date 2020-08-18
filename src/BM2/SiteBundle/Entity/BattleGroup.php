@@ -14,7 +14,7 @@ class BattleGroup {
 		$this->soldiers = new ArrayCollection;
 		foreach ($this->getCharacters() as $char) {
 			foreach ($char->getUnits() as $unit) {
-				foreach ($char->getActiveSoldiers() as $soldier) {
+				foreach ($unit->getActiveSoldiers() as $soldier) {
 					$this->soldiers->add($soldier);
 				}
 			}
