@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
@@ -26,6 +27,7 @@ use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -214,7 +216,7 @@ class UnitController extends Controller {
 				}
 			}
 		}
-		$form = $this->createForm(new UnitSoldiersType($em, $unit->getSoldiers(), $resupply, $training, $units, $settlement, $canReassign));
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -230,7 +232,7 @@ class UnitController extends Controller {
 		}
 
                 return $this->render('Unit/soldiers.html.twig', [
-			'soldiers' => $unit->getSoldiers(),
+			'soldiers' => $unit->getActiveSoldiers(),
 			'recruits' => $unit->getRecruits(),
 			'resupply' => $resupply,
 			'settlement' => $settlement,
@@ -241,41 +243,38 @@ class UnitController extends Controller {
 	}
 
 	/**
-	  * @Route("/units/{unit}/cancel/{recruit}", name="maf_unit_cancel_training", requirements={"unit"="\d+", "recruit"="\d+"})
+	  * @Route("/units/{unit}/cancel/{recruit}", name="maf_recruit_cancel", requirements={"unit"="\d+", "recruit"="\d+"})
 	  */
 	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
-		if ($request->isMethod('POST')) {
-			list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
-			if (! $character instanceof Character) {
-				return $this->redirectToRoute($character);
-			}
-
-			$em = $this->getDoctrine()->getManager();
-			$recruit = $em->getRepository('BM2SiteBundle:Soldier')->find($request->request->get('recruit'));
-			if (!$recruit || !$recruit->isRecruit() || $recruit->getBase()!=$settlement) {
-				throw $this->createNotFoundException('error.notfound.recruit');
-			}
-
-			// return his equipment to the stockpile:
-			$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
-			$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
-			$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
-
-			if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
-				// old soldier - return to militia with his old stuff
-				$recruit->setWeapon($recruit->getOldWeapon());
-				$recruit->setArmour($recruit->getOldArmour());
-				$recruit->setEquipment($recruit->getOldEquipment());
-				$recruit->setTraining(0)->setTrainingRequired(0);
-				$this->get('history')->addToSoldierLog($recruit, 'traincancel');
-			} else {
-				// fresh recruit - return to workforce
-				$settlement->setPopulation($settlement->getPopulation()+1);
-				$em->remove($recruit);
-			}
-			$em->flush();
+		list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		return new Response();
+
+		$em = $this->getDoctrine()->getManager();
+		if (!$recruit->isRecruit() || $recruit->getHome()!=$settlement) {
+			throw $this->createNotFoundException('error.notfound.recruit');
+		}
+
+		// return his equipment to the stockpile:
+		$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+		$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+		$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
+
+		if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
+			// old soldier - return to militia with his old stuff
+			$recruit->setWeapon($recruit->getOldWeapon());
+			$recruit->setArmour($recruit->getOldArmour());
+			$recruit->setEquipment($recruit->getOldEquipment());
+			$recruit->setTraining(0)->setTrainingRequired(0);
+			$this->get('history')->addToSoldierLog($recruit, 'traincancel');
+		} else {
+			// fresh recruit - return to workforce
+			$settlement->setPopulation($settlement->getPopulation()+1);
+			$em->remove($recruit);
+		}
+		$em->flush();
+                return new RedirectResponse($this->generateUrl('maf_unit_soldiers', ["unit"=>$unit->getId()]).'#recruits');
 	}
 
         /**
@@ -495,9 +494,9 @@ class UnitController extends Controller {
         }
 
         /**
-          * @Route("/unit/recruit", name="maf_recruit")
+          * @Route("/units/recruit", name="maf_recruit")
           */
-     	public function unitRecruitAction(Request $request, Unit $unit) {
+     	public function unitRecruitAction(Request $request) {
      		list($character, $settlement) = $this->get('dispatcher')->gateway('unitRecruitTest', true);
                 # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
      		if (! $character instanceof Character) {
@@ -505,7 +504,7 @@ class UnitController extends Controller {
      		}
      		$em = $this->getDoctrine()->getManager();
 
-                $query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBunlde:Soldier s JOIN s.unit u WHERE u.settlement = :here AND s.training_required > 0');
+                $query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s JOIN s.unit u WHERE u.settlement = :here AND s.training_required > 0');
      		$query->setParameter('here', $settlement);
      		$allocated = $query->getSingleResult();
                 $allUnits = $this->findUnits($character);
@@ -542,7 +541,7 @@ class UnitController extends Controller {
      					'form'=>$form->createView()
      				);
      			}
-                        if ($data['number'] > $remaining = 200 - $unit->getSoldirs()->count()) {
+                        if ($data['number'] > $remaining = 200 - $unit->getSoldiers()->count()) {
                                 $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
                                 $data['number'] = $remaining;
                         }
@@ -564,7 +563,7 @@ class UnitController extends Controller {
 			}
      			$corruption = $this->get('economy')->calculateCorruption($settlement);
      			for ($i=0; $i<$data['number']; $i++) {
-     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $data['unit'], $corruption, $unit)) {
+     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $corruption, $data['unit'])) {
      					$this->get('history')->addToSoldierLog(
      						$soldier, 'recruited',
      						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(),
@@ -583,20 +582,20 @@ class UnitController extends Controller {
      			$settlement->setPopulation($settlement->getPopulation()-$count);
      			$settlement->setRecruited($settlement->getRecruited()+$count);
      			$em->flush();
-     			return $this->redirectToRoute('bm2_site_settlement_soldiers', array('id'=>$settlement->getId()));
+     			return $this->redirectToRoute('maf_unit_soldiers', array('unit'=>$data['unit']->getId()));
      		}
 		$soldiercount = 0;
-		foreach ($settlement->getUntits() as $unit) {
+		foreach ($settlement->getUnits() as $unit) {
 			$soldiercount += $unit->getSoldiers()->count();
 		}
 
-     		return array(
+                return $this->render('Unit/recruit.html.twig', [
      			'settlement'=>$settlement,
      			'allocated'=>$allocated,
      			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
      			'soldierscount' => $soldiercount,
 
      			'form'=>$form->createView()
-     		);
+                ]);
      	}
 }
