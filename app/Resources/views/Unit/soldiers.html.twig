@@ -81,7 +81,7 @@
 					<td class="progress_column"><div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ soldier.training|number_format }} / {{ soldier.trainingRequired }}</span></div></td>
 					<td align="right">{% if time < 1 %}{{ 'today'|trans }}{% else %}{{ time|number_format }} {{ "day"|transchoice(time|number_format) }}{% endif %}</td>
 					<td>
-						<a href="{{ path('maf_recruit_cancel', {"unit":unit.id, "recruit":soldier.id}) }}"><button class="canceltraining" value="{{ soldier.id }}" onlcick="DeleteRow">{{ 'recruit.troops.cancel'|trans({},"actions") }}</button></a>
+						<a href="{{ path('maf_recruit_cancel', {"unit":unit.id, "recruit":soldier.id}) }}"><button class="canceltraining" value="{{ soldier.id }}">{{ 'recruit.troops.cancel'|trans({},"actions") }}</button></a>
 						{% if soldier.oldweapon or soldier.oldarmour or soldier.oldequipment %}
 							{{ 'recruit.troops.returns'|trans({},"actions") }}
 						{% else %}
@@ -108,9 +108,5 @@
 		 	$(this).progressbar({value: percent });
 		});
 		$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
-
-		$('table').on('click', 'input[type="button"]', function(e){
-			$(this).closest('tr').remove()
-		})
 	{% endif %}
 {% endblock %}
