@@ -27,7 +27,7 @@ class Soldier extends NPC {
 
 
 	public function isActive($include_routed=false) {
-		if (!$this->isAlive()) return false;
+		if (!$this->isAlive() || $this->getTrainingRequired() > 0 || $this->getTravelDays() > 0) return false;
 		if ($this->getType()=='noble') {
 			// nobles have their own active check
 			return $this->getCharacter()->isActive($include_routed, true);
@@ -327,9 +327,6 @@ class Soldier extends NPC {
 		}
 		if ($this->getLiege()) {
 			$this->getLiege()->removeSoldier($this);
-		}
-		if ($this->getMercenary()) {
-			$this->getMercenary()->removeSoldier($this);
 		}
 	}
 	
