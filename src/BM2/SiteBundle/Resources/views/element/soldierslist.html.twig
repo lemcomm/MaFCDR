@@ -19,70 +19,72 @@
 	{% for soldier in form.npcs %}
 		{% set id = soldier.vars.name %}
 		{% set man = soldiers[id] %}
-		<tr has_changed="false">
-			<td><input type="checkbox" class="check_soldier" data-id="{{ man.id }}"/></td>
-			<td{% if not man.alive %} class="disabled"{% endif %}>{{ man.name }}</td>
-			<td>
-				{% if not man.alive %}
-					<img class="tt" src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
-				{% else %}
-					{% if man.wounded %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" />
-						{% if man.wounded > 10 %}
-							<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
-						{% endif %}
-						{% if man.wounded > 25 %}
-							<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
-						{% endif %}
-					{% endif %}
-					{% if man.routed %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/runner4.svg') }}" alt="{{ 'routed'|trans }}" title="{{ 'routed'|trans }}" height="16px" />
-					{% endif %}
-					{% if man.hungry > 90 %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery_red.svg') }}" alt="{{ 'veryhungry'|trans }}" title="{{ 'veryhungry'|trans }}" height="16px" />
-					{% elseif man.hungry > 50 %}
-						<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery.svg') }}" alt="{{ 'hungry'|trans }}" title="{{ 'hungry'|trans }}" height="16px" />
-					{% endif %}
-				{% endif %}
-			</td>
-			<td align="right">{{ man.experience }}</td>
-			{% if not man.locked %}
+		{% if man.trainingRequired <= 0 %}
+			<tr has_changed="false">
+				<td><input type="checkbox" class="check_soldier" data-id="{{ man.id }}"/></td>
+				<td{% if not man.alive %} class="disabled"{% endif %}>{{ man.name }}</td>
 				<td>
-					{% if soldier.action is defined %}
-						{{ form_widget(soldier.action) }}
+					{% if not man.alive %}
+						<img class="tt" src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
+					{% else %}
+						{% if man.wounded %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" />
+							{% if man.wounded > 10 %}
+								<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
+							{% endif %}
+							{% if man.wounded > 25 %}
+								<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
+							{% endif %}
+						{% endif %}
+						{% if man.routed %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/runner4.svg') }}" alt="{{ 'routed'|trans }}" title="{{ 'routed'|trans }}" height="16px" />
+						{% endif %}
+						{% if man.hungry > 90 %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery_red.svg') }}" alt="{{ 'veryhungry'|trans }}" title="{{ 'veryhungry'|trans }}" height="16px" />
+						{% elseif man.hungry > 50 %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery.svg') }}" alt="{{ 'hungry'|trans }}" title="{{ 'hungry'|trans }}" height="16px" />
+						{% endif %}
 					{% endif %}
 				</td>
-				{% if man.weapon %}
-					<td>{{ link(man.weapon) }}</td>
-				{% elseif man.trainedweapon %}
-					<td class="disabled">{{ ('item.'~man.trainedweapon.name)|trans }}</td>
-				{% else %}
-					<td>{{ 'item.improvised'|trans }}</td>
-				{% endif %}
+				<td align="right">{{ man.experience }}</td>
+				{% if not man.locked %}
+					<td>
+						{% if soldier.action is defined %}
+							{{ form_widget(soldier.action) }}
+						{% endif %}
+					</td>
+					{% if man.weapon %}
+						<td>{{ link(man.weapon) }}</td>
+					{% elseif man.trainedweapon %}
+						<td class="disabled">{{ ('item.'~man.trainedweapon.name)|trans }}</td>
+					{% else %}
+						<td>{{ 'item.improvised'|trans }}</td>
+					{% endif %}
 
-				{% if man.armour %}
-					<td>{{ link(man.armour) }}</td>
-				{% elseif man.trainedarmour %}
-					<td class="disabled">{{ ('item.'~man.trainedarmour.name)|trans }}</td>
-				{% else %}
-					<td></td>
-				{% endif %}
+					{% if man.armour %}
+						<td>{{ link(man.armour) }}</td>
+					{% elseif man.trainedarmour %}
+						<td class="disabled">{{ ('item.'~man.trainedarmour.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
 
-				{% if man.equipment %}
-					<td>{{ link(man.equipment) }}</td>
-				{% elseif man.trainedequipment %}
-					<td class="disabled">{{ ('item.'~man.trainedequipment.name)|trans }}</td>
+					{% if man.equipment %}
+						<td>{{ link(man.equipment) }}</td>
+					{% elseif man.trainedequipment %}
+						<td class="disabled">{{ ('item.'~man.trainedequipment.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
 				{% else %}
-					<td></td>
+					<td colspan="5" class="disabled">{{ 'islocked'|trans }}</td>
 				{% endif %}
-			{% else %}
-				<td colspan="5" class="disabled">{{ 'islocked'|trans }}</td>
-			{% endif %}
-			<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
-			<td>
-				<a href="{{ path('bm2_site_events_soldierlog', {'soldier':man.id}) }}">log</a>
-			</td>
-		</tr>
+				<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
+				<td>
+					<a href="{{ path('bm2_site_events_soldierlog', {'soldier':man.id}) }}">log</a>
+				</td>
+			</tr>
+		{% endif %}
 	{% endfor %}
 	</tbody>
 </table>
