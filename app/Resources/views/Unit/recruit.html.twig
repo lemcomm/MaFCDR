@@ -3,6 +3,7 @@
 {% block content %}
 <h2>{{ "recruit.troops.name"|trans({},"actions")|title }}</h2>
 <p>{{ "recruit.troops.intro"|trans({"%settlement%":settlement.name,"%type%":settlement.getType|trans},"actions")|raw }}</p>
+{#
 {% if settlement.militia %}
 	<h3>{{ 'npc.soldiershere'|transchoice(10)|title }}</h3>
 	<ul>{% for type,number in settlement.activemilitiabytype %}
@@ -15,6 +16,7 @@
 		{% endfor %}</ul>
 	{% endif %}
 {% endif %}
+#}
 {% if settlement.recruitlimit <= 0 %}
 	<p>{{ "recruit.troops.atlimit"|trans({},"actions") }}</p>
 {% else %}
