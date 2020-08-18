@@ -836,6 +836,8 @@ recruit:
   returns:      will return to militia
   disbands:     will return to workforce
   supply:       Due to a lack of equipment, only %only% of %planned% planned recruits could be added.
+  unit:         Unit
+  nounit:       (Select a Unit)
  warning:
   over25percent:  You are recruiting a considerable share of your population into military service. These peasants will no longer be available for construction, farming or production. Make sure you can handle the consequences.
   over50percent:  You are recruiting more than half of your population into military service. Unless you have taken specific steps to prevent it, this will likely result in the economic destruction of this settlement. Make sure you know what you are doing.
