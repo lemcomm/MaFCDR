@@ -51,12 +51,14 @@ class SoldiersRecruitType extends AbstractType {
 		$available = $this->available_equipment;
 		$units = $this->units;
 
-		$builder->add('unit', Unit::class, array(
+		$builder->add('unit', EntityType::class, array(
 			'label' => 'recruit.troops.unit',
 			'required' => true,
-			'choice_label' => 'unit.name',
+			'class' => Unit::class,
+			'choice_label' => 'settings.name',
 			'choices' => $units,
 			'placeholder'=>'recruit.troops.nounit',
+			'translation_domain'=>'actions'
 		));
 
 		$builder->add('number', IntegerType::class, array(
@@ -65,11 +67,12 @@ class SoldiersRecruitType extends AbstractType {
 
 		$fields = array('weapon', 'armour', 'equipment');
 		foreach ($fields as $field) {
-			$builder->add($field, EquipmentType::class, array(
+			$builder->add($field, EntityType::class, array(
 				'label'=>$field,
 				'placeholder'=>$field=='weapon'?'item.choose':'item.none',
 				'required'=>$field=='weapon'?true:false,
 				'choice_label'=>'nameTrans',
+				'class'=>EquipmentType::class,
 				'choice_translation_domain' => true,
 				'query_builder'=>function(EntityRepository $er) use ($available, $field) {
 					return $er->createQueryBuilder('e')->where('e in (:available)')->andWhere('e.type = :type')->orderBy('e.name')
