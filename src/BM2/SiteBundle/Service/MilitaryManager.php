@@ -43,8 +43,16 @@ class MilitaryManager {
 	}
 
 	public function TrainingCycle(Settlement $settlement) {
-		if ($settlement->getRecruits()->isEmpty()) return;
-		$training = min($settlement->getSingleTrainingPoints(), $settlement->getTrainingPoints()/$settlement->getRecruits()->count());
+		$recruits = new ArrayCollection();
+		foreach ($this->getUnits() as $unit) {
+			foreach ($unit->getSoldiers() as $soldier) {
+				if ($soldier->isRecruit()) {
+					$recruits->add($soldier);
+				}
+			}
+		}
+		if ($recruits->isEmpty()) return;
+		$training = min($settlement->getSingleTrainingPoints(), $settlement->getTrainingPoints()/$recruits->count());
 		$startLoc = $settlement->getGeoMarker()->getLocation();
 
 		// TODO: add the speed (efficiency) of the training building here, at least with some effect
@@ -739,7 +747,7 @@ class MilitaryManager {
 		$distance = $this->geo->getDistance($start, $end);
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt(1/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
-		return $days*0.925; #Average travel speed of all region types.
+		return $days*0.925*1.33; #Average travel speed of all region types.
 	}
 
 	public function returnUnitHome (Unit $unit, $reason='recalled', $origin, $bulk = false) {
@@ -763,7 +771,7 @@ class MilitaryManager {
 		$count = $unit->getSoldiers()->count();
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
-		$final = $days*0.925*0.66; #Average travel speed of all region types mulitiplied by .66 so it deliberately moves slower than everything else.
+		$final = $days*0.925*1.33; #Average travel speed of all region types mulitiplied by 1.33 so it deliberately moves slower than everything else.
 
 		$unit->setTravelDays(ceil($final));
 		$unit->setCharacter(null);
