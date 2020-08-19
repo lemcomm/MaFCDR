@@ -204,6 +204,9 @@ class CharacterManager {
 		foreach ($character->getUnits() as $unit) {
 			$this->milman->returnUnitHome($unit, 'death', $origin);
 		}
+		foreach($character->getMarshallingUnits() as $unit) {
+			$unit->setMarshal(null);
+		}
 		foreach ($character->getEntourage() as $entourage) {
 			$this->milman->disbandEntourage($entourage, $character);
 		}
@@ -482,6 +485,9 @@ class CharacterManager {
 		// disband my troops
 		foreach ($character->getUnits() as $unit) {
 			$this->milman->returnUnitHome($unit, 'retire', $origin);
+		}
+		foreach($character->getMarshallingUnits() as $unit) {
+			$unit->setMarshal(null);
 		}
 		foreach ($character->getEntourage() as $entourage) {
 			$this->milman->disbandEntourage($entourage, $character);
