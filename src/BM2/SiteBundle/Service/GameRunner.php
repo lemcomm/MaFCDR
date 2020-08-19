@@ -637,37 +637,9 @@ class GameRunner {
 		$result = $query->getResult();
 		foreach ($result as $unit) {
 			if ($unit->getSettlement()) {
-				$this->milman->returnUnitHome($unit->getCharacter()->getLocation(), $unit->getSettlement())
+				$this->milman->returnUnitHome($unit->getCharacter()->getLocation(), $unit->getSettlement());
 			}
 		}
-
-
-		#FIXME: Rewrite this for units.
-		$disband_soldiers = 0;
-		$query = $this->em->createQuery('SELECT s, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Soldier s JOIN s.character c WHERE c.slumbering = true');
-		$iterableResult = $query->iterate();
-		$i=1;
-		while ($row = $iterableResult->next()) {
-			// meet the most stupid array return data setup imaginable - first return row is different, yeay!
-			$s = array_shift($row);
-			$soldier = $s[0];
-			if (isset($s['days'])) {
-				$days = $s['days'];
-			} else {
-				$d = array_shift($row);
-				$days = $d['days'];
-			}
-			if (rand(0,250) < $days) {
-				$disband_soldiers++;
-				$this->milman->disband($soldier, $soldier->getCharacter());
-			}
-
-			if (($i++ % $this->batchsize) == 0) {
-				$this->em->flush();
-			}
-		}
-		echo "done\n";
-		$this->em->flush();
 
 		$disband_entourage = 0;
 		$query = $this->em->createQuery('SELECT e, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Entourage e JOIN e.character c WHERE c.slumbering = true');
@@ -694,8 +666,8 @@ class GameRunner {
 		}
 		$this->em->flush();
 
-		if ($disband_soldiers > 0 || $disband_entourage > 0) {
-			$this->logger->info("disbanded $disband_soldiers soldiers and $disband_entourage entourage.");
+		if ($disband_entourage > 0) {
+			$this->logger->info("disbanded $disband_entourage entourage.");
 		}
 
 		// Update Soldier travel times.
@@ -727,7 +699,7 @@ class GameRunner {
 		if ($count) {
 			foreach ($units as $each) {
 				$unit = $this->em->getRepository('BM2SiteBundle:Unit')->findOneById($each);
-				if ($unit && $character = $unit->getCharacter()) {
+				if ($unit && ($character = $unit->getCharacter())) {
 					$this->history->logEvent(
 						$character,
 						'event.military.soldierarrivals',
@@ -739,6 +711,40 @@ class GameRunner {
 						$this->logger->alert("No unit found for ".$unit);
 					}
 					# We can also reach this because the character wasn't found, which can happen when a soldier arrives to a leaderless unit, which can happen for any number of legit reasons.
+				}
+			}
+		}
+		$this->em->flush();
+
+		// Update Unit travel times.
+		$this->logger->info("deducting a day from unit travel times...");
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Unit u SET u.travel_days = (u.travel_days - 1) WHERE u.travel_days IS NOT NULL');
+		$query->execute();
+
+		// Update Unit arrivals based on travel times being at or below zero.
+		$this->logger->info("checking if units have arrived...");
+		$count = 0;
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.travel_days <= 0');
+		$units = [];
+		foreach ($query->getResult() as $unit) {
+			$count++;
+			$unit->setTravelDays(null);
+			if ($unit->getDestination()=='base') {
+				$units[] = $unit;
+			}
+			$unit->setDestrination(null);
+		}
+		if ($count) {
+			foreach ($units as $each) {
+				if ($settlement = $unit->getSettlement()) {
+					$this->history->logEvent(
+						$settlement,
+						'event.military.unitreturns',
+						array('%link-unit%'=>$unit->getId()),
+						History::MEDIUM, false, 30
+					);
+				} else {
+					# Somehow this unit is being returned to somewhere but doesn't have a settlement assigned????
 				}
 			}
 		}
