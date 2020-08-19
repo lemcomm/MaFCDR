@@ -826,6 +826,10 @@ recruit:
     Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might
     want to wait for current training to finish.<br />
     Details of the current recruit training is available on the <a href="%url%">%page%</a> page.
+  current2: >
+    You are current training %number% new soldiers out of %optimal% training slots.<br />
+    Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might
+    want to wait for current training to finish.<br />
   time2:        You can train about %amount% soldiers at once before training speeds slow down.
   submit:       Recruit
   cancel:       Cancel
