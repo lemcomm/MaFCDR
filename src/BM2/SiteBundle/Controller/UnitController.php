@@ -36,7 +36,7 @@ class UnitController extends Controller {
         private function findUnits(Character $character) {
                 $em = $this->getDoctrine()->getManager();
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) ORDER BY s.name ASC');
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
@@ -318,7 +318,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitAppointAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitAssignTest', false, true, false, $unit);
+		$character = $this->get('dispatcher')->gateway('unitAppointTest', false, true, false, $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -505,9 +505,10 @@ class UnitController extends Controller {
      		$em = $this->getDoctrine()->getManager();
 
                 $query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s JOIN s.unit u WHERE u.settlement = :here AND s.training_required > 0');
+                #$query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required > 0');
      		$query->setParameter('here', $settlement);
      		$allocated = $query->getSingleResult();
-                $allUnits = $this->findUnits($character);
+                $allUnits = $settlement->getUnits();
                 $units = [];
                 foreach ($allUnits as $unit) {
                         if($unit->getSoldiers()->count() < 200 && $unit->getSettings()->getReinforcements()) {
@@ -518,28 +519,37 @@ class UnitController extends Controller {
                         $units[] = $this->get('military_manager')->newUnit(null, $settlement, null); #Ensure we always have atleast 1!
                 }
 
+		$soldierscount = 0;
+		foreach ($settlement->getUnits() as $unit) {
+			$soldierscount += $unit->getSoldiers()->count();
+		}
      		$available = $this->get('military_manager')->findAvailableEquipment($settlement, true);
      		$form = $this->createForm(new SoldiersRecruitType($available, $units));
      		$form->handleRequest($request);
+
+                $renderArray = [
+                        'soldierscount'=>$soldierscount,
+                        'settlement'=>$settlement,
+                        'allocated'=>$allocated,
+                        'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
+                        'form'=>$form->createView(),
+                ];
+
      		if ($form->isValid()) {
      			$data = $form->getData();
      			$generator = $this->get('generator');
+                        if ($data['unit']->getSettlemenet() != $settlement) {
+                                $form->addError(new FormError("recruit.troops.unitnothere"));
+                                return $this->render('Unit/recruit.html.twig', $renderArray);
+                        }
 
      			if ($data['number'] > $settlement->getPopulation()) {
      				$form->addError(new FormError("recruit.troops.toomany"));
-     				return array(
-     					'settlement'=>$settlement,
-     					'allocated'=>$allocated,
-     					'form'=>$form->createView()
-     				);
+                                return $this->render('Unit/recruit.html.twig', $renderArray);
      			}
      			if ($data['number'] > $settlement->getRecruitLimit()) {
      				$form->addError(new FormError($this->get('translator')->trans("recruit.troops.toomany2"), null, array('%max%'=>$settlement->getRecruitLimit(true))));
-     				return array(
-     					'settlement'=>$settlement,
-     					'allocated'=>$allocated,
-     					'form'=>$form->createView()
-     				);
+                                return $this->render('Unit/recruit.html.twig', $renderArray);
      			}
                         if ($data['number'] > $remaining = 200 - $unit->getSoldiers()->count()) {
                                 $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
@@ -549,11 +559,7 @@ class UnitController extends Controller {
      			for ($i=0; $i<$data['number']; $i++) {
      				if (!$data['weapon']) {
      					$form->addError(new FormError("recruit.troops.noweapon"));
-     					return array(
-     						'settlement'=>$settlement,
-     						'allocated'=>$allocated,
-     						'form'=>$form->createView()
-     					);
+                                        return $this->render('Unit/recruit.html.twig', $renderArray);
      				}
      			}
      			$count = 0;
@@ -584,18 +590,7 @@ class UnitController extends Controller {
      			$em->flush();
      			return $this->redirectToRoute('maf_unit_soldiers', array('unit'=>$data['unit']->getId()));
      		}
-		$soldiercount = 0;
-		foreach ($settlement->getUnits() as $unit) {
-			$soldiercount += $unit->getSoldiers()->count();
-		}
 
-                return $this->render('Unit/recruit.html.twig', [
-     			'settlement'=>$settlement,
-     			'allocated'=>$allocated,
-     			'training'=>$this->get('military_manager')->findAvailableEquipment($settlement, true),
-     			'soldierscount' => $soldiercount,
-
-     			'form'=>$form->createView()
-                ]);
+                return $this->render('Unit/recruit.html.twig', $renderArray);
      	}
 }
