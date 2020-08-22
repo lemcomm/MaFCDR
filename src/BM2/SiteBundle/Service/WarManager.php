@@ -469,7 +469,11 @@ class WarManager {
 		/* FIXME: to prevent abuse, this should be lower in very uneven battles
 		FIXME: We should probably find some better logic about calculating the battlesize variable when this is called by sieges, but we can work that out later. */
 		# setup regroup timer and change action
-		$amount = min($battlesize*5, $character->getLivingSoldiers()->count())+2; # to prevent regroup taking long in very uneven battles
+		$soldiers = 0;
+		foreach ($character->getUnits() as $unit) {
+			$soldiers += $unit->getLivingSoldiers()->count();
+		}
+		$amount = min($battlesize*5, $soldiers)+2; # to prevent regroup taking long in very uneven battles
 		$regroup_time = sqrt($amount*10) * 5; # in minutes
 
 		$act = new Action;
