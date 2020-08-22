@@ -25,7 +25,6 @@ class Soldier extends NPC {
 		return true;
 	}
 
-
 	public function isActive($include_routed=false) {
 		if (!$this->isAlive() || $this->getTrainingRequired() > 0 || $this->getTravelDays() > 0) return false;
 		if ($this->getType()=='noble') {
@@ -93,6 +92,9 @@ class Soldier extends NPC {
 	public function gainMorale($value=1) { $this->morale+=$value; return $this; }
 
 	public function getAllInUnit() {
+		if ($this->isNoble) {
+			return $this;
+		}
 		return $this->getUnit()->getSoldiers();
 	}
 
@@ -254,11 +256,13 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this quite a bit
 
-		$fighters = $this->getAllInUnit()->count();
-		if ($fighters>1) {
-			$this->ranged = $power * pow($fighters, 0.96)/$fighters;
-		} else {
-			$this->ranged = $power;
+		if ($this->isNoble) {
+			$fighters = $this->getAllInUnit()->count();
+			if ($fighters>1) {
+				$this->ranged = $power * pow($fighters, 0.96)/$fighters;
+			} else {
+				$this->ranged = $power;
+			}
 		}
 		return $this->ranged;
 	}
@@ -283,11 +287,15 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this a little
 
-		$fighters = $this->getAllInUnit()->count();
-		if ($fighters>1) {
-			$this->melee = $power * pow($fighters, 0.96)/$fighters;
-		} else {
+		if ($this->isNoble) {
 			$this->melee = $power;
+		} else {
+			$fighters = $this->getAllInUnit()->count();
+			if ($fighters>1) {
+				$this->melee = $power * pow($fighters, 0.96)/$fighters;
+			} else {
+				$this->melee = $power;
+			}
 		}
 		return $this->melee;
 	}
@@ -320,7 +328,7 @@ class Soldier extends NPC {
 			$this->getUnit()->removeSoldier($this);
 		}
 		if ($this->getCharacter()) {
-			$this->getCharacter()->removeSoldier($this);
+			$this->getCharacter()->removeSoldiersOld($this);
 		}
 		if ($this->getBase()) {
 			$this->getBase()->removeSoldier($this);
