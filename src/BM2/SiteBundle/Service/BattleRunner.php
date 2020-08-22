@@ -224,15 +224,6 @@ class BattleRunner {
 		}
 		$this->em->flush(); #So we don't have doctrine entity lock failures, we need the above battling flag set. It also gives us an easy way to check which characters we need to check below.
 
-		$this->log(25, "checking mercenaries...\n");
-		$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:Mercenaries m WHERE m.hired_by IN (:chars)');
-		$query->setParameter('chars', $characters);
-		foreach ($query->getResult() as $mercs) {
-			// FIXME: there should be a check here that if the enemy is tiny, we don't ask for much gold, i.e. a max value
-			// sadly, we know enemy numbers only after prepare(), right below. :-(
-			$this->npc_manager->payMercenaries($mercs);
-		}
-
 		$this->log(15, "preparing...\n");
 
 		$preparations = $this->prepare();
@@ -269,7 +260,7 @@ class BattleRunner {
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
 		foreach ($this->nobility as $noble) {
 			$noble->getCharacter()->setActiveReport(null);
-			$noble->getCharacter()->removeSoldier($noble);
+			$noble->getCharacter()->removeSoldiersOld($noble);
 		}
 		if ($battle->getPrimaryDefender()) {
 			$battle->setPrimaryDefender(NULL);
@@ -282,6 +273,13 @@ class BattleRunner {
 		# TODO: Adapt this for when sieges have reached their conclusion, and pass which side was victorious to a different function to closeout the siege properly.
 		if (!$battle->getSiege()) {
 			foreach ($battle->getGroups() as $group) {
+				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
+				// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
+				foreach ($group->getCharacters() as $char) {
+					if ($char->getTravel()) {
+						$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
+					}
+				}
 				$this->war_manager->disbandGroup($group, $this->battlesize);
 				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
