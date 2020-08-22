@@ -54,16 +54,6 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 			foreach ($query->getResult() as $battle) {
 				$battlerunner->enableLog($arg_debug);
 				$battlerunner->run($battle, $cycle);
-
-				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
-				// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
-				foreach ($battle->getGroups() as $group) {
-					foreach ($group->getCharacters() as $char) {
-						if ($char->getTravel()) {
-							$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
-						}
-					}
-				}
 			}
 			if ($opt_time) {
 				$event = $stopwatch->lap('battles');
