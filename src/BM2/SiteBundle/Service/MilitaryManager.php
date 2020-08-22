@@ -157,7 +157,7 @@ class MilitaryManager {
 						break;
 					case 'disband':
 						if ($canReassign) {
-							$this->disband($npc, $character);
+							$this->disband($npc);
 						}
 						break;
 					case 'bury':
@@ -230,7 +230,7 @@ class MilitaryManager {
 							}
 						}
 						break;
-					case 'disband':		$this->disband($npc, $character); break;
+					case 'disband':		$this->disband($npc); break;
 					case 'disband2':		$this->disbandEntourage($npc, $character); break;
 					case 'bury':			$this->bury($npc); break;
 					case 'makemilitia':	if ($settlement) { $this->makeMilitia($npc, $settlement); } break;
@@ -426,7 +426,7 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function disband(Soldier $soldier, $current) {
+	public function disband(Soldier $soldier) {
 		$this->em->remove($soldier);
 	}
 
