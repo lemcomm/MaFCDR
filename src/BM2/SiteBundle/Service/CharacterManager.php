@@ -369,10 +369,15 @@ class CharacterManager {
 			$house = $character->getHeadOfHouse();
 			$inheritor = false;
 			$difhouse = false;
-			if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+			if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
+				# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
-			} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+			} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
+				$character->getSuccessor()->getHouse() == $character->getHouse() OR (
+					$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
+				)
+			)) {
 				$inheritor = true;
 				$successor = $character->getSuccessor();
 				if ($successor->getHouse() != $character->getHouse()) {
@@ -408,10 +413,10 @@ class CharacterManager {
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
-					if ($best === null) {
+					if ($best === null && $member != $character) {
 						$best = $member;
 					}
-					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate() && $member != $character) {
 						$best = $member;
 					}
 				}
@@ -592,10 +597,15 @@ class CharacterManager {
 			$house = $character->getHeadOfHouse();
 			$inheritor = false;
 			$difhouse = false;
-			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+			if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
+				# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
-			} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+			} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
+				$character->getSuccessor()->getHouse() == $character->getHouse() OR (
+					$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
+				)
+			)) {
 				$inheritor = true;
 				$successor = $character->getSuccessor();
 				if ($successor->getHouse() != $character->getHouse()) {
@@ -631,10 +641,10 @@ class CharacterManager {
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
-					if ($best === null) {
+					if ($best === null && $member != $character) {
 						$best = $member;
 					}
-					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate() && $member != $character) {
 						$best = $member;
 					}
 				}
