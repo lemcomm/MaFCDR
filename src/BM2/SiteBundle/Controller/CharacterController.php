@@ -350,7 +350,16 @@ class CharacterController extends Controller {
 		}
 		if ($details['spot']) {
 			$entourage = $char->getActiveEntourageByType();
-			$soldiers = $char->getActiveSoldiersByType();
+			$soldiers = [];
+			foreach ($char->getUnits() as $unit) {
+				foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
+					if (array_key_exists($key, $militia)) {
+						$soldiers[$key] += $type;
+					} else {
+						$soldiers[$key] = $type;
+					}
+				}
+			}
 		} else {
 			$entourage = null;
 			$soldiers = null;
