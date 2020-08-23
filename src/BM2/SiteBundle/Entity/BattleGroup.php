@@ -21,10 +21,12 @@ class BattleGroup {
 		}
 
 		if ($this->battle->getSettlement() && $this->isDefender() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() == $this->battle->getSettlement()) {
-			foreach ($this->battle->getSettlement()->getLocalUnits() as $unit) {
-				foreach ($unit->getActiveSoldiers() as $soldier) {
-					if ($soldier->isActive()) {
-						$this->soldiers->add($soldier);
+			foreach ($this->battle->getSettlement()->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					foreach ($unit->getActiveSoldiers() as $soldier) {
+						if ($soldier->isActive()) {
+							$this->soldiers->add($soldier);
+						}
 					}
 				}
 			}
