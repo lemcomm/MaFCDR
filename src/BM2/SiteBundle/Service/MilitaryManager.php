@@ -578,6 +578,7 @@ class MilitaryManager {
 	public function newUnit(Character $character=null, Settlement $home = null, $data) {
 		$unit = new Unit();
 		$this->em->persist($unit);
+		$unit->setSettlement($home);
 		$unit->setSupplier($data['supplier']);
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
 		$this->em->flush();
