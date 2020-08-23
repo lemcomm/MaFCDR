@@ -245,37 +245,43 @@ class UnitController extends Controller {
 	/**
 	  * @Route("/units/{unit}/cancel/{recruit}", name="maf_recruit_cancel", requirements={"unit"="\d+", "recruit"="\d+"})
 	  */
-	public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
+        public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
+                list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
+                if (! $character instanceof Character) {
+                	return $this->redirectToRoute($character);
+                }
 
-		$em = $this->getDoctrine()->getManager();
-		if (!$recruit->isRecruit() || $recruit->getHome()!=$settlement) {
-			throw $this->createNotFoundException('error.notfound.recruit');
-		}
+                $em = $this->getDoctrine()->getManager();
+                if (!$recruit->isRecruit() || $recruit->getHome()!=$settlement) {
+                	throw $this->createNotFoundException('error.notfound.recruit');
+                }
 
-		// return his equipment to the stockpile:
-		$this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
-		$this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
-		$this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
+                // return his equipment to the stockpile:
+                if ($recruit->getOldWeapon() && $recruit->getWeapon() != $recruit->getOldWeapon()) {
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+                }
+                if ($recruit->getOldArmour() && $recruit->getArmour() != $recruit->getOldArmour()) {
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+                }
+                if ($recruit->getOldEquipment() && $recruit->getEquipment() != $recruit->getOldEquipment()) {
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
+                }
 
-		if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
-			// old soldier - return to militia with his old stuff
-			$recruit->setWeapon($recruit->getOldWeapon());
-			$recruit->setArmour($recruit->getOldArmour());
-			$recruit->setEquipment($recruit->getOldEquipment());
-			$recruit->setTraining(0)->setTrainingRequired(0);
-			$this->get('history')->addToSoldierLog($recruit, 'traincancel');
-		} else {
-			// fresh recruit - return to workforce
-			$settlement->setPopulation($settlement->getPopulation()+1);
-			$em->remove($recruit);
-		}
-		$em->flush();
+                if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
+                	// old soldier - return to militia with his old stuff
+                	$recruit->setWeapon($recruit->getOldWeapon());
+                	$recruit->setArmour($recruit->getOldArmour());
+                	$recruit->setEquipment($recruit->getOldEquipment());
+                	$recruit->setTraining(0)->setTrainingRequired(0);
+                	$this->get('history')->addToSoldierLog($recruit, 'traincancel');
+                } else {
+                	// fresh recruit - return to workforce
+                	$settlement->setPopulation($settlement->getPopulation()+1);
+                	$em->remove($recruit);
+                }
+                $em->flush();
                 return new RedirectResponse($this->generateUrl('maf_unit_soldiers', ["unit"=>$unit->getId()]).'#recruits');
-	}
+        }
 
         /**
 	  * @Route("/units/{unit}/assign", name="maf_unit_assign", requirements={"unit"="\d+"})
