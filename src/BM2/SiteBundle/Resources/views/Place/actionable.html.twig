@@ -12,10 +12,10 @@
 		<h4>{{ place.name|title }}</h4>
 		{{ place.description }}
 		{% if place.canEnter %}
-			<a href="{{path('bm2_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
+			<a href="{{path('maf_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
 		{% endif %}
 		{% if place.canManage %}
-			<a href="{{path('bm2_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
+			<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 		{% endif %}
 		</div>
 	{% endfor %}
