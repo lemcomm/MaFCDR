@@ -26,7 +26,7 @@
 		{{ macros.permission_row(form.permissions.vars.prototype) }}
 	</tr>
 	</table>
-	<form class="wide" action="{{ path('bm2_site_place_permissions', {'id':place.id}) }}" method="post" {{ form_start(form) }}
+	<form class="wide" action="{{ path('maf_place_permissions', {'id':place.id}) }}" method="post" {{ form_start(form) }}
 		{{ form_errors(form) }}
 		{{ form_widget(form._token) }}
 		<h3>{{ "place.permissions.manage"|trans({},"places")|title }}</h3>
@@ -43,7 +43,7 @@
 			{% endfor %}
 			</tbody>
 		</table>
-		
+
 		<br /><br />
 
 		<button type="submit" name="submit">{{ "buttons.submit"|trans({},"places") }}</button>
