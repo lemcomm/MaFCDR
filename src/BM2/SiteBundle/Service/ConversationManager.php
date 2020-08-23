@@ -181,8 +181,12 @@ class ConversationManager {
                 }
         }
 
-        public function writeMessage(Conversation $conv, $msg = null, Character $char, $text, $type) {
-                $valid = $conv->findActiveCharPermission($char);
+        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type) {
+                if ($type == 'system') {
+                        $valid = true;
+                } else {
+                        $valid = $conv->findActiveCharPermission($char);
+                }
                 if ($valid) {
                         $new = new Message();
                         $this->em->persist($new);
@@ -190,9 +194,11 @@ class ConversationManager {
                         $new->setCycle($this->appstate->getCycle());
                         $new->setSent(new \DateTime("now"));
                         $new->setContent($text);
-                        $new->setSender($char);
-                        if ($msg !== NULL) {
-                                $target = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($msg);
+                        if ($type != 'system') {
+                                $new->setSender($char);
+                        }
+                        if ($replyTo !== NULL) {
+                                $target = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
                                 if ($target) {
                                         $new->setReplyTo($target);
                                 }
@@ -395,7 +401,7 @@ class ConversationManager {
                 }
                 foreach ($allConvs as $conv) {
                         $this->pruneConversation($conv);
-                }                
+                }
         }
 
         public function updateMembers(Conversation $conv) {
