@@ -230,13 +230,17 @@ class GameRequestController extends Controller {
 		if ($character->getLiege()) {
 			$liege = $character->getLiege();
 			foreach ($liege->getOwnedSettlements() as $settlement) {
-				if ($settlement->getFeedSoldiers()) {
+				if ($settlement->getFeedSoldiers() && !$settlements->contains($settlement)) {
 					$settlements->add($settlement);
 				}
 			}
 		}
-		if ($character->getInsideSettlement()) {
+		if ($character->getInsideSettlement() && !$settlements->contains($character->getInsideSettlement())) {
 			$settlements->add($character->getInsideSettlement());
+		}
+		$soldiers = 0;
+		foreach ($character->getUnits() as $unit) {
+			$soldiers += $unit->getSoldiers()->count();
 		}
 
 		$form = $this->createForm(new SoldierFoodType($settlements, $character));
@@ -250,7 +254,7 @@ class GameRequestController extends Controller {
 		}
 		return array(
 			'form' => $form->createView(),
-			'size' => $character->getEntourage()->count()+$character->getSoldiers()->count()
+			'size' => $character->getEntourage()->count()+$soldiers
 		);
 	}
 
