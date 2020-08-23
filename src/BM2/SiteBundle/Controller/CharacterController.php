@@ -152,6 +152,10 @@ class CharacterController extends Controller {
 					$ultimates->add($ult);
 				}
 			}
+			$soldiers = 0;
+			Foreach ($char->getUnits() as $unit) {
+				$soldiers += $unit->getActiveSoldiers()->count();
+			}
 
 			$spotted[] = array(
 				'char' => $char,
@@ -159,7 +163,7 @@ class CharacterController extends Controller {
 				'realms' => $realms,
 				'ultimates' => $ultimates,
 				'entourage' => $char->getLivingEntourage()->count(),
-				'soldiers' => $char->getLivingSoldiers()->count(),
+				'soldiers' => $soldiers,
 			);
 		}
 
