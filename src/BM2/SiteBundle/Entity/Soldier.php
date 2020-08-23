@@ -21,10 +21,6 @@ class Soldier extends NPC {
 		return "soldier #{$this->id} ({$this->getName()}, {$this->getType()}, base $base, char $char)";
 	}
 
-	public function isSoldier() {
-		return true;
-	}
-
 	public function isActive($include_routed=false) {
 		if (!$this->isAlive() || $this->getTrainingRequired() > 0 || $this->getTravelDays() > 0) return false;
 		if ($this->getType()=='noble') {
