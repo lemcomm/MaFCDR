@@ -14,7 +14,7 @@
 			{{ 'house.nodesc'|trans({}, "politics")|raw }}
 		{% endif %}
 		{% if not already %}
-			<a href="{{path('bm2_house_join', {"house":house.id}) }}"><button id="join">{{ 'house.join.button'|trans({},"politics") }}</button></a>
+			<a href="{{path('maf_house_join', {"house":house.id}) }}"><button id="join">{{ 'house.join.button'|trans({},"politics") }}</button></a>
 		{% endif %}
 		</div>
 	{% endfor %}
