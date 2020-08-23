@@ -92,27 +92,26 @@
 {% endblock %}
 
 {% block jquery %}
+{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
 {% if not election.closed %}
 $("table.votes li.self").each(function(){
 	var vote = $(this).closest('td').find('button').data('vote');
 	$(this).closest('tr').find('input.votebox').val(vote);
 });
 
-var character_cache = {};
-$("#form_candidate").autocomplete({
-	minLength: 3,
-	source: function( request, response ) {
-		var term = request.term;
-		if ( term in character_cache ) {
-			response( character_cache[ term ] );
-			return;
-		}
-		$.getJSON("{{ path('bm2_site_data_characters') }}", request, function( data, status, xhr ) {
-			character_cache[ term ] = data;
-			response( data );
-		});
-	}
-});
+charselect($("#form_candidate"), characterchange);
+
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("form_candidate").selectionStart;
+	var textTxt = $("#form_candidate").val();
+	$("#form_candidate").val(insert);
+
+}
+function characterchange(id, name) {
+	search_insert(name+" ("+id+")");
+}
+
 
 $(".votehere").click(function(){
 	var id = $(this).data('id');
