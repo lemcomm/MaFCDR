@@ -538,7 +538,7 @@ class UnitController extends Controller {
      		if ($form->isValid()) {
      			$data = $form->getData();
      			$generator = $this->get('generator');
-                        if ($data['unit']->getSettlemenet() != $settlement) {
+                        if ($data['unit']->getSettlement() != $settlement) {
                                 $form->addError(new FormError("recruit.troops.unitnothere"));
                                 return $this->render('Unit/recruit.html.twig', $renderArray);
                         }
