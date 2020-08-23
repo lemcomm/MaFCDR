@@ -36,7 +36,7 @@ class WorkerUpdateSpottingCommand extends ContainerAwareCommand {
 			->from('BM2SiteBundle:GeoData', 'g')
 			->join('g.biome', 'b')
 			->from('BM2SiteBundle:Character', 'c')
-			->leftJoin('c.soldiers', 's', 'WITH', 's.alive=true')
+			->leftJoin('c.soldiers_old', 's', 'WITH', 's.alive=true')
 			->leftJoin('c.entourage', 'e', 'WITH', '(e.type = :scout AND e.alive=true)')
 			->where($qb->expr()->eq('ST_Contains(g.poly, c.location)', 'true'))
 			->from('BM2SiteBundle:RegionFamiliarity', 'f')
