@@ -107,22 +107,6 @@ function replyform(title, conversation, reply_to) {
 var request;
 var target;
 
-$(".cmsg_flags").on("click", "button.cmsg_icon", function(){
-	var button = $(this);
-	var id = button.data("msg");
-	var flag = button.data("flag");
-
-	button.addClass("working");
-	$.post("{{ path('cmsg_flags')}}", {'message':id, 'flag':flag}, function(result) {
-		button.removeClass("working");
-		if (result == 'added') {
-			button.addClass("active");
-		} else if (result == 'removed') {
-			button.removeClass("active");
-		}
-	});
-});
-
 $("#oldmessages").hide();
 var old_visible = false;
 $("#hidetoggle").click(function(){
