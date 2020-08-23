@@ -118,7 +118,11 @@ class HouseController extends Controller {
 			if ($character->getCrest()); {
 				$crest = $character->getCrest();
 			}
-			$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
+			if ($settlement = $character->getInsideSettlement()) {
+				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, null, $settlement, $crest, $character);
+			} else {
+				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $character->getInsidePlace(), null, $crest, $character);
+			}
 			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
@@ -223,7 +227,7 @@ class HouseController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'messages'));
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
 		return array(
 			'form' => $form->createView()
