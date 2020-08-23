@@ -674,6 +674,15 @@ class AccountController extends Controller {
 				$em->flush();
 				return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
 				break;
+			case 'newbackground':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_background', ['id'=>$character->getId(), 'starting'=>'1']);
+
 			case 'edithist':
 				$em->flush();
 				/* I don't have words for how stupid I think this is.
