@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
@@ -44,7 +45,7 @@ class MilitaryManager {
 
 	public function TrainingCycle(Settlement $settlement) {
 		$recruits = new ArrayCollection();
-		foreach ($this->getUnits() as $unit) {
+		foreach ($settlement->getUnits() as $unit) {
 			foreach ($unit->getSoldiers() as $soldier) {
 				if ($soldier->isRecruit()) {
 					$recruits->add($soldier);
@@ -431,10 +432,6 @@ class MilitaryManager {
 	}
 
 	public function disbandEntourage(Entourage $entourage, $current) {
-		// disband entourage, who will then move towards their home
-		if ($current && $entourage->isAlive() && $entourage->getHome()) {
-			$this->walkHome($entourage->getHome(), $current);
-		}
 		$current->removeEntourage($entourage);
 		if ($entourage->getType()->getName() == 'follower' && $entourage->getSupply() > 0) {
 			$this->salvageItem($current, $entourage->getEquipment(), $entourage->getSupply());
