@@ -293,15 +293,20 @@ class RealmManager {
 
 	public function countElection(Election $election) {
 		$election->setClosed(true);
+		$position = $election->getPosition();
 
 		$candidates = array();
 		foreach ($election->getVotes() as $vote) {
-			$c = $vote->getTargetCharacter()->getId();
-			if (!isset($candidates[$c])) {
-				$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
+			$target = $vote->getTargetCharacter();
+			$c = $target->getId();
+			# Only allow slumbering electees on positions that allow you to hold it while slumbering. Never allow the dead to be voted in.
+			if (($position->getKeepOnSlumber() == false && $target->isActive(true)) || ($position->getKeepOnSlumber() == true && $target->isAlive())) {
+				if (!isset($candidates[$c])) {
+					$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
+				}
+				$candidates[$c]['votes'] += $vote->getVote();
+				$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $vote->getCharacter());
 			}
-			$candidates[$c]['votes'] += $vote->getVote();
-			$candidates[$c]['weight'] += $vote->getVote() * $this->getVoteWeight($election, $vote->getCharacter());
 		}
 
 		$winner = null;
