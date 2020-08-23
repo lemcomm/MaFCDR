@@ -257,7 +257,11 @@ class WarController extends Controller {
 					$siege->setSettlement($settlement);
 					$settlement->setSiege($siege);
 					$encirclement = intval($settlement->getFullPopulation()/3); #1/3 of population returned as flat integer (no decimals)
-					if ($character->getActiveSoldiers()->count() >= $encirclement) {
+					$count = 0;
+					foreach ($character->getUnits() as $unit) {
+						$count += $unit->getActiveSoldiers()->count();
+					}
+					if ($count >= $encirclement) {
 						$siege->setEncircled(TRUE);
 					} else {
 						$siege->setEncircled(FALSE);
@@ -580,7 +584,10 @@ class WarController extends Controller {
 		if ($form->isValid()) {
 
 		// FIXME: shouldn't militia defend against looting?
-			$my_soldiers = $character->getActiveSoldiers()->count();
+			$my_soldiers = 0;
+			foreach ($character->getUnits() as $unit) {
+				$my_soldiers += $unit->getActiveSoldiers()->count();
+			}
 			$ratio = $my_soldiers / (100 + $settlement->getFullPopulation());
 			if ($ratio > 0.25) { $ratio = 0.25; }
 			if (!$inside) {
@@ -1098,7 +1105,10 @@ class WarController extends Controller {
 			} else {
 				$hours = 4;
 			}
-			$men = $character->getActiveSoldiers()->count();
+			$men = 0;
+			foreach ($character->getUnits() as $unit) {
+				$men += $unit->getActiveSoldiers()->count();
+			}
 			$damage = round(rand(sqrt($men)*$hours*25, sqrt($men*2)*$hours*25)); // for 100 men, damage = 1000 - 2000 => 5-10 attacks to destroy a tower
 
 			$act = new Action;
