@@ -58,7 +58,7 @@ class GameRequestController extends Controller {
 	  * @Route("/{id}/approve", name="bm2_gamerequest_approve", requirements={"id"="\d+"})
 	  */
 
-	public function approveAction(GameRequest $id) {
+	public function approveAction(GameRequest $id, $route = 'bm2_gamerequest_manage') {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -88,7 +88,7 @@ class GameRequestController extends Controller {
 					$id->setAccepted(true);
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('military.settlement.food.supplied', array('%character%'=>$id->getFromCharacter()->getName(), '%settlement%'=>$id->getToSettlement()->getName()), 'actions'));
-					return $this->redirectToRoute('bm2_gamerequest_manage');
+					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notlord');
 				}
@@ -115,7 +115,11 @@ class GameRequestController extends Controller {
 					$em->remove($id);
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
-					return $this->redirectToRoute('bm2_house_applicants', array('id'=>$house->getId()));
+					if ($route == 'maf_house_applicants') {
+						return $this->redirectToRoute($route, array('house'=>$house->getId()));
+					} else {
+						return $this->redirectToRoute($route);
+					}
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
