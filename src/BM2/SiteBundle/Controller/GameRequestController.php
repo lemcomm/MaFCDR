@@ -58,10 +58,13 @@ class GameRequestController extends Controller {
 	  * @Route("/{id}/approve", name="bm2_gamerequest_approve", requirements={"id"="\d+"})
 	  */
 
-	public function approveAction(GameRequest $id, $route = 'bm2_gamerequest_manage') {
+	public function approveAction(Request $request, GameRequest $id, $route = 'bm2_gamerequest_manage') {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
+		}
+		if ($request->query->get('route')) {
+			$route = $request->query->get('route');
 		}
 		$em = $this->getDoctrine()->getManager();
 		# Are we allowed to act on this GR? True = yes. False = no.
