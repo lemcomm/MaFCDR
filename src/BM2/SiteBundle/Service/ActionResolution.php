@@ -136,17 +136,21 @@ class ActionResolution {
 			$done = min(1.0, $elapsed / $old_time);
 
 			// TODO: opposing and supporting actions
-			if ($action->getCharacter()->getActiveSoldiers()) {
-				$attackers = $action->getCharacter()->getActiveSoldiers()->count();
-			} else {
-				$attackers = 0;
+			$attackers = 0;
+			foreach ($action->getCharacter()->getUnits() as $unit) {
+				$attackers += $unit->getActiveSoldiers()->count();
 			}
 			$additional_defenders = 0;
 
 			foreach ($action->getSupportingActions() as $support) {
-				$attackers += $support->getCharacter()->getActiveSoldiers()->count();
+				foreach ($support->getCharacter()->getUnits() as $unit) {
+					$attackers += $unit->getActiveSoldiers()->count();
+				}
 			}
 			foreach ($action->getOpposingActions() as $oppose) {
+				foreach ($oppose->getCharacter()->getUnits() as $unit) {
+					$additional_defenders += $unit->getActiveSoldiers()->count();
+				}
 				$additional_defenders += $oppose->getCharacter()->getActiveSoldiers()->count();
 			}
 
