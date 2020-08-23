@@ -15,7 +15,7 @@
 	{% else %}
 	<p>{{ 'character.start.returnee'|trans({"%name%":character.name})|raw }}</p>
 	{% endif %}
-
+		{#
 		<h3>{{ 'character.start.offer'|trans|title }}</h3>
 		<p>{{ 'character.start.offerintro'|trans({"%he%":character.gender("he")|trans})|raw }}</p>
 		<form class="wide" action="{{ path('bm2_site_character_start') }}" method="post">
@@ -38,6 +38,7 @@
 			<div id="offerdetails"></div>
 			{{ form_widget(form_offer.submit) }}
 		</form>
+		#}
 
 		<h3>{{ 'character.start.family'|trans|title }}</h3>
 		<p>{{ 'character.start.existing'|trans|raw }}</p>
@@ -74,18 +75,6 @@
 	$("#sd").on("dialogopen", function(event, ui){
 		$("#sd").dialog("option", "position", { my: "left top", at: "left bottom", of: $('#sd_anchor') } );
 		$("#dummy").hide();
-	});
-
-
-	var url = "{{ path('bm2_site_actions_offerdetails', {'offer': '000'}) }}";
-	$("#character_placement_offer").change(function(){
-		var id = $(this).val();
-		$("#offerdetails").load(url.replace("000", id));
-	});
-
-	$("#sd").on("click", "li.offersdetailslink", function(){
-		var id = $(this).data("id");
-		$("#offerdetails").load(url.replace("000", id));
 	});
 
 {% endblock %}
