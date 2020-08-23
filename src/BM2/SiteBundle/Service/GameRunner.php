@@ -245,7 +245,7 @@ class GameRunner {
 				$slumbered[] = $character;
 			}
 		}
-		if (count($deadcount)+count($slumbercount) != 0) {
+		if ($deadcount+$slumbercount != 0) {
 			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
@@ -677,8 +677,7 @@ class GameRunner {
 
 		// Update soldier recruit training times. This will also set the training times for units, so this and the above affect whether travel starts same day or next (I'm going with next day).
 		$this->logger->info("checking on recruits...");
-		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id >= :start AND s.id <= :end');
-		$query->setParameters(array('start'=>$start, 'end'=>$end));
+		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id > 0');
 		foreach ($query->getResult() as $settlement) {
 			$this->milman->TrainingCycle($settlement);
 		}
@@ -931,6 +930,7 @@ class GameRunner {
 			$announcements = false;
 			$general = false;
 			$deserted = false;
+			$msguser = false;
 			if ($convos) {
 				foreach ($convos as $convo) {
 					if ($convo->getSystem() == 'announcements') {
@@ -945,11 +945,21 @@ class GameRunner {
 				#newConversation(Character $char, $recipients=null, $topic, $type, $content, Realm $realm = null, $system=null)
 				$rulers = $realm->findRulers();
 				if (!$rulers->isEmpty()) {
-					$msguser = $rulers->first();
+					foreach ($rulers as $ruler) {
+						if ($ruler->isActive(true)) {
+							$msguser = $ruler;
+							break;
+						}
+					}
 				} else {
 					$members = $realm->findMembers(true);
-					if ($members->isEmpty()) {
-						$msguser = $members->first();
+					if (!$members->isEmpty()) {
+						foreach ($members as $member) {
+							if ($member->isActive(true)) {
+								$msguser = $member;
+								break;
+							}
+						}
 					} else {
 						$this->logger->notice($realm->getName()." deserted, making inactive.");
 						$deserted = true;
@@ -959,23 +969,33 @@ class GameRunner {
 				}
 				if ($msguser) {
 					$topic = $realm->getName().' Announcements';
-					$conversation = $this->conv->createConversation(null, null, $topic, null, $realm, 'announcements');
+					$conversation = $this->convman->newConversation(null, null, $topic, null, null, $realm, 'announcements');
 					$this->logger->notice($realm->getName()." announcements created");
 				}
 			}
 			if (!$general && !$deserted) {
 				$rulers = $realm->findRulers();
 				if (!$rulers->isEmpty()) {
-					$msguser = $rulers->first();
+					foreach ($rulers as $ruler) {
+						if ($ruler->isActive(true)) {
+							$msguser = $ruler;
+							break;
+						}
+					}
 				} else {
 					$members = $realm->findMembers(true);
-					if ($members->isEmpty()) {
-						$msguser = $members->first();
+					if (!$members->isEmpty()) {
+						foreach ($members as $member) {
+							if ($member->isActive(true)) {
+								$msguser = $member;
+								break;
+							}
+						}
 					}
 				}
 				if ($msguser) {
 					$topic = $realm->getName().' General Discussion';
-					$conversation = $this->conv->createConversation(null, null, $topic, null, $realm, 'general');
+					$conversation = $this->convman->newConversation(null, null, $topic, null, null, $realm, 'general');
 					$this->logger->notice($realm->getName()." discussion created");
 				}
 			}
@@ -1299,7 +1319,7 @@ class GameRunner {
 		$targetconvo = $query->getResult();
 
 		foreach ($targetconvo as $topic) {
-			$this->convman->writeMessage($topic, null, $msg);
+			$this->convman->writeMessage($topic, null, null, $msg, 'system');
 		}
 
 	}
