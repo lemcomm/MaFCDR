@@ -150,6 +150,7 @@ class Character {
 	public function isActive($include_wounded=false, $include_slumbering=false) {
 		if (!$this->location) return false;
 		if (!$this->alive) return false;
+		if ($this->retired) return false;
 		if ($this->slumbering && !$include_slumbering) return false;
 		// we can take a few wounds before we go inactive
 		if ($this->healthValue() < 0.9 && !$include_wounded) return false;
