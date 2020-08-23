@@ -23,6 +23,7 @@ use BM2\SiteBundle\Form\SubrealmType;
 use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -71,7 +72,7 @@ class RealmController extends Controller {
 	public function viewAction(Realm $id) {
 		$realm = $id;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
-		# NOTE: Character onject checking not conducted because we don't need it. 
+		# NOTE: Character onject checking not conducted because we don't need it.
 		# $character isn't checked in a context that would require it to be NULL or an Object.
 
 		$superrulers = array();
@@ -102,10 +103,10 @@ class RealmController extends Controller {
 		$diplomacy = array();
 		foreach ($query->getResult() as $relation) {
 			if ($relation->getSourceRealm() == $realm) {
-				$target = $relation->getTargetRealm(); 
+				$target = $relation->getTargetRealm();
 				$side = 'we';
 			} else {
-				$target = $relation->getSourceRealm(); 
+				$target = $relation->getSourceRealm();
 				$side = 'they';
 			}
 			$index = $target->getId();
@@ -120,11 +121,11 @@ class RealmController extends Controller {
 					$restorable = TRUE;
 				}
 			}
-		} 
+		}
 		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
 			$restorable = TRUE;
 			echo $restorable;
-		}*/	
+		}*/
 
 		return array(
 			'realm' =>		$realm,
@@ -139,7 +140,7 @@ class RealmController extends Controller {
 			'restorable' => $restorable
 		);
 	}
-	
+
 	/**
 	  * @Route("/new")
 	  * @Template
@@ -394,7 +395,7 @@ class RealmController extends Controller {
 				$this->addFlash('error', $this->get('translator')->trans('realm.abolish.fail', array(), 'politics')); # 'You have not validated your certainty.'
 				return array('realm'=>$realm, 'form'=>$form->createView());
 			}
-				
+
 		}
 		return array('realm'=>$realm,
 			     'form'=>$form->createView());
@@ -608,7 +609,7 @@ class RealmController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('position.appoint.done', array(), 'politics'));
 			}
 			if ($nodemoruler) {
-				$this->addFlash('error', $this->get('translator')->trans('position.appoint.nodemoruler', array(), 'politics'));		
+				$this->addFlash('error', $this->get('translator')->trans('position.appoint.nodemoruler', array(), 'politics'));
 			}
 			return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 		}
@@ -640,7 +641,7 @@ class RealmController extends Controller {
 		$this->addToHierarchy($realm);
 
 	   	$descriptorspec = array(
-			   0 => array("pipe", "r"),  // stdin 
+			   0 => array("pipe", "r"),  // stdin
 			   1 => array("pipe", "w"),  // stdout
 			   2 => array("pipe", "w") // stderr
 			);
@@ -703,9 +704,9 @@ class RealmController extends Controller {
 						} else {
 							$available[$id] = array('realm'=>$myrealm, 'via'=>array($char));
 						}
-						if (!$realms->contains($myrealm)) { 
-							$realms->add($myrealm); 
-						}					
+						if (!$realms->contains($myrealm)) {
+							$realms->add($myrealm);
+						}
 					} else {
 						if (!isset($unavailable[$id])) {
 							$unavailable[$id] = array('realm'=>$myrealm, 'reason'=>'current');
@@ -727,7 +728,7 @@ class RealmController extends Controller {
 
 		if ($request->isMethod('POST')) {
 			$form->bind($request);
-			if ($form->isValid()) {		
+			if ($form->isValid()) {
 				$data = $form->getData();
 				$target = $data['target'];
 
@@ -799,7 +800,7 @@ class RealmController extends Controller {
 				$fail=true;
 			}
 			if (!$fail) {
-				$fail = $this->checkRealmNames($form, $data['name'], $data['formal_name']);			
+				$fail = $this->checkRealmNames($form, $data['name'], $data['formal_name']);
 			}
 			if (!$fail) {
 				if ($data['type'] >= $realm->getType()) {
@@ -893,7 +894,7 @@ class RealmController extends Controller {
 		}
 
 		$em = $this->getDoctrine()->getManager();
-		
+
 		$this->get('realm_manager')->makeRuler($realm, $character);
 		$realm->setActive(TRUE);
 		$this->get('history')->logEvent(
@@ -911,9 +912,9 @@ class RealmController extends Controller {
 		$em->flush();
 
 		return new Response();
-		
+
 	}
-	
+
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
 	  * @Template
@@ -1006,7 +1007,7 @@ class RealmController extends Controller {
 			}
 		}
 		// FIXME: should not be possible to have relations with yourself...
-		
+
 		$form = $this->createForm(new RealmRelationType(), $relation);
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -1115,7 +1116,7 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		/* 
+		/*
 		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
 		And yes, you're reading this right, elections only used to be counted when someone was viewing the list of elections in a realm.
 		--Andrew 20170918
@@ -1126,7 +1127,7 @@ class RealmController extends Controller {
 		foreach ($query->getResult() as $election) {
 			$this->get('realm_manager')->countElection($election);
 		}
-		$em->flush(); 
+		$em->flush();
 		*/
 
 		return array(
@@ -1224,11 +1225,11 @@ class RealmController extends Controller {
 
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'politics', 'attr'=>array('class'=>'wide')))
 			->add('candidate', 'text', array(
-				'required'=>true, 
+				'required'=>true,
 				'label'=>'votes.add.label',
 				))
 			->add('vote', 'choice', array(
-				'required'=>true, 
+				'required'=>true,
 				'label'=>'votes.add.procontra',
 				'choices'=>array(1=>'votes.pro', -1=>'votes.contra')
 				))
@@ -1259,18 +1260,23 @@ class RealmController extends Controller {
 					$apply = 1;
 				}
 
-				// FIXME: this works on character names, WHICH ARE NOT UNIQUE! -- our current hack: add them all
-				$candidates = $em->getRepository('BM2SiteBundle:Character')->findByName($data['candidate']);
-				foreach ($candidates as $candidate) {
-					if (!$candidate->isNPC()) {
-						// TODO: filter out already existing candidates
-						$vote = new Vote;
-						$vote->setVote($apply);
-						$vote->setCharacter($character);
-						$vote->setElection($election);
-						$vote->setTargetCharacter($candidate);
-						$em->persist($vote);
-					}
+				$input = $data['candidate'];
+				# First strip it of all non-numeric characters and see if we can find a character.
+				$id = preg_replace('/(?:[^123456790]*)/', '', $input);
+				if ($id) {
+					$candidate = $em->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$id, 'alive' => TRUE));
+				} else {
+					# Presumably, that wasn't an ID. Assume it's just a name.
+					$name = trim(preg_replace('/(?:[123456790()]*)/', '', $input));
+					$candidate = $em->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
+				}
+				if ($candidate) {
+					$vote = new Vote;
+					$vote->setVote($apply);
+					$vote->setCharacter($character);
+					$vote->setElection($election);
+					$vote->setTargetCharacter($candidate);
+					$em->persist($vote);
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('votes.add.done', array(), 'politics'));
