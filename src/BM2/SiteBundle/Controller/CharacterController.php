@@ -242,7 +242,7 @@ class CharacterController extends Controller {
 		}
 
 		return array(
-			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($char),
+			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 		);
 	}
 
@@ -327,7 +327,6 @@ class CharacterController extends Controller {
 			}
 		}
 		return array(
-			'form_offer'=>$form_offer->createView(),
 			'form_existing'=>$form_existing->createView(),
 			'form_map'=>$form_map->createView(),
 			'retiree'=>$retiree
