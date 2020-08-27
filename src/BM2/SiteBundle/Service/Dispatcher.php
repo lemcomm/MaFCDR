@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Unit;
@@ -129,6 +130,9 @@ class Dispatcher {
 				return array($character, $settlement, $place); #This is currently used on a couple pages. Should be rarest of three.
 			}
 		} else {
+			if ($getPlace) {
+				return [$character, $place];
+			}
 			return $character;
 		}
 	}
@@ -2021,49 +2025,44 @@ class Dispatcher {
 		return array("name"=>"place.new.name", "url"=>"maf_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 	}
 
-	public function placeManageTest() {
+	public function placeManageTest($ignored, Place $place) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->place->getOwner != $this->getCharacter() OR !$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'describe')) {
+		if (!$place->getOwner() != $this->getCharacter() OR !$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'describe')) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
 		} else {
 			return $this->action("place.manage", "maf_place_manage", true,
-				array('place'=>$this->place->getId()),
-				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
+				array('place'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 			);
 		}
 	}
 
-	public function placePermissionsTest() {
+	public function placePermissionsTest($ignored, Place $place) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
-		if ($this->place != $this->getActionablePlace()) {
-			return array("name"=>"place.permissions.name",
-				     "description"=>"unavailable.noplace"
-				    );
-		}
-		if (!$this->place->getOwner != $this->getCharacter()) {
+		if (!$place->getOwner() != $this->getCharacter()) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
 		return $this->action("place.permissions", "maf_place_permissions", true,
-				array('place'=>$this->place->getId()),
-				array("%name%"=>$this->place->getName(), "%formalname%"=>$this->place->getFormalName())
+				array('place'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$this->place->getFormalName())
 			);
 	}
 
-	public function placeEnterTest($check_duplicate=false) {
+	public function placeEnterTest($check_duplicate=false, Place $place) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->permission_manager->checkPlacePermissions($this->place, $this->getCharacter(), 'visit')) {
+		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit')) {
 			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
 		}
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
 		}
-		if ($this->place != $this->getActionablePlace()) {
+		if ($place != $this->getActionablePlace() && $this->getCharacter()->getInsideSettlement() != $place->getSettlement()) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
