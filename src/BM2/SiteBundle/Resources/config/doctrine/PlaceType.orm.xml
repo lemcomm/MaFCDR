@@ -7,6 +7,7 @@
 		<field name="name" type="string"/>
 		<field name="requires" type="string" nullable="true"/>
 		<field name="visible" type="boolean"/>
+		<field name="defensible" type="boolean" nullable="true"/>
 		<one-to-many field="subtypes" target-entity="PlaceSubType" mapped-by="place_type"/>
 	</entity>
 </doctrine-mapping>
