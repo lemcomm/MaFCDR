@@ -25,6 +25,9 @@ class Place {
 		foreach ($this->findDefenders() as $char) {
 			$defenders += $char->getActiveSoldiers()->count();
 		}
+                foreach ($this->getUnits() as $unit) {
+                        $defenders += $unit->getActiveSoldiers()->count();
+                }
 		return $defenders;
 	}
 
