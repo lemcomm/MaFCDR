@@ -134,6 +134,11 @@ class ConversationController extends Controller {
 			$data = $form->getData();
 
 			$recipients = new ArrayCollection;
+			if (isset($data['owner'])) foreach ($data['owner'] as $rec) {
+				if (!$recipients->contains($rec)) {
+					$recipients->add($rec);
+				}
+			}
 			if (isset($data['nearby'])) foreach ($data['nearby'] as $rec) {
 				if (!$recipients->contains($rec)) {
 					$recipients->add($rec);
@@ -145,11 +150,6 @@ class ConversationController extends Controller {
 				}
 			}
 			if (isset($data['contacts'])) foreach ($data['contacts'] as $rec) {
-				if (!$recipients->contains($rec)) {
-					$recipients->add($rec);
-				}
-			}
-			if (isset($data['owner'])) foreach ($data['owner'] as $rec) {
 				if (!$recipients->contains($rec)) {
 					$recipients->add($rec);
 				}
