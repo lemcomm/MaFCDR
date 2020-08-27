@@ -269,7 +269,7 @@ class ConversationManager {
                         $msg->setType($type);
                         $msg->setCycle($cycle);
                         $msg->setContent($content);
-                        $new->setRecipients($counter);
+                        $msg->setRecipients($counter);
                 }
 
                 $this->em->flush();
