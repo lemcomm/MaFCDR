@@ -11,23 +11,24 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $placetypes = array(
-		'academy'	=> array('requires' => 'academy',	'visible' => false),
-		'arena'		=> array('requires' => 'arena',		'visible' => false),
-		'capital'	=> array('requires' => 'ruler',		'visible' => true),
-		'castle'	=> array('requires' => 'castle',	'visible' => true),
-		'cave'		=> array('requires' => '',		'visible' => true),
-		'embassy'	=> array('requires' => 'ambassador',	'visible' => true, 'pop' =>	2)
-		'fort'		=> array('requires' => 'fort',		'visible' => true),
-		'home'		=> array('requires' => 'dynasty head',	'visible' => true),
-		'inn'		=> array('requires' => 'inn',		'visible' => true),
-		'library'	=> array('requires' => '',		'visible' => true),
-		'monument'	=> array('requires' => 'lord',		'visible' => true),
-		'plaza'		=> array('requires' => 'lord',		'visible' => true),
-		'portal' 	=> array('requires' => 'magic',		'visible' => false),
-		'passage'	=> array('requires' => 'warren',	'visible' => false),
-		'track'		=> array('requires' => 'track',		'visible' => true),
-		'tavern'	=> array('requires' => 'tavern',	'visible' => true),
-		'tournament'	=> array('requires' => 'lord',		'visible' => false, 'pop' =>	10)
+		'academy'	=> array('requires' => 'academy',	'visible' => false,	'defensible'=>true),
+		'arena'		=> array('requires' => 'arena',		'visible' => false,	'defensible'=>true),
+		'capital'	=> array('requires' => 'ruler',		'visible' => true,	'defensible'=>true),
+		'castle'	=> array('requires' => 'castle',	'visible' => true,	'defensible'=>true),
+		'cave'		=> array('requires' => '',		'visible' => true,	'defensible'=>false),
+		'embassy'	=> array('requires' => 'ambassador',	'visible' => true,	'defensible'=>true, 'pop' =>	2),
+		'fort'		=> array('requires' => 'fort',		'visible' => true,	'defensible'=>true),
+		'home'		=> array('requires' => 'dynasty head',	'visible' => true,	'defensible'=>true),
+		'inn'		=> array('requires' => 'inn',		'visible' => true,	'defensible'=>false),
+		'library'	=> array('requires' => '',		'visible' => true,	'defensible'=>false),
+		'monument'	=> array('requires' => 'lord',		'visible' => true,	'defensible'=>false),
+		'plaza'		=> array('requires' => 'lord',		'visible' => true,	'defensible'=>false),
+		'port'		=> array('requires' => 'docks',		'visible' => true,	'defensible'=>false),
+		'portal' 	=> array('requires' => 'magic',		'visible' => false,	'defensible'=>false),
+		'passage'	=> array('requires' => 'warren',	'visible' => false,	'defensible'=>false),
+		'track'		=> array('requires' => 'track',		'visible' => true,	'defensible'=>false),
+		'tavern'	=> array('requires' => 'tavern',	'visible' => true,	'defensible'=>false),
+		'tournament'	=> array('requires' => 'lord',		'visible' => false,	'defensible'=>false, 'pop' =>	10)
 	);
 
 	private $placesubtypes = array(
@@ -80,6 +81,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 				$type->setRequires($data['requires']);
 			}
 			$type->setVisible($data['visible']);
+			$type->setDefensible($data['defensible']);
 			if ($data['pop']) {
 				$type->setWorkers($data['pop']);
 			} else {
