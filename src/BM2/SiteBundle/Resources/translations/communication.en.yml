@@ -95,6 +95,7 @@ event:
    cancelled:   %character% has withdrawn their claim to this settlement.
   charstart:    A new First One named %character% has appeared here.
   newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% children coming of age.
+  newplace:     %character% has formalized %place% as a location of interst.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -195,7 +196,7 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
-  newplace:     Formalized %place% by %link-character%.
+  newplace:     Formalized %place% by %character%.
   joinhouse:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
