@@ -30,13 +30,12 @@ class PlaceController extends Controller {
 	  * @Template("BM2SiteBundle:Place:view.html.twig")
 	  */
 	public function indexAction(Place $id) {
-		$place = $id;
-		$em = $this->getDoctrine()->getManager();
-
 		$character = $this->get('appstate')->getCharacter(false, true, true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
+		$place = $id;
+		$em = $this->getDoctrine()->getManager();
 
 		if ($character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
@@ -49,14 +48,23 @@ class PlaceController extends Controller {
 			$details = $this->get('interactions')->characterViewDetails($character, $place);
 		}
 
-		/* Leaving this here for later implementation...
+
+		$militia = [];
 		if ($details['spy'] || $place->getOwner() == $character) {
-			$militia = $place->getActiveMilitiaByType();
+			foreach ($place->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
+						if (array_key_exists($key, $militia)) {
+							$militia[$key] += $type;
+						} else {
+							$militia[$key] = $type;
+						}
+					}
+				}
+			}
 		} else {
 			$militia = null;
 		}
-		When we add this, get rid of $militia below this. */
-		$militia = null;
 
 		if ($character->getInsidePlace() == $place) {
 			$inside = true;
@@ -118,12 +126,13 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/enter", name="maf_place_enter")
+	  * @Route("/{id}/enter", requirements={"id"="\d+"}, name="maf_place_enter")
 	  * @Template
 	  */
 
-	public function enterPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
+	public function enterPlaceAction(Place $id) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeEnterTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -145,7 +154,7 @@ class PlaceController extends Controller {
 	  */
 
 	public function exitPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
+		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', false, true, false);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -167,7 +176,8 @@ class PlaceController extends Controller {
 	  */
 
 	public function permissionsAction(Place $id, Request $request) {
-		$character = $this->get('dispatcher')->gateway($place, 'placePermissionsTest');
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placePermissionsTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -268,17 +278,30 @@ class PlaceController extends Controller {
 			}
 		}
 
-		$found = false;
 		foreach ($settlement->getCapitalOf() as $realm) {
 			if (!$found) {
+
+			}
+		}
+
+		$found = false;
+		$found2 = false;
+		$arrivals = [];
+		foreach ($settlement->getCapitalOf() as $realm) {
+			if (!$found || !$found2) {
 				foreach ($realm->findRulers() as $ruler) {
-					if ($ruler == $character && $canPlace) {
+					if ($ruler == $character) {
 						$rights[] = 'ruler';
+						$found = true;
 						break; #No need to continue.
 					}
 				}
-			} else {
-				break; #No need to continue.
+				if ($found && !$found2) {
+					if ($realm->getArrivalPlaces()->count() < 5) {
+						$arrivals[] = $realm;
+						$found2 = true;
+					}
+				}
 			}
 		}
 		$realm = $settlement->getRealm();
@@ -294,10 +317,14 @@ class PlaceController extends Controller {
 		if ($diplomacy) {
 			$rights[] = 'diplomat';
 		}
+		if ($settlement->getGeoData()->getCoast() && $settlement->hasBuildingNamed('Dockyard')) {
+			$rights[] = 'port';
+		}
 
 
 		#Now generate the list of things we can build!
 		$query = $this->getDoctrine()->getManager()->createQuery("select p from BM2SiteBundle:PlaceType p where (p.requires in (:rights) OR p.requires IS NULL) AND p.visible = TRUE")->setParameter('rights', $rights);
+
 
 		$form = $this->createForm(new PlaceNewType($query->getResult()));
 		$form->handleRequest($request);
@@ -371,6 +398,7 @@ class PlaceController extends Controller {
 				$newdesc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
 				$this->getDoctrine()->getManager()->flush($place);
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
+				return $this->redirectToRoute('maf_place_actionable');
 			}
 		}
 		return array(
@@ -384,18 +412,34 @@ class PlaceController extends Controller {
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('dispatcher')->gateway('placeManageTest');
+		$character = $this->get('dispatcher')->gateway('placeManageTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
 		$olddescription = $place->getDescription()->getText();
-		if ($place->getOwner() == $character) {
-			$isowner = true;
+		$type = $place->getType()->getName();
+		$hostedRealm = null;
+		$realm = null;
+		if ($type == 'capital' || $type == 'embassy') {
+			$realm = $place->getCapitalOf();
+			if ($realm && $realm->findRulers()->contains($character)) {
+				$isowner = true;
+			}
+		} elseif ($type == 'embassy') {
+			$realm = $place->getOwningRealm();
+			if ($realm && $realm->findRulers()->contains($character)) {
+				$isowner = true;
+			}
+			$hostedRealm = $place->getForRealm();
 		} else {
-			$isowner = false;
+			if ($place->getOwner() == $character) {
+				$isowner = true;
+			} else {
+				$isowner = false;
+			}
 		}
-		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $id));
+		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $id, $hostedRealm));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
