@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\ORM\EntityManager;
@@ -284,7 +285,7 @@ class Interactions {
 		$place->addCharactersPresent($character);
 
 		// If the Place is in a Settlement, set us in it, otherwise, set us to the place's location.
-		if ($place->getSettlement()) {
+		if ($settlement = $place->getSettlement()) {
 			$center_radius = $this->geo->calculateActionDistance($settlement) / 2;
 			$passable = false;
 			$loc = $character->getLocation();
@@ -316,17 +317,25 @@ class Interactions {
 
 		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
 		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
-		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
-			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered2':'event.settlement.entered2',
-				array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
-				History::LOW, true, 10
-			);
+
+
+		if ($character->getUnits()) {
+			$count = 0;
+			foreach ($character->getUnits() as $unit) {
+				$count += $unit->getLivingSoldiers()->count();
+			}
+			if ($count > 5) {
+				$this->history->logEvent(
+					$place,
+					$force?'event.place.forceentered2':'event.place.entered2',
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
+					History::LOW, true, 10
+				);
+			}
 		} else {
 			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered':'event.settlement.entered',
+				$place,
+				$force?'event.place.forceentered':'event.place.entered',
 				array('%link-character%'=>$character->getId()),
 				History::LOW, true, 10
 			);
