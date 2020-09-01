@@ -73,12 +73,14 @@ class Settlement {
 		return $this->population + $this->thralls + $soldiers;
 	}
 
-	public function getTimeToTake(Character $taker, $attackers=-1, $additional_defenders=0) {
-		if ($attackers == -1) {
-			$attackers = 0;
-			foreach ($taker->getUnits() as $unit) {
-				$attackers += $unit->getActiveSoldiers()->count();
-			}
+	public function getTimeToTake(Character $taker, $supporters = null, $opposers = null) {
+		$supportCount = 1;
+		$opposeCount = 1;
+		if ($supporters) {
+			$supportCount = $supporters->count();
+		}
+		if ($opposers) {
+			$opposeCount = $opposers->count();
 		}
 		$enforce_claim = false;
 		foreach ($this->getClaims() as $claim) {
@@ -97,27 +99,23 @@ class Settlement {
 			$time_to_take *= 0.2;
 		}
 
-		// militia automatically opposes
-		$defenders = $this->countDefenders();
-		if ($defenders > 0) {
-			// inactive lords don't have much support from the local militia
-			if ($this->getOwner() && $this->getOwner()->getSlumbering()) {
-				$defenders *= 0.25;
-			}
-			$time_to_take *= 1 + sqrt($defenders);
-		}
-
-		$defenders += $additional_defenders;
-		$mod = ($defenders+10) / ($attackers+10);
-		if ($mod < 1.0) {
-			$mod = sqrt($mod);
-		}
-
 		// inactive lord = half time, in addition to the change above (which also includes inactive ones)
-		if ($this->getOwner() && $this->getOwner()->getAlive() && $this->getOwner()->getSlumbering()) {
-			$mod *= 0.5;
+		if ($owner = $this->getOwner() && $this->getOwner()->getAlive()) {
+			if ($this->getOwner()->getSlumbering()) {
+				$mod = 0.5;
+			} else {
+				if ($opposers && $opposers->countains($owner)) {
+					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
+				} else {
+					$mod = 10;
+				}
+			}
 		}
 		$time_to_take *= $mod;
+
+		$ratio = ($opposeCount/$supportCount);
+
+		$time_to_take *= $ratio;
 
 		return round($time_to_take);
 	}
