@@ -2171,8 +2171,11 @@ class Dispatcher {
 		}
 		if (!$this->getCharacter()->getInsidePlace()) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.outside"
+				     "description"=>"unavailable.outsideplace"
 				    );
+		}
+		if ($this->getCharacter()->getInsidePlace()->getSiege()) {
+			return array("name"=>"location.exit.name", "description"=>"unavailable.besieged");
 		}
 		if (!$place = $this->getActionablePlace()) {
 			return array("name"=>"place.exit.name",
