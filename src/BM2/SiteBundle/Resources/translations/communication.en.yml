@@ -44,6 +44,7 @@ event:
   take:
    started:     %character% has initiated actions to take control.
    stopped:     %character% has abandoned attempts to take control.
+   start:       You have begun the process of forcefully taking control of this settlement. It will end at %time%, server time.
   taken:				Control established by %character%.
   taken2:       Control established by %character% of %realm%.
   loot:         The settlement is being looted by %character%.
@@ -196,7 +197,6 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
-  newplace:     Formalized %place% by %character%.
   joinhouse:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
@@ -311,6 +311,16 @@ event:
   relocated:
    settlement:  Relocated to the settlement of %settlement%.
   newname:      Changed it's name to %name%.
+ place:
+  formalized:   Foramlized by %character% in the lands of %settlement%.
+  attacked:     The place is being attacked by troops of %character%.
+  battle:       %battle% was fought.
+  entered:      %character% has entered the place.
+  entered2:     %character% has entered the place with %soldiers% soldiers.
+  forceentered: %character% has forced his way into the place.
+  forceentered2: %character% has forced his way into the place with %soldiers% soldiers.
+  left:         %character% has been seen leaving.
+  forceleft:    %character% has been forced outside the walls during the battle.
 
 
 report:
