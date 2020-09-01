@@ -209,6 +209,18 @@ class PlaceController extends Controller {
 				}
 			}
 			$em->flush();
+			$change = false;
+			if ($place->getAllowSpawn() && !$place->getType()->getSpawnable()) {
+				$place->setAllowSpawn(false);
+				$change = true;
+			}
+			if (!$place->getPublic() && $place->getType()->getPublic()) {
+				$place->setPublic(true);
+				$change = true;
+			}
+			if ($change) {
+				$em->flush(); #No sneaky allowed!
+			}
 			$this->addFlash('notice', $this->get('translator')->trans('control.permissions.success', array(), 'actions'));
 			return $this->redirect($request->getUri());
 		}
@@ -341,6 +353,7 @@ class PlaceController extends Controller {
 				$place->setShortDescription($data['short_description']);
 				$place->setCreator($character);
 				$place->setOwner($character);
+				$place->setType($data['type']);
 				if ($character->getInsideSettlement()) {
 					$place->setSettlement($character->getInsideSettlement());
 					$place->setGeoData($character->getInsideSettlement()->getGeoData());
@@ -362,6 +375,7 @@ class PlaceController extends Controller {
 					$place->setGeoData($geoData);
 				}
 				$place->setVisible($data['type']->getVisible());
+				$place->setActive(true);
 				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
 					$place,
