@@ -135,26 +135,28 @@ class ActionResolution {
 			$elapsed = $now->getTimestamp() - $action->getStarted()->getTimestamp();
 			$done = min(1.0, $elapsed / $old_time);
 
-			// TODO: opposing and supporting actions
-			$attackers = 0;
-			foreach ($action->getCharacter()->getUnits() as $unit) {
-				$attackers += $unit->getActiveSoldiers()->count();
-			}
-			$additional_defenders = 0;
-
-			foreach ($action->getSupportingActions() as $support) {
-				foreach ($support->getCharacter()->getUnits() as $unit) {
-					$attackers += $unit->getActiveSoldiers()->count();
+			if ($action->getSupportingActions()->count() > 0) {
+				$supporters = new ArrayCollection();
+				foreach ($action->getSupportingActions() as $support) {
+					foreach ($support->getCharacter() as $char) {
+						$supporters->add($char);
+					}
 				}
+			} else {
+				$supporters = null;
 			}
-			foreach ($action->getOpposingActions() as $oppose) {
-				foreach ($oppose->getCharacter()->getUnits() as $unit) {
-					$additional_defenders += $unit->getActiveSoldiers()->count();
+			if ($action->getOpposingActions()->count() > 0) {
+				$opposers = new ArrayCollection();
+				foreach ($action->getOpposingActions() as $oppose) {
+					foreach ($oppose->getCharacter() as $char) {
+						$opposers->add($char);
+					}
 				}
-				$additional_defenders += $oppose->getCharacter()->getActiveSoldiers()->count();
+			} else {
+				$opposers = null;
 			}
 
-			$time = $action->getTargetSettlement()->getTimeToTake($action->getCharacter(), $attackers, $additional_defenders);
+			$time = $action->getTargetSettlement()->getTimeToTake($action->getCharacter(), $supporters, $opposers);
 
 			if ($time/$old_time < 0.99 || $time/$old_time > 1.01) {
 				$time_left = round($time * (1-$done));
