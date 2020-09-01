@@ -2123,12 +2123,12 @@ class Dispatcher {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
-		if (!$place->getOwner() != $this->getCharacter()) {
+		if ($place->getOwner() != $this->getCharacter()) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
 		return $this->action("place.permissions", "maf_place_permissions", true,
 				array('place'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$this->place->getFormalName())
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 			);
 	}
 
