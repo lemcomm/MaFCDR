@@ -34,6 +34,7 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 		),
 		'place' => array(
 			'see'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.see', 'desc'=>'perm.desc.see'),
+			'manage'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.manage', 'desc'=>'perm.desc.manage'),
 			'visit'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placevisit', 'desc'=>'perm.desc.placevisit'),
 			'docks'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placedocks', 'desc'=>'perm.desc.placedocks'),
 			'describe'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placedescribe', 'desc'=>'perm.desc.placedescribe'),
