@@ -1115,6 +1115,86 @@ class Dispatcher {
 		return $this->action("military.block", "bm2_site_war_block", true);
 	}
 
+	/*public function militaryAttackSettlementTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if (!$settlement = $this->getActionableSettlement()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($settlement->getOwner() == $this->getCharacter()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.yours");
+		}
+		if (!$settlement->isDefended()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.location.nodefenders");
+		}
+		if ($this->getCharacter()->getInsideSettlement() != $settlement) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.mustsiege");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			return array("name"=>"military.settlement.attack.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.settlement.attack", "bm2_site_war_attacksettlement");
+	}
+
+	public function militaryAttackPlaceTest($check_duplicate=false) {
+		if ($this->getCharacter()->isPrisoner()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.prisoner");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.attack')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->isDoingAction('settlement.defend')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.both");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->getActiveSoldiers()->isEmpty()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.nosoldiers");
+		}
+		if (!$place = $this->getActionablePlace()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($place->getOwner() == $this->getCharacter()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.yours");
+		}
+		if (!$place->isDefended()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.location.nodefenders");
+		}
+		if ($this->getCharacter()->getInsidePlace() != $place) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.mustsiege");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			return array("name"=>"military.place.attack.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.place.attack", "bm2_site_war_attacksettlement");
+	}*/
+
 	public function militaryDefendSettlementTest($check_duplicate=false) {
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"military.settlement.defend.name", "description"=>"unavailable.prisoner");
