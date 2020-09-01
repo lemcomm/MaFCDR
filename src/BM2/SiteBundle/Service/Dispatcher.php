@@ -2109,8 +2109,8 @@ class Dispatcher {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
-		if (!$place->getOwner() != $this->getCharacter() OR !$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'describe')) {
-			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
+		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'manage')) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.notmanager");
 		} else {
 			return $this->action("place.manage", "maf_place_manage", true,
 				array('place'=>$place->getId()),
