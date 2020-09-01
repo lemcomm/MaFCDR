@@ -86,6 +86,7 @@
 
 		<one-to-many field="owned_settlements" target-entity="Settlement" mapped-by="owner"/>
 		<one-to-many field="settlement_claims" target-entity="SettlementClaim" mapped-by="character" fetch="EXTRA_LAZY"/>
+		<one-to-many field="occupied_settlements" target-entity="Settlement" mapped-by="occupant"/>
 
 		<many-to-one field="liege" target-entity="Character" inversed-by="vassals"/>
 		<one-to-many field="vassals" target-entity="Character" mapped-by="liege"/>
@@ -106,6 +107,7 @@
 
 		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
 		<one-to-many field="created_places" target-entity="Place" mapped-by="creator"/>
+		<one-to-many field="occupied_places" target-entity="Place" mapped-by="occupant"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
 
 		<many-to-one field="house" target-entity="House" inversed-by="members"/>
