@@ -152,7 +152,7 @@ class PlaceController extends Controller {
 	  */
 
 	public function exitPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', false, true, false);
+		$character = $this->get('dispatcher')->gateway('placeLeaveTest', false, true, false);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -161,10 +161,10 @@ class PlaceController extends Controller {
 		if ($this->get('interactions')->characterLeavePlace($character)) {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('place.exit.success', array(), 'actions'));
-			$this->redirectToRoute('maf_place_actionable');
+			return $this->redirectToRoute('maf_place_actionable');
 		} else {
-			$this->addFlash('error', $this->get('translator')->trans('place.exit.failure', array('%name%' => $id->getName()), 'actions'));
-			$this->redirectToRoute('maf_place', ['id' => $id->getId()]);
+			$this->addFlash('error', $this->get('translator')->trans('place.exit.failure', array(), 'actions'));
+			return $this->redirectToRoute('maf_place_actionable');
 		}
 	}
 
