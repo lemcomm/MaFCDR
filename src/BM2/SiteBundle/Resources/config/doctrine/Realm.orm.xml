@@ -21,6 +21,8 @@
 		<many-to-one field="superior" target-entity="Realm" inversed-by="inferiors"/>
 		<one-to-many field="inferiors" target-entity="Realm" mapped-by="superior"/>
 		<one-to-many field="settlements" target-entity="Settlement" mapped-by="realm"/>
+		<one-to-many field="occupied_settlements" target-entity="Settlement" mapped-by="occupier"/>
+		<one-to-many field="occupied_places" target-entity="Place" mapped-by="occupier"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="realm" fetch="EXTRA_LAZY"/>
 
