@@ -413,12 +413,12 @@ class ActionsController extends Controller {
 				History::HIGH, true, 20
 			);
 			$this->getDoctrine()->getManager()->flush();
+			$endTime = new \DateTime("+ ".$time_to_take." Seconds");
 
-			return array(
-				'settlement'	=> $settlement,
-				'timetotake' 	=> $time_to_take,
-				'result'		=> $result
-			);
+			if ($result) {
+				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.take.start', ["%time%"=>$endTime->format('Y-M-d H:i:s')], 'communication'));
+				return $this->redirectToRoute('bm2_actions');
+			}
 		}
 
 		return array(
