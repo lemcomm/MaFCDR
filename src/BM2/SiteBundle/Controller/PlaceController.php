@@ -131,21 +131,19 @@ class PlaceController extends Controller {
 	  */
 
 	public function enterPlaceAction(Place $id) {
-		$place = $id;
-		$character = $this->get('dispatcher')->gateway('placeEnterTest', false, true, false, $place);
+		$character = $this->get('dispatcher')->gateway('placeEnterTest', false, true, false, $id);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
-		$result = null;
-		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
-			$result = 'entered';
+		if ($this->get('interactions')->characterEnterPlace($character, $id)) {
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('place.enter.success', array('%name%' => $id->getName()), 'actions'));
+			return $this->redirectToRoute('maf_place', ['id' => $id->getId()]);
 		} else {
-			$result = 'denied';
+			$this->addFlash('error', $this->get('translator')->trans('place.enter.failure', array(), 'actions'));
+			return $this->redirectToRoute('maf_place_actionable');
 		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
 	}
 
 	/**
@@ -161,13 +159,13 @@ class PlaceController extends Controller {
 
 		$result = null;
 		if ($this->get('interactions')->characterLeavePlace($character)) {
-			$result = 'left';
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('place.exit.success', array(), 'actions'));
+			$this->redirectToRoute('maf_place_actionable');
 		} else {
-			$result = 'denied';
+			$this->addFlash('error', $this->get('translator')->trans('place.exit.failure', array('%name%' => $id->getName()), 'actions'));
+			$this->redirectToRoute('maf_place', ['id' => $id->getId()]);
 		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
 	}
 
 	/**
@@ -378,21 +376,6 @@ class PlaceController extends Controller {
 						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
 						History::MEDIUM,
 						true
-					);
-					$this->get('history')->logEvent(
-						$character,
-						'event.character.newplace',
-						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
-						History::HIGH,
-						true
-					);
-				} else {
-					$this->get('history')->logEvent(
-						$character,
-						'event.character.newplace',
-						array('%link-place%'=>$place->getId(), '%link-character%'=>$character->getId()),
-						History::MEDIUM,
-						false
 					);
 				}
 				$newdesc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
