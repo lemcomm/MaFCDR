@@ -6,7 +6,6 @@
 		</id>
 		<field name="name" type="string"/>
                 <many-to-one field="place_type" target-entity="PlaceType" inversed-by="subtypes"/>
-                <field name="workers" type="integer"/>
-                <field name="requires" type="string"/>
+                <field name="requires" type="string" nullable="true"/>
 	</entity>
 </doctrine-mapping>
