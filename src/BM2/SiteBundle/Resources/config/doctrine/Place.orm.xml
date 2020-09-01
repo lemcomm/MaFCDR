@@ -26,11 +26,16 @@
 
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_places"/>
 		<many-to-one field="creator" target-entity="Character" inversed-by="created_places"/>
+		<many-to-one field="occupant" target-entity="Character" inversed-by="occupied_places"/>
+
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
+
 		<many-to-one field="owning_realm" target-entity="Realm" inversed-by="embassies_abroad"/>
 		<many-to-one field="hosting_realm" target-entity="Realm" inversed-by="hosted_embassies"/>
 		<many-to-one field="for_realm" target-entity="Realm" inversed-by="arrival_places"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital_place"/>
+		<many-to-one field="occupier" target-entity="Realm" inversed-by="occupied_places"/>
+
 		<one-to-one field="house" target-entity="House" inversed-by="home"/>
 
 		<field name="location" type="point" nullable="true"/>
