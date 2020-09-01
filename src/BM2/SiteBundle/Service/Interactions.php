@@ -92,7 +92,7 @@ class Interactions {
 				$this->history->logEvent(
 					$settlement,
 					$force?'event.settlement.forceentered2':'event.settlement.entered2',
-					array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$count),
 					History::LOW, true, 10
 				);
 			}
@@ -328,7 +328,7 @@ class Interactions {
 				$this->history->logEvent(
 					$place,
 					$force?'event.place.forceentered2':'event.place.entered2',
-					array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$count),
 					History::LOW, true, 10
 				);
 			}
