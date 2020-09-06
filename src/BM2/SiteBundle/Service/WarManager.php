@@ -487,6 +487,7 @@ class WarManager {
 	}
 
 	public function disbandSiege(Siege $siege, Character $leader, $completed = FALSE) {
+		# Siege disbandment and removal actually happens as part of removeCharacterFromBattlegroup.
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
 				if (!$completed) {
@@ -548,7 +549,7 @@ class WarManager {
 						);
 						if ($group->getLeader() == $char) {
 							$group->setLeader(null);
-							$char->removeLeadingBattelgroup($bg);
+							$char->removeLeadingBattlegroup($bg);
 						}
 					}
 					if (!$focus->getSiege()) {
@@ -576,7 +577,7 @@ class WarManager {
 						);
 						if ($group->getLeader() == $char) {
 							$group->setLeader(null);
-							$char->removeLeadingBattelgroup($bg);
+							$char->removeLeadingBattlegroup($bg);
 						}
 					}
 					if (!$group->getBattle()) {
@@ -696,8 +697,7 @@ class WarManager {
 				}
 
 			}
-		}
-		if ($attacker != $victor && $sortie) {
+		} else if ($attacker != $victor && $sortie) {
 			if ($current < $max && !$bypass) {
 				# Siege moves backwards.
 				$siege->setStage($current-1);
@@ -760,6 +760,10 @@ class WarManager {
 				foreach ($victor->getCharacters() as $char) {
 					# Force move victorious attackers inside the settlement.
 					$this->interactions->characterEnterSettlement($char, $settlement, true);
+				}
+				if ($victor->getLeader()) {
+					$settlement->setOccupant($char);
+					$settlement->setOccupier($siege->getRealm());
 				}
 			}
 			$this->disbandSiege($siege, null, TRUE);
