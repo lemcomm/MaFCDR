@@ -294,6 +294,7 @@ class UnitController extends Controller {
 			return $this->redirectToRoute($character);
 		}
                 $options = $this->get('dispatcher')->getActionableCharacters(true);
+                $options[] = $character;
 
                 $form = $this->createForm(new CharacterSelectType($options, 'unit.assign.empty', 'unit.assign.select', 'unit.assign.submit', 'actions'));
 
@@ -330,6 +331,7 @@ class UnitController extends Controller {
 			return $this->redirectToRoute($character);
 		}
                 $options = $this->get('dispatcher')->getActionableCharacters(true); # Returns an array.
+                $options[] = $character;
                 # Check if the unit has a settlement, and if so, set $realm to the realm of that settlement, if any, and check if realm exists.
                 if ($unit->getSettlement() && $realm = $unit->getSettlement()->getRealm()) {
                         # Get all members of the ultimate realm of the settlement.
