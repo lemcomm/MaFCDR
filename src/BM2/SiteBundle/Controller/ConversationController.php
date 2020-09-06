@@ -327,21 +327,25 @@ class ConversationController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
+			$current = $conv->findActivePermissions();
 			$now = new \DateTime("now");
 			$added = new ArrayCollection();
 			foreach($data['contacts'] as $new) {
 				# Double check we can actually add this person.
 				if (in_array($new, $contacts)) {
-					$perm = new ConversationPermission();
-					$em->persist($perm);
-					$perm->setConversation($conv);
-					$perm->setCharacter($new);
-					$perm->setStartTime($now);
-					$perm->setActive(true);
-					$perm->setUnread(0);
-					$perm->setManager(false);
-					$perm->setOwner(false);
-					$added->add($new);
+					# Also check that we aren't adding a duplicate permission.
+					if (!$current->contains($new) && !$added->contains($new)) {
+						$perm = new ConversationPermission();
+						$em->persist($perm);
+						$perm->setConversation($conv);
+						$perm->setCharacter($new);
+						$perm->setStartTime($now);
+						$perm->setActive(true);
+						$perm->setUnread(0);
+						$perm->setManager(false);
+						$perm->setOwner(false);
+						$added->add($new);
+					}
 				}
 			}
 			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $added, $char, false);
@@ -369,7 +373,6 @@ class ConversationController extends Controller {
 			$flush = false;
 			$change = 'permission.invalidrequest';
 			$now = new \DateTime("now");
-			echo 'Owner :'.$me->getOwner().'  Manager.: '.$me->getManager().' var cast as '.gettype($var);
 			if ($me->getOwner()) {
 				if (!$perm->getManager()) {
 					if ($var == 0) {
