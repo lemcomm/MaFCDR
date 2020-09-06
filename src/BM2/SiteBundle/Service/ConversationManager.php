@@ -247,17 +247,23 @@ class ConversationManager {
                         $recipients = $realm->findMembers();
                 }
                 $counter = 0;
+                $added = [];
                 foreach ($recipients as $recipient) {
-                        $counter++;
-                        $perm = new ConversationPermission();
-                        $this->em->persist($perm);
-                        $perm->setStartTime($now);
-                        $perm->setCharacter($recipient);
-                        $perm->setConversation($conv);
-                        $perm->setOwner(false);
-                        $perm->setManager(false);
-                        $perm->setActive(true);
-                        $perm->setUnread(1);
+                        if (!in_array($recipient, $added)) {
+                                $counter++;
+                                $perm = new ConversationPermission();
+                                $this->em->persist($perm);
+                                $perm->setStartTime($now);
+                                $perm->setCharacter($recipient);
+                                $perm->setConversation($conv);
+                                $perm->setOwner(false);
+                                $perm->setManager(false);
+                                $perm->setActive(true);
+                                $perm->setUnread(1);
+                                $added[] = $recipient;
+                        } else {
+                                #Do nothing, duplicate recipient.
+                        }
                 }
 
                 if ($content) {
