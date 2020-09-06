@@ -240,7 +240,14 @@ class WarController extends Controller {
 			}
 		} else {
 			$already = FALSE;
-			$form = $this->createForm(new SiegeStartType($settlement, $this->get('geography')->findPlacesInActionRange($character)));
+			$realms = $character->findRealms();
+			$wars = [];
+			foreach ($realms as $realm) {
+				foreach($realm->getWars() as $war) {
+					$wars[] = $war;
+				}
+			}
+			$form = $this->createForm(new SiegeStartType($settlement, $this->get('geography')->findPlacesInActionRange($character), $realms, $wars));
 		}
 
 		$form->handleRequest($request);
@@ -251,6 +258,12 @@ class WarController extends Controller {
 				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
 				$siege = new Siege;
 				$em->persist($siege);
+				if ($data['war']) {
+					$siege->setWar($data['war']);
+					$siege->setRealm($data['war']->getRealm());
+				} elseif ($data['realm']) {
+					$siege->setRealm($data['realm']);
+				}
 				$siege->setStage(1);
 				if ($data['settlement']) {
 					$place = FALSE;
