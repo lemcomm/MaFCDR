@@ -34,6 +34,7 @@
 		<one-to-many field="my_relations" target-entity="RealmRelation" mapped-by="source_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="foreign_relations" target-entity="RealmRelation" mapped-by="target_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="wars" target-entity="War" mapped-by="realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="sieges" target-entity="Siege" mapped-by="realm" fetch="EXTRA_LAZY"/>
 
 		<one-to-many field="conversations_old" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
 		<one-to-many field="conversations" target-entity="BM2\SiteBundle\Entity\Conversation" mapped-by="realm"/>
