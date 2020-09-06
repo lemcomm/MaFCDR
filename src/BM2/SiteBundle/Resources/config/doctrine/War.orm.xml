@@ -14,6 +14,7 @@
 		<one-to-one field="log" target-entity="EventLog" inversed-by="war"/>
 		<one-to-many field="related_battles" target-entity="Battle" mapped-by="war"/>
 		<one-to-many field="related_battle_reports" target-entity="BattleReport" mapped-by="war"/>
+		<one-to-many field="seiges" target-entity="Siege" mapped-by="war"/>
 
 	</entity>
 </doctrine-mapping>
