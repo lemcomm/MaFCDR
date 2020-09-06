@@ -31,6 +31,8 @@ class SiegeStartType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$settlement = $this->settlement;
 		$places = $this->places;
+		$wars = $this->wars;
+		$realms = $this->realms;
 
 		if ($settlement) {
 			$builder->add('settlement', CheckboxType::class, array(
@@ -58,6 +60,20 @@ class SiegeStartType extends AbstractType {
 		}
 
 		if ($settlement || $places) {
+			$builder->add('submit', ChoiceType::class, [
+				'required'=>false,
+				'choices'=> $wars,
+				'choice_label' => 'summary',
+				'placeholder'=>'military.siege.menu.none',
+				'label'=>'military.siege.menu.wars'
+			]);
+			$builder->add('submit', ChoiceType::class, [
+				'required'=>false,
+				'choices'=> $realms,
+				'choice_label' => 'name',
+				'placeholder'=>'military.siege.menu.none',
+				'label'=>'military.siege.menu.realms'
+			]);
 			$builder->add('submit', 'submit', array('label'=>'military.siege.submit'));
 		}
 	}
