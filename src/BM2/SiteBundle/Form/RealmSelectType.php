@@ -36,6 +36,16 @@ class RealmSelectType extends AbstractType {
 				$this->label	= 'diplomacy.join.label';
 				$this->submit	= 'diplomacy.join.submit';
 				$this->domain	= 'politics';
+			case 'changeoccupier':
+				$this->empty	= '';
+				$this->label	= 'control.changeoccupier.realm';
+				$this->submit	= 'control.changeoccupier.submit';
+				$this->domain	= 'actions';
+			case 'occupy':
+				$this->empty	= '';
+				$this->label	= 'control.occupy.realm';
+				$this->submit	= 'control.occupy.submit';
+				$this->domain	= 'actions';
 		}
 	}
 
