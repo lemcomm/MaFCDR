@@ -30,14 +30,16 @@ class WarManager {
 	protected $milman;
 	protected $actman;
 	protected $interactions;
+	protected $politics;
 
-	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime, Interactions $interactions) {
+	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime, Interactions $interactions, Politics $politics) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->milman = $milman;
 		$this->actman = $actman;
 		$this->gametime = $gametime;
 		$this->interactions = $interactions;
+		$this->politics = $politics;
 	}
 
 	public function createBattle(Character $character, Settlement $settlement=null, Place $place=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
@@ -762,8 +764,7 @@ class WarManager {
 					$this->interactions->characterEnterSettlement($char, $settlement, true);
 				}
 				if ($victor->getLeader()) {
-					$settlement->setOccupant($char);
-					$settlement->setOccupier($siege->getRealm());
+					$this->politics->changeSettlementOccupier($victor->getLeader(), $settlement, $siege->getRealm());
 				}
 			}
 			$this->disbandSiege($siege, null, TRUE);
