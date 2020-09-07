@@ -48,7 +48,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
     war_manager:
         class:      BM2\SiteBundle\Service\WarManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager', '@twig.extension.gametime', '@interactions']
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager', '@twig.extension.gametime', '@interactions', '@politics']
     generator:
         class:      BM2\SiteBundle\Service\Generator
         arguments:  ['@doctrine.orm.entity_manager', '@military_manager']
@@ -57,6 +57,9 @@ services:
         arguments:  ['@appstate']
         tags:
             - { name: twig.extension }
+    message_manager:
+        class:      Calitarus\MessagingBundle\Service\MessageManager
+        arguments:  [@doctrine.orm.entity_manager, @appstate, @logger]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
         arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions']
