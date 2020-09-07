@@ -835,5 +835,125 @@ class ActionsController extends Controller {
 		return array('dungeons'=>$this->get('geography')->findDungeonsInActionRange($character));
 	}
 
+	/**
+	  * @Route("/changeoccupant", name="maf_settlement_occupant")
+	  */
+	public function changeOccupantAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupantTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
+		$form = $this->createForm(new InteractionType('occupier',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$result = array(
+				'success'=>true
+			);
+			if ($data['target']) {
+				$act = new Action;
+				$act->setType('settlement.occupant')->setCharacter($character);
+				$act->setTargetSettlement($settlement)->setTargetCharacter($data['target']);
+				$act->setBlockTravel(true);
+				$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
+				$complete = new \DateTime("+2 hours");
+				$act->setComplete($complete);
+				$result = $this->get('action_manager')->queue($act);
+				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
+				return $this->redirectToRoute('bm2_actions');
+			}
+		}
+
+		return $this->render('Settlement/occupant.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/changeoccupier", name="maf_settlement_occupier")
+	  */
+	public function changeOccupierAction($id, Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupierTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$this->get('dispatcher')->setSettlement($settlement);
+
+		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changeoccupier'));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$targetrealm = $data['target'];
+
+			if ($settlement->getOccupier() == $targetrealm) {
+				$result = 'same';
+			} else {
+				$result = 'success';
+				$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+				$this->getDoctrine()->getManager()->flush();
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return $this->render('Settlement/occupier.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/occupation/start", name="maf_settlement_occupation_start")
+	  */
+	public function occupationStartAction($id, Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationStartTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'occupy'));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$targetrealm = $data['target'];
+
+			$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return $this->render('Settlement/occupationstart.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/occupation/end", name="maf_settlement_occupation_end")
+	  */
+	public function occupationEndAction($id, Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationEndTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$this->get('dispatcher')->setSettlement($settlement);
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $success = $this->get('politics')->endOccupation($settlement, 'manual');
+                        if ($success) {
+                                $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
+                                return $this->redirectToRoute('bm2_actions');
+                        }
+                }
+		return $this->render('Settlement/occupationend.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
 }
