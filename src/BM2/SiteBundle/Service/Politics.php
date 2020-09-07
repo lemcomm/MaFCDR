@@ -183,7 +183,7 @@ class Politics {
 						'event.settlement.ownership.lost',
 						array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$character->getId()),
 						History::HIGH, true
-					);						
+					);
 				}
 				$this->history->logEvent(
 					$character,
@@ -384,7 +384,7 @@ class Politics {
 						'event.settlement.taken',
 						array('%link-character%'=>$settlement->getOwner()->getId()),
 						History::MEDIUM
-					);						
+					);
 					if ($oldrealm && $newrealm==null) {
 						$this->history->logEvent(
 							$oldrealm,
@@ -434,13 +434,64 @@ class Politics {
 		} /* end switch */
 
 		// wars
+		$this->updateWarTargets($settlement, $oldrealm, $newrealm);
+	}
+
+	public function changeSettlementOccupier(Character $char, Settlement $settlement, Realm $realm) {
+		$new = false;
+		$old = null;
+		if (!$settlement->getOccupier()) {
+			$new = true;
+		} else {
+			$old = $settlement->getOccupier();
+		}
+		$settlement->setOccupier($realm);
+		$settlement->setOccupant($char);
+		$wars = $this->updateWarTargets($settlement, $old, $realm);
+		$this->history->logEvent(
+			$settlement,
+			'event.settlement.occupied',
+			array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+			History::HIGH, true
+		);
+	}
+
+	public function endOccupation(Settlement $settlement, $why = null) {
+		$settlement->setOccupant(null);
+		$settlement->setOccupier(null);
+		if ($warTargets = $settlement->getWarTargets()) {
+			foreach ($warTargets as $target) {
+				if ($target->getTakenCurrently()) {
+					$target->setTakenCurrently(false);
+				}
+			}
+		}
+		if ($why == 'manual') {
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.endoccupation.manual',
+				array("%link-realm%"=>$settlement->getOccupier()->getId(), "%link-character%"=>$settlement->getOccupant()->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.endoccupation.warended',
+				array("%link-realm%"=>$settlement->getOccupier()->getId(), "%link-character%"=>$settlement->getOccupant()->getId()),
+				History::HIGH, true
+			);
+		}
+	}
+
+	public function updateWarTargets(Settlement $settlement, Realm $oldRealm = null, Realm $newRealm) {
+		$wars = [];
 		foreach ($settlement->getWarTargets() as $target) {
 			$old = false; $new = false;
 			// FIXME: This doesn't work if oldrealm and newrealm are in the same hierarchy!
-			if ($oldrealm && $oldrealm->findAllSuperiors(true)->contains($target->getWar()->getRealm())) {
+			if ($oldRealm && $oldRealm->findAllSuperiors(true)->contains($target->getWar()->getRealm())) {
 				$old = true;
 			}
-			if ($newrealm && $newrealm->findAllSuperiors(true)->contains($target->getWar()->getRealm())) {
+			if ($newRealm && $newRealm->findAllSuperiors(true)->contains($target->getWar()->getRealm())) {
 				$new = true;
 			}
 			if ($old != $new) {
@@ -449,7 +500,11 @@ class Politics {
 				} else {
 					$target->setTakenEver(true)->setTakenCurrently(true);
 				}
+				if (!in_array($target->getWar(), $wars)) {
+					$wars[] = $target->getWar();
+				}
 			}
 		}
+		return $wars;
 	}
 }
