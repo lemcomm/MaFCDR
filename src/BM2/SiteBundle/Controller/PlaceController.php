@@ -100,7 +100,9 @@ class PlaceController extends Controller {
 				'name' => $place->getName(),
 				'description' => $place->getShortDescription(),
 				'canManage' => $this->canManage($place, $character),
-				'canEnter' => $this->canEnter($place, $character)
+				'canEnter' => $this->canEnter($place, $character),
+				'canSiege' => $this->canSiege($place, $character),
+				'canSpawn' => $this->canSpawn($place, $character)
 			);
 			$places[] = $data;
 		}
@@ -123,6 +125,25 @@ class PlaceController extends Controller {
 		} else {
 			return false;
 		}
+	}
+
+	private function canSiege(Place $place, Character $character) {
+		if(!$place->getType()->getDefensible() || $this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private function canSpawn(Place $place, Character $character) {
+		if ($settlement = $place->getGeoData()->getSettlement() && $place->getType()->getSpawnable()) {
+			foreach ($character->findRulerships() as $pos) {
+				if ($pos->getRealm() == $settlement->getRealm() && ($place->getForRealm() == $pos->getRealm() || $place->getForRealm() === null)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
