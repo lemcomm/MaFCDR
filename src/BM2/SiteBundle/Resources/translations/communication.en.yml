@@ -97,6 +97,11 @@ event:
   charstart:    A new First One named %character% has appeared here.
   newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% children coming of age.
   newplace:     %character% has formalized %place% as a location of interst.
+  occupied:     %character% has delcared an occupation in the name of %realm%.
+  occupied2:    %character% has taken over %realm%'s occupation.
+  endoccupation:
+   manual:      %character% has declared an end to the occupation by %realm%.
+   warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
