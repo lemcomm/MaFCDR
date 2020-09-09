@@ -158,6 +158,16 @@ class Politics {
 		}
 		$settlement->setOwner($character);
 
+		$occupantTakeOver = false;
+		if ($reason == 'take' && $settlement->getOccupant()) {
+			if ($settlement->getOccupant() == $character) {
+				$occupantTakeOver = true;
+				$this->endOccupation($settlement, 'take', true);
+			} else {
+				$this->endOccupation($settlement, 'take', false);
+			}
+		}
+
 		// clean out claim if we have one
 		if ($character) {
 			if ($this->removeClaim($character, $settlement)) {
@@ -168,9 +178,11 @@ class Politics {
 		}
 
 		// clean out permissions
-		foreach ($settlement->getPermissions() as $perm) {
-			$settlement->removePermission($perm);
-			$this->em->remove($perm);
+		if (!$occupantTakeOver) {
+			foreach ($settlement->getPermissions() as $perm) {
+				$settlement->removePermission($perm);
+				$this->em->remove($perm);
+			}
 		}
 
 		// TODO: probably need to clean out some actions, too
@@ -497,7 +509,14 @@ class Politics {
 				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
-		} else {
+		} elseif ($why =='take') {
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.endoccupation.take',
+				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
+				History::HIGH, true
+			);
+		}else {
 			$this->history->logEvent(
 				$settlement,
 				'event.settlement.endoccupation.warended',
