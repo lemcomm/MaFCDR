@@ -26,20 +26,14 @@ class CharacterTransformer implements DataTransformerInterface {
 		if (!$input) {
 			return null;
 		}
-		# Because of the above abuse proofing, this transformer will also accepted character IDs.
-		# If we have an ID, we just use it. We confirm that by seeing if what we have qualifies as numerical, per PHP.
-		if (is_numeric($input)) {
-			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$input, 'alive' => TRUE));
+		# First strip it of all non-numeric characters and see if we can find a character.
+		$id = preg_replace('/(?:[^123456790]*)/', '', $input);
+		if ($id) {
+			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$id, 'alive' => TRUE));
 		} else {
-			# If not, we assume we have $char->getListName(), as these are most list entries, and see if we can strip of anything that's not numeric.
-			$id = preg_replace('/(?:[^123456790]*)/', '', $input);
-			# Now see if doctrine can find that id....
-			if (is_numeric($id)) {
-				$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$input, 'alive' => TRUE));
-			} else {
-				# Presumably, that wasn't an ID. Assume it's just a name.
-				$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $input, 'alive' => TRUE), array('id' => 'ASC'));
-			}
+			# Presumably, that wasn't an ID. Assume it's just a name. Strip out parantheses and numbers.
+			$name = trim(preg_replace('/(?:[123456790()]*)/', '', $input));
+			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
 		}
 
 		if (!$character) {
@@ -54,7 +48,7 @@ class CharacterTransformer implements DataTransformerInterface {
 			));
 		}
 		*/
-		
+
 		return $character;
 	}
 }
