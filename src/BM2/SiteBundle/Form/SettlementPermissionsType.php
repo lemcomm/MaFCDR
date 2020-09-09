@@ -17,11 +17,13 @@ class SettlementPermissionsType extends AbstractType {
 	private $settlement;
 	private $me;
 	private $em;
+	private $lord;
 
-	public function __construct(Settlement $settlement, Character $me, EntityManager $em) {
+	public function __construct(Settlement $settlement, Character $me, EntityManager $em, $lord) {
 		$this->settlement = $settlement;
 		$this->me = $me;
 		$this->em = $em;
+		$this->lord = $lord;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -33,13 +35,23 @@ class SettlementPermissionsType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
+		$lord = $this->lord;
 		$s = $this->settlement;
-		$builder->add('settlement', 'entity', array(
-			'required' => true,
-			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
-				return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);
-			}
-		));
+		if ($lord) {
+			$builder->add('settlement', 'entity', array(
+				'required' => true,
+				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
+					return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);
+				}
+			));
+		} else {
+			$builder->add('occupied_settlement', 'entity', array(
+				'required' => true,
+				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
+					return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);
+				}
+			));
+		}
 		// TODO: filter according to what's available? (e.g. no permission for docks at regions with no coast)
 		$builder->add('permission', 'entity', array(
 			'required' => true,
