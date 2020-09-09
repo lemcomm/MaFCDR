@@ -163,23 +163,23 @@ class SettlementController extends Controller {
 	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
 	  * @Template
 	  */
-	public function permissionsAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
+	public function permissionsAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlPermissionsTest', false, true, false, $id);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
+		$settlement = $id;
+		if ($settlement->getOwner() == $character) {
+			$lord = true;
+			$original_permissions = clone $settlement->getPermissions();
+		} else {
+			$lord = false;
+			$original_permissions = clone $settlement->getOccupationPermissions();
 		}
 
-		$original_permissions = clone $settlement->getPermissions();
 
-		$form = $this->createForm(new SettlementPermissionsSetType($character, $this->getDoctrine()->getManager()), $settlement);
+		$form = $this->createForm(new SettlementPermissionsSetType($character, $this->getDoctrine()->getManager(), $lord), $settlement);
 
 		// FIXME: right now, nothing happens if we disallow thralls while having some
 		//			 something should happen - set them free? most should vanish, but some stay as peasants?
@@ -189,15 +189,29 @@ class SettlementController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			foreach ($settlement->getPermissions() as $permission) {
-				$permission->setValueRemaining($permission->getValue());
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			if ($lord) {
+				foreach ($settlement->getPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$settlement->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$settlement->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
+				}
+			} else {
+				foreach ($settlement->getOccupationPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
+				}
+				foreach ($original_permissions as $orig) {
+					if (!$settlement->getOccupationPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
 			}
 			$em->flush();
@@ -208,7 +222,8 @@ class SettlementController extends Controller {
 		return array(
 			'settlement' => $settlement,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('settlement'),
-			'form' => $form->createView()
+			'form' => $form->createView(),
+			'lord' => $lord
 		);
 	}
 
@@ -216,19 +231,12 @@ class SettlementController extends Controller {
 	  * @Route("/{id}/quests", requirements={"id"="\d+"})
 	  * @Template
 	  */
-	public function questsAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
+	public function questsAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlQuestsTest', false, true, false, $id);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
-		}
+
 		return array('settlement'=>$settlement, 'quests'=>$settlement->getQuests());
 	}
 
@@ -236,19 +244,12 @@ class SettlementController extends Controller {
 	  * @Route("/{id}/description", requirements={"id"="\d+"})
 	  * @Template
 	  */
-	public function descriptionAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
+	public function descriptionAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlSettlementDescriptionTest', false, true, false, $id);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
-		}
+
 		$desc = $settlement->getDescription();
 		if ($desc) {
 			$text = $desc->getText();
