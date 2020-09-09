@@ -1,8 +1,8 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
-{% macro permission_row(permission) %}
+{% macro permission_row(permission, lord) %}
 {% spaceless %}
-<td style="display:none">{{ form_widget(permission.settlement) }}</td>
+<td style="display:none">{% if lord %}{{ form_widget(permission.settlement) }}{% else %}{{ form_widget(permission.occupied_settlement) }}{% endif %}</td>
 <td>{{ form_widget(permission.permission) }}</td>
 <td>{{ form_widget(permission.value) }}</td>
 <td>{{ form_widget(permission.reserve) }}</td>
@@ -23,33 +23,29 @@
 
 	<table style="display:none">
 	<tr id="prototype">
-		{{ macros.permission_row(form.permissions.vars.prototype) }}
+		{% if lord %}
+			{{ macros.permission_row(form.permissions.vars.prototype, lord) }}
+		{% else %}
+			{{ macros.permission_row(form.occupation_permissions.vars.prototype, lord) }}
+		{% endif %}
 	</tr>
 	</table>
 	<form class="wide" action="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}" method="post" {{ form_start(form) }}
 		{{ form_errors(form) }}
 		{{ form_widget(form._token) }}
-		<h3>{{ "control.permissions.general"|trans({},"actions")|title }}</h3>
-{#
-		<dl class="wide">
-			<dt>{{ form_label(form.allow_spawn) }}</dt>
-			<dd>{{ form_widget(form.allow_spawn) }}</dd>
-			<dt>{{ form_label(form.allow_thralls) }}</dt>
-			<dd>{{ form_widget(form.allow_thralls) }}</dd>
-			<dt>{{ form_label(form.feed_soldiers) }}</dt>
-			<dd>{{ form_widget(form.feed_soldiers) }}</dd>
-		</dl>
-#}
-		<div style="clear:both">
-			{{ form_label(form.allow_spawn) }}
-			{{ form_widget(form.allow_spawn) }}
-		</div><div style="clear:both; margin-top: 1em">
-			{{ form_label(form.allow_thralls) }}
-			{{ form_widget(form.allow_thralls) }}
-		</div><div style="clear:both; margin-top: 1em">
-			{{ form_label(form.feed_soldiers) }}
-			{{ form_widget(form.feed_soldiers) }}
-		</div>
+		{% if lord %}
+			<h3>{{ "control.permissions.general"|trans({},"actions")|title }}</h3>
+			<div style="clear:both">
+				{{ form_label(form.allow_spawn) }}
+				{{ form_widget(form.allow_spawn) }}
+			</div><div style="clear:both; margin-top: 1em">
+				{{ form_label(form.allow_thralls) }}
+				{{ form_widget(form.allow_thralls) }}
+			</div><div style="clear:both; margin-top: 1em">
+				{{ form_label(form.feed_soldiers) }}
+				{{ form_widget(form.feed_soldiers) }}
+			</div>
+		{% endif %}
 		<br />
 		<h3>{{ "control.permissions.specific"|trans({},"actions")|title }}</h3>
 		<table class="permissions">
@@ -60,12 +56,18 @@
 				<th>{{ 'perm.listing'|trans({}, "politics") }}</th>
 			</tr></thead>
 			<tbody>
-			{% for permission in form.permissions %}
-				<tr>{{ macros.permission_row(permission) }}</tr>
-			{% endfor %}
+			{% if lord %}
+				{% for permission in form.permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% else %}
+				{% for permission in form.occupation_permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% endif %}
 			</tbody>
 		</table>
-		
+
 		<br /><br />
 
 		<button type="submit" name="submit">{{ "control.permissions.submit"|trans({},"actions") }}</button>
