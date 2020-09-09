@@ -32,11 +32,16 @@ class Interactions {
 		if ($character->getInsideSettlement() == $settlement) {
 			return true; // we are already inside
 		}
+		if ($settlement->getOccupier()) {
+			$occupied = true;
+		} else {
+			$occupied = false;
+		}
 
 		#TODO: The entire if below this line might be redundant now that dispatcher also has all this logic.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit', $occupied)) {
 				return false;
 			}
 
