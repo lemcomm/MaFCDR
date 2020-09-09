@@ -410,6 +410,30 @@ control:
     last description(s), you won't know what the previous descriptions were.
   full:         Edit Text
   success:      Description has been updated successfully!
+ occupy:
+  realm:        In the name of what Realm?
+  submit:       Begin Occupation
+ occupationstart:
+  name:         Occupy Settlement
+  description:  Declare an occupation of this settlement?
+  intro: >
+    Now that you're inside %settlement% you're in a good position to delcare an occupation.<br /><br />
+    By declaring an occupation, you will be effectively be making yourself psuedo-owner, and the regular owner will have his own privileges revoked.
+ occupationend:
+  name:         End Occupation
+  description:  Declare an end to the occupation?
+  intro: >
+    As the occupant of %settlement% you are well within your capabilities to declare an end to the occupation of this settlement.
+ changeoccupant:
+  name:         Change Occupant
+  description:  Someone else can manage this
+  intro: >
+    As the occupant of %settlement% you can always pass off this responsibiity to someone else.
+ changeoccupier:
+  name:         Change Occupying Realm
+  description:  Replace the flag of the occupation
+  intro: >
+    As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement.
 
 military:
  name:          Military actions
