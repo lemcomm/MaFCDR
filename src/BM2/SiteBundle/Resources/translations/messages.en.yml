@@ -1550,6 +1550,7 @@ unavailable:
   notactive:    You don't have an active permission to this conversation.
  noplace:       There are no Places of Interest here.
  nopermission:  You don't have permissions to do that here.
+ occupied:      The ongoing occupation prevents this.
 
 marker:
  name:      Marker name
