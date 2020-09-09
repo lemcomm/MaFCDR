@@ -281,20 +281,28 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.name", "elements"=>array(array("name"=>"control.all", "description"=>"unavailable.$check")));
 		}
-
+		$char = $this->getCharacter();
+		$settlement = $char->getInsideSettlement();
 		$actions=array();
-		$actions[] = $this->controlTakeTest(true);
 
-		if (!$this->getCharacter()->getInsideSettlement()) {
+		if (!$settlement) {
 			$actions[] = array("name"=>"control.all", "description"=>"unavailable.notinside");
 		} else {
+			$actions[] = $this->controlTakeTest(true);
+			if ($settlement->getOccupant() == $char) {
+				$actions[] = $this->controlOccupationEndTest(true);
+				$actions[] = $this->controlChangeOccupantTest(true);
+				$actions[] = $this->controlChangeOccupierTest(true);
+			} elseif (!$settlement->getOccupant() && $settlement->getOwner() != $char) {
+				$actions[] = $this->controlOccupationStartTest(true);
+			}
 			$actions[] = $this->controlChangeRealmTest(true);
-			$actions[] = $this->controlSettlementDescriptionTest();
+			$actions[] = $this->controlSettlementDescriptionTest(null, $settlement);
 			$actions[] = $this->controlGrantTest(true);
 			$actions[] = $this->controlRenameTest(true);
 			$actions[] = $this->controlCultureTest(true);
-			$actions[] = $this->controlPermissionsTest();
-			$actions[] = $this->controlQuestsTest();
+			$actions[] = $this->controlPermissionsTest(null, $settlement);
+			$actions[] = $this->controlQuestsTest(null, $settlement);
 		}
 
 		return array("name"=>"control.name", "elements"=>$actions);
@@ -429,11 +437,14 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"recruit.name", "description"=>"unavailable.npc");
 		}
-		if (! $settlement = $this->getCharacter()->getInsideSettlement()) {
+		$settlement = $this->getCharacter()->getInsideSettlement();
+		if (!$settlement) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
 			if ($settlement->getOccupier()) {
 				$occupied = true;
+			} else {
+				$occupied = false;
 			}
 			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit', false, $occupied)) {
 				$actions[] = $this->unitNewTest();
@@ -1083,7 +1094,7 @@ class Dispatcher {
 		if (!$this->getActionableCharacters()) {
 			return array("name"=>"control.changeoccupant.name", "description"=>"unavailable.nobody");
 		}
-		return $this->action("control.changeoccupant", "maf_settlement_occuapnt");
+		return $this->action("control.changeoccupant", "maf_settlement_occupant");
 	}
 
 	public function controlRenameTest($check_duplicate=false) {
@@ -1104,7 +1115,7 @@ class Dispatcher {
 	}
 
 
-	public function controlSettlementDescriptionTest($check_duplicate=false) {
+	public function controlSettlementDescriptionTest($check_duplicate=false, $settlement) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.$check");
 		}
@@ -1112,7 +1123,7 @@ class Dispatcher {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($settlement->getOccupier()) {
-			return array("name"=>"control.description.name", "description"=>"unavailable.occupied");
+			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.occupied");
 		}
 		if ($settlement->getOwner() == $this->getCharacter()) {
 			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$settlement->getId()));
@@ -1135,11 +1146,10 @@ class Dispatcher {
 		}
 	}
 
-	public function controlPermissionsTest() {
+	public function controlPermissionsTest($ignored, $settlement) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.$check");
 		}
-		$settlement = $this->getCharacter()->getInsideSettlement();
 		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupant() == $this->getCharacter()) {
 			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
 		} else {
@@ -1147,11 +1157,10 @@ class Dispatcher {
 		}
 	}
 
-	public function controlQuestsTest() {
+	public function controlQuestsTest($ignored, $settlement) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.$check");
 		}
-		$settlement = $this->getCharacter()->getInsideSettlement();
 		if ($settlement->getOccupier()) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.occupied");
 		}
@@ -1372,6 +1381,53 @@ class Dispatcher {
 	}
 
 	public function militarySiegeSettlementTest() {
+		# Grants you access to the page in which you can start a siege.
+		$settlement = $this->getActionableSettlement();
+		$place = $this->getActionablePlace();
+		if ($this->getCharacter()->isPrisoner()) {
+			# Prisoners can't attack.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
+		}
+		if ($this->getCharacter()->isDoingAction('military.siege')) {
+			# Already doing.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.already");
+		}
+		if ($this->getCharacter()->getInsideSettlement()) {
+			# Already inside.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
+		}
+		if (!$settlement && (!$place || ($place && $place->getCharactersPresent()->isEmpty()))) {
+			# Can't attack nothing or empty places.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosiegable");
+		}
+		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+			# Busy regrouping.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
+		}
+		if ($this->getCharacter()->isDoingAction('military.evade')) {
+			# Busy avoiding battle.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.evading");
+		}
+		if ($this->getCharacter()->hasNoSoldiers()) {
+			# The guards laugh at your "siege".
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupier() == $this->getCharacter()) {
+			# No need to siege your own settlement.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
+		}
+		if ($this->getCharacter()->isInBattle()) {
+			# Busy fighting for life.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");
+		}
+		if ($this->getCharacter()->DaysInGame()<2) {
+			# Too new.
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.fresh");
+		}
+		return $this->action("military.siege.start", "bm2_site_war_siege", false, array('action'=>'start'));
+	}
+
+	public function militarySiegePlaceTest($ignored, Place $place) {
 		# Grants you access to the page in which you can start a siege.
 		$settlement = $this->getActionableSettlement();
 		$place = $this->getActionablePlace();
@@ -2235,14 +2291,15 @@ class Dispatcher {
 			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
 		}
 		# If not inside a settlement, check that we've enough separation (500m)
-		if (!$character->getInsideSettlement()) {
+		$settlement = $character->getInsideSettlement();
+		if (!$settlement) {
 			if (!$this->geography->checkPlacePlacement($character)) {
 				return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
 			}
 		}
-		if ($settlement = $character->getInsideSettlement() && $settlement->getOccupier()) {
+		if ($settlement && $settlement->getOccupier()) {
 				$occupied = true;
-		} elseif ($settlement = $this->geography->findMyRegion($character)->getSettlement() && $settlement->getOccupier()) {
+		} elseif ($this->geography->findMyRegion($character)->getSettlement() && $this->geography->findMyRegion($character)->getSettlement()->getOccupier()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
