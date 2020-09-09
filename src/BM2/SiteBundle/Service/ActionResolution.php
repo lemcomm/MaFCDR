@@ -347,6 +347,30 @@ class ActionResolution {
 	}
 
 
+	private function settlement_occupant(Action $action) {
+		$settlement = $action->getTargetSettlement();
+		$to = $action->getTargetCharacter();
+
+		if (!$settlement || !$to || !$action->getCharacter()) {
+			$this->log(0, 'invalid action '.$action->getId());
+			// TODO: clean it up, but during alpha we want it to hang around for debug purposes
+			return;
+		}
+
+
+		$test = $this->dispatcher->controlChangeOccupantTest();
+		if (!isset($test['url'])) {
+			$this->history->logEvent(
+				$action->getCharacter(),
+				'resolution.occupant.failed',
+				array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$to->getId(), '%reason%'=>array('key'=>'resolution.'.$test['description'])),
+				History::MEDIUM, false, 30
+			);
+		} else {
+			$this->politics->changeSettlementOccupier($to, $settlement, $settlement->getOccupier());
+		}
+		$this->em->remove($action);
+	}
 
 	private function settlement_attack(Action $action) {
 		// this is just a convenience alias
