@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\KnightOffer;
 use BM2\SiteBundle\Entity\Trade;
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\EntourageRecruitType;
 use BM2\SiteBundle\Form\InteractionType;
@@ -175,7 +176,6 @@ class ActionsController extends Controller {
 
 	/**
 	  * @Route("/enter")
-	  * @Template
 	  */
 	public function enterAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEnterTest', true, true);
@@ -183,20 +183,18 @@ class ActionsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$result = null;
 		if ($this->get('interactions')->characterEnterSettlement($character, $settlement)) {
-			$result = 'entered';
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('location.enter.result.entered', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		} else {
-			$result = 'denied';
+			$this->addFlash($this->get('translator')->trans('location.enter.result.denied', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('settlement'=>$settlement, 'result'=>$result);
 	}
 
 	/**
 	  * @Route("/exit")
-	  * @Template
 	  */
 	public function exitAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
@@ -204,15 +202,14 @@ class ActionsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$result = null;
 		if ($this->get('interactions')->characterLeaveSettlement($character)) {
-			$result = 'left';
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('location.exit.result.left', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		} else {
-			$result = 'denied';
+			$this->addFlash($this->get('translator')->trans('location.exit.result.denied', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('settlement'=>$settlement, 'result'=>$result);
 	}
 
 	   /**
@@ -839,7 +836,7 @@ class ActionsController extends Controller {
 	  * @Route("/changeoccupant", name="maf_settlement_occupant")
 	  */
 	public function changeOccupantAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupantTest', true);
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlChangeOccupantTest', true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -869,7 +866,7 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return $this->render('Settlement/occupant.html.twig', [
+		return $this->render('BM2SiteBundle::Settlement/occupant.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -877,8 +874,8 @@ class ActionsController extends Controller {
 	/**
 	  * @Route("/changeoccupier", name="maf_settlement_occupier")
 	  */
-	public function changeOccupierAction($id, Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupierTest', true);
+	public function changeOccupierAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlChangeOccupierTest', true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -902,7 +899,7 @@ class ActionsController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('Settlement/occupier.html.twig', [
+		return $this->render('BM2SiteBundle::Settlement/occupier.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -910,7 +907,7 @@ class ActionsController extends Controller {
 	/**
 	  * @Route("/occupation/start", name="maf_settlement_occupation_start")
 	  */
-	public function occupationStartAction($id, Request $request) {
+	public function occupationStartAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationStartTest', true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -921,12 +918,12 @@ class ActionsController extends Controller {
 			$data = $form->getData();
 			$targetrealm = $data['target'];
 
-			$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+			$result = $this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
 			$this->getDoctrine()->getManager()->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('Settlement/occupationstart.html.twig', [
+		return $this->render('BM2SiteBundle::Settlement/occupationstart.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -934,25 +931,21 @@ class ActionsController extends Controller {
 	/**
 	  * @Route("/occupation/end", name="maf_settlement_occupation_end")
 	  */
-	public function occupationEndAction($id, Request $request) {
+	public function occupationEndAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationEndTest', true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
-		$em = $this->getDoctrine()->getManager();
-		$this->get('dispatcher')->setSettlement($settlement);
-
 		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('politics')->endOccupation($settlement, 'manual');
-                        if ($success) {
-                                $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
-                                return $this->redirectToRoute('bm2_actions');
-                        }
+                        $this->get('politics')->endOccupation($settlement, 'manual');
+			$this->getDoctrine()->getManager()->flush();
+                        $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
+                        return $this->redirectToRoute('bm2_actions');
                 }
-		return $this->render('Settlement/occupationend.html.twig', [
+		return $this->render('BM2SiteBundle::Settlement/occupationend.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
