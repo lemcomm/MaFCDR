@@ -448,42 +448,66 @@ class Politics {
 		$settlement->setOccupier($realm);
 		$settlement->setOccupant($char);
 		$wars = $this->updateWarTargets($settlement, $old, $realm);
-		$this->history->logEvent(
-			$settlement,
-			'event.settlement.occupied',
-			array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
-			History::HIGH, true
-		);
+		if ($new) {
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.occupied',
+				array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.occupied2',
+				array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+				History::MEDIUM, true
+			);
+		}
 	}
 
-	public function endOccupation(Settlement $settlement, $why = null) {
+	public function endOccupation(Settlement $settlement, $why = null, $occupantTakeOver = false) {
+		$occupier = $settlement->getOccupier();
+		$occupant = $settlement->getOccupant();
 		$settlement->setOccupant(null);
 		$settlement->setOccupier(null);
-		if ($warTargets = $settlement->getWarTargets()) {
+		if ($warTargets = $settlement->getWarTargets() && !$occupantTakeOver) {
 			foreach ($warTargets as $target) {
 				if ($target->getTakenCurrently()) {
 					$target->setTakenCurrently(false);
 				}
 			}
 		}
+		if (!$occupantTakeOver) {
+			foreach ($settlement->getOccupationPermissions() as $perm) {
+				$this->em->remove($perm);
+			}
+		} else {
+			foreach ($settlement->getPermissions() as $perm) {
+				$this->em->remove($perm);
+			}
+			foreach ($settlement->getOccupationPermissions() as $perm) {
+				$perm->setSettlement($perm->getOccupiedSettlement());
+				$perm->setOccupiedSettlement(null);
+			}
+		}
 		if ($why == 'manual') {
 			$this->history->logEvent(
 				$settlement,
 				'event.settlement.endoccupation.manual',
-				array("%link-realm%"=>$settlement->getOccupier()->getId(), "%link-character%"=>$settlement->getOccupant()->getId()),
+				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
 		} else {
 			$this->history->logEvent(
 				$settlement,
 				'event.settlement.endoccupation.warended',
-				array("%link-realm%"=>$settlement->getOccupier()->getId(), "%link-character%"=>$settlement->getOccupant()->getId()),
+				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
 		}
 	}
 
-	public function updateWarTargets(Settlement $settlement, Realm $oldRealm = null, Realm $newRealm) {
+	public function updateWarTargets(Settlement $settlement, Realm $oldRealm = null, Realm $newRealm = null) {
 		$wars = [];
 		foreach ($settlement->getWarTargets() as $target) {
 			$old = false; $new = false;
