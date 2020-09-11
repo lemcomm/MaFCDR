@@ -647,13 +647,18 @@ class WarManager {
 			$victor = $siege->getDefender();
 			$bypass = TRUE; #Attackers failed to muster any attackers.
 		}
+		if ($siege->getSettlement()) {
+			$target = $siege->getSettlement();
+		} else {
+			$target = $siege->getPlace();
+		}
 		if ($attacker == $victor && $assault) {
 			if ($current < $max && !$bypass) {
 				# Siege moves forward
 				$siege->setStage($current+1);
 				# "After the [link], the siege has advanced in favor of the attackers"
 				$this->history->logEvent(
-					$settlement,
+					$target,
 					'siege.advance.attacker',
 					array('%link-battle%'=>$this->report->getId()),
 					History::MEDIUM, true, 20
@@ -675,7 +680,7 @@ class WarManager {
 				if (!$bypass) {
 					# "After the defenders failed to muster troops in [link], the siege concluded in attacker victory."
 					$this->history->logEvent(
-						$settlement,
+						$target,
 						'siege.victor.attacker',
 						array(),
 						History::MEDIUM, false
@@ -683,7 +688,7 @@ class WarManager {
 				} else {
 					# "After the [link], the siege concluded in an attacker victory."
 					$this->history->logEvent(
-						$settlement,
+						$target,
 						'siege.bypass.attacker',
 						array('%link-battle%'=>$this->report->getId()),
 						History::MEDIUM, false
@@ -705,7 +710,7 @@ class WarManager {
 				$siege->setStage($current-1);
 				# "After the [link], the siege has advanced in favor of the defenders"
 				$this->history->logEvent(
-					$settlement,
+					$target,
 					'siege.advance.defender',
 					array('%link-battle%'=>$this->report->getId()),
 					History::MEDIUM, true, 20
@@ -727,7 +732,7 @@ class WarManager {
 				if (!$bypass) {
 					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
 					$this->history->logEvent(
-						$settlement,
+						$target,
 						'siege.victor.defender',
 						array(),
 						History::MEDIUM, false
@@ -735,7 +740,7 @@ class WarManager {
 				} else {
 					# "After the [link], the siege concluded in a defender victory."
 					$this->history->logEvent(
-						$settlement,
+						$target,
 						'siege.bypass.defender',
 						array('%link-battle%'=>$this->report->getId()),
 						History::MEDIUM, false
@@ -759,12 +764,24 @@ class WarManager {
 
 		if ($completed) {
 			if ($victor == $attacker) {
-				foreach ($victor->getCharacters() as $char) {
-					# Force move victorious attackers inside the settlement.
-					$this->interactions->characterEnterSettlement($char, $settlement, true);
-				}
-				if ($victor->getLeader()) {
-					$this->politics->changeSettlementOccupier($victor->getLeader(), $settlement, $siege->getRealm());
+				if ($target instanceof Settlement) {
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the settlement.
+							$this->interactions->characterEnterSettlement($char, $target, true);
+
+					}
+					if ($victor->getLeader()) {
+						$this->politics->changeSettlementOccupier($victor->getLeader(), $settlement, $siege->getRealm());
+					}
+				} else {
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the place.
+							$this->interactions->characterEnterPlace($char, $target, true);
+
+					}
+					if ($victor->getLeader()) {
+						$this->politics->changePlaceOccupier($victor->getLeader(), $settlement, $siege->getRealm());
+					}
 				}
 			}
 			$this->disbandSiege($siege, null, TRUE);
