@@ -136,9 +136,12 @@ class PlaceController extends Controller {
 	}
 
 	private function canSpawn(Place $place, Character $character) {
-		if ($settlement = $place->getGeoData()->getSettlement() && $place->getType()->getSpawnable()) {
-			foreach ($character->findRulerships() as $pos) {
-				if ($pos->getRealm() == $settlement->getRealm() && ($place->getForRealm() == $pos->getRealm() || $place->getForRealm() === null)) {
+		$settlement = $place->getGeoData()->getSettlement();
+		if ($settlement && $place->getType()->getSpawnable()) {
+			foreach ($character->findRulerships() as $realm) {
+				if ($realm == $settlement->getRealm() && (
+					$place->getForRealm() == $realm || $place->getForRealm() === null
+				)) {
 					return true;
 				}
 			}
@@ -502,6 +505,128 @@ class PlaceController extends Controller {
 			}
 		}
 		return $fail;
+	}
+
+	/**
+	  * @Route("/changeoccupant", requirements={"id"="\d+"}, name="maf_place_occupant")
+	  */
+	public function changeOccupantAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeChangeOccupantTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new InteractionType('occupier',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$result = array(
+				'success'=>true
+			);
+			if ($data['target']) {
+				$act = new Action;
+				$act->setType('place.occupant')->setCharacter($character);
+				$act->setTargetSettlement($settlement)->setTargetCharacter($data['target']);
+				$act->setBlockTravel(true);
+				$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
+				$complete = new \DateTime("+1 hour");
+				$act->setComplete($complete);
+				$result = $this->get('action_manager')->queue($act);
+				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
+				return $this->redirectToRoute('bm2_actions');
+			}
+		}
+
+		return $this->render('BM2SiteBundle::Place/occupant.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/changeoccupier", requirements={"id"="\d+"}, name="maf_place_occupier")
+	  */
+	public function changeOccupierAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeChangeOccupierTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$this->get('dispatcher')->setSettlement($settlement);
+
+		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changeoccupier'));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$targetrealm = $data['target'];
+
+			if ($settlement->getOccupier() == $targetrealm) {
+				$result = 'same';
+			} else {
+				$result = 'success';
+				$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+				$this->getDoctrine()->getManager()->flush();
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return $this->render('BM2SiteBundle::Place/occupier.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/occupation/start", requirements={"id"="\d+"}, name="maf_place_occupation_start")
+	  */
+	public function occupationStartAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeOccupationStartTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'occupy'));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$targetrealm = $data['target'];
+
+			$result = $this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return $this->render('BM2SiteBundle::Place/occupationstart.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/occupation/end", requirements={"id"="\d+"}, name="maf_settlement_occupation_end")
+	  */
+	public function occupationEndAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('controlOccupationEndTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $this->get('politics')->endOccupation($settlement, 'manual');
+			$this->getDoctrine()->getManager()->flush();
+                        $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
+                        return $this->redirectToRoute('bm2_actions');
+                }
+		return $this->render('BM2SiteBundle::Place/occupationend.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
 	}
 
 }
