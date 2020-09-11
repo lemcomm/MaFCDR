@@ -15,8 +15,8 @@
 		<one-to-one field="attacker" target-entity="BattleGroup" inversed-by="attacking_in_siege"/>
 		<one-to-many field="battles" target-entity="Battle" mapped-by="siege"/>
 		<one-to-many field="related_battle_reports" target-entity="BattleReport" mapped-by="siege"/>
-		<many-to-one field="realm" target-entity="Realm" mapped-by="sieges"/>
-		<many-to-one field="war" target-entity="War" mapped-by="sieges"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="sieges"/>
+		<many-to-one field="war" target-entity="War" inversed-by="sieges"/>
 
 	</entity>
 </doctrine-mapping>
