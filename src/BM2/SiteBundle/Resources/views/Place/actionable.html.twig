@@ -17,6 +17,15 @@
 		{% if place.canManage %}
 			<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 		{% endif %}
+		{% if place.canPermission %}
+			<a href="{{path('maf_place_permissions', {"id":place.id}) }}"><button id="permissions">{{ 'place.permissions.button'|trans({}, "places")|raw }}</button></a>
+		{% endif %}
+		{% if place.canSiege %}
+			<a href="{{path('bm2_site_war_siege', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
+		{% endif %}
+		{% if place.canSpawn %}
+			<a href="{{path('maf_place_spawn', {"id":place.id}) }}"><button id="spawn">{{ 'place.spawn.button'|trans({}, "places")|raw }}</button></a>
+		{% endif %}
 		</div>
 	{% endfor %}
 	<hr>
