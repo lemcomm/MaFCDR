@@ -235,7 +235,6 @@ class UnitController extends Controller {
 			'soldiers' => $unit->getActiveSoldiers(),
 			'recruits' => $unit->getRecruits(),
 			'resupply' => $resupply,
-			'settlement' => $settlement,
 			'training' => $training,
 			'form' => $form->createView(),
                         'unit' => $unit,
