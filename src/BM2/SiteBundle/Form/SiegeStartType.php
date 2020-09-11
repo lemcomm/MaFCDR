@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -14,11 +15,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SiegeStartType extends AbstractType {
 
 	private $settlement;
-	private $places;
+	private $place;
+	private $realms;
+	private $wars;
 
-	public function __construct($settlement = null, $places = null) {
+	public function __construct($settlement = null, $place = null, $realms = null, $wars = null) {
 		$this->settlement = $settlement;
-		$this->places = $places;
+		$this->place = $place;
+		$this->realms = $realms;
+		$this->wars = $wars;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -30,7 +35,7 @@ class SiegeStartType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$settlement = $this->settlement;
-		$places = $this->places;
+		$place = $this->place;
 		$wars = $this->wars;
 		$realms = $this->realms;
 
@@ -45,37 +50,34 @@ class SiegeStartType extends AbstractType {
 			));
 		}
 
-		if ($places) {
-			$builder->add('place', ChoiceType::class, array(
+		if ($place) {
+			$builder->add('place', CheckboxType::class, array(
 				'required'=>false,
-				'choices' => $places,
-				'choice_label' => 'name',
-				'placeholder'=>'military.siege.menu.none',
-				'label'=> 'military.siege.menu.places'
+				'label'=> 'military.siege.place.confirm'
 			));
 		} else {
-			$builder->add('places', HiddenType::class, array(
+			$builder->add('place', HiddenType::class, array(
 				'data'=>false
 			));
 		}
 
-		if ($settlement || $places) {
-			$builder->add('submit', ChoiceType::class, [
-				'required'=>false,
-				'choices'=> $wars,
-				'choice_label' => 'summary',
-				'placeholder'=>'military.siege.menu.none',
-				'label'=>'military.siege.menu.wars'
-			]);
-			$builder->add('submit', ChoiceType::class, [
-				'required'=>false,
-				'choices'=> $realms,
-				'choice_label' => 'name',
-				'placeholder'=>'military.siege.menu.none',
-				'label'=>'military.siege.menu.realms'
-			]);
-			$builder->add('submit', 'submit', array('label'=>'military.siege.submit'));
-		}
+		$builder->add('war', EntityType::class, [
+			'required'=>false,
+			'choices'=> $wars,
+			'class'=>'BM2SiteBundle:War',
+			'choice_label' => 'summary',
+			'placeholder'=>'military.siege.menu.none',
+			'label'=>'military.siege.menu.wars'
+		]);
+		$builder->add('realm', EntityType::class, [
+			'required'=>false,
+			'choices'=> $realms,
+			'class'=>'BM2SiteBundle:Realm',
+			'choice_label' => 'name',
+			'placeholder'=>'military.siege.menu.none',
+			'label'=>'military.siege.menu.realms'
+		]);
+		$builder->add('submit', 'submit', array('label'=>'military.siege.submit'));
 	}
 
 	public function getName() {
