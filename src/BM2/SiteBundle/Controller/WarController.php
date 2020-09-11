@@ -5,10 +5,11 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
+use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Siege;
 use BM2\SiteBundle\Entity\War;
 use BM2\SiteBundle\Entity\WarTarget;
-use BM2\SiteBundle\Entity\Realm;
 
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\BattleParticipateType;
@@ -161,14 +162,22 @@ class WarController extends Controller {
 
 	/**
 	  * @Route("/siege")
+	  * @Route("/siege/")
+	  * @Route("/siege/place")
+	  * @Route("/siege/place/{place}")
 	  * @Template
 	  */
-	public function siegeAction(Request $request) {
+	public function siegeAction(Request $request, Place $place = null) {
 		# Security check.
-		list($character, $settlement, $place) = $this->get('dispatcher')->gateway(false, true, null, true); # Welcome to the original place in the game to ask for a place. :P
-
+		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true, false);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
+		}
+		if ($place) {
+			$nearby = $this->get('geography')->findPlacesInActionRange($character);
+			if ($nearby === null || ($nearby !== null && !in_array($place, $nearby))) {
+				$place = null; # Nice try.
+			}
 		}
 
 		if ($action = $request->query->get('action')) {
@@ -221,7 +230,7 @@ class WarController extends Controller {
 					break;
 			}
 		} else {
-			list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true, null, true);
+			list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true, null);
 		}
 
 		# Prepare other variables.
@@ -247,7 +256,7 @@ class WarController extends Controller {
 					$wars[] = $war;
 				}
 			}
-			$form = $this->createForm(new SiegeStartType($settlement, $this->get('geography')->findPlacesInActionRange($character), $realms, $wars));
+			$form = $this->createForm(new SiegeStartType($settlement, $place, $realms, $wars));
 		}
 
 		$form->handleRequest($request);
