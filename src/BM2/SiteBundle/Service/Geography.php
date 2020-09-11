@@ -437,7 +437,10 @@ class Geography {
 
 	public function findPlacesNearMe(Character $character, $maxdistance) {
 		if ($character->getInsideSettlement()) {
-			$results = $character->getInsideSettlement()->getPlaces();
+			$results = [];
+			foreach ($character->getInsideSettlement()->getPlaces() as $place) {
+				$results[] = $place;
+			}
 		} else {
 			#$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:Place p WHERE ST_Distance(:me, p.location) < :maxdistance');
 			$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
