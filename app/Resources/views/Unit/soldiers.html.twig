@@ -19,11 +19,10 @@
 		"listpath":path('maf_unit_soldiers', {"unit":unit.id})
 	} %}
 
-	<h2>{{ 'settlement.recruits'|trans({"%name%":settlement.name})|title }}</h2>
-	{% if recruits is empty %}
-		<p>{{ 'none'|trans }}</p>
-		<p>{{ "recruit.troops.recruitlink"|trans({"%url%":path("maf_recruit") },"actions")|raw }}</p>
-	{% else %}
+
+	{% set settlement = unit.settlement %}
+	{% if settlement and recruits is not empty %}
+		<h2>{{ 'settlement.recruits'|trans({"%name%":unit.settlement.name})|title }}</h2>
 		<a id="recruits"></a>
 		<div id="oncancel" class="hidden" style="margin-bottom:1em">
 			{{ 'recruit.troops.canceldone'|trans({},"actions") }}<br />
