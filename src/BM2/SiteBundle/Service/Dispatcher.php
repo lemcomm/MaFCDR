@@ -109,18 +109,17 @@ class Dispatcher {
 			}
 		}
 		$settlement = null;
-		if ($test || $getSettlement) {
-			if ($test) {
-				$test = $this->$test($check_duplicate, $option);
-				if (!isset($test['url'])) {
-					throw new AccessDeniedHttpException("messages::unavailable.intro::".$test['description']);
-				}
+		$place = null;
+		if ($test) {
+			$test = $this->$test($check_duplicate, $option);
+			if (!isset($test['url'])) {
+				throw new AccessDeniedHttpException("messages::unavailable.intro::".$test['description']);
 			}
-			if ($getSettlement) {
-				$settlement = $this->getActionableSettlement();
-				if ($getPlace) {
-					$place = $this->geography->findNearestActionablePlace($character);
-				}
+		}
+		if ($getSettlement) {
+			$settlement = $this->getActionableSettlement();
+			if ($getPlace) {
+				$place = $this->geography->findNearestActionablePlace($character);
 			}
 		}
 		if ($getSettlement) {
@@ -2498,21 +2497,14 @@ class Dispatcher {
 
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
+		$character = $this->getCharacter();
+		if ($unit->getCharacter() == $character || ($unit->getCharacter() === null && $unit->getSettlement() && $unit->getSettlement()->getOwner() == $character)) {
+			return $this->action("unit.soldiers", "maf_unit_soldiers");
+		} else {
+			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
 		}
 
-		if ($unit->getSoldiers()->count() >= 200) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.unitfull");
-		}
-		if ($unit->getSettings()->getReinforcements() == false) {
-			return array("name"=>"recruit.troops.name", "description"=>"unvailabile.unitdeclines");
-		}
-		$available = $this->milman->findAvailableEquipment($settlement, true);
-		if (empty($available)) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.notrain");
-		}
-		return $this->action("recruit.troops", "maf_unit_soldiers");
+
 	}
 
 	public function unitRecruitTest() {
