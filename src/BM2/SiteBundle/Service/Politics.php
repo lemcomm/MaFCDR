@@ -477,49 +477,83 @@ class Politics {
 		}
 	}
 
-	public function endOccupation(Settlement $settlement, $why = null, $occupantTakeOver = false) {
-		$occupier = $settlement->getOccupier();
-		$occupant = $settlement->getOccupant();
-		$settlement->setOccupant(null);
-		$settlement->setOccupier(null);
-		if ($warTargets = $settlement->getWarTargets() && !$occupantTakeOver) {
-			foreach ($warTargets as $target) {
-				if ($target->getTakenCurrently()) {
-					$target->setTakenCurrently(false);
+	public function changePlaceOccupier(Character $char, Place $place, Realm $realm) {
+		$new = false;
+		$old = null;
+		if (!$place->getOccupier()) {
+			$new = true;
+		} else {
+			$old = $place->getOccupier();
+		}
+		$place->setOccupier($realm);
+		$place->setOccupant($char);
+		if ($new) {
+			$this->history->logEvent(
+				$place,
+				'event.place.occupied',
+				array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+				History::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$place,
+				'event.place.occupied2',
+				array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+				History::MEDIUM, true
+			);
+		}
+	}
+
+	public function endOccupation($target, $why = null, $occupantTakeOver = false) {
+		$occupier = $target->getOccupier();
+		$occupant = $target->getOccupant();
+		$target->setOccupant(null);
+		$target->setOccupier(null);
+		if ($target instanceof Settlement) {
+			$type = 'Settlement';
+			$event = 'settlement';
+			$warTargets = $target->getWarTargets();
+			if ($warTargets && !$occupantTakeOver) {
+				foreach ($warTargets as $target) {
+					if ($target->getTakenCurrently()) {
+						$target->setTakenCurrently(false);
+					}
 				}
 			}
+		} else {
+			$type = 'Place';
 		}
 		if (!$occupantTakeOver) {
-			foreach ($settlement->getOccupationPermissions() as $perm) {
+			foreach ($target->getOccupationPermissions() as $perm) {
 				$this->em->remove($perm);
 			}
 		} else {
-			foreach ($settlement->getPermissions() as $perm) {
+			foreach ($target->getPermissions() as $perm) {
 				$this->em->remove($perm);
 			}
-			foreach ($settlement->getOccupationPermissions() as $perm) {
-				$perm->setSettlement($perm->getOccupiedSettlement());
-				$perm->setOccupiedSettlement(null);
+			foreach ($target->getOccupationPermissions() as $perm) {
+				$perm->set.$type($perm->getOccupied.$type());
+				$perm->setOccupied.$type(null);
 			}
 		}
 		if ($why == 'manual') {
 			$this->history->logEvent(
-				$settlement,
-				'event.settlement.endoccupation.manual',
+				$target,
+				'event.'.$event.'.endoccupation.manual',
 				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
 		} elseif ($why =='take') {
 			$this->history->logEvent(
-				$settlement,
-				'event.settlement.endoccupation.take',
+				$target,
+				'event.'.$event.'.endoccupation.take',
 				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
 		}else {
 			$this->history->logEvent(
-				$settlement,
-				'event.settlement.endoccupation.warended',
+				$target,
+				'event.'.$event.'.endoccupation.warended',
 				array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 				History::HIGH, true
 			);
