@@ -91,59 +91,64 @@
 		<a href="#">{{ 'menu.actions'|trans }}</a>
 		<div class="sub">
 			<ul class="row">
+				<h3>{{ 'location.title'|trans({},"actions") }}</h3>
 				{% set check = dispatcher.locationEnterTest() %}
 				{% if check.url is defined %}
-				<li class="part">
-					<h3>{{ 'location.title'|trans({},"actions") }}</h3>
 					<ul>
 						<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 					</ul>
-				</li>
 				{% endif %}
 				{% set check = dispatcher.locationLeaveTest() %}
 				{% if check.url is defined %}
-					<h3>{{ 'location.title'|trans({},"actions") }}</h3>
-					<a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a>
+					<ul>
+						<a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a>
+					</ul>
 				{% endif %}
 				{% if character.insidesettlement and character.insidesettlement.owner == character %}
-				<li class="part">
-					<h3>{{ 'menu.economy'|trans|title }}</h3>
-					<ul>
-						{% set check = dispatcher.economyTradeTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.economyRoadsTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.economyFeaturesTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.economyBuildingsTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-					</ul>
-				</li>
-				<li class="part">
-					<h3>{{ 'menu.military'|trans|title }}</h3>
-					<ul>
-						{% set check = dispatcher.personalEntourageTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.unitRecruitTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-						{% set check = dispatcher.personalAssignedUnitsTest() %}
-						{% if check.url is defined %}
-							<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-						{% endif %}
-					</ul>
-				</li>
+					{% set check = dispatcher.placeListTest() %}
+					{% if check.url is defined %}
+						<ul>
+							<a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a>
+						</ul>
+					{% endif %}
+					<li class="part">
+						<h3>{{ 'menu.economy'|trans|title }}</h3>
+						<ul>
+							{% set check = dispatcher.economyTradeTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.economyRoadsTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.economyFeaturesTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.economyBuildingsTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+						</ul>
+					</li>
+					<li class="part">
+						<h3>{{ 'menu.military'|trans|title }}</h3>
+						<ul>
+							{% set check = dispatcher.personalEntourageTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.unitRecruitTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.personalAssignedUnitsTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+						</ul>
+					</li>
 				{% endif %}
 			</ul>
 			<a href="{{ path('bm2_actions') }}">{{ 'menu.allactions'|trans }}</a>
