@@ -92,61 +92,12 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		$placeList = $this->get('geography')->findPlacesInActionRange($character);
-		$places = array();
-		foreach ($placeList as $place) {
-			$data = array(
-				'id' => $place->getId(),
-				'name' => $place->getName(),
-				'description' => $place->getShortDescription(),
-				'canManage' => $this->canManage($place, $character),
-				'canEnter' => $this->canEnter($place, $character),
-				'canSiege' => $this->canSiege($place, $character),
-				'canSpawn' => $this->canSpawn($place, $character)
-			);
-			$places[] = $data;
-		}
+		$places = $this->get('geography')->findPlacesInActionRange($character);
+
 		return array(
-			'places' => $places
+			'places' => $places,
+			'character' => $character
 		);
-	}
-
-	private function canManage(Place $place, Character $character) {
-		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'describe')) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private function canEnter(Place $place, Character $character) {
-		if($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private function canSiege(Place $place, Character $character) {
-		if(!$place->getType()->getDefensible() || $this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private function canSpawn(Place $place, Character $character) {
-		$settlement = $place->getGeoData()->getSettlement();
-		if ($settlement && $place->getType()->getSpawnable()) {
-			foreach ($character->findRulerships() as $realm) {
-				if ($realm == $settlement->getRealm() && (
-					$place->getForRealm() == $realm || $place->getForRealm() === null
-				)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -442,6 +393,8 @@ class PlaceController extends Controller {
 		$type = $place->getType()->getName();
 		$hostedRealm = null;
 		$realm = null;
+		$spawn = false;
+		$activeRealms = null;
 		if ($type == 'capital' || $type == 'embassy') {
 			$realm = $place->getCapitalOf();
 			if ($realm && $realm->findRulers()->contains($character)) {
@@ -453,6 +406,7 @@ class PlaceController extends Controller {
 				$isowner = true;
 			}
 			$hostedRealm = $place->getForRealm();
+			$activeRealms = $this->getDoctrine()->getManager()->getRepository('BM2SiteBundle:Realm')->findBy(['active'=>true]);
 		} else {
 			if ($place->getOwner() == $character) {
 				$isowner = true;
@@ -460,7 +414,13 @@ class PlaceController extends Controller {
 				$isowner = false;
 			}
 		}
-		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $id, $hostedRealm));
+		if ($place->getType()->getSpawnable()) {
+			$spawn = true;
+			$myRealms = $character->findRulerships();
+		} else {
+			$myRealms = null;
+		}
+		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $place, $myRealms, $activeRealms));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -476,7 +436,13 @@ class PlaceController extends Controller {
 					$place->setShortDescription($data['short_description']);
 				}
 				if ($olddescription != $data['description']) {
-					$desc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
+					$this->get('description_manager')->newDescription($place, $data['description'], $character);
+				}
+				if ($spawn && $data['allow_spawn'] && $data['for_realm']&& $data['spawn_desc']) {
+					# Must be correct type, have flag set, and have something in the description.
+					$place->setForRealm($data['for_realm']);
+					$place->setAllowSpawn($data['allow_spawn']);
+					$this->get('description_manager')->newSpawnDescription($place, $data['spawn_desc'], $character);
 				}
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
