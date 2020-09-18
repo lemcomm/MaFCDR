@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\SpawnDescription">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<many-to-one field="place" target-entity="Place" inversed-by="spawn_descriptions"/>
+		<one-to-one field="active_place" target-entity="Place" inversed-by="spawn_description"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="spawn_descriptions"/>
+		<one-to-one field="active_realm" target-entity="Realm" inversed-by="spawn_description"/>
+
+		<many-to-one field="house" target-entity="House" inversed-by="spawn_descriptions"/>
+		<one-to-one field="active_house" target-entity="House" inversed-by="spawn_description"/>
+
+		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
+		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
+		<many-to-one field="updater" target-entity="Character" inversed-by="updated_spawn_descriptions"/>
+		<field name="ts" type="datetime"/>
+		<field name="cycle" type="integer"/>
+
+		<field name="text" type="text"/>
+	</entity>
+</doctrine-mapping>
