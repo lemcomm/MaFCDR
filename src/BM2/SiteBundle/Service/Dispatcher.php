@@ -463,12 +463,10 @@ class Dispatcher {
 		$actions=array();
 
 		if ($this->getCharacter()->isNPC()) {
-			# $actions[] = $this->metaUnitSettingsTest(); TODO: Redirect to new unit management page
 			$actions[] = $this->metaKillTest();
 		} else {
 			$actions[] = $this->personalRequestsManageTest();
 			$actions[] = $this->personalRequestSoldierFoodTest();
-			# $actions[] = $this->metaUnitSettingsTest(); TODO: Redirect to new unit management page
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
 			}
@@ -2271,7 +2269,7 @@ class Dispatcher {
 
 	/* ========== Place Actions ============== */
 
-	private function placeListTest() {
+	public function placeListTest() {
 		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
 			return $this->action("place.list", "maf_place_actionable");
 		} else if ($this->getLeaveablePlace()) {
@@ -2352,7 +2350,7 @@ class Dispatcher {
 		if ($place->getOccupier()) {
 			$occupied = true;
 		} else {
-			$occupued = false;
+			$occupied = false;
 		}
 		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit', false, $occupied)) {
 			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
