@@ -2343,6 +2343,59 @@ class Dispatcher {
 			);
 	}
 
+	public function placeManageRulersTest($ignored, Place $place) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.spawn.name", "description"=>"unavailable.$check");
+		}
+		$character = $this->getCharacter();
+		$settlement = $place->getSettlement();
+		if (!$settlement) {
+			$settlement = $place->getGeoFeature()->getGeoData()->getSettlement();
+		}
+		if (!$place->getType()->getSpawnable()) {
+			return array("name"=>"place.spawn.name", "description"=>"unavailable.notspawnable");
+		}
+		if ((!$place->getForRealm() && $settlement->getOwner() != $character) || !$place->getForRealm()->findRulers()->contains($character)) {
+			return array("name"=>"place.spawn.name", "description"=>"unavailable.notowner");
+		}
+
+		return $this->action("place.spawn", "maf_place_spawn", true,
+				array('place'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+			);
+	}
+
+	public function placeManageEmbassyTest($ignored, Place $place) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.spawn.name", "description"=>"unavailable.$check");
+		}
+		$character = $this->getCharacter();
+		$settlement = $place->getSettlement();
+		if (!$settlement) {
+			$settlement = $place->getGeoFeature()->getGeoData()->getSettlement();
+		}
+		if ($place->getType()->getName() != 'embassy') {
+			return array("name"=>"place.embassy.name", "description"=>"unavailable.wrongplacetype");
+		}
+		if (
+			(!$place->getHostingRealm() && (
+				($place->getRealm() == $settlement->getRealm() && $settlement->getOwner() != $character) ||
+				($place->getRealm()->findAllSuperiors()->contains($settlement->getRealm()) && $settlement->getOwner() != $character) ||
+				($place->getRealm()->findAllInferiors()->contains($settlement->getRealm()) && $settlement->getOwner() != $character)
+			)) ||
+			(!$place->getOwningRealm() && !$place->getHostingRealm()->findRulers()->contains($character)) ||
+			(!$place->getAmbassador() && !$place->getOwningRealm()->findRulers()->contains($character)) ||
+			($place->getAmbassador() != $character)
+		) {
+			return array("name"=>"place.embassy.name", "description"=>"unavailable.notowner");
+		}
+
+		return $this->action("place.embassy", "maf_place_embassy", true,
+				array('place'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+			);
+	}
+
 	public function placeEnterTest($check_duplicate=false, Place $place) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
@@ -2496,7 +2549,7 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
-		if ($unit->getCharacter() == $character || ($unit->getCharacter() === null && $unit->getSettlement() && $unit->getSettlement()->getOwner() == $character)) {
+		if ($unit->getCharacter() == $character || ($unit->getSettlement() && $unit->getSettlement()->getOwner() == $character) || ($unit->getMarshal() == $character)) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
