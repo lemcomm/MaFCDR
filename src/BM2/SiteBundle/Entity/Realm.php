@@ -198,5 +198,39 @@ class Realm {
 		return $all;
 
 	}
+
+	public function findHierarchy($include_myself = false) {
+		$all = new ArrayCollection;
+		if ($include_myself) {
+			$all->add($this);
+		}
+		foreach ($this->findAllSuperiors() as $realm) {
+			$all->add($realm);
+		}
+		foreach ($this->findAllInferiors() as $realm) {
+			$all->add($realm);
+		}
+		return $all;
+	}
+
+	public function findFriendlyRelations() {
+		$all = new ArrayCollection();
+		foreach ($this->getMyRelations() as $rel) {
+			if ($rel->getStatus() != 'nemesis' && $rel->getStatus() != 'war') {
+				$all->add($rel->getTargetRealm());
+			}
+		}
+		return $all;
+	}
+
+	public function findUnfriendlyRelations() {
+		$all = new ArrayCollection();
+		foreach ($this->getMyRelations() as $rel) {
+			if ($rel->getStatus() == 'nemesis' || $rel->getStatus() == 'war') {
+				$all->add($rel->getTargetRealm());
+			}
+		}
+		return $all;
+	}
 	
 }
