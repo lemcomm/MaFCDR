@@ -156,21 +156,23 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
 	  */
 	public function unitSoldiersAction(Request $request, Unit $unit) {
-                list($character, $settlement) = $this->get('dispatcher')->gateway('unitSoldiersTest', true, true, false, $unit);
+                $character = $this->get('dispatcher')->gateway('unitSoldiersTest', false, true, false, $unit);
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
 
 		$em = $this->getDoctrine()->getManager();
-
+                $settlement=$character->getInsideSettlement();
 		$resupply=array();
 		$training=array();
                 $units=false;
                 $canResupply=false;
                 $canRecruit=false;
                 $canReassign=false;
-		if ($settlement = $character->getInsideSettlement()) {
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
+
+		if ($settlement == $unit->getSettlement() && ($unit->getCharacter()->getInsideSettlement()==$settlement || !$unit->getCharacter())) {
+                        # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
+			if ($settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
                                 $canResupply = true;
 				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
 			}
@@ -190,7 +192,8 @@ class UnitController extends Controller {
                                         $local->add($mine);
                                 }
                         }
-                        # So we get all local units, check if our unit is in it, if it is we see if we have unit management here and build a list of all other units if we do,
+                        # So we get all local units, check if our unit is in it,
+                        # if it is we see if we have unit management here and build a list of all other units if we do,
                         # along with set the flag enabling reassignment of soldiers.
                         # Yes, I wrote this because I stared at this for several minutes trying to figure it out.
                         if ($local->contains($unit)) {
@@ -216,7 +219,7 @@ class UnitController extends Controller {
 				}
 			}
 		}
-		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign));
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
