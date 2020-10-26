@@ -14,8 +14,8 @@
 		<many-to-one field="house" target-entity="House" inversed-by="spawn_descriptions"/>
 		<one-to-one field="active_house" target-entity="House" inversed-by="spawn_description"/>
 
-		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
-		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
+		<one-to-one field="previous" target-entity="SpawnDescription" inversed-by="next"/>
+		<one-to-one field="next" target-entity="SpawnDescription" mapped-by="previous"/>
 		<many-to-one field="updater" target-entity="Character" inversed-by="updated_spawn_descriptions"/>
 		<field name="ts" type="datetime"/>
 		<field name="cycle" type="integer"/>
