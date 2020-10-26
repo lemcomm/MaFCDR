@@ -110,6 +110,7 @@
 		<one-to-many field="occupied_places" target-entity="Place" mapped-by="occupant"/>
 		<one-to-many field="ambassadorships" target-entity="Place" mapped-by="ambassador"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
+		<one-to-many field="updated_spawn_descriptions" target-entity="SpawnDescription" mapped-by="updater"/>
 
 		<many-to-one field="house" target-entity="House" inversed-by="members"/>
 		<one-to-many field="founded_houses" target-entity="House" mapped-by="founder"/>
