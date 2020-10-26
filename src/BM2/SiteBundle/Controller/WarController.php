@@ -384,9 +384,9 @@ class WarController extends Controller {
 					# notify
 					$this->get('history')->logEvent(
 						$defender->getCharacter(),
-						'resolution.defend.success', array(
+						'resolution.defend.success2', array(
 							"%link-settlement%"=>$settlement->getId(),
-							"%time%"=>$this->gametime->realtimeFilter($time)
+							"%link-character%"=>$character->getId()
 						),
 						History::HIGH, false, 25
 					);
