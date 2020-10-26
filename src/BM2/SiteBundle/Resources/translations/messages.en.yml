@@ -1002,6 +1002,7 @@ npc:
  soldiers:     Soldiers of %name%
  soldiershere: soldiers present
  intraining:   recruits in training
+ units:        Your unit|Your units
 
 soldier:
  type:             type
@@ -1621,3 +1622,4 @@ unit:
  manage:
   success:     Unit Settings have been updated!
   failed:      Unit Settings not updated.
+  link:        View Soldiers
