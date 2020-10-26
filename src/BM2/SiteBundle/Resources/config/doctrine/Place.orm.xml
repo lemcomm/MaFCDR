@@ -32,6 +32,7 @@
 
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="places"/>
 
+		<many-to-one field="realm" target-entity="Realm" inversed-by="places"/>
 		<many-to-one field="owning_realm" target-entity="Realm" inversed-by="embassies_abroad"/>
 		<many-to-one field="hosting_realm" target-entity="Realm" inversed-by="hosted_embassies"/>
 		<many-to-one field="for_realm" target-entity="Realm" inversed-by="arrival_places"/>
