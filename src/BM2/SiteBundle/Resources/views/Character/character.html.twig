@@ -112,8 +112,8 @@
 		</ul>
 	{% endif %}
 
-	<h2>{{ 'npc.units'|transchoice(10)|capitalize }}</h2>
 	{% if units is not empty %}
+		<h2>{{ 'npc.units'|transchoice(units.count)|capitalize }}</h2>
 		<ul>
 		{% for unit in units %}
 			<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
@@ -121,8 +121,8 @@
 		</ul>
 	{% endif %}
 
-	<h2>{{ 'npc.entourage'|transchoice(10)|capitalize }}</h2>
 	{% if entourage is not empty %}
+		<h2>{{ 'npc.entourage'|transchoice(10)|capitalize }}</h2>
 		<ul>
 		{% for type,number in entourage %}
 			<li>{{number}} {{ ("npc."~type)|transchoice(number) }}</li>
