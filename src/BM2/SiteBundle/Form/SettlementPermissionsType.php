@@ -44,7 +44,13 @@ class SettlementPermissionsType extends AbstractType {
 					return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);
 				}
 			));
+			$builder->add('occupied_settlement', 'hidden', array(
+				'data'=>null
+			));
 		} else {
+			$builder->add('settlement', 'hidden', array(
+				'data'=>null
+			));
 			$builder->add('occupied_settlement', 'entity', array(
 				'required' => true,
 				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
