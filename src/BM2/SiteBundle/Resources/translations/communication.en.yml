@@ -6,6 +6,8 @@ rss:
  desc:        Might & Fealty Event Log Summary
  feed:        Get event updates via RSS
 
+
+
 event:
  artifact:
   created:      Created
@@ -22,7 +24,6 @@ event:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
   estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
-
  description:
   updated:
    artifact:    The description of this artifact has changed.
@@ -30,7 +31,6 @@ event:
    realm:       %character% has updated the description of the realm.
    place:       %character% has changed the description of %place%.
    settlement:  %character% has updated the description of %settlement%.
-
  feature2:
   damaged:      The %featuretype% %name% is deteriorating. Workers should be assigned for repair.
   disabled:     The %featuretype% %name% has become inoperative due to deterioration. Workers should be assigned for repair.
@@ -102,6 +102,7 @@ event:
   endoccupation:
    manual:      %character% has declared an end to the occupation by %realm%.
    warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
+  besieged:     %character% has declared a siege of the Settlement.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -210,6 +211,9 @@ event:
    subcreated:  Formalized the %house% as a cadet of %house-2%.
    subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
    newhead:     Took over leadership of the house after the passing of %character%.
+  siege:
+   disband:     By declaration of %character% the siege of the settlement of %settlement% has concluded peacefully.
+   disband2:    By declaration of %character% the siege of the place of %place% has concluded peacefully.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -227,7 +231,6 @@ event:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
   recalled:     %character% has recalled %unit% from your command.
-
  quest:
   created:      Quest created.
   started:      %character% has begun the quest.
@@ -235,11 +238,9 @@ event:
   completed:    %character% claims to have completed the quest.
   confirmed:    %character% has been confirmed to have completed the quest.
   rejected:     The claim of %character% to have completed the quest has been rejected.
-
  war:
   started:      The war has been declared.
   settlement:   Attack on %settlement% started.
-
  realm:
   founded:      Founded by %character%.
   inherited:    Rulership passed to %character-2% upon the death of %character-1%.
@@ -326,6 +327,8 @@ event:
   forceentered2: %character% has forced his way into the place with %soldiers% soldiers.
   left:         %character% has been seen leaving.
   forceleft:    %character% has been forced outside the walls during the battle.
+  besieged:     %character% has declared a siege of the location.
+
 
 
 report:
@@ -405,6 +408,7 @@ resolution:
   evading:      Enemy troops are engaging you. As instructed, your troops will try to evade the battle, but if they fail to do so, the fight will occur in an estimated %time%.
  defend:
   success:      %settlement% is being attacked. As ordered, your troops are rallying to defend it. The battle is expected to occur in %time%.
+  success2:     %settlement% is being sieged by %character%. As ordered, your troops are rallying to defend it.
   removed:      You are no longer defending %settlement%, because you have moved too far away from it.
  disengage:
   success:      You have successfully evaded a battle.
