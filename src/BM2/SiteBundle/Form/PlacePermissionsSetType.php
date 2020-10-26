@@ -28,12 +28,6 @@ class PlacePermissionsSetType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		if ($p->getType()->getSpawnable() === true) {
-			$builder->add('allow_spawn', 'checkbox', array(
-				'label' => "control.permissions.spawn",
-				'required' => false,
-			));
-		}
 		if ($p->getType()->getPublic() === false) {
 			$builder->add('public', 'checkbox', [
 				'required'=> false,
