@@ -490,15 +490,32 @@ class WarManager {
 
 	public function disbandSiege(Siege $siege, Character $leader, $completed = FALSE) {
 		# Siege disbandment and removal actually happens as part of removeCharacterFromBattlegroup.
+		$place = null;
+		$settlement = null;
+		if ($siege->getSettlement()) {
+			$settlement = $siege->getSettlement();
+		} else {
+			$place = $siege->getPlace();
+		}
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
+				echo $siege->getId().' '.$leader->getId();
 				if (!$completed) {
-					$this->history->logEvent(
-						$character,
-						'event.character.siege.disband',
-						array('%link-settlement%'=>$siege->getSettlement()->getId(), '%link-character%'=>$leader->getId()),
-						History::LOW, true
-					);
+					if ($settlement) {
+						$this->history->logEvent(
+							$character,
+							'event.character.siege.disband',
+							array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$leader->getId()),
+							History::LOW, true
+						);
+					} else {
+						$this->history->logEvent(
+							$character,
+							'event.character.siege.disband2',
+							array('%link-place%'=>$place->getId(), '%link-character%'=>$leader->getId()),
+							History::LOW, true
+						);
+					}
 				} else {
 					# Do nothing, because this is already handled by the siege code. :)
 				}
