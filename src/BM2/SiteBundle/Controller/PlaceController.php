@@ -186,10 +186,12 @@ class PlaceController extends Controller {
 			$em->flush();
 			$change = false;
 			if ($place->getAllowSpawn() && !$place->getType()->getSpawnable()) {
+				#Check for invalid settings.
 				$place->setAllowSpawn(false);
 				$change = true;
 			}
 			if (!$place->getPublic() && $place->getType()->getPublic()) {
+				#Check for invalid settings.
 				$place->setPublic(true);
 				$change = true;
 			}
@@ -327,8 +329,8 @@ class PlaceController extends Controller {
 				$place->setFormalName($data['formal_name']);
 				$place->setShortDescription($data['short_description']);
 				$place->setCreator($character);
-				$place->setOwner($character);
 				$place->setType($data['type']);
+				$place->setRealm($data['realm']);
 				if ($character->getInsideSettlement()) {
 					$place->setSettlement($character->getInsideSettlement());
 					$place->setGeoData($character->getInsideSettlement()->getGeoData());
@@ -350,7 +352,12 @@ class PlaceController extends Controller {
 					$place->setGeoData($geoData);
 				}
 				$place->setVisible($data['type']->getVisible());
-				$place->setActive(true);
+				if ($data['type'] != 'embassy' && $data['type'] != 'capital') {
+					$place->setActive(true);
+				} else {
+					$place->setActive(false);
+					$place->setOwner($character);
+				}
 				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
 					$place,
@@ -384,43 +391,28 @@ class PlaceController extends Controller {
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('dispatcher')->gateway('placeManageTest', false, true, false, $place);
+
+		if ($place->getType()->getName() == 'embassy') {
+			$character = $this->get('dispatcher')->gateway('placeManageRulersTest', false, true, false, $place);
+			$type = 'embassy';
+		} elseif ($place->getType()->getName() == 'capital') {
+			$character = $this->get('dispatcher')->gateway('placeManageEmbassyTest', false, true, false, $place);
+			$type = 'capital';
+		} elseif ($place->getAllowSpawn()) {
+			$character = $this->get('dispatcher')->gateway('placeManageRulersTest', false, true, false, $place);
+			$type = 'spawn';
+		} else {
+			$type = 'generic';
+			$character = $this->get('dispatcher')->gateway('placeManageTest', false, true, false, $place);
+		}
+
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
 		$olddescription = $place->getDescription()->getText();
-		$type = $place->getType()->getName();
-		$hostedRealm = null;
-		$realm = null;
-		$spawn = false;
-		$activeRealms = null;
-		if ($type == 'capital' || $type == 'embassy') {
-			$realm = $place->getCapitalOf();
-			if ($realm && $realm->findRulers()->contains($character)) {
-				$isowner = true;
-			}
-		} elseif ($type == 'embassy') {
-			$realm = $place->getOwningRealm();
-			if ($realm && $realm->findRulers()->contains($character)) {
-				$isowner = true;
-			}
-			$hostedRealm = $place->getForRealm();
-			$activeRealms = $this->getDoctrine()->getManager()->getRepository('BM2SiteBundle:Realm')->findBy(['active'=>true]);
-		} else {
-			if ($place->getOwner() == $character) {
-				$isowner = true;
-			} else {
-				$isowner = false;
-			}
-		}
-		if ($place->getType()->getSpawnable()) {
-			$spawn = true;
-			$myRealms = $character->findRulerships();
-		} else {
-			$myRealms = null;
-		}
-		$form = $this->createForm(new PlaceManageType($olddescription, $isowner, $place, $myRealms, $activeRealms));
+		
+		$form = $this->createForm(new PlaceManageType($olddescription, $type, $place));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
