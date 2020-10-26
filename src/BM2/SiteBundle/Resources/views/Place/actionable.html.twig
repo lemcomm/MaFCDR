@@ -7,6 +7,7 @@
 	<h3> {{ 'place.actionable.list'|trans({},"places")|title }}</h2>
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for place in places %}
+		{% set type = place.type %}
 		{% if place.visible or (not place.visible and place.owner == character) %}
 			<hr>
 			<div class="subcontent inline_announcements" style="color:#460702">
@@ -16,7 +17,13 @@
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
-				{% set check = dispatcher.placeManageTest(null, place) %}
+				{% if type.name == 'embassy' %}
+					{% set check = dispatcher.placeManageEmbassyTest(null, place) %}
+				{% elseif type.spawnable == TRUE and place.allowSpawn == TRUE %}
+					{% set check = dispatcher.placeManageRulersTest(null, place) %}
+				{% else %}
+					{% set check = dispatcher.placeManageTest(null, place) %}
+				{% endif %}
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
@@ -26,10 +33,6 @@
 				{% endif %}
 				{% if place.getType.getDefensible() and place.getOwner() != character %}
 					<a href="{{path('bm2_site_war_siege', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% set check = dispatcher.placeSpawnManageTest(null, place) %}
-				{% if check.url is defined %}
-					<a href="{{path('maf_place_spawn', {"id":place.id}) }}"><button id="spawn">{{ 'place.spawn.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 			</div>
 		{% endif %}
