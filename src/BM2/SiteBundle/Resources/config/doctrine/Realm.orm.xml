@@ -45,6 +45,7 @@
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm" fetch="EXTRA_LAZY"/>
 
+		<one-to-many field="places" target-entity="Place" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="embassies_abroad" target-entity="Place" mapped-by="owning_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="hosted_embassies" target-entity="Place" mapped-by="hosting_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="arrival_places" target-entity="Place" mapped-by="for_realm" fetch="EXTRA_LAZY"/>
