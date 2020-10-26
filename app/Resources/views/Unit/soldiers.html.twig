@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+	{% set settlement = unit.settlement %}
 	<h2>{{ 'npc.soldiers'|trans({'%name%': unit.settings.name}) }}</h2>
 	<p>{{ 'recruit.manage.intro'|trans({},"actions") }}</p>
 	{% if character.isinbattle or character.islooting %}
@@ -20,7 +21,6 @@
 	} %}
 
 
-	{% set settlement = unit.settlement %}
 	{% if settlement and recruits is not empty %}
 		<h2>{{ 'settlement.recruits'|trans({"%name%":unit.settlement.name})|title }}</h2>
 		<a id="recruits"></a>
