@@ -23,8 +23,10 @@ class UnitSoldiersType extends AbstractType {
 	private $others;
 	private $settlement;
 	private $reassign;
+	private $unit;
+	private $me;
 
-	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement, $reassign) {
+	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement, $reassign, $unit, $me) {
 		$this->em = $em;
 		if (is_array($soldiers)) {
 			$this->soldiers = $soldiers;
@@ -44,6 +46,8 @@ class UnitSoldiersType extends AbstractType {
 		$this->others = $units;
 		$this->settlement = $settlement;
 		$this->reassign = $reassign;
+		$this->unit = $unit;
+		$this->me = $me;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -62,6 +66,13 @@ class UnitSoldiersType extends AbstractType {
 		$builder->add('npcs', 'form');
 		$in_battle = -1;
 		$is_looting = -1;
+		$unit = $this->unit;
+		$me = $this->me;
+
+		$local = false;
+		if ($unit->getCharacter() == $me || (!$unit->getCharacter() && ($unit->getMarshal() == $me || $unit->getSettlement()->getOwner() == $me))) {
+			$local = true;
+		}
 
 		foreach ($this->soldiers as $soldier) {
 			$actions = false;
@@ -80,18 +91,20 @@ class UnitSoldiersType extends AbstractType {
 
 			if ($soldier->isLocked() || $is_looting) {
 				// disallow almost all actions if soldier is locked or if character is in a battle or looting
-				if (!$soldier->isAlive()) {
+				if (!$soldier->isAlive() && $local) {
 					$actions = array('bury' => 'recruit.manage.bury2');
 				}
 			} else {
 				if ($soldier->isAlive()) {
 					if (!$in_battle) {
-						$actions = array('disband'=>'recruit.manage.disband');
-						if (!empty($avail_train) && $soldier->isActive()) {
-							$actions['retrain'] = 'recruit.manage.retrain';
-						}
-						if ($this->reassign) {
-							$actions['assignto'] = 'recruit.manage.reassign';
+						if ($local) {
+							$actions = array('disband'=>'recruit.manage.disband');
+							if (!empty($avail_train) && $soldier->isActive()) {
+								$actions['retrain'] = 'recruit.manage.retrain';
+							}
+							if ($this->reassign) {
+								$actions['assignto'] = 'recruit.manage.reassign';
+							}
 						}
 					}
 					$resupply = false;
@@ -106,7 +119,6 @@ class UnitSoldiersType extends AbstractType {
 					if ($resupply) {
 						$actions['resupply'] = 'recruit.manage.resupply';
 					}
-
 				} else {
 					$actions = array('bury' => 'recruit.manage.bury');
 				}
@@ -119,7 +131,6 @@ class UnitSoldiersType extends AbstractType {
 				));
 			}
 		}
-
 		if (!empty($this->others) && $this->reassign) {
 			$others = $this->others;
 			$builder->add('assignto', EntityType::class, array(
