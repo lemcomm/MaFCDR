@@ -409,6 +409,7 @@ resolution:
  defend:
   success:      %settlement% is being attacked. As ordered, your troops are rallying to defend it. The battle is expected to occur in %time%.
   success2:     %settlement% is being sieged by %character%. As ordered, your troops are rallying to defend it.
+  success3:     %place% is being sieged by %character%. As ordered, your troops are rallying to defend it.
   removed:      You are no longer defending %settlement%, because you have moved too far away from it.
  disengage:
   success:      You have successfully evaded a battle.
