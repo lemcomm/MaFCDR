@@ -1380,7 +1380,6 @@ class Dispatcher {
 	public function militarySiegeSettlementTest() {
 		# Grants you access to the page in which you can start a siege.
 		$settlement = $this->getActionableSettlement();
-		$place = $this->getActionablePlace();
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
@@ -1393,7 +1392,7 @@ class Dispatcher {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
 		}
-		if (!$settlement && (!$place || ($place && $place->getCharactersPresent()->isEmpty()))) {
+		if (!$settlement) {
 			# Can't attack nothing or empty places.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosiegable");
 		}
@@ -1424,10 +1423,8 @@ class Dispatcher {
 		return $this->action("military.siege.start", "bm2_site_war_siege", false, array('action'=>'start'));
 	}
 
-	public function militarySiegePlaceTest($ignored, Place $place) {
+	public function militarySiegePlaceTest($ignored, $place) {
 		# Grants you access to the page in which you can start a siege.
-		$settlement = $this->getActionableSettlement();
-		$place = $this->getActionablePlace();
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
@@ -1436,14 +1433,14 @@ class Dispatcher {
 			# Already doing.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->getInsideSettlement()) {
+		if ($this->getCharacter()->getInsidePlace()) {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
 		}
-		if (!$settlement && (!$place || ($place && $place->getCharactersPresent()->isEmpty()))) {
+		/*if (!$place || ($place && !$place->isDefended())) {
 			# Can't attack nothing or empty places.
-			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosiegable");
-		}
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.notdefended");
+		}*/
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
@@ -1456,7 +1453,7 @@ class Dispatcher {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupier == $this->getCharacter()) {
+		if ($place->getOwner() == $this->getCharacter() || $place->getOccupier() == $this->getCharacter()) {
 			# No need to siege your own settlement.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
@@ -1820,20 +1817,13 @@ class Dispatcher {
 
 	public function militarySiegeGeneralTest($check_duplicate=false) {
 		# Controls access to the siege action selection menu.
-		$settlement = $this->getActionableSettlement();
-		$place = $this->getActionablePlace();
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.general.name", "description"=>"unavailable.prisoner");
 		}
-		if (((!$settlement || $settlement && !$settlement->getSiege())) && (!$place || ($place && !$place->getSiege()))) {
+		if (!$siege) {
 			# No siege.
 			return array("name"=>"military.siege.general.name", "description"=>"unavailable.nosiege");
-		}
-		if ($settlement && $settlement->getSiege()) {
-			$siege = $settlement->getSiege();
-		} elseif ($place && $place->getSettlement()) {
-			$siege = $place->getSiege();
 		}
 		$inSiege = FALSE;
 		foreach ($siege->getGroups() as $group) {
@@ -1957,25 +1947,19 @@ class Dispatcher {
 	}
 	*/
 
-	public function militarySiegeJoinSiegeTest($check_duplicate=false) {
+	public function militarySiegeJoinSiegeTest($check_duplicate=false, $siege) {
 		# Controls access to the ability to join an ongoing siege.
-		$settlement = $this->getActionableSettlement();
-		$place = $this->getActionablePlace();
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.prisoner");
 		}
+		if (!$siege) {
+			# No siege.
+			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
+		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.siege')) {
 			# Already doing.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.already");
-		}
-		if (!$settlement && !$place) {
-			# Can't attack nothing.
-			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosettlement");
-		}
-		if (((!$settlement || $settlement && !$settlement->getSiege())) && (!$place || ($place && !$place->getSiege()))) {
-			# No siege.
-			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
 		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.
