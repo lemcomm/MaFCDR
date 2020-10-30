@@ -411,7 +411,7 @@ class PlaceController extends Controller {
 		}
 
 		$olddescription = $place->getDescription()->getText();
-		
+
 		$form = $this->createForm(new PlaceManageType($olddescription, $type, $place));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -430,12 +430,7 @@ class PlaceController extends Controller {
 				if ($olddescription != $data['description']) {
 					$this->get('description_manager')->newDescription($place, $data['description'], $character);
 				}
-				if ($spawn && $data['allow_spawn'] && $data['for_realm']&& $data['spawn_desc']) {
-					# Must be correct type, have flag set, and have something in the description.
-					$place->setForRealm($data['for_realm']);
-					$place->setAllowSpawn($data['allow_spawn']);
-					$this->get('description_manager')->newSpawnDescription($place, $data['spawn_desc'], $character);
-				}
+				
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
