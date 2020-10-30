@@ -21,7 +21,7 @@ class Realm {
 			while ($superior->getSuperior()) {
 				$superior=$superior->getSuperior();
 			}
-			$this->ultimate=$superior;			
+			$this->ultimate=$superior;
 		}
 		return $this->ultimate;
 	}
@@ -45,9 +45,9 @@ class Realm {
 		foreach ($all as $realm) {
 			foreach ($realm->getSettlements() as $settlement) {
 				if (!$territory->contains($settlement)) {
-					$territory->add($settlement);					
+					$territory->add($settlement);
 				}
-			}			
+			}
 		}
 
 		return $territory;
@@ -167,7 +167,7 @@ class Realm {
 
 		return $all;
 	}
-	
+
 	public function findDeadInferiors() {
 		$all = new ArrayCollection;
 		foreach ($this->getInferiors() as $subrealm) {
@@ -175,7 +175,7 @@ class Realm {
 			$all->add($subrealm);
 			}
 		}
-	
+
 		return $all;
 	}
 
