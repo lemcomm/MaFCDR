@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Spawn">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="active" type="boolean"/>
+
+                <many-to-one field="realm" target-entity="Realm" inversed-by="spawns"/>
+                <many-to-one field="place" target-entity="Place" inversed-by="spawns"/>
+                <one-to-one field="description" target-entity="SpawnDescription" mapped-by="active_spawn"/>
+                <one-to-many field="descriptions" target-entity="SpawnDescription" mapped-by="spawn"/>
+
+	</entity>
+</doctrine-mapping>
