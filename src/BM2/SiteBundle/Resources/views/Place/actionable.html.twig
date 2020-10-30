@@ -32,7 +32,7 @@
 					<a href="{{path('maf_place_permissions', {"id":place.id}) }}"><button id="permissions">{{ 'place.permissions.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 				{% if place.getType.getDefensible() and place.getOwner() != character %}
-					<a href="{{path('bm2_site_war_siege', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
+					<a href="{{path('maf_war_siege_place', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 			</div>
 		{% endif %}
