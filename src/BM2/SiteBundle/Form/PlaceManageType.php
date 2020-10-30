@@ -29,19 +29,12 @@ class PlaceManageType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$isOwner = $this->isOwner;
 		$me = $this->me;
-		$type = $place->getType()->getName();
+		$type = $me->getType()->getName();
 		$name = $me->getName();
 		$formal = $me->getFormalName();
 		$short = $me->getShortDescription();
 		$description = $this->description;
-
-		if ($place->getSettlement()) {
-			$settlement = $place->getSettlement();
-		} else {
-			$settlement = $place->getGeoFeature()->getGeoData()->getSettlement();
-		}
 
 		$builder->add('name', 'text', array(
 			'label'=>'names.name',
@@ -96,7 +89,7 @@ class PlaceManageType extends AbstractType {
 			if (!$me->getHostingRealm()) {
 				$builder->add('hosting_realm', EntityType::class, [
 					'required'=>false,
-					'choices'=> $place->getRealm()->findHierarchy(true),
+					'choices'=> $me->getRealm()->findHierarchy(true),
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'manage.hosting.empty',
@@ -109,30 +102,36 @@ class PlaceManageType extends AbstractType {
 					'data'=>false
 				]);
 			} elseif (!$me->getOwningRealm()) {
+				$builder->add('hosting_realm', HiddenType::class, [
+					'data'=>$me->getHostingRealm()
+				]);
 				$builder->add('owning_realm', EntityType::class, [
 					'required'=>false,
-					'choices'=> $place->getHostingRealm()->findFriendlyRelations(),
+					'choices'=> $me->getHostingRealm()->findFriendlyRelations(),
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'manage.hosted.empty',
 					'label'=>'manage.hosted.name'
 				]);
-				$builder->add('hosting_realm', HiddenType::class, [
-					'data'=>$place->getHostingRealm()
+				$builder->add('ambassador', HiddenType::class, [
+					'data'=>false
 				]);
 			} else {
+				$builder->add('owning_realm', HiddenType::class, [
+					'data'=>$me->getHostingRealm()
+				]);
+				$builder->add('hosting_realm', HiddenType::class, [
+					'data'=>$me->getHostingRealm()
+				]);
 				$builder->add('ambassador', EntityType::class, [
 					'required'=>false,
-					'choices'=>$place->getOwningRealm()->findActiveMembers(),
+					'choices'=>$me->getOwningRealm()->findActiveMembers(),
 					'class'=>'BM2SiteBundle:Character',
 					'choice_label' => 'name',
 					'placeholder'=>'manage.ambassador.empty',
 					'label'=>'manage.ambassador.name'
-				])
+				]);
 			}
-		}
-		if ($type == 'capital') {
-
 		}
 	}
 
