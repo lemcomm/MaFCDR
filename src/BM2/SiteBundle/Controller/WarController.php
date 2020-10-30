@@ -164,7 +164,7 @@ class WarController extends Controller {
 	  * @Route("/siege")
 	  * @Route("/siege/")
 	  * @Route("/siege/place")
-	  * @Route("/siege/place/{place}")
+	  * @Route("/siege/place/{place}", requirements={"place"="\d+"}, name="maf_war_siege_place")
 	  * @Template
 	  */
 	public function siegeAction(Request $request, Place $place = null) {
@@ -179,7 +179,9 @@ class WarController extends Controller {
 				$place = null; # Nice try.
 			}
 		}
-
+		if ($place) {
+			$settlement = null;
+		}
 		if ($action = $request->query->get('action')) {
 			$action = $request->query->get('action');
 		} else {
@@ -194,43 +196,45 @@ class WarController extends Controller {
 		if($siege) {
 			switch($action) {
 				case 'leadership':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeLeadershipTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeLeadershipTest', false, true, false, $siege);
 					break;
 				/*
 				case 'build':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeBuildTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeBuildTest', false, true, false, $siege);
 					break;
 				*/
 				case 'assault':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeAssaultTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeAssaultTest', false, true, false, $siege);
 					break;
 				case 'disband':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeDisbandTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeDisbandTest', false, true, false, $siege);
 					break;
 				case 'leave':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', false, true, false, $siege);
 					break;
 				/* TODO: Make suicide runs possible.
 				case 'attack':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeAttackTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeAttackTest', false, true, false, $siege);
 					break;
 				case 'joinattack':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', false, true, false, $siege);
 					break;
 				*/
 				case 'joinsiege':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeJoinSiegeTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeJoinSiegeTest', false, true, false, $siege);
 					break;
 				case 'assume':
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeAssumeTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeAssumeTest', false, true, false, $siege);
 					break;
 				case 'select':
 				default:
-					list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militarySiegeGeneralTest', true, null, true);
+					$character = $this->get('dispatcher')->gateway('militarySiegeGeneralTest', false, true, false, $siege);
 					break;
 			}
+		} elseif (!$place) {
+			$character = $this->get('dispatcher')->gateway('militarySiegeSettlementTest');
 		} else {
-			list($character, $settlement) = $this->get('dispatcher')->gateway('militarySiegeSettlementTest', true, null);
+			$character = $this->get('dispatcher')->gateway('militarySiegePlaceTest', false, true, false, $place);
 		}
 
 		# Prepare other variables.
@@ -256,7 +260,7 @@ class WarController extends Controller {
 					$wars[] = $war;
 				}
 			}
-			$form = $this->createForm(new SiegeStartType($settlement, $place, $realms, $wars));
+			$form = $this->createForm(new SiegeStartType($realms, $wars));
 		}
 
 		$form->handleRequest($request);
@@ -274,7 +278,7 @@ class WarController extends Controller {
 					$siege->setRealm($data['realm']);
 				}
 				$siege->setStage(1);
-				if ($data['settlement']) {
+				if ($data['confirm'] && $settlement) {
 					$place = FALSE;
 					$siege->setSettlement($settlement);
 					$settlement->setSiege($siege);
@@ -303,10 +307,10 @@ class WarController extends Controller {
 						$maxstages++; # At this point, our castle has a large, enclosed compound of it's own, usually built at the same strength as the primary walls.
 					}
 					$siege->setMaxStage($maxstages); # Assuming we have everything, this will max out at 5.
-				} elseif ($data['place'] instanceof Place) {
-					$place = $data['place'];
+				} elseif ($data['confirm'] && $place) {
 					$settlement = FALSE;
-					$siege->setPlace($data['target']);
+					$siege->setPlace($place);
+					$siege->setEncircled(TRUE); #For now, sieges always encircle places.
 					$place->setSiege($siege);
 					$siege->setMaxStage(1);
 				}
@@ -368,29 +372,56 @@ class WarController extends Controller {
 
 				$character->setTravelLocked(true);
 
-				# add everyone who has a "defend settlement" action set
-				foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_settlement' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
-					$defenders->addCharacter($defender->getCharacter());
+				if ($settlement) {
+					# add everyone who has a "defend settlement" action set
+					foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_settlement' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
+						$defenders->addCharacter($defender->getCharacter());
 
-					$act = new Action;
-					$act->setType('military.siege')
-						->setCharacter($defender->getCharacter())
-						->setTargetBattlegroup($defenders)
-						->setStringValue('forced')
-						->setCanCancel(true)
-						->setBlockTravel(true);
-					$this->get('action_manager')->queue($act);
+						$act = new Action;
+						$act->setType('military.siege')
+							->setCharacter($defender->getCharacter())
+							->setTargetBattlegroup($defenders)
+							->setStringValue('forced')
+							->setCanCancel(true)
+							->setBlockTravel(true);
+						$this->get('action_manager')->queue($act);
 
-					# notify
-					$this->get('history')->logEvent(
-						$defender->getCharacter(),
-						'resolution.defend.success2', array(
-							"%link-settlement%"=>$settlement->getId(),
-							"%link-character%"=>$character->getId()
-						),
-						History::HIGH, false, 25
-					);
-					$defender->getCharacter()->setTravelLocked(true);
+						# notify
+						$this->get('history')->logEvent(
+							$defender->getCharacter(),
+							'resolution.defend.success2', array(
+								"%link-settlement%"=>$settlement->getId(),
+								"%link-character%"=>$character->getId()
+							),
+							History::HIGH, false, 25
+						);
+						$defender->getCharacter()->setTravelLocked(true);
+					}
+				} elseif ($place) {
+					# add everyone who has a "defend place" action set
+					foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_place' => $place->getId(), 'type' => 'place.defend')) as $defender) {
+						$defenders->addCharacter($defender->getCharacter());
+
+						$act = new Action;
+						$act->setType('military.siege')
+							->setCharacter($defender->getCharacter())
+							->setTargetBattlegroup($defenders)
+							->setStringValue('forced')
+							->setCanCancel(true)
+							->setBlockTravel(true);
+						$this->get('action_manager')->queue($act);
+
+						# notify
+						$this->get('history')->logEvent(
+							$defender->getCharacter(),
+							'resolution.defend.success3', array(
+								"%link-place%"=>$settlement->getId(),
+								"%link-character%"=>$character->getId()
+							),
+							History::HIGH, false, 25
+						);
+						$defender->getCharacter()->setTravelLocked(true);
+					}
 				}
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
