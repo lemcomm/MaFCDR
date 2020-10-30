@@ -14,6 +14,7 @@ use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
@@ -143,50 +144,41 @@ class MilitaryManager {
 		}
 	}
 
-	public function manageUnit($npcs, $data, Settlement $settlement=null, Character $character=null, $canResupply, $canRecruit, $canReassign) {
+	public function manageUnit($soldiers, $data, Settlement $settlement=null, Character $character=null, $canResupply, $canRecruit, $canReassign) {
 		$assigned_soldiers = 0;
 		$success=0; $fail=0;
-		foreach ($npcs as $npc) {
-			$change = $data['npcs'][$npc->getId()];
-			if (isset($change['action'])) {
-				$this->logger->debug("applying action ".$change['action']." to soldier #".$npc->getId()." (".$npc->getName().")");
-				switch ($change['action']) {
-					case 'assignto':
-						if ($canReassign && $data['assignto']) {
-							$npc->setUnit($data['assignto']);
-						}
-						break;
-					case 'disband':
-						if ($canReassign) {
-							$this->disband($npc);
-						}
-						break;
-					case 'bury':
-						$this->bury($npc);
-						break;
-					case 'makemilitia':
-						if ($settlement) {
-							$this->makeMilitia($npc, $settlement);
-						}
-						break;
-					case 'makesoldier':
-						if ($settlement) {
-							$this->makeSoldier($npc, $character);
-						}
-						break;
-					case 'resupply':
-						if ($canResupply && $this->resupply($npc, $settlement)) {
-							$success++;
-						} else {
-							$fail++;
-						}
-						break;
-					case 'retrain':
-						if ($canRecruit) {
-							$this->retrain($npc, $settlement, $data['weapon'], $data['armour'], $data['equipment']);
-						}
-						break;
-				}
+
+		foreach ($data['npcs'] as $npc=>$action) {
+
+			$criteria = Criteria::create()->where(Criteria::expr()->eq("id", $npc));
+			$soldier = $soldiers->matching($criteria)->first();
+
+			switch ($action['action']) {
+				case 'assignto':
+					if ($canReassign && $data['assignto']) {
+						$soldier->setUnit($data['assignto']);
+					}
+					break;
+				case 'disband':
+					if ($canReassign) {
+						$this->disband($soldier);
+					}
+					break;
+				case 'bury':
+					$this->bury($npc);
+					break;
+				case 'resupply':
+					if ($canResupply && $this->resupply($soldier, $settlement)) {
+						$success++;
+					} else {
+						$fail++;
+					}
+					break;
+				case 'retrain':
+					if ($canRecruit) {
+						$this->retrain($soldier, $settlement, $data['weapon'], $data['armour'], $data['equipment']);
+					}
+					break;
 			}
 			$this->em->flush();
 		}
