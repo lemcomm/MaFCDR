@@ -14,14 +14,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SiegeStartType extends AbstractType {
 
-	private $settlement;
-	private $place;
 	private $realms;
 	private $wars;
 
-	public function __construct($settlement = null, $place = null, $realms = null, $wars = null) {
-		$this->settlement = $settlement;
-		$this->place = $place;
+	public function __construct($realms = null, $wars = null) {
 		$this->realms = $realms;
 		$this->wars = $wars;
 	}
@@ -34,33 +30,14 @@ class SiegeStartType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$settlement = $this->settlement;
-		$place = $this->place;
 		$wars = $this->wars;
 		$realms = $this->realms;
 
-		if ($settlement) {
-			$builder->add('settlement', CheckboxType::class, array(
-				'required'=>false,
-				'label'=> 'military.siege.menu.confirm'
-			));
-		} else {
-			$builder->add('settlement', HiddenType::class, array(
-				'data'=>false
-			));
-		}
 
-		if ($place) {
-			$builder->add('place', CheckboxType::class, array(
-				'required'=>false,
-				'label'=> 'military.siege.place.confirm'
-			));
-		} else {
-			$builder->add('place', HiddenType::class, array(
-				'data'=>false
-			));
-		}
-
+		$builder->add('confirm', CheckboxType::class, array(
+			'required'=>false,
+			'label'=> 'military.siege.place.confirm'
+		));
 		$builder->add('war', EntityType::class, [
 			'required'=>false,
 			'choices'=> $wars,
