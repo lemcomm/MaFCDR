@@ -49,8 +49,10 @@
 		<one-to-many field="places" target-entity="Place" mapped-by="realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="embassies_abroad" target-entity="Place" mapped-by="owning_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="hosted_embassies" target-entity="Place" mapped-by="hosting_realm" fetch="EXTRA_LAZY"/>
-		<one-to-many field="arrival_places" target-entity="Place" mapped-by="for_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="usable_places" target-entity="Place" mapped-by="for_realm" fetch="EXTRA_LAZY"/>
 		<many-to-one field="capital_place" target-entity="Place" inversed-by="capital_of"/>
+
+		<one-to-many field="vassals" target-entity="Character" mapped-by="realm"/>
 
 	</entity>
 </doctrine-mapping>
