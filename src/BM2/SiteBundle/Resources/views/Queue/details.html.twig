@@ -36,8 +36,21 @@
 	<dd>{{ link(action.targetcharacter) }}</dd>
 {% endif %}
 {% if action.targetbattlegroup %}
-	<dt>{{ "queue.target.battle"|trans({}, "actions") }}</dt>
-	<dd>{{ link(action.targetbattlegroup.battle) }}</dd>
+	{% set group = action.targetbattlegroup %}
+	{% if group.battle %}
+		<dt>{{ "queue.target.battle"|trans({}, "actions") }}</dt>
+		<dd>{{ link(action.targetbattlegroup.battle) }}</dd>
+	{% endif %}
+	{% if group.siege %}
+		{% if group.siege.settlement %}
+			<dt>{{ "queue.target.siege.settlement"|trans({}, "actions") }}</dt>
+			<dd>{{ link(group.siege.settlement) }}</dd>
+		{% endif %}
+		{% if group.siege.place %}
+			<dt>{{ "queue.target.siege.place"|trans({}, "actions") }}</dt>
+			<dd>{{ link(group.siege.place) }}</dd>
+		{% endif %}
+	{% endif %}
 {% endif %}
 {% if action.targetlisting %}
 	<dt>{{ "queue.target.list"|trans({}, "actions") }}</dt>
@@ -86,7 +99,7 @@
 {% block jquery %}
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 
