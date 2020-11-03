@@ -76,6 +76,9 @@ queue:
   character:    Character
   battle:       Battle
   list:         List
+  siege:
+   place:       Place of Interest
+   settlement:  Settlement
  support:       Supporting
  oppose:        Opposing
  supported:     Supported by
