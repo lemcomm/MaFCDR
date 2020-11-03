@@ -306,7 +306,16 @@ class Character {
 				}
 			}
 		}
-		if ($check_lord && $this->getLiege()) {
+
+		if ($check_lord && $this->findAllegiance()) {
+			$alg = $this->findAllegiance();
+			$class = get_class($alg);
+			if ($class != 'Realm') {
+				$realms->add($alg->getRealm());
+			} else {
+				$realms->add($alg);
+			}
+		} elseif ($check_lord && $this->getLiege()) {
 			foreach ($this->getLiege()->findRealms(false) as $lordrealm) {
 				if (!$realms->contains($lordrealm)) {
 					$realms->add($lordrealm);
@@ -400,17 +409,17 @@ class Character {
 		return ($this->findActions($key)->count()>0);
 	}
 
-	public function isDiplomat() {
-		$realms = array();
+	public function findForeignAffairsRealms() {
+		$realms = new ArrayCollection();
 		foreach ($this->getPositions() as $pos) {
 			if ($pos->getRuler()) {
-				$realms[] = $pos->getRealm()->getId();
+				$realms->add($pos->getRealm()->getId());
 			}
 			if ($pos->getType() && $pos->getType()->getName() == 'foreign affairs') {
-				$realms[] = $pos->getRealm()->getId();
+				$realms->add($pos->getRealm()->getId());
 			}
 		}
-		if (empty($realms)) {
+		if ($realms->isEmpty()) {
 			return null;
 		} else {
 			return $realms;
@@ -428,6 +437,21 @@ class Character {
 			}
 		}
 		return $noSoldiers;
+	}
+
+	public function findAllegiance() {
+		if ($this->realm) {
+			return $this->realm;
+		}
+		if ($this->liege_land) {
+			return $this->liege_land;
+		}
+		if ($this->liege_place) {
+			return $this->liege_place;
+		}
+		if ($this->liege_position) {
+			return $this->liege_position;
+		}
 	}
 	
 }
