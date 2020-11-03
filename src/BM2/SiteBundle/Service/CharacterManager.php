@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\RealmPosition;
@@ -1033,6 +1034,30 @@ class CharacterManager {
 	public function checkReturnability(Character $character) {
 		if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days < 7) {
 			throw new AccessDeniedHttpException('error.noaccess.notreturnable');
+		}
+	}
+
+	public function updateAllegiance(Character $character, Realm $realm = null, Place $place, Settlement $settlement = null, RealmPosition $position = null) {
+		if ($realm) {
+			$character->setRealm($realm);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition(null);
+		} elseif ($place) {
+			$character->setRealm(null);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace($place);
+			$character->setLiegePosition(null);
+		} elseif ($settlement) {
+			$character->setRealm(null);
+			$character->setLiegeLand($settlement);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition(null);
+		} elseif ($position) {
+			$character->setRealm(null);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition($position);
 		}
 	}
 
