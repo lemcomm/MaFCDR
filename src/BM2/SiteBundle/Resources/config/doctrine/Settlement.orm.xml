@@ -66,5 +66,9 @@
 		<one-to-many field="units" target-entity="Unit" mapped-by="settlement"/>
 
 		<one-to-one field="siege" target-entity="Siege" mapped-by="settlement"/>
+
+		<one-to-many field="vassals" target-entity="Character" mapped-by="liege_land"/>
+
+		<one-to-many field="activities" target-entity="Activity" mapped-by="settlement"/>
 	</entity>
 </doctrine-mapping>
