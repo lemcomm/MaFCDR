@@ -265,42 +265,17 @@ class PlaceController extends Controller {
 			}
 		}
 
-		foreach ($settlement->getCapitalOf() as $realm) {
-			if (!$found) {
-
-			}
-		}
-
-		$found = false;
-		$found2 = false;
-		$arrivals = [];
-		foreach ($settlement->getCapitalOf() as $realm) {
-			if (!$found || !$found2) {
-				foreach ($realm->findRulers() as $ruler) {
-					if ($ruler == $character) {
-						$rights[] = 'ruler';
-						$found = true;
-						break; #No need to continue.
-					}
-				}
-				if ($found && !$found2) {
-					if ($realm->getArrivalPlaces()->count() < 5) {
-						$arrivals[] = $realm;
-						$found2 = true;
-					}
-				}
-			}
-		}
 		$realm = $settlement->getRealm();
-		if ($settlement->getCapitalOf() == $realm) {
-			if ($realm->findRulers()->contains($settlement->getOwner())) {
+		foreach ($settlement->getCapitalOf() as $capitals) {
+			if ($capitals->findRulers()->contains($character)) {
 				$rights[] = 'ruler';
+				break;
 			}
 		}
 		if ($settlement->hasBuildingNamed('Academy')) {
 			$rights[] = 'academy';
 		}
-		$diplomacy = $character->isDiplomat();
+		$diplomacy = $character->findForeignAffairsRealms(); #Returns realms or null.
 		if ($diplomacy) {
 			$rights[] = 'diplomat';
 		}
@@ -313,7 +288,7 @@ class PlaceController extends Controller {
 		$query = $this->getDoctrine()->getManager()->createQuery("select p from BM2SiteBundle:PlaceType p where (p.requires in (:rights) OR p.requires IS NULL) AND p.visible = TRUE")->setParameter('rights', $rights);
 
 
-		$form = $this->createForm(new PlaceNewType($query->getResult()));
+		$form = $this->createForm(new PlaceNewType($query->getResult(), $character->findRealms()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em = $this->getDoctrine()->getManager();
@@ -430,7 +405,7 @@ class PlaceController extends Controller {
 				if ($olddescription != $data['description']) {
 					$this->get('description_manager')->newDescription($place, $data['description'], $character);
 				}
-				
+
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
