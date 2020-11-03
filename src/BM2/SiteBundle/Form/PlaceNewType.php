@@ -10,8 +10,12 @@ use BM2\SiteBundle\Entity\PlaceType;
 
 class PlaceNewType extends AbstractType {
 
-	public function __construct($types) {
+	private $types;
+	private $realms;
+
+	public function __construct($types, $realms) {
 		$this->types = $types;
+		$this->realms = $realms;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
