@@ -7,7 +7,6 @@
 		<field name="name" type="string"/>
 		<field name="formal_name" type="string"/>
 		<field name="visible" type="boolean" nullable="true"/>
-		<field name="allow_spawn" type="boolean" nullable="true"/>
 		<field name="workers" type="integer" nullable="true"/>
 		<field name="active" type="boolean" nullable="true"/>
 		<field name="public" type="boolean" nullable="true"/>
@@ -35,7 +34,7 @@
 		<many-to-one field="realm" target-entity="Realm" inversed-by="places"/>
 		<many-to-one field="owning_realm" target-entity="Realm" inversed-by="embassies_abroad"/>
 		<many-to-one field="hosting_realm" target-entity="Realm" inversed-by="hosted_embassies"/>
-		<many-to-one field="for_realm" target-entity="Realm" inversed-by="arrival_places"/>
+		<many-to-one field="for_realm" target-entity="Realm" inversed-by="usable_places"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital_place"/>
 		<many-to-one field="occupier" target-entity="Realm" inversed-by="occupied_places"/>
 
@@ -70,6 +69,10 @@
 		<one-to-one field="siege" target-entity="Siege" mapped-by="place"/>
 
 		<one-to-many field="related_actions" target-entity="Action" mapped-by="target_place"/>
+
+		<one-to-many field="vassals" target-entity="Character" mapped-by="liege_place"/>
+
+		<one-to-many field="activities" target-entity="Activity" mapped-by="place"/>
 
 	</entity>
 </doctrine-mapping>
