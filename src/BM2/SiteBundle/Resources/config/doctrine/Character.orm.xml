@@ -136,5 +136,13 @@
 		<one-to-many field="owned_conversations" target-entity="Conversation" mapped-by="owner" fetch="EXTRA_LAZY"/>
 		<one-to-many field="messages" target-entity="Message" mapped-by="sender" fetch="EXTRA_LAZY"/>
 		<one-to-many field="tagged_messages" target-entity="MessageTag" mapped-by="character" fetch="EXTRA_LAZY"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="vassals"/>
+		<many-to-one field="liege_land" target-entity="Settlement" inversed-by="vassals"/>
+		<many-to-one field="liege_place" target-entity="Place" inversed-by="vassals"/>
+		<many-to-one field="liege_position" target-entity="RealmPosition" inversed-by="vassals"/>
+
+		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
+		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
 	</entity>
 </doctrine-mapping>
