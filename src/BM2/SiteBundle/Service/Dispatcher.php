@@ -1437,10 +1437,10 @@ class Dispatcher {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
 		}
-		/*if (!$place || ($place && !$place->isDefended())) {
+		if (!$place || ($place && !$place->isDefended())) {
 			# Can't attack nothing or empty places.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.notdefended");
-		}*/
+		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
@@ -2322,6 +2322,22 @@ class Dispatcher {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
 		return $this->action("place.permissions", "maf_place_permissions", true,
+				array('place'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+			);
+	}
+
+	public function placeAllowRealmUseTest($ignored, Place $place) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.allowuse.name", "description"=>"unavailable.$check");
+		}
+		if ($place->getOwner() != $this->getCharacter()) {
+			return array("name"=>"place.allowuse.name", "description"=>"unavailable.notowner");
+		}
+		if ($place->getType()->getName() != 'embassy' && $place->getType()->getSpawnable()) {
+			return array("name"=>"place.allowuse.name", "description"=>"unavailable.notrealmuseable");
+		}
+		return $this->action("place.allowuse", "maf_place_allowuse", true,
 				array('place'=>$place->getId()),
 				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 			);
