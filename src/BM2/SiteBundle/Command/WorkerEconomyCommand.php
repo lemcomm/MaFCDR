@@ -52,7 +52,7 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 			// check and update trades, food and wealth production
 			$WealthProduction = 0;
 			foreach ($this->economy->getResources() as $resource) {
-				if (!$settlement->getSiege() || !$settlement->getSiege()->getEncirlced()) {
+				if (!$settlement->getSiege() || ($settlement->getSiege() && !$settlement->getSiege()->getEncirlced())) {
 					$production = $this->economy->ResourceProduction($settlement, $resource, false, true); // with forced recalculation to update building effects
 					$WealthProduction += $production * $resource->getGoldValue();
 					$tradebalance = $this->economy->TradeBalance($settlement, $resource);
@@ -107,19 +107,20 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 	}
 
 	private function return_bytes($val) {
-	    $val = trim($val);
-	    $last = strtolower($val[strlen($val)-1]);
-	    switch($last) {
-	        // The 'G' modifier is available since PHP 5.1.0
-	        case 'g':
-	            $val *= 1024;
-	        case 'm':
-	            $val *= 1024;
-	        case 'k':
-	            $val *= 1024;
-	    }
+		$val = trim($val);
+		$last = strtolower($val[strlen($val)-1]);
+		$val = substr($val, 0, -1);
+		switch($last) {
+		// The 'G' modifier is available since PHP 5.1.0
+		case 'g':
+		    $val *= 1024;
+		case 'm':
+		    $val *= 1024;
+		case 'k':
+		    $val *= 1024;
+		}
 
-	    return $val;
+		return $val;
 	}
 
 
