@@ -300,7 +300,7 @@ class RealmManager {
 			$target = $vote->getTargetCharacter();
 			$c = $target->getId();
 			# Only allow slumbering electees on positions that allow you to hold it while slumbering. Never allow the dead to be voted in.
-			if (($position->getKeepOnSlumber() == false && $target->isActive(true)) || ($position->getKeepOnSlumber() == true && $target->isAlive())) {
+			if (!$position || ($position->getKeepOnSlumber() == false && $target->isActive(true)) || ($position->getKeepOnSlumber() == true && $target->isAlive())) {
 				if (!isset($candidates[$c])) {
 					$candidates[$c] = array('char'=>$vote->getTargetCharacter(), 'votes'=>0, 'weight'=>0);
 				}
