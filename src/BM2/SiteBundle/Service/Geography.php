@@ -894,13 +894,6 @@ class Geography {
 		return array(false,false, false);
 	}
 
-	public function getDistance($locA, $locB) {
-		$query = $this->em->createQuery('SELECT ST_Distance(:locA, :locB)');
-		#Yes, this is a PHP wrapper for checking distance between points in PostGIS.
-		$query->addParameters(array('locA'=>$locA, 'locB'=>$locB));
-		return $query->getResult();
-	}
-
 	public function getBaseSpeed() {
 		return $this->base_speed;
 	}
