@@ -55,7 +55,6 @@ class MilitaryManager {
 		}
 		if ($recruits->isEmpty()) return;
 		$training = min($settlement->getSingleTrainingPoints(), $settlement->getTrainingPoints()/$recruits->count());
-		$startLoc = $settlement->getGeoMarker()->getLocation();
 
 		// TODO: add the speed (efficiency) of the training building here, at least with some effect
 		// (not full, because you can't focus them)
@@ -72,7 +71,7 @@ class MilitaryManager {
 					$recruit->setTraining(0)->setTrainingRequired(0);
 					$this->history->addToSoldierLog($recruit, 'traincomplete');
 					if ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() != $settlement) {
-						$recruit->setTravelDays($this->getSoldierTravelTime($startLoc, $unit->getCharacter()->getLocation()));
+						$recruit->setTravelDays(ceil($this->getSoldierTravelTime($settlement, $unit->getCharacter())));
 						$recruit->setDestination('unit');
 					}
 				}
@@ -733,8 +732,8 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function getSoldierTravelTime($start, $end) {
-		$distance = $this->geo->getDistance($start, $end);
+	public function getSoldierTravelTime(Settlement $start, Character $end) {
+		$distance = $this->geo->calculateDistanceToSettlement($end, $start);
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt(1/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
 		return $days*0.925*1.33; #Average travel speed of all region types.
