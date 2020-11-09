@@ -8,14 +8,26 @@
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for place in places %}
 		{% set type = place.type %}
-		{% if place.visible or (not place.visible and place.owner == character) %}
+		{% if character.insidePlace == place %}
+			{% set inside = true %}
+		{% else %}
+			{% set inside = false %}
+		{% endif %}
+		{% if place.visible or inside or (not place.visible and place.owner == character) %}
 			<hr>
 			<div class="subcontent inline_announcements" style="color:#460702">
 				<h4>{{ place.name|title }}</h4>
-				{{ place.description.text }}
-				{% set check = dispatcher.placeEnterTest(true, place) %}
-				{% if check.url is defined %}
-					<a href="{{path('maf_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
+				{% if inside %}
+					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
+				{% endif %}
+				{{ place.description.text }}<br><br>
+				{% if not inside %}
+					{% set check = dispatcher.placeEnterTest(true, place) %}
+					{% if check.url is defined %}
+						<a href="{{path('maf_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
+					{% endif %}
+				{% else %}
+					<a href="{{path('maf_place_exit') }}"><button id="exit">{{ 'place.exit'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 				{% if type.name == 'embassy' %}
 					{% set check = dispatcher.placeManageEmbassyTest(null, place) %}
@@ -27,12 +39,28 @@
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
+				{% set check = dispatcher.placeNewPlayerInfoTest(null, place) %}
+				{% if check.url is defined %}
+					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="permissions">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
+				{% endif %}
 				{% set check = dispatcher.placePermissionsTest(null, place) %}
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_permissions', {"id":place.id}) }}"><button id="permissions">{{ 'place.permissions.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
-				{% if place.getType.getDefensible() and place.getOwner() != character %}
+				{% if not inside and place.getType.getDefensible() and place.getOwner() != character %}
 					<a href="{{path('maf_war_siege_place', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
+				{% endif %}
+				{% if inside %}
+					{% if place.getType.getDefensible() %}
+						{% if place.getOwner() != character and place.getOccupant() != character %}
+							<a href="{{path('maf_place_occupation_start', {"place":place.id}) }}"><button id="siege">{{ 'place.occupy.button.start'|trans({}, "places")|raw }}</button></a>
+						{% endif %}
+						{% if place.getOccuppier() == character %}
+							<a href="{{path('maf_place_occupant', {"place":place.id}) }}"><button id="siege">{{ 'place.occupant.button'|trans({}, "places")|raw }}</button></a>
+							<a href="{{path('maf_place_occupier', {"place":place.id}) }}"><button id="siege">{{ 'place.occupier.button'|trans({}, "places")|raw }}</button></a>
+							<a href="{{path('maf_place_occupation_end', {"place":place.id}) }}"><button id="siege">{{ 'place.occupy.button.end'|trans({}, "places")|raw }}</button></a>
+						{% endif %}
+					{% endif %}
 				{% endif %}
 			</div>
 		{% endif %}
