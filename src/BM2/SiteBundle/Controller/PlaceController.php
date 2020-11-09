@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
+use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
@@ -114,7 +115,7 @@ class PlaceController extends Controller {
 		if ($this->get('interactions')->characterEnterPlace($character, $id)) {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('place.enter.success', array('%name%' => $id->getName()), 'actions'));
-			return $this->redirectToRoute('maf_place', ['id' => $id->getId()]);
+			return $this->redirectToRoute('maf_place_actionable', ['id' => $id->getId()]);
 		} else {
 			$this->addFlash('error', $this->get('translator')->trans('place.enter.failure', array(), 'actions'));
 			return $this->redirectToRoute('maf_place_actionable');
@@ -436,7 +437,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/changeoccupant", requirements={"id"="\d+"}, name="maf_place_occupant")
+	  * @Route("/{id}/changeoccupant", requirements={"id"="\d+"}, name="maf_place_occupant")
 	  */
 	public function changeOccupantAction(Place $id, Request $request) {
 		$place = $id;
@@ -476,7 +477,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/changeoccupier", requirements={"id"="\d+"}, name="maf_place_occupier")
+	  * @Route("/{id}/changeoccupier", requirements={"id"="\d+"}, name="maf_place_occupier")
 	  */
 	public function changeOccupierAction(Place $id, Request $request) {
 		$place = $id;
@@ -510,7 +511,7 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/occupation/start", requirements={"id"="\d+"}, name="maf_place_occupation_start")
+	  * @Route("/{id}/occupation/start", requirements={"id"="\d+"}, name="maf_place_occupation_start")
 	  */
 	public function occupationStartAction(Place $id, Request $request) {
 		$place = $id;
@@ -535,11 +536,11 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/occupation/end", requirements={"id"="\d+"}, name="maf_settlement_occupation_end")
+	  * @Route("/{id}/occupation/end", requirements={"id"="\d+"}, name="maf_place_occupation_end")
 	  */
 	public function occupationEndAction(Place $id, Request $request) {
 		$place = $id;
-		$character = $this->get('dispatcher')->gateway('controlOccupationEndTest', false, true, false, $place);
+		$character = $this->get('dispatcher')->gateway('placeOccupationEndTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -554,6 +555,37 @@ class PlaceController extends Controller {
                 }
 		return $this->render('BM2SiteBundle::Place/occupationend.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+
+	/**
+	  * @Route("/{place}/newplayer", requirements={"realm"="\d+"}, name="maf_place_newplayer")
+	  */
+	public function newplayerAction(Place $place, Request $request) {
+		$character = $this->get('dispatcher')->gateway('placeNewPlayerInfoTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$desc = $place->getSpawnDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newSpawnDescription($place, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return $this->render('BM2SiteBundle::Place/newplayer.html.twig', [
+			'place'=>$place, 'form'=>$form->createView()
 		]);
 	}
 
