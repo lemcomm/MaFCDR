@@ -499,7 +499,6 @@ class WarManager {
 		}
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
-				echo $siege->getId().' '.$leader->getId();
 				if (!$completed) {
 					if ($settlement) {
 						$this->history->logEvent(
@@ -577,8 +576,13 @@ class WarManager {
 				}
 			} else if ($type == 'siege' && $focus->getAttacker() == $bg) {
 				# Since attackers control the siege, the siege only ends if the attackers disband it (or are otherwise broken)
-				$focus->getSettlement()->setSiege(NULL);
-				$focus->setSettlement(NULL);
+				if ($focus->getSettlement()) {
+					$focus->getSettlement()->setSiege(NULL);
+					$focus->setSettlement(NULL);
+				} else {
+					$focus->getPlace()->setSiege(NULL);
+					$focus->getPlace(NULL);
+				}
 				$focus->setAttacker(NULL);
 				// siege is terminated, as sieges don't care how many groups, only if the attacker group has no more attackers in it.
 				foreach ($focus->getGroups() as $group) {
