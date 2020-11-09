@@ -37,5 +37,6 @@
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_house"/>
 
 		<one-to-one field="home" target-entity="Place" mapped-by="house"/>
+		<one-to-one field="spawn" target-entity="Spawn" mapped-by="house"/>
 	</entity>
 </doctrine-mapping>
