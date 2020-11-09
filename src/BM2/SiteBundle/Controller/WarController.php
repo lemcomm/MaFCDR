@@ -431,33 +431,69 @@ class WarController extends Controller {
 					# if action is not already selected that means we shouldn't be here yet, rereoute the user to whatever action is.
 					switch($data['action']){
 						case 'leadership':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leadership'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'leadership'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leadership'));
+							}
 							break;
 						case 'build':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'build'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'build'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'build'));
+							}
 							break;
 						case 'assault':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assault'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'assault'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assault'));
+							}
 							break;
 						case 'disband':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'disband'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'disband'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'disband'));
+							}
 							break;
 						case 'leave':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leave'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'leave'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leave'));
+							}
 							break;
 						/*
 						case 'attack':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'attack'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'attack'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'attack'));
+							}
 							break;
 						case 'joinattack':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinattack'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'joinattack'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinattack'));
+							}
 							break;
 							*/
 						case 'joinsiege':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinsiege'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'joinsiege'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinsiege'));
+							}
 							break;
 						case 'assume':
-							return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assume'));
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'assume'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assume'));
+							}
 							break;
 					}
 				} else {
@@ -475,7 +511,11 @@ class WarController extends Controller {
 								}
 								$group->setLeader($data['newleader']);
 								$em->flush();
-								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
 							} else {
 								throw $this->createNotFoundException('error.notfound.change');
 							}
@@ -484,7 +524,11 @@ class WarController extends Controller {
 							# Start constructing siege equipment!
 							if ($siege->getAttacker()->getCharacters()->contains($character) && data['subaction'] == 'build') {
 								$this->get('war_manager')->buildSiegeTools($data['type'], $data['quantity']);
-								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
 							}
 						case 'assault':
 							# We're either attackers assaulting or defenders sortieing! Battle type (assault vs sortie) is figured out by WarMan based on which group is passed as the attacker.
@@ -571,7 +615,11 @@ class WarController extends Controller {
 										->setBlockTravel(true);
 									$this->get('action_manager')->queue($act);
 								}
-								return $this->redirectToRoute('bm2_site_war_siege');
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
 							}
 							break;
 						case 'assume':
@@ -584,7 +632,11 @@ class WarController extends Controller {
 									$siege->setLeader('defenders', $character);
 									$em->flush();
 								}
-								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
 							}
 							break;
 						default:
