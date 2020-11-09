@@ -265,6 +265,36 @@ class RealmController extends Controller {
 
 
 	/**
+	  * @Route("/{realm}/newplayer", requirements={"realm"="\d+"}, name="bm2_site_realm_newplayer")
+	  * @Template
+	  */
+	public function newplayerAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyNewPlayerInfoTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$desc = $realm->getSpawnDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newSpawnDescription($realm, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return array('realm'=>$realm, 'form'=>$form->createView());
+	}
+
+
+	/**
 	  * @Route("/{realm}/abdicate", requirements={"realm"="\d+"})
 	  * @Template
 	  */
