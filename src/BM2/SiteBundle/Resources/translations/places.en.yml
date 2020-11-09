@@ -40,6 +40,12 @@ place:
   intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Eventually these will be expanded to allow realms to do customized introductions for new players with separate arrival descriptions, as well as exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
   list:      Local Places
  enter:      Visit Place
+ newplayer:
+  name: Review Place Spawn Description
+  name2: Update the Spawn Description of %name%
+  description: Modify the new player description of the place.
+  longdesc: This page will let you modify the new player description of the place, which is displayed as part of the new character spawn selection process.
+  intro: Here you can alter the  information that is displayed to players creating a new character, after they opt to spawn in to the game. This description is specific to this location, so should be used to guide new players in the first actions. It is understood that this will also, likely, include propaganda about your realm, but that is your choice.
 
 by:
  lord:    As the Lord...
