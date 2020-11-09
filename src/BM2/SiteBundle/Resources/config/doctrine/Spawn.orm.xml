@@ -8,8 +8,7 @@
 
                 <many-to-one field="realm" target-entity="Realm" inversed-by="spawns"/>
                 <many-to-one field="place" target-entity="Place" inversed-by="spawns"/>
-                <one-to-one field="description" target-entity="SpawnDescription" mapped-by="active_spawn"/>
-                <one-to-many field="descriptions" target-entity="SpawnDescription" mapped-by="spawn"/>
+		<one-to-one field="house" target-entity="House" inversed-by="spawn"/>
 
 	</entity>
 </doctrine-mapping>
