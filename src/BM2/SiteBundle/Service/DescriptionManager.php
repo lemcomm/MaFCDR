@@ -173,18 +173,16 @@ class DescriptionManager {
 			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
 			switch($this->getClassName($entity)) {
 				case 'House':
-					$olddesc->setActiveHouse(NULL);
-					$this->em->flush();
+					$olddesc->setActiveHouse(null);
 					break;
 				case 'Place':
-					$olddesc->setActivePlace(NULL);
-					$this->em->flush();
+					$olddesc->setActivePlace(null);
 					break;
 				case 'Realm':
-					$desc->setActiveRealm($entity);
-					$desc->setRealm($entity);
+					$desc->setActiveRealm(null);
 					break;
 			}
+			$this->em->flush();
 		}
 
 		$desc = new SpawnDescription();
@@ -204,7 +202,7 @@ class DescriptionManager {
 				$desc->setRealm($entity);
 				break;
 		}
-		$entity->setDescription($desc);
+		$entity->setSpawnDescription($desc);
 		if ($olddesc) {
 			$desc->setPrevious($olddesc);
 		}
@@ -213,68 +211,6 @@ class DescriptionManager {
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		$this->em->flush($desc);
-		if (!$new) {
-			/* No need to tell the people that just made the thing that they updated the descriptions. */
-			switch($this->getClassName($entity)) {
-				case 'House':
-					$this->history->logEvent(
-						$entity,
-						'event.description.updated.house',
-						History::LOW
-					);
-					break;
-				case 'Place':
-					$this->history->logEvent(
-						$entity,
-						'event.description.updated.place',
-						array('%link-character%'=>$character->getId(), '%link-place%'=>$entity->getId()),
-						History::LOW
-					);
-					break;
-				case 'Realm':
-					$this->history->logEvent(
-						$entity,
-						'event.description.updated.realm',
-						array('%link-character%'=>$character->getId()),
-						History::LOW
-					);
-					break;
-			}
-		}
 		return $desc;
-	}
-
-	public function findDescription($entity) {
-		/* Originally, this was written to find you the current description, in an earlier version of this file and how the databse would work.
-		Now though, you just do $thing->getDescription() to get it, as a given $thing will have two associations to descriptions,
-		one that is the active, and one that goes to all.
-		This could be extended though, to add $criteria to let you find one within so many days or something. */
-		if ($entity->getDescription()) {
-			return $entity->getDescription();
-		}
-		switch($this->getClassName($entity)) {
-			case 'Artifact':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by d.ts desc");
-				break;
-			case 'Item':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.item = :entity order by d.ts desc");
-				break;
-			case 'Place':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.place = :entity order by d.ts desc");
-				break;
-			case 'Settlement':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.settlement = :entity order by d.ts desc");
-				break;
-			default:
-				break;
-		}
-		$query->setParameter('entity', $entity);
-		$query->setMaxResults(1);
-		$desc = $query->getOneOrNullResult();
-		if (!$desc) {
-			return null;
-		} else {
-			return $desc;
-		}
 	}
 }
