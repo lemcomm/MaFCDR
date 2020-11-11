@@ -96,6 +96,7 @@ class HouseManager {
 		$house->setFounder($founder);
 		$house->setHead($founder);
 		$house->setGold(0);
+		$house->setActive(true);
 		$founder->setHouse($house);
 		$this->em->flush();
 		if ($description) {
