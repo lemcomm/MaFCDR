@@ -12,12 +12,11 @@
 						<li><a href="{{ path('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}) }}">{{ 'menu.rss'|trans }}</a></li>
 					</ul>
 				</li>
-				{# Commenting this out until we figure out what we want to do with Units.
 				<li class="part">
 					<h3>{{ 'menu.your'|trans|title }}</h3>
 					<ul>
-						{% if character.soldiers is not empty %}
-							<li><a href="{{ path('maf_unit_soldiers') }}">{{ 'npc.soldier'|transchoice(10) }}</a></li>
+						{% if character.units is not empty %}
+							<li><a href="{{ path('maf_units') }}">{{ 'npc.units'|transchoice(10) }}</a></li>
 						{% endif %}
 						{% if character.entourage is not empty %}
 							<li><a href="{{ path('bm2_site_character_entourage') }}">{{ 'npc.entourage2'|transchoice(10) }}</a></li>
@@ -27,7 +26,6 @@
 						{% endif %}
 					</ul>
 				</li>
-				#}
 			</ul>
 		</div>
 	</li>
@@ -50,6 +48,7 @@
 						<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs_orgs') }}">{{ 'orgs.title'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.title'|trans({}, "conversations") }}</a></li>
 					</ul>
 				</li>
