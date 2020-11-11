@@ -431,6 +431,7 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				} else {
+					$house->setActive(false);
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.death',
@@ -659,6 +660,7 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				} else {
+					$house->setActive(false);
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.retire',
