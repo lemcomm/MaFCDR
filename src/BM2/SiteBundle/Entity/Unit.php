@@ -7,6 +7,7 @@ class Unit {
 	private $maxSize = 200;
 
 	public function getVisualSize() {
+		$size = 0;
 		foreach ($this->soldiers as $soldier) {
 			$size += $soldier->getVisualSize();
 		}
@@ -72,7 +73,7 @@ class Unit {
 	}
 
 	public function isLocal() {
-		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace()) {
+		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace() && !$this->getDefendingSettlement()) {
 			return true;
 		}
 		return false;
