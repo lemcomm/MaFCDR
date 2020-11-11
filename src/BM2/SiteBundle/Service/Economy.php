@@ -539,79 +539,71 @@ class Economy {
 			$settlement->setThralls($settlement->getThralls() + $thrallschange);
 		}
 
-		// effect on troops (militia and mobile)
-		// soldiers can eat with a little shortage, else they would almost never get anything,
-		// because moving into a region in balance drops food supply
-		if ($shortage>0.25 || $real_shortage>0.25) {
-			$severity=1;
-			if ($shortage>0.5 || $real_shortage>0.5) $severity++;
-			if ($shortage>0.75 || $real_shortage>0.75) $severity++;
-			$severity += min(3, round($settlement->getStarvation()/10));
-			/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
-			foreach ($settlement->getSuppliedUnits() as $unit) {
-				$this->feedSoldiers($unit, $severity);
-			}
-			*/
-		} else {
-			// got food
-			/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
-			foreach ($settlement->getSuppliedUnits() as $unit) {
-				foreach ($unit->getCharacter()->getLivingSoldiers() as $soldier) {
-					$soldier->feed();
-				}
-				foreach ($unit->getCharacter()->getLivingEntourage() as $ent) {
-					$end->feed();
-				}
-			}
-			*/
+		/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
+		$units = $this->FindFeedableUnits($settlement);
+		foreach ($units as $unit) {
+			$this->supplySoldiers($unit, $real_shortage);
 		}
+		$this->em->flush();
+		*/
 	}
 
-	public function feedSoldiers(Unit $unit, $my_severity) {
-		$my_severity = min($my_severity, 6); // can't starve to death in less than 10 days or so
-		$food_followers = $unit->getEntourage()->filter(function($entry) {
-			return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
-		})->toArray();
-		foreach ($unit->getLivingSoldiers() as $soldier) {
-			if (!empty($food_followers)) {
-				$soldier->feed();
-				shuffle($food_followers);
-				$has = $food_followers[0]->getSupply();
-				if ($has<=1) {
-					$food_followers[0]->setSupply(0);
-					unset($food_followers[0]);
-				} else {
-					$food_followers[0]->setSupply($has-1);
-				}
+	public function getSupplyTravelTime(Settlement $start, Unit $end) {
+		if ($unit->getDefendingSettlement()) {
+			$distance = $this->geo->calculateDistanceBetweenSettlements($start, $unit->getDefendingSettlement());
+		} elseif ($unit->getCharacter()) {
+			$distance = $this->geo->calculateDistanceToSettlement($end, $start);
+		} elseif ($unit->getPlace()) {
+			$place = $unit->getPlace();
+			if ($place->getInsideSettlement()) {
+				$distance = $this->geo->calculateDistanceBetweenSettlements($start, $place->getInsideSettlement());
 			} else {
-				$soldier->makeHungry($my_severity);
-				// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
-				if (rand(90, 180) < $soldier->getHungry()) {
-					$soldier->kill();
-					$this->history->addToSoldierLog($soldier, 'starved');
-				}
+				$distance = $this->geo->calculateDistanceBetweenSettlements($start, $place->getGeoData()->getSettlement());
 			}
 		}
-		foreach ($unit->getLivingEntourage() as $ent) {
-			if (!empty($food_followers)) {
-				$ent->feed();
-				shuffle($food_followers);
-				$has = $food_followers[0]->getSupply();
-				if ($has<=1) {
-					$food_followers[0]->setSupply(0);
-					unset($food_followers[0]);
-				} else {
-					$food_followers[0]->setSupply($has-1);
-				}
-			} else {
-				$ent->makeHungry($my_severity);
-				// entourage also can take several days of starvation without danger of death, like soldiers
-				if (rand(80, 160) < $ent->getHungry()) {
-					$ent->kill();
+		$speed = $this->geo->getbaseSpeed() / exp(sqrt(1/200)); #This is the regular travel speed for M&F.
+		$days = $distance / $speed;
+		return ($days*1.33)-1; #Average travel speed of all region types.
+	}
+
+	public function supplySoldiers(Unit $unit, $shortage, Settlement $settlement) {
+		$count = $unit->getLivingSoldiers()->count();
+		if($shortage > 0) {
+			$deduct = $count*$shortage;
+		}
+
+		$qty = $count - $deduct;
+		$here = false;
+		if (!$unit->getCharacter() || ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() == $settlement) || ($unit->getPlace() && $unit->getPlace()->getInsideSettlement() == $settlement)) {
+			$here = true;
+		}
+		if ($qty > 0 && !$here) {
+			$supply = new Resupply();
+			$this->em->persist($supply);
+			$supply->setOrigin($settlement);
+			$supply->setUnit($unit);
+			$supply->setType('food');
+			$supply->setQuantity($qty);
+			$supply->setTravelDays($this->getSupplyTravelTime($settlement, $unit));
+		} elseif ($qty > 0 && $here) {
+			$found = false;
+			if ($unit->getSupplies()) {
+				foreach ($unit->getSupplies() as $supply) {
+					if ($supply->getType() == $resupply->getType()) {
+						$found = true;
+						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
+						break;
+					}
 				}
 			}
+			if (!$found) {
+				$supply = new Supply();
+				$this->em->persist($supply);
+				$supply->setUnit($unit);
+				$supply->setType('food');
+				$supply->setQuantity($qty);
+			}
 		}
-		// TODO: event to the character if we use up food from followers? - and also when we don't have any left?
 	}
 
 	public function ResourceProduction(Settlement $settlement, ResourceType $resource, $ignore_buildings=false, $force_recalc=false) {
@@ -700,10 +692,25 @@ class Economy {
 		return array($base, 1.0+($bonus/100));
 	}
 
+	public function FindFeedableUnits(Settlement $settlement) {
+		$units = new ArrayCollection();
+		foreach ($settlement->getSuppliedUnits() as $unit) {
+			if (!$units->contains($unit)) {
+				$units->add($unit);
+			}
+		}
+		foreach ($settlement->getUnits() as $unit) {
+			if (!$unit->getSupplier() && $unit->isLocal() && !$units->contains($unit)) {
+				$units->add($unit);
+			}
+		}
+		return $units;
+	}
+
 	public function ResourceDemand(Settlement $settlement, ResourceType $resource, $split_results=false) {
 		// this is the population used for all resources except food, which has its own calculation
 		$militia = $settlement->countDefenders();
-		$population = $settlement->getPopulation() + $settlement->getThralls()/2 + $militia/2;
+		$population = $settlement->getPopulation() + $settlement->getThralls()/2;
 
 		$buildings_operation = $this->ResourceForBuildingOperation($settlement, $resource);
 		$buildings_construction = $this->ResourceForBuildingConstruction($settlement, $resource);
@@ -711,12 +718,14 @@ class Economy {
 		switch (strtolower($resource->getName())) {
 			case 'food':
 				$suppliedNPCs = 0;
-				/* TODO: When settlements feeding remote goes live, uncomment this.
-				foreach ($settlement->getSuppliedUnits() as $unit) {
+				/*TODO: When settlements feeding remote goes live, uncomment this.
+				$units = $this->FindFeedableUnits($settlement);
+				foreach ($units as $unit) {
 					$suppliedNPCs += $unit->getLivingSoldiers()->count();
-					$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
-				} */
-				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $militia + $suppliedNPCs;
+				}
+				$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
+				*/
+				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs;
 				break;
 			case 'wood':
 				$base = sqrt($population) + exp(sqrt($population)/150) - 5;
