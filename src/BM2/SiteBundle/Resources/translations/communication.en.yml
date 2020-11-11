@@ -110,6 +110,7 @@ event:
  character:
   created:      First mention in family chronicle.
   start:        Has appeared at %settlement%.
+  start2:        Has appeared at %place%.
   renamed:      Has changed name from "%oldname%" to "%newname%".
   knownas1:     Now known as "%newname%".
   knownas2:     No longer known as "%oldname%".
@@ -328,6 +329,7 @@ event:
   left:         %character% has been seen leaving.
   forceleft:    %character% has been forced outside the walls during the battle.
   besieged:     %character% has declared a siege of the location.
+  start:        A new First One named %character% has appeared here.
 
 
 
