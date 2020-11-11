@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Conversationpermission;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Form\AddParticipantType;
@@ -34,9 +35,27 @@ class ConversationController extends Controller {
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
-		$convs = $this->get('conversation_manager')->getConversations($char);
+		$convs = $this->get('conversation_manager')->getPrivateConversations($char);
 
 		return $this->render('Conversation/index.html.twig', [
+			'orgs' => false,
+			'conversations' => $convs,
+			'char' => $char,
+		]);
+	}
+
+        /**
+	  * @Route("/orgs", name="maf_convs_orgs")
+	  */
+	public function orgsAction() {
+                $char = $this->get('dispatcher')->gateway('conversationListTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+		$convs = $this->get('conversation_manager')->getOrgConversations($char);
+
+		return $this->render('Conversation/orgs.html.twig', [
+			'orgs' => true,
 			'conversations' => $convs,
 			'char' => $char,
 		]);
@@ -100,9 +119,10 @@ class ConversationController extends Controller {
 
 	/**
 	  * @Route("/new", name="maf_conv_new")
-	  * @Route("/new/r/{realm}", name="maf_conv_realm_new")
+	  * @Route("/new/r{realm}", name="maf_conv_realm_new")
+	  * @Route("/new/h{house}", name="maf_conv_house_new")
 	  */
-	public function newConversationAction(Request $request, Realm $realm=null) {
+	public function newConversationAction(Request $request, Realm $realm=null, House $house=null) {
                 $char = $this->get('dispatcher')->gateway('conversationNewTest');
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
@@ -111,11 +131,19 @@ class ConversationController extends Controller {
 		if ($realm && !$char->findRealms()->contains($realm)) {
 			$realm = null;
 		}
+		if ($house && $char->getHouse() != $house) {
+			$house = null;
+		}
 
-		if ($realm) {
+		if ($realm || $house) {
 			$contacts = null;
 			$distance = null;
 			$settlement = null;
+			if ($realm) {
+				$org = $realm;
+			} else {
+				$org = $house;
+			}
 		} else {
 			if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
 				$distance = $this->get('geography')->calculateInteractionDistance($char);
@@ -127,35 +155,41 @@ class ConversationController extends Controller {
 			$contacts = $this->get('conversation_manager')->getLegacyContacts($char);
 		}
 
-		$form = $this->createForm(new NewConversationType($contacts, $distance, $char, $settlement, $realm));
+		$form = $this->createForm(new NewConversationType($contacts, $distance, $char, $settlement, $org));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
+			if (!$org) {
+				$recipients = new ArrayCollection;
+				if (isset($data['owner'])) foreach ($data['owner'] as $rec) {
+					if (!$recipients->contains($rec)) {
+						$recipients->add($rec);
+					}
+				}
+				if (isset($data['nearby'])) foreach ($data['nearby'] as $rec) {
+					if (!$recipients->contains($rec)) {
+						$recipients->add($rec);
+					}
+				}
+				if (isset($data['captor'])) foreach ($data['captor'] as $rec) {
+					if (!$recipients->contains($rec)) {
+						$recipients->add($rec);
+					}
+				}
+				if (isset($data['contacts'])) foreach ($data['contacts'] as $rec) {
+					if (!$recipients->contains($rec)) {
+						$recipients->add($rec);
+					}
+				}
+				if ($recipients->contains($char)) {
+					$recipients->remove($char);
+				}
+			} else {
+				$recipients = null;
+			}
 
-			$recipients = new ArrayCollection;
-			if (isset($data['owner'])) foreach ($data['owner'] as $rec) {
-				if (!$recipients->contains($rec)) {
-					$recipients->add($rec);
-				}
-			}
-			if (isset($data['nearby'])) foreach ($data['nearby'] as $rec) {
-				if (!$recipients->contains($rec)) {
-					$recipients->add($rec);
-				}
-			}
-			if (isset($data['captor'])) foreach ($data['captor'] as $rec) {
-				if (!$recipients->contains($rec)) {
-					$recipients->add($rec);
-				}
-			}
-			if (isset($data['contacts'])) foreach ($data['contacts'] as $rec) {
-				if (!$recipients->contains($rec)) {
-					$recipients->add($rec);
-				}
-			}
-
-			$conv = $this->get('conversation_manager')->newConversation($char, $recipients, $data['topic'], $data['type'], $data['content'], $realm);
+			$conv = $this->get('conversation_manager')->newConversation($char, $recipients, $data['topic'], $data['type'], $data['content'], $org);
 			if ($conv === 'no recipients') {
 				#TODO: Throw exception!
 			}
@@ -240,14 +274,7 @@ class ConversationController extends Controller {
 
 		if ($unread) {
 			$lastPerm->setUnread(0);
-			$i = 0;
-			foreach ($messages as $m) {
-				$i++;
-				if ($i == $total - $unread) {
-					$last = $m->getSent();
-					break;
-				}
-			}
+			$last = $lastPerm->getLastAccess();
 		} else {
 			$unread = 0;
 			$last = NULL;
@@ -327,28 +354,17 @@ class ConversationController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
-			$current = $conv->findActivePermissions();
-			$now = new \DateTime("now");
-			$added = new ArrayCollection();
 			foreach($data['contacts'] as $new) {
 				# Double check we can actually add this person.
 				if (in_array($new, $contacts)) {
-					# Also check that we aren't adding a duplicate permission.
-					if (!$current->contains($new) && !$added->contains($new)) {
-						$perm = new ConversationPermission();
-						$em->persist($perm);
-						$perm->setConversation($conv);
-						$perm->setCharacter($new);
-						$perm->setStartTime($now);
-						$perm->setActive(true);
-						$perm->setUnread(0);
-						$perm->setManager(false);
-						$perm->setOwner(false);
-						$added->add($new);
-					}
+					echo 'found ';
+					$this->get('conversation_manager')->addParticipant($conv, $new);
+					$em->flush();
+				} else {
+					echo 'negative ';
 				}
 			}
-			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $added, $char, false);
+			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $data['contacts'], $char, false);
 			$em->flush();
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
 		}
