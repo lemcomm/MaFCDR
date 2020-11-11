@@ -6,6 +6,7 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="motto" type="string" nullable="true"/>
+		<field name="active" type="boolean" nullable="true"/>
 
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
@@ -38,5 +39,6 @@
 
 		<one-to-one field="home" target-entity="Place" mapped-by="house"/>
 		<one-to-one field="spawn" target-entity="Spawn" mapped-by="house"/>
+		<one-to-many field="conversations" target-entity="Conversation" mapped-by="house"/>
 	</entity>
 </doctrine-mapping>
