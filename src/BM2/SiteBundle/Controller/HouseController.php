@@ -399,4 +399,35 @@ class HouseController extends Controller {
 			'form' => $form->createView()
 		);
 	}
+
+
+	/**
+	  * @Route("/{house}/newplayer", requirements={"house"="\d+"}, name="maf_house_newplayer")
+	  */
+	public function newplayerAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseNewPlayerInfoTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$desc = $house->getSpawnDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newSpawnDescription($house, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+		}
+		return $this->render('BM2SiteBundle::House/newplayer.html.twig', [
+			'place'=>$place, 'form'=>$form->createView()
+		]);
+	}
 }
