@@ -11,6 +11,7 @@ use BM2\SiteBundle\Service\AppState;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\ConversationPermission;
+use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Realm;
 
@@ -28,6 +29,18 @@ class ConversationManager {
 
         public function getConversations(Character $char) {
                 $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me ORDER BY c.realm ASC, c.updated DESC');
+                $query->setParameter('me', $char);
+                return $query->getResult();
+        }
+
+        public function getOrgConversations(Character $char) {
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL) ORDER BY c.realm ASC, c.updated DESC');
+                $query->setParameter('me', $char);
+                return $query->getResult();
+        }
+
+        public function getPrivateConversations(Character $char) {
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
@@ -213,9 +226,18 @@ class ConversationManager {
                 }
         }
 
-        public function newConversation(Character $char=null, $recipients=null, $topic, $type, $content, Realm $realm = null, $system = null) {
-                if ($recipients === NULL && $realm === NULL) {
+        public function newConversation(Character $char=null, $recipients=null, $topic, $type, $content, $org = null, $system = null) {
+                if ($recipients === null && $org === null) {
                         return 'no recipients';
+                }
+                $realm = null;
+                $house = null;
+                if ($org) {
+                        if ($org instanceof Realm) {
+                                $realm = $org;
+                        } elseif ($org instanceof House) {
+                                $house = $org;
+                        }
                 }
                 $now = new \DateTime("now");
                 $cycle = $this->appstate->getCycle();
@@ -230,8 +252,9 @@ class ConversationManager {
                 if ($system) {
                         $conv->setSystem($system);
                 }
+                $added = [];
 
-                if (!$realm) {
+                if (!$realm && !$house) {
                         $creator = new ConversationPermission();
                         $this->em->persist($creator);
                         $creator->setOwner(true);
@@ -242,12 +265,15 @@ class ConversationManager {
                         $creator->setConversation($conv);
                         $creator->setCharacter($char);
                         $creator->setLastAccess($now);
-                } else {
+                        $added[] = $char;
+                } elseif ($realm) {
                         $conv->setRealm($realm);
                         $recipients = $realm->findMembers();
+                } elseif ($house) {
+                        $conv->setHouse($house);
+                        $recipients = $house->findAllLiving();
                 }
                 $counter = 0;
-                $added = [];
                 foreach ($recipients as $recipient) {
                         if (!in_array($recipient, $added)) {
                                 $counter++;
@@ -282,11 +308,11 @@ class ConversationManager {
                 return $conv;
         }
 
-        public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true) {
+        public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true, $extra=null) {
                 $now = new \DateTime("now");
                 $cycle = $this->appstate->getCycle();
                 if ($type == 'newperms') {
-                        $content = $originator->getName().' has added the following people to the conversation: ';
+                        $content = '[c:'.$originator->getId().'] has added the following people to the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
                                 $content .= $data[0]->getName();
@@ -295,30 +321,36 @@ class ConversationManager {
                                 foreach ($data as $char) {
                                         $i++;
                                         if ($i == $count) {
-                                                $content .= 'and '.$char->getName().'.';
+                                                $content .= 'and [c:'.$char->getId().']';
                                         } else {
-                                                $content .= $char->getName().', ';
+                                                $content .= '[c:'.$char->getId().'], ';
                                         }
                                 }
                         }
                 } elseif ($type == 'removal') {
-                        $content = $originator->getName().' has removed the following people from the conversation: ';
+                        $content = '[c:'.$originator->getId().'] has removed the following people from the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
-                                $content .= $data[0]->getName().'.';
+                                $content .= '[c:'.$data[0]->getId().'].';
                         } else {
                                 $i = 0;
                                 foreach ($data as $char) {
                                         $i++;
                                         if ($i == $count) {
-                                                $content .= 'and '.$char->getName().'.';
+                                                $content .= 'and [c:'.$char->getId().'].';
                                         } else {
-                                                $content .= $char->getName().', ';
+                                                $content .= '[c:'.$char->getId().'], ';
                                         }
                                 }
                         }
                 } elseif ($type == 'left') {
                         $content = $originator->getName().' has left the conversation.';
+                } elseif ($type == 'realmnew') {
+                        $content = 'A new First One has appeared in the realm by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
+                } elseif ($type == 'realmnew2') {
+                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
+                } elseif ($type == 'housenew') {
+                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
                 }
 
                 $msg = new Message();
@@ -328,6 +360,8 @@ class ConversationManager {
                 $msg->setType('system');
                 $msg->setCycle($cycle);
                 $msg->setContent($content);
+                $count = $conv->findActivePermissions()->count();
+                $msg->setRecipients($count);
                 if (!$conv->getRealm()) {
                         foreach ($conv->findActivePermissions() as $perm) {
                                 $perm->setUnread($perm->getUnread()+1);
@@ -450,5 +484,54 @@ class ConversationManager {
                 }
                 return array('added'=>$added, 'removed'=>$removed);
                 */
+        }
+
+        public function sendNewCharacterMsg(Realm $realm = null, House $house = null, Place $place, Character $char) {
+                $em = $this->em;
+                $ultimate = null;
+                $sameRealm = false;
+                if ($realm) {
+                        if ($realm->isUltimate()) {
+                                $ultimate = $realm;
+                                $same = true;
+                        } else {
+                                $ultimate = $realm->findUltimate();
+                        }
+                }
+                # public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true, $extra=null)
+                if ($realm && $same) {
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, 'realmnew', 'system', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
+                } elseif ($realm && !$same) {
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, 'realmnew', 'system', null, $char, null, ['where'=>$place->getId()]);
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, 'realmnew2', 'system', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
+                } elseif ($house) {
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, 'housenew', 'system', null, $char, null, ['where'=>$place->getId()]);
+                }
+        }
+
+        public function addParticipant(Conversation $conv, Character $char) {
+                $perm = $this->em->getRepository('BM2SiteBundle:ConversationPermission')->findOneBy(['conversation'=>$conv, 'character'=>$char,'active'=>true]);
+                if (!$perm) {
+                        echo 'creating perm ';
+                        $now = new \DateTime("now");
+                        $perm = new ConversationPermission();
+                        $this->em->persist($perm);
+                        $perm->setConversation($conv);
+                        $perm->setCharacter($char);
+                        $perm->setStartTime($now);
+                        $perm->setActive(true);
+                        $perm->setUnread(0);
+                        $perm->setManager(false);
+                        $perm->setOwner(false);
+                }
+                return $perm;
         }
 }
