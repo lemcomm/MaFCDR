@@ -63,7 +63,9 @@
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_settlement"/>
 
 		<one-to-many field="supplied_units" target-entity="Unit" mapped-by="supplier"/>
+		<one-to-many field="sent_supplies" target-entity="Supply" mapped-by="origin"/>
 		<one-to-many field="units" target-entity="Unit" mapped-by="settlement"/>
+		<one-to-many field="defending_units" target-entity="Unit" mapped-by="defending_settlement"/>
 
 		<one-to-one field="siege" target-entity="Siege" mapped-by="settlement"/>
 
