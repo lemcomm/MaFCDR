@@ -10,7 +10,7 @@
 			<a id="{{message.id}}"></a>
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
-			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic}, "conversations")|raw }}
+			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipients}, "conversations")|raw }}
 			{% if message.replyTo %}
 				 --
 				<a href="#{{message.replyTo.id}}">
@@ -39,6 +39,20 @@
 					{% endif %}
 					<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li>
 				</ul>
+				{% if message.replies and message.replies.count > 0 %}<br>
+					<br>{{ 'index.replies' |trans({}, "conversations")|raw }}
+					<ul>
+						{% for msg in message.replies %}
+							<a href="#{{msg.id}}">
+								{% if msg.sender %}
+									<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%day%":msg.cycle|gametime("short"), "%ts%":msg.sent|date}, "conversations")|raw }}</li>
+								{% else %}
+									<li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%day%":msg.cycle|gametime("short"), "%ts%":msg.sent|date}, "conversations")|raw }}</li>
+								{% endif %}
+							</a>
+						{% endfor %}
+					</ul>
+				{% endif %}
 				{# Flags currently removed.
 				<ul class="cmsg_flags">
 					<li><button class="cmsg_icon icon-star3{% if meta and meta.hasflagbyname("important") %} active{% endif %}" title="{{ 'flag.important'|trans({},"conversations") }}" data-msg="{{ message.id }}" data-flag="important"></button></li>
