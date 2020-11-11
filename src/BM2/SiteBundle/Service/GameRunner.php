@@ -149,7 +149,7 @@ class GameRunner {
 			foreach($row[0]->getFromCharacter()->getUnits() as $unit) {
 				if ($unit->getSupplier()==$row->getToSettlement()) {
 					$char = $row->getFromCharacter();
-					$this->logger->info("Character ".$char->getName()." (".$char->getId().") may be using request for food...");
+					$this->logger->info("  Character ".$char->getName()." (".$char->getId().") may be using request for food...");
 					# Character supplier matches target settlement, we need to see if this is still a valid food source.
 
 					# Get all character realms.
@@ -217,15 +217,15 @@ class GameRunner {
 			$this->convman->updateMembers($conversation);
 		}
 
-		$this->logger->info("Checking for dead and slumbering characters that need sorting...");
+		$this->logger->info("  Checking for dead and slumbering characters that need sorting...");
 		// NOTE: We're going to want to change this from c.system is null to something else, or build additional logic down the line, when we have more thant 'procd_inactive' as the system flag.
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE (c.alive = false AND c.location IS NOT NULL AND (c.system IS NULL OR c.system <> :system)) OR (c.alive = true and c.slumbering = true AND (c.system IS NULL OR c.system <> :system))');
 		$query->setParameter('system', 'procd_inactive');
 		$result = $query->getResult();
 		if (count($result) > 0) {
-			$this->logger->info("Sorting the dead from the slumbering...");
+			$this->logger->info("  Sorting the dead from the slumbering...");
 		} else {
-			$this->logger->info("No dead or slumbering found!");
+			$this->logger->info("  No dead or slumbering found!");
 		}
 		$dead = [];
 		$slumbered = [];
@@ -246,50 +246,50 @@ class GameRunner {
 			}
 		}
 		if ($deadcount+$slumbercount != 0) {
-			$this->logger->info("Sorting $deadcount dead and $slumbercount slumbering");
+			$this->logger->info("  Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
 			if ($character->getSystem() != 'procd_inactive') {
-				$this->logger->info($character->getName().", ".$character->getId()." is under review, as dead.");
+				$this->logger->info("  ".$character->getName().", ".$character->getId()." is under review, as dead.");
 				$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
-				$this->logger->info("Dead; removed from the map.");
+				$this->logger->info("    Dead; removed from the map.");
 				$captor = $character->getPrisonerOf();
 				if ($captor) {
-					$this->logger->info("Captive. The dead are captive no more.");
+					$this->logger->info("    Captive. The dead are captive no more.");
 					$character->setPrisonerOf(null);
 					$captor->removePrisoner($character);
 				}
-				$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
+				$this->logger->info("    Heir: ".($heir?$heir->getName():"(nobody)"));
 				if ($character->getPositions()) {
-					$this->logger->info("Positions detected");
+					$this->logger->info("    Positions detected");
 					foreach ($character->getPositions() as $position) {
 						if ($position->getRuler()) {
-							$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
+							$this->logger->info("    ".$position->getName().", ".$position->getId().", is detected as ruler position.");
 							if ($heir) {
-								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->logger->info("    ".$heir->getName()." inherits ".$position->getRealm()->getName());
 								$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'death');
 							} else {
-								$this->logger->info("No one inherits ".$position->getRealm()->getName());
+								$this->logger->info("  No one inherits ".$position->getRealm()->getName());
 								$this->cm->failInheritRealm($character, $position->getRealm(), 'death');
 							}
-							$this->logger->info("Removing them from ".$position->getName());
+							$this->logger->info("    Removing them from ".$position->getName());
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						} else if ($position->getInherit()) {
 							if ($heir) {
-								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->logger->info("    ".$heir->getName()." inherits ".$position->getRealm()->getName());
 								$this->cm->inhertPosition($position->getRealm(), $heir, $character, $via, 'death');
 							} else {
-								$this->logger->info("No one inherits ".$position->getName());
+								$this->logger->info("    No one inherits ".$position->getName());
 								$this->cm->failInheritPosition($character, $position, 'death');
 							}
-							$this->logger->info("Removing them from ".$position->getName());
+							$this->logger->info("    Removing them from ".$position->getName());
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						} else {
-							$this->logger->info("No inheritance. Removing them from ".$position->getName());
+							$this->logger->info("    No inheritance. Removing them from ".$position->getName());
 							$this->history->logEvent(
 								$position->getRealm(),
 								'event.position.death',
@@ -298,7 +298,7 @@ class GameRunner {
 							);
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						}
 					}
 				}
@@ -306,53 +306,53 @@ class GameRunner {
 					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
 				}
 				$character->setSystem('procd_inactive');
-				$this->logger->info("Character set as known dead.");
+				$this->logger->info("    Character set as known dead.");
 			} else {
 				$knowndead++;
 			}
 		}
 		foreach ($slumbered as $character) {
 			if ($character->getSystem() != 'procd_inactive') {
-				$this->logger->info($character->getName().", ".$character->getId()." is under review, as slumbering.");
-				$this->logger->info("Heir: ".($heir?$heir->getName():"(nobody)"));
+				$this->logger->info("  ".$character->getName().", ".$character->getId()." is under review, as slumbering.");
+				$this->logger->info("    Heir: ".($heir?$heir->getName():"(nobody)"));
 				if ($character->getPositions()) {
 					foreach ($character->getPositions() as $position) {
 						if ($position->getRuler()) {
-							$this->logger->info($position->getName().", ".$position->getId().", is detected as ruler position.");
+							$this->logger->info("    ".$position->getName().", ".$position->getId().", is detected as ruler position.");
 							if ($heir) {
-								$this->logger->info($heir->getName()." inherits ".$position->getRealm()->getName());
+								$this->logger->info("    ".$heir->getName()." inherits ".$position->getRealm()->getName());
 								$this->cm->inheritRealm($position->getRealm(), $heir, $character, $via, 'slumber');
 							} else {
-								$this->logger->info("No one inherits ".$position->getRealm()->getName());
+								$this->logger->info("    No one inherits ".$position->getRealm()->getName());
 								$this->cm->failInheritRealm($character, $position->getRealm(), 'slumber');
 							}
-							$this->logger->info("Removing ".$character->getName()." from ".$position->getName());
+							$this->logger->info("    Removing ".$character->getName()." from ".$position->getName());
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						} else if (!$position->getKeepOnSlumber() && $position->getInherit()) {
 							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
 							if ($heir) {
-								$this->logger->info($heir->getName()." inherits ".$position->getName());
+								$this->logger->info("    ".$heir->getName()." inherits ".$position->getName());
 								$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
 							} else {
-								$this->logger->info("No one inherits ".$position->getName());
+								$this->logger->info("    No one inherits ".$position->getName());
 								$this->cm->failInheritPosition($character, $position, 'slumber');
 							}
-							$this->logger->info("Removing ".$character->getName());
+							$this->logger->info("    Removing ".$character->getName());
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						} else if (!$position->getKeepOnSlumber()) {
-							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
-							$this->logger->info("Removing ".$character->getName());
+							$this->logger->info("    ".$position->getName().", ".$position->getId().", is detected as non-ruler, non-inherited position.");
+							$this->logger->info("    Removing ".$character->getName());
 							$this->cm->failInheritPosition($character, $position, 'slumber');
 							$position->removeHolder($character);
 							$character->removePosition($position);
-							$this->logger->info("Removed.");
+							$this->logger->info("    Removed.");
 						} else {
-							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler position.");
-							$this->logger->info($position->getName()." is set to keep on slumber.");
+							$this->logger->info("    ".$position->getName().", ".$position->getId().", is detected as non-ruler position.");
+							$this->logger->info("    ".$position->getName()." is set to keep on slumber.");
 							$this->history->logEvent(
 								$position->getRealm(),
 								'event.position.inactivekept',
@@ -370,7 +370,7 @@ class GameRunner {
 					$house = $character->getHeadOfHouse();
 					$inheritor = false;
 					$difhouse = false;
-					$this->logger->info("Detectd character is head of house ID #".$house->getId());
+					$this->logger->info("  Detectd character is head of house ID #".$house->getId());
 					#TODO: Make this it's own method on CharMan, and call it from there, merging it with the two similar instances theres, with switch on event firing for different circumstances.
 					if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
 						$inheritor = true;
@@ -438,15 +438,15 @@ class GameRunner {
 					}
 				}
 				$character->setSystem('procd_inactive');
-				$this->logger->info("Character set as known slumber.");
+				$this->logger->info("  Character set as known slumber.");
 			} else {
 				$knownslumber++;
 			}
 		}
 		if ($keeponslumbercount > 0) {
-			$this->logger->info("$keeponslumbercount positions kept on slumber!");
+			$this->logger->info("  $keeponslumbercount positions kept on slumber!");
 		}
-		$this->logger->info("Counted $knownslumber known slumberers and $knowndead known dead.");
+		$this->logger->info("  Counted $knownslumber known slumberers and $knowndead known dead.");
 		$this->appstate->setGlobal('cycle.characters', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -749,6 +749,95 @@ class GameRunner {
 		}
 		$this->em->flush();
 
+		$this->logger->info("checking if units have gotten supplies...");
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
+		foreach ($query->getResult() as $resupply) {
+			$unit = $resupply->getUnit();
+			$found = false;
+			if ($unit->getSupplies()) {
+				foreach ($unit->getSupplies() as $supply) {
+					if ($supply->getType() == $resupply->getType()) {
+						$found = true;
+						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
+						break;
+					}
+				}
+			}
+			if (!$found) {
+				$supply = new Supply();
+				$this->em->persist($supply);
+				$supply->setUnit($unit);
+				$supply->setType($resupply->getType());
+				$supply->setQuantity($resupply->getQuantity());
+			}
+			$this->em->remove($resupply);
+		}
+		$this->em->flush();
+
+		/* TODO: Enable this once people have time to set up supplies.
+		$this->logger->info("checking if units have food to eat...");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.id > 0');
+		foreach ($query->getResult() as $unit) {
+			$food = null;
+			foreach ($unit->getSupplies() as $supply) {
+				if ($supply->getType() == 'food') {
+					$food = $supply;
+					break;
+				}
+			}
+			$living = $unit->getLivingSoldiers();
+			$count = $living->count();
+			$supply = $food->getQuantity();
+			if ($count < $supply) {
+				$short = 0;
+			} else {
+				$short = floor($food->getQuantity()/$count*6);
+				if ($short < 1) {
+					$short = 0;
+				}
+			}
+			if ($short > 0) {
+				if ($unit->getCharacter()) {
+					$food_followers = $unit->getEntourage()->filter(function($entry) {
+						return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
+					})->toArray();
+					if (!empty($food_followers)) {
+						foreach ($food_followers as $ent) {
+							if ($ent->getSupply() > ($count - $supply)) {
+								$supply2 = $count-$supply;
+								$supply += $count-$supply;
+								$ent->setSupply($ent->getSupply()-$count2);
+							} else {
+								$supply += $ent->getSupply();
+								$ent->setSupply(0);
+							}
+						}
+					}
+				}
+			}
+			if ($count < $supply) {
+				$short = 0;
+			} else {
+				$short = floor($supply/$count*6);
+				if ($short < 1) {
+					$short = 0;
+				}
+			}
+			foreach ($unit->getLivingSoldiers() as $soldier) {
+				$soldier->makeHungry($short);
+				// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
+				if ($soldier->getHungry() > 96 && rand(96, 192) < $soldier->getHungry()) {
+					$soldier->kill();
+					$this->history->addToSoldierLog($soldier, 'starved');
+				}
+			}
+		}*/
+
+		// Update Unit resupply travel times.
+		$this->logger->info("deducting a day from unit resupply times...");
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Resupply r SET r.travel_days = (r.travel_days - 1) WHERE r.travel_days IS NOT NULL');
+		$query->execute();
+
 		$this->appstate->setGlobal('cycle.soldiers', 'complete');
 		$this->em->flush();
 		$this->em->clear();
@@ -1007,7 +1096,59 @@ class GameRunner {
 		return true;
 	}
 
-    public function runPositionsCycle() {
+	public function runHousesCycle() {
+		$last = $this->appstate->getGlobal('cycle.houses', 0);
+		if ($last==='complete') return true;
+        	$last=(int)$last;
+		$this->logger->info("Houses Cycle...");
+
+		$this->logger->info("Checking for missing House conversations...");
+
+		$query = $this->em->createQuery('SELECT h FROM BM2SiteBundle:House h WHERE h.active = true OR h.active IS NULL');
+
+		foreach ($query->getResult() as $house) {
+			$anno = false;
+			$gen = false;
+
+                	$criteria = Criteria::create()->where(Criteria::expr()->eq("system", "announcements"))->orWhere(Criteria::expr()->eq("system", "general"));
+			$convs = $house->getConversations()->matching($criteria);
+			if ($convs->count() > 0) {
+				foreach ($convs as $conv) {
+					if (!$anno && $conv->getSystem() == 'announcements') {
+						$anno = true;
+						continue;
+					}
+					if (!$gen && $conv->getSystem() == 'general') {
+						$gen = true;
+						continue;
+					}
+					if ($gen && $anno) {
+						break;
+					}
+				}
+			}
+			if (!$anno) {
+				$this->logger->info("... creating Announcements for ".$house->getName()." (".$house->getId().")");
+				$topic = $house->getName().' Announcements';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $house, 'announcements');
+				$this->logger->notice($house->getName()." announcements created");
+			}
+			if (!$gen) {
+				$this->logger->info("... creating General Discussion for ".$house->getName()." (".$house->getId().")");
+				$topic = $house->getName().' General Discussion';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $house, 'general');
+				$this->logger->notice($house->getName()." general discussion created");
+			}
+		}
+
+		$this->appstate->setGlobal('cycle.houses', 'complete');
+		$this->em->flush();
+		$this->em->clear();
+
+		return true;
+	}
+
+	public function runPositionsCycle() {
 		$last = $this->appstate->getGlobal('cycle.positions', 0);
 		if ($last==='complete') return true;
         	$last=(int)$last;
