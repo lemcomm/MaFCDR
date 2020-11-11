@@ -46,7 +46,11 @@ class NPC {
 		return ($this->hungry > 0);
 	}
 	public function makeHungry($value=1) {
-		$this->hungry+=$value;
+		if ($value > 0) {
+			$this->hungry+=$value;
+		} else {
+			$this->feed();
+		}
 		return $this;
 	}
 	public function feed() {
