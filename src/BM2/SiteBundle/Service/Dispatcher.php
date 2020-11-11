@@ -531,6 +531,7 @@ class Dispatcher {
 				$actions[] = $this->houseManageApplicantsTest();
 				$actions[] = $this->houseManageDisownTest();
 				$actions[] = $this->houseManageSuccessorTest();
+				$actions[] = $this->houseNewPlayerInfoTest();
 			}
 		}
 
@@ -3090,6 +3091,23 @@ class Dispatcher {
 			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.successor", "maf_house_successor", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseNewPlayerInfoTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.newplayer.house.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->house) {
+			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nohouse");
+		}
+		if ($this->house && $this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.newplayer.house.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.newplayer.house", "maf_house_newplayer", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
