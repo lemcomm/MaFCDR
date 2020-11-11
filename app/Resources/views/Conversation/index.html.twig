@@ -46,7 +46,10 @@
 			<thead>
 				<tr>
 					<td colspan="7" class="cmsg_header">
-						{% if conv.realm %}
+						{% if conv.house %}
+							{{ "index.ref"|trans({"%ref%":link(conv.house)}, "conversations")|raw }}
+							<a href="{{ path("maf_conv_house_new", {"house":conv.house.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+						{% elseif conv.realm %}
 							{{ "index.ref"|trans({"%ref%":link(conv.realm)}, "conversations")|raw }}
 							<a href="{{ path("maf_conv_realm_new", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
 						{% else %}
