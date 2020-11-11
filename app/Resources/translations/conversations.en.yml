@@ -1,7 +1,7 @@
 now:        now
 
 index:
- title:     conversations overview
+ title:     Private Conversations
  topic:     topic
  messages:  messages
  unread:    unread
@@ -22,8 +22,13 @@ index:
  request:   Request from %sender% on %day% (%ts%)
  rp:        Roleplay from %sender% on %day% (%ts%)
  reply:     replying to %sender% on %day% (%ts%)
+ replies:   "Replies to this message:"
+ repliedto: %sender% replied on %day% (%ts%)
  conversation: Sent to "%conv%" (%i% recipients)
  conversation2: Sent to "%conv%"
+
+orgs:
+ title: Organization Conversations
 
 type:
  letter: Letter
