@@ -691,7 +691,7 @@ class GameRunner {
 			$count++;
 			$soldier->setTravelDays(null);
 			$soldier->setDestination(null);
-			if (!in_array($solder->getUnit()->getId(), $units)) {
+			if (!in_array($soldier->getUnit()->getId(), $units)) {
 				$units[] = $soldier->getUnit()->getId();
 			}
 		}
