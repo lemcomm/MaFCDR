@@ -52,7 +52,7 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 			// check and update trades, food and wealth production
 			$WealthProduction = 0;
 			foreach ($this->economy->getResources() as $resource) {
-				if (!$settlement->getSiege() || ($settlement->getSiege() && !$settlement->getSiege()->getEncirlced())) {
+				if (!$settlement->getSiege() || ($settlement->getSiege() && !$settlement->getSiege()->getEncircled())) {
 					$production = $this->economy->ResourceProduction($settlement, $resource, false, true); // with forced recalculation to update building effects
 					$WealthProduction += $production * $resource->getGoldValue();
 					$tradebalance = $this->economy->TradeBalance($settlement, $resource);
