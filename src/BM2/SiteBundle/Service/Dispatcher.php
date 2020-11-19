@@ -2089,6 +2089,11 @@ class Dispatcher {
 		return $this->action("unit.list", "maf_units");
 	}
 
+	public function unitInfoTest() {
+		# No restrictions on this page, yet.
+		return $this->action("unit.info", "maf_units_info");
+	}
+
 	public function personalRequestsManageTest() {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"personal.requests.name", "description"=>"unavailable.npc");
