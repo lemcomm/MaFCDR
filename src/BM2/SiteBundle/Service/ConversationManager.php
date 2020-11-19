@@ -285,7 +285,11 @@ class ConversationManager {
                                 $perm->setOwner(false);
                                 $perm->setManager(false);
                                 $perm->setActive(true);
-                                $perm->setUnread(1);
+                                if ($content) {
+                                        $perm->setUnread(1);
+                                } else {
+                                        $perm->setUnread(0);
+                                }
                                 $added[] = $recipient;
                         } else {
                                 #Do nothing, duplicate recipient.
