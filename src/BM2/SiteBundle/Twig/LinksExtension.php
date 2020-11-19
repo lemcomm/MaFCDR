@@ -108,18 +108,26 @@ class LinksExtension extends \Twig_Extension {
 				case 'family':
 					$type = 'House';
 					break;
+				case 'u':
+				case 'unit':
+					$type = 'Unit';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
 			$entity = $this->em->getRepository('BM2SiteBundle:'.$type)->find($id);
 			if ($entity) {
-				if ($type != 'NewsEdition') {
+				if ($type != 'NewsEdition' && $type != 'Unit') {
 					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
-				} else {
+				} elseif ($type == 'Unit') {
+					$url = $this->generator->generate($this->getLink($type), array('unit' => $id));
+				}  else {
 					$url = $this->generator->generate($this->getLink($type), array('edition' => $id));
 				}
-				if ($type != 'NewsEdition') {
+				if ($type != 'NewsEdition' && $type != 'Unit') {
 					$name = $entity->getName();
+				} elseif ($type == 'Unit') {
+					$name = $entity->getSettings()->getName();
 				} else {
 					$name = $entity->getPaper()->getName();
 				}
@@ -174,6 +182,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'newsedition':	return 'bm2_site_news_read';
 			case 'house':		return 'maf_house';
 			case 'place':		return 'maf_place';
+			case 'unit':		return 'maf_units_info';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
@@ -315,7 +324,11 @@ class LinksExtension extends \Twig_Extension {
 		// FIXME: above still not working, so trying with all absolute paths now
 		$type = UrlGeneratorInterface::ABSOLUTE_URL;
 
-		$url = $this->generator->generate($path, array('id' => $id), $type);
+		if ($class != 'Unit') {
+			$url = $this->generator->generate($path, array('id' => $id), $type);
+		} else {
+			$url = $this->generator->generate($path, array('unit' => $id), $type);
+		}
 		if ($raw) return $url;
 		$link = '<a ';
 		if ($class) { $link .= 'class="link_'.$class.'" '; }
