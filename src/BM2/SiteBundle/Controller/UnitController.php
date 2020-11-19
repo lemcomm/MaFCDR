@@ -84,6 +84,22 @@ class UnitController extends Controller {
         }
 
         /**
+          * @Route("/units/{unit}", name="maf_units_info", requirements={"unit"="\d+"})
+          */
+
+        public function infoAction(Unit $unit) {
+                $character = $this->get('dispatcher')->gateway('unitInfoTest');
+                if (! $character instanceof Character) {
+                        return $this->redirectToRoute($character);
+                }
+
+                return $this->render('Unit/info.html.twig', [
+                        'unit' => $unit,
+                        'char' => $character
+                ]);
+        }
+
+        /**
           * @Route("/units/new", name="maf_unit_new")
           */
 
