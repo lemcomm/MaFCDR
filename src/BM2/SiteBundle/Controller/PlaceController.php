@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
+use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
@@ -369,14 +370,11 @@ class PlaceController extends Controller {
 		$place = $id;
 
 		if ($place->getType()->getName() == 'embassy') {
-			$character = $this->get('dispatcher')->gateway('placeManageRulersTest', false, true, false, $place);
+			$character = $this->get('dispatcher')->gateway('placeManageEmbassyTest', false, true, false, $place);
 			$type = 'embassy';
 		} elseif ($place->getType()->getName() == 'capital') {
-			$character = $this->get('dispatcher')->gateway('placeManageEmbassyTest', false, true, false, $place);
-			$type = 'capital';
-		} elseif ($place->getAllowSpawn()) {
 			$character = $this->get('dispatcher')->gateway('placeManageRulersTest', false, true, false, $place);
-			$type = 'spawn';
+			$type = 'capital';
 		} else {
 			$type = 'generic';
 			$character = $this->get('dispatcher')->gateway('placeManageTest', false, true, false, $place);
@@ -587,6 +585,48 @@ class PlaceController extends Controller {
 		return $this->render('BM2SiteBundle::Place/newplayer.html.twig', [
 			'place'=>$place, 'form'=>$form->createView()
 		]);
+	}
+
+	/**
+	  * @Route("/{place}/spawn", requirements={"place"="\d+"}, name="maf_place_new")
+	  * @Template
+	  */
+	public function spawnAction(Place $place, Request $request) {
+		$character = $this->get('dispatcher')->gateway('placeSpawnTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$error = null;
+
+		$house = $character->getHouse();
+		$realms = $character->findRealms();
+		$form = $this->createForm(new PlaceSpawnType($realms, $house));
+		$form->handRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['realm'] && $data['house']) {
+				$error = 'spawn.form.error.both';
+			} elseif (!$data['realm'] && !$data['house']) {
+				$error = 'spawn.form.error.neither';
+			}
+			if (!$error) {
+				$spawn = new Spawn;
+				$this->getDoctrine()->getManager()->persist($spawn);
+				$spawn->setPlace($place);
+				if ($data['realm']) {
+					$spawn->setRealm($data['realm']);
+				} elseif ($data['house']) {
+					$spawn->setHouse($data['house']);
+				}
+				$spawn->setAtive(false);
+				$this->getDoctrine()->getManager()->flush();
+			}
+		}
+
+		return array(
+			'form' => $form->createView(),
+			'error' => $error
+		);
 	}
 
 }
