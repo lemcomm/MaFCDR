@@ -1467,7 +1467,7 @@ class Dispatcher {
 			# Too new.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.siege.start", "bm2_site_war_siege", false, array('action'=>'start'));
+		return $this->action("military.siege.start", "maf_war_siege_place", false, array('place'=>$place->getId(), 'action'=>'start'));
 	}
 
 	public function militarySiegeLeadershipTest($check_duplicate=false, $siege) {
@@ -2306,7 +2306,10 @@ class Dispatcher {
 		if (!$place->getType()->getSpawnable()) {
 			return array("name"=>"place.spawn.name", "description"=>"unavailable.notspawnable");
 		}
-		if ((!$place->getForRealm() && $settlement->getOwner() != $character) || !$place->getForRealm()->findRulers()->contains($character)) {
+		if (
+			(!$place->getRealm() && $settlement->getOwner() != $character) ||
+			!$place->getRealm()->findRulers()->contains($character)
+		) {
 			return array("name"=>"place.spawn.name", "description"=>"unavailable.notowner");
 		}
 
