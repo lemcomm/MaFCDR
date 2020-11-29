@@ -265,6 +265,9 @@ class CharacterController extends Controller {
 				$settlement = $place->getInsideSettlement();
 				$character->setInsideSettlement($settlement);
 			}
+			if ($character->getRetired()) {
+				$character->setRetired(false);
+			}
 			$character->setInsidePlace($place);
 			$conv->sendNewCharacterMsg($realm, $house, $character);
 
@@ -295,58 +298,6 @@ class CharacterController extends Controller {
 		return array(
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 		);
-
-		if ($request->isMethod('POST')) {
-			$startlocation = false;
-			$historydone=false;
-			$em = $this->getDoctrine()->getManager();
-
-			#TODO: Add code for realm arrival places here.
-
-			$form_existing->bind($request);
-			if ($form_existing->isValid()) {
-				// place at estate of family member
-				$data = $form_existing->getData();
-				$startlocation = $data['settlement'];
-			}
-
-			$form_map->bind($request);
-			if ($form_map->isValid()) {
-				$data = $form_map->getData();
-				$id = $data['settlement_id'];
-
-				$startlocation = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-				if (!$startlocation->getOwner() || $startlocation->getAllowSpawn()==false) {
-					$startlocation = false;
-				}
-			}
-
-			if ($startlocation) {
-				if ($character->getRetired()) {
-					# No idea why but we lose the $retiree we declared above...
-					$retiree = true;
-					$character->setRetired(false);
-				}
-				$character->setLocation($startlocation->getGeoData()->getCenter());
-				$character->setInsideSettlement($startlocation);
-				if (!$historydone) {
-					$this->get('history')->logEvent(
-						$character,
-						'event.character.start2',
-						array('%link-place%'=>$place->getId()),
-						History::HIGH,	true
-					);
-				}
-				$this->get('history')->logEvent(
-					$place,
-					'event.place.charstart',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, true, 15
-				);
-				$this->get('history')->visitLog($startlocation, $character);
-				$em->flush();
-			}
-		}
 	}
 
 	/**
