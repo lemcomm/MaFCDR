@@ -1552,6 +1552,7 @@ unavailable:
  noplace:       There are no Places of Interest here.
  nopermission:  You don't have permissions to do that here.
  occupied:      The ongoing occupation prevents this.
+ notdefended:   This place has no defenders, and thus no siege is needed.
 
 marker:
  name:      Marker name
