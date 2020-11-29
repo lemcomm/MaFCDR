@@ -293,6 +293,21 @@ class RealmController extends Controller {
 		return array('realm'=>$realm, 'form'=>$form->createView());
 	}
 
+	/**
+	  * @Route("/{realm}/newplayer", requirements={"realm"="\d+"}, name="bm2_site_realm_newplayer")
+	  * @Template
+	  */
+	public function realmSpawnAction(Realm $realm, Request $request) {
+		$character = $this->gateway($realm, 'hierarchyNewPlayerInfoTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		#Code for finding and allowing activation of spawn locations here.
+
+		return array('realm'=>$realm, 'form'=>$form->createView());
+	}
+
 
 	/**
 	  * @Route("/{realm}/abdicate", requirements={"realm"="\d+"})
