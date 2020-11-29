@@ -47,7 +47,8 @@
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_permissions', {"id":place.id}) }}"><button id="permissions">{{ 'place.permissions.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
-				{% if not inside and place.getType.getDefensible() and place.getOwner() != character %}
+				{% set check = dispatcher.militarySiegePlaceTest(null, place) %}
+				{% if check.url is defined %}
 					<a href="{{path('maf_war_siege_place', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 				{% if inside %}
