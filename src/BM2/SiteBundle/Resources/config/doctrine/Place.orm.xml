@@ -34,7 +34,6 @@
 		<many-to-one field="realm" target-entity="Realm" inversed-by="places"/>
 		<many-to-one field="owning_realm" target-entity="Realm" inversed-by="embassies_abroad"/>
 		<many-to-one field="hosting_realm" target-entity="Realm" inversed-by="hosted_embassies"/>
-		<many-to-one field="for_realm" target-entity="Realm" inversed-by="usable_places"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital_place"/>
 		<many-to-one field="occupier" target-entity="Realm" inversed-by="occupied_places"/>
 
