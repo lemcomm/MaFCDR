@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -588,45 +589,30 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{place}/spawn", requirements={"place"="\d+"}, name="maf_place_new")
-	  * @Template
+	  * @Route("/{place}/spawn", requirements={"place"="\d+"}, name="maf_place_spawn_toggle")
 	  */
-	public function spawnAction(Place $place, Request $request) {
-		$character = $this->get('dispatcher')->gateway('placeSpawnTest');
+	public function placeSpawnToggleAction(Place $place) {
+		$character = $this->get('dispatcher')->gateway('placeNewPlayerInfoTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		$error = null;
 
-		$house = $character->getHouse();
-		$realms = $character->findRealms();
-		$form = $this->createForm(new PlaceSpawnType($realms, $house));
-		$form->handRequest($request);
-		if ($form->isValid() && $form->isSubmitted()) {
-			$data = $form->getData();
-			if ($data['realm'] && $data['house']) {
-				$error = 'spawn.form.error.both';
-			} elseif (!$data['realm'] && !$data['house']) {
-				$error = 'spawn.form.error.neither';
+		$em = $this->getDoctrine()->getManager();
+		if($place->getSpawn()) {
+			$em->remove($place->getSpawn());
+		} else {
+			$spawn = new Spawn();
+			$spawn->setPlace($place);
+			$em->persist($spawn);
+			if($place->getType()->getName() == 'home' && $place->getHouse()) {
+				$spawn->setHouse($place->getHouse());
+			} else {
+				$spawn->setRealm($place->getRealm());
 			}
-			if (!$error) {
-				$spawn = new Spawn;
-				$this->getDoctrine()->getManager()->persist($spawn);
-				$spawn->setPlace($place);
-				if ($data['realm']) {
-					$spawn->setRealm($data['realm']);
-				} elseif ($data['house']) {
-					$spawn->setHouse($data['house']);
-				}
-				$spawn->setAtive(false);
-				$this->getDoctrine()->getManager()->flush();
-			}
+			$spawn->setActive(false);
 		}
-
-		return array(
-			'form' => $form->createView(),
-			'error' => $error
-		);
+		$em->flush();
+		return new RedirectResponse($this->generateUrl('maf_place_actionable').'#'.$place->getId());
 	}
 
 }
