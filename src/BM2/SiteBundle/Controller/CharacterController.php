@@ -232,6 +232,82 @@ class CharacterController extends Controller {
 	}
 
 	/**
+	  * @Route("/start", name="maf_character_start")
+	  */
+	public function startAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter(true, false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		if ($character->getLocation()) {
+			return $this->redirectToRoute('bm2_character');
+		}
+		if ($request->query->get('logic') == 'retired') {
+			$retiree = true;
+		} else {
+			$retiree = false;
+		}
+		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
+		$this->get('character_manager')->checkReturnability($character);
+
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE s.active = true');
+		$result = $query->getResult();
+		$realms = new ArrayCollection();
+		$houses = new ArrayCollection();
+		foreach ($result as $spawn) {
+			if (!$realms->contains($spawn->getRealm())) {
+				$realms->add($spawn->getRealm());
+			}
+		}
+		$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE s.active = true');
+		$result = $query->getResult();
+		foreach ($result as $spawn) {
+			if (!$houses->contains($spawn->getHouse())) {
+				$houses->add($spawn->getHouse());
+			}
+		}
+		$myHouse = $character->getHouse();
+
+		return $this->render('BM2SiteBundle::Character/start.html.twig', [
+			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse, 'retiree'=>$retiree
+		]);
+
+	}
+
+	/**
+	  * @Route("/spawn/r{realm}", requirements={"realm"="\d+"}, name="maf_spawn_realm")
+  	  * @Route("/spawn/h{house}", requirements={"house"="\d+"}, name="maf_spawn_house")
+  	  * @Route("/spawn/myhouse", name="maf_spawn_myhouse")
+	  */
+	  public function spawnAction(Realm $realm = null, House $house = null) {
+  		$character = $this->get('appstate')->getCharacter(true, false, true);
+  		if (! $character instanceof Character) {
+  			return $this->redirectToRoute($character);
+  		}
+  		if ($character->getLocation()) {
+  			return $this->redirectToRoute('bm2_character');
+  		}
+
+		$spawns = new ArrayCollection();
+		if ($realm) {
+			foreach ($realm->getSpawns() as $spawn) {
+				$spawns->add($spawn);
+			}
+		}
+		if ($house) {
+			$spawns->add($house->getSpawn());
+		}
+		if (!$house && !$realm) {
+			$myHouse = $character->getHouse();
+		}
+
+		return $this->render('BM2SiteBundle::Character/spawn.html.twig', [
+			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse
+		]);
+	}
+
+	/**
 	  * @Route("/spawnin/home", name="maf_spawn_home")
 	  * @Route("/spawnin/s{spawn}", requirements={"spawn"="\d+"}, name="maf_spawn_in")
 	  */
@@ -298,84 +374,6 @@ class CharacterController extends Controller {
 		return array(
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 		);
-	}
-
-	/**
-	  * @Route("/start", name="maf_character_start")
-	  */
-	public function startAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, false, true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		if ($character->getLocation()) {
-			return $this->redirectToRoute('bm2_character');
-		}
-		if ($request->query->get('logic') == 'retired') {
-			$retiree = true;
-		} else {
-			$retiree = false;
-		}
-		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
-		$this->get('character_manager')->checkReturnability($character);
-
-		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE s.active = true');
-		$result = $query->getResult();
-		$realms = new ArrayCollection();
-		$houses = new ArrayCollection();
-		foreach ($result as $spawn) {
-			if (!$realms->contains($spawn->getHouse())) {
-				$realms->add($spawn->getHouse());
-			}
-		}
-		$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE s.active = true');
-		$result = $query->getResult();
-		$realms = new ArrayCollection();
-		$houses = new ArrayCollection();
-		foreach ($result as $spawn) {
-			if (!$houses->contains($spawn->getHouse())) {
-				$houses->add($spawn->getHouse());
-			}
-		}
-		$myHouse = $character->getHouse();
-
-		return $this->render('BM2SiteBundle::Character/start.html.twig', [
-			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse
-		]);
-
-	}
-
-	/**
-	  * @Route("/spawn/r{realm}", requirements={"realm"="\d+"}, name="maf_spawn_realm")
-  	  * @Route("/spawn/h{house}", requirements={"house"="\d+"}, name="maf_spawn_house")
-  	  * @Route("/spawn/myhouse", name="maf_spawn_myhouse")
-	  */
-	  public function spawnAction(Realm $realm = null, House $house = null) {
-  		$character = $this->get('appstate')->getCharacter(true, false, true);
-  		if (! $character instanceof Character) {
-  			return $this->redirectToRoute($character);
-  		}
-  		if ($character->getLocation()) {
-  			return $this->redirectToRoute('bm2_character');
-  		}
-
-		$spawns = new ArrayCollection();
-		if ($realm) {
-			foreach ($realm->getSpawns() as $spawn) {
-				$spawns->add($spawn);
-			}
-		}
-		if ($house) {
-			$spawns->add($house->getSpawn());
-		}
-		if (!$house && !$realm) {
-			$myHouse = $character->getHouse();
-		}
-
-		return $this->render('BM2SiteBundle::Character/spawn.html.twig', [
-			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse
-		]);
 	}
 
 
@@ -626,7 +624,7 @@ class CharacterController extends Controller {
 					if ($character->getLocation()) {
 						return $this->redirectToRoute('bm2_play', array('id'=>$character->getId()));
 					} else {
-						return $this->redirectToRoute('maf_start');
+						return $this->redirectToRoute('maf_character_start');
 					}
 				} else {
 					return $this->redirectToRoute('bm2_characters');
