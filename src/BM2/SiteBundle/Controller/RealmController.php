@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\RealmRelation;
+use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Entity\Vote;
 use BM2\SiteBundle\Form\ElectionType;
 use BM2\SiteBundle\Form\InteractionType;
@@ -28,6 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -294,18 +296,35 @@ class RealmController extends Controller {
 	}
 
 	/**
-	  * @Route("/{realm}/newplayer", requirements={"realm"="\d+"}, name="bm2_site_realm_newplayer")
+	  * @Route("/{realm}/spawns", requirements={"realm"="\d+"}, name="maf_realm_spawn")
 	  * @Template
 	  */
 	public function realmSpawnAction(Realm $realm, Request $request) {
-		$character = $this->gateway($realm, 'hierarchyNewPlayerInfoTest');
+		$character = $this->gateway($realm, 'hierarchyRealmSpawnsTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
 
-		#Code for finding and allowing activation of spawn locations here.
+		return array('realm'=>$realm);
+	}
 
-		return array('realm'=>$realm, 'form'=>$form->createView());
+	/**
+	  * @Route("/{realm}/spawns/{spawn}", requirements={"realm"="\d+","spawn"="\d+"}, name="maf_realm_spawn_toggle")
+	  */
+	public function realmSpawnToggleAction(Realm $realm, Spawn $spawn) {
+		$character = $this->gateway($realm, 'hierarchyRealmSpawnsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		if($spawn->getActive()) {
+			$spawn->setActive(false);
+		} else {
+			$spawn->setActive(true);
+		}
+		$em->flush();
+		return new RedirectResponse($this->generateUrl('maf_realm_spawn', ['realm' => $realm->getId()]).'#'.$spawn->getId());
 	}
 
 
