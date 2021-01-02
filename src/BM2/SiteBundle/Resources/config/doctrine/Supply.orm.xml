@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
                 <many-to-one field="unit" target-entity="Unit" inversed-by="supplies"/>
+		<many-to-one field="origin" target-entity="Settlement" inversed-by="sent_supplies"/>
                 <field name="type" type="string"/>
 		<field name="quantity" type="integer"/>
 
