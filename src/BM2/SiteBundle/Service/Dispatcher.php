@@ -559,8 +559,9 @@ class Dispatcher {
 				# NOTE: We'll have to rework this later when othe positions can manage a realm.
 				$actions[] = $this->hierarchyManageRealmTest();
 				$actions[] = $this->hierarchyManageDescriptionTest();
-				$actions[] = $this->hierarchyNewPlayerInfoTest();
 				$actions[] = $this->hierarchySelectCapitalTest();
+				$actions[] = $this->hierarchyNewPlayerInfoTest();
+				$actions[] = $this->hierarchyRealmSpawnsTest();
 				$actions[] = $this->hierarchyAbdicateTest();
 				$actions[] = $this->hierarchyRealmPositionsTest();
 				$actions[] = $this->hierarchyRealmLawsTest();
@@ -2805,6 +2806,20 @@ class Dispatcher {
 			return array("name"=>"realm.laws.name", "description"=>"unavailable.notleader");
 		} else {
 			return $this->action("realm.laws", "bm2_site_realm_laws", true,
+				array('realm'=>$this->realm->getId()),
+				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			);
+		}
+	}
+
+	public function hierarchyRealmSpawnsTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.spawns.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
+			return array("name"=>"realm.spawns.name", "description"=>"unavailable.notleader");
+		} else {
+			return $this->action("realm.spawns", "maf_realm_spawn", true,
 				array('realm'=>$this->realm->getId()),
 				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
 			);
