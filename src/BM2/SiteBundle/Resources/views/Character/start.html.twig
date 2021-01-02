@@ -15,64 +15,24 @@
 	{% else %}
 	<p>{{ 'character.start.returnee'|trans({"%name%":character.name})|raw }}</p>
 	{% endif %}
-		{#
-		<h3>{{ 'character.start.offer'|trans|title }}</h3>
-		<p>{{ 'character.start.offerintro'|trans({"%he%":character.gender("he")|trans})|raw }}</p>
-		<form class="wide" action="{{ path('bm2_site_character_start') }}" method="post">
-			{{ form_widget(form_offer._token) }}
-			<div>
-			<label for="character_placement_offer">{{ 'character.start.offerchoice'|trans }}</label>
-			<select required="required" name="character_placement_offer[offer]" id="character_placement_offer">
-				<option value="">{{ 'form.choose'|trans }}</option>
-				{% for choice in form_offer.offer.vars.choices %}
-					<option value="{{ choice.value }}">
-						{% if choice.data.givesettlement %}
-							{{ 'character.start.offersummary2'|trans({'%name%':choice.data.settlement.name}) }}
-						{% else %}
-							{{ 'character.start.offersummary'|trans({'%count%':choice.data.soldiers|length, '%name%':choice.data.settlement.name}) }}
-						{% endif %}
-					</option>
-				{% endfor %}
-			</select>
-			</div>
-			<div id="offerdetails"></div>
-			{{ form_widget(form_offer.submit) }}
-		</form>
-		#}
 
-		<h3>{{ 'character.start.family'|trans|title }}</h3>
-		<p>{{ 'character.start.existing'|trans|raw }}</p>
-		<form class="wide" action="{{ path('bm2_site_character_start') }}" method="post">
-			{{ form_widget(form_existing) }}
-		</form>
+	{% if not realms.isEmpty %}
+		<h3>{{ 'character.start.realm'|trans|title }}</h3>
+		<p>{{ 'character.start.realmintro'|trans|raw }}</p>
+		{% for realm in realms %}
 
-		<h3>{{ 'character.start.selection'|trans|title }}</h3>
-		<p>{{ 'character.start.mapintro'|trans|raw }}</p>
+		{% endfor %}
+	{% endif %}
+	{% if not houses.isEmpty %}
+		<h3>{{ 'character.start.house'|trans|title }}</h3>
+		<p>{{ 'character.start.houseintro'|trans|raw }}</p>
+		{% for house in houses %}
 
-		<div id="sd_viewer" style="float:right;width:30%">
-			<h3>{{ 'settlement.details'|trans|title }}</h3>
-			<p id="dummy">{{ 'settlement.dummy'|trans }}</p>
-			<form id="form_map" action="{{ path('bm2_site_character_start') }}" method="post">
-				{{ form_widget(form_map) }}
-			</form>
-			<br id="sd_anchor" />
-			<div id="sd"></div>
-		</div>
-		&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
-		<div id="map" style="min-width:30em;min-height:30em;width:65%"></div>
+		{% endfor %}
+	{% endif %}
+	{% if myhouse %}
+		<h3>{{ 'character.start.myhouse'|trans|title }}</h3>
+		<p>{{ 'character.start.myhouseintro'|trans|raw }}</p>
 
-{% endblock %}
-
-{% block javascript %}
-	var startbutton="{{ 'character.start.submit'|trans|title }}";
-{% endblock %}
-{% block jquery %}
-	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
-	mapinit('map', true, 'start');
-
-	$("#sd").on("dialogopen", function(event, ui){
-		$("#sd").dialog("option", "position", { my: "left top", at: "left bottom", of: $('#sd_anchor') } );
-		$("#dummy").hide();
-	});
-
+	{% endif %}
 {% endblock %}
