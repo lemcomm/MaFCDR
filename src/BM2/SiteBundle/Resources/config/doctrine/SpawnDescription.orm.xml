@@ -7,8 +7,8 @@
 
 		<!-- The below two refer to the spawn in question.
 		They describe what new arrivals see when they join a realm or house, by way of a place, as the intro text. -->
-		<many-to-one field="place" target-entity="Place" inversed-by="descriptions"/>
-		<one-to-one field="active_place" target-entity="Place" inversed-by="description"/>
+		<many-to-one field="place" target-entity="Place" inversed-by="spawn_descriptions"/>
+		<one-to-one field="active_place" target-entity="Place" inversed-by="spawn_description"/>
 
 		<!-- The below four refer to the realms and houses and their specific spawn descriptions.
 		Basically, they're new player text that lets rulers tell a bit about their realm.-->
