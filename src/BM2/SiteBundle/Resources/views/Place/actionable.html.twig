@@ -41,7 +41,8 @@
 				{% endif %}
 				{% set check = dispatcher.placeNewPlayerInfoTest(null, place) %}
 				{% if check.url is defined %}
-					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="permissions">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
+					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="spawn_description">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
+					<a href="{{path('maf_place_spawn_toggle', {"place":place.id}) }}"><button id="toggle_spawn">{% if place.spawn %}{{ 'place.spawn.deactivate'|trans({}, "places")|raw }}{% else %}{{ 'place.spawn.activate'|trans({}, "places")|raw }}{% endif %}</button></a>
 				{% endif %}
 				{% set check = dispatcher.placePermissionsTest(null, place) %}
 				{% if check.url is defined %}
