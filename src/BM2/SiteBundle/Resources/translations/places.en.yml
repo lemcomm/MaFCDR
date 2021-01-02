@@ -46,6 +46,10 @@ place:
   description: Modify the new player description of the place.
   longdesc: This page will let you modify the new player description of the place, which is displayed as part of the new character spawn selection process.
   intro: Here you can alter the  information that is displayed to players creating a new character, after they opt to spawn in to the game. This description is specific to this location, so should be used to guide new players in the first actions. It is understood that this will also, likely, include propaganda about your realm, but that is your choice.
+  button:    Change Intro Message
+ spawn:
+  activate:    Enable Spawning
+  deactivate:  Disable Spawning
 
 by:
  lord:    As the Lord...
