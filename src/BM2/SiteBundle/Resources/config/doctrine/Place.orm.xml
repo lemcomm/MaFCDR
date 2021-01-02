@@ -49,7 +49,7 @@
 
                 <one-to-one field="spawn_description" target-entity="SpawnDescription" mapped-by="active_place"/>
                 <one-to-many field="spawn_descriptions" target-entity="SpawnDescription" mapped-by="place"/>
-		<one-to-many field="spawns" target-entity="Spawn" mapped-by="place"/>
+		<one-to-one field="spawn" target-entity="Spawn" mapped-by="place"/>
 
 		<one-to-many field="buildings" target-entity="Building" mapped-by="place"/>
 		<one-to-many field="characters_present" target-entity="Character" mapped-by="inside_place"/>
