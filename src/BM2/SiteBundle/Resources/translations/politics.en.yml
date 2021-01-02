@@ -369,11 +369,25 @@ realm:
    6: Queen
    7: Empress
  newplayer:
-  name: Review Realm Spawn Description
-  name2: Update the Spawn Description of %name%
+  name: Review Arrival Description
+  name2: Update the Arrival Description of %name%
   description: Modify the new player description of the realm.
   longdesc: This page will let you modify the new player description of the realm, which is displayed as part of the new character spawn selection process.
-  intro: Here you can alter the realm information that is displayed to players creating a new character. This will display across all spawn locations for the realm of %name%, and should be used to describe the realm, not the locations you can spawn at. It is understood that this will also, likely, include propaganda about your realm, but that is your choice. <br /><br />It should be noted that this will only display in locations directly spawning into your realm, not your subrealms. They have their own, if you allow that.
+  intro: Here you can alter the realm information that is displayed to players creating a new character or considering to join your realm at an Arrival location. This will display across all arrival locations for the realm of %name%, and should be used to describe the realm, not the locations you can spawn at. It is understood that this will also, likely, include propaganda about your realm, but that is your choice. <br /><br />It should be noted that this will only display in locations directly spawning into your realm, not your subrealms. They have their own, if you allow that.
+ spawns:
+  name: Manage Arrival Locations
+  description: Determine which arrival locations are active for your realm.
+  longdesc: This page lets you manage which of the Places in the Realm, that have been configured as such, can be used as arrival places for the realm.
+  intro: In a realm, there are any number of formalized Places of Interest, many of which can be utilized as a place of arrival for your realm, that will allow foreign and newly introduced First Ones to join your realm. Ideally, you'll want to centralize to only a few places to allow first ones to arrive in your realm, in order to ensure they get the best new player experience you can offer.
+  owner:
+   name: Owned By
+   empty: No Current Owner
+  status:
+   active: Currently allowing new arrivals
+   inactive: Turning all arrivals away to other locations
+  toggle:
+   active: Allow new arrivals to join the realm here
+   inactive: Forbid new arrivals from joining here
 
 position:
  name:          Title:
