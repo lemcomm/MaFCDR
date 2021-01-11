@@ -6,6 +6,9 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
+use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
@@ -251,23 +254,75 @@ class CharacterController extends Controller {
 		$this->get('character_manager')->checkReturnability($character);
 
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE s.active = true');
+		switch(rand(0,7)) {
+			case 0:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.id DESC');
+				break;
+			case 1:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.id ASC');
+				break;
+			case 2:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.name DESC');
+				break;
+			case 3:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.name ASC');
+				break;
+			case 4:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.formal_name DESC');
+				break;
+			case 5:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.formal_name ASC');
+				break;
+			case 6:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.superior DESC');
+				break;
+			case 7:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.superior ASC');
+				break;
+		}
 		$result = $query->getResult();
 		$realms = new ArrayCollection();
 		$houses = new ArrayCollection();
+		$myHouse = null;
 		foreach ($result as $spawn) {
 			if (!$realms->contains($spawn->getRealm())) {
-				$realms->add($spawn->getRealm());
+				if ($spawn->getRealm()->getSpawnDescription() && $spawn->getPlace()->getDescription() && $spawn->getPlace()->getSpawnDescription()) {
+					$realms->add($spawn->getRealm());
+				}
 			}
 		}
-		$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE s.active = true');
-		$result = $query->getResult();
-		foreach ($result as $spawn) {
-			if (!$houses->contains($spawn->getHouse())) {
-				$houses->add($spawn->getHouse());
+		if ($character->getHouse() && $character->getHouse()->getHome()) {
+			$myHouse = $character->getHouse();
+		} else {
+			switch(rand(0,5)) {
+				case 0:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.id DESC');
+					break;
+				case 1:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.id ASC');
+					break;
+				case 2:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.name DESC');
+					break;
+				case 3:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.name ASC');
+					break;
+				case 4:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.superior DESC');
+					break;
+				case 5:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.superior ASC');
+					break;
+			}
+			$result = $query->getResult();
+			foreach ($result as $spawn) {
+				if (!$houses->contains($spawn->getHouse())) {
+					if ($spawn->getHouse()->getSpawnDescription() && $spawn->getPlace()->getDescription() && $spawn->getPlace()->getSpawnDescription()) {
+						$houses->add($spawn->getHouse());
+					}
+				}
 			}
 		}
-		$myHouse = $character->getHouse();
 
 		return $this->render('BM2SiteBundle::Character/start.html.twig', [
 			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse, 'retiree'=>$retiree
@@ -290,12 +345,15 @@ class CharacterController extends Controller {
   		}
 
 		$spawns = new ArrayCollection();
+		$myHouse = null;
 		if ($realm) {
 			foreach ($realm->getSpawns() as $spawn) {
-				$spawns->add($spawn);
+				if ($spawn->getPlace()->getSpawnDescription() && $spawn->getPlace()->getDescription()) {
+					$spawns->add($spawn);
+				}
 			}
 		}
-		if ($house) {
+		if ($house && $house->getHome() && $house->getHome()->getSpawnDescription() && $house->getHome()->getDescription()) {
 			$spawns->add($house->getSpawn());
 		}
 		if (!$house && !$realm) {
@@ -303,7 +361,7 @@ class CharacterController extends Controller {
 		}
 
 		return $this->render('BM2SiteBundle::Character/spawn.html.twig', [
-			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse
+			'realm'=>$realm, 'house'=>$house, 'spawns'=>$spawns, 'myHouse'=>$myHouse
 		]);
 	}
 
@@ -317,35 +375,56 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		$conv = $this->get('conversation_manager');
+		$em = $this->getDoctrine()->getManager();
 
 		$house = null;
 		$realm = null;
-		if ($spawn) {
-			$place = $spawn->getPlace();
-			if ($spawn->getRealm()) {
-				$realm = $spawn->getRealm();
-			} else {
-				$house = $spawn->getHouse();
-			}
-		} else {
-			$house = $character->getHouse();
-			$place = $house->getPlace();
-		}
+		$conv = null;
+		$supConv = null;
 		if (!$character->getLocation()) {
+			if ($spawn) {
+				$place = $spawn->getPlace();
+				if ($spawn->getRealm()) {
+					$realm = $spawn->getRealm();
+					$character->setRealm($realm);
+					$this->get('history')->logEvent(
+						$realm,
+						'event.realm.arrival',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, true, 15
+					);
+					if ($realm->getSuperior()) {
+						$this->get('history')->logEvent(
+							$realm->findUltimate(),
+							'event.subrealm.arrival',
+							array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+							History::MEDIUM, true, 15
+						);
+					}
+				} else {
+					$house = $spawn->getHouse();
+					$character->setHouse();
+				}
+			} else {
+				$house = $character->getHouse();
+				$place = $house->getPlace();
+			}
 			# new character spawn in.
 			if ($place->getLocation()) {
 				$character->setLocation($place->getLocation());
 				$settlement = null;
 			} else {
-				$character->setLocation($place->getInsideSettlement()->getGeoMaker()->getLocation());
-				$settlement = $place->getInsideSettlement();
+				$settlement = $place->getSettlement();
+				$character->setLocation($settlement->getGeoMarker()->getLocation());
 				$character->setInsideSettlement($settlement);
 			}
 			if ($character->getRetired()) {
 				$character->setRetired(false);
 			}
 			$character->setInsidePlace($place);
-			$conv->sendNewCharacterMsg($realm, $house, $character);
+			list($conv, $supConv) = $conv->sendNewCharacterMsg($realm, $house, $place, $character);
+			# $conv should always be a Conversation, while supConv will be if realm is not Ultimate--otherwise null.
+			# Both instances of Converstion.
 
 			$this->get('history')->logEvent(
 				$character,
@@ -369,11 +448,29 @@ class CharacterController extends Controller {
 				);
 				$this->get('history')->visitLog($settlement, $character);
 			}
+			$em->flush();
+		} else {
+			$realm = $character->findPrimaryRealm();
+			if ($realm) {
+				if ($realm->getSuperior()) {
+					$supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm->getSuperior(), 'system'=>'announcements']);
+				}
+				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+			} elseif ($character->getHouse()) {
+				$house = $character->getHouse();
+				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
+			}
+
 		}
 
-		return array(
+		return $this->render('BM2SiteBundle::Character/first.html.twig', [
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
-		);
+			'house' => $house,
+			'realm' => $realm,
+			'place' => $place,
+			'conv' => $conv,
+			'supConv' => $supConv
+		]);
 	}
 
 
