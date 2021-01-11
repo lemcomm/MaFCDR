@@ -40,34 +40,34 @@ warning:
  taken:		This design has already been choosen by someone else.
 
 
-badge: Badge 
-french: French 
-german: German 
-italian: Italian 
-polish: Polish 
-spanish: Spanish 
-swiss: Swiss 
+badge: Badge
+french: French
+german: German
+italian: Italian
+polish: Polish
+spanish: Spanish
+swiss: Swiss
 
-base: Base 
-bend: Bend 
-bend_sinister: Bend sinister 
-chevron: Chevron 
-chief: Chief 
-cross: Cross 
-fess: Fess 
-flaunches: Flaunches 
-gryon: Gryon 
-pale: Pale 
-per_bend: Per bend 
-per_bend_sinister: Per bend sinister 
-per_chevron: Per chevron 
-per_fess: Per fess 
-per_pale: Per pale 
-per_saltire: Per saltire 
-pile: Pile 
-quarterly: Quarterly 
-saltire: Saltire 
-shakefork: Shakefork 
+base: Base
+bend: Bend
+bend_sinister: Bend sinister
+chevron: Chevron
+chief: Chief
+cross: Cross
+fess: Fess
+flaunches: Flaunches
+gryon: Gryon
+pale: Pale
+per_bend: Per bend
+per_bend_sinister: Per bend sinister
+per_chevron: Per chevron
+per_fess: Per fess
+per_pale: Per pale
+per_saltire: Per saltire
+pile: Pile
+quarterly: Quarterly
+saltire: Saltire
+shakefork: Shakefork
 
 beasts: Beasts
 objects: Objects
@@ -153,15 +153,26 @@ colours:			Colors
 argent:			Argent
 or:				Or
 copper:			Copper
+iron:  Iron
+lead:  Lead
+buff:   Buff
+amaranth: Amaranth
+aquamarine: Aquamarine
 azure:			Azure
 blue celeste:	Blue celeste
+brunatre: Brunâtre
+carnation: Carnation
+eisen-farbe: Eisen-farbe
 gules:			Gules
 murrey:			Murrey
+ochre:  Ochre
 purpure:			Purpure
+red ochre: Red Ochre
 sable:			Sable
 sanguine:		Sanguine
 tenne:			Tenne
-vert:				Tert
+vert:				Vert
+white:   White
 cendree:			Cendrée
 
 blazon:
