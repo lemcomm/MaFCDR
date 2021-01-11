@@ -480,25 +480,13 @@ summary:
 
 first:
  title:     Welcome to Might & Fealty
- liege: >
-   You have accepted the knight offer of %liege% and are now their vassal. This settlement belongs to %liege%, so you are in
-   friendly territory at this time.<br />
-   If your knight offer included soldiers, they are being assigned to you already. If your knight offer included lordship
-   of the settlement itself, the local steward is already drawing up the documents. Both of these will take a short time
-   until they are ready and you can make full use of your new holdings.<br />
-   Talk to your liege first to find out what the current political situation is and where you are needed. A welcome message
-   should be below. Also make yourself familiar with your troops and the surrounding area.
- free: >
-   You have decided to begin as an independent First One. This is a hard and challenging path. One of the first things you will
-   want to do is check out the surrounding area, find out who owns the settlement you spawned in, and talk to him or her.<br />
-   You have no troops and no income at this time, so finding allies should be your first priority. Serve a lord as a knight
-   until you can secure an estate for yourself, for example.
- manual: >
-   Might & Fealty being a slow game, don't expect much action on your first day. If you haven't yet, check out
-   <a href="%manual%">the game manual</a> for more information and basic concepts. There's also a link at the top, so you
-   can check the manual for reference at any time.<br />
-   Lastly, Might & Fealty is a game where communication with other players is very important. Check out the messages section
-   and start talking with characters around you.
+ intro:
+  realm: With the formal affiar of joining %realm% out of the way, the first thing you will probably want to do is introduce yourself to your new comrades in arms.
+  subrealm: That can be done either here in the subrealm, <a href="%conv-1%">here</a>, or sovereign realm, <a href="%conv-2%">here</a>, where the local bureaucrats have already announced your arrival.
+  sovrealm: That can be done <a href="%conv-2%">here</a>, where the local bureaucrats have already announced your arrival.
+  house: With the formal affair of joining %house% out of the way, the first thing you will probably want to do is introduce yourself to your new comrades in arms. That can be done <a href="%conv-2%">here</a>.<br /><br />As you are starting in a House rather than a Realm, you may wish to ask for recommendations for which realm you should seek to join. It's quite likely that your fellows will have suggestions.
+  nodesc: The staff wish you well on your travels and glory in your life. May your actions bring you and them renown.
+  final: It is important to note that Might & Fealty tends to be a slow game, so don't expect much action in your first days. That said, it can be quite complex, as it tries to emulate the possibilities of real life as well as it can given the setting, so we do recommend reading the <a href="%manual%">the game manual</a> if you haven't already. Alternatively, <a href="%discord%">the community discord</a> can also be a great help.
 
 character:
  name:    Name
@@ -557,9 +545,8 @@ character:
   100: Historic
   150: Ancestors
  start:
-  title:      Character Placement
-  intro:      Select the starting location for %name%. This is an important choice and will greatly influence your early play experience.
-  returnee:   Select the restart location for %name%. As we're sure you're aware, this will affect your play experience.
+  title:      Character Arrival Organizations
+  intro:      Select the arrival organization for %name%. You can either choose to start in a Realm, a House, or, if your character has one already through their lineage, their own House. Realms can offer a variety of locations to start the game in, while Houses will only let you start at their Home. Houses do offer you the chance to start outside of a regular realm organization though, but are very hard to leave--generally requiring your character's death to do so.<br /><br />If you're unsure what whether to start in a Realm or a House, we suggest starting in a Realm.
   offer:      Accept fealty offer
   offerintro: >
     Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers
@@ -580,6 +567,23 @@ character:
     to begin your quest. This is an advanced option only recommended if none of the above are available or you are looking for something
     special to start.
   returnsuccess:  You have successfully restarted your career in this world of roles, politics, and warfare.
+  realm:      Available Realm(s) to Join
+  realmintro: Sometimes called nations or countries, Realms are the governments in Might & Fealty, and are usually made up of a host of various characters all with their own agendas. This list is presented in varying orders, selected at random.
+  house:      Available House(s) to Join
+  houseintro: Houses can be anything from a tribe to a family to a clan, and unlike Realms are generally permanent affairs. Once you're in one, it is usually very hard to leave, without joining another. That said, they're not bound by realm borders and do offer their own means to keep in touch. If a character has children with someone in the same house, their child will be in that house automatically.
+  myhouse:    Start at your House's Home
+  myhouseintro: As you already have a House, you can always join it.
+  join:
+   realm:     Start your career in the realm of %name%
+   house:     Start your career in the house of %name%
+   myhouse:   "Start in your house: %name%"
+  nobles:     Active Characters
+  regions:    Held Settlements
+ spawn:
+  realm:
+   title:     Arriving in %name%
+   intro:     As one of the many realms of the game, joining %name% will immediately start you as part of their realm as a member but otherwise unaligned First One. This will get you in their conversations, announce your arrival, and, hopefully, get you towards something to do fairly quickly. Even though your presence is announced, it is suggested that you also introduce yourself as well.<br /><br />Note: Might & Fealty is a slower game, so it's entirely possible you won't get a response for several hours.
+  join:      Make your debut at %name%
  details:
   realm:      realm(s)
   ultimate:   sovereign realm(s)
