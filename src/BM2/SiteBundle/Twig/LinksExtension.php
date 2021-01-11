@@ -69,6 +69,12 @@ class LinksExtension extends \Twig_Extension {
 				case 'noble':
 					$type = 'Character';
 					break;
+				case 'p':
+				case 'poi':
+				case 'place':
+				case 'placeofinterest':
+					$type = 'Place';
+					break;
 				case 'vote':
 					$type = 'Election';
 					break;
