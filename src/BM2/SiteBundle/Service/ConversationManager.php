@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\ConversationPermission;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 
 class ConversationManager {
@@ -350,11 +351,11 @@ class ConversationManager {
                 } elseif ($type == 'left') {
                         $content = $originator->getName().' has left the conversation.';
                 } elseif ($type == 'realmnew') {
-                        $content = 'A new First One has appeared in the realm by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
+                        $content = 'A new First One has appeared in the realm by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmnew2') {
-                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
+                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
                 } elseif ($type == 'housenew') {
-                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].']';
+                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
                 }
 
                 $msg = new Message();
@@ -503,22 +504,25 @@ class ConversationManager {
                         }
                 }
                 # public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true, $extra=null)
+                $conv = null;
+                $supConv = null;
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
-                        $this->newSystemMessage($conv, 'realmnew', 'system', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
+                        $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
-                        $this->newSystemMessage($conv, 'realmnew', 'system', null, $char, null, ['where'=>$place->getId()]);
-                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
-                        $this->addParticipant($conv, $char);
-                        $this->newSystemMessage($conv, 'realmnew2', 'system', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
+                        $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
+                        $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
+                        $this->addParticipant($supConv, $char);
+                        $this->newSystemMessage($supConv, 'realmnew2', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
                 } elseif ($house) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
-                        $this->newSystemMessage($conv, 'housenew', 'system', null, $char, null, ['where'=>$place->getId()]);
+                        $this->newSystemMessage($conv, 'housenew', null, $char, null, ['where'=>$place->getId()]);
                 }
+                return [$conv, $supConv];
         }
 
         public function addParticipant(Conversation $conv, Character $char) {
