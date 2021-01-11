@@ -1,17 +1,20 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
 {% block content %}
-<h2>{{ 'first.title'|trans|title }}</h2>
-{% if character.liege %}
-	<p>{{ "first.liege"|trans({"%liege%":link(character.liege)})|raw }}</p>
-
-	<h3>{{ 'unread.title'|trans({}, "conversations")|title }}</h3>
-	{% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
-{% else %}
-	<p>{{ "first.free"|trans|raw }}</p>
-{% endif %}
-
-<p>{{ "first.manual"|trans({"%manual%":path("bm2_manual")})|raw }}</p>
-
-
+	<h2>{{ 'first.title'|trans|title }}</h2>
+	{% if place.spawnDescription %}
+		<p>{{ place.spawnDescription.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
+	{% else %}
+		<p>{{ "first.nodesc"|trans|raw }}</p>
+	{% endif %}
+	<hr>
+	{% if realm %}
+		{{ "first.realm"|trans({"%link-realm%":realm.id})}}
+		{% if not realm.superior %}
+			{{ "first.subrealm"|trans({"%conv-1%":path("maf_conv_read", {"conv":conv.id}), "%conv-2%":path("maf_conv_read", {"conv":supConv.id})})|raw }}
+		{% else %}
+			{{ "first.subrealm"|trans({"%conv-1%":path("maf_conv_read", {"conv":conv.id})})|raw }}
+		{% endif %}
+	{% endif %}
+	<p>{{ "first.final"|trans({"%manual%":path(bm2_manual), "%discord%":"https://discord.gg/7YpAhEh"})|raw }}
 {% endblock %}
