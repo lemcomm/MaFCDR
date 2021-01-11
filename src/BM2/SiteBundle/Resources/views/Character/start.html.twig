@@ -10,29 +10,33 @@
 {# overwrite because this is the one page where it's ok to have a character without a location #}
 {% set character = appstate.getCharacter(true,false,true) %}
 	<h2>{{ 'character.start.title'|trans|title }}</h2>
-	{% if not retiree %}
 	<p>{{ 'character.start.intro'|trans({"%name%":character.name})|raw }}</p>
-	{% else %}
-	<p>{{ 'character.start.returnee'|trans({"%name%":character.name})|raw }}</p>
-	{% endif %}
 
+	{% if myhouse %}
+		<hr>
+		<h3>{{ 'character.start.myhouse'|trans|raw }}</h3>
+		<p>{{ 'character.start.myhouseintro'|trans|raw }}</p>
+
+	{% endif %}
 	{% if not realms.isEmpty %}
-		<h3>{{ 'character.start.realm'|trans|title }}</h3>
+		<hr>
+		<h3>{{ 'character.start.realm'|trans|raw }}</h3>
 		<p>{{ 'character.start.realmintro'|trans|raw }}</p>
 		{% for realm in realms %}
-
+			<hr>
+			<h3><u>{{ realm.formalName }}</u></h3>
+			<p>{{ 'character.start.nobles'|trans|raw }}: {{ realm.findActiveMembers.count }}<br />
+			{{ 'character.start.regions'|trans|raw }}: {{ realm.findTerritory.count }}<br /></p>
+			<p>{{ realm.spawnDescription.text}}<br /><br />
+			<a href="{{ path('maf_spawn_realm', {"realm":realm.id}) }}">{{ 'character.start.join.realm'|trans({"%name%":realm.name})|raw }}</a></p>
 		{% endfor %}
 	{% endif %}
 	{% if not houses.isEmpty %}
-		<h3>{{ 'character.start.house'|trans|title }}</h3>
+		<hr>
+		<h3>{{ 'character.start.house'|trans|raw }}</h3>
 		<p>{{ 'character.start.houseintro'|trans|raw }}</p>
 		{% for house in houses %}
 
 		{% endfor %}
-	{% endif %}
-	{% if myhouse %}
-		<h3>{{ 'character.start.myhouse'|trans|title }}</h3>
-		<p>{{ 'character.start.myhouseintro'|trans|raw }}</p>
-
 	{% endif %}
 {% endblock %}
