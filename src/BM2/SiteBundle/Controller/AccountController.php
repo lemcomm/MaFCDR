@@ -664,7 +664,7 @@ class AccountController extends Controller {
 					$character->setSystem(NULL);
 				}
 				$em->flush();
-				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'new'));
+				return $this->redirectToRoute('maf_character_start', array('logic'=>'new'));
 				break;
 			case 'viewhist':
 				if ($character->getList() < 100 ) {
@@ -698,7 +698,7 @@ class AccountController extends Controller {
 					$character->setSystem(NULL);
 				}
 				$em->flush();
-				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
+				return $this->redirectToRoute('maf_character_start', array('logic'=>'retired'));
 				break;
 			default:
 				throw new AccessDeniedHttpException('error.notfound.playlogic');
