@@ -285,6 +285,7 @@ event:
      superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
     estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
   capital:      Declared that its capital shall now be %settlement%.
+  arrival:      %character% has arrived in the realm at %place%.
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
  position:
