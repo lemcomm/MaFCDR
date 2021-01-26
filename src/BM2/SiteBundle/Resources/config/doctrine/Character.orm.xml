@@ -141,6 +141,7 @@
 		<many-to-one field="liege_land" target-entity="Settlement" inversed-by="vassals"/>
 		<many-to-one field="liege_place" target-entity="Place" inversed-by="vassals"/>
 		<many-to-one field="liege_position" target-entity="RealmPosition" inversed-by="vassals"/>
+		<field name="oath_current" type="boolean" nullable="true"/>
 
 		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
 		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
