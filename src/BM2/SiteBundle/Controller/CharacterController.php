@@ -434,7 +434,7 @@ class CharacterController extends Controller {
 			);
 			$this->get('history')->logEvent(
 				$place,
-				'event.place.charstart',
+				'event.place.start',
 				array('%link-character%'=>$character->getId()),
 				History::MEDIUM, true, 15
 			);
@@ -492,7 +492,7 @@ class CharacterController extends Controller {
 			$soldiers = [];
 			foreach ($char->getUnits() as $unit) {
 				foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
-					if (array_key_exists($key, $militia)) {
+					if (array_key_exists($key, $soldiers)) {
 						$soldiers[$key] += $type;
 					} else {
 						$soldiers[$key] = $type;
