@@ -188,11 +188,6 @@ class PlaceController extends Controller {
 			}
 			$em->flush();
 			$change = false;
-			if ($place->getAllowSpawn() && !$place->getType()->getSpawnable()) {
-				#Check for invalid settings.
-				$place->setAllowSpawn(false);
-				$change = true;
-			}
 			if (!$place->getPublic() && $place->getType()->getPublic()) {
 				#Check for invalid settings.
 				$place->setPublic(true);
@@ -600,6 +595,7 @@ class PlaceController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		if($place->getSpawn()) {
 			$em->remove($place->getSpawn());
+			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.success.stop', ["%name%"=>$place->getName()], 'actions'));
 		} else {
 			$spawn = new Spawn();
 			$spawn->setPlace($place);
@@ -610,6 +606,7 @@ class PlaceController extends Controller {
 				$spawn->setRealm($place->getRealm());
 			}
 			$spawn->setActive(false);
+			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.success.start', ["%name%"=>$place->getName()], 'actions'));
 		}
 		$em->flush();
 		return new RedirectResponse($this->generateUrl('maf_place_actionable').'#'.$place->getId());
