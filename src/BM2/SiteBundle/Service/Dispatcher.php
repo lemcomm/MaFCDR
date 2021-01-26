@@ -2688,6 +2688,18 @@ class Dispatcher {
 		return array("name"=>"oath.name", "url"=>"bm2_site_politics_oath", "include"=>"hierarchy");
 	}
 
+	public function hierarchyOfferOathTest() {
+		// swear an oath of fealty - only available if we don't lead a realm (if we do, similar actions are under realm management)
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.npc");
+		}
+		if ($this->getCharacter()->isRuler()) {
+			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.leader");
+		}
+
+		return array("name"=>"oath.name", "url"=>"bm2_site_politics_oath", "include"=>"hierarchy");
+	}
+
 	public function hierarchyCreateRealmTest() {
 		if ($this->getCharacter()->isTrial()) {
 			return array("name"=>"realm.new.name", "description"=>"unavailable.free");
