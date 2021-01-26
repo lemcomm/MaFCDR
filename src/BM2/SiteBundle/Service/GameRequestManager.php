@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\EquipmentType;
@@ -38,6 +39,7 @@ class GameRequestManager {
 		FromRealm		-> Realm.
 		FromHouse		-> House.
 		FromPlace		-> Place.
+		FromPosition		-> Realm Position.
 
 			REQUESTEE INFORMATION -- Who/what is a request is made to. Only one should be set, as appropriate. Reverses as "RelatedRequests".
 		ToCharacter		-> Character.
@@ -45,6 +47,7 @@ class GameRequestManager {
 		ToRealm			-> Realm.
 		ToHouse			-> House.
 		ToPlace			-> Place.
+		ToPosition		-> Realm Position.
 
 			REQUESTED INFORMATION -- Who/what is being requested. For sanity's sake, just set one, unless you're feeling brave. Reverses as "PartOfRequests".
 		IncludeCharacter	-> Character.
@@ -52,6 +55,7 @@ class GameRequestManager {
 		IncludeRealm		-> Realm.
 		IncludeHouse		-> House.
 		IncludePlace		-> Place.
+		IncludePosition		-> Realm Position.
 		IncludeSoldiers		-> Soldiers. Array.
 		IncludeEquipment	-> Equipment. Does not reverse.
 
@@ -103,12 +107,19 @@ class GameRequestManager {
 		if ($char->getHouse() && $char->getHouse()->getHead() == $char) {
 			$houseID = $char->getHouse()->getId();
 		}
+		# Build a list of all positions we hold, using their IDs.
+		$positionIDs = [];
+		foreach ($character->getPositions() as $pos) {
+			$positionIDs[] = $pos->getId();
+		}
 		# Now we build the query, or two of them.
 		# TODO: See if we need to actually differentiate these. I'm suspeting Doctrine is smart enough to know what to do here.
 		if ($houseID) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs));
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)');
+			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
 		} else {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)')->setParameters(array('char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs));
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)');
+			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
 		}
 		try {
 			# We try/catch this because doctrine doesn't like to return null. By not like, I mean it won't return null on this type of query.
@@ -122,7 +133,7 @@ class GameRequestManager {
 	/* THE FOLLOWING IS PROVIDED FOR TEMPLATING PURPOSES ONLY. For performance reasons do not use this function to actually generate a request.
 	Use a situational method, like "newRequestFromCharacterToHouse", or make a new situational method if one doesn't exist.*/
 
-	public function makeRequest($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Settlement $fromSettlement = null, Realm $fromRealm = null, House $fromHouse = null, Place $fromPlace, Character $toChar = null, Settlement $toSettlement = null, Realm $toRealm = null, House $toHouse = null, Place $toPlace, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, House $includeHouse = null, Place $includePlace, Soldier $includeSoldiers = null, EquipmentType $includeEquipment = null) {
+	public function makeRequest($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Settlement $fromSettlement = null, Realm $fromRealm = null, House $fromHouse = null, Place $fromPlace, RealmPosition $fromPos = null, Character $toChar = null, Settlement $toSettlement = null, Realm $toRealm = null, House $toHouse = null, Place $toPlace = null, RealmPosition $toPos = null, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, House $includeHouse = null, Place $includePlace, RealmPosition $includePos = null, Soldier $includeSoldiers = null, EquipmentType $includeEquipment = null) {
 		$GR = new GameRequest();
 		$this->em->persist($GR);
 		$GR->setType($type);
@@ -159,6 +170,9 @@ class GameRequestManager {
 		if ($fromPlace) {
 			$GR->setFromPlace($fromPlace);
 		}
+		if ($fromPos) {
+			$GR->setFromPosition($fromPos);
+		}
 		if ($toChar) {
 			$GR->setToCharacter($toChar);
 		}
@@ -174,6 +188,9 @@ class GameRequestManager {
 		if ($toPlace) {
 			$GR->setToPlace($toPlace);
 		}
+		if ($toPos) {
+			$GR->setToPosition($toPos);
+		}
 		if ($includeChar) {
 			$GR->setIncludeCharacter($includeChar);
 		}
@@ -188,6 +205,9 @@ class GameRequestManager {
 		}
 		if ($includePlace) {
 			$GR->setIncludePlace($includePlace);
+		}
+		if ($includePos) {
+			$GR->setIncludePosition($includePos);
 		}
 		if ($includeSoldiers) {
 			foreach ($includeSoldiers as $soldier) {
@@ -280,6 +300,26 @@ class GameRequestManager {
 		}
 		if ($toSettlement) {
 			$GR->setToSettlement($toSettlement);
+		}
+		$this->em->flush();
+	}
+
+	public function newOathOffer(Character $char, $text, $target) {
+		$GR = new GameRequest();
+		$this->em->persist($GR);
+		$GR->setType('oath.offer');
+		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
+		$GR->setSubject($char->getName().' Offers an Oath');
+		$GR->setText($text);
+		$GR->setFromCharacter($char);
+		if ($target instanceof Settlement) {
+			$GR->setToSettlement($target);
+		} elseif ($target instanceof Place) {
+			$GR->setToPlace($target);
+		} elseif ($target instanceof RealmPosition) {
+			$GR->setToPosition($target);
 		}
 		$this->em->flush();
 	}
