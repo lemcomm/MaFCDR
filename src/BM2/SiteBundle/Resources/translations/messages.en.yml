@@ -1486,6 +1486,7 @@ unavailable:
  nofeatures:    No damageable features nearby.
  notyours:      The settlement owner has not granted you permission to do this.
  notyours2:     You do not control this settlement.
+ notowner:      You do not control this place of interest.
  notrain:       No available training options.
  nobody:        No other First Ones within range.
  nosoldiers:    You do not have any soldiers.
@@ -1511,6 +1512,7 @@ unavailable:
  notmember:     You are not a member of this realm.
  leader:        As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.
  notleader:     You are not the ruler of this realm.
+ notholder:     You do not hold the position of %name%.
  notdiplomat:   You do not hold a position with diplomacy permissions in this realm.
  noothers:      There are no other characters nearby.
  vassal:        You cannot do this as long as you are the vassal of someone else.
