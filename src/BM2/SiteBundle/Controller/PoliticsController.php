@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Listing;
 use BM2\SiteBundle\Entity\Partnership;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\CharacterSelectType;
 use BM2\SiteBundle\Form\ListingType;
@@ -17,6 +18,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -81,7 +85,7 @@ class PoliticsController extends Controller {
 		$this->addToHierarchy($character);
 
    	$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin 
+		   0 => array("pipe", "r"),  // stdin
 		   1 => array("pipe", "w"),  // stdout
 		   2 => array("pipe", "w") // stderr
 		);
@@ -156,6 +160,113 @@ class PoliticsController extends Controller {
 		return array('vassal'=>$vassal, 'form'=>$form->createView());
 	}
 
+	/**
+	  * @Route("/offeroath", name="maf_politics_oath_offer")
+	  * @Template
+	  */
+	public function offerOathAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('hierarchyOfferOathTest');
+		if (!$character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		$others = $this->get('dispatcher')->getActionableCharacters();
+		$options = [];
+		if ($character->getInsideSettlement()) {
+			$options[] = $character->getInsideSettlement();
+		}
+		if ($character->getInsidePlace()) {
+			$options[] = $character->getInsidePlace();
+		}
+		foreach ($others as $other) {
+			$otherchar = $other['character'];
+			if ($otherchar->getOwnedSettlements()){
+				foreach ($otherchar->getOwnedSettlements() as $settlement) {
+					if (!in_array($settlement, $options)) {
+						$options[] = $settlement;
+					}
+				}
+			}
+			if ($otherchar->getPositions()) {
+				foreach ($otherchar->getPositions() as $pos) {
+					if ($pos->getVassals() && !in_array($pos, $options)) {
+						$options[] = $pos;
+					}
+				}
+			}
+			if ($otherchar->getOwnedPlaces()) {
+				foreach ($otherchar->getOwnedPlaces() as $place) {
+					if ($place->getType()->getVassals()) {
+						$options[] = $place;
+					}
+				}
+			}
+		}
+		$form = $this->createFormBuilder()
+			->add('liege', ChoiceType::class, [
+			'label'=>'oath.offerto',
+			'required'=>true,
+			'empty_value'=>'oath.choose',
+			'translation_domain'=>'politics',
+			'choices'=>$options,
+			'choices_as_values'=>true,
+			'choice_label' => function ($choice, $key, $value) {
+				if ($choice instanceof Settlement) {
+					if ($choice->getRealm()) {
+						return $choice->getName().' ('.$choice->getRealm()->getName().')';
+					} else {
+						return $choice->getName();
+					}
+				}
+				if ($choice instanceof RealmPosition) {
+					if ($choice->getName() == 'ruler') {
+						return 'Ruler of '.$choice->getRealm()->getName();
+					}
+					return $choice->getName().' ('.$choice->getRealm()->getName().')';
+				}
+				if ($choice instanceof Place) {
+					if ($choice->getRealm()) {
+						return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' in '.$choice->getRealm()->getName();
+					} else {
+						return $choice->getName().' - '.ucfirst($choice->getType()->getName());
+					}
+				}
+			},
+			'group_by' => function($choice, $key, $value) {
+				if ($choice instanceof Settlement) {
+					return 'Settlements';
+				}
+				if ($choice instanceof RealmPosition) {
+					if ($choice->getRuler()) {
+						return 'Rulers';
+					}
+					return 'Other Positions';
+				}
+				if ($choice instanceof Place) {
+					return 'Places';
+				}
+			},
+		])->add('message', TextareaType::class, [
+			'label' => 'oath.message',
+			'translation_domain'=>'politics',
+			'required' => true
+		])->add('submit', SubmitType::class, [
+			'label'=>'oath.submit',
+			'translation_domain'=>'politics',
+		])->getForm();
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$this->get('game_request_manager')->newOathOffer($character, $data['message'], $data['liege']);
+			return array('success'=>true);
+		}
+                return [
+			'form' => $form->createView(),
+		];
+	}
+
+
    /**
      * @Route("/oath")
      * @Template
@@ -178,7 +289,7 @@ class PoliticsController extends Controller {
 				$unavailableLords[] = array('char'=>$other['character'], 'reason'=>'vassal');
 			} else {
 				$availableLords[] = $other['character'];
-			}			
+			}
 		}
 
 		if (!empty($availableLords)) {
@@ -232,7 +343,7 @@ class PoliticsController extends Controller {
 			return array(
 				'form'=>$form->createView(),
 				'unavailable'=>$unavailableLords
-			);			
+			);
 		} else {
 			return array(
 				'nobody'=>true,
@@ -379,7 +490,7 @@ class PoliticsController extends Controller {
 					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners)) {
 						$choices[$char->getId()] = $char->getName();
 					}
-				} else {					
+				} else {
 					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners) && $char->getMale() != $character->getMale()) {
 						$choices[$char->getId()] = $char->getName();
 					}
@@ -424,7 +535,7 @@ class PoliticsController extends Controller {
 									if ($relation->getType()=="marriage") {
 										$priority = History::HIGH;
 									} else {
-										$priority = History::MEDIUM;										
+										$priority = History::MEDIUM;
 									}
 									foreach ($relation->getPartners() as $partner) {
 										$other = $relation->getOtherPartner($partner);
@@ -548,7 +659,7 @@ class PoliticsController extends Controller {
 				$using = $em->getRepository('BM2SiteBundle:SettlementPermission')->findByListing($listing);
 				if ($using && !empty($using)) {
 					$can_delete = false;
-					$locked_reasons[] = "used";			
+					$locked_reasons[] = "used";
 				}
 			}
 			$is_new = false;
@@ -591,7 +702,7 @@ class PoliticsController extends Controller {
 					}
 					$seen->add($parent);
 					$current = $parent;
-				}					
+				}
 			}
 			// FIXME: this works on character names, WHICH ARE NOT UNIQUE!
 			foreach ($listing->getMembers() as $member) {
@@ -627,7 +738,7 @@ class PoliticsController extends Controller {
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('lists.delete.done', array("%name%"=>$name), 'politics'));
 				return $this->redirectToRoute('bm2_lists');
-			}			
+			}
 		}
 
 		$used_by = array();
@@ -731,7 +842,7 @@ class PoliticsController extends Controller {
 				}
 			}
 			$this->getDoctrine()->getManager()->flush();
-			if ($change_others) { 
+			if ($change_others) {
 				$others = $this->get('dispatcher')->getActionableCharacters();
 			}
 			$form = $this->createForm(new PrisonersManageType($prisoners, $others));
