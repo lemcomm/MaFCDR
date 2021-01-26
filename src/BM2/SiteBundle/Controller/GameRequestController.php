@@ -50,6 +50,16 @@ class GameRequestController extends Controller {
 					$result = true;
 				}
 				break;
+			case 'oath.offer':
+				if ($id->getToSettlement() && $id->getToSettlement()->getOwner() != $char) {
+					$result = false;
+				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
+					$result = false;
+				} elseif ($id->getToPosition() && $id->getToPosition()->getCharacter() != $char) {
+					$result = false;
+				} else {
+					$result = true;
+				}
 		}
 		return $result;
 	}
@@ -127,6 +137,83 @@ class GameRequestController extends Controller {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
 				break;
+			case 'oath.offer':
+				if ($allowed) {
+					$character = $id->getFromCharacter();
+					if ($id->getToSettlement()) {
+						$settlement = $id->getToSettlement();
+						$character->setLiegeLand($settlement);
+						$character->setOathCurrent(TRUE);
+						$character->setRealm(NULL);
+						$this->get('history')->logEvent(
+							$settlement,
+							'event.settlement.newknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.newliege.land',
+							array('%link-settlement%'=>$settlement->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+					if ($id->getToPlace()) {
+						$place = $id->getToPlace();
+						$character->setLiegePlace($place);
+						$character->setOathCurrent(TRUE);
+						$character->setRealm(NULL);
+						$this->get('history')->logEvent(
+							$place,
+							'event.place.newknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.newliege.place',
+							array('%link-place%'=>$place->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.place.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+					if ($id->getToPosition()) {
+						$pos = $id->getToPlace();
+						$character->setLiegePosition($place);
+						$character->setOathCurrent(TRUE);
+						$this->get('history')->logEvent(
+							$pos,
+							'event.position.newknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.newliege.position',
+							array('%link-position%'=>$pos->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.position.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+				} else {
+					if ($id->getToSettlement()) {
+						throw new AccessDeniedHttpException('unavailable.notyours2');
+					}
+					if ($id->getToPlace()) {
+						throw new AccessDeniedHttpException('unavailable.notowner');
+					}
+					if ($id->getToPosition()) {
+						throw new AccessDeniedHttpException('unavailable.notholder', ["%name%"=>$id->getToPosition()->getName()]);
+					}
+				}
+				break;
 		}
 
 		return new Response();
@@ -181,6 +268,75 @@ class GameRequestController extends Controller {
 					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
+			case 'oath.offer':
+				if ($allowed) {
+					$character = $id->getFromCharacter();
+					if ($id->getToSettlement()) {
+						$settlement = $id->getToSettlement();
+						$this->get('history')->logEvent(
+							$settlement,
+							'event.settlement.rejectknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.liegerejected.land',
+							array('%link-settlement%'=>$settlement->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+					if ($id->getToPlace()) {
+						$place = $id->getToPlace();
+						$this->get('history')->logEvent(
+							$place,
+							'event.place.rejectknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.liegerejected.place',
+							array('%link-place%'=>$place->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.place.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+					if ($id->getToPosition()) {
+						$pos = $id->getToPlace();
+						$this->get('history')->logEvent(
+							$pos,
+							'event.position.rejectknight',
+							array('%link-character%'=>$id->getFromCharacter()->getId()),
+							History::HIGH, true
+						);
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.liegerejected.position',
+							array('%link-position%'=>$pos->getId()),
+							History::ULTRA, true
+						);
+						$em->remove($id);
+						$em->flush();
+						$this->addFlash('notice', $this->get('translator')->trans('oath.position.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					}
+				} else {
+					if ($id->getToSettlement()) {
+						throw new AccessDeniedHttpException('unavailable.notyours2');
+					}
+					if ($id->getToPlace()) {
+						throw new AccessDeniedHttpException('unavailable.notowner');
+					}
+					if ($id->getToPosition()) {
+						throw new AccessDeniedHttpException('unavailable.notholder', ["%name%"=>$id->getToPosition()->getName()]);
+					}
 				}
 				break;
 		}
