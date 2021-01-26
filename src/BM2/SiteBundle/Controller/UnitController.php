@@ -36,7 +36,7 @@ class UnitController extends Controller {
         private function findUnits(Character $character) {
                 $em = $this->getDoctrine()->getManager();
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.settlement = :settlement) OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR u.settlement = :settlement OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
@@ -69,10 +69,8 @@ class UnitController extends Controller {
 
                 if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
                         $lord = true;
-                        $marshalled = null;
                 } else {
                         $lord = false;
-                        $marshalled = $this->findMarshalledUnits($character);
                 }
                 $units = $this->findUnits($character);
 
