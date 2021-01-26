@@ -146,14 +146,14 @@ oath:
   liege:   Already is your current liege
   vassal:  Is your vassal or a vassal of one of your vassals
  position:
-  approved:
-  rejected:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
  place:
-  approved:
-  rejected:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
  settlement:
-  approved:
-  rejected:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
 
 vassals:
  view:
