@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class Place {
 
         public function isFortified() {
