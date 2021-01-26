@@ -437,6 +437,10 @@ control:
   description:  Replace the flag of the occupation
   intro: >
     As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement.
+ spawn:
+  success:
+   start:       You have enabled spawning at %name%, further action may be required by the realm rulers or house head, as appropriate.
+   stop:        You have disabled all spawning at %name%. No further characters may appear here.
 
 military:
  name:          Military actions
@@ -1209,12 +1213,13 @@ unit:
   commander: Under comamnd of %name%.
   nocommander: Not currently under anyone's command.
   supplied: Supplied by
+  nosupplier: <i>no one</i>
   source:  %settlement%
   nosource: Nowhere
   base:     Based out of
   based:    %settlement%
   nobase:   <i>Your Camp</i>
-  marshal:  Can be marshalled by %name%.
+  marshal:  Can be marshalled by %character%.
   nomarshal: Marshalling of this unit is reserved by the settlement's owner.
   assign:   Assign a Leader
   appoint:  Appoint a Marshal
