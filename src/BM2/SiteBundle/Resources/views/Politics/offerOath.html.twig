@@ -1,0 +1,19 @@
+{% extends "BM2SiteBundle::layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "oath.name"|trans({},"politics")|title }}</h2>
+
+	<p>{{ "oath.intro"|trans({},"politics")|raw }}</p>
+
+	<table>
+	<tr><td>{{ form_label(form.liege) }}</td>
+	{{ form_errors(form.liege) }}
+	<td>{{ form_widget(form.liege) }}</td></tr>
+	<tr><td>{{ form_label(form.message) }}</td>
+	{{ form_errors(form.message) }}
+	<td>{{ form_widget(form.message) }}</td></tr>
+	</table>
+
+	{{ form_row(form.submit) }}
+
+{% endblock %}
