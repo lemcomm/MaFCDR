@@ -31,7 +31,7 @@
 				{% endif %}
 				{% if type.name == 'embassy' %}
 					{% set check = dispatcher.placeManageEmbassyTest(null, place) %}
-				{% elseif type.spawnable == TRUE and place.allowSpawn == TRUE %}
+				{% elseif type.name == 'capital' %}
 					{% set check = dispatcher.placeManageRulersTest(null, place) %}
 				{% else %}
 					{% set check = dispatcher.placeManageTest(null, place) %}
