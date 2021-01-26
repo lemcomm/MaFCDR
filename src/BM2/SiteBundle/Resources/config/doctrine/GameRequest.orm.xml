@@ -19,18 +19,21 @@
 		<many-to-one field="from_realm" target-entity="Realm" inversed-by="requests"/>
 		<many-to-one field="from_house" target-entity="House" inversed-by="requests"/>
 		<many-to-one field="from_place" target-entity="Place" inversed-by="requests"/>
+		<many-to-one field="from_position" target-entity="RealmPosition" inversed-by="requests"/>
 
 		<many-to-one field="to_character" target-entity="Character" inversed-by="related_requests"/>
 		<many-to-one field="to_settlement" target-entity="Settlement" inversed-by="related_requests"/>
 		<many-to-one field="to_realm" target-entity="Realm" inversed-by="related_requests"/>
 		<many-to-one field="to_house" target-entity="House" inversed-by="related_requests"/>
 		<many-to-one field="to_place" target-entity="Place" inversed-by="related_requests"/>
-		
+		<many-to-one field="to_position" target-entity="RealmPosition" inversed-by="related_requests"/>
+
 		<many-to-one field="include_character" target-entity="Character" inversed-by="part_of_requests"/>
 		<many-to-one field="include_settlement" target-entity="Settlement" inversed-by="part_of_requests"/>
 		<many-to-one field="include_realm" target-entity="Realm" inversed-by="part_of_requests"/>
 		<many-to-one field="include_house" target-entity="House" inversed-by="part_of_requests"/>
 		<many-to-one field="include_place" target-entity="Place" inversed-by="part_of_requests"/>
+		<many-to-one field="include_position" target-entity="RealmPosition" inversed-by="part_of_requests"/>
 		<many-to-many field="include_soldiers" target-entity="Soldier" inversed-by="part_of_requests">
 			<join-table name="gamerequest_soldiers">
 				<join-columns>
