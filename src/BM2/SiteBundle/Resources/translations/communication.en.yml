@@ -103,6 +103,8 @@ event:
    manual:      %character% has declared an end to the occupation by %realm%.
    warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
   besieged:     %character% has declared a siege of the Settlement.
+  newknight:    %character% has been accepted as a vassal of the settlement.
+  rejectknight: %character% has been rejected as a potential vassal of the settlement.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -215,6 +217,14 @@ event:
   siege:
    disband:     By declaration of %character% the siege of the settlement of %settlement% has concluded peacefully.
    disband2:    By declaration of %character% the siege of the place of %place% has concluded peacefully.
+  newliege:
+   land:        Your oath of vassalage to the lord of %settlement% has been accepted.
+   place:       Your oath of vassalage to the owner of %place% has been accepted.
+   position:    Your oath of vassalage to the %position% has been accepted.
+  liegerejected:
+   land:        The lord of %settlement% has rejected your offer of vassalge.
+   place:       The owner of %place% has rejected your offer of vassalge.
+   position:    The %position% has rejected your offer of vassalge.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -295,6 +305,8 @@ event:
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
+  newknight:    %character% has been accepted as a vassal of the position.
+  rejectknight: %character% has been rejected as a potential vassal of the position .
  house:
   founded:      By decree of %character% the house was formalized!
   newmember:    %character% was accepted into the ranks.
@@ -332,8 +344,8 @@ event:
   forceleft:    %character% has been forced outside the walls during the battle.
   besieged:     %character% has declared a siege of the location.
   start:        A new First One named %character% has appeared here.
-
-
+  newknight:    %character% has been accepted as a vassal of the place.
+  rejectknight: %character% has been rejected as a potential vassal of the place.
 
 report:
  building:
