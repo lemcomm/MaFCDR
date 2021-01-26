@@ -114,12 +114,12 @@ oath:
   name:         Oath Tree
   description:  See your oaths in a graphical view.
   longdesc:     View the tree of oaths that you belong to. (might take a short while to generate for large trees)
- name:          Oath of Fealty
+ name:          Offer a New Oath of Fealty
  intro: >
    Fealty is what defines the hierarchy and political system. What exactly an oath contains - vassalage, military service,
-   shares of estate income, protection, honour and politics - is negotiable between liege and vassal.<br />
-   Here you can swear an oath of fealty to a nearby character, which turns you into his or her vassal. This will also make
-   your estate a part of his/her realm.
+   shares of estate income, protection, honour and politics - is negotiable between liege and vassal.<br /><br />
+   Here you can offer an oath of fealty to any position of authority, be it the lord of a settlement, the owner of a place of interest, a realm position holder, or even to a realm ruler directly, if the people holding that position are present. If you're inside a Settlement or a Place of Interest, and those are a viable choice, they will always be present.<br /><br />
+   Who you hold an oath of fealty to defines your primary realm affiliation. Since your oath is to a position, not necessarily the person holding it, this should prevent confusing realm loyalties to some degree.
  hasvassals: >
    All your vassals will also become a part of the realm you join, as their oath to you binds them to your decisions. Of course,
    if you act against their will, they might leave you afterwards.
@@ -133,9 +133,11 @@ oath:
  nobody:    There are no eligible new lords within your action range.
  newliege:	New liege
  choose:		-- Choose liege --
+ offerto:   Offer your services to...
+ message:   Message to include...
  norealm:   Independent
  swearto:   Swear oath to...
- submit:		Swear oath
+ submit:		 Offer oath
  fail:
   vassal:	You cannot swear an oath to your own vassals (or their vassals).
  success:	Swearing an oath of fealty, you are now a vassal of %newliege%.
@@ -143,6 +145,15 @@ oath:
  reason:
   liege:   Already is your current liege
   vassal:  Is your vassal or a vassal of one of your vassals
+ position:
+  approved:
+  rejected:
+ place:
+  approved:
+  rejected:
+ settlement:
+  approved:
+  rejected:
 
 vassals:
  view:
