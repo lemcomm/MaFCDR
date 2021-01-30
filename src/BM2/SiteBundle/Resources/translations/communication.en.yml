@@ -242,6 +242,10 @@ event:
  unit:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
+  basetaken:    %settlement% has been occupied by %realm%, leaving this unit to your direct command.
+  basetaken2:   %settlement% has been taken by an unaligned first one, leaving this unit to your direct command.
+  defenselost:  The defense of %settlement% has failed, so the unit has returned home.
+  defenselost2:  The defense of %place% has failed, so the unit has returned home.
   recalled:     %character% has recalled %unit% from your command.
  quest:
   created:      Quest created.
@@ -386,7 +390,7 @@ politics:
   offer2:     %character% has accepted your knight offer in %settlement% and become your knight.
   taken:      Has appeared as a knight of %character% at %settlement%.
   taken2:     Has appeared as a vassal of %character% and received lordship of %settlement%.
-  broken:     %character% has broken their oath of fealty to you and become a rogue.
+  broken:     %character% has broken their oath of fealty and become a rogue.
   disowned:   Oath of fealty dissolved by your liege, %character%.
   nowruler:   %character% has become ruler of %realm% and is thus no longer a vassal.
   changed:    %character-1% has broken the oath of fealty to you and sworn an oath to %character-2% instead.
