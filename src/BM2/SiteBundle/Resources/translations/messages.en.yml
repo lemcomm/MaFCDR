@@ -841,6 +841,7 @@ charstatus:
  sieging:     sieging
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
+requests:     %number% request|%number% requests
 inside:       inside %place%
 near:         near %place%
 familiarity:
@@ -1559,7 +1560,7 @@ unavailable:
  nopermission:  You don't have permissions to do that here.
  occupied:      The ongoing occupation prevents this.
  notdefended:   This place has no defenders, and thus no siege is needed.
-
+ nohome:        You need a Place to call Home to do this.
 marker:
  name:      Marker name
  type:      Marker type
