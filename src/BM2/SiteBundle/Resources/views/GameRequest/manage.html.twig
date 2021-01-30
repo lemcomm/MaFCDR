@@ -29,6 +29,14 @@
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
 			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'house.manage.applicant.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'house.manage.applicant.deny'|trans({},"politics") }}</button></a>
 			</div>
+		{% elseif gamerequest.type == 'oath.offer' %}
+			<hr>
+			{{ 'oath.offer.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-settlement%":link(gamerequest.toSettlement), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'oath.offer.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'oath.offer.deny'|trans({},"politics") }}</button></a>
+			</div>
 		{% endif %}
 	{% else %}
 		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
