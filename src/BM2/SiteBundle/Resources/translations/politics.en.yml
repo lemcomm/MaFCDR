@@ -154,6 +154,10 @@ oath:
  settlement:
   approved:     You have accepted the oath of vassalage from %name%
   rejected:     You have rejected the oath of vassalage from %name%
+ offer:
+  preamble:     "%link-character% has offered an oath of fealty to you, in your position as the lord of %link-settlement%, on %date% and has provided the following message:"
+  approve:      Accept their fealty
+  deny:         Reject their fealty
 
 vassals:
  view:
@@ -860,9 +864,9 @@ house:
    description: Find a location that better suits your House?
    longdesc:    If your house's previous location didn't quite suit your likings, you can always move it to another settlement.
    intro: >
-    As the Head of the %name% it is well within your powers to relocate the House to a place more of your choosing.
-    You can do this whenever you so desire, so long as you are in a region in which you have the rights to do so--moving
-    isn't so simple as forming one, and it's not seen as such an inalienable right of First Ones to do.
+    As the Head of the <b>%name%</b> it is well within your powers to relocate the House to a place more of your choosing.
+    You can do this whenever you so desire, so long as you are in a Home in which you own--moving
+    isn't so simple as forming a House, and it's not seen an inalienable right of First Ones to do.<br /><br />
     If you're sure about moving to the settlement you're currently in, simple check the box below, and click 'submit'.
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
@@ -926,3 +930,11 @@ house:
    Houses, courtesy of the First Ones that comprise them, are hard to miss things. If they're there, you'll know.
    It's a First One thing. As a First One yourself though, you can view any of the local ones, and even petition to join one if you
    are not already part of another.
+ newplayer:
+  name:         Setup Intro Message
+  description:  Alter the message new character receive
+  longdesc:     As the head of your house, you directly control the introduction those who arrive here receive
+ spawntoggle:
+  name:         Toggle Arrivals
+  description:  Enable or disable new characters spawning here
+  longdesc:     You can, at any time, change whether or not you allow people to arrive in the world at your Home.
