@@ -126,14 +126,34 @@ class Politics {
 	}
 
 	public function breakoath(Character $character) {
+		# This will slowly no longer be relevant, so we check for it separately.
+		if ($character->getLiege()) {
+			$this->history->logEvent(
+				$character->getLiege(),
+				'politics.oath.broken',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$character->setLiege(null);
+		}
 		$this->history->logEvent(
-			$character->getLiege(),
+			$character->findAllegiance(),
 			'politics.oath.broken',
 			array('%link-character%'=>$character->getId()),
 			History::MEDIUM, true
 		);
-		// TODO: notify my vassals
-		$character->setLiege(null);
+		if ($character->getRealm()) {
+			$character->setRealm(NULL);
+		}
+		if ($character->getLiegeLand()) {
+			$character->setLiegeLand(NULL);
+		}
+		if ($character->getLiegePlace()) {
+			$character->setLiegePlace(NULL);
+		}
+		if ($character->getLiegePosition()) {
+			$character->setLiegePosition(NULL);
+		}
 	}
 
 	public function disown(Character $character) {
@@ -178,7 +198,12 @@ class Politics {
 		}
 
 		// clean out permissions
+		foreach ($settlement->getPermissions() as $perm) {
+			$settlement->removePermission($perm);
+			$this->em->remove($perm);
+		}
 		if (!$occupantTakeOver) {
+			# endoccupation handles this on it's own.
 			foreach ($settlement->getPermissions() as $perm) {
 				$settlement->removePermission($perm);
 				$this->em->remove($perm);
@@ -522,6 +547,7 @@ class Politics {
 			}
 		} else {
 			$type = 'Place';
+			$event = 'place';
 		}
 		if (!$occupantTakeOver) {
 			foreach ($target->getOccupationPermissions() as $perm) {
