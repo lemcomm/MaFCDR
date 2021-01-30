@@ -20,7 +20,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'cave'		=> array('requires' => '',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'embassy'	=> array('requires' => 'ambassador',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 2),
 		'fort'		=> array('requires' => 'fort',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
-		'home'		=> array('requires' => 'dynasty head',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
+		'home'		=> array('requires' => 'dynasty head',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>true,	'pop' => 0),
 		'inn'		=> array('requires' => 'inn',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'library'	=> array('requires' => '',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'monument'	=> array('requires' => 'lord',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
