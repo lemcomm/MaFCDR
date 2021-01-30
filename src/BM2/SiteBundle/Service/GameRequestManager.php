@@ -109,7 +109,7 @@ class GameRequestManager {
 		}
 		# Build a list of all positions we hold, using their IDs.
 		$positionIDs = [];
-		foreach ($character->getPositions() as $pos) {
+		foreach ($char->getPositions() as $pos) {
 			$positionIDs[] = $pos->getId();
 		}
 		# Now we build the query, or two of them.
