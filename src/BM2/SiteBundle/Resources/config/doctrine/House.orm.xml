@@ -27,7 +27,6 @@
 		<field name="secret" type="text" nullable="true"/>
 
  		<many-to-one field="inside_settlement" target-entity="Settlement" inversed-by="houses_present"/>
-		<many-to-one field="inside_place" target-entity="Place" inversed-by="houses_present"/>
 
 		<field name="gold" type="integer"/>
 
