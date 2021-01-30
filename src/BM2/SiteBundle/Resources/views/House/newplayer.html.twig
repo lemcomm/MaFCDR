@@ -1,10 +1,10 @@
 {% extends "BM2SiteBundle::layout.html.twig" %}
 
 {% block content %}
-	<h2>{{ 'realm.newplayer.name2'|trans({"%name%":realm.name},"politics")|title }}</h2>
-	<p>{{ 'realm.newplayer.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+	<h2>{{ 'house.newplayer.name2'|trans({"%name%":house.name},"politics")|title }}</h2>
+	<p>{{ 'house.newplayer.intro'|trans({"%name%":house.name},"politics")|raw }}</p>
 
-	<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_newplayer', {'realm':realm.id}) }}" method="post" {{ form_start(form) }}
+	<form id="realmdata" class="wide" action="{{ path('maf_house_newplayer', {'house':house.id}) }}" method="post" {{ form_start(form) }}
 		{{ form_widget(form) }}
 		<button name="submit">{{ 'buttons.submit'|trans({},"places") }}</button>
 	</form>
