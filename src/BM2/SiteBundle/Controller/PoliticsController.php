@@ -256,100 +256,15 @@ class PoliticsController extends Controller {
 		])->getForm();
 
 		$form->handleRequest($request);
-		if ($form->isValid() && $form->isSubmitted()) {
+		if ($form->isValid()) {
 			$data = $form->getData();
 			$this->get('game_request_manager')->newOathOffer($character, $data['message'], $data['liege']);
-			return array('success'=>true);
+			$this->addFlash('success', $this->get('translator')->trans('oath.offered', array(), 'politics'));
+			return $this->redirectToRoute('bm2_relations');
 		}
                 return [
 			'form' => $form->createView(),
 		];
-	}
-
-
-   /**
-     * @Route("/oath")
-     * @Template
-     */
-	public function oathAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('hierarchyOathTest');
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-
-		$em = $this->getDoctrine()->getManager();
-		$others = $this->get('dispatcher')->getActionableCharacters();
-		$availableLords = array();
-		$unavailableLords = array();
-		foreach ($others as $other) {
-			// filter out my current liege and those below me
-			if ($other['character'] == $character->getLiege()) {
-				$unavailableLords[] = array('char'=>$other['character'], 'reason'=>'liege');
-			} elseif ($this->get('politics')->isSuperior($other['character'], $character)) {
-				$unavailableLords[] = array('char'=>$other['character'], 'reason'=>'vassal');
-			} else {
-				$availableLords[] = $other['character'];
-			}
-		}
-
-		if (!empty($availableLords)) {
-			$available = array();
-			foreach ($availableLords as $lord) {
-				$realms = new ArrayCollection;
-				foreach ($lord->findRulerships() as $realm) {
-					if (!$realms->contains($realm)) {
-						$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
-						$realms->add($realm);
-					}
-				}
-				foreach ($lord->getOwnedSettlements() as $settlement) {
-					if ($realm = $settlement->getRealm()) {
-						if (!$realms->contains($realm)) {
-							$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
-							$realms->add($realm);
-						}
-					} else {
-						$available[$lord->getId().'-0'] = $lord->getName().' ('.$this->get('translator')->trans('oath.norealm', array(), 'politics').')';
-					}
-				}
-			}
-			$form = $this->createFormBuilder()
-				->add('liege', 'choice', array(
-				'label'=>'oath.swearto',
-				'required'=>true,
-				'empty_value'=>'oath.choose',
-				'translation_domain'=>'politics',
-				'choices'=>$available
-			))->getForm();
-
-			$form->handleRequest($request);
-			if ($form->isValid()) {
-				$data = $form->getData();
-				list($liege_id, $realm_id) = explode('-', $data['liege']);
-
-				$liege = $em->getRepository('BM2SiteBundle:Character')->find($liege_id);
-				if ($realm_id>0) {
-					$realm = $em->getRepository('BM2SiteBundle:Realm')->find($realm_id);
-				} else {
-					$realm = null;
-				}
-
-				$this->get('politics')->oath($character, $liege, $realm);
-
-				$em->flush();
-				return array('success'=>true);
-			}
-
-			return array(
-				'form'=>$form->createView(),
-				'unavailable'=>$unavailableLords
-			);
-		} else {
-			return array(
-				'nobody'=>true,
-				'unavailable'=>$unavailableLords
-			);
-		}
 	}
 
    /**
@@ -363,11 +278,10 @@ class PoliticsController extends Controller {
 		}
 		if ($request->isMethod('POST')) {
 			$this->get('politics')->breakoath($character);
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			return array('success'=>true);
+			$em = $this->getDoctrine()->getManager()->flush();
+			$this->addFlash('success', $this->get('translator')->trans('oath.broken', array(), 'politics'));
+			return $this->redirectToRoute('bm2_relations');
 		}
-
 		return array();
 	}
 
@@ -717,7 +631,7 @@ class PoliticsController extends Controller {
 				}
 			}
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('lists.updated', array(), 'politics'));
+			$this->addFlash('success', $this->get('translator')->trans('lists.updated', array(), 'politics'));
 			return $this->redirectToRoute('bm2_site_politics_list', array('id'=>$listing->getId()));
 		}
 
