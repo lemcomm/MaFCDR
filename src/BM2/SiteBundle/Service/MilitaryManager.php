@@ -739,7 +739,7 @@ class MilitaryManager {
 		return $days*0.925*1.33; #Average travel speed of all region types.
 	}
 
-	public function returnUnitHome (Unit $unit, $reason='recalled', $origin, $bulk = false) {
+	public function returnUnitHome (Unit $unit, $reason='recalled', Character $origin, $bulk = false) {
 		if ($unit->getSettlement()) {
 			$dest = $unit->getSettlement();
 			$toHome = true;
@@ -756,7 +756,7 @@ class MilitaryManager {
 			$this->disbandUnit($unit, true);
 			return true;
 		}
-		$distance = $this->geo->getDistance($origin, $unit->getSettlement()->getGeoMarker()->getLocation());
+		$distance = $this->geo->calculateDistanceToSettlement($origin, $unit->getSettlement());
 		$count = $unit->getSoldiers()->count();
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
@@ -764,6 +764,8 @@ class MilitaryManager {
 
 		$unit->setTravelDays(ceil($final));
 		$unit->setCharacter(null);
+		$unit->setDefendingSettlement(null);
+		$unit->setPlace(null);
 		if (!$bulk) {
 			$this->em->flush();
 		}
