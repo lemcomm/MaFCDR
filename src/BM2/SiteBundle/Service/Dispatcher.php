@@ -497,7 +497,7 @@ class Dispatcher {
 
 		$actions=array();
 
-		if ($this->getCharacter()->getLiege()) {
+		if ($this->getCharacter()->findAllegiance()) {
 			$actions[] = array("name"=>"oath.view.name", "url"=>"bm2_site_politics_hierarchy", "description"=>"oath.view.description", "long"=>"oath.view.longdesc");
 		}
 		if ($this->getCharacter()->getVassals()) {
@@ -524,7 +524,7 @@ class Dispatcher {
 		$house = $this->house;
 		if ($house) {
 			$actions[] = array("title"=>$house->getName());
-			$actions[] = array("name"=>"house.view", "url"=>"maf_house", "parameters"=>array("id"=>$this->house->getId()), "description"=>"house.view.description", "long"=>"house.view.longdesc");
+			$actions[] = array("name"=>"house.view.name", "url"=>"maf_house", "parameters"=>array("id"=>$this->house->getId()), "description"=>"house.view.description", "long"=>"house.view.longdesc");
 			if ($house->getHead() == $this->getCharacter()) {
 				$actions[] = $this->houseManageHouseTest();
 				$actions[] = $this->houseManageRelocateTest();
@@ -532,6 +532,7 @@ class Dispatcher {
 				$actions[] = $this->houseManageDisownTest();
 				$actions[] = $this->houseManageSuccessorTest();
 				$actions[] = $this->houseNewPlayerInfoTest();
+				$actions[] = $this->houseSpawnToggleTest();
 			}
 		}
 
@@ -2258,6 +2259,9 @@ class Dispatcher {
 		}
 		if ($place->getOwner() != $this->getCharacter()) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.notowner");
+		}
+		if (!$place->getType()->getSpawnable()) {
+			return array("name"=>"place.newplayer.name", "description"=>"unavailable.notspawnable");
 		} else {
 			return $this->action("place.newplayer", "maf_place_newplayer", true,
 				array('place'=>$place->getId()),
@@ -2678,14 +2682,11 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.npc");
 		}
-		if ($this->getCharacter()->isRuler()) {
-			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.leader");
-		}
 		if (!$this->getActionableCharacters()) {
 			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.noothers");
 		}
 
-		return array("name"=>"oath.name", "url"=>"bm2_site_politics_oath", "include"=>"hierarchy");
+		return array("name"=>"oath.name", "url"=>"maf_politics_oath_offer", "include"=>"hierarchy");
 	}
 
 	public function hierarchyOfferOathTest() {
@@ -2913,7 +2914,7 @@ class Dispatcher {
 			return array("name"=>"rogue.name", "description"=>"unavailable.$check");
 		}
 		// break my oath and become independent
-		if (!$this->getCharacter()->getLiege() || $this->getCharacter()->isRuler()) {
+		if (!$this->getCharacter()->findAllegiance()) {
 			return array("name"=>"rogue.name", "description"=>"unavailable.notvassal");
 		}
 		return $this->action("rogue", "bm2_site_politics_breakoath", true);
@@ -3055,23 +3056,23 @@ class Dispatcher {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->house) {
-			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nohouse");
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.nohouse");
 		}
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.nothead");
 		}
 		$character = $this->getCharacter();
-		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+		if (!$character->getInsidePlace()) {
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notinside");
 		}
 		if ($character->getInsidePlace() && $character->getInsidePlace()->getType()->getName() != "home") {
-			return array("name"=>"house.new.name", "description"=>"unavailable.wrongplacetype");
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.wrongplacetype");
 		}
-		if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() != $this->getCharacter()) {
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getOwner() != $this->getCharacter()) {
 			#TODO: Rework this for permissions when we add House permissions (if we do).
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notyours2");
 		}
-		if ($character->getInsideSettlement() == $this->house->getInsideSettlement()) {
+		if ($character->getInsidePlace() == $this->house->getHome()) {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.househere");
 		} else {
 			return $this->action("house.manage.relocate", "maf_house_relocate", true,
@@ -3134,15 +3135,38 @@ class Dispatcher {
 
 	public function houseNewPlayerInfoTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
-			return array("name"=>"house.newplayer.house.name", "description"=>"unavailable.$check");
+			return array("name"=>"house.newplayer.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->house) {
-			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nohouse");
+			return array("name"=>"house.newplayer.name", "description"=>"unavailable.nohouse");
+		}
+		if (!$this->house->getHome()) {
+			return array("name"=>"house.newplayer.name", "description"=>"unavailable.nohome");
 		}
 		if ($this->house && $this->house->getHead() != $this->getCharacter()) {
-			return array("name"=>"house.newplayer.house.name", "description"=>"unavailable.nothead");
+			return array("name"=>"house.newplayer.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.newplayer.house", "maf_house_newplayer", true,
+			return $this->action("house.newplayer", "maf_house_newplayer", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseSpawnToggleTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->house) {
+			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.nohouse");
+		}
+		if (!$this->house->getHome()) {
+			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.nohome");
+		}
+		if ($this->house && $this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.nothead");
+		} else {
+			return $this->action("house.spawntoggle", "maf_house_newplayer", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
