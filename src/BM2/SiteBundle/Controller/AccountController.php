@@ -231,6 +231,7 @@ class AccountController extends Controller {
 				'renaming' => $renaming,
 				'reclaiming' => $reclaiming,
 				'unread' => $unread,
+				'requests' => count($this->get('game_request_manager')->findAllManageableRequests($character)),
 				'events' => $events
 			);
 
