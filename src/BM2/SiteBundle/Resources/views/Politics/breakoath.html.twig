@@ -2,11 +2,6 @@
 
 {% block content %}
 <h2>{{ "rogue.name"|trans({},"politics")|title }}</h2>
-{% if success is defined %}
-	{{ 'rogue.success'|trans({},"politics")|raw }}
-{% elseif fail is defined %}
-	{{ fail|trans({},"politics") }}
-{% else %}
 	<p>{{ "rogue.intro"|trans({},"politics")|raw }}</p>
 
 	<h3>{{ "oath.current"|trans({},"politics")|title }}</h3>
@@ -16,6 +11,4 @@
 	<form class="wide" action="{{ path('bm2_site_politics_breakoath') }}" method="post">
 		<button type="submit">{{ "rogue.submit"|trans({},"politics") }}</button>
 	</form>
-{% endif %}
-
 {% endblock %}
