@@ -85,8 +85,10 @@ Table headers are handled as translation strings from the character.list databas
 				{% endif %}
 			{% endif %}
 		</td>
-		<td align="right">
+		<td align="center">
 			{% if character.unread > 0 %}{{ "newmessages"|transchoice(character.unread, {"%number%":character.unread}) }}{% endif %}
+			{% if character.unread > 0 and character.requests > 0 %} | {% endif %}
+			{% if character.requests > 0 %}{{ "requests"|transchoice(character.requests, {"%number%":character.requests}) }}{% endif %}
 		</td>
 		<td align="right">
 			{% if character.events > 0 %}{{ "newevents"|transchoice(character.events, {"%number%":character.events}) }}{% endif %}
