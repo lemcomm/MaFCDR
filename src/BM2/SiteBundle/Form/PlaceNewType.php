@@ -27,6 +27,7 @@ class PlaceNewType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$types = $this->types;
+		$realms = $this->realms;
 		$builder->add('name', 'text', array(
 			'label'=>'names.name',
 			'required'=>true,
@@ -57,6 +58,8 @@ class PlaceNewType extends AbstractType {
 			'group_by' => function($val, $key, $index) {
 				if ($val->getRequires() == NULL) {
 					return 'by.none';
+				} elseif (in_array($val->getRequires(), ['inn', 'tavern', 'castle', 'fort', 'docks', 'track', 'arena', 'academy'])) {
+					return 'by.building';
 				} else {
 					return 'by.'.$val->getRequires();
 				}
