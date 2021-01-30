@@ -792,7 +792,45 @@ class WarManager {
 
 					}
 					if ($victor->getLeader()) {
-						$this->politics->changeSettlementOccupier($victor->getLeader(), $settlement, $siege->getRealm());
+						$this->politics->changeSettlementOccupier($victor->getLeader(), $target, $siege->getRealm());
+					}
+					foreach ($target->getSuppliedUnits() as $unit) {
+						if ($unit->getCharacter() != $victor->getLeader() && $unit->getSettlement() != $target) {
+							$unit->setSupplier(NULL);
+						}
+					}
+					foreach ($target->getUnits() as $unit) {
+						if ($unit->getCharacter() != $victor->getLeader() && $unit->getCharacter() !== NULL) {
+							$unit->setSettlement(NULL);
+							$unit->setMarshal(NULL);
+							if ($siege->getRealm()) {
+								$this->history->logEvent(
+									$unit,
+									'event.unit.basetaken',
+									array("%link-realm%"=>$siege->getRealm()->getId(), "%link-settlement%"=>$target->getId()),
+									History::HIGH, true
+								);
+							}
+							if (!$siege->getRealm()) {
+								$this->history->logEvent(
+									$unit,
+									'event.unit.basetaken2',
+									array("%link-settlement%"=>$target->getId()),
+									History::HIGH, true
+								);
+							}
+						}
+					}
+					foreach ($target->getDefendingUnits() as $unit) {
+						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
+						if ($siege->getRealm()) {
+							$this->history->logEvent(
+								$unit,
+								'event.unit.defenselost',
+								array("%link-settlement%"=>$target->getId()),
+								History::HIGH, true
+							);
+						}
 					}
 				} else {
 					foreach ($victor->getCharacters() as $char) {
@@ -801,7 +839,18 @@ class WarManager {
 
 					}
 					if ($victor->getLeader()) {
-						$this->politics->changePlaceOccupier($victor->getLeader(), $settlement, $siege->getRealm());
+						$this->politics->changePlaceOccupier($victor->getLeader(), $target, $siege->getRealm());
+					}
+					foreach ($target->getUnits() as $unit) {
+						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
+						if ($siege->getRealm()) {
+							$this->history->logEvent(
+								$unit,
+								'event.unit.defenselost2',
+								array("%link-place%"=>$target->getId()),
+								History::HIGH, true
+							);
+						}
 					}
 				}
 			}
