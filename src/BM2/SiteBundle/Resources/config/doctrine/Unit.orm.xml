@@ -8,6 +8,8 @@
 		<field name="travel_days" type="smallint" nullable="true"/>
 		<field name="destination" type="string" nullable="true"/>
 
+		<one-to-one field="log" target-entity="EventLog" inversed-by="unit"/>
+
 		<many-to-one field="character" target-entity="Character" inversed-by="units"/>
 		<many-to-one field="marshal" target-entity="Character" inversed-by="marshalling_units"/>
                 <many-to-one field="settlement" target-entity="Settlement" inversed-by="units"/>
