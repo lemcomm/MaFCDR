@@ -281,6 +281,10 @@ class PlaceController extends Controller {
 			$rights[] = 'port';
 		}
 
+		if ($character->getHouse() && $character->getHouse()->getHead() == $character) {
+			$rights[] = 'dynasty head';
+		}
+
 
 		#Now generate the list of things we can build!
 		$query = $this->getDoctrine()->getManager()->createQuery("select p from BM2SiteBundle:PlaceType p where (p.requires in (:rights) OR p.requires IS NULL) AND p.visible = TRUE")->setParameter('rights', $rights);
@@ -327,9 +331,9 @@ class PlaceController extends Controller {
 				$place->setVisible($data['type']->getVisible());
 				if ($data['type'] != 'embassy' && $data['type'] != 'capital') {
 					$place->setActive(true);
+					$place->setOwner($character);
 				} else {
 					$place->setActive(false);
-					$place->setOwner($character);
 				}
 				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
@@ -349,7 +353,7 @@ class PlaceController extends Controller {
 				}
 				$newdesc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
 				$this->getDoctrine()->getManager()->flush($place);
-				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
+				$this->addFlash('notice', $this->get('translator')->trans('new.success', ["%name%"=>$place->getName()], 'places'));
 				return $this->redirectToRoute('maf_place_actionable');
 			}
 		}
