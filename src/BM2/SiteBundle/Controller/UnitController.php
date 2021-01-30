@@ -468,7 +468,7 @@ class UnitController extends Controller {
 
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character->getLocation(), false);
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character, false);
                         if ($success) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.return.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
@@ -497,7 +497,7 @@ class UnitController extends Controller {
 
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter()->getLocation(), false);
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter(), false);
                         if ($success) {
                                 $this->get('history')->logEvent(
         				$data['target'],
