@@ -17,6 +17,7 @@ type:
 new:
  name:       Formalize a New Place
  intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.
+ success:    Successfully created %name%
 
 description:
  generic:    Description
@@ -57,19 +58,25 @@ by:
  none:    As a First One...
  magic:   As a Mage...
  ruler:   As the Ruler...
+ building: From local buildings...
+ dynasty head: As Head of Household...
 
 arena:    Arena
 capital:  Capital
 castle:   Castle
 cave:     Cave
+home:     Home
 inn:      Inn
 library:  Library
 monument: Monument
 plaza:    Plaza
 portal:   Portal
 tavern:   Tavern
+track:    Track
 
-
+realm:
+ label:   Realm
+ empty:   (none)
 
 help:
  new:
