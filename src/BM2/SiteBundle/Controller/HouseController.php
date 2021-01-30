@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
+use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\HouseCreationType;
 use BM2\SiteBundle\Form\HouseMembersType;
 use BM2\SiteBundle\Form\HouseJoinType;
@@ -352,7 +353,7 @@ class HouseController extends Controller {
 
 		$settlement = $character->getInsideSettlement();
 		$place = $character->getInsidePlace();
-		$house = $charcter->getHouse();
+		$house = $character->getHouse();
 		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$form = $this->createForm(new AreYouSureType());
@@ -366,7 +367,7 @@ class HouseController extends Controller {
 			if (!$fail) {
 				#Update House location
 				if (!$place) {
-					$house->setInsidePlace(null);
+					$place->setHouse(null);
 					$house->setInsideSettlement($settlement);
 					#Create relocation event in House's event log
 					$this->get('history')->logEvent(
@@ -376,7 +377,7 @@ class HouseController extends Controller {
 						History::HIGH, true
 					);
 				} else {
-					$house->setInsidePlace($place);
+					$place->setHouse($house);
 					$house->setInsideSettlement(null);
 					#Create relocation event in House's event log
 					$this->get('history')->logEvent(
@@ -427,7 +428,26 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
 		}
 		return $this->render('BM2SiteBundle::House/newplayer.html.twig', [
-			'place'=>$place, 'form'=>$form->createView()
+			'house'=>$house, 'form'=>$form->createView()
 		]);
+	}
+
+	/**
+	  * @Route("/{house}/spawntoggle", requirements={"house"="\d+"}, name="maf_house_spawn_toggle")
+	  */
+	public function houseSpawnToggleAction(House $house) {
+		$character = $this->get('dispatcher')->gateway('houseSpawnToggleTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		if($spawn->getActive()) {
+			$spawn->setActive(false);
+		} else {
+			$spawn->setActive(true);
+		}
+		$em->flush();
+		return new RedirectResponse($this->generateUrl('bm2_politics'));
 	}
 }
