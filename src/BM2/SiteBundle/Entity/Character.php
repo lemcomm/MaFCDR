@@ -306,14 +306,25 @@ class Character {
 				}
 			}
 		}
+		foreach ($this->getOwnedPlaces() as $place) {
+			if ($realm = $place->getRealm()) {
+				if (!$realms->contains($realm)) {
+					$realms->add($realm);
+				}
+			}
+		}
 
 		if ($check_lord && $this->findAllegiance()) {
 			$alg = $this->findAllegiance();
 			$class = get_class($alg);
 			if ($class != 'Realm') {
-				$realms->add($alg->getRealm());
+				if ($alg->getRealm() != NULL) {
+					$realms->add($alg->getRealm());
+				}
 			} else {
-				$realms->add($alg);
+				if ($alg != NULL) {
+					$realms->add($alg);
+				}
 			}
 		} elseif ($check_lord && $this->getLiege()) {
 			foreach ($this->getLiege()->findRealms(false) as $lordrealm) {
@@ -452,6 +463,7 @@ class Character {
 		if ($this->liege_position) {
 			return $this->liege_position;
 		}
+		return null;
 	}
 	
 }
