@@ -157,9 +157,10 @@ class GameRequestController extends Controller {
 							array('%link-settlement%'=>$settlement->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPlace()) {
 						$place = $id->getToPlace();
@@ -178,9 +179,10 @@ class GameRequestController extends Controller {
 							array('%link-place%'=>$place->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.place.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.place.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPosition()) {
 						$pos = $id->getToPlace();
@@ -198,9 +200,10 @@ class GameRequestController extends Controller {
 							array('%link-position%'=>$pos->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.position.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.position.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 				} else {
 					if ($id->getToSettlement()) {
@@ -223,10 +226,13 @@ class GameRequestController extends Controller {
 	  * @Route("/{id}/deny", name="bm2_gamerequest_deny", requirements={"id"="\d+"})
 	  */
 
-	public function denyAction(GameRequest $id) {
+	public function denyAction(Request $request, GameRequest $id, $route = 'bm2_gamerequest_manage') {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
+		}
+		if ($request->query->get('route')) {
+			$route = $request->query->get('route');
 		}
 		$em = $this->getDoctrine()->getManager();
 		# Are we allowed to act on this GR? True = yes. False = no.
@@ -287,9 +293,10 @@ class GameRequestController extends Controller {
 							array('%link-settlement%'=>$settlement->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPlace()) {
 						$place = $id->getToPlace();
@@ -305,9 +312,10 @@ class GameRequestController extends Controller {
 							array('%link-place%'=>$place->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.place.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.place.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPosition()) {
 						$pos = $id->getToPlace();
@@ -323,9 +331,10 @@ class GameRequestController extends Controller {
 							array('%link-position%'=>$pos->getId()),
 							History::ULTRA, true
 						);
+						$this->addFlash('notice', $this->get('translator')->trans('oath.position.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
-						$this->addFlash('notice', $this->get('translator')->trans('oath.position.rejected', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+						return $this->redirectToRoute($route);
 					}
 				} else {
 					if ($id->getToSettlement()) {
