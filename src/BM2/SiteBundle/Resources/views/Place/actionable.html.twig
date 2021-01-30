@@ -54,14 +54,20 @@
 				{% endif %}
 				{% if inside %}
 					{% if place.getType.getDefensible() %}
-						{% if place.getOwner() != character and place.getOccupant() != character %}
-							<a href="{{path('maf_place_occupation_start', {"place":place.id}) }}"><button id="siege">{{ 'place.occupy.button.start'|trans({}, "places")|raw }}</button></a>
+						{% if place.getOwner() != character and place.getOccupant() and place.getOccupant() != character %}
+							<a href="{{path('maf_place_occupation_start', {"id":place.id}) }}"><button id="siege">{{ 'place.occupy.button.start'|trans({}, "places")|raw }}</button></a>
 						{% endif %}
-						{% if place.getOccuppier() == character %}
+						{% if place.getOccupier() == character %}
 							<a href="{{path('maf_place_occupant', {"place":place.id}) }}"><button id="siege">{{ 'place.occupant.button'|trans({}, "places")|raw }}</button></a>
 							<a href="{{path('maf_place_occupier', {"place":place.id}) }}"><button id="siege">{{ 'place.occupier.button'|trans({}, "places")|raw }}</button></a>
 							<a href="{{path('maf_place_occupation_end', {"place":place.id}) }}"><button id="siege">{{ 'place.occupy.button.end'|trans({}, "places")|raw }}</button></a>
 						{% endif %}
+					{% endif %}
+				{% endif %}
+				{% if character.getInsidePlace() == place and place.getType.getName() == 'home' %}
+					{% set check = dispatcher.houseManageRelocateTest() %}
+					{% if check.url is defined %}
+						<a href="{{path('maf_house_relocate') }}"><button id="siege">{{ 'house.manage.relocate.name'|trans({}, "politics")|raw }}</button></a>
 					{% endif %}
 				{% endif %}
 			</div>
