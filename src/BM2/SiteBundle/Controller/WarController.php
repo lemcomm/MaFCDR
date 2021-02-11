@@ -1283,17 +1283,7 @@ class WarController extends Controller {
 					// leave settlement if we attack targets outside
 					$character->setInsideSettlement(null);
 				}
-
-				// FIXME: incomplete - people joining later don't see this conversation!
-				//			=> it should be linked to battle, but maybe it should just be in the new message system?
-				$msg_user = $this->get('message_manager')->getMsgUser($character);
-				$recipients = array();
-				foreach ($data['target'] as $target) {
-					$recipients[] = $this->get('message_manager')->getMsgUser($target);
-				}
-				if ($data['message']) {
-					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, 'attack by '.$character->getName(), $data['message']);
-				}
+				
 				$em->flush();
 			}
 		}
