@@ -369,10 +369,10 @@ class WarManager {
 	public function joinBattle(Character $character, BattleGroup $group) {
 		$battle = $group->getBattle();
 		$soldiers = 0;
+
 		foreach ($character->getUnits() as $unit) {
-			$soldiers += $unit->getActiveSoldiers();
+			$soldiers += $unit->getActiveSoldiers()->count();
 		}
-		$soldiers = count($character->getActiveSoldiers());
 
 		// make sure we are only on one side, and send messages to others involved in this battle
 		foreach ($battle->getGroups() as $mygroup) {
