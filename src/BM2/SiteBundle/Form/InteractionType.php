@@ -52,7 +52,7 @@ class InteractionType extends AbstractType {
 				$qb->andWhere('c.system NOT LIKE :gm OR c.system IS NULL')->setParameter('gm', 'GM');
 				$qb->andWhere('me = :me')->andWhere('c != me')->setParameter('me', $me);
 				if ($maxdistance) {
-					$qb->andWhere('ST_Distance(me.location, c.location) < :maxdistance')->setParameter('maxdistance', $maxdistance);					
+					$qb->andWhere('ST_Distance(me.location, c.location) < :maxdistance')->setParameter('maxdistance', $maxdistance);
 				}
 				if ($settlementcheck) {
 					if (!$me->getInsideSettlement()) {
@@ -70,15 +70,6 @@ class InteractionType extends AbstractType {
 
 		$builder->add('submit', 'submit', array('label'=>'interaction.'.$this->action.'.submit'));
 	}
-
-	private function attackFields(FormBuilderInterface $builder, array $options) {
-		$builder->add('message', 'textarea', array(
-			'label' => 'interaction.attack.message',
-			'required' => true,
-			'empty_data' => '(no message)'
-		));
-	}
-
 
 	private function messageFields(FormBuilderInterface $builder, array $options) {
 		$builder->add('subject', 'text', array(
