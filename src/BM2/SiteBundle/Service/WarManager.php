@@ -368,6 +368,10 @@ class WarManager {
 
 	public function joinBattle(Character $character, BattleGroup $group) {
 		$battle = $group->getBattle();
+		$soldiers = 0;
+		foreach ($character->getUnits() as $unit) {
+			$soldiers += $unit->getActiveSoldiers();
+		}
 		$soldiers = count($character->getActiveSoldiers());
 
 		// make sure we are only on one side, and send messages to others involved in this battle
@@ -431,15 +435,19 @@ class WarManager {
 		$base = 15;
 		$base += sqrt($character->getEntourage()->count()*10);
 
-		$takes = $character->getSoldiers()->count() * 5;
-		foreach ($character->getSoldiers() as $soldier) {
-			if ($soldier->isWounded()) {
-				$takes += 5;
-			}
-			switch ($soldier->getType()) {
-				case 'cavalry':
-				case 'mounted archer':		$takes += 3;
-				case 'heavy infantry':		$takes += 2;
+		$takes = 0;
+
+		foreach ($character->getUnits() as $unit) {
+			$takes += $unit->getSoldiers()->count();
+			foreach ($unit->getSoldiers() as $soldier) {
+				if ($soldier->isWounded()) {
+					$count += 5;
+				}
+				switch ($soldier->getType()) {
+					case 'cavalry':
+					case 'mounted archer':		$takes += 3;
+					case 'heavy infantry':		$takes += 2;
+				}
 			}
 		}
 
