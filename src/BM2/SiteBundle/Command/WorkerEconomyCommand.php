@@ -90,7 +90,7 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 				}
 			}
 
-			if (!$settlement->getSiege() || !$settlement->getSiege()->getEncirlced()) {
+			if (!$settlement->getSiege() || !$settlement->getSiege()->getEncircled()) {
 				// check workforce
 				$this->economy->checkWorkforce($settlement);
 			}
