@@ -163,8 +163,11 @@ class RealmController extends Controller {
 				// good name, create realm
 				$realm = $this->get('realm_manager')->create($data['name'], $data['formal_name'], $data['type'], $character);
 				// and create the initial realm conversation, making sure our ruler is set up for the messaging system
-				$msguser = $this->get('message_manager')->getMsgUser($character);
-				list($meta,$conversation) = $this->get('message_manager')->createConversation($msguser, $data['formal_name'], null, $realm);
+
+				$topic = $realm->getName().' Announcements';
+				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $realm, 'announcements');
+				$topic = $realm->getName().' General Discussion';
+				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $realm, 'general');
 
 				$this->getDoctrine()->getManager()->flush();
 				$this->get('appstate')->setSessionData($character); // update, because we changed our realm count
@@ -879,8 +882,10 @@ class RealmController extends Controller {
 				}
 
 				// and setup the realm conversation
-				$msguser = $this->get('message_manager')->getMsgUser($data['ruler']);
-				list($meta,$conversation) = $this->get('message_manager')->createConversation($msguser, $data['formal_name'], null, $subrealm);
+				$topic = $subrealm->getName().' Announcements';
+				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $subrealm, 'announcements');
+				$topic = $subrealm->getName().' General Discussion';
+				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $subrealm, 'general');
 
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('diplomacy.subrealm.success', array(), 'politics'));
