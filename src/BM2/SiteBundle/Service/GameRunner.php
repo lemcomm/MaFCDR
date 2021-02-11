@@ -731,7 +731,7 @@ class GameRunner {
 			if ($unit->getDestination()=='base') {
 				$units[] = $unit;
 			}
-			$unit->setDestrination(null);
+			$unit->setDestination(null);
 		}
 		if ($count) {
 			foreach ($units as $each) {
