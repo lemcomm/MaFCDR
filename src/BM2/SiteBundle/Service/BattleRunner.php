@@ -752,7 +752,7 @@ class BattleRunner {
 							$shots++;
 							if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 								$rangedHits++;
-								$result = $this->RangedHit($solder, $target);
+								$result = $this->RangedHit($soldier, $target);
 							} else {
 								$missed++;
 								$this->log(10, "missed\n");
