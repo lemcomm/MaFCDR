@@ -105,7 +105,7 @@ class Battle {
 				}
 			}
 			if ($this->getSettlement()) {
-				$this->defenders += $this->getSettlement()->getActiveMilitia()->count();
+				$this->defenders += $this->getSettlement()->countDefenders();
 			}
 		}
 		return $this->defenders;
