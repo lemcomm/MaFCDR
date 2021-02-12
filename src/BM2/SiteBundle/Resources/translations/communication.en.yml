@@ -269,6 +269,7 @@ event:
   elected2:     %character% was elected to the position of %realmposition%.
   joined:       Became a part of %realm%.
   wasjoined:    Acquired control of %realm%.
+  subjoined:    The subrealm of %realm% aquired controler of %realm-2%.
   left:         Left %realm% and became independent.
   wasleft:      Lost control of %realm%, which declared itself independent.
   gained:       Gained ownership of %settlement%.
