@@ -793,40 +793,24 @@ class RealmController extends Controller {
 
 		$form = $this->createForm(new RealmSelectType($realms, 'join'));
 
-		if ($request->isMethod('POST')) {
-			$form->bind($request);
-			if ($form->isValid()) {
-				$data = $form->getData();
-				$target = $data['target'];
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			$target = $data['target'];
+			$msg = $data['message'];
 
-				if ($target->getType() > $realm->getType()) {
-					$realm->setSuperior($target);
-					$target->addInferior($realm);
-
-					$this->get('history')->logEvent(
-						$this->realm,
-						'event.realm.joined',
-						array('%link-realm%'=>$target->getId()),
-						History::HIGH
-					);
-					$this->get('history')->logEvent(
-						$target,
-						'event.realm.wasjoined',
-						array('%link-realm%'=>$realm->getId()),
-						History::MEDIUM
-					);
-
-					// TODO: messaging everyone who needs to know
-
-					$em = $this->getDoctrine()->getManager();
-					$em->flush();
-
-					return array('realm'=>$realm, 'success'=>true, 'target'=>$target);
-				} else {
-					$form->addError(new FormError($this->get('translator')->trans("diplomacy.join.unavail.type", array(), 'politics')));
-				}
-
+			$data = $form->getData();
+			if ($target->getType() > $realm->getType()) {
+				$timeout = new \DateTime("now");
+				$timeout->add(new \DateInterval("P7D"));
+				# newRequestFromRealmToRealm($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Realm $fromRealm = null, Realm $toRealm = null, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, Place $includePlace, RealmPosition $includePos = null)
+				$this->get('game_request_manager')->newRequestFromRealmToRealm('realm.join', $timeout, null, null, $realm->getName().' Request to Join', $msg, $character, $realm, $target);
+				$this->addFlash('success', $this->get('translator')->trans('realm.join.sent', ['%target%'=>$target->getName()], 'politics'));
+				return $this->redirectToRoute('bm2_site_realm_diplomacy', ['realm'=>$realm->getId()]);
+			} else {
+				$form->addError(new FormError($this->get('translator')->trans("diplomacy.join.unavail.type", array(), 'politics')));
 			}
+
 		}
 
 		return array('realm'=>$realm, 'unavailable'=>$unavailable, 'choices'=>$available, 'form'=>$form->createView());
