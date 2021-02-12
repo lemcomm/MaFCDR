@@ -351,11 +351,23 @@ class ConversationManager {
                 } elseif ($type == 'left') {
                         $content = $originator->getName().' has left the conversation.';
                 } elseif ($type == 'realmnew') {
-                        $content = 'A new First One has appeared in the realm by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the realm as a knight of [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmnew2') {
-                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
                 } elseif ($type == 'housenew') {
-                        $content = 'A new First One has appeared in the subrealm of [r:'.$extra['realm'].'] by the name of [c:'.$originator->getId().'] at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinplace') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [p:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinplace2') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinsettlement') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [e:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinsettlement2') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [e:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinposition') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [realmpos:'.$extra['where'].'].';
+                } elseif ($type == 'realmjoinposition2') {
+                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['where'].'].';
                 }
 
                 $msg = new Message();
@@ -509,7 +521,7 @@ class ConversationManager {
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
-                        $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
+                        $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
@@ -521,6 +533,60 @@ class ConversationManager {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
                         $this->newSystemMessage($conv, 'housenew', null, $char, null, ['where'=>$place->getId()]);
+                }
+                return [$conv, $supConv];
+        }
+
+        public function sendExistingCharacterMsg(Realm $realm = null, Settlement $settlement = null, Place $place = null, RealmPosition $pos = null, Character $char, $publicJoin = FALSE) {
+                $em = $this->em;
+                if ($realm === NULL && $settlement && $settlement->getRealm()) {
+                        $realm = $settlement->getRealm();
+                } elseif ($realm === NULL && $place && $place->getRealm()) {
+                        $realm = $place->getRealm();
+                } elseif ($realm === NULL && $pos && $pos->getRealm()) {
+                        $realm = $pos->getRealm();
+                }
+
+                $ultimate = null;
+                $sameRealm = false;
+                if ($realm->isUltimate()) {
+                        $ultimate = $realm;
+                        $same = true;
+                } else {
+                        $ultimate = $realm->findUltimate();
+                }
+
+                # public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true, $extra=null)
+                $conv = null;
+                $supConv = null;
+                # We only actually need $realm->getId() passed through sometimes, but it's simpler to just always prepare it and only use it sometimes.
+                if ($realm && $place) {
+                        #Joined through a place.
+                        $string = 'realmjoinplace';
+                        $extra = ['realm'=>$realm->getId(), 'place'=>$place->getId()];
+                } elseif ($realm && $settlement) {
+                        #joined through a settlement.
+                        $string = 'realmjoinsettlement';
+                        $extra = ['realm'=>$realm->getId(), 'settlement'=>$settlement->getId()];
+                } elseif ($realm && $pos) {
+                        #joined through a position.
+                        $string = 'realmjoinposition';
+                        $extra = ['realm'=>$realm->getId(), 'pos'=>$pos->getId()];
+                } elseif ($realm && $publicJoin) {
+                        #joined through some other means.
+                        #TODO: Public joins and utilizing the publicJoin var.
+                }
+                if ($realm && $same) {
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                } elseif ($realm && !$same) {
+                        $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+                        $this->addParticipant($conv, $char);
+                        $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
+                        $this->addParticipant($supConv, $char);
+                        $this->newSystemMessage($supConv, $string.'2', null, $char, null, $extra);
                 }
                 return [$conv, $supConv];
         }
