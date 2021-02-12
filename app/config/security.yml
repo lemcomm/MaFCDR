@@ -46,6 +46,7 @@ security:
         - { path: ^/(../)?payment/paypal_success$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment/paypal_cancel$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment, roles: ROLE_USER }
+        - { path: ^/(../)?publications, roles: ROLE_USER }
         - { path: ^/(../)?character, roles: ROLE_USER }
         - { path: ^/(../)?actions, roles: ROLE_USER }
         - { path: ^/(../)?artifacts, roles: ROLE_USER }
