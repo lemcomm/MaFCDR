@@ -89,6 +89,7 @@ class GameRequestManager {
 			foreach ($realm->findRulers() as $ruler) {
 				if ($char == $ruler) {
 					$realmIDs[] = $realm->getId();
+					echo $realm->getId().', ';
 				}
 			}
 		}
@@ -197,7 +198,7 @@ class GameRequestManager {
 		if ($includeSettlement) {
 			$GR->setIncludeSettlement($includeSettlement);
 		}
-		if ($includRealm) {
+		if ($includeRealm) {
 			$GR->setIncludeRealm($includeRealm);
 		}
 		if ($includeHouse) {
@@ -304,7 +305,57 @@ class GameRequestManager {
 		$this->em->flush();
 	}
 
+	public function newRequestFromRealmToRealm($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Realm $fromRealm = null, Realm $toRealm, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, Place $includePlace = null, RealmPosition $includePos = null) {
+		$GR = new GameRequest();
+		$this->em->persist($GR);
+		$GR->setType($type);
+		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
+		if ($expires) {
+			$GR->setExpires($expires);
+		}
+		if ($numberValue) {
+			$GR->setNumberValue($numberValue);
+		}
+		if ($stringValue) {
+			$GR->setStringValue($stringValue);
+		}
+		if ($subject) {
+			$GR->setSubject($subject);
+		}
+		if ($text) {
+			$GR->setText($text);
+		}
+		if ($fromChar) {
+			$GR->setFromCharacter($fromChar);
+		}
+		if ($fromRealm) {
+			$GR->setFromRealm($fromRealm);
+		}
+		if ($toRealm) {
+			$GR->setToRealm($toRealm);
+		}
+		if ($includeChar) {
+			$GR->setIncludeCharacter($includeChar);
+		}
+		if ($includeSettlement) {
+			$GR->setIncludeSettlement($includeSettlement);
+		}
+		if ($includeRealm) {
+			$GR->setIncludeRealm($includeRealm);
+		}
+		if ($includePlace) {
+			$GR->setIncludePlace($includePlace);
+		}
+		if ($includePos) {
+			$GR->setIncludePosition($includePos);
+		}
+		$this->em->flush();
+	}
+
 	public function newOathOffer(Character $char, $text, $target) {
+		# This is a separate function because of the $target variable being of varying types.
 		$GR = new GameRequest();
 		$this->em->persist($GR);
 		$GR->setType('oath.offer');
