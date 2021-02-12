@@ -48,6 +48,7 @@
 		{{ form_widget(form.target) }}
 		{{ form_widget(form.submit) }}
 	</div>
+	{{ form_widget(form.message) }}
 	</form>
 	{% else %}
 		<div class="warning">{{ 'diplomacy.join.noothers'|trans({},"politics") }}</div>
