@@ -501,13 +501,13 @@ class WarController extends Controller {
 					# This only engages if we've already got action set to "selected", so we start looking at what subaction we're processing.
 					switch($data['subaction']) {
 						case 'leadership':
-							if (($siege->getAttacker()->getLeader() == $character || $siege->getDefenders()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
+							if (($siege->getAttacker()->getLeader() == $character || $siege->getDefender()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
 								# We already know they're *a* leader, now to figure out what group they lead.
 								#TODO: Later when we add more sides to a battle, we'll need to expand this.
 								if ($siege->getAttacker()->getCharacters()->contains($character)) {
 									$group = $siege->getAttackers();
 								} else {
-									$group = $siege->getDefenders();
+									$group = $siege->getDefender();
 								}
 								$group->setLeader($data['newleader']);
 								$em->flush();
@@ -535,7 +535,7 @@ class WarController extends Controller {
 							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'assault') {
 								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getAttacker(), $siege->getDefender());
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
-							} else if ($siege->getDefenders()->getLeader() == $character && $data['subaction'] == 'assault') {
+							} else if ($siege->getDefender()->getLeader() == $character && $data['subaction'] == 'assault') {
 								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getDefender(), $siege->getAttacker());
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							} else {
@@ -1283,7 +1283,7 @@ class WarController extends Controller {
 					// leave settlement if we attack targets outside
 					$character->setInsideSettlement(null);
 				}
-				
+
 				$em->flush();
 			}
 		}
