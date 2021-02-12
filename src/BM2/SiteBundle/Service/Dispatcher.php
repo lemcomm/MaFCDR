@@ -2694,9 +2694,6 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.npc");
 		}
-		if ($this->getCharacter()->isRuler()) {
-			return array("name"=>"oath.name", "include"=>"hierarchy", "description"=>"unavailable.leader");
-		}
 
 		return array("name"=>"oath.name", "url"=>"bm2_site_politics_oath", "include"=>"hierarchy");
 	}
