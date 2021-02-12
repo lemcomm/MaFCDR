@@ -60,6 +60,12 @@ class GameRequestController extends Controller {
 				} else {
 					$result = true;
 				}
+			case 'realm.join':
+				if (in_array($char, $id->getToRealm()->findRulers()->toArray())) {
+					$result = true;
+				} else {
+					$result = false;
+				}
 		}
 		return $result;
 	}
@@ -77,6 +83,7 @@ class GameRequestController extends Controller {
 			$route = $request->query->get('route');
 		}
 		$em = $this->getDoctrine()->getManager();
+		$conv = $this->get('conversation_manager');
 		# Are we allowed to act on this GR? True = yes. False = no.
 		$allowed = $this->security($character, $id);
 		# Do try to keep this switch and the denyAction switch in the order of most expected request. It'll save processing time.
@@ -160,6 +167,8 @@ class GameRequestController extends Controller {
 						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
+
+						list($conv, $supConv) = $conv->sendExistingCharacterMsg(null, $settlement, null, null, $character);
 						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPlace()) {
@@ -182,11 +191,13 @@ class GameRequestController extends Controller {
 						$this->addFlash('notice', $this->get('translator')->trans('oath.place.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
+
+						list($conv, $supConv) = $conv->sendExistingCharacterMsg(null, null, $place, null, $character);
 						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPosition()) {
-						$pos = $id->getToPlace();
-						$character->setLiegePosition($place);
+						$pos = $id->getToPosition();
+						$character->setLiegePosition($pos);
 						$character->setOathCurrent(TRUE);
 						$this->get('history')->logEvent(
 							$pos,
@@ -203,6 +214,8 @@ class GameRequestController extends Controller {
 						$this->addFlash('notice', $this->get('translator')->trans('oath.position.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
+
+						list($conv, $supConv) = $conv->sendExistingCharacterMsg(null, null, null, $pos, $character);
 						return $this->redirectToRoute($route);
 					}
 				} else {
@@ -215,6 +228,51 @@ class GameRequestController extends Controller {
 					if ($id->getToPosition()) {
 						throw new AccessDeniedHttpException('unavailable.notholder', ["%name%"=>$id->getToPosition()->getName()]);
 					}
+				}
+				break;
+			case 'realm.join':
+				if ($allowed) {
+					$target = $id->getToRealm();
+					$realm = $id->getFromRealm();
+
+					$realm->setSuperior($target);
+					$target->addInferior($realm);
+
+					$this->get('history')->logEvent(
+						$realm,
+						'event.realm.joined',
+						array('%link-realm%'=>$target->getId()),
+						History::HIGH
+					);
+					$this->get('history')->logEvent(
+						$target,
+						'event.realm.wasjoined',
+						array('%link-realm%'=>$realm->getId()),
+						History::MEDIUM
+					);
+					if ($target->findUltimate() != $target) {
+						$this->get('history')->logEvent(
+							$target,
+							'event.realm.wasjoined',
+							array('%link-realm%'=>$target->getId(), '%link-realm-2%'=>$realm->getId()),
+							History::MEDIUM
+						);
+					}
+
+					$this->addFlash(
+						'notice',
+						$this->get('translator')->trans(
+							'diplomacy.join.approved', [
+								'%name%'=>$id->getFromRealm()->getName(),
+								'%name2'=>$id->getToRealm()->getName()
+							], 'politics'
+						)
+					);
+					$em->remove($id);
+					$em->flush();
+
+				} else {
+					throw new AccessDeniedHttpException('unavailable.notruler');
 				}
 				break;
 		}
@@ -312,7 +370,14 @@ class GameRequestController extends Controller {
 							array('%link-place%'=>$place->getId()),
 							History::ULTRA, true
 						);
-						$this->addFlash('notice', $this->get('translator')->trans('oath.place.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
+						$this->addFlash(
+							'notice',
+							$this->get('translator')->trans(
+								'oath.place.rejected',
+								array('%name%'=>$id->getFromCharacter()->getName()),
+								'politics'
+							)
+						);
 						$em->remove($id);
 						$em->flush();
 						return $this->redirectToRoute($route);
@@ -331,7 +396,14 @@ class GameRequestController extends Controller {
 							array('%link-position%'=>$pos->getId()),
 							History::ULTRA, true
 						);
-						$this->addFlash('notice', $this->get('translator')->trans('oath.position.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
+						$this->addFlash(
+							'notice',
+							$this->get('translator')->trans(
+								'oath.position.rejected',
+								array('%name%'=>$id->getFromCharacter()->getName()),
+								'politics'
+							)
+						);
 						$em->remove($id);
 						$em->flush();
 						return $this->redirectToRoute($route);
@@ -346,6 +418,34 @@ class GameRequestController extends Controller {
 					if ($id->getToPosition()) {
 						throw new AccessDeniedHttpException('unavailable.notholder', ["%name%"=>$id->getToPosition()->getName()]);
 					}
+				}
+				break;
+			case 'realm.join':
+				if ($allowed) {
+					$target = $id->getToRealm();
+					$realm = $id->getFromRealm();
+
+					$this->get('history')->logEvent(
+						$realm,
+						'event.realm.joinrejected',
+						array('%link-realm%'=>$target->getId()),
+						History::MEDIUM
+					);
+
+					$this->addFlash(
+						'notice',
+						$this->get('translator')->trans(
+							'diplomacy.join.denied', [
+								'%name%'=>$id->getFromRealm()->getName(),
+								'%name2%'=>$id->getToRealm()->getName()
+							], 'politics'
+						)
+					);
+					$em->remove($id);
+					$em->flush();
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.notruler');
 				}
 				break;
 		}
