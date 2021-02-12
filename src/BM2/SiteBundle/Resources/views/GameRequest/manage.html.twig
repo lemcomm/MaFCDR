@@ -37,6 +37,14 @@
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
 			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'oath.offer.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'oath.offer.deny'|trans({},"politics") }}</button></a>
 			</div>
+		{% elseif gamerequest.type == 'realm.join' %}
+			<hr>
+			{{ 'diplomacy.join.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-realm%":link(gamerequest.fromRealm), "%link-realm-2%":link(gamerequest.toRealm), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'diplomacy.join.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'diplomacy.join.deny'|trans({},"politics") }}</button></a>
+			</div>
 		{% endif %}
 	{% else %}
 		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
