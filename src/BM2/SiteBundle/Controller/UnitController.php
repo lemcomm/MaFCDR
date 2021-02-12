@@ -589,7 +589,7 @@ class UnitController extends Controller {
      			$count = 0;
 			if ($data['unit']->getAvailable() < $data['number']) {
 				$data['number'] = $data['unit']->getAvailable();
-				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getName()), 'actions'));
+				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getSettings()->getName()), 'actions'));
 			}
      			$corruption = $this->get('economy')->calculateCorruption($settlement);
      			for ($i=0; $i<$data['number']; $i++) {
