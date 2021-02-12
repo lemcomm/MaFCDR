@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Listing;
 use BM2\SiteBundle\Entity\Partnership;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Settlement;
@@ -226,7 +227,13 @@ class PoliticsController extends Controller {
 				}
 				if ($choice instanceof Place) {
 					if ($choice->getRealm()) {
-						return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' in '.$choice->getRealm()->getName();
+						if ($choice->getHouse()) {
+							return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' of '.$choice->getHouse()->getName().' in '.$choice->getRealm()->getName();
+						} else {
+							return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' in '.$choice->getRealm()->getName();
+						}
+					} elseif ($choice->getHouse()) {
+						return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' of '.$choice->getHouse()->getName();
 					} else {
 						return $choice->getName().' - '.ucfirst($choice->getType()->getName());
 					}
@@ -528,10 +535,10 @@ class PoliticsController extends Controller {
 	}
 
 
-   /**
-     * @Route("/lists", name="bm2_lists")
-     * @Template
-     */
+	/**
+	  * @Route("/lists", name="bm2_lists")
+	  * @Template
+	  */
 	public function listsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway();
 		if (! $character instanceof Character) {
