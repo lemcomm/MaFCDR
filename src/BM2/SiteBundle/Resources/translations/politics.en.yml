@@ -522,6 +522,13 @@ diplomacy:
    type:        Does not have a higher designation than your realm.
    current:     Is your current superior realm.
   done:         You have successfully submitted to the superior power of %target% and made your %realm% a part of it.
+  sent:         Your request has been sent to %target%.
+  approve:      Approve
+  approved:     %name% is now a subrealm of %name2%.
+  deny:         Deny
+  denied:       You have rejected the request of %name% to become a subrealm of %name2%.
+  preamble:     'You have received a request from %link-character%, a ruler of %link-realm%, to join their realm under %link-realm-2%, on %date%, as follows:'
+
 
  restore:
   name:         Restore %name%
