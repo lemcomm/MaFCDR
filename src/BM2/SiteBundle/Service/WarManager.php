@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
+use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
@@ -305,11 +306,11 @@ class WarManager {
 		// setup actions and lock travel
 		switch ($type) {
 			case 'siegeassault':
-				$acttype = 'settlement.assault';
+				$acttype = 'siege.assault';
 				break;
 			case 'siegesortie':
 			case 'sortie':
-				$acttype = 'settlement.sortie';
+				$acttype = 'siege.sortie';
 				break;
 			case 'field':
 			case 'urban':
@@ -318,16 +319,54 @@ class WarManager {
 				break;
 		}
 
-		$act = new Action;
-		$act->setType($acttype);
-		$act->setCharacter($character)
-			->setTargetSettlement($settlement)
-			->setTargetBattlegroup($attackers)
-			->setCanCancel(false)
-			->setBlockTravel(true);
-		$this->actman->queue($act);
+		if ($acttype == 'military.battle') {
+			if ($place) {
+				$act = new Action;
+				$act->setType($acttype);
+				$act->setCharacter($character)
+					->setTargetPlace($place)
+					->setTargetSettlement($settlement)
+					->setTargetBattlegroup($attackers)
+					->setCanCancel(false)
+					->setBlockTravel(true);
+				$this->actman->queue($act);
+			} else {
+				$act = new Action;
+				$act->setType($acttype);
+				$act->setCharacter($character)
+					->setTargetSettlement($settlement)
+					->setTargetBattlegroup($attackers)
+					->setCanCancel(false)
+					->setBlockTravel(true);
+				$this->actman->queue($act);
+			}
+			$character->setTravelLocked(true);
+		} elseif (in_array($acttype, ['siege.assault','siege.sortie'])) {
+			foreach ($attackers->getCharacters() as $BGChar) {
+				if ($place) {
+					$act = new Action;
+					$act->setType($acttype);
+					$act->setCharacter($character)
+						->setTargetPlace($place)
+						->setTargetSettlement($settlement)
+						->setTargetBattlegroup($attackers)
+						->setCanCancel(false)
+						->setBlockTravel(true);
+					$this->actman->queue($act);
+				} else {
+					$act = new Action;
+					$act->setType($acttype);
+					$act->setCharacter($character)
+						->setTargetSettlement($settlement)
+						->setTargetBattlegroup($attackers)
+						->setCanCancel(false)
+						->setBlockTravel(true);
+					$this->actman->queue($act);
+				}
+				$BGChar->setTravelLocked(true);
+			}
+		}
 
-		$character->setTravelLocked(true);
 
 		// notifications and counter-actions
 		if ($targets) {
@@ -496,8 +535,9 @@ class WarManager {
 		$this->actman->queue($act, true);
 	}
 
-	public function disbandSiege(Siege $siege, Character $leader, $completed = FALSE) {
+	public function disbandSiege(Siege $siege, Character $leader = null, $completed = FALSE) {
 		# Siege disbandment and removal actually happens as part of removeCharacterFromBattlegroup.
+		# This needs either completed to be true and leader to be null, or completed to be false and leader to be a Character.
 		$place = null;
 		$settlement = null;
 		if ($siege->getSettlement()) {
@@ -616,6 +656,7 @@ class WarManager {
 					} else {
 						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 					}
+					$focus->getBattle()->setSiege(NULL); # Detach the siege from the battle.
 				}
 				$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
@@ -656,7 +697,7 @@ class WarManager {
 	#TODO
 	}
 
-	public function progressSiege(Siege $siege, BattleGroup $victor, $flag) {
+	public function progressSiege(Siege $siege, BattleGroup $victor, $flag, BattleReport $report) {
 		$current = $siege->getStage();
 		$max = $siege->getMaxStage();
 		$battle = $victor->getBattle();
@@ -689,7 +730,7 @@ class WarManager {
 				$this->history->logEvent(
 					$target,
 					'siege.advance.attacker',
-					array('%link-battle%'=>$this->report->getId()),
+					array('%link-battle%'=>$report->getId()),
 					History::MEDIUM, true, 20
 				);
 				foreach ($siege->getGroups() as $group) {
@@ -719,7 +760,7 @@ class WarManager {
 					$this->history->logEvent(
 						$target,
 						'siege.bypass.attacker',
-						array('%link-battle%'=>$this->report->getId()),
+						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
 					foreach ($victor->getCharacters() as $char) {
@@ -734,14 +775,14 @@ class WarManager {
 
 			}
 		} else if ($attacker != $victor && $sortie) {
-			if ($current < $max && !$bypass) {
+			if ($current > 1 && !$bypass) {
 				# Siege moves backwards.
 				$siege->setStage($current-1);
 				# "After the [link], the siege has advanced in favor of the defenders"
 				$this->history->logEvent(
 					$target,
 					'siege.advance.defender',
-					array('%link-battle%'=>$this->report->getId()),
+					array('%link-battle%'=>$report->getId()),
 					History::MEDIUM, true, 20
 				);
 				foreach ($siege->getGroups() as $group) {
@@ -755,10 +796,10 @@ class WarManager {
 					}
 				}
 			}
-			if ($current == $max || $bypass) {
+			if ($current <= 1 || $bypass) {
 				$completed = TRUE;
 				# Siege is over, defender victory.
-				if (!$bypass) {
+				if ($bypass) {
 					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
 					$this->history->logEvent(
 						$target,
@@ -771,7 +812,7 @@ class WarManager {
 					$this->history->logEvent(
 						$target,
 						'siege.bypass.defender',
-						array('%link-battle%'=>$this->report->getId()),
+						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
 					foreach ($victor->getCharacters() as $char) {
@@ -786,7 +827,8 @@ class WarManager {
 			}
 		}
 		# Yes, this means that if attackers lose an assault or defenders lose a sortie, nothing changes. This is intentional.
-
+		$battle->setPrimaryAttacker(NULL);
+		$battle->setPrimaryDefender(NULL);
 		foreach ($siege->getGroups() as $group) {
 			$group->setBattle(NULL);
 		}
@@ -862,6 +904,7 @@ class WarManager {
 					}
 				}
 			}
+			$this->em->flush();
 			$this->disbandSiege($siege, null, TRUE);
 		}
 
