@@ -6,6 +6,8 @@
 <h2>
 	{% if realm %}
 		{{ 'conversation.new.title2'|trans({"%realm%":link(realm)}, "conversations")|raw }}</h2>
+	{% elseif house %}
+		{{ 'conversation.new.title2'|trans({"%realm%":link(house)}, "conversations")|raw }}</h2>
 	{% else %}
 		{{ 'conversation.new.title'|trans({}, "conversations")|title }}</h2>
 	{% endif %}
