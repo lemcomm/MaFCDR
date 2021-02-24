@@ -11,7 +11,7 @@
 		<field name="cycle" type="integer" nullable="true"/>
 		<field name="updated" type="datetime" nullable="true"/>
                 <field name="active" type="boolean"/>
-                <many-to-one field="owner" target-entity="Character" inversed-by="owned_conversations"/>
+                <many-to-one field="local_for" target-entity="Character" inversed-by="local_conversation"/>
                 <one-to-many field="messages" target-entity="Message" mapped-by="conversation" on-delete="CASCADE" fetch="EAGER">
 			<order-by>
 				<order-by-field name="sent" direction="ASC" />
