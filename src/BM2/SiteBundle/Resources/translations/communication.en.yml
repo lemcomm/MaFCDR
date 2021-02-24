@@ -457,8 +457,8 @@ battle:
 
 siege:
  bypass:
-  attacker:     After the defenders failed to muster troops in %battle%, the siege concluded in a defender victory.
-  defender:     After the attackers failed to muster troops in %battle%, the siege concluded in an attacker victory.
+  attacker:     After the defenders failed to muster troops in %battle%, the siege concluded in a attacker victory.
+  defender:     After the attackers failed to muster troops in %battle%, the siege concluded in an defender victory.
  advance:
   attacker:     After the %battle%, the siege has advanced in favor of the attackers.
   defender:     After the %battle%, the siege has advanced in favor of the defenders.
