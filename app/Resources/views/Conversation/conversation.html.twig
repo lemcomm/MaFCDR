@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
-{% if conversation.realm is null %}
+{% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
 	<p align="right">
 		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
 	</p>
@@ -11,29 +11,11 @@
 {% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last} %}
 
 <div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
-	<button id="syntaxhelp" class="cmsg_button">syntax help</button>
-	<div id="help" style="display:none">
-		You can use <a href="http://daringfireball.net/projects/markdown/syntax">markdown syntax</a>:
-		<ul class="simple">
-			<li># Huge Header</li>
-			<li>## Large Header</li>
-			<li>### Header</li>
-			<li><em>*emphasis*</em></li>
-			<li><strong>**strong emphasis**</strong></li>
-			<li><strong><em>***extra strong emphasis***</em></strong></li>
-			<li>make unordered lists by beginning each line with a single *<li>
-			<li>second-level sub unordered lists can be done with a space and then a * at the beginning of the line</li>
-			<li>...or numbered lists by using 1. 2. 3.<li>
-			<li>...but maybe you don't want a list, so add a \ after the number and before the period like this: 2015\.</li>
-			<li>you can also blockquote a paragraph like this by leading with a ></li>
-			<li>...or even double or triple indent by adding more > symbols.</li>
-			<li>...or even add numbered or unordered lists in that block quote!</li>
-		</ul>
-	</div>
+	{% include "Conversation/syntax.html.twig" %}
 	{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
 </div>
 
-{% if conversation.realm is null %}
+{% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
 	<p align="right">
 		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
 	</p>
@@ -70,9 +52,6 @@ $("#syntaxhelp").click(function(){
 	$("#help").toggle();
 });
 
-var redirect = false;
-var insert = null;
-
 $("#replydialog").dialog({
 	autoOpen: false,
 	width: "65%",
@@ -80,16 +59,12 @@ $("#replydialog").dialog({
 });
 
 $(".cmsg_conversation").on("click", "button.topicreply", function(){
-	insert = $(this).closest('.cmsg_conversation').children('.cmsg_general').first();
 	var id = $(this).data('id');
-	redirect = false;
 	replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", id, 0);
 });
 
 $(".cmsg_conversation").on("click", "button.reply", function(){
-	insert = $(this).closest('.cmsg_conversation').children('.cmsg_general').first();
 	var id = $(this).closest('.cmsg_message').data('id');
-	redirect = false;
 	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", {{ conversation.id }}, id);
 });
 
@@ -102,7 +77,6 @@ function replyform(title, conversation, reply_to) {
 
 	$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
 }
-
 
 var request;
 var target;
