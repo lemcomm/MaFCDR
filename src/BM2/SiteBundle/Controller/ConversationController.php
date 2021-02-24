@@ -145,6 +145,7 @@ class ConversationController extends Controller {
 				$org = $house;
 			}
 		} else {
+			$org = false;
 			if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
 				$distance = $this->get('geography')->calculateInteractionDistance($char);
 			} else {
@@ -198,9 +199,47 @@ class ConversationController extends Controller {
 			return $this->redirectToRoute('maf_conv_summary');
 		}
 
-		return $this->render('Conversation/new.html.twig', [
+		return $this->render('Conversation/newconversation.html.twig', [
 			'form' => $form->createView(),
-			'realm' => $realm
+			'realm' => $realm,
+			'house' => $house
+		]);
+	}
+
+	/**
+	  * @Route("/new/local", name="maf_conv_new_local")
+	  */
+	public function newLocalConversationAction(Request $request) {
+                $char = $this->get('dispatcher')->gateway('conversationNewTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		$org = false;
+		if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
+			$distance = $this->get('geography')->calculateInteractionDistance($char);
+		} else {
+			$distance = $this->get('geography')->calculateSpottingDistance($char);
+		}
+		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
+		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
+
+		$form = $this->createForm(new NewLocalMessageType());
+
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			$conv = $this->get('conversation_manager')->newLocalMessage($char, $data['target'], $data['topic'], $data['type'], $data['content'], null, null, true);
+
+			$url = $this->generateUrl('maf_conv_read', ['conv' => $conv->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
+			return $this->redirectToRoute('maf_conv_summary');
+		}
+
+		return $this->render('Conversation/newconversation.html.twig', [
+			'form' => $form->createView(),
+			'realm' => $realm,
+			'house' => $house
 		]);
 	}
 
@@ -252,7 +291,7 @@ class ConversationController extends Controller {
 		}
 		return $this->render('Conversation/recent.html.twig', [
 			'messages' => $all,
-			'string' => $window
+			'period' => $window
 		]);
 	}
 
@@ -513,6 +552,7 @@ class ConversationController extends Controller {
 
 	/**
 	  * @Route("/{conv}/reply", name="maf_conv_reply", requirements={"conv"="\d+"})
+  	  * @Route("/{conv}/reply/{msg}", name="maf_conv_reply_msg", requirements={"conv"="\d+","msg"="\d+"})
 	  */
 	public function replyAction(Conversation $conv, Request $request) {
                 $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv);
@@ -540,31 +580,31 @@ class ConversationController extends Controller {
 
 
 	/**
-	  * @Route("/recent/reply/{msg}", requirements={"msg"="\d+"})
-	  * @Route("/recent/reply/{msg}/", requirements={"msg"="\d+"})
-	  * @Route("/recent/reply/{msg}/{string}", name="maf_conv_recent_reply", requirements={"msg"="\d+"})
+	  * @Route("/recent/reply/{window}", name="maf_conv_recent_reply", requirements={"window"="\d+"})
 	  */
-	public function replyRecentAction(Message $msg, Request $request, string $string='0') {
-		$conv = $msg->getConversation();
-                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
-                if (! $char instanceof Character) {
-                        return $this->redirectToRoute($char);
-                }
+	public function replyRecentAction(Request $request, string $window='0') {
 
 		$form = $this->createForm(new RecentReplyType());
 
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
+
+			$conv = $data['conversation'];
 			$em = $this->getDoctrine()->getManager();
+			$conv = $em->getRepository(Conversation::class)->findOneById($conv);
+	                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
 
-			$message = $this->get('conversation_manager')->writeMessage($conv, $msg, $char, $data['content'], $data['type']);
+			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+			$message = $this->get('conversation_manager')->writeMessage($conv, $data['reply_to'], $char, $data['content'], $data['type']);
 
-			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $string]).'#'.$message->getId());
+			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
 		}
 
-		return $this->render('Conversation/recentreply.html.twig', [
-			'message' => $msg,
+		return $this->render('Conversation/reply.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
