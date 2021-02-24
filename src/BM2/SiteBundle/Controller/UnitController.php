@@ -535,7 +535,7 @@ class UnitController extends Controller {
                 $allUnits = $settlement->getUnits();
                 $units = [];
                 foreach ($allUnits as $unit) {
-                        if($unit->getSoldiers()->count() < 200 && $unit->getSettings()->getReinforcements()) {
+                        if($unit->getSoldiers()->count() < 200 && ($unit->getSettings()->getReinforcements() || !$unit->getCharacter())) {
                                 $units[] = $unit;
                         }
                 }
