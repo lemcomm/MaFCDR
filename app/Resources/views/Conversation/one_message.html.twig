@@ -1,4 +1,4 @@
-<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}">
+<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}">
 	<div class="cmsg_message_wrapper_{{message.type}}">
 		<div class="cmsg_message_header_{{message.type}}">
 			{% if message.sender %}
@@ -10,7 +10,7 @@
 			<a id="{{message.id}}"></a>
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
-			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipients}, "conversations")|raw }}
+			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipientCount}, "conversations")|raw }}
 			{% if message.replyTo %}
 				 --
 				<a href="#{{message.replyTo.id}}">
