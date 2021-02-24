@@ -62,7 +62,7 @@ class BattleRunner {
 		$this->war_manager = $war_manager;
 	}
 
-	public function enableLog($level=10) {
+	public function enableLog($level=9999) {
 		$this->debug=$level;
 	}
 	public function disableLog() {
@@ -249,29 +249,33 @@ class BattleRunner {
 		}
 
 		# Remove actions related to this battle.
+		$this->log(15, "Removeing related actions...\n");
 		foreach ($battle->getGroups() as $group) {
 			foreach ($group->getRelatedActions() as $act) {
-				if ($act->getType() == 'military.battle') {
+				$relevantActs = ['military.battle', 'siege.sortie', 'siege.assault'];
+				if (in_array($act->getType(), $relevantActs)) {
 					$this->em->remove($act);
 				}
 			}
 		}
 
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
+		$this->log(15, "Removing temporary character associations...\n");
 		foreach ($this->nobility as $noble) {
 			$noble->getCharacter()->setActiveReport(null);
 			$noble->getCharacter()->removeSoldiersOld($noble);
 		}
-		if ($battle->getPrimaryDefender()) {
-			$battle->setPrimaryDefender(NULL);
-		}
-		if ($battle->getPrimaryAttacker()) {
-			$battle->setPrimaryAttacker(NULL);
-		}
-		$this->em->flush();
 
 		# TODO: Adapt this for when sieges have reached their conclusion, and pass which side was victorious to a different function to closeout the siege properly.
 		if (!$battle->getSiege()) {
+			$this->log(15, "Regular battle detected, Nulling primary battle groups...\n");
+			if ($battle->getPrimaryDefender()) {
+				$battle->setPrimaryDefender(NULL);
+			}
+			if ($battle->getPrimaryAttacker()) {
+				$battle->setPrimaryAttacker(NULL);
+			}
+			$this->log(15, "Jittering characters and disbanding groups...\n");
 			foreach ($battle->getGroups() as $group) {
 				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
 				// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
@@ -284,9 +288,11 @@ class BattleRunner {
 				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
 		} else {
+			$this->log(15, "Siege battle detected, progressing siege...\n");
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
-			$this->war_manager->progressSiege($battle->getSiege(), $victor, $preparations);
+			$this->war_manager->progressSiege($battle->getSiege(), $victor, $preparations, $this->report);
 		}
+		$this->em->flush();
 		$this->em->remove($battle);
 	}
 
