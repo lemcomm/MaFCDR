@@ -18,6 +18,9 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
                 <field name="content" type="text" nullable="true"/>
-		<field name="recipients" type="integer" nullable="true"/>
+		<field name="recipient_count" type="integer" nullable="true"/>
+		<one-to-many field="recipients" target-entity="MessageRecipient" mapped-by="message" on-delete="CASCADE" fetch="EAGER">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
 	</entity>
 </doctrine-mapping>
