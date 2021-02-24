@@ -52,7 +52,6 @@ class AppState {
 			if (!$required) {
 				return null;
 			} else {
-				$session->getFlashbag()->add('error.missing.token');
 				return 'fos_user_security_login';
 			}
 		}
@@ -61,7 +60,6 @@ class AppState {
 			if (!$required) {
 				return null;
 			} else {
-				$session->getFlashbag()->add('error.missing.user');
 				return 'fos_user_security_login';
 			}
 		}
