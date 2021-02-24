@@ -370,7 +370,7 @@ class Geography {
 	}
 
 
-	public function findCharactersNearMe(Character $character, $maxdistance, $only_outside=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false) {
+	public function findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false) {
 		$qb = $this->em->createQueryBuilder();
 		$qb->select('c as character, ST_Distance(me.location, c.location) AS distance')
 			->from('BM2SiteBundle:Character', 'me')
@@ -378,18 +378,32 @@ class Geography {
 			->where('c.alive = true')
 			->andWhere('me = :me')
 			->andWhere('me != c');
-		if ($character->getInsideSettlement()) {
+		if ($character->getInsidePlace()) {
+			if ($character->getInsideSettlement()) {
+				$qb->andWhere(
+					$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement')
+				);
+			}
 			$qb->andWhere($qb->expr()->orX(
-					$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement'),
-					$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
-				));
+				$qb->expr()->eq('c.inside_place', 'me.inside_place'),
+				$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
+			));
+		} elseif ($character->getInsideSettlement()) {
+			$qb->andWhere($qb->expr()->orX(
+				$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement'),
+				$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
+			));
 		} else {
 			$qb->andWhere('ST_Distance(me.location, c.location) < :maxdistance');
 		}
+
 		if ($exclude_slumbering) {
 			$qb->andWhere('c.slumbering = false');
 		}
-		if ($only_outside) {
+		if ($only_oustide_place) {
+			$qb->andWhere('c.inside_place is NULL');
+		}
+		if ($only_outside_settlement) {
 			$qb->andWhere('c.inside_settlement is NULL');
 		}
 		$qb->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
@@ -407,9 +421,9 @@ class Geography {
 	public function findCharactersInSpotRange(Character $character) {
 		return $this->findCharactersNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	public function findCharactersInActionRange(Character $character, $only_outside=false, $match_battle=false) {
+	public function findCharactersInActionRange(Character $character, $only_outside_settlement=false, $match_battle=false, $only_oustide_place=false) {
 		// FIXME: this should also include characters in the same settlement
-		return $this->findCharactersNearMe($character, $this->calculateInteractionDistance($character), $only_outside, true, $match_battle);
+		return $this->findCharactersNearMe($character, $this->calculateInteractionDistance($character), $only_outside_settlement, true, $match_battle, null, $only_outside_place);
 	}
 
 	public function findCharactersInArea($geo) {
