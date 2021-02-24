@@ -352,14 +352,6 @@ class Dispatcher {
 		} else {
 			$actions[] = array("name"=>"military.other", "description"=>"unavailable.nosettlement");
 		}
-		if ($place = $this->getActionablePlace()) {
-			$actions[] = $this->militaryDefendPlaceTest();
-			if (!$place->getSiege()) {
-				$actions[] = $this->MilitarySiegeSettlementTest();
-			} else {
-				$actions[] = $this->militarySiegeJoinSiegeTest();
-			}
-		}
 
 		return array("name"=>"military.name", "elements"=>$actions);
 	}
@@ -383,16 +375,19 @@ class Dispatcher {
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.restricted")));
 		}
-		if ($settlement = $this->getActionableSettlement() || $place = $this->getActionablePlace()) {
-			$actions[] = $this->militarySiegeSettlementTest();
-			$actions[] = $this->militarySiegeLeadershipTest();
-			$actions[] = $this->militarySiegeAssumeTest();
-			$actions[] = $this->militarySiegeBuildTest();
-			$actions[] = $this->militarySiegeAssaultTest();
-			$actions[] = $this->militarySiegeDisbandTest();
-			$actions[] = $this->militarySiegeLeaveTest();
-			#$actions[] = $this->militarySiegeAttackTest();
-			#$actions[] = $this->militarySiegeJoinAttackTest();
+		if ($settlement = $this->getActionableSettlement()) {
+			if (!$siege = $settlement->getSiege()) {
+				$actions[] = $this->militarySiegeSettlementTest();
+			} else {
+				$actions[] = $this->militarySiegeLeadershipTest(null, $siege);
+				$actions[] = $this->militarySiegeAssumeTest(null, $siege);
+				$actions[] = $this->militarySiegeBuildTest(null, $siege);
+				$actions[] = $this->militarySiegeAssaultTest(null, $siege);
+				$actions[] = $this->militarySiegeDisbandTest(null, $siege);
+				$actions[] = $this->militarySiegeLeaveTest(null, $siege);
+				#$actions[] = $this->militarySiegeAttackTest(null, $siege);
+				#$actions[] = $this->militarySiegeJoinAttackTest(null, $siege);
+			}
 		}
 
 		$actions[] = $this->militaryLootSettlementTest(true);
