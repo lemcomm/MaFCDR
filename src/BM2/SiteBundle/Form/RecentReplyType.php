@@ -40,6 +40,8 @@ class RecentReplyType extends AbstractType {
 			'label' => 'message.content.label',
 			'required' => true
 		));
+		$builder->add('conversation', HiddenType::class);
+		$builder->add('reply_to', HiddenType::class);
 
 		$builder->add('submit', SubmitType::class, array('label'=>'message.reply.submit', 'attr'=>array('class'=>'cmsg_button')));
 	}
