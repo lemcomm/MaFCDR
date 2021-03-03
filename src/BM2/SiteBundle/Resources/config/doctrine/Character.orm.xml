@@ -4,7 +4,6 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="version" type="integer" version="true"/>
 		<field name="name" type="string"/>
 		<field name="battling" type="boolean" nullable="true"/>
 		<field name="known_as" type="string" nullable="true"/>
