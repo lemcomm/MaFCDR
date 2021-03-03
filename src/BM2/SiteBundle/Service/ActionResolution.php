@@ -191,6 +191,13 @@ class ActionResolution {
 		$this->em->remove($action);
 	}
 
+	private function update_settlement_loot(Action $action) {
+		$now = new \DateTime("now");
+		if ($act->getComplete() <= $now) {
+			$this->em->remove($action);
+		}
+	}
+
 	private function settlement_loot(Action $action) {
 		// just remove this, damage and all has already been applied, we just needed the action to stop travel
 		$this->em->remove($action);
