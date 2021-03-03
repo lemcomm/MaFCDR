@@ -532,7 +532,7 @@ class BattleRunner {
 		}
 		$this->log(20, "...starting phases...\n");
 		while ($combat) {
-			$this->prepareRound($phase);
+			$this->prepareRound();
 			# Main combat loop, go!
 			# TODO: Expand this for multiple ranged phases.
 			if ($phase === 1 && $doRanged) {
@@ -576,10 +576,11 @@ class BattleRunner {
 			$this->defUsedContacts = 0;
 			$this->attusedContacts = 0;
 		}
+		$this->em->flush();
 
 	}
 
-	private function runStage($type = 'normal', $rangedPenaltyStart, $phase, $doRanged) {
+	private function runStage($type, $rangedPenaltyStart, $phase, $doRanged) {
 		$groups = $this->battle->getGroups();
 		$battle = $this->battle;
 		foreach ($groups as $group) {
@@ -644,15 +645,15 @@ class BattleRunner {
 
 			*/
 			if ($type == 'ranged') {
+				$bonus = sqrt($enemies); // easier to hit if there are many enemies
 				foreach ($group->getFightingSoldiers() as $soldier) {
-					if ($soldier->RangedPower()>0) {
+					if ($soldier->RangedPower() > 0) {
 						// ranged soldier - fire!
 						$result=false;
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$shots++;
-							$bonus = sqrt($enemies); // easier to hit if there are many enemies
 							if (rand(0,100+$defBonus)<min(95*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 								// target hit
 								$rangedHits++;
@@ -828,11 +829,11 @@ class BattleRunner {
 						if ($battle->getType() == 'siegeassault' && $usedContacts >= $currentContacts) {
 							$crowded++; #Frontline is too crowded in the siege.
 						} else {
-							$missed++; #Just couldn't hit the target :(
+							$notarget++; #Just couldn't hit the target :(
 						}
 					}
 				}
-				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
+				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$notarget, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
 			}
 			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
