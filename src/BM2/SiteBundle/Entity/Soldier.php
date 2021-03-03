@@ -253,6 +253,8 @@ class Soldier extends NPC {
 		// TODO: heavy armour should reduce this quite a bit
 
 		if ($this->isNoble) {
+			$this->ranged = $power;
+		}else {
 			$fighters = $this->getAllInUnit()->count();
 			if ($fighters>1) {
 				$this->ranged = $power * pow($fighters, 0.96)/$fighters;
