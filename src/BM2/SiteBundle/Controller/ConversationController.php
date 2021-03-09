@@ -11,6 +11,7 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Form\AddParticipantType;
 use BM2\SiteBundle\Form\MessageReplyType;
 use BM2\SiteBundle\Form\NewConversationType;
+use BM2\SiteBundle\Form\NewLocalMessageType;
 use BM2\SiteBundle\Form\RecentReplyType;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -207,7 +208,7 @@ class ConversationController extends Controller {
 	}
 
 	/**
-	  * @Route("/new/local", name="maf_conv_new_local")
+	  * @Route("/new/local", name="maf_conv_local_new")
 	  */
 	public function newLocalConversationAction(Request $request) {
                 $char = $this->get('dispatcher')->gateway('conversationNewTest');
@@ -224,22 +225,29 @@ class ConversationController extends Controller {
 		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
 		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
 
-		$form = $this->createForm(new NewLocalMessageType());
+		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace()));
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			$data = $form->getData();
-			$conv = $this->get('conversation_manager')->newLocalMessage($char, $data['target'], $data['topic'], $data['type'], $data['content'], null, null, true);
+			if ($data['target'] == 'local') {
+				$target = new ArrayCollection();
+				foreach ($allNearby as $each) {
+					$target->add($each['character']);
+				}
+			} else {
+				$target = $data['target'];
+			}
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null, null, true);
 
-			$url = $this->generateUrl('maf_conv_read', ['conv' => $conv->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+			$url = $this->generateUrl('maf_conv_local', [], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$msg->getId();
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
 			return $this->redirectToRoute('maf_conv_summary');
 		}
 
-		return $this->render('Conversation/newconversation.html.twig', [
+		return $this->render('Conversation/newlocal.html.twig', [
 			'form' => $form->createView(),
-			'realm' => $realm,
-			'house' => $house
+			'nearby' => $allNearby,
 		]);
 	}
 
@@ -336,6 +344,43 @@ class ConversationController extends Controller {
 			'veryold' => $veryold,
 			'last' => $last,
 			'active'=> $lastPerm->getActive(),
+		]);
+	}
+
+	/**
+	  * @Route("/local", name="maf_conv_local")
+	  */
+	public function readLocalAction() {
+                $char = $this->get('dispatcher')->gateway('conversationLocalTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
+
+		$em = $this->getDoctrine()->getManager();
+		$conv = $char->getLocalConversation();
+		$messages = $conv->getMessages();
+		$unread = $conv->findLocalUnread();
+		$total = $messages->count();
+
+		if ($unread) {
+			foreach($unread as $msg) {
+				$msg->setRead(TRUE);
+			}
+			$em->flush();
+		}
+
+		#Find the timestamp of the last read message.
+
+		$veryold = new \DateTime('now');
+		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
+
+		return $this->render('Conversation/conversation.html.twig', [
+			'conversation' => $conv,
+			'messages' => $messages,
+			'total' => $total,
+			'unread' => $unread,
+			'veryold' => $veryold,
+			'local'=> true,
 		]);
 	}
 
