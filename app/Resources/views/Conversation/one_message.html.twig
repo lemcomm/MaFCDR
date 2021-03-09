@@ -10,7 +10,11 @@
 			<a id="{{message.id}}"></a>
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
-			{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipientCount}, "conversations")|raw }}
+			{% if local is not defined %}
+				{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipientCount}, "conversations")|raw }}
+			{% else %}
+				{{ 'index.local' |trans({"%topic%":message.topic, "%i%":message.recipientCount}, "conversations")|raw }}
+			{% endif %}
 			{% if message.replyTo %}
 				 --
 				<a href="#{{message.replyTo.id}}">
