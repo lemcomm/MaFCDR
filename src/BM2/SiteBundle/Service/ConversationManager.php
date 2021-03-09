@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\ConversationPermission;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
+use BM2\SiteBundle\Entity\MessageRecipient;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 
@@ -53,14 +54,9 @@ class ConversationManager {
         }
 
         public function getLegacyContacts(Character $char) {
-                # Fetch all conversations in which I have an active permission...
-                $query1 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = TRUE');
-                $query1->setParameter('me', $char);
-                $result1 = $query1->getResult();
-                # Fetch all distinct characters who have permissions in a conversation I'm part of.
-                $query2 = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (:conv)');
-                $query2->setParameter('conv', $result1);
-                return $query2->getResult();
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (SELECT conv FROM BM2SiteBundle:Conversation conv JOIN conv.permissions perm WHERE perm.character = :me AND perm.active = TRUE)');
+                $query->setParameter('me', $char);
+                return $query->getResult();
 	}
 
         public function getUnreadConvPermissions(Character $char) {
@@ -227,36 +223,69 @@ class ConversationManager {
                 }
         }
 
-        public function writeLocalMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type) {
-                if ($type == 'system') {
-                        $valid = true;
+        public function writeLocalMessage(Character $char, $target, $topic, $type, $text, $replyTo = null) {
+                #TODO: Finish reworking this.
+                if ($target == 'place') {
+                        $recipients = $char->getInsidePlace()->getCharactersPresent();
+                } elseif ($target == 'settlement') {
+                        $recipients = $char->getInsideSettlement()->getCharactersPresent();
                 } else {
-                        $valid = $conv->findActiveCharPermission($char);
+                        $recipients = $target;
                 }
-                if ($valid) {
-                        $new = new Message();
-                        $this->em->persist($new);
-                        $new->setType($type);
-                        $new->setCycle($this->appstate->getCycle());
-                        $new->setSent(new \DateTime("now"));
-                        $new->setContent($text);
-                        if ($type != 'system') {
-                                $new->setSender($char);
+                $count = $recipients->count();
+                if (!$recipients->contains($char)) {
+                        $recipients->add($char);
+                }
+
+                $now = new \DateTime("now");
+                $cycle = $this->appstate->getCycle();
+                if ($replyTo) {
+                        $origTarget = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
+                } else {
+                        $origTarget = FALSE;
+                }
+
+                foreach ($recipients as $rec) {
+                        if (!$rec->getLocalConversation()) {
+                                $conv = new Conversation();
+                                $this->em->persist($conv);
+                                $conv->setLocalFor($rec);
+                                $conv->setCreated($now);
+                                $conv->setActive(true);
+                                $conv->setCycle($cycle);
+                                $conv->setUpdated($now);
+                        } else {
+                                $conv = $rec->getLocalConversation();
+                                $conv->setUpdated($now);
                         }
-                        if ($replyTo !== NULL) {
-                                $target = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
-                                if ($target) {
-                                        $new->setReplyTo($target);
+                        $msg = new Message();
+                        $this->em->persist($msg);
+                        $msg->setConversation($conv);
+                        $msg->setType($type);
+                        $msg->setTopic($topic);
+                        $msg->setCycle($cycle);
+                        $msg->setSender($char);
+                        $msg->setSent($now);
+                        $msg->setContent($text);
+                        if ($origTarget) {
+                                $targetMsg = $this->em->getRepository('BM2SiteBundle:Message')->findOneBy(['sent'=>$origTarget->getSent(), 'sender'=>$origTarget->getSender(), 'content'=>$origTarget->getContent()]);
+                                if ($targetMsg) {
+                                        $msg->setReplyTo($target);
                                 }
                         }
-                        $count = $conv->findActivePermissions()->count();
-                        $new->setRecipientCount($count);
-                        $new->setConversation($conv);
-                        $this->em->flush();
-                        return $new;
-                } else {
-                        return 'noActivePerm';
+                        $msg->setRecipientCount($count);
+                        foreach ($recipients as $recip) {
+                                $msgRec = new MessageRecipient();
+                                $this->em->persist($msgRec);
+                                $msgRec->setMessage($msg);
+                                $msgRec->setCharacter($recip);
+                        }
+                        if ($conv->getLocalFor() == $char) {
+                                $mine = $msg;
+                        }
                 }
+                $this->em->flush();
+                return $mine;
         }
 
         public function newConversation(Character $char=null, $recipients=null, $topic, $type, $content = null, $org = null, $system = null, $local = false) {
@@ -309,31 +338,25 @@ class ConversationManager {
                         $conv->setLocalFor($character);
                 }
                 $counter = 0;
-                if (!$local) {
-                        foreach ($recipients as $recipient) {
-                                if (!in_array($recipient, $added)) {
-                                        $counter++;
-                                        $perm = new ConversationPermission();
-                                        $this->em->persist($perm);
-                                        $perm->setStartTime($now);
-                                        $perm->setCharacter($recipient);
-                                        $perm->setConversation($conv);
-                                        $perm->setOwner(false);
-                                        $perm->setManager(false);
-                                        $perm->setActive(true);
-                                        if ($content) {
-                                                $perm->setUnread(1);
-                                        } else {
-                                                $perm->setUnread(0);
-                                        }
-                                        $added[] = $recipient;
+                foreach ($recipients as $recipient) {
+                        if (!in_array($recipient, $added)) {
+                                $counter++;
+                                $perm = new ConversationPermission();
+                                $this->em->persist($perm);
+                                $perm->setStartTime($now);
+                                $perm->setCharacter($recipient);
+                                $perm->setConversation($conv);
+                                $perm->setOwner(false);
+                                $perm->setManager(false);
+                                $perm->setActive(true);
+                                if ($content) {
+                                        $perm->setUnread(1);
                                 } else {
-                                        #Do nothing, duplicate recipient.
+                                        $perm->setUnread(0);
                                 }
-                        }
-                } else {
-                        if ($recipients == 'all') {
-
+                                $added[] = $recipient;
+                        } else {
+                                #Do nothing, duplicate recipient.
                         }
                 }
 
