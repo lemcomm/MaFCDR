@@ -421,7 +421,7 @@ class Geography {
 	public function findCharactersInSpotRange(Character $character) {
 		return $this->findCharactersNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	public function findCharactersInActionRange(Character $character, $only_outside_settlement=false, $match_battle=false, $only_oustide_place=false) {
+	public function findCharactersInActionRange(Character $character, $only_outside_settlement=false, $match_battle=false, $only_outside_place=false) {
 		// FIXME: this should also include characters in the same settlement
 		return $this->findCharactersNearMe($character, $this->calculateInteractionDistance($character), $only_outside_settlement, true, $match_battle, null, $only_outside_place);
 	}
