@@ -14,8 +14,10 @@
 <div class="cmsg_conversation">
 	{% if conversation.realm %}
 	<h3>{{ conversation.realm.name }}: {{ conversation.topic }}</h3>
-	{% else %}
+	{% elseif local is not defined%}
 	<h3>{{ conversation.topic }}</h3>
+	{% else %}
+	<h3>{{ 'conversation.local.title'|trans({'%name%':conversation.getLocalFor.getName}, "conversations") }}</h3>
 	{% endif %}
 
 	{{ macros.general(conversation, participants) }}
@@ -30,7 +32,11 @@
 			</div>
 			{% set in_hidden = false %}
 		{% endif %}
-		{% include "Conversation/one_message.html.twig" with {"last":last, "message":msg} only %}
+		{% if last is defined %}
+			{% include "Conversation/one_message.html.twig" with {"last":last, "message":msg} only %}
+		{% else %}
+			{% include "Conversation/one_message.html.twig" with {"message":msg, "local":local} only %}
+		{% endif %}
 	{% endfor %}
 	{% if in_hidden == true %}
 		</div>
