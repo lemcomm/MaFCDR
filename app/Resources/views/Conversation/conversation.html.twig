@@ -7,12 +7,15 @@
 		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
 	</p>
 {% endif %}
-
-{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last} %}
+{% if last is defined %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last} %}
+{% else %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local} %}
+{% endif %}
 
 <div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
 	{% include "Conversation/syntax.html.twig" %}
-	{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
+	{# {{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }} #}
 </div>
 
 {% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
