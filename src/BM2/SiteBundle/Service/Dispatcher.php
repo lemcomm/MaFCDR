@@ -2584,13 +2584,14 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
+		}
 		if ($unit->getCharacter() == $character || ($unit->getSettlement() && $unit->getSettlement()->getOwner() == $character) || ($unit->getMarshal() == $character)) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
 		}
-
-
 	}
 
 	public function unitRecruitTest() {
@@ -3244,6 +3245,10 @@ class Dispatcher {
 	}
 
 	public function conversationNewTest() {
+		return ["name"=>"conv.new.name", "url"=>"maf_conv_new", "description"=>"conv.new.description"];
+	}
+
+	public function conversationLocalTest() {
 		return ["name"=>"conv.new.name", "url"=>"maf_conv_new", "description"=>"conv.new.description"];
 	}
 
