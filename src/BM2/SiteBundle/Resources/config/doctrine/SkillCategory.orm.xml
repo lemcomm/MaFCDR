@@ -1,0 +1,10 @@
+<doctrine-mapping>
+        <entity name="BM2\SiteBundle\Entity\SkillCategory">
+                <id name="id" type="integer">
+                        <generator strategy="AUTO" />
+                </id>
+
+                <field name="name" type="string" />
+                <one-to-many field="skills" target-entity="SkillType" mapped-by="category"/>
+        </entity>
+</doctrine-mapping>
