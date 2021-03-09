@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
                 <many-to-one field="type" target-entity="ActivityType"/>
+		<many-to-one field="subtype" target-entity="ActivitySubType"/>
                 <field name="name" type="string"/>
 		<field name="created" type="datetime"/>
 		<field name="start" type="datetime"/>
