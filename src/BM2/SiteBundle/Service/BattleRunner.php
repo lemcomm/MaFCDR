@@ -149,7 +149,7 @@ class BattleRunner {
 						case 'stone castle': # 5 points
 							if ($myStage < 3) {
 								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenses();
+								$this->defenseBonus += $building->getDefenseScore();
 							}
 							break;
 						case 'palisade': # 10 points
@@ -160,19 +160,19 @@ class BattleRunner {
 						case 'wood castle': # 5 points
 							if ($myStage < 2) {
 								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenses();
+								$this->defenseBonus += $building->getDefenseScore();
 							}
 							break;
 						case 'fortress': # 50 points
 							if ($myStage == 3) {
 								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenses();
+								$this->defenseBonus += $building->getDefenseScore();
 							}
 							break;
 						case 'citadel': # 70 points
 							if ($myStage == 4) {
 								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenses();
+								$this->defenseBonus += $building->getDefenseScore();
 							}
 							break;
 						default:
@@ -180,7 +180,7 @@ class BattleRunner {
 							# Apothercary and alchemist are also 5.
 							# This grants up to 30 points.
 							$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
-							$this->defenseBonus += $building->getDefenses();
+							$this->defenseBonus += $building->getDefenseScore();
 							break;
 					}
 				}
