@@ -9,6 +9,6 @@
                 <many-to-one field="activity" target-entity="Activity" inversed-by="participants"/>
                 <one-to-many field="bout_participation" target-entity="ActivityBoutParticipant" mapped-by="participant"/>
                 <many-to-one field="character" target-entity="Character" inversed-by="activity_participation"/>
-
+		<many-to-one field="style" target-entity="Style"/>
 	</entity>
 </doctrine-mapping>
