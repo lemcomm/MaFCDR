@@ -32,6 +32,11 @@ class Conversation {
                 return $this->getPermissions()->matching($criteria)->first();
         }
 
+        public function findLocalUnread() {
+                $criteria = Criteria::create()->where(Criteria::expr()->neq("read", TRUE));
+                return $this->getMessages()->matching($criteria)->first();
+        }
+
         public function findRelevantPermissions(Character $char, $admin=false) {
                 $all = $this->getPermissions();
                 if ($admin) {
