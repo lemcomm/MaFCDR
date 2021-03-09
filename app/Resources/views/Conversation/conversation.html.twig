@@ -15,7 +15,9 @@
 
 <div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
 	{% include "Conversation/syntax.html.twig" %}
-	{# {{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }} #}
+	{% if local is not defined %}
+		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
+	{% endif %}
 </div>
 
 {% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
