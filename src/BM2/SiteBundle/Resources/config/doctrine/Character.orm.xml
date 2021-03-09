@@ -132,7 +132,7 @@
 		<many-to-one field="used_portal" target-entity="Portal" inversed-by="recently_used_by"/>
 
 		<one-to-many field="conv_permissions" target-entity="ConversationPermission" mapped-by="character" fetch="EXTRA_LAZY"/>
-		<one-to-many field="local_conversation" target-entity="Conversation" mapped-by="local_for" fetch="EXTRA_LAZY"/>
+		<one-to-one field="local_conversation" target-entity="Conversation" mapped-by="local_for" fetch="EXTRA_LAZY"/>
 		<one-to-many field="messages" target-entity="Message" mapped-by="sender" fetch="EXTRA_LAZY"/>
 		<one-to-many field="tagged_messages" target-entity="MessageTag" mapped-by="character" fetch="EXTRA_LAZY"/>
 
@@ -144,5 +144,7 @@
 
 		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
 		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
+
+                <many-to-one field="skills" target-entity="Skill" inversed-by="character"/>
 	</entity>
 </doctrine-mapping>
