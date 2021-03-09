@@ -4,6 +4,7 @@
 		<id name="id" type="bigint">
 			<generator strategy="AUTO"/>
 		</id>
+		<field name="topic" type="string" nullable="true"/>
                 <field name="type" type="string" nullable="true"/>
                 <field name="sent" type="datetime"/>
 		<field name="cycle" type="integer" nullable="true"/>
@@ -22,5 +23,6 @@
 		<one-to-many field="recipients" target-entity="MessageRecipient" mapped-by="message" on-delete="CASCADE" fetch="EAGER">
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
+		<field name="read" type="boolean" nullable="true"/>
 	</entity>
 </doctrine-mapping>
