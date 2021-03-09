@@ -216,7 +216,7 @@ class Settlement {
 	public function isFortified() {
 		$walls = $this->getBuildings()->filter(
 			function($entry) {
-				if (!$entry->isActive()) return false;
+				if (!$entry->isActive() && abs($entry->getCondition())/$entry->getType()->getBuildHours() < 0.3) return false;
 				return in_array($entry->getType()->getName(), array('Palisade', 'Wood Wall', 'Stone Wall'));
 			}
 		);
