@@ -1187,11 +1187,12 @@ place:
   longdesc:       With the permission of the regional lord, you can formalize a new place of interest that others can visit. The creation is instant, but future upgrades will take time and resources.
  enter:
   name:   Enter Place
-  success: You have sucessfully entered %name%.
+  success: You have successfully entered %name%.
   failure: You find yourself unable to %name%. Either you don't have permission or some other factor, like a siege, is preventing entry.
  exit:
   name:   Exit Place
-  sucess: You find yourself outside %name%.
+  description: Sometimes, it is better to be outside.
+  success: You find yourself outside %name%.
   failure: You find that you are unable to leave. Perhaps it is besieged?
  list:
   name:   View Local Places
