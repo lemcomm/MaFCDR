@@ -26,6 +26,7 @@ index:
  repliedto: %sender% replied on %day% (%ts%)
  conversation: Sent to "%conv%" (%i% recipients)
  conversation2: Sent to "%conv%"
+ local: %topic% (%i% recipients)
 
 orgs:
  title: Organization Conversations
@@ -64,13 +65,22 @@ conversation:
  new:
   title:		new conversation
   title2:   New Conversation within %realm%
+  title3:   New Local Message
   label:    create a new conversation
   desc:     start a new topic and invite participants
+ target:
+  label:  Recipients
+  choose: (select recipients)
+  local:  All Nearby
+  settlement: All in this Settlement
+  place:  All in this Place
  reply:
   title:		New Conversation Message
   label:		add a message
  topic:
   label:		Topic
+ local:
+  title:  Local Messages for %name%
  parent:
   label:		sub-topic of...
   empty:		(nothing)
