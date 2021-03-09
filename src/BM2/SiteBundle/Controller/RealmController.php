@@ -327,7 +327,7 @@ class RealmController extends Controller {
 			$spawn->setActive(true);
 		}
 		$em->flush();
-		return new RedirectResponse($this->generateUrl('maf_realm_spawn', ['realm' => $realm->getId()]).'#'.$spawn->getId());
+		return new RedirectResponse($this->generateUrl('maf_realm_spawn', ['realm' => $realm->getId()]).'#'.$spawn->getPlace()->getId());
 	}
 
 
