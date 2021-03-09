@@ -1,0 +1,17 @@
+<doctrine-mapping>
+        <entity name="BM2\SiteBundle\Entity\Skill">
+                <id name="id" type="integer">
+                        <generator strategy="AUTO" />
+                </id>
+
+                <many-to-one field="character" target-entity="Character" inversed-by="skills"/>
+                <many-to-one field="type" target-entity="SkillType" fetch="EAGER"/>
+                <many-to-one field="category" target-entity="SkillCategory"/>
+
+                <field name="theory" type="integer"/>
+                <field name="practice" type="integer"/>
+                <field name="theory_high" type="integer"/>
+                <field name="practice_high" type="integer"/>
+                <field name="updated" type="datetime"/>
+        </entity>
+</doctrine-mapping>
