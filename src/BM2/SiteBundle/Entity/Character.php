@@ -3,7 +3,9 @@
 namespace BM2\SiteBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
+use BM2\SiteBundle\Entity\Place;
 
 class Character {
 
@@ -316,8 +318,7 @@ class Character {
 
 		if ($check_lord && $this->findAllegiance()) {
 			$alg = $this->findAllegiance();
-			$class = get_class($alg);
-			if ($class != 'Realm') {
+			if (!$alg instanceof Realm) {
 				if ($alg->getRealm() != NULL) {
 					$realms->add($alg->getRealm());
 				}
@@ -452,16 +453,32 @@ class Character {
 
 	public function findAllegiance() {
 		if ($this->realm) {
-			return $this->realm;
+			return $this->getRealm();
 		}
 		if ($this->liege_land) {
-			return $this->liege_land;
+			return $this->getLiegeLand();
 		}
 		if ($this->liege_place) {
-			return $this->liege_place;
+			return $this->getLiegePlace();
 		}
 		if ($this->liege_position) {
-			return $this->liege_position;
+			return $this->getLiegePosition();
+		}
+		return null;
+	}
+
+	public function findPrimaryRealm() {
+		if ($this->realm) {
+			return $this->getRealm();
+		}
+		if ($this->liege_land) {
+			return $this->getLiegeLand()->getRealm();
+		}
+		if ($this->liege_place) {
+			return $this->getLiegePlace()->getRealm();
+		}
+		if ($this->liege_position) {
+			return $this->getLiegePosition()->getRealm();
 		}
 		return null;
 	}
