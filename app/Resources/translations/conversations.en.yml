@@ -23,7 +23,7 @@ index:
  rp:        Roleplay from %sender% on %day% (%ts%)
  reply:     replying to %sender% on %day% (%ts%)
  replies:   "Replies to this message:"
- repliedto: %sender% replied on %day% (%ts%)
+ repliedto: %sender% on %ts%
  conversation: Sent to "%conv%" (%i% recipients)
  conversation2: Sent to "%conv%"
  local: %topic% (%i% recipients)
