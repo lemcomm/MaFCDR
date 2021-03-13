@@ -78,6 +78,7 @@ class NewLocalMessageType extends AbstractType {
 			'choices' => $target,
 			'placeholder' => 'conversation.target.choose',
 		]);
+		$builder->add('reply_to', HiddenType::class);
 
 		$builder->add('submit', SubmitType::class, array('label'=>'conversation.create', 'attr'=>array('class'=>'cmsg_button')));
 	}
