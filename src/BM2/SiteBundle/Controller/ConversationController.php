@@ -238,7 +238,7 @@ class ConversationController extends Controller {
 			} else {
 				$target = $data['target'];
 			}
-			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null, null, true);
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null);
 
 			$url = $this->generateUrl('maf_conv_local', [], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$msg->getId();
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
@@ -441,11 +441,8 @@ class ConversationController extends Controller {
 			foreach($data['contacts'] as $new) {
 				# Double check we can actually add this person.
 				if (in_array($new, $contacts)) {
-					echo 'found ';
 					$this->get('conversation_manager')->addParticipant($conv, $new);
 					$em->flush();
-				} else {
-					echo 'negative ';
 				}
 			}
 			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $data['contacts'], $char, false);
@@ -623,7 +620,6 @@ class ConversationController extends Controller {
 		]);
 	}
 
-
 	/**
 	  * @Route("/recent/reply/{window}", name="maf_conv_recent_reply", requirements={"window"="\d+"})
 	  */
@@ -645,6 +641,44 @@ class ConversationController extends Controller {
 
 			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
 			$message = $this->get('conversation_manager')->writeMessage($conv, $data['reply_to'], $char, $data['content'], $data['type']);
+
+			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
+		}
+
+		return $this->render('Conversation/reply.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/local/reply", name="maf_conv_local_reply")
+	  */
+	public function replyLocalAction(Request $request, string $window='0') {
+                $char = $this->get('dispatcher')->gateway('conversationLocalReplyTest');
+
+		$org = false;
+		if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
+			$distance = $this->get('geography')->calculateInteractionDistance($char);
+		} else {
+			$distance = $this->get('geography')->calculateSpottingDistance($char);
+		}
+		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
+		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
+
+		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace()));
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+
+			$conv = $data['conversation'];
+			$em = $this->getDoctrine()->getManager();
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+
+			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to']);
 
 			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
 		}
