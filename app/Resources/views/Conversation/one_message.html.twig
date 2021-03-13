@@ -49,9 +49,9 @@
 						{% for msg in message.replies %}
 							<a href="#{{msg.id}}">
 								{% if msg.sender %}
-									<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%day%":msg.cycle|gametime("short"), "%ts%":msg.sent|date}, "conversations")|raw }}</li>
+									<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
 								{% else %}
-									<li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%day%":msg.cycle|gametime("short"), "%ts%":msg.sent|date}, "conversations")|raw }}</li>
+									<li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
 								{% endif %}
 							</a>
 						{% endfor %}
