@@ -3233,7 +3233,7 @@ class Dispatcher {
 	}
 
 	public function conversationRecentTest() {
-		return ["name"=>"conv.unread.name", "url"=>"maf_conv_unread", "description"=>"conv.unread.description"];
+		return ["name"=>"conv.recent.name", "url"=>"maf_conv_recent", "description"=>"conv.recent.description"];
 	}
 
 	public function conversationUnreadTest() {
@@ -3249,7 +3249,7 @@ class Dispatcher {
 	}
 
 	public function conversationLocalTest() {
-		return ["name"=>"conv.new.name", "url"=>"maf_conv_new", "description"=>"conv.new.description"];
+		return ["name"=>"conv.local.name", "url"=>"maf_conv_local", "description"=>"conv.new.description"];
 	}
 
 	public function conversationSingleTest($ignored, Conversation $conv) {
@@ -3260,13 +3260,19 @@ class Dispatcher {
 	}
 
 	public function conversationManageTest($ignored, Conversation $conv) {
-		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
-			return ["name"=>"conv.read.name", "description"=>"unavailable.conv.nopermission"];
+		if ($conv->getLocalFor()) {
+			return ["name"=>"conv.manage.name", "description"=>"unavailable.conv.islocal"];
 		}
-		return ["name"=>"conv.read.name", "url"=>"maf_conv_read", "description"=>"conv.read.description"];
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+			return ["name"=>"conv.manage.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.manage.name", "url"=>"maf_conv_participants", "description"=>"conv.manage.description"];
 	}
 
 	public function conversationChangeTest($ignored, Conversation $conv) {
+		if ($conv->getLocalFor()) {
+			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.islocal"];
+		}
 		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
 			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.nopermission"];
 		}
@@ -3277,10 +3283,13 @@ class Dispatcher {
 		if (!$perm->getManager() AND !$perm->getOwner()) {
 			return ["name"=>"conv.change.name", "description"=>"unavailable.conv.notmanager"];
 		}
-		return ["name"=>"conv.change.name", "url"=>"maf_conv_read", "description"=>"conv.change.description"];
+		return ["name"=>"conv.change.name", "url"=>"maf_conv_participants", "description"=>"conv.change.description"];
 	}
 
 	public function conversationLeaveTest($ignored, Conversation $conv) {
+		if ($conv->getLocalFor()) {
+			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.islocal"];
+		}
 		if ($conv->getRealm()) {
 			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.ismanaged"];
 		}
@@ -3295,13 +3304,16 @@ class Dispatcher {
 	}
 
 	public function conversationRemoveTest($ignored, Conversation $conv) {
+		if ($conv->getLocalFor()) {
+			return ["name"=>"conv.remove.name", "description"=>"unavailable.conv.islocal"];
+		}
 		if ($conv->getRealm()) {
-			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.ismanaged"];
+			return ["name"=>"conv.remove.name", "description"=>"unavailable.conv.ismanaged"];
 		}
 		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
-			return ["name"=>"conv.leave.name", "description"=>"unavailable.conv.nopermission"];
+			return ["name"=>"conv.remove.name", "description"=>"unavailable.conv.nopermission"];
 		}
-		return ["name"=>"conv.leave.name", "url"=>"maf_conv_leave", "description"=>"conv.leave.description"];
+		return ["name"=>"conv.remove.name", "url"=>"maf_conv_leave", "description"=>"conv.remove.description"];
 	}
 
 	public function conversationAddTest($ignored, Conversation $conv) {
@@ -3319,10 +3331,14 @@ class Dispatcher {
 	}
 
 	public function conversationReplyTest($ignored, Conversation $conv) {
-		if ($conv->findCharPermissions($this->getCharacter())->isEmpty()) {
+		if ($conv->findCharPermissions($this->getCharacter())->isEmpty() && $conv->getLocalFor() != $this->getCharacter()) {
 			return ["name"=>"conv.reply.name", "description"=>"unavailable.conv.nopermission"];
 		}
 		return ["name"=>"conv.reply.name", "url"=>"maf_conv_change", "description"=>"conv.reply.description"];
+	}
+
+	public function conversationLocalReplyTest() {
+		return ["name"=>"conv.localreply.name", "url"=>"maf_conv_local_reply", "description"=>"conv.localreply.description"];
 	}
 
 	/* ========== various tests and helpers ========== */
