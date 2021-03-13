@@ -26,6 +26,7 @@ menu:
  credits:   Credits
  contact:   Contact
  forum:     Forum
+ discord:   Discord
  wiki:      Wiki
  bugs:      Bugtracker
  about:     About
@@ -482,10 +483,13 @@ first:
  title:     Welcome to Might & Fealty
  intro:
   realm: With the formal affiar of joining %realm% out of the way, the first thing you will probably want to do is introduce yourself to your new comrades in arms.
-  subrealm: That can be done either here in the subrealm, <a href="%conv-1%">here</a>, or sovereign realm, <a href="%conv-2%">here</a>, where the local bureaucrats have already announced your arrival.
-  sovrealm: That can be done <a href="%conv-2%">here</a>, where the local bureaucrats have already announced your arrival.
-  house: With the formal affair of joining %house% out of the way, the first thing you will probably want to do is introduce yourself to your new comrades in arms. That can be done <a href="%conv-2%">here</a>.<br /><br />As you are starting in a House rather than a Realm, you may wish to ask for recommendations for which realm you should seek to join. It's quite likely that your fellows will have suggestions.
-  nodesc: The staff wish you well on your travels and glory in your life. May your actions bring you and them renown.
+  subrealm: >
+    That can be done either here in the subrealm, <a href="%conv%">here</a>, or sovereign realm, <a href="%conv2%">here</a>, where the local bureaucrats have already announced your arrival.
+  sovrealm: >
+    That can be done <a href="%conv%">here</a>, where the local bureaucrats have already announced your arrival.
+  house: >
+    With the formal affair of joining %house% out of the way, the first thing you will probably want to do is introduce yourself to your new comrades in arms. That can be done <a href="%conv-2%">here</a>.<br /><br />As you are starting in a House rather than a Realm, you may wish to ask for recommendations for which realm you should seek to join. It's quite likely that your fellows will have suggestions.
+  nodesc: The staff wish you well on your travels and glory in your life. May your actions bring you and those they server renown.
   final: It is important to note that Might & Fealty tends to be a slow game, so don't expect much action in your first days. That said, it can be quite complex, as it tries to emulate the possibilities of real life as well as it can given the setting, so we do recommend reading the <a href="%manual%">the game manual</a> if you haven't already. Alternatively, <a href="%discord%">the community discord</a> can also be a great help.
 
 character:
