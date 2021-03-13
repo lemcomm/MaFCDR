@@ -374,7 +374,7 @@ class CharacterController extends Controller {
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		$conv = $this->get('conversation_manager');
+		$convMan = $this->get('conversation_manager');
 		$em = $this->getDoctrine()->getManager();
 
 		$house = null;
@@ -422,7 +422,7 @@ class CharacterController extends Controller {
 				$character->setRetired(false);
 			}
 			$character->setInsidePlace($place);
-			list($conv, $supConv) = $conv->sendNewCharacterMsg($realm, $house, $place, $character);
+			list($conv, $supConv) = $convMan->sendNewCharacterMsg($realm, $house, $place, $character);
 			# $conv should always be a Conversation, while supConv will be if realm is not Ultimate--otherwise null.
 			# Both instances of Converstion.
 
@@ -450,17 +450,20 @@ class CharacterController extends Controller {
 			}
 			$em->flush();
 		} else {
+			$place = $spawn->getPlace();
 			$realm = $character->findPrimaryRealm();
 			if ($realm) {
 				if ($realm->getSuperior()) {
 					$supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm->getSuperior(), 'system'=>'announcements']);
+				} else {
+					$supConv = null;
 				}
 				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
 			} elseif ($character->getHouse()) {
 				$house = $character->getHouse();
 				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
+				$supConv = null;
 			}
-
 		}
 
 		return $this->render('BM2SiteBundle::Character/first.html.twig', [
