@@ -407,11 +407,11 @@ class ConversationManager {
                 } elseif ($type == 'left') {
                         $content = $originator->getName().' has left the conversation.';
                 } elseif ($type == 'realmnew') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the realm as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the realm as a knight at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmnew2') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight at [p:'.$extra['where'].'].';
                 } elseif ($type == 'housenew') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has sworn allegiance to the house at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinplace') {
                         $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinplace2') {
@@ -569,17 +569,21 @@ class ConversationManager {
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
+                        $em->flush();
                         $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
+                        $em->flush();
                         $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                         $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
                         $this->addParticipant($supConv, $char);
+                        $em->flush();
                         $this->newSystemMessage($supConv, 'realmnew2', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
                 } elseif ($house) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
+                        $em->flush();
                         $this->newSystemMessage($conv, 'housenew', null, $char, null, ['where'=>$place->getId()]);
                 }
                 return [$conv, $supConv];
@@ -627,13 +631,16 @@ class ConversationManager {
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
+                        $em->flush();
                         $this->newSystemMessage($conv, $string, null, $char, null, $extra);
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
                         $this->addParticipant($conv, $char);
+                        $em->flush();
                         $this->newSystemMessage($conv, $string, null, $char, null, $extra);
                         $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
                         $this->addParticipant($supConv, $char);
+                        $em->flush();
                         $this->newSystemMessage($supConv, $string.'2', null, $char, null, $extra);
                 }
                 return [$conv, $supConv];
@@ -642,7 +649,6 @@ class ConversationManager {
         public function addParticipant(Conversation $conv, Character $char) {
                 $perm = $this->em->getRepository('BM2SiteBundle:ConversationPermission')->findOneBy(['conversation'=>$conv, 'character'=>$char,'active'=>true]);
                 if (!$perm) {
-                        echo 'creating perm ';
                         $now = new \DateTime("now");
                         $perm = new ConversationPermission();
                         $this->em->persist($perm);
