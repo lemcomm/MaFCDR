@@ -5,16 +5,16 @@
 	{% if place.spawnDescription %}
 		<p>{{ place.spawnDescription.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
 	{% else %}
-		<p>{{ "first.nodesc"|trans|raw }}</p>
+		<p>{{ "first.intro.nodesc"|trans|raw }}</p>
 	{% endif %}
 	<hr>
 	{% if realm %}
-		{{ "first.realm"|trans({"%link-realm%":realm.id})}}
+		{{ "first.intro.realm"|trans({"%realm%":realm.name})}}
 		{% if not realm.superior %}
-			{{ "first.subrealm"|trans({"%conv-1%":path("maf_conv_read", {"conv":conv.id}), "%conv-2%":path("maf_conv_read", {"conv":supConv.id})})|raw }}
+			{{ "first.intro.sovrealm"|trans({"%conv%":path("maf_conv_read", {"conv":conv.id})})|raw }}
 		{% else %}
-			{{ "first.subrealm"|trans({"%conv-1%":path("maf_conv_read", {"conv":conv.id})})|raw }}
+			{{ "first.intro.subrealm"|trans({"%conv%":path("maf_conv_read", {"conv":conv.id}), "%conv2%":path("maf_conv_read", {"conv":supConv.id})})|raw }}
 		{% endif %}
 	{% endif %}
-	<p>{{ "first.final"|trans({"%manual%":path(bm2_manual), "%discord%":"https://discord.gg/7YpAhEh"})|raw }}
+	<p>{{ "first.intro.final"|trans({"%manual%":path('bm2_manual'), "%discord%":"https://discord.gg/7YpAhEh"})|raw }}
 {% endblock %}
