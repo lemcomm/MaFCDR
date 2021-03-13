@@ -21,8 +21,8 @@ new:
 
 description:
  generic:    Description
- short:      Short, Externally Visible Description
- full:       Longer, Internally Visible Description
+ short:      Short Description
+ full:       Longer, More Detailed Description
 
 place:
  owner:      Owner
@@ -86,7 +86,7 @@ help:
   formalname: The formal name of this place. Perhaps something ostentatious?
   type:       Select the type of place this is. You can only choose this once, so choose carefully.
   shortdesc:  This is the short description of this place, viewable by those outside of it.
-  longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it. Make it good!
+  longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it and also used to lure new characters to spawn here. Make it good!
 
 unknown:
  title:      Unknown Place
