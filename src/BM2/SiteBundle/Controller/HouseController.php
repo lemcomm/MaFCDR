@@ -2,20 +2,21 @@
 
 namespace BM2\SiteBundle\Controller;
 
-use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
+use BM2\SiteBundle\Entity\House;
 
-use BM2\SiteBundle\Form\DescriptionNewType;
-use BM2\SiteBundle\Form\HouseCreationType;
-use BM2\SiteBundle\Form\HouseMembersType;
-use BM2\SiteBundle\Form\HouseJoinType;
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\HouseCadetType;
+use BM2\SiteBundle\Form\HouseCreationType;
+use BM2\SiteBundle\Form\HouseJoinType;
+use BM2\SiteBundle\Form\HouseMembersType;
 
+use BM2\SiteBundle\Service\DescriptionManager;
 use BM2\SiteBundle\Service\GameRequestManager;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
-use BM2\SiteBundle\Service\DescriptionManager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
@@ -32,11 +33,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HouseController extends Controller {
 
-	private $house;
-
 	/**
 	  * @Route("/{id}", name="maf_house", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:House:view.html.twig")
 	  */
 
 	public function viewAction(House $house) {
@@ -51,17 +49,16 @@ class HouseController extends Controller {
 				}
 			}
 		}
-
-		return array(
+		
+		return $this->render('BM2SiteBundle::House/view.html.twig', [
 			'house' => $house,
 			'details' => $details,
 			'head' => $head
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/nearby", name="maf_house_nearby")
-	  * @Template
 	  */
 
 	public function nearbyAction() {
@@ -90,16 +87,15 @@ class HouseController extends Controller {
 				}
 			}
 		}
-
-		return array(
+		
+		return $this->render('BM2SiteBundle::House/nearby.html.twig', [
 			'houses' => $houses,
 			'already' => $already
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/create", name="maf_house_create")
-	  * @Template
 	  */
 
 	public function createAction(Request $request) {
@@ -128,14 +124,13 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('BM2SiteBundle::House/create.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{house}/manage", name="maf_house_manage", requirements={"house"="\d+"})
-	  * @Template
 	  */
 
 	public function manageAction(House $house, Request $request) {
@@ -186,7 +181,7 @@ class HouseController extends Controller {
 				$change = TRUE;
 			}
 			if ($data['private'] != $priv) {
-				$house->setPrivate($data['secret']);
+				$house->setPrivate($data['private']);
 				$change = TRUE;
 			}
 			if ($change) {
@@ -195,14 +190,13 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('BM2SiteBundle::House/manage.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{house}/join", name="maf_house_join", requirements={"house"="\d+"})
-	  * @Template
 	  */
 
 	public function joinAction(House $house, Request $request) {
@@ -230,17 +224,17 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('BM2SiteBundle::House/join.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{house}/applicants", name="maf_house_applicants", requirements={"house"="\d+"})
-	  * @Template
 	  */
 
 	public function applicantsAction(House $house, Request $request) {
+		# TODO: Make this a sub-route of the manage GameRequests route.
 		$character = $this->get('dispatcher')->gateway('houseManageApplicantsTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -253,15 +247,15 @@ class HouseController extends Controller {
 			$subject = $joinrequest->getSubject();
 			$text = $joinrequest->getText();
 		}
-		return array(
+
+		return $this->render('BM2SiteBundle::House/applicants.html.twig', [
 			'name' => $house->getName(),
-			'joinrequests' => $joinrequests
-		);
+			'form' => $form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/{house}/disown", name="maf_house_disown", requirements={"house"="\d+"})
-	  * @Template
 	  */
 
 	public function disownAction(House $house, Request $request) {
@@ -301,15 +295,14 @@ class HouseController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('BM2SiteBundle::House/disown.html.twig', [
 			'name' => $house->getName(),
-			'form' => $form->createView(),
-		);
+			'form' => $form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/{house}/successor", name="maf_house_successor", requirements={"house"="\d+"})
-	  * @Template
 	  */
 
 	public function successorAction(House $house, Request $request) {
@@ -334,15 +327,14 @@ class HouseController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('BM2SiteBundle::House/successor.html.twig', [
 			'name' => $house->getName(),
-			'form' => $form->createView(),
-		);
+			'form' => $form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/relocate", name="maf_house_relocate")
-	  * @Template
 	  */
 
 	public function relocateAction(Request $request) {
@@ -395,10 +387,10 @@ class HouseController extends Controller {
 				/* You shouldn't ever reach this. The form requires input. */
 			}
 		}
-		return array(
+		return $this->render('BM2SiteBundle::House/relocate.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 
@@ -449,5 +441,35 @@ class HouseController extends Controller {
 		}
 		$em->flush();
 		return new RedirectResponse($this->generateUrl('bm2_politics'));
+	}
+
+	/**
+	  * @Route("/{house}/cadet", name="maf_house_cadetship", requirements={"house"="\d+"})
+	  */
+
+	public function cadetAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageCadetTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$myHouse = $character->getHouse();
+		$form = $this->createForm(new HouseCadetType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$yes = $form->getData()['sure']
+			if ($yes) {
+				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character->getHouse(), $house);
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('house.fail.cadet', array(), 'messages'));
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('house.success.cadet', array(), 'messages'));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
+		}
+		return $this->render('BM2SiteBundle::House/cadet.html.twig', [
+			'house'=>$house,
+			'myHouse'=>$myHouse,
+			'form'=>$form->createView()
+		]);
 	}
 }

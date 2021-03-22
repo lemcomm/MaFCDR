@@ -73,6 +73,7 @@ class ConversationManager {
                 #TODO: This function is possibly one of the slowest in the game. Like the conversation list, it scales with the number of conversations and permissions we have.
                 # The main thing slowing it down is that you have to check every message against the character permissions to see if should be rendered or not.
                 # If it was just "you're in this conversation or not" we could do this in two queries. Because you can be in the conversation historically but not actively participating though, we have to sort things out.
+		# Ideally, we should look into a way to do this is a single SQL query.
                 $endTime = new \DateTime($string);
                 $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p WHERE p.character = :me AND (p.end_time > :end_time OR p.end_time IS NULL)');
                 $query->setParameters(['end_time' => $endTime, 'me' => $char]);
@@ -93,6 +94,16 @@ class ConversationManager {
                                 $allMsg->add($msg);
                         }
                 }
+		if ($local = $char->getLocalConversation()) {
+			foreach ($local->getMessages() as $msg) {
+				if ($msg->getSent() >= $endTime) {
+					if (!$msg->getRead()) {
+						$msg->setRead(true);
+					}
+					$allMsg->add($msg);
+				}
+			}
+		}
                 $iterator = $allMsg->getIterator();
                 $iterator->uasort(function($a, $b) {
                         return ($a->getSent() > $b->getSent()) ? 1 : -1 ;
@@ -117,6 +128,14 @@ class ConversationManager {
                                 }
                         }
                 }
+		if ($local = $char->getLocalConversation()) {
+			foreach ($local->getMessages() as $msg) {
+				if (!$msg->getRead()) {
+					$allMsg->add($msg);
+					$msg->setRead(true);
+				}
+			}
+		}
                 # We got the messages, now sort them...
                 $iterator = $unread->getIterator();
                 $iterator->uasort(function($a, $b) {
@@ -124,20 +143,6 @@ class ConversationManager {
                 });
                 $this->em->flush();
                 return new ArrayCollection(iterator_to_array($iterator));
-        }
-
-        public function getConvUnreadMessages(Character $char, Conversation $conv) {
-                $unread = new ArrayCollection();
-                foreach ($char->getConvPermissions()->filter(function($entry) use ($conv) {return $entry->getConversation() == $conv;}) as $perm) {
-                        if ($total = $perm->getUnread() > 0) {
-                                $counter = 0;
-                                foreach ($perm->getConversation()->getMessages() as $message) {
-                                        if ($message->sent() > $perm->getLastAccess()) {
-                                                $unread->add($message);
-                                        }
-                                }
-                        }
-                }
         }
 
         public function removePlayerConversation(Character $char, Conversation $conv) {

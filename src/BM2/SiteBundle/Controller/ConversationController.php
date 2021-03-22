@@ -687,4 +687,21 @@ class ConversationController extends Controller {
 			'form' => $form->createView()
 		]);
 	}
+
+	/**
+	  * @Route("/local/remove/{msg}", name="maf_conv_local_remove", requirements={"msg"="\d+"})
+	  */
+	public function removeLocalAction(Request $request, Message $msg) {
+                $char = $this->get('dispatcher')->gateway('conversationLocalRemoveTest', false, true, false, $msg);
+		$em = $this->getDoctrine()->getManager();
+		
+		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Message m WHERE m.conversation = :conv AND m.sent <= :date ORDER BY m.sent DESC');
+                $query->setParameters(['conv'=>$msg->getConversation(), 'date'=>$msg->getSent()]);
+		$query->setMaxResults(1);
+                $nextOldest = $query->getResult();
+		
+		$em->remove($msg);
+		$em->flush();
+		return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$nextOldest->getId());
+	}
 }
