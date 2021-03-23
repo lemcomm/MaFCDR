@@ -225,7 +225,7 @@ class ConversationController extends Controller {
 		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
 		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
 
-		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace()));
+		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace(), false));
 
 		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid()) {
@@ -344,6 +344,7 @@ class ConversationController extends Controller {
 			'veryold' => $veryold,
 			'last' => $last,
 			'active'=> $lastPerm->getActive(),
+			'local'=> false,
 		]);
 	}
 
@@ -653,7 +654,7 @@ class ConversationController extends Controller {
 	/**
 	  * @Route("/local/reply", name="maf_conv_local_reply")
 	  */
-	public function replyLocalAction(Request $request, string $window='0') {
+	public function replyLocalAction(Request $request) {
                 $char = $this->get('dispatcher')->gateway('conversationLocalReplyTest');
 
 		$org = false;
@@ -665,22 +666,23 @@ class ConversationController extends Controller {
 		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
 		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
 
-		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace()));
+		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace(), true));
 
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
+			if ($data['target'] == 'local') {
+				$target = new ArrayCollection();
+				foreach ($allNearby as $each) {
+					$target->add($each['character']);
+				}
+			} else {
+				$target = $data['target'];
+			}
 
-			$conv = $data['conversation'];
-			$em = $this->getDoctrine()->getManager();
-	                if (! $char instanceof Character) {
-	                        return $this->redirectToRoute($char);
-	                }
-
-			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
 			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to']);
 
-			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
+			return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$msg->getId());
 		}
 
 		return $this->render('Conversation/reply.html.twig', [
@@ -694,12 +696,12 @@ class ConversationController extends Controller {
 	public function removeLocalAction(Request $request, Message $msg) {
                 $char = $this->get('dispatcher')->gateway('conversationLocalRemoveTest', false, true, false, $msg);
 		$em = $this->getDoctrine()->getManager();
-		
+
 		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Message m WHERE m.conversation = :conv AND m.sent <= :date ORDER BY m.sent DESC');
                 $query->setParameters(['conv'=>$msg->getConversation(), 'date'=>$msg->getSent()]);
 		$query->setMaxResults(1);
                 $nextOldest = $query->getResult();
-		
+
 		$em->remove($msg);
 		$em->flush();
 		return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$nextOldest->getId());
