@@ -49,7 +49,7 @@ class HouseController extends Controller {
 				}
 			}
 		}
-		
+
 		return $this->render('BM2SiteBundle::House/view.html.twig', [
 			'house' => $house,
 			'details' => $details,
@@ -87,7 +87,7 @@ class HouseController extends Controller {
 				}
 			}
 		}
-		
+
 		return $this->render('BM2SiteBundle::House/nearby.html.twig', [
 			'houses' => $houses,
 			'already' => $already
@@ -457,7 +457,7 @@ class HouseController extends Controller {
 		$form = $this->createForm(new HouseCadetType());
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
-			$yes = $form->getData()['sure']
+			$yes = $form->getData()['sure'];
 			if ($yes) {
 				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character->getHouse(), $house);
 			} else {
