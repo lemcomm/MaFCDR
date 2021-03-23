@@ -94,6 +94,11 @@ class ConversationManager {
                                 $allMsg->add($msg);
                         }
                 }
+                /* TODO: Figure out how to make the recent menu smart enough to handle replies to *either* local or regular conversations.
+                Currently, the main issue is that you need a character to get the reply-to list for local conversations, unless we also store the target group.
+                Even then, we need a way to correlate whether or not we can send to that group specifically, which again, we need a character for.
+                It might be easier to just have the local use the same filtering system as the recent.
+                One way to solve this would be to rebuild the entire message loading templates.
 		if ($local = $char->getLocalConversation()) {
 			foreach ($local->getMessages() as $msg) {
 				if ($msg->getSent() >= $endTime) {
@@ -104,6 +109,7 @@ class ConversationManager {
 				}
 			}
 		}
+                */
                 $iterator = $allMsg->getIterator();
                 $iterator->uasort(function($a, $b) {
                         return ($a->getSent() > $b->getSent()) ? 1 : -1 ;
