@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Form;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -17,10 +18,12 @@ class NewLocalMessageType extends AbstractType {
 
 	private $settlement;
 	private $place;
+	private $reply;
 
-	public function __construct($settlement, $place) {
+	public function __construct($settlement, $place, $reply) {
 		$this->settlement = $settlement;
 		$this->place = $place;
+		$this->reply = $reply;
 	}
 
 	public function getName() {
@@ -37,6 +40,12 @@ class NewLocalMessageType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$place = $this->place;
 		$settlement = $this->settlement;
+		if ($this->reply) {
+			$reply = 'reply';
+		} else {
+			$reply = 'new';
+		}
+
 		$target = ['local'=>'conversation.target.local'];
 		if ($place) {
 			$target['place'] = 'conversation.target.place';
@@ -80,7 +89,7 @@ class NewLocalMessageType extends AbstractType {
 		]);
 		$builder->add('reply_to', HiddenType::class);
 
-		$builder->add('submit', SubmitType::class, array('label'=>'conversation.create', 'attr'=>array('class'=>'cmsg_button')));
+		$builder->add('submit', SubmitType::class, array('label'=>'message.send.'.$reply, 'attr'=>array('class'=>'cmsg_button')));
 	}
 
 
