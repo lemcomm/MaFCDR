@@ -89,7 +89,6 @@ class GameRequestManager {
 			foreach ($realm->findRulers() as $ruler) {
 				if ($char == $ruler) {
 					$realmIDs[] = $realm->getId();
-					echo $realm->getId().', ';
 				}
 			}
 		}
