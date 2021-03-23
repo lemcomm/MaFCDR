@@ -55,12 +55,18 @@ $("#replydialog").dialog({
 $(".cmsg_conversation").on("click", "button.reply", function(){
 	var id = $(this).closest('.cmsg_message').data('id');
         var conv = $(this).closest('.cmsg_message').data('conv');
-	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", conv, id);
+        var local = $(this).closest('.cmsg_message').data('local');
+	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", conv, id, local);
 });
 
-function replyform(title, conversation, reply_to) {
-	$("#replydialog").dialog("option", "title", title);
-	$("#message_reply_topic").parent().hide();
+function replyform(title, conversation, reply_to, local) {
+        $("#replydialog").dialog("option", "title", title);
+        if (local) {
+                
+        } else {
+                $("#message_reply_topic").parent().disabled();
+                $("#message_reply_target").parent().disabled();
+        }
 	$("#replydialog").dialog("open");
 	$("#recent_reply_conversation").val(conversation);
 	$("#recent_reply_reply_to").val(reply_to);
