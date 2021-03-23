@@ -39,20 +39,6 @@
 		<div class="sub">
 			<ul class="row">
 				<li class="part">
-					<h3>{{ 'menu.news'|trans|title }}</h3>
-					<ul>
-						<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
-					</ul>
-					<h3>{{ 'menu.messages3'|trans|title }}</h3>
-					<ul>
-						<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations") }}</a></li>
-						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
-						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
-						<li><a href="{{ path('maf_convs_orgs') }}">{{ 'orgs.title'|trans({}, "conversations") }}</a></li>
-						<li><a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.title'|trans({}, "conversations") }}</a></li>
-					</ul>
-				</li>
-				<li class="part">
 					<h3>{{ 'menu.messages2'|trans|title }}</h3>
 					<ul>
 						<li><a href="{{ path('maf_conv_recent', {"window":3}) }}">{{ 'recent.unread'|trans({}, "conversations") }}</a></li>
@@ -65,6 +51,28 @@
 						<li><a href="{{ path('maf_conv_recent', {"window":7}) }}">{{ 'recent.2m'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_conv_recent', {"window":8}) }}">{{ 'recent.3m'|trans({}, "conversations") }}</a></li>
 					</ul>
+				</li>
+				<li class="part">
+					<h3>{{ 'menu.messages4'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a></li>
+					</ul>
+					<h3>{{ 'menu.messages3'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs_orgs') }}">{{ 'orgs.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.title'|trans({}, "conversations") }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>{{ 'menu.news'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+					</ul>
+				</li>
 			</ul>
 		</div>
 	</li>
