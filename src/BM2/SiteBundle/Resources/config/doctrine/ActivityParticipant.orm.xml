@@ -4,11 +4,12 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="role" type="string"/>
+		<field name="role" type="string" nullable="true"/>
 
                 <many-to-one field="activity" target-entity="Activity" inversed-by="participants"/>
                 <one-to-many field="bout_participation" target-entity="ActivityBoutParticipant" mapped-by="participant"/>
                 <many-to-one field="character" target-entity="Character" inversed-by="activity_participation"/>
 		<many-to-one field="style" target-entity="Style"/>
+		<many-to-one field="group" target-entity="ActivityGroup" inversed-by="participants"/>
 	</entity>
 </doctrine-mapping>

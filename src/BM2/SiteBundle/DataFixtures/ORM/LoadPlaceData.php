@@ -64,7 +64,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 	 * {@inheritDoc}
 	 */
 	public function getOrder() {
-		return 1000; // or anywhere, really
+		return 1; // or anywhere, really
 	}
 
 	/**

@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<field name="enabled" type="boolean"/>
 		<one-to-many field="requires" target-entity="ActivityRequirements" mapped-by="type"/>
 	</entity>
 </doctrine-mapping>

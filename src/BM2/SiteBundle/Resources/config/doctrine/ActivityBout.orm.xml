@@ -4,7 +4,8 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-
+		
+                <many-to-one field="type" target-entity="ActivitySubType"/>
                 <many-to-one field="activity" target-entity="Activity" inversed-by="bouts"/>
                 <one-to-many field="participants" target-entity="ActivityBoutParticipant" mapped-by="bout"/>
 

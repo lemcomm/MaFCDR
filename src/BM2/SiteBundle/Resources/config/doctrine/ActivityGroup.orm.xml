@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityGroup">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string" nullable="true"/>
+                <many-to-one field="activity" target-entity="Activity" inversed-by="participants"/>
+		<one-to-many field="participants" target-entity="ActivityParticipant" mapped-by="group"/>
+                <one-to-many field="bout_participation" target-entity="ActivityBoutGroup" mapped-by="participant"/>
+	</entity>
+</doctrine-mapping>

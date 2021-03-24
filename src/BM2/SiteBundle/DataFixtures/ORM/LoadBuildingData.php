@@ -50,7 +50,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Saddler'               => array('auto' =>   2600, 'min' =>    250, 'work' =>   8000, 'ratio' =>   800, 'builtin' => array('city'), 'requires' => array('Leather Tanner')),
 		'School'                => array('auto' =>   3000, 'min' =>    300, 'work' =>  15000, 'ratio' =>  3000, 'builtin' => array('city')),
 		'Shrine'                => array('auto' =>    500, 'min' =>     50, 'work' =>   5000, 'ratio' =>  4000, 'builtin' => array('city','fort','port','temple','graveyard')),
-		'Stables'               => array('auto' =>   3200, 'min' =>    200, 'work' =>  10000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Saddler'), 'conditions'=>true, 'icon'=>'rpg_map/stables.svg'),
+		'Stables'               => array('auto' =>      0, 'min' =>    200, 'work' =>  10000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Saddler'), 'conditions'=>true, 'icon'=>'rpg_map/stables.svg'),
 		'Stone Castle'          => array('auto' =>      0, 'min' =>   2000, 'work' => 300000, 'ratio' =>  1600, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Stone Wall','Stone Towers','Wood Castle','Dirt Streets','Mason'), 'icon'=>'rpg_map/fortress.svg'),
 		'Stone Towers'          => array('auto' =>  50000, 'min' =>   1500, 'work' => 160000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 5, 'requires' => array('Wood Towers','Stone Wall','Mason'), 'icon'=>'rpg_map/tower_square.svg'),
 		'Stone Wall'            => array('auto' =>  25000, 'min' =>   1000, 'work' => 120000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 10, 'requires' => array('Wood Wall','Mason')),
@@ -80,10 +80,12 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Race Track'		=> array('auto' =>      0, 'min' =>   7500, 'work' =>  96000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Bank','Stables')),
 		'Warehouse'		=> array('auto' =>   2000, 'min' =>    250, 'work' =>   5000, 'ratio' =>  3000, 'builtin' => array('city','port'), 'requires' => array('Dirt Streets','Carpenter')),
 		'Dockyard'		=> array('auto' =>   3000, 'min' =>    750, 'work' =>  10000, 'ratio' =>  2500, 'builtin' => array('city','port'), 'requires' => array('Warehouse','Mason','Inn'), 'conditions'=>true),
-		'Guild Square'		=> array('auto' =>      0, 'min' =>    500, 'work' =>   7500, 'ratio' =>  3000, 'builtin' => array('port','fort'), 'requires' => array('Carpenter','Mason')),
+		'Guild Square'		=> array('auto' =>      0, 'min' =>    500, 'work' =>   7500, 'ratio' =>  3000, 'builtin' => array('city','port','fort'), 'requires' => array('Carpenter','Mason')),
 		'Empty Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Palisade')),
 		'Filled Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Empty Moat'), 'conditions'=>true),
 		'Quarry'		=> array('auto' =>      0, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter'), 'conditions'=>true),
+		
+		'Hunters Lodge'		=> array('auto' =>	0, 'min' =>	50, 'work' =>	5000, 'ratio' =>  1200, 'builtin' => ['city', 'fort'], 'requires' => ['Bowyer'], 'conditions'=>true),
 	);
 
 	private $resources = array(
@@ -157,6 +159,8 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Empty Moat'		=> array('wood'=>array('construction'=>500), 'metal'=>array('construction'=>50), 'goods'=>array('construction'=>300, 'operation'=>2)),
 		'Filled Moat'		=> array('wood'=>array('construction'=>5000), 'metal'=>array('construction'=>200), 'goods'=>array('construction'=>300, 'operation'=>3)),
 		'Quarry'		=> array('wood'=>array('construction'=>3000, 'operation'=>100), 'metal'=>array('construction'=>1000, 'operation'=>50, 'bonus'=>20), 'goods'=>array('construction'=>300, 'operation'=>2, 'bonus'=>1)),
+		
+		'Hunters Lodge'         => array('wood'=>array('construction'=>1800, 'bonus'=>1), 'metal'=>array('construction'=>100), 'food'=>array('provides'=>5, 'bonus'=>5)),
 	);
 
 	/**
