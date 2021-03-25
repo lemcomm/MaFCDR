@@ -473,12 +473,21 @@ class BattleRunner {
 	private function addNobility(BattleGroup $group) {
 		foreach ($group->getCharacters() as $char) {
 			// TODO: might make this actual buy options, instead of hardcoded
-			$weapon = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('sword');
-			$armour = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('plate armour');
-			$horse = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('war horse');
+			$weapon = $char->getWeapon();
+			if (!$weapon) {
+				$weapon = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('sword');
+			}
+			$armour = $char->getArmour();
+			if (!$armour) {
+				$armour = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('plate armour');
+			}
+			$equipment = $char->getEquipment();
+			if (!$equipment) {
+				$equipemnt = $this->em->getRepository('BM2SiteBundle:EquipmentType')->findOneByName('war horse');
+			}
 
 			$noble = new Soldier();
-			$noble->setWeapon($weapon)->setArmour($armour)->setEquipment($horse);
+			$noble->setWeapon($weapon)->setArmour($armour)->setEquipment($equipment);
 			$noble->setNoble(true);
 			$noble->setName($char->getName());
 			$noble->setLocked(false)->setRouted(false)->setAlive(true);
@@ -558,6 +567,7 @@ class BattleRunner {
 			}
 		}
 		// Updated siege assault contact scores. When we have siege engines, this will get ridiculously simpler to calculate. Defenders always get it slightly easier.
+		/* Or it would've been if this wasn't garbage.
 		if ($this->battle->getType() == 'siegeassault') {
 			$newAttContacts = $this->attCurrentContacts - $this->attSlain;
 			$newDefContacts = $this->defCurrentContacts - $this->defSlain;
@@ -576,6 +586,7 @@ class BattleRunner {
 			$this->defUsedContacts = 0;
 			$this->attusedContacts = 0;
 		}
+		*/
 		$this->em->flush();
 
 	}
@@ -594,22 +605,23 @@ class BattleRunner {
 			$fail = 0;
 			$missed = 0;
 			$crowded = 0;
-			$attSlain = $this->attSlain; # For Sieges.
-			$defSlain = $this->defSlain; # For Sieges.
+			#$attSlain = $this->attSlain; # For Sieges.
+			#$defSlain = $this->defSlain; # For Sieges.
 			$extras = array();
 			$rangedPenalty = $rangedPenaltyStart; #We need each group to reset their rangedPenalty and defenseBonus.
 			$defBonus = $this->defenseBonus;
+			# The below is partially commented out until we fully add in the battle contact and siege weapon systems.
 			if ($battle->getType() == 'siegeassault') {
 				if ($battle->getPrimaryAttacker() == $group OR $group->getReinforcing() == $battle->getPrimaryAttacker()) {
 					$rangedPenalty = 1; # TODO: Make this dynamic. Right now this can lead to weird scenarios in regions with higher penalties where the defenders are actually easier to hit.
 					$siegeAttacker = TRUE;
-					$usedContacts = 0;
-					$currentContacts = $this->attCurrentContacts;
+					#$usedContacts = 0;
+					#$currentContacts = $this->attCurrentContacts;
 				} else {
 					$defBonus = 0; # Siege defenders use pre-determined rangedPenalty.
 					$siegeAttacker = FALSE;
-					$usedContacts = 0;
-					$currentContacts = $this->defCurrentContacts;
+					#$usedContacts = 0;
+					#$currentContacts = $this->defCurrentContacts;
 				}
 			}
 			if ($type != 'hunt') {
@@ -768,13 +780,14 @@ class BattleRunner {
 							// no more targets
 							$this->log(10, "no more targets\n");
 						}
-					} else if ($soldier->MeleePower() > 0 && (($battle->getType() == 'siegeassault' && $usedContacts < $currentContacts) || ($battle->getType() != 'siegeassault'))) {
+					} else if ($soldier->MeleePower() > 0) {
 						// We are either in a siege assault and we have contact points left, OR we are not in a siege assault. We are a melee unit or ranged unit with melee capabilities in final siege battle.
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$strikes++;
 							$result = $this->MeleeAttack($soldier, $target, $phase);
+							/*
 							if ($battle->getType() == 'siegeassault') {
 								$usedContacts++;
 								if ($result=='kill'||$result=='capture') {
@@ -785,16 +798,20 @@ class BattleRunner {
 									}
 								}
 							}
+							*/
 						} else {
 							// no more targets
 							$this->log(10, "but finds no target\n");
 						}
 					} else {
+						$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack\n");
+						/*
 						if ($battle->getType() == 'siegeassault') {
 							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack, contacts at ".$usedContacts." of ".$currentContacts."\n");
 						} else {
 							$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack\n");
 						}
+						*/
 					}
 					if ($result) {
 						if ($result=='kill'||$result=='capture') {
@@ -826,11 +843,14 @@ class BattleRunner {
 							$extras[] = $extra;
 						}
 					} else {
+						$notarget++;
+						/*
 						if ($battle->getType() == 'siegeassault' && $usedContacts >= $currentContacts) {
 							$crowded++; #Frontline is too crowded in the siege.
 						} else {
 							$notarget++; #Just couldn't hit the target :(
 						}
+						*/
 					}
 				}
 				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$notarget, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
@@ -839,6 +859,7 @@ class BattleRunner {
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
 				$stageReport->setExtra($extras); # Commit this foolery because storing it in data is going to be chaos incarnate.
 			}
+			/*
 			$this->defSlain += $defSlain;
 			$this->attSlain += $attSlain;
 			if ($battle->getType() == 'siegeassault') {
@@ -850,6 +871,7 @@ class BattleRunner {
 					$this->defUsedContacts += $usedContacts;
 				}
 			}
+			*/
 		}
 		/*
 
