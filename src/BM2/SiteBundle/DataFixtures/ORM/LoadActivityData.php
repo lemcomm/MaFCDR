@@ -15,14 +15,14 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadActivityData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $types = array(
-		'duel'			=> ['enabled' => True],
-		'arena'			=> ['enabled' => False, 'buildings' => ['arena', 'tournament'], 'places' => ['arena', 'tournament']],
-		'melee tournament'	=> ['enabled' => False, 'buildings' => ['arena', 'tournament'], 'places' => ['arena', 'tournament']],
-		'joust'			=> ['enabled' => False, 'places' => ['tournament']],
-		'grand tournament'	=> ['enabled' => False, 'buildings' => ['arena', 'archery range'], 'places' => ['tournament']],
-		'race'			=> ['enabled' => False, 'buildings' => ['race track'], 'places' => ['track']],
-		'hunt'			=> ['enabled' => False, 'buildings' => ['hunters lodge'], 'places' => ['tournament']],
-		'ball'			=> ['enabled' => False, 'places' =>['home', 'capital', 'castle', 'embassy']],
+		'duel'			=> ['enabled' => True,  'buildings'=> null,                          'places'=>null],
+		'arena'			=> ['enabled' => False, 'buildings' => ['Arena'],                    'places' => ['arena', 'tournament']],
+		'melee tournament'	=> ['enabled' => False, 'buildings' => ['Arena'],                    'places' => ['arena', 'tournament']],
+		'joust'			=> ['enabled' => False, 'buildings'=> null,                          'places' => ['tournament']],
+		'grand tournament'	=> ['enabled' => False, 'buildings' => ['Arena', 'Archery Range'],   'places' => ['tournament']],
+		'race'			=> ['enabled' => False, 'buildings' => ['Race Track'],               'places' => ['track']],
+		'hunt'			=> ['enabled' => False, 'buildings' => ['Hunters Lodge'],            'places' => ['tournament']],
+		'ball'			=> ['enabled' => False, 'buildings'=> null,                          'places' =>['home', 'capital', 'castle', 'embassy']],
 	);
 
 	/**
@@ -55,7 +55,7 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 							if (!$req) {
 								$req = new ActivityRequirement();
 								$manager->persist($req);
-								$req->setType($id);
+								$req->setType($type);
 								$req->setBuilding($bldgType);
 							}
 						} else {
@@ -71,7 +71,7 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 							if (!$req) {
 								$req = new ActivityRequirement();
 								$manager->persist($req);
-								$req->setType($id);
+								$req->setType($type);
 								$req->setPlace($placeType);
 							}
 						} else {
