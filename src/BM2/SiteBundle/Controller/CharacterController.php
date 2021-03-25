@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\CharacterBackgroundType;
+use BM2\SiteBundle\Form\CharacterLoadoutType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
 use BM2\SiteBundle\Form\CharacterRatingType;
 use BM2\SiteBundle\Form\CharacterSettingsType;
@@ -830,7 +831,6 @@ class CharacterController extends Controller {
 
 		if ($form->isValid()) {
 			$data = $form->getData();
-#			$character->setAutoReadRealms($data->getAutoReadRealms());
 			$em->flush();
 
 
@@ -840,6 +840,37 @@ class CharacterController extends Controller {
 		}
 
 		return array('form'=>$form->createView());
+	}
+
+   /**
+     * @Route("/loadout", name="maf_character_loadout")
+     */
+	public function loadoutAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		$opt['wpns'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
+		$opt['arms'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'armour']);
+		$opt['othr'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'equipment']);
+
+		$form = $this->createForm(new CharacterLoadoutType($opt), $character);
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$em->flush();
+
+
+			$this->addFlash('notice', $this->get('translator')->trans('loadout.success', array(), 'settings'));
+
+			return $this->redirectToRoute('bm2_recent');
+		}
+
+		return $this->render('BM2SiteBundle::Character/loadout.html.twig', [
+			'form'=>$form->createView(),
+		]);
 	}
 
    /**
