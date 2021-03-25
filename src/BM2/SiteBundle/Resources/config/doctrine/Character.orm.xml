@@ -41,6 +41,9 @@
 
 		<field name="auto_read_realms" type="boolean" nullable="true"/>
 		<field name="non_hetero_options" type="boolean" nullable="true"/>
+		<many-to-one field="weapon" target-entity="EquipmentType"/>
+		<many-to-one field="armour" target-entity="EquipmentType"/>
+		<many-to-one field="equipment" target-entity="EquipmentType"/>
 
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
@@ -145,6 +148,6 @@
 		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
 		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
 
-                <many-to-one field="skills" target-entity="Skill" inversed-by="character"/>
+                <one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
 	</entity>
 </doctrine-mapping>
