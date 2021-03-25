@@ -6,6 +6,6 @@
 		</id>
 		<field name="name" type="string"/>
 		<field name="enabled" type="boolean"/>
-		<one-to-many field="requires" target-entity="ActivityRequirements" mapped-by="type"/>
+		<one-to-many field="requires" target-entity="ActivityRequirement" mapped-by="type"/>
 	</entity>
 </doctrine-mapping>
