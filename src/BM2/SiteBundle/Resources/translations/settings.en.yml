@@ -14,10 +14,20 @@ character:
   readrealms:        Automatically mark realm messages as read?
  non_hetero_options: Show homosexual partnership options?
 
+loadout:
+ title:      Character Loadout
+ description: >
+   From here, until we fully detail the soldier gear system (and similarly, the character gear system), you can specifically select the loadout for your character to be used in battle.<br \><br \>
+   It should be noted, that the equipment you use in battle your character will gain familiarity and skill with, which can then affect your performance in future battles and duels, or in the future proper tournaments.
+ armor:     Armor
+ weapon:    Weapon
+ equipment: Equipment
+ none:      (select)
+
 unit:
  title:     Unit Settings
  description: >
-  This page lets you manage the individual tactics and strategy for each unit under your command, as well as change their unit names and supply sources (as applicable).
+  This page lets you manage the individual tactics and strategy for each unit under your command, as well as change their unit names and supply sources (as applicable).<br \><br \>
   All of this is presently not implemented, but will be fully tied into the rest of the game in short order, starting with supply sources, as things are completed. Full information can be found on the manual's "Units" page.
  yourown:   Settings for your personal force
  name:      Unit Name?
