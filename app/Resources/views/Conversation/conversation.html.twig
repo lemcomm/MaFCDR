@@ -7,18 +7,16 @@
 		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
 	</p>
 {% endif %}
-{% if not local %}
-	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last} %}
+{% if local is not defined %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": false} %}
 {% else %}
-	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local} %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local, "archive": false} %}
 {% endif %}
 
 <div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
 	{% include "Conversation/syntax.html.twig" %}
-	{% if not local %}
+	{% if local is not defined %}
 		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
-	{% else %}
-		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyLocalAction')) }}
 	{% endif %}
 </div>
 
@@ -67,28 +65,21 @@ $("#replydialog").dialog({
 
 $(".cmsg_conversation").on("click", "button.topicreply", function(){
 	var id = $(this).data('id');
-	replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", id, {{ local }});
+	replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", id);
 });
 
 $(".cmsg_conversation").on("click", "button.reply", function(){
 	var id = $(this).closest('.cmsg_message').data('id');
-	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", {{ conversation.id }}, id, {{ local }});
+	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", {{ conversation.id }}, id);
 });
 
-function replyform(title, conversation, reply_to, local) {
+function replyform(title, conversation, reply_to, ) {
 	$("#replydialog").dialog("option", "title", title);
-	if (!local) {
-		$("#message_reply_topic").parent().hide();
-	}
+	$("#message_reply_topic").parent().hide();
 	$("#replydialog").dialog("open");
 	$("#message_reply_conversation").val(conversation);
 	$("#message_reply_reply_to").val(reply_to);
-
-	if (!local) {
-		$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
-	} else {
-		$("#replydialog form").attr('action', '{{ path('maf_conv_local_reply') }}');
-	}
+	$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
 }
 
 var request;
