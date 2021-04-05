@@ -3248,7 +3248,10 @@ class Dispatcher {
 		return ["name"=>"conv.new.name", "url"=>"maf_conv_new", "description"=>"conv.new.description"];
 	}
 
-	public function conversationLocalTest() {
+	public function conversationLocalTest($ignored, Conversation $conv=null) {
+		if ($conv && $conv->getLocalFor() != $this->getCharacter()) {
+			return ["name"=>"conv.local.name", "description"=>"unavailable.conv.nopermission"];
+		}
 		return ["name"=>"conv.local.name", "url"=>"maf_conv_local", "description"=>"conv.new.description"];
 	}
 
