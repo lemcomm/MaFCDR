@@ -2,6 +2,17 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Dompdf\Dompdf;
+use Dompdf\Options as PdfOpt;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Conversationpermission;
@@ -12,16 +23,6 @@ use BM2\SiteBundle\Form\AddParticipantType;
 use BM2\SiteBundle\Form\MessageReplyType;
 use BM2\SiteBundle\Form\NewConversationType;
 use BM2\SiteBundle\Form\NewLocalMessageType;
-use BM2\SiteBundle\Form\RecentReplyType;
-
-use Doctrine\Common\Collections\ArrayCollection;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @Route("/conv")
@@ -238,7 +239,7 @@ class ConversationController extends Controller {
 			} else {
 				$target = $data['target'];
 			}
-			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null);
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null, $data['target']);
 
 			$url = $this->generateUrl('maf_conv_local', [], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$msg->getId();
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
@@ -344,7 +345,6 @@ class ConversationController extends Controller {
 			'veryold' => $veryold,
 			'last' => $last,
 			'active'=> $lastPerm->getActive(),
-			'local'=> false,
 		]);
 	}
 
@@ -383,6 +383,116 @@ class ConversationController extends Controller {
 			'veryold' => $veryold,
 			'local'=> true,
 		]);
+	}
+
+	/**
+	  * @Route("/export/{conv}", name="maf_conv_export", requirements={"conv"="\d+"})
+	  */
+	public function exportAction(Conversation $conv) {
+		if ($conv->getLocalFor() != NULL) {
+	                $char = $this->get('dispatcher')->gateway('conversationLocalTest', false, true, false, $conv);
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+			$messages = $conv->getMessages();
+			$local = true;
+			$perms = $conv->findCharPermissions($char);
+			$lastPerm = $perms->last();
+		} else {
+	                $char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+			$messages = $conv->findMessages($char);
+			$local = false;
+		}
+
+		$total = $messages->count();
+
+		#Find the timestamp of the last read message.
+
+		$veryold = new \DateTime('now');
+		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
+		if ($local) {
+			$view = $this->renderView('Conversation/archive.html.twig', [
+				'conversation' => $conv,
+				'messages' => $messages,
+				'total' => $total,
+				'unread' => 0,
+				'veryold' => $veryold,
+				'local'=> $local,
+			]);
+		} else {
+			$view = $this->renderView('Conversation/archive.html.twig', [
+				'conversation' => $conv,
+				'messages' => $messages,
+				'total' => $total,
+				'unread' => 0,
+				'veryold' => $veryold,
+				'last' => NULL,
+				'active'=> false,
+			]);
+		}
+
+
+		set_time_limit(240);
+		$pdf = new Dompdf();
+		$pdf->loadHtml($view);
+		$pdf->render();
+		return $pdf->stream('msgArchive'.$conv->getId().'.pdf', [
+			"Attachment" => true
+		]);
+	}
+
+	/**
+	  * @Route("/print/{conv}", name="maf_conv_print", requirements={"conv"="\d+"})
+	  */
+	public function printAction(Conversation $conv) {
+		if ($conv->getLocalFor() != NULL) {
+	                $char = $this->get('dispatcher')->gateway('conversationLocalTest', false, true, false, $conv);
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+			$messages = $conv->getMessages();
+			$local = true;
+			$perms = $conv->findCharPermissions($char);
+			$lastPerm = $perms->last();
+		} else {
+	                $char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+			$messages = $conv->findMessages($char);
+			$local = false;
+		}
+
+		$total = $messages->count();
+
+		#Find the timestamp of the last read message.
+
+		$veryold = new \DateTime('now');
+		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
+
+		if ($local) {
+			return $this->render('Conversation/archive.html.twig', [
+				'conversation' => $conv,
+				'messages' => $messages,
+				'total' => $total,
+				'unread' => 0,
+				'veryold' => $veryold,
+				'local'=> $local,
+			]);
+		} else {
+			return $this->render('Conversation/archive.html.twig', [
+				'conversation' => $conv,
+				'messages' => $messages,
+				'total' => $total,
+				'unread' => 0,
+				'veryold' => $veryold,
+				'last' => NULL,
+				'active'=> false,
+			]);
+		}
 	}
 
 	/**
@@ -626,7 +736,7 @@ class ConversationController extends Controller {
 	  */
 	public function replyRecentAction(Request $request, string $window='0') {
 
-		$form = $this->createForm(new RecentReplyType());
+		$form = $this->createForm(new MessageReplyType());
 
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
@@ -680,7 +790,7 @@ class ConversationController extends Controller {
 				$target = $data['target'];
 			}
 
-			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to']);
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to'], $data['target']);
 
 			return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$msg->getId());
 		}
