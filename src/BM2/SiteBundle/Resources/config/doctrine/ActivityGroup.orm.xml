@@ -7,6 +7,6 @@
 		<field name="name" type="string" nullable="true"/>
                 <many-to-one field="activity" target-entity="Activity" inversed-by="participants"/>
 		<one-to-many field="participants" target-entity="ActivityParticipant" mapped-by="group"/>
-                <one-to-many field="bout_participation" target-entity="ActivityBoutGroup" mapped-by="participant"/>
+                <one-to-many field="bout_participation" target-entity="ActivityBoutGroup" mapped-by="group"/>
 	</entity>
 </doctrine-mapping>
