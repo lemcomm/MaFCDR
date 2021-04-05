@@ -23,6 +23,7 @@
 		<one-to-many field="recipients" target-entity="MessageRecipient" mapped-by="message" on-delete="CASCADE" fetch="EAGER">
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
+                <field name="target" type="string" nullable="true"/>
 		<field name="read" type="boolean" nullable="true"/>
 	</entity>
 </doctrine-mapping>
