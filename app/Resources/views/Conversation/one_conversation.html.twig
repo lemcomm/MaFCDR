@@ -9,33 +9,39 @@
 	</div>
 {% endmacro %}
 
-{% import _self as macros %}
+	{% if not archive %}
+		{% import _self as macros %}
+	{% endif %}
 
 <div class="cmsg_conversation">
 	{% if conversation.realm %}
-	<h3>{{ conversation.realm.name }}: {{ conversation.topic }}</h3>
+		<h3>{{ conversation.realm.name }}: {{ conversation.topic }}</h3>
 	{% elseif local is not defined%}
-	<h3>{{ conversation.topic }}</h3>
+		<h3>{{ conversation.topic }}</h3>
 	{% else %}
-	<h3>{{ 'conversation.local.title'|trans({'%name%':conversation.getLocalFor.getName}, "conversations") }}</h3>
+		<h3>{{ 'conversation.local.title'|trans({'%name%':conversation.getLocalFor.getName}, "conversations") }}</h3>
 	{% endif %}
 
-	{{ macros.general(conversation, participants) }}
+	{% if not archive %}
+		{{ macros.general(conversation, participants) }}
+	{% endif %}
 
 	{% set in_hidden = false %}
 	{% for msg in messages %}
-		{% if in_hidden == false and msg.sent < veryold %}
-			<button id="hidetoggle" class="cmsg_button">{{ 'conversation.old.show'|trans({},"conversations") }}</button>
-			<div id="oldmessages">
-			{% set in_hidden = true %}
-		{% elseif in_hidden == true and msg.sent > veryold %}
-			</div>
-			{% set in_hidden = false %}
+		{% if not archive %}
+			{% if in_hidden == false and msg.sent < veryold %}
+				<button id="hidetoggle" class="cmsg_button">{{ 'conversation.old.show'|trans({},"conversations") }}</button>
+				<div id="oldmessages">
+				{% set in_hidden = true %}
+			{% elseif in_hidden == true and msg.sent > veryold %}
+				</div>
+				{% set in_hidden = false %}
+			{% endif %}
 		{% endif %}
 		{% if last is defined %}
-			{% include "Conversation/one_message.html.twig" with {"last":last, "message":msg} only %}
+			{% include "Conversation/one_message.html.twig" with {"last":last, "message":msg, "archive": archive} only %}
 		{% else %}
-			{% include "Conversation/one_message.html.twig" with {"message":msg, "local":local} only %}
+			{% include "Conversation/one_message.html.twig" with {"message":msg, "local":local, "archive": archive} only %}
 		{% endif %}
 	{% endfor %}
 	{% if in_hidden == true %}
@@ -43,8 +49,8 @@
 	{% endif %}
 
 	{# FIXME: this only counts top-level messages, for some reason #}
-	{% if messages.count > 5 %}
-	<br/>
-	{{ macros.general(conversation, participants) }}
+	{% if not archive and messages.count > 5 %}
+		<br/>
+		{{ macros.general(conversation, participants) }}
 	{% endif %}
 </div>
