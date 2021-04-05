@@ -1,4 +1,9 @@
-<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}">
+{% if archive %}
+	<hr>
+	<div class="cmsg_message">
+{% else %}
+	<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}">
+{% endif %}
 	<div class="cmsg_message_wrapper_{{message.type}}">
 		<div class="cmsg_message_header_{{message.type}}">
 			{% if message.sender %}
@@ -7,7 +12,7 @@
 				{% set sender = "<i>The System</i>" %}
 			{% endif %}
 
-			<a id="{{message.id}}"></a>
+			{% if not archive %}<a id="{{message.id}}"/>{% endif %}
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
 			{% if local is not defined %}
@@ -32,16 +37,20 @@
 		</div>
 
 		<div class="cmsg_content_{{message.type}}">
-			{{ message.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
+		{{ message.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
 		</div>
 
-		{% if message.type != 'system' %}
+		{% if message.type != 'system' and archive == false %}
 			<div class="cmsg_message_meta_{{message.type}}">
 				<ul class="cmsg_actions">
 					{% if last is defined and last is not null and last.timestamp < message.sent.timestamp %}
 						<li>{{ 'message.new'|trans({},"conversations") }}</li>
 					{% endif %}
-					<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li>
+					{% if not message.target %}
+						<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li>
+					{% else %}
+						<a href="{{ path('maf_conv_local') }}#{{message.id}}"><button id="view_local">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a>
+					{% endif %}
 				</ul>
 				{% if message.replies and message.replies.count > 0 %}<br>
 					<br>{{ 'index.replies' |trans({}, "conversations")|raw }}
