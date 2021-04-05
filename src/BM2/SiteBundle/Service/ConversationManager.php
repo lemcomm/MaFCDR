@@ -98,7 +98,7 @@ class ConversationManager {
                 Currently, the main issue is that you need a character to get the reply-to list for local conversations, unless we also store the target group.
                 Even then, we need a way to correlate whether or not we can send to that group specifically, which again, we need a character for.
                 It might be easier to just have the local use the same filtering system as the recent.
-                One way to solve this would be to rebuild the entire message loading templates.
+                One way to solve this would be to rebuild the entire message loading templates. */
 		if ($local = $char->getLocalConversation()) {
 			foreach ($local->getMessages() as $msg) {
 				if ($msg->getSent() >= $endTime) {
@@ -109,7 +109,6 @@ class ConversationManager {
 				}
 			}
 		}
-                */
                 $iterator = $allMsg->getIterator();
                 $iterator->uasort(function($a, $b) {
                         return ($a->getSent() > $b->getSent()) ? 1 : -1 ;
@@ -234,7 +233,7 @@ class ConversationManager {
                 }
         }
 
-        public function writeLocalMessage(Character $char, $target, $topic, $type, $text, $replyTo = null) {
+        public function writeLocalMessage(Character $char, $target, $topic, $type, $text, $replyTo = null, $group) {
                 #TODO: Finish reworking this.
                 if ($target == 'place') {
                         $recipients = $char->getInsidePlace()->getCharactersPresent();
@@ -285,6 +284,7 @@ class ConversationManager {
                                 }
                         }
                         $msg->setRecipientCount($count);
+                        $msg->setTarget($group);
                         foreach ($recipients as $recip) {
                                 $msgRec = new MessageRecipient();
                                 $this->em->persist($msgRec);
