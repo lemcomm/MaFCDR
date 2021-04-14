@@ -642,8 +642,8 @@ class ActionsController extends Controller {
 		//   194  		if ($request->isMethod('POST') && $request->request->has("charactercreation")) {
 		if ($request->isMethod('POST')) {
 			if ($form) {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
+		                $form->handleRequest($request);
+	                	if ($form->isValid()) {
 					if ($trade->getAmount()>0) {
 						if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
 							$form->addError(new FormError("trade.allremote"));
