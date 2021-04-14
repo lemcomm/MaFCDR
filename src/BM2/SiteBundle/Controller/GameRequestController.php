@@ -60,12 +60,28 @@ class GameRequestController extends Controller {
 				} else {
 					$result = true;
 				}
+				break;
 			case 'realm.join':
 				if (in_array($char, $id->getToRealm()->findRulers()->toArray())) {
 					$result = true;
 				} else {
 					$result = false;
 				}
+				break;
+			case 'house.cadet':
+				if ($char->getHeadOfHouse() != $id->getToHouse()) {
+					$result = false;
+				} else {
+					$result = true;
+				}
+				break;
+			case 'house.uncadet':
+				if ($char->getHeadOfHouse() != $id->getToHouse()) {
+					$result = false;
+				} else {
+					$result = true;
+				}
+				break;
 		}
 		return $result;
 	}
@@ -275,6 +291,66 @@ class GameRequestController extends Controller {
 					throw new AccessDeniedHttpException('unavailable.notruler');
 				}
 				break;
+			case 'house.cadet':
+				if ($allowed) {
+					$cadet = $id->getFromHouse();
+					$sup = $id->getToHouse();
+					$character = $id->getFromCharacter();
+					foreach ($cadet->getMembers() as $mbr) {
+						if ($mbr->isAlive()) {
+							$this->get('history')->openLog($sup, $mbr);
+						}
+					}
+					$this->get('history')->logEvent(
+						$sup,
+						'event.house.newcadet',
+						array('%link-house%'=>$cadet->getId()),
+						History::HIGH, true
+					);
+					$this->get('history')->logEvent(
+						$cadet,
+						'event.house.joinhouse.approved',
+						array('%link-house%'=>$sup->getId()),
+						History::ULTRA, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
+			case 'house.uncadet':
+				if ($allowed) {
+					$cadet = $id->getFromHouse();
+					$sup = $id->getToHouse();
+					$character = $id->getFromCharacter();
+					foreach ($cadet->getMembers() as $mbr) {
+						if ($mbr->isAlive()) {
+							$this->get('history')->closeLog($sup, $mbr);
+						}
+					}
+					$this->get('history')->logEvent(
+						$sup,
+						'event.house.lostcadet',
+						array('%link-house%'=>$cadet->getId()),
+						History::HIGH, true
+					);
+					$this->get('history')->logEvent(
+						$cadet,
+						'event.house.leavehouse.approved',
+						array('%link-house%'=>$sup->getId()),
+						History::ULTRA, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
 		}
 
 		return new Response();
@@ -312,7 +388,7 @@ class GameRequestController extends Controller {
 					$id->setExpires($timeout->add(new \DateInterval("P7D")));
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('military.settlement.food.rejected', array('%character%'=>$id->getFromCharacter()->getName(), '%settlement%'=>$id->getToSettlement()->getName()), 'actions'));
-					return $this->redirectToRoute('bm2_gamerequest_manage');
+					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notlord');
 				}
@@ -329,7 +405,7 @@ class GameRequestController extends Controller {
 					$em->remove($id);
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
-					return $this->redirectToRoute('bm2_house_applicants', array('house'=>$house->getId()));
+					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
@@ -446,6 +522,40 @@ class GameRequestController extends Controller {
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notruler');
+				}
+				break;
+			case 'house.cadet':
+				if ($allowed) {
+					$house = $id->getToHouse();
+					$this->get('history')->logEvent(
+						$id->getFromHouse(),
+						'event.house.joinhouse.denied',
+						array('%link-house%'=>$house->getId()),
+						History::HIGH, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.denied', array('%character%'=>$id->getFromHouse()->getName()), 'politics'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
+			case 'house.uncadet':
+				if ($allowed) {
+					$house = $id->getToHouse();
+					$this->get('history')->logEvent(
+						$id->getFromHouse(),
+						'event.house.leavehouse.denied',
+						array('%link-house%'=>$house->getId()),
+						History::MEDIUM, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.denied', array('%character%'=>$id->getFromHouse()->getName()), 'politics'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
 				break;
 		}
