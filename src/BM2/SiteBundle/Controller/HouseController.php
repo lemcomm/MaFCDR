@@ -9,6 +9,7 @@ use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\HouseCadetType;
+use BM2\SiteBundle\Form\HouseUncadetType;
 use BM2\SiteBundle\Form\HouseCreationType;
 use BM2\SiteBundle\Form\HouseJoinType;
 use BM2\SiteBundle\Form\HouseMembersType;
@@ -459,16 +460,44 @@ class HouseController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$yes = $form->getData()['sure'];
 			if ($yes) {
-				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character->getHouse(), $house);
+				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character, $myHouse, $house);
 			} else {
-				$this->addFlash('notice', $this->get('translator')->trans('house.fail.cadet', array(), 'messages'));
+				$this->addFlash('notice', $this->get('translator')->trans('house.cadet.fail', array(), 'messages'));
 			}
-			$this->addFlash('notice', $this->get('translator')->trans('house.success.cadet', array(), 'messages'));
+			$this->addFlash('notice', $this->get('translator')->trans('house.cadet.success', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
 		return $this->render('BM2SiteBundle::House/cadet.html.twig', [
 			'house'=>$house,
 			'myHouse'=>$myHouse,
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{house}/uncadet", name="maf_house_uncadet", requirements={"house"="\d+"})
+	  */
+
+	public function uncadetAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageCadetTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new HouseUncadetType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$yes = $form->getData()['sure'];
+			if ($yes) {
+				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.uncadet', null, null, null, $data['subject'], $data['text'], $character, $house, $house->getSuperior());
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.fail', array(), 'messages'));
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
+		}
+		return $this->render('BM2SiteBundle::House/uncadet.html.twig', [
+			'house'=>$house,
 			'form'=>$form->createView()
 		]);
 	}
