@@ -39,10 +39,17 @@ class ConversationController extends Controller {
                 }
 		$convs = $this->get('conversation_manager')->getPrivateConversations($char);
 
+		if (count($convs) >= 150) {
+			$warn = true;
+		} else {
+			$warn = false;
+		}
+
 		return $this->render('Conversation/index.html.twig', [
 			'orgs' => false,
 			'conversations' => $convs,
 			'char' => $char,
+			'warning' => $warn
 		]);
 	}
 
@@ -514,6 +521,8 @@ class ConversationController extends Controller {
 				$manager = $me->getManager();
 				$owner = $me->getOwner();
 			}
+		} else {
+			$me = false;
 		}
 
 		return $this->render('Conversation/participants.html.twig', [
@@ -684,18 +693,24 @@ class ConversationController extends Controller {
 		if ($perms = $conv->findCharPermissions($char)) {
 			$em = $this->getDoctrine()->getManager();
 			$wasOwner = false;
+			$topic = $conv->getTopic();
 			foreach ($perms as $perm) {
 				if ($perm->getOwner()) {
 					$wasOwner = true;
 				}
+				if ($perm->getActive() && $perms->count() > 1) {
+					$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
+				}
 				$em->remove($perm);
 			}
-			if ($wasOwner) {
-				$this->get('conversation_manager')->findNewOwner($conv, $char, false);
-			}
 			$em->flush();
-			$this->get('conversation_manager')->pruneConversation($conv);
-			$this->addFlash('notice', $this->get('translator')->trans('conversation.removed', ["%name%"=>$conv->getTopic()], 'conversations'));
+			$prune = $this->get('conversation_manager')->pruneConversation($conv);
+			if ($prune == 'pruned') {
+				if ($wasOwner) {
+					$this->get('conversation_manager')->findNewOwner($conv, $char, true);
+				}
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('conversation.removed', ["%name%"=>$topic], 'conversations'));
 		} else {
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.badremoved', ["%id%"=>$conv->getId()], 'conversations'));
 		}
