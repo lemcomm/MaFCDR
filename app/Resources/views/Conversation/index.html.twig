@@ -19,6 +19,9 @@
 			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
 		{% endif %}
 	</td>
+	<td>
+		<a href="{{path('maf_conv_print', {"conv":conv.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
+	</td>
 </tr>
 
 {% endmacro %}
@@ -32,6 +35,11 @@
 
 {% block content %}
 <h2>{{ 'index.title'|trans({}, "conversations")|title }}</h2>
+
+{% if warning %}
+	<div class="warning leftmain">{{ 'index.toomany'|trans({}, "conversations") }}</div>
+	<br />
+{% endif %}
 
 <div id="ajax_errors"></div>
 {% set group = null %}
@@ -64,6 +72,7 @@
 					<th>{{ 'index.participants'|trans({}, "conversations") }}</th>
 					<th>{{ 'index.first'|trans({}, "conversations") }}</th>
 					<th>{{ 'index.last'|trans({}, "conversations") }}</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
