@@ -80,7 +80,7 @@ class NPC {
 	}
 
 	public function gainExperience($amount=1) {
-		$this->experience += $amount;
+		$this->experience += intval(ceil($amount));
 	}
 
 
