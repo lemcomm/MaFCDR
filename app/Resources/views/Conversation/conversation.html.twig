@@ -2,11 +2,9 @@
 
 {% block content %}
 <h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
-{% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
-	<p align="right">
-		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
-	</p>
-{% endif %}
+
+{% include "Conversation/single_menu.html.twig" with {"conversation": conversation, "active": active} %}
+
 {% if local is not defined %}
 	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": false} %}
 {% else %}
@@ -20,11 +18,7 @@
 	{% endif %}
 </div>
 
-{% if conversation.realm != true and conversation.house != true and conversation.localFor != true %}
-	<p align="right">
-		{% if active %}<a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a> | {% endif %}<a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
-	</p>
-{% endif %}
+{% include "Conversation/single_menu.html.twig" with {"conversation": conversation, "active": active} %}
 
 {% endblock %}
 
