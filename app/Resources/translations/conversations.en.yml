@@ -27,6 +27,7 @@ index:
  conversation: Sent to "%conv%" (%i% recipients)
  conversation2: Sent to "%conv%"
  local: %topic% (%i% recipients)
+ toomany:   It looks like you have a significant number of conversations here. Perhaps you might want to consider leaving some of the older ones, potentially after exporting them?
 
 orgs:
  title: Organization Conversations
@@ -126,6 +127,8 @@ conversation:
   label:    Add Participants
   help:     Add one or more people to this conversation.
  recent:    Recent Messages
+ export:
+  print:    Basic Export
 
 message:
  content:
