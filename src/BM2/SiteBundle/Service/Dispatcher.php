@@ -526,6 +526,9 @@ class Dispatcher {
 				$actions[] = $this->houseManageApplicantsTest();
 				$actions[] = $this->houseManageDisownTest();
 				$actions[] = $this->houseManageSuccessorTest();
+				if ($house->getSuperior()) {
+					$actions[] = $this->houseManageUncadetTest();
+				}
 				$actions[] = $this->houseNewPlayerInfoTest();
 				$actions[] = $this->houseSpawnToggleTest();
 			}
@@ -3114,12 +3117,52 @@ class Dispatcher {
 			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->house) {
-			return array("name"=>"house.manage.applicants.name", "description"=>"unavailable.nohouse");
+			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nohouse");
 		}
 		if ($this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.manage.successor.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.successor", "maf_house_successor", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageCadetTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->house) {
+			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.nohouse");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.nothead");
+		}
+		if ($this->house->getSuperior()) {
+			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.hassuperiorhouse");
+		} else {
+			return $this->action("house.manage.cadet", "maf_house_cadetship", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseManageUncadetTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->house) {
+			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nohouse");
+		}
+		if ($this->house->getHead() != $this->getCharacter()) {
+			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nothead");
+		}
+		if (!$this->house->getSuperior()) {
+			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nosuperiorhouse");
+		} else {
+			return $this->action("house.manage.uncadet", "maf_house_uncadet", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
