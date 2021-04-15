@@ -42,7 +42,7 @@ class ConversationManager {
         }
 
         public function getPrivateConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL ORDER BY c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
@@ -453,29 +453,25 @@ class ConversationManager {
 
         public function pruneConversation(Conversation $conv) {
                 $keep = new ArrayCollection();
+                $perms = $conv->getPermissions();
                 $all = $conv->getMessages();
                 # Grab all conversation messages and go through each of them.
                 foreach ($all as $msg) {
                         # Grab all conversation permissions and go through each of them.
-                        $perms = $conv->getPermissions();
                         if ($perms->count() > 0) {
+                                $keep = false;
                                 foreach ($perms as $perm) {
                                         # If the message exists within the bounds of a permission, add it to $keep.
                                         if ($perm->getStartTime() <= $msg->getSent() AND ($msg->getSent() <= $perm->getEndTime() OR $perm->getActive())) {
-                                                $keep->add($msg);
+                                                $keep = true;
                                                 break;
                                         }
                                 }
-                                # Go through all messages. If they don't exist in the Keep array, remove it.
-                                foreach ($all as $msg) {
-                                        if (!$keep->contains($msg)) {
-                                                $this->em->remove($msg);
-                                        }
-                                }
-                        } else {
-                                foreach ($all as $msg) {
+                                if (!$keep) {
                                         $this->em->remove($msg);
                                 }
+                        } else {
+                                $this->em->remove($msg);
                         }
                 }
                 $this->em->flush();
@@ -486,8 +482,9 @@ class ConversationManager {
                         }
                         $this->em->remove($conv);
                         $this->em->flush();
+                        return 'deleted';
                 }
-                return true;
+                return 'pruned';
         }
 
         public function leaveAllConversations(Character $char) {
