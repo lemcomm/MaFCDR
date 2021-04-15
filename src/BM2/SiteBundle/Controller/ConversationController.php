@@ -829,6 +829,10 @@ class ConversationController extends Controller {
 
 		$em->remove($msg);
 		$em->flush();
-		return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$nextOldest->getId());
+		if ($nextOldest) {
+			return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$nextOldest->getId());
+		} else {
+			return new RedirectResponse($this->generateUrl('maf_conv_local'));
+		}
 	}
 }
