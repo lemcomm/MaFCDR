@@ -12,7 +12,7 @@
 				{% set sender = "<i>The System</i>" %}
 			{% endif %}
 
-			{% if not archive %}<a id="{{message.id}}"/>{% endif %}
+			{% if not archive %}<a id="{{message.id}}"></a>{% endif %}
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
 			{% if local is not defined %}
