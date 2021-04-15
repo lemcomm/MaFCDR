@@ -329,10 +329,10 @@ class Soldier extends NPC {
 			$this->getCharacter()->removeSoldiersOld($this);
 		}
 		if ($this->getBase()) {
-			$this->getBase()->removeSoldier($this);
+			$this->getBase()->removeSoldiersOld($this);
 		}
 		if ($this->getLiege()) {
-			$this->getLiege()->removeSoldier($this);
+			$this->getLiege()->removeSoldiersGiven($this);
 		}
 	}
 	
