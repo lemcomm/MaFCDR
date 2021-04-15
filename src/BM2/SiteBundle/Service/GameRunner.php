@@ -637,9 +637,15 @@ class GameRunner {
 		$result = $query->getResult();
 		foreach ($result as $unit) {
 			if ($unit->getSettlement()) {
-				$this->milman->returnUnitHome($unit->getCharacter()->getLocation(), $unit->getSettlement());
+				$this->milman->returnUnitHome($unit, 'slumber', $unit->getCharacter(), true);
+			} else {
+				foreach ($unit->getSoldiers() as $soldier) {
+					$this->milman->disband($soldier);
+				}
+				$this->milman->disbandUnit($unit, true);
 			}
 		}
+		$this->em->flush();
 
 		$disband_entourage = 0;
 		$query = $this->em->createQuery('SELECT e, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Entourage e JOIN e.character c WHERE c.slumbering = true');
