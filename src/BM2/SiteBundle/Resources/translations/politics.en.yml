@@ -945,3 +945,11 @@ house:
   name:         Toggle Arrivals
   description:  Enable or disable new characters spawning here
   longdesc:     You can, at any time, change whether or not you allow people to arrive in the world at your Home.
+ cadet:
+  name:        Offer Subordination
+  description: Offer to merge your house into another house as a cadet house.
+  longdesc: >
+    As the head of a house you can decide that perhaps your house would be better off as part of another, potentially more powerful house.
+    It should be noted, that you won't be able to undo this on your own, though you will retain control over your own house otherwise.
+  subject: Offer Subject
+  text:    Offer Text
