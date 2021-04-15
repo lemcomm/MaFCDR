@@ -172,7 +172,6 @@ class CharacterManager {
 	}
 
 	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
-		$origin = $character->getLocation();
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		$character->setSystem(null);
@@ -203,7 +202,7 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'death', $origin);
+			$this->milman->returnUnitHome($unit, 'death', $character);
 		}
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
@@ -464,7 +463,6 @@ class CharacterManager {
 	public function retire(Character $character) {
 		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
 		// List is set to 90 as this sorts them to the retired listing on the account character list.
-		$origin = $character->getLocation();
 		$character->setRetired(true)->setList(90)->setSlumbering(true);
 		// remove from map and hiearchy
 		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
@@ -491,7 +489,7 @@ class CharacterManager {
 
 		// disband my troops
 		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'retire', $origin);
+			$this->milman->returnUnitHome($unit, 'retire', $character);
 		}
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
