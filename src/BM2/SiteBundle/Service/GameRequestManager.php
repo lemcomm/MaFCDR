@@ -304,6 +304,55 @@ class GameRequestManager {
 		$this->em->flush();
 	}
 
+	public function newRequestFromHouseToHouse($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, House $fromHouse = null, House $toHouse, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, Place $includePlace = null, RealmPosition $includePos = null) {
+		$GR = new GameRequest();
+		$this->em->persist($GR);
+		$GR->setType($type);
+		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
+		if ($expires) {
+			$GR->setExpires($expires);
+		}
+		if ($numberValue) {
+			$GR->setNumberValue($numberValue);
+		}
+		if ($stringValue) {
+			$GR->setStringValue($stringValue);
+		}
+		if ($subject) {
+			$GR->setSubject($subject);
+		}
+		if ($text) {
+			$GR->setText($text);
+		}
+		if ($fromChar) {
+			$GR->setFromCharacter($fromChar);
+		}
+		if ($fromHouse) {
+			$GR->setFromHouse($fromHouse);
+		}
+		if ($toHouse) {
+			$GR->setToHouse($toHouse);
+		}
+		if ($includeChar) {
+			$GR->setIncludeCharacter($includeChar);
+		}
+		if ($includeSettlement) {
+			$GR->setIncludeSettlement($includeSettlement);
+		}
+		if ($includeRealm) {
+			$GR->setIncludeRealm($includeRealm);
+		}
+		if ($includePlace) {
+			$GR->setIncludePlace($includePlace);
+		}
+		if ($includePos) {
+			$GR->setIncludePosition($includePos);
+		}
+		$this->em->flush();
+	}
+
 	public function newRequestFromRealmToRealm($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, Realm $fromRealm = null, Realm $toRealm, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, Place $includePlace = null, RealmPosition $includePos = null) {
 		$GR = new GameRequest();
 		$this->em->persist($GR);
