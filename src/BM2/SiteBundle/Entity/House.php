@@ -44,7 +44,7 @@ class House {
 		$all_active = new ArrayCollection;
 		$all_members = $this->findAllMembers();
 		foreach ($all_members as $member) {
-			if ($member->isAlive() && !$member->isRetired() && !$member->isSlumbering()) {
+			if ($member->isAlive() && !$member->getRetired() && !$member->getSlumbering()) {
 				$all_living[] = $member;
 			}
 		}
