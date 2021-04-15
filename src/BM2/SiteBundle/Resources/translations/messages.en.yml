@@ -1565,6 +1565,8 @@ unavailable:
  occupied:      The ongoing occupation prevents this.
  notdefended:   This place has no defenders, and thus no siege is needed.
  nohome:        You need a Place to call Home to do this.
+ nosuperiorhouse: Your house is not a cadet of any other house.
+ hassuperiorhouse: Your house must first be independent before becoming the cadet of another house.
 marker:
  name:      Marker name
  type:      Marker type
@@ -1629,6 +1631,12 @@ house:
   created:     You have formalized your House!
   background:  The details of your House have been udpated.
   relocated:   You have relocated your House!
+ cadet:
+  success:     You have offered your house as a cadet to another.
+  fail:        Your uncertainty has prevented this request. Are you sure you want to do this?
+ uncadet:
+  success:     You have requested your house's freedom.
+  fail:        Your uncertainty has prevented this request. Are you sure you want to do this?
 
 unit:
  manage:
