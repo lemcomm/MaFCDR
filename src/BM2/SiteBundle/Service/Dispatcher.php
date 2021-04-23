@@ -3129,40 +3129,55 @@ class Dispatcher {
 		}
 	}
 
-	public function houseManageCadetTest() {
+	public function houseManageCadetTest($ignored, House $target) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
-			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.$check");
+			return array("name"=>"house.cadet.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->house) {
-			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.nohouse");
+			return array("name"=>"house.cadet.name", "description"=>"unavailable.nohouse");
 		}
-		if ($this->house->getHead() != $this->getCharacter()) {
-			return array("name"=>"house.manage.cadet.name", "description"=>"unavailable.nothead");
+		$char = $this->getCharacter();
+		if ($this->house->getHead() != $char) {
+			return array("name"=>"house.cadet.name", "description"=>"unavailable.nothead");
 		}
 		if ($this->house->getSuperior()) {
-			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.hassuperiorhouse");
+			return array("name"=>"house.cadet.name", "description"=>"unavailable.hassuperiorhouse");
+		}
+
+		$success = $this->action("house.cadet", "maf_house_cadetship", true,
+			array('house'=>$this->house->getId()),
+			array("%name%"=>$this->house->getName())
+		);
+		if (
+			($target->getHome() && $char->getInsidePlace() == $target->getInsidePlace()) ||
+			($char->getInsideSettlement() == $target->getInsideSettlement())
+		) {
+			return $success;
 		} else {
-			return $this->action("house.manage.cadet", "maf_house_cadetship", true,
-				array('house'=>$this->house->getId()),
-				array("%name%"=>$this->house->getName())
-			);
+			$nearby = $this->geography->findCharactersInActionRange($char);
+			foreach ($nearby as $other) {
+				if ($other[0] == $char) {
+					return $success;
+				}
+			}
+			return array("name"=>"house.cadet.name", "description"=>"unavailable.housenotnearby");
 		}
 	}
 
 	public function houseManageUncadetTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
-			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.$check");
+			return array("name"=>"house.uncadet.name", "description"=>"unavailable.$check");
 		}
 		if (!$this->house) {
-			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nohouse");
+			return array("name"=>"house.uncadet.name", "description"=>"unavailable.nohouse");
 		}
 		if ($this->house->getHead() != $this->getCharacter()) {
-			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nothead");
+			return array("name"=>"house.uncadet.name", "description"=>"unavailable.nothead");
 		}
 		if (!$this->house->getSuperior()) {
-			return array("name"=>"house.manage.uncadet.name", "description"=>"unavailable.nosuperiorhouse");
+			return array("name"=>"house.uncadet.name", "description"=>"unavailable.nosuperiorhouse");
 		} else {
-			return $this->action("house.manage.uncadet", "maf_house_uncadet", true,
+			return $this->action("house.uncadet", "maf_house_uncadet", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
