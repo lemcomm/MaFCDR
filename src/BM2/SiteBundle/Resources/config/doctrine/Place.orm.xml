@@ -37,7 +37,7 @@
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital_place"/>
 		<many-to-one field="occupier" target-entity="Realm" inversed-by="occupied_places"/>
 
-		<one-to-one field="house" target-entity="House" inversed-by="home"/>
+		<one-to-one field="house" target-entity="House" mapped-by="home"/>
 
 		<field name="location" type="point" nullable="true"/>
 		<one-to-one field="geo_marker" target-entity="GeoFeature" inversed-by="place"/>
