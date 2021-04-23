@@ -34,7 +34,7 @@ class HouseCadetType extends AbstractType {
 			'required' => true
 		));
 
-		$builder->add('submit', SubmitType::class, array('label'=>'requet.generic.submit', 'translation_domain' => 'actions'));
+		$builder->add('submit', SubmitType::class, array('label'=>'request.generic.submit', 'translation_domain' => 'actions'));
 	}
 
 	public function getName() {
