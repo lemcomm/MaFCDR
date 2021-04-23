@@ -88,8 +88,9 @@ class HouseManager {
 			$superior->addCadet($house);
 		}
 		if ($place) {
-			$house->setInsidePlace($place);
-		} else {
+			$house->setHome($place);
+		}
+		if ($settlement) {
 			$house->setInsideSettlement($settlement);
 		}
 		$house->setCrest($crest);
