@@ -73,25 +73,12 @@ class HouseController extends Controller {
 		} else {
 			#TODO: Add code for houses as places here.
 		}
-		$already = false;
-		if ($character->getHouse()) {
-			$already = true;
-		}
-
-		foreach ($houses as $house) {
-			$member = false;
-			$head = false;
-			if ($house->getMembers()->contains($character)) {
-				$member = true;
-				if ($house->getHead() == $character) {
-					$head = true;
-				}
-			}
-		}
+		$myHouse = $character->getHouse();
 
 		return $this->render('BM2SiteBundle::House/nearby.html.twig', [
 			'houses' => $houses,
-			'already' => $already
+			'myHouse' => $myHouse,
+			'char' => $char
 		]);
 	}
 
@@ -116,10 +103,10 @@ class HouseController extends Controller {
 			if ($character->getCrest()); {
 				$crest = $character->getCrest();
 			}
+			$settlement = $character->getInsideSettlement();
+			$place = $character->getInsidePlace();
 			if ($settlement = $character->getInsideSettlement()) {
-				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, null, $settlement, $crest, $character);
-			} else {
-				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $character->getInsidePlace(), null, $crest, $character);
+				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $place, $settlement, $crest, $character);
 			}
 			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
@@ -449,7 +436,7 @@ class HouseController extends Controller {
 	  */
 
 	public function cadetAction(House $house, Request $request) {
-		$character = $this->get('dispatcher')->gateway('houseManageCadetTest');
+		$character = $this->get('dispatcher')->gateway('houseManageCadetTest', null, null, null, $house);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -458,7 +445,8 @@ class HouseController extends Controller {
 		$form = $this->createForm(new HouseCadetType());
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
-			$yes = $form->getData()['sure'];
+			$data = $form->getData();
+			$yes = $data['sure'];
 			if ($yes) {
 				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character, $myHouse, $house);
 			} else {
@@ -479,7 +467,7 @@ class HouseController extends Controller {
 	  */
 
 	public function uncadetAction(House $house, Request $request) {
-		$character = $this->get('dispatcher')->gateway('houseManageCadetTest');
+		$character = $this->get('dispatcher')->gateway('houseManageUncadetTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -487,7 +475,8 @@ class HouseController extends Controller {
 		$form = $this->createForm(new HouseUncadetType());
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
-			$yes = $form->getData()['sure'];
+			$data = $form->getData();
+			$yes = $data['sure'];
 			if ($yes) {
 				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.uncadet', null, null, null, $data['subject'], $data['text'], $character, $house, $house->getSuperior());
 			} else {
