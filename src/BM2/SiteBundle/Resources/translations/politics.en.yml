@@ -804,6 +804,7 @@ house:
  history:
   name:         House History
  nodesc:        For reasons beyond your ability to know, this house does not have a description.
+ nohead:        Vacant
  new:
   name:         Formalize Your House
   description:  Any First One can declare themselves head of their House
@@ -840,7 +841,40 @@ house:
    name:        Secret Memo
    desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
  create:
+  motto:        House Motto
   submit:       Create Your House!
+ cadet:
+  name:    Offer Cadetship
+  intro: >
+    As the head of %house2%, it is within your capabilities to unilaterally declare your house subservient to %house1%.
+    That said, once you do this, the only way it can be undone is by the permission of the house you will be subservient to.<br /><br />
+    If you wish to go through with this, you can send a request offering your subordination with the form below.
+  subject:
+   name:   Request Subject
+   desc:   A short, and to the point summary
+  text:
+   name:   Message Contents
+   desc:   While you could leave this blank, adding some words explaining exactly why you are offering the subservience of your entire House is advised.
+  sure:
+   name:   Certain?
+   desc:   Once you do this, the only way you can undo it is if the other house agrees.
+ uncadet:
+  name:         Request End of Cadetship
+  description:  Ask your superior house for your house's freedom.
+  longdesc:     It is always possible to request an end to the cadetship of your house, but your superior house has no obligation to agree.
+  intro: >
+    As the head of %house-2%, it is within your capabilities to request freedom for your House from %house-1%.
+    That said, the do not have to accept your request. If they do not, and if you find this particularly problematic, perhaps it might be best to arrange for a change of leadership.<br /><br />
+    If you wish to go through with this, you can send a request asking for your freedom with the form below.
+  subject:
+   name:   Request Subject
+   desc:   A short, and to the point summary
+  text:
+   name:   Message Contents
+   desc:   While you could leave this blank, adding some words explaining exactly why you are requesting the freedom of your entire House is advised.
+  sure:
+   name:   Certain?
+   desc:   Once a request is sent, it cannot be unsent.
  join:
   name:         Ask to Join this House
   intro: >
@@ -878,9 +912,21 @@ house:
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
    approve:     Approve
-   approved:    The applcation from %link-character% has been approved.
+   approved:    The applcation from %character% has been approved.
    deny:        Deny
-   denied:      The applcation from %link-character% has been denied.
+   denied:      The applcation from %character% has been denied.
+  cadet:
+   preamble:    You've received an offer of cadetship from %link-character% of %link-house%, on %date%, as follows:
+   approve:     Approve
+   approved:    The cadetship from %character% of %house% has been approved.
+   deny:        Deny
+   denied:      The cadetship from %character% of %house% has been denied.
+  uncadet:
+   preamble:    You've received an request for disassociation from %link-character% of the cadet %link-house%, on %date%, as follows:
+   approve:     Approve
+   approved:    The disassociation request from %character% of %house% has been approved.
+   deny:        Deny
+   denied:      The disassociation request from %character% of %house% has been denied.
   applicants:
    name:        Manage Applicants
    name2:       Manage Applicants to the %name%
@@ -926,8 +972,11 @@ house:
    This naturally includes the public (and private) details of your own house.
   head:         Head
   founder:      Founder
+  cadets:       Cadets
+  superior:     Superior
   home:         Home
   members:      Members
+  motto:        Motto
   notable:      Notable Members
   internal:     Internal Information
   secret:       Secret Information
