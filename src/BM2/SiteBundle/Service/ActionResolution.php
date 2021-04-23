@@ -193,7 +193,7 @@ class ActionResolution {
 
 	private function update_settlement_loot(Action $action) {
 		$now = new \DateTime("now");
-		if ($act->getComplete() <= $now) {
+		if ($action->getComplete() <= $now) {
 			$this->em->remove($action);
 		}
 	}
