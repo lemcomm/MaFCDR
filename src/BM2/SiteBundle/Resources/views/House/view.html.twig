@@ -27,7 +27,7 @@
 			<dd>{{ link(house.head) }}</dd>
 		{% endif %}
 		{% if house.motto %}
-			<dt>{{ 'house.view.motto' }}</dt>
+			<dt>{{ 'house.view.motto'|trans({},"politics") }}</dt>
 			<dd>{{ house.motto }} </dd>
 		{% endif %}
 		<dt>{{ 'house.view.home'|trans({},"politics") }}</dt>
@@ -40,8 +40,17 @@
 		{% else %}
 			<dd>{{ link(house.insideSettlement) }}</dt>
 		{% endif %}
+		{% if house.superior %}
+			<dt>{{ 'house.view.superior'|trans({}, "politics") }}</dt>
+			<dd>{{ link(house.superior) }}</dd>
+		{% endif %}
+		{% if house.cadets is not empty %}
+			<dt>{{ 'house.view.cadets'|trans({}, "politics") }}</dt>
+			<dd>{% for cadet in house.cadets %}{{ link(cadet) }}, {% endfor %}</dd>
+		{% endif %}
+
 	</dl>
-	{% if details %}
+	{% if details and house.private is not null %}
 		<h3>{{ 'house.background.private.name'|trans({},"politics")|title }}</h3>
 		{{ house.private|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{% endif %}
@@ -49,8 +58,8 @@
 		<h3>{{ 'house.background.description.name'|trans({},"politics")|title }}</h3>
 		{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{% endif %}
-	{% if head %}
+	{% if head and house.secret is not null %}
 		<h3>{{ 'house.background.secret.name'|trans({},"politics")|title }}</h3>
-		{{ house.private|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+		{{ house.secret|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 	{% endif %}
 {% endblock %}
