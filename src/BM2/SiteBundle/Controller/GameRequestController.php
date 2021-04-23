@@ -280,7 +280,7 @@ class GameRequestController extends Controller {
 						$this->get('translator')->trans(
 							'diplomacy.join.approved', [
 								'%name%'=>$id->getFromRealm()->getName(),
-								'%name2'=>$id->getToRealm()->getName()
+								'%name2%'=>$id->getToRealm()->getName()
 							], 'politics'
 						)
 					);
@@ -295,6 +295,8 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$cadet = $id->getFromHouse();
 					$sup = $id->getToHouse();
+					$sup->addCadet($cadet);
+					$cadet->setSuperior($sup);
 					$character = $id->getFromCharacter();
 					foreach ($cadet->getMembers() as $mbr) {
 						if ($mbr->isAlive()) {
@@ -315,7 +317,7 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
-					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.cadet.approved', array('%house%'=>$cadet->getName(), '%character%'=>$character->getName()), 'politics'));
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
@@ -325,6 +327,8 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$cadet = $id->getFromHouse();
 					$sup = $id->getToHouse();
+					$sup->removeCadet($cadet);
+					$cadet->setSuperior(null);
 					$character = $id->getFromCharacter();
 					foreach ($cadet->getMembers() as $mbr) {
 						if ($mbr->isAlive()) {
@@ -345,7 +349,7 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
-					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.uncadet.approved', array('%house%'=>$cadet->getName(), '%character%'=>$character->getName()), 'politics'));
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
