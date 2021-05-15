@@ -147,15 +147,15 @@
 		{% if character and not simple %}
 			{% if character.location %}
 				{% if character.special %}
-					{% include "BM2SiteBundle:element:nav_special.html.twig" %}
+					{% include "element/nav_special.html.twig" %}
 				{% else %}
-					{% include "BM2SiteBundle:element:nav_main.html.twig" %}
+					{% include "element/nav_main.html.twig" %}
 				{% endif %}
 			{% else %}
-				{% include "BM2SiteBundle:element:nav_start.html.twig" %}
+				{% include "element/nav_start.html.twig" %}
 			{% endif %}
 		{% else %}
-			{% include "BM2SiteBundle:element:nav_guest.html.twig" %}
+			{% include "element/nav_guest.html.twig" %}
 		{% endif %}
 	</div>
 
