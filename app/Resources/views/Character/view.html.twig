@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% macro others(char) %}
 	{% if char.crest %}
@@ -179,7 +179,7 @@
 		<h3>{{ 'npc.is'|trans|title }}</h3>
 	{% else %}
 		<h2>{{ 'politics.hierarchy'|trans|title }}</h2>
-		{% include "BM2SiteBundle:element:hierarchy.html.twig" with {"character":char, "who":'other'} only %}
+		{% include "element/hierarchy.html.twig" with {"character":char, "who":'other'} only %}
 
 		<h2>{{ 'estate'|transchoice(char.ownedSettlements|length)|title }}</h2>
 		<ul>
