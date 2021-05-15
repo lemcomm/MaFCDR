@@ -23,9 +23,11 @@ class ExceptionController extends Controller {
 	 *
 	 * @throws \InvalidArgumentException When the exception template does not exist
 	 * @Route("/")
-	 * @Template
 	 */
 	public function exceptionAction(FlattenException $exception, DebugLoggerInterface $logger = null, $format = 'html', $embedded = false) {
-		return array('status_code' => $exception->getStatusCode(), 'status_text' => $exception->getMessage());
+		return $this->render('Exception/exception.html.twig', [
+			'status_code' => $exception->getStatusCode(), 
+			'status_text' => $exception->getMessage()
+		]);
 	}
 }
