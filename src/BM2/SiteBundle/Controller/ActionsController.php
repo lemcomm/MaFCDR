@@ -29,7 +29,6 @@ class ActionsController extends Controller {
 
    /**
      * @Route("/", name="bm2_actions")
-     * @Template("BM2SiteBundle:Actions:actions.html.twig")
      */
 	public function indexAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
@@ -53,13 +52,14 @@ class ActionsController extends Controller {
 		} else {
 			$siege = FALSE;
 		}
-
-		return array('pagetitle'=>$pagetitle, 'siege'=>$siege);
+		return $this->render('Actions/actions.html.twig', [
+			'pagetitle'=>$pagetitle,
+			'siege'=>$siege
+		]);
 	}
 
 	/**
 	  * @Route("/support", name="bm2_actionsupport")
-	  * @Template
 	  */
 	public function supportAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
@@ -104,22 +104,26 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-
-			return array(
+			return $this->render('Actions/support.html.twig', [
 				'action'=>$action,
-				'result'=>array(
+				'result'=>[
 					'success' => true,
 					'target' => $action->getTargetSettlement()
-				)
-			);
+				]
+			]);
 		} else {
-			return array('action'=>null, 'result'=>array('success'=>false, 'message'=>'either.invalid.noid'));
+			return $this->render('Actions/support.html.twig', [
+				'action'=>null,
+				'result'=>[
+					'success'=>false,
+					'message'=>'either.invalid.noid'
+				]
+			]);
 		}
 	}
 
 	/**
 	  * @Route("/oppose", name="bm2_actionoppose")
-	  * @Template
 	  */
 	public function opposeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
@@ -160,16 +164,21 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-
-			return array(
+			return $this->render('Actions/oppose.html.twig', [
 				'action'=>$action,
-				'result'=>array(
+				'result'=>[
 					'success' => true,
 					'target' => $action->getTargetSettlement()
-				)
-			);
+				]
+			]);
 		} else {
-			return array('action'=>null, 'result'=>array('success'=>false, 'message'=>'either.invalid.noid'));
+			return $this->render('Actions/oppose.html.twig', [
+				'action'=>null,
+				'result'=>[
+					'success'=>false,
+					'message'=>'either.invalid.noid'
+				]
+			]);
 		}
 	}
 
@@ -214,7 +223,6 @@ class ActionsController extends Controller {
 
 	   /**
 	     * @Route("/embark")
-	     * @Template
 	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
@@ -256,15 +264,18 @@ class ActionsController extends Controller {
 		$em->flush();
 
 		if ($embark_ship) {
-			return array('ships'=>true);
+			return $this->render('Actions/embark.html.twig', [
+				'ships'=>true
+			]);
 		} else {
-			return array('dockname'=>$dock->getName());
+			return $this->render('Actions/embark.html.twig', [
+				'dockname'=>$dock->getName()
+			]);
 		}
 	}
 
    /**
      * @Route("/givegold")
-     * @Template
      */
 	public function giveGoldAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationGiveGoldTest');
@@ -294,15 +305,18 @@ class ActionsController extends Controller {
 				History::MEDIUM, true, 20
 			);
 			$em->flush();
-			return array('success'=>true, 'amount'=>$data['amount'], 'target'=>$data['target']);
+			return $this->render('Actions/givegold.html.twig', [
+				'success'=>true, 'amount'=>$data['amount'], 'target'=>$data['target']
+			]);
 		}
 
-		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
+		return $this->render('Actions/givegold.html.twig', [
+			'form'=>$form->createView(), 'gold'=>$character->getGold()
+		]);
 	}
 
    /**
      * @Route("/giveship")
-     * @Template
      */
 	public function giveShipAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationGiveShipTest', true, true);
@@ -332,18 +346,23 @@ class ActionsController extends Controller {
 					History::MEDIUM, true, 20
 				);
 				$em->flush();
+
+				return $this->render('Actions/giveship.html.twig', [
+					'success'=>true
+				]);
 				return array('success'=>true);
 			} else {
 				// TODO: form error, but this should never happen!
 			}
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Actions/giveship.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/spy")
-	  * @Template
 	  */
 	public function spyAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('nearbySpyTest', true, true);
@@ -351,14 +370,14 @@ class ActionsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-
-		return array('settlement'=>$settlement);
+		return $this->render('Actions/spy.html.twig', [
+			'settlement'=>$settlement
+		]);
 	}
 
 
 	/**
 	  * @Route("/take")
-	  * @Template
 	  */
 	public function takeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlTakeTest', true, true);
@@ -418,18 +437,17 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Actions/take.html.twig', [
 			'settlement' => $settlement,
 			'others' => $others,
 			'timetotake' => $time_to_take,
 			'limit' => $character->isTrial()?Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT:-1,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
    /**
      * @Route("/changerealm/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function changeRealmAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
@@ -471,14 +489,22 @@ class ActionsController extends Controller {
 					}
 				}
 			}
-			return array('settlement'=>$settlement, 'result'=>$result, 'newrealm'=>$targetrealm);
+
+			return $this->render('Actions/changerealm.html.twig', [
+				'settlement'=>$settlement,
+				'result'=>$result,
+				'newrealm'=>$targetrealm
+			]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+
+		return $this->render('Actions/changerealm.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/grant")
-     * @Template
      */
 	public function grantAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlGrantTest', true);
@@ -527,18 +553,25 @@ class ActionsController extends Controller {
 					$complete->add(new \DateInterval("PT".$time_to_grant."M"));
 					$act->setComplete($complete);
 					$result = $this->get('action_manager')->queue($act);
-					return array('settlement'=>$settlement, 'result'=>$result, 'newowner'=>$data['target']);
+
+					return $this->render('Actions/grant.html.twig', [
+						'settlement'=>$settlement,
+						'result'=>$result,
+						'newowner'=>$data['target']
+					]);
 				}
 			}
 
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/grant.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/rename")
-     * @Template
      */
 	public function renameAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlRenameTest', true);
@@ -572,16 +605,22 @@ class ActionsController extends Controller {
 				$act->setComplete($complete);
 				$result = $this->get('action_manager')->queue($act);
 
-				return array('settlement'=>$settlement, 'result'=>$result, 'newname'=>$newname);
+				return $this->render('Actions/rename.html.twig', [
+					'settlement'=>$settlement,
+					'result'=>$result,
+					'newname'=>$newname
+				]);
 			}
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/rename.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/changeculture")
-     * @Template
      */
 	public function changecultureAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlCultureTest', true);
@@ -597,16 +636,26 @@ class ActionsController extends Controller {
 			// this is a meta action and thus executed immediately
 			$settlement->setCulture($culture);
 			$this->getDoctrine()->getManager()->flush();
-			return array('settlement'=>$settlement, 'result'=>array('success'=>true, 'immediate'=>true), 'culture'=>$culture->getName());
+
+			return $this->render('Actions/changeculture.html.twig', [
+				'settlement'=>$settlement,
+				'result'=>[
+					'success'=>true,
+					'immediate'=>true
+				],
+				'culture'=>$culture->getName()
+			]);
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/changeculture.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
 
   /**
      * @Route("/trade")
-     * @Template
      */
 	public function tradeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyTradeTest', true);
@@ -731,7 +780,7 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Actions/trade.html.twig', [
 			'settlement'=>$settlement,
 			'owned' => ($settlement->getOwner()==$character?true:false),
 			'settlements' => $settlementsdata,
@@ -739,13 +788,12 @@ class ActionsController extends Controller {
 			'trades' => $trades,
 			'form' => $form->createView(),
 			'cancelform' => $cancelform->createView()
-		);
+		]);
 	}
 
 
    /**
      * @Route("/entourage")
-     * @Template
      */
 	public function entourageAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalEntourageTest', true);
@@ -816,12 +864,15 @@ class ActionsController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array('settlement'=>$settlement, 'entourage'=>$entourage, 'form'=>$form->createView());
+		return $this->render('Actions/entourage.html.twig', [
+			'settlement'=>$settlement,
+			'entourage'=>$entourage,
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
-	  * @Route("/dungeons", name="bm2_dungeons"))
-	  * @Template
+	  * @Route("/dungeons", name="bm2_dungeons")
 	  */
 	public function dungeonsAction() {
 		$character = $this->get('dispatcher')->gateway('locationDungeonsTest');
@@ -829,7 +880,9 @@ class ActionsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('dungeons'=>$this->get('geography')->findDungeonsInActionRange($character));
+		return $this->render('Actions/dungeons.html.twig', [
+			'dungeons'=>$this->get('geography')->findDungeonsInActionRange($character)
+		]);
 	}
 
 	/**
@@ -866,7 +919,7 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::Settlement/occupant.html.twig', [
+		return $this->render('Settlement/occupant.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -899,7 +952,7 @@ class ActionsController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('BM2SiteBundle::Settlement/occupier.html.twig', [
+		return $this->render('Settlement/occupier.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -923,7 +976,7 @@ class ActionsController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('BM2SiteBundle::Settlement/occupationstart.html.twig', [
+		return $this->render('Settlement/occupationstart.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -945,7 +998,7 @@ class ActionsController extends Controller {
                         $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
                         return $this->redirectToRoute('bm2_actions');
                 }
-		return $this->render('BM2SiteBundle::Settlement/occupationend.html.twig', [
+		return $this->render('Settlement/occupationend.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
