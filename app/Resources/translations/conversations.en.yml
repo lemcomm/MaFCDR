@@ -218,3 +218,8 @@ recent:
  1m: 1 Month
  2m: 2 Months
  3m: 3 Months
+
+local:
+ title: Local Messages
+ new:
+  title: New Local Message
