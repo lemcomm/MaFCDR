@@ -62,7 +62,6 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/", name="bm2_character")
-     * @Template("BM2SiteBundle:Character:character.html.twig")
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
@@ -78,8 +77,7 @@ class CharacterController extends Controller {
 		} else {
 			return $this->redirectToRoute('bm2_site_character_start');
 		}
-
-		return array(
+		return $this->render('Character/character.html.twig', [
 			'location' => $location,
 			'familiarity' => $geo->findRegionFamiliarityLevel($character, $location),
 			'spot' => $geo->calculateSpottingDistance($character),
@@ -91,13 +89,12 @@ class CharacterController extends Controller {
 			'entourage' => $character->getActiveEntourageByType(),
 			'units' => $character->getUnits(),
 			'dead_entourage' => $character->getDeadEntourage()->count(),
-		);
+		]);
 
 	}
 
 	/**
 	  * @Route("/summary", name="bm2_recent")
-	  * @Template
 	  */
 	public function summaryAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
@@ -118,8 +115,7 @@ class CharacterController extends Controller {
 			}
 		}
 		$em->flush();
-
-		return array(
+		return $this->render('Character/summary.html.twig', [
 			'events' => $this->get('character_manager')->findEvents($character),
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 			'others' => $this->get('geography')->findCharactersInSpotRange($character),
@@ -128,12 +124,11 @@ class CharacterController extends Controller {
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
 			'actrange' => $this->get('geography')->calculateInteractionDistance($character)
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/scouting", name="bm2_scouting")
-	  * @Template
 	  */
 	public function scoutingAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
@@ -171,14 +166,13 @@ class CharacterController extends Controller {
 			);
 		}
 
-		return array(
-			'spotted' => $spotted
-		);
+		return $this->render('Character/scouting.html.twig', [
+			'spotted'=>$spotted
+		]);
 	}
 
 	/**
 	  * @Route("/estates", name="bm2_estates")
-	  * @Template
 	  */
 	public function estatesAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
@@ -214,6 +208,14 @@ class CharacterController extends Controller {
 				}) as $building) {
 				$build[] = array('id'=>$building->getType()->getId(), 'name'=>$building->getType()->getName());
 			}
+			$militia = 0;
+			$recruits = 0;
+			foreach ($settlement->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					$militia += $unit->getActiveSoldiers()->count();
+					$recruits += $unit->getRecruits()->count();
+				}
+			}
 
 			$settlements[] = array(
 				'id' => $settlement->getId(),
@@ -223,8 +225,8 @@ class CharacterController extends Controller {
 				'thralls' => $settlement->getThralls(),
 				'size' => $settlement->getSize(),
 				'popchange' => $popchange,
-				'militia' => $settlement->getActiveMilitia()->count(),
-				'recruits' => $settlement->getRecruits()->count(),
+				'militia' => $militia,
+				'recruits' => $recruits,
 				'realm' => $realm,
 				'ultimate' => $ultimate,
 				'build' => $build,
@@ -232,7 +234,10 @@ class CharacterController extends Controller {
 		}
 
 		$poly = $this->get('geography')->findRegionsPolygon($character->getOwnedSettlements());
-		return array('settlements'=>$settlements, 'poly'=>$poly);
+		return $this->render('Character/estates.html.twig', [
+	   		'settlements'=>$settlements,
+			'poly'=>$poly
+		]);
 	}
 
 	/**
@@ -361,7 +366,7 @@ class CharacterController extends Controller {
 			$myHouse = $character->getHouse();
 		}
 
-		return $this->render('BM2SiteBundle::Character/spawn.html.twig', [
+		return $this->render('Character/spawn.html.twig', [
 			'realm'=>$realm, 'house'=>$house, 'spawns'=>$spawns, 'myHouse'=>$myHouse
 		]);
 	}
@@ -467,7 +472,7 @@ class CharacterController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::Character/first.html.twig', [
+		return $this->render('Character/first.html.twig', [
 			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 			'house' => $house,
 			'realm' => $realm,
@@ -480,7 +485,6 @@ class CharacterController extends Controller {
 
 	/**
 	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_site_character_view")
-	  * @Template
 	  */
 	public function viewAction(Character $id) {
 		$char = $id;
@@ -520,19 +524,18 @@ class CharacterController extends Controller {
 				}
 			}
 		}
-		return array(
+		return $this->render('Character/view.html.twig', [
 			'char'		=> $char,
 			'details'	=> $details,
 			'relationship'	=> $relationship,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
 			'banned'	=> $banned,
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/reputation/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function reputationAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -554,14 +557,14 @@ class CharacterController extends Controller {
 			$my_rating->setCharacter($char);
 		}
 		$form = $this->createForm(new CharacterRatingType, $my_rating);
-		return array(
+		return $this->render('Character/view.html.twig', [
 			'char'		=> $char,
 			'ratings'	=> $data,
 			'respect'	=> $respect,
 			'honor'		=> $honor,
 			'trust'		=> $trust,
 			'form'		=> $form->createView()
-		);
+		]);
 	}
 
 	/**
@@ -661,7 +664,9 @@ class CharacterController extends Controller {
 			$return_value = proc_close($process);
 		}
 
-		return array('svg' => $svg);
+		return $this->render('Account/familytree.html.twig', [
+			'svg' => $svg
+		]);
 	}
 
 	private function addRelatives($characters, Character $char) {
@@ -693,7 +698,6 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/background")
-     * @Template
      */
 	public function backgroundAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
@@ -735,15 +739,14 @@ class CharacterController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Character/background.html.twig', [
 			'form' => $form->createView(),
 			'starting' => $starting
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/rename")
-	  * @Template
 	  */
 	public function renameAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
@@ -812,12 +815,13 @@ class CharacterController extends Controller {
 			return array('result'=>array('success'=>true), 'newname'=>$newname);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Character/rename.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
    /**
      * @Route("/settings")
-     * @Template
      */
 	public function settingsAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
@@ -839,7 +843,10 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_recent');
 		}
 
-		return array('form'=>$form->createView());
+
+		return $this->render('Character/settings.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
    /**
@@ -868,14 +875,13 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_recent');
 		}
 
-		return $this->render('BM2SiteBundle::Character/loadout.html.twig', [
+		return $this->render('Character/loadout.html.twig', [
 			'form'=>$form->createView(),
 		]);
 	}
 
    /**
      * @Route("/kill")
-     * @Template
      */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
@@ -937,12 +943,14 @@ class CharacterController extends Controller {
 				return $this->redirectToRoute('bm2_characters');
 			}
 		}
-		return array('form'=>$form->createView());
+
+		return $this->render('Character/kill.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
    /**
      * @Route("/retire")
-     * @Template
      */
 	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
@@ -1000,12 +1008,14 @@ class CharacterController extends Controller {
 				return $this->redirectToRoute('bm2_characters');
 			}
 		}
-		return array('form'=>$form->createView());
+
+		return $this->render('Character/retire.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
 	/**
 	  * @Route("/surrender")
-	  * @Template
 	  */
 	public function surrenderAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalSurrenderTest');
@@ -1037,13 +1047,15 @@ class CharacterController extends Controller {
 			return array('success'=>true, 'target'=>$data['target']);
 		}
 
-		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
+		return $this->render('Character/surrender.html.twig', [
+			'form'=>$form->createView(),
+			'gold'=>$character->getGold()
+		]);
 	}
 
 
 	/**
 	  * @Route("/escape")
-	  * @Template
 	  */
 	public function escapeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalEscapeTest');
@@ -1076,16 +1088,15 @@ class CharacterController extends Controller {
 			return array('queued'=>true, 'hours'=>$hours);
 		}
 
-		return array(
+		return $this->render('Character/surrender.html.twig', [
 			'captor_active' => $captor_active,
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/crest")
-	  * @Template
 	  */
 	public function heraldryAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('metaHeraldryTest');
@@ -1145,13 +1156,14 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_character');
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Character/crest.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/entourage")
-	  * @Template
 	  */
 	public function entourageAction(Request $request) {
 		# TODO: We call AppState and Dispatcher? Can't we combine this into a single call and return it as a list somehow? -- Andrew 20181210
@@ -1199,13 +1211,13 @@ class CharacterController extends Controller {
 			$food_days = 0;
 		}
 
-		return array(
+		return $this->render('Character/entourage.html.twig', [
 			'entourage' => $character->getEntourage(),
 			'form' => $form->createView(),
 			'food_days' => $food_days,
 			'can_resupply' => $character->getInsideSettlement()?$this->get('permission_manager')->checkSettlementPermission($character->getInsideSettlement(), $character, 'resupply'):false,
 			'resupply' => $resupply
-		);
+		]);
 	}
 
    /**
@@ -1347,7 +1359,6 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/battlereport/{id}", name="bm2_battlereport", requirements={"id"="\d+"})
-     * @Template
      */
 	public function viewBattleReportAction($id) {
 		$character = $this->get('appstate')->getCharacter(true,true,true);
@@ -1410,34 +1421,21 @@ class CharacterController extends Controller {
 					$nobles[$i][] = array('character'=>$char, 'fate'=>$fate);
 				}
 			}
-			return array('version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location);
+
+			return $this->render('Character/viewBattleReport.html.twig', [
+				'version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location
+			]);
 		} else {
 			$count = $report->getGroups()->count(); # These return in a specific order, low to high, ID ascending.
 			foreach ($report->getGroups() as $group) {
 				$totalRounds = $group->getCombatStages()->count();
 				break;
 			}
-			return array('version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds);
-		}
-	}
 
-	/**
-	  * @Route("/mercenaries/{id}", name="bm2_mercenaries", requirements={"id"="\d+"})
-	  * @Template
-	  */
-	public function mercenariesAction($id) {
-		$character = $this->get('appstate')->getCharacter(true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
+			return $this->render('Character/viewBattleReport.html.twig', [
+				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds
+			]);
 		}
-
-		$em = $this->getDoctrine()->getManager();
-		$mercs = $em->getRepository('BM2SiteBundle:Mercenaries')->find($id);
-		if (!$mercs) {
-			throw $this->createNotFoundException('error.notfound.mercenaries');
-		}
-
-		return array('mercs'=>$mercs, 'hiredbyme'=>$mercs->getHiredBy()==$character);
 	}
 
 }
