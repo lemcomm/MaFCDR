@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'account.settings.title'|trans }}</h2>
@@ -43,8 +43,8 @@ $("#enable").click(function(){
 $("#disable").click(function(){
 {# creating a new one first to invalidate the old one #}
 	$.post("{{ path('bm2_secret', {'id':user.id}) }}", function(secret) {
-		localStorage.removeItem("maf.userid"); 
-		localStorage.removeItem("maf.secret"); 
-	});	
+		localStorage.removeItem("maf.userid");
+		localStorage.removeItem("maf.secret");
+	});
 });
 {% endblock %}
