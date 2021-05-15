@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="meta">
-	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
+	{% include "element/linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
 </div>
 {% if character.actions is not empty %}
 <div class="queue secondary">
