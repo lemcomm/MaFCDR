@@ -1074,6 +1074,16 @@ class Dispatcher {
 		return $this->action("control.grant", "bm2_site_actions_grant");
 	}
 
+	public function controlAbandonTest($check_duplicate=false, $settlement) {
+		if (($check = $this->controlActionsGenericTests()) !== true) {
+			return array("name"=>"control.abandon.name", "description"=>"unavailable.$check");
+		}
+		if ($settlement->getOwner() != $this->getCharacter()) {
+			return array("name"=>"control.abandon.name", "description"=>"unavailable.notyours2");
+		}
+		return $this->action("control.abandon", "bm2_site_settlement_abandon");
+	}
+
 	public function controlChangeOccupantTest($check_duplicate=false) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.changeoccupant.name", "description"=>"unavailable.$check");
