@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ 'newcharacter.title'|trans }}</h2>
@@ -54,7 +54,7 @@ function findChar(id) {
 	id = parseInt(id);
 	for (i in chars) {
 		if (chars[i].id == id) {
-			return chars[i];	
+			return chars[i];
 		}
 	};
 	return false;
@@ -98,8 +98,8 @@ function updateOptions(me, target) {
 			}
 		});
 		if (updateselection) {
-			$("#charactercreation_"+target+" option:not([disabled])").first().attr("selected", "selected");		
-		}		
+			$("#charactercreation_"+target+" option:not([disabled])").first().attr("selected", "selected");
+		}
 	} else {
 		$("#charactercreation_"+target+" option").removeAttr('disabled');
 	}
@@ -118,7 +118,7 @@ function updatePartners() {
 				$(this).attr('disabled','disabled');
 				if (id==selected) {
 					$(this).removeAttr('selected');
-					$("#charactercreation_partner option:not([disabled])").first().attr("selected", "selected");		
+					$("#charactercreation_partner option:not([disabled])").first().attr("selected", "selected");
 				}
 			}
 		}
