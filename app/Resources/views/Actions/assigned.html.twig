@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -63,7 +63,7 @@
 					{% endif %}
 					{{ chance|number_format }} %
 				</td>
-			</tr>	
+			</tr>
 		{% endfor %}
 		</tbody></table>
 		<br />
