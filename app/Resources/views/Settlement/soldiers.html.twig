@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -19,7 +19,7 @@
 
 	{% if next < total_soldiers or start > 0 %}
 		{# FIXME: translate #}
-		showing soldiers {{ start }} - {{ next }} of {{ total_soldiers }} - 
+		showing soldiers {{ start }} - {{ next }} of {{ total_soldiers }} -
 		{% if start > 0 %}
 			<a href="{{ path("bm2_site_settlement_soldiers", {'id':settlement.id, 'start':prev}) }}"><button>previous {{ slice }}</button></a>
 		{% endif %}
@@ -29,7 +29,7 @@
 		{% endif %}
 	{% endif %}
 
-	{% include "BM2SiteBundle:element:soldierslist.html.twig" with {
+	{% include "element/soldierslist.html.twig" with {
 		"settlement":settlement,
 		"submitpath":path('bm2_site_settlement_soldiers', {'id':settlement.id, 'start':start}),
 		"listpath":path('bm2_site_settlement_soldiers', {'id':settlement.id, 'start':start}),
@@ -120,7 +120,7 @@
 {% if recruits is not empty %}
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 
