@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {# This macro builds the table rows for each character on the list. If you want to change the rows, change the logic in the table.
 Table headers are handled as translation strings from the character.list database entry. #}
@@ -186,7 +186,7 @@ Table headers are handled as translation strings from the character.list databas
 			0:{"name":"newcharacter.title", "url":"bm2_newchar", "description":"newcharacter.description"}
 		} %}
 	{% endif %}
-	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":{"elements":elements}, "domain":'messages'} only %}
+	{% include "element/linklist.html.twig" with {"list":{"elements":elements}, "domain":'messages'} only %}
 </div>
 
 <br style="clear:left"/>
@@ -216,13 +216,6 @@ Table headers are handled as translation strings from the character.list databas
 	{% endfor %}
 	</table>
 
-	{% if free_npcs > 0 %}
-		<div style="float:left;width:98%">
-			<h3>{{ 'bandits.title'|trans }}</h3>
-			<p>{{ 'bandits.intro'|trans|manuallinks }}</p>
-			{{ form(npcsform, {'action':path('bm2_choose_bandit')}) }}
-		</div>
-	{% endif %}
 	{% if npcs is not empty %}
 		<table class="leftmain">
 		<tr>
