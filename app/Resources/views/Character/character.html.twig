@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="meta">
-	{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
+	{% include "element/linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
 </div>
 {% if character.achievements is not empty %}
 	<div class="meta secondary">
@@ -54,7 +54,7 @@
 
 	{% if not character.npc %}
 		<h2>{{ 'politics.hierarchy'|trans|title }}</h2>
-		{% include "BM2SiteBundle:element:hierarchy.html.twig" with {"character":character, "who":'self'} only %}
+		{% include "element/hierarchy.html.twig" with {"character":character, "who":'self'} only %}
 
 		<div id="myestates">
 		<h2>{{ 'estate'|transchoice(character.ownedSettlements|length)|title }}{% if character.ownedSettlements|length > 0%} <button id="expandestates">expand</button>{% endif %}</h2>
