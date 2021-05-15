@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Form\SettlementAbandonType;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 
@@ -25,7 +26,6 @@ class SettlementController extends Controller {
 
 	/**
 	  * @Route("/{id}", name="bm2_settlement", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Settlement:settlement.html.twig")
 	  */
 	public function indexAction(Settlement $id) {
 		$em = $this->getDoctrine()->getManager();
@@ -140,7 +140,7 @@ class SettlementController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Settlement/settlement.html.twig', [
 			'settlement' => $settlement,
 			'familiarity' => $character?$this->get('geography')->findRegionFamiliarityLevel($character, $settlement->getGeoData()):false,
 			'details' => $details,
@@ -156,12 +156,11 @@ class SettlementController extends Controller {
 			'recruits' => $recruits,
 			'security' => round(($this->get('economy')->EconomicSecurity($settlement)-1.0)*16),
 			'heralds' => $heralds
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function permissionsAction(Settlement $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway('controlPermissionsTest', false, true, false, $id);
@@ -219,17 +218,16 @@ class SettlementController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array(
+		return $this->render('Settlement/permissions.html.twig', [
 			'settlement' => $settlement,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('settlement'),
 			'form' => $form->createView(),
 			'lord' => $lord
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/quests", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function questsAction(Settlement $id, Request $request) {
 		$character = $this->get('dispatcher')->gateway('controlQuestsTest', false, true, false, $id);
@@ -237,15 +235,17 @@ class SettlementController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('settlement'=>$settlement, 'quests'=>$settlement->getQuests());
+		return $this->render('Settlement/quests.html.twig', [
+			'quests'=>$settlement->getQuests(),
+			'settlement' => $settlement
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/description", requirements={"id"="\d+"})
-	  * @Template
 	  */
-	public function descriptionAction(Settlement $id, Request $request) {
-		$character = $this->get('dispatcher')->gateway('controlSettlementDescriptionTest', false, true, false, $id);
+	public function descriptionAction(Settlement $settlement, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlSettlementDescriptionTest', false, true, false, $settlement);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -265,8 +265,38 @@ class SettlementController extends Controller {
 			}
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+			return $this->redirectToRoute('bm2_settlement', ['id'=>$settlement->getId()]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Settlement/description.html.twig', [
+                        'form' => $form->createView(),
+			'settlement' => $settlement
+                ]);
+	}
+
+	/**
+	  * @Route("/{id}/abandon", requirements={"id"="\d+"})
+	  */
+	public function abandonAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlAbandonTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->CreateForm(new SettlementAbandonType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$result = $this->get('interactions')->abandonSettlement($character, $id, $data['keep']);
+			if ($result) {
+				$this->addFlash('notice', $this->get('translator')->trans('control.abandon.success', [], 'actions'));
+				return $this->redirectToRoute('bm2_settlement', ['id'=>$id->getId()]);
+			}
+			# If the form doesn't validate, they don't get here. Thus, no else case.
+		}
+		return $this->render('Settlement/abandon.html.twig', [
+                        'form' => $form->createView(),
+			'settlement' => $id
+                ]);
 	}
 
 }
