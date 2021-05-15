@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::plain.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "plain.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 <h3>{{ 'estate'|transchoice(settlements|length)|title }}</h3>
@@ -22,8 +22,8 @@
 		{% for settlement in settlements %}
 			<tr>
 				<td>{{ settlement_link(settlement.id, settlement.name) }}</td>
-				<td>{% if settlement.realm is defined %}{{ realm_link(settlement.realm.id, settlement.realm.name) }}{% endif %}</td>
-				<td>{% if settlement.ultimate is defined %}{{ realm_link(settlement.ultimate.id, settlement.ultimate.name) }}{% endif %}</td>
+				<td>{% if settlement.realm is not null and settlement.realm %}{{ realm_link(settlement.realm.id, settlement.realm.name) }}{% endif %}</td>
+				<td>{% if settlement.ultimate is not null and settlement.ultimate %}{{ realm_link(settlement.ultimate.id, settlement.ultimate.name) }}{% endif %}</td>
 				<td>{{ ('settlement.size.'~settlement.size)|trans }}</td>
 				<td align="right">{{ settlement.pop }}</td>
 				<td align="right">{{ settlement.peasants }}</td>
@@ -82,7 +82,7 @@
 		$("#estates").tablesorter({
 			sortList: [[0,0]],
 		});
-		{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+		{% include "element/mapstrings.js.twig" %}
 		mapinit('map', false, false, false);
 		addoutline('{{ poly }}', '#cccc20', 3, '#cccc20', 0.4);
 	{% endblock %}
