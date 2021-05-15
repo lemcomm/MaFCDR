@@ -54,7 +54,6 @@ class AccountController extends Controller {
 
    /**
      * @Route("/", name="bm2_account")
-     * @Template("BM2SiteBundle:Account:account.html.twig")
      */
 	public function indexAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -68,23 +67,22 @@ class AccountController extends Controller {
 
 		list($announcements, $notices) = $this->notifications();
 
-		return array(
+		return $this->render('Account/account.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices
-		);
+		]);
 	}
 
 
    /**
      * @Route("/data")
-     * @Template
      */
-   public function dataAction(Request $request) {
+	public function dataAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
-   	$form = $this->createForm(new UserDataType(), $user);
+			$form = $this->createForm(new UserDataType(), $user);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -93,15 +91,14 @@ class AccountController extends Controller {
 			return $this->redirectToRoute('bm2_account');
 		}
 
-   	return array(
-   		'user' => $user,
-   		'form' => $form->createView()
-   	);
-   }
+		return $this->render('Account/data.html.twig', [
+	   		'user' => $user,
+	   		'form' => $form->createView()
+		]);
+	}
 
    /**
      * @Route("/characters", name="bm2_characters")
-     * @Template
      */
 	public function charactersAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -288,7 +285,7 @@ class AccountController extends Controller {
 			$em->flush();
 		}
 
-		return array(
+		return $this->render('Account/characters.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices,
 			'locked' => ($user->getAccountLevel()==0),
@@ -300,7 +297,7 @@ class AccountController extends Controller {
 			'user' => $user,
 			'daysleft' => $daysleft,
 			'enough_credits' => $enough_credits
-		);
+		]);
 	}
 
 	private function character_sort($a, $b) {
@@ -313,7 +310,6 @@ class AccountController extends Controller {
 
 	/**
 	  * @Route("/overview")
-	  * @Template("BM2SiteBundle:Account:overview.html.twig")
 	  */
 	public function overviewAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -341,17 +337,16 @@ class AccountController extends Controller {
 
 		}
 
-		return array(
+		return $this->render('Account/overview.html.twig', [
 			'characters' => $characters,
 			'settlements' => $this->get('geography')->findRegionsPolygon($settlements),
 			'claims' => $this->get('geography')->findRegionsPolygon($claims)
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/newchar", name="bm2_newchar")
-	  * @Template("BM2SiteBundle:Account:charactercreation.html.twig")
 	  */
 	public function newcharAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -476,14 +471,14 @@ class AccountController extends Controller {
 			$mychars[$char->getId()] = array('id'=>$char->getId(), 'name'=>$char->getName(), 'mine'=>true, 'gender'=>($char->getMale()?'m':'f'), 'partners'=>$mypartners);
 		}
 
-		return array(
+		return $this->render('Account/charactercreation.html.twig', [
 			'characters' => $mychars,
 			'limit' => $user->getNewCharsLimit(),
 			'spawnlimit' => $spawnlimit,
 			'characters_active' => $characters_active,
 			'characters_allowed' => $characters_allowed,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	private function findSexPartners($char) {
@@ -516,7 +511,6 @@ class AccountController extends Controller {
 
 	/**
 	  * @Route("/settings")
-	  * @Template
 	  */
 	public function settingsAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -539,10 +533,11 @@ class AccountController extends Controller {
 				return $this->redirectToRoute('bm2_account');
 			}
 		}
-		return array(
+
+		return $this->render('Account/settings.html.twig', [
 			'form' => $form->createView(),
 			'user' => $user
-		);
+		]);
 	}
 
 	/**
@@ -709,42 +704,7 @@ class AccountController extends Controller {
 	}
 
 	/**
-	  * @Route("/choosebandit", name="bm2_choose_bandit")
-	  * @Template("BM2SiteBundle:Account:characters.html.twig")
-	  */
-	public function choosebanditAction(Request $request) {
-		$user = $this->getUser();
-
-		// check max NPCs
-		$npc_count = 0;
-		foreach ($user->getCharacters() as $character) {
-			if ($character->isNPC()) {
-				$npc_count++;
-				// for now, we allow at most 1 npc per player
-				throw new AccessDeniedHttpException('npc.maxreached');
-			}
-		}
-
-		$npcs_form = $this->createForm(new NpcSelectType($this->get('npc_manager')->getAvailableNPCs()));
-		$npcs_form->handleRequest($request);
-		if ($npcs_form->isValid()) {
-			$data = $npcs_form->getData();
-			if (!isset($data['npc'])) {
-				throw new \Exception("please select a bandit");
-			}
-			$character = $data['npc'];
-			$character->setUser($user);
-			$this->get('npc_manager')->spawnNPC($character);
-			$this->getDoctrine()->getManager()->flush();
-			return $this->playAction($character->getId());
-		} else {
-			return $this->charactersAction();
-		}
-	}
-
-	/**
 	  * @Route("/familytree")
-	  * @Template
 	  */
 	public function familytreeAction() {
 		$descriptorspec = array(
@@ -767,13 +727,14 @@ class AccountController extends Controller {
 			$return_value = proc_close($process);
 		}
 
-		return array('svg' => $svg);
+		return $this->render('Account/familytree.html.twig', [
+			'svg' => $svg
+		]);
 	}
 
 
 	/**
 	  * @Route("/familytree.json", defaults={"_format"="json"})
-	  * @Template("BM2SiteBundle:Account:familytree.json.twig")
 	  */
 	public function familytreedataAction() {
 		$user = $this->getUser();
@@ -796,9 +757,12 @@ class AccountController extends Controller {
 			}
 		}
 
-		return array(
-			'tree' => array('nodes'=>$nodes, 'links'=>$links)
-		);
+		return $this->render('Account/familytreedata.json.twig', [
+			'tree' => [
+				'nodes'=>$nodes,
+				'links'=>$links
+			]
+		]);
 	}
 
 	private function node_find($id, $data) {
