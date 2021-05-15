@@ -396,6 +396,16 @@ control:
     You can give a short summary, a long description and a description of the reward. You should include all important information,
     including whether the quest reward will be given only to the first to complete it, or to multiple people, and on which conditions,
     such as evidence of conclusion, or time limits.
+ abandon:
+  name:         Abandon Settlement
+  description:  Reliquish control of this settlement.
+  help: >
+    As the rightful owner of %settlement%, you can always decide that you simply don't want to be the lord any longer.<br/>
+    You can also decide if you simply wish to be rid of the region, or for you AND your realm to be rid of the region.
+  keep:         Keep in realm?
+  sure:         Are you sure?
+  success:      Settlement has been abandoned.
+  submit:       Dispatch the order!
  description:
   settlement:
    name:        Update Description
