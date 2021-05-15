@@ -26,13 +26,7 @@ twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
     form_themes:
-         - 'BM2SiteBundle:Form:form_theme.html.twig'
-    paths:
-         - "%kernel.root_dir%/src/BM2/SiteBundle/Resources/views": BM2Site
-# Below is deprecated as of Symfony 2.6 --Andrew
-#    form:
-#        resources:
-#            - 'BM2SiteBundle:Form:form_theme.html.twig'
+         - 'Form/form_theme.html.twig'
 
 # Assetic Configuration
 assetic:
