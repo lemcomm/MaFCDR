@@ -1,9 +1,9 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ 'character.title'|trans({},"settings")|title }}</h2>
 	<p>{{ 'character.description'|trans({},"settings")|raw }}</p>
-	
+
 <form id="charactersettings" class="wide" action="{{ path('bm2_site_character_settings') }}" method="post" {{ form_start(form) }}
 	{{ form_errors(form) }}
 	{{ form_widget(form._token) }}
