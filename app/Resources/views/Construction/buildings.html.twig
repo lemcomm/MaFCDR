@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -36,7 +36,7 @@
 				</tr></thead>
 				<tbody>
 				{% for build in buildings if build.active == true %}
-					{% include "BM2SiteBundle:element:buildingrow.html.twig" with { "build": build } only %}
+					{% include "element/buildingrow.html.twig" with { "build": build } only %}
 				{% endfor %}
 				</tbody>
 			</table>
@@ -189,7 +189,7 @@ $("input.assignment").change(function(){
 	var param = id.split("_");
 	var target="dummy";
 	if (param[1]=="existing") {
-		target = "#we_"+param[2]; 
+		target = "#we_"+param[2];
 		$("#done_"+param[2]).html("?");
 	} else if (param[1]=="available") {
 		target = "#wa_"+param[2];
