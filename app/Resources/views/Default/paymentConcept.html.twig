@@ -1,5 +1,5 @@
 {% set biglogo = true %}
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'paymentconcept'|trans|title }}</h2>
@@ -26,4 +26,3 @@
 #}
 
 {% endblock %}
-
