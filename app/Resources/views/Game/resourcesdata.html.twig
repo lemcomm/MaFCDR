@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -33,11 +33,11 @@ $(".plot").click(function(){
 	switch (id) {
 	{% for resource in resources %}
 		case "{{ resource.name }}":
-			$.plot($("#graph"), [ 
-				{{data[resource.name].supply|json_encode|raw}}, 
-				{{data[resource.name].demand|json_encode|raw}}, 
-				{{data[resource.name].trade|json_encode|raw}} ], 
-			options); 
+			$.plot($("#graph"), [
+				{{data[resource.name].supply|json_encode|raw}},
+				{{data[resource.name].demand|json_encode|raw}},
+				{{data[resource.name].trade|json_encode|raw}} ],
+			options);
 		break;
 	{% endfor %}
 	}
