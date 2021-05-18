@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -32,22 +32,22 @@ $(".plot").click(function(){
 
 	switch (id) {
 		case "settlements":
-			$.plot($("#graph"), [ {{data.settlements|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.settlements|json_encode|raw}} ], options );
 			break;
 		case "population":
-			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options );
 			break;
 		case "soldiers":
-			$.plot($("#graph"), [ {{data.soldiers|json_encode|raw}}, {{data.militia|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.soldiers|json_encode|raw}}, {{data.militia|json_encode|raw}} ], options );
 			break;
 		case "area":
-			$.plot($("#graph"), [ {{data.area|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.area|json_encode|raw}} ], options );
 			break;
 		case "characters":
-			$.plot($("#graph"), [ {{data.characters|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.characters|json_encode|raw}} ], options );
 			break;
 		case "players":
-			$.plot($("#graph"), [ {{data.players|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.players|json_encode|raw}} ], options );
 			break;
 	}
 });
