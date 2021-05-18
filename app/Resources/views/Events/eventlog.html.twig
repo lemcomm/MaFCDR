@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'events.logtitle'|trans({'%subject%':link(log.subject)})|title|raw }}</h2>
@@ -16,7 +16,7 @@
 	<input type="radio" id="filter_ultra" name="radio" /><label for="filter_ultra">{{ 'events.filter.ultra'|trans }}</label>
 </div>
 
-{% include "BM2SiteBundle:Events:eventdata.html.twig" with { "log":log, "metas":metas, "research":true} %}
+{% include "Events/eventdata.html.twig" with { "log":log, "metas":metas, "research":true} %}
 
 {% endblock %}
 
