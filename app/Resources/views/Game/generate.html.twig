@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
   {{ parent() }}
@@ -91,7 +91,7 @@ function generateSQL() {
   var water = parseFloat($("#waterlevel").val());
   var mountains = parseFloat($("#mountains").val());
 
-  $.post('{{ path('bm2_site_game_process') }}', { 
+  $.post('{{ path('bm2_site_game_process') }}', {
     'seed': {{ seed }},
     'water': water,
     'mountains': mountains,
@@ -104,7 +104,7 @@ function generateSQL() {
     alert("data submitted");
   });
 
-  return;  
+  return;
 
   $('#prepare').append("TRUNCATE GeoData, Settlement, GeoResource;<br />");
   $('#prepare').append("ALTER TABLE GeoPoint ALTER coordinates TYPE GEOMETRY(POINTZ);<br />");
