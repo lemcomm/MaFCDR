@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -111,14 +111,14 @@
 {% endblock %}
 
 {% block jquery %}
-{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+{% include "element/mapstrings.js.twig" %}
 mapinit('map', false, 'featureconstruction', true);
 zoomto({{ settlement.geodata.center.getX }}, {{ settlement.geodata.center.getY }}, 5);
 addoutline('{{ regionpoly }}');
 
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 
@@ -134,7 +134,7 @@ $("input.assignment").change(function(){
 	var param = id.split("_");
 	var target="dummy";
 	if (param[1]=="existing") {
-		target = "#we_"+param[2]; 
+		target = "#we_"+param[2];
 		$("#done_"+param[2]).html("?");
 	} else if (param[1]=="available") {
 		target = "#wa_"+param[2];
