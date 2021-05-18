@@ -1,7 +1,7 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
-{% include "BM2SiteBundle:element:toc.html.twig" with {"toc":toc} %}
+{% include "element/toc.html.twig" with {"toc":toc} %}
 
 <h1>{{ ('manual.'~page)|trans|title }}</h1>
 
@@ -10,4 +10,3 @@
 <div class="clear"></div>
 
 {% endblock %}
-
