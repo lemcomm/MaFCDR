@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 
@@ -16,6 +16,6 @@
 
 
 <h3>{{ link(artifact.log)|title|raw }}</h3>
-{% include "BM2SiteBundle:Events:eventdata.html.twig" with { "log":artifact.log, "metas":false, "research":false} %}
+{% include "Events/eventdata.html.twig" with { "log":artifact.log, "metas":false, "research":false} %}
 
 {% endblock %}
