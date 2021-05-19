@@ -51,7 +51,7 @@ class HouseController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::House/view.html.twig', [
+		return $this->render('House/view.html.twig', [
 			'house' => $house,
 			'details' => $details,
 			'head' => $head
@@ -75,7 +75,7 @@ class HouseController extends Controller {
 		}
 		$myHouse = $character->getHouse();
 
-		return $this->render('BM2SiteBundle::House/nearby.html.twig', [
+		return $this->render('House/nearby.html.twig', [
 			'houses' => $houses,
 			'myHouse' => $myHouse,
 			'char' => $char
@@ -112,7 +112,7 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return $this->render('BM2SiteBundle::House/create.html.twig', [
+		return $this->render('House/create.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
@@ -178,7 +178,7 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return $this->render('BM2SiteBundle::House/manage.html.twig', [
+		return $this->render('House/manage.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
@@ -212,7 +212,7 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return $this->render('BM2SiteBundle::House/join.html.twig', [
+		return $this->render('House/join.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
@@ -236,7 +236,7 @@ class HouseController extends Controller {
 			$text = $joinrequest->getText();
 		}
 
-		return $this->render('BM2SiteBundle::House/applicants.html.twig', [
+		return $this->render('House/applicants.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
 		]);
@@ -283,7 +283,7 @@ class HouseController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::House/disown.html.twig', [
+		return $this->render('House/disown.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
 		]);
@@ -315,7 +315,7 @@ class HouseController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::House/successor.html.twig', [
+		return $this->render('House/successor.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
 		]);
@@ -375,7 +375,7 @@ class HouseController extends Controller {
 				/* You shouldn't ever reach this. The form requires input. */
 			}
 		}
-		return $this->render('BM2SiteBundle::House/relocate.html.twig', [
+		return $this->render('House/relocate.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
 		]);
@@ -407,7 +407,7 @@ class HouseController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
 		}
-		return $this->render('BM2SiteBundle::House/newplayer.html.twig', [
+		return $this->render('House/newplayer.html.twig', [
 			'house'=>$house, 'form'=>$form->createView()
 		]);
 	}
@@ -455,7 +455,7 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.cadet.success', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return $this->render('BM2SiteBundle::House/cadet.html.twig', [
+		return $this->render('House/cadet.html.twig', [
 			'house'=>$house,
 			'myHouse'=>$myHouse,
 			'form'=>$form->createView()
@@ -485,7 +485,7 @@ class HouseController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.success', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return $this->render('BM2SiteBundle::House/uncadet.html.twig', [
+		return $this->render('House/uncadet.html.twig', [
 			'house'=>$house,
 			'form'=>$form->createView()
 		]);
