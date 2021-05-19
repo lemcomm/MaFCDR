@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 
@@ -61,8 +61,8 @@
 				-
 				<a href="{{ path('bm2_site_realm_officials', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.appoint'|trans({},"politics") }}</a>
 			</dd>
-			{% endif %}	
-		{% endfor %}		
+			{% endif %}
+		{% endfor %}
 	</dl>
 {% endif %}
 
