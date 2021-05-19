@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 	{% if equipmenttype.icon %}
@@ -43,19 +43,19 @@
 					})
 				}
 		};
-		
+
 		this.each(function(){
 				var container = this;
-				
+
 				// store list of contained images (excluding those in tables)
 				var imgs = $('img', container).not($("table img"));
-				
-				// store initial dimensions on each image 
+
+				// store initial dimensions on each image
 				imgs.each(function(){
 					$(this).attr('startwidth', $(this).width())
 						.attr('startheight', $(this).height())
 						.css('max-width', $(this).attr('startwidth')+"px");
-				
+
 					fit.one(this);
 				});
 				// Re-adjust when window width is changed
