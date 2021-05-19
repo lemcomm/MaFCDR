@@ -1,9 +1,9 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ "news.title"|transchoice(10, {},"communication")|title }}</h2>
 
-	{% include "BM2SiteBundle:element:newslist.html.twig" with {"title":"news.local"|trans({},"communication"), "list":local_list} only %}
+	{% include "element/newslist.html.twig" with {"title":"news.local"|trans({},"communication"), "list":local_list} only %}
 
 	<h3>{{ "news.reader"|trans({},"communication") }}</h3>
 	<ul>
