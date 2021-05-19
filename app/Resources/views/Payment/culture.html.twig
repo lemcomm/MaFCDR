@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'account.culture.title'|trans|title }}</h2>
@@ -16,7 +16,7 @@
 				{% for inside in culture.contains %}
 					<li>
 						{% if inside == 'names' %}
-							{{ namescount[culture.id] }} 
+							{{ namescount[culture.id] }}
 						{% endif %}
 						{{ ('account.culture.contents.'~inside)|trans }}
 					</li>
@@ -42,7 +42,7 @@
 	<table>
 		<thead>
 			<tr>
-				<th>{{ 'account.culture.buy'|trans }}</th>	
+				<th>{{ 'account.culture.buy'|trans }}</th>
 				<th>{{ 'account.culture.name'|trans }}</th>
 				<th>{{ 'account.culture.cost'|trans }}</th>
 				<th>{{ 'account.culture.contains'|trans }}</th>
@@ -60,7 +60,7 @@
 						{% for inside in cultures[id].contains %}
 							<li>
 								{% if inside == 'names' %}
-									{{ namescount[id] }} 
+									{{ namescount[id] }}
 								{% endif %}
 								{{ ('account.culture.contents.'~inside)|trans }}
 							</li>
@@ -74,4 +74,3 @@
 	{{ form_end(form) }}
 {% endif %}
 {% endblock %}
-
