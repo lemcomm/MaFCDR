@@ -19,7 +19,6 @@ class BuildingController extends Controller {
 
 	/**
 	  * @Route("/tavern")
-	  * @Template
 	  */
 	public function tavernAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationTavernTest', true);
@@ -36,16 +35,15 @@ class BuildingController extends Controller {
 		$query->setParameters(array('me'=>$settlement->getGeoData()->getId(), 'maxdistance'=>20000));
 		$nearby_people = $query->getResult();
 
-		return array(
+		return $this->render('Building/tavern.html.twig', [
 			'settlement'=>$settlement,
 			'nearby_settlements'=>$nearby_settlements,
 			'nearby_people'=>$nearby_people
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/library")
-	  * @Template
 	  */
 	public function libraryAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLibraryTest', true);
@@ -66,11 +64,11 @@ class BuildingController extends Controller {
 		$top_realms = $query->getResult();
 
 
-		return array(
+		return $this->render('Building/library.html.twig', [
 			'settlement'=>$settlement,
 			'top_settlements'=>$top_settlements,
 			'top_realms'=>$top_realms
-		);
+		]);
 	}
 
 	/**
@@ -103,7 +101,6 @@ class BuildingController extends Controller {
 
 	/**
 	  * @Route("/temple")
-	  * @Template
 	  */
 	public function templeAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationTempleTest', true);
@@ -126,12 +123,13 @@ class BuildingController extends Controller {
 			$data["population"]["data"][] = array($cycle, $row->getPopulation());
 			$data["thralls"]["data"][] = array($cycle, $row->getThralls());
 		}
-		return array('settlement'=>$settlement, 'data'=>$data);
+		return $this->render('Building/temple.html.twig', [
+			'settlement'=>$settlement, 'data'=>$data
+		]);
 	}
 
 	/**
 	  * @Route("/barracks")
-	  * @Template
 	  */
 	public function barracksAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationBarracksTest', true);
@@ -152,7 +150,9 @@ class BuildingController extends Controller {
 
 			$data["militia"]["data"][] 	= array($cycle, $row->getMilitia());
 		}
-		return array('settlement'=>$settlement, 'data'=>$data);
+		return $this->render('Building/barracks.html.twig', [
+			'settlement'=>$settlement, 'data'=>$data
+		]);
 	}
 
 }
