@@ -1,6 +1,6 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
-{% form_theme form with 'BM2SiteBundle:Form:form_characterlist.html.twig' %}
+{% form_theme form with 'Form/form_characterlist.html.twig' %}
 
 {% block content %}
 <h2>{{ "military.battles.initiate.name"|trans({},"actions")|title }}</h2>
