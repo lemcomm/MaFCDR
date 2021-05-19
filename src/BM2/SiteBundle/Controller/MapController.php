@@ -28,7 +28,6 @@ class MapController extends Controller {
 
    /**
      * @Route("/", name="bm2_map")
-     * @Template("BM2SiteBundle:Map:map-openlayers.html.twig")
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(false);
@@ -42,15 +41,18 @@ class MapController extends Controller {
 				$details = null;
 				$roads = null;
 			}
-			return array(
+
+			return $this->render('Map/map-openlayers.html.twig', [
 				'actdistance'		=>	$this->get('geography')->calculateInteractionDistance($character),
 				'spotdistance'		=>	$this->get('geography')->calculateSpottingDistance($character),
 				'travel'				=> $travel,
 				'traveldetails'	=> $details,
 				'travelroads'		=> $roads,
-			);
+			]);
 		} else {
-			return array();
+
+			return $this->render('Info/map-openlayers.html.twig', [
+			]);
 		}
 	}
 
@@ -95,7 +97,7 @@ class MapController extends Controller {
 			if (count($my_markers) >= 10) { $limit = true; }
 		}
 
-		return $this->render('BM2SiteBundle:Map:marker.html.twig', array('mymarkers'=>$my_markers, 'limit'=>$limit, 'form'=>$form->createView()));
+		return $this->render('Map/marker.html.twig', array('mymarkers'=>$my_markers, 'limit'=>$limit, 'form'=>$form->createView()));
 	}
 
 	/**
@@ -698,29 +700,30 @@ class MapController extends Controller {
 
 	/**
      * @Route("/details/settlement/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsSettlementAction($id) {
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 
-		return array('settlement'=>$settlement);
+		return $this->render('Map/detailsSettlement.html.twig', [
+			'settlement'=>$settlement
+		]);
 	}
 
 	/**
      * @Route("/details/offerslist/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsOfferslistAction(Settlement $id) {
 		$em = $this->getDoctrine()->getManager();
 		$offers = $em->getRepository('BM2SiteBundle:KnightOffer')->findBySettlement($id);
 
-		return array('offers'=>$offers);
+		return $this->render('Map/detailsOfferslist.html.twig', [
+			'offers'=>$offers
+		]);
 	}
 
 	/**
      * @Route("/details/character/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsCharacterAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -736,16 +739,15 @@ class MapController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Map/detailsCharacter.html.twig', [
 			'char'=>$char,
 			'realms'=>$realms,
 			'ultimates'=>$ultimates
-		);
+		]);
 	}
 
    /**
      * @Route("/details/marker/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsMarkerAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -753,7 +755,9 @@ class MapController extends Controller {
 
 		// TODO: check if we are allowed to see this marker
 
-		return array('marker'=>$marker);
+		return $this->render('Map/detailsMarker.html.twig', [
+			'marker'=>$marker
+		]);
 	}
 
 }
