@@ -15,15 +15,14 @@ class InfoController extends Controller {
 
 	/**
 	  * @Route("/buildingtypes")
-	  * @Template("BM2SiteBundle:Info:all.html.twig")
 	  */
 	public function allbuildingtypesAction() {
-		return $this->alltypes('BuildingType');
+
+		return $this->render('Info/all.html.twig', $this->alltypes('BuildingType'));
 	}
 
    /**
      * @Route("/buildingtype/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function buildingtypeAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -32,20 +31,21 @@ class InfoController extends Controller {
 			throw $this->createNotFoundException('error.notfound.buildingtype');
 		}
 
-		return array("buildingtype" => $buildingtype);
+		return $this->render('Info/buildingtype.html.twig', [
+			"buildingtype" => $buildingtype
+		]);
 	}
 
 	/**
 	  * @Route("/featuretypes")
-	  * @Template("BM2SiteBundle:Info:all.html.twig")
 	  */
 	public function allfeaturetypesAction() {
-		return $this->alltypes('FeatureType');
+
+		return $this->render('Info/all.html.twig', $this->alltypes('FeatureType'));
 	}
 
    /**
      * @Route("/featuretype/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function featuretypeAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -54,20 +54,21 @@ class InfoController extends Controller {
 			throw $this->createNotFoundException('error.notfound.featuretype');
 		}
 
-		return array("featuretype" => $featuretype);
+		return $this->render('Info/featuretype.html.twig', [
+			"featuretype" => $featuretype
+		]);
 	}
 
 	/**
 	  * @Route("/entouragetypes")
-	  * @Template("BM2SiteBundle:Info:all.html.twig")
 	  */
 	public function allentouragetypesAction() {
-		return $this->alltypes('EntourageType');
+
+		return $this->render('Info/all.html.twig', $this->alltypes('EntourageType'));
 	}
 
    /**
      * @Route("/entouragetype/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function entouragetypeAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -76,20 +77,21 @@ class InfoController extends Controller {
 			throw $this->createNotFoundException('error.notfound.entouragetype');
 		}
 
-		return array("entouragetype" => $entouragetype);
+		return $this->render('Info/entouragetype.html.twig', [
+			"entouragetype" => $entouragetype
+		]);
 	}
 
 	/**
 	  * @Route("/equipmenttypes")
-	  * @Template("BM2SiteBundle:Info:all.html.twig")
 	  */
 	public function allequipmenttypesAction() {
-		return $this->alltypes('EquipmentType');
+
+		return $this->render('Info/all.html.twig', $this->alltypes('EquipmentType'));
 	}
 
 	/**
 	  * @Route("/equipmenttype/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function equipmenttypeAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -98,7 +100,9 @@ class InfoController extends Controller {
 			throw $this->createNotFoundException('error.notfound.equipmenttype');
 		}
 
-		return array("equipmenttype" => $equipmenttype);
+		return $this->render('Info/equipmenttype.html.twig', [
+			"equipmenttype" => $equipmenttype
+		]);
 	}
 
 
