@@ -27,7 +27,7 @@
 			{% endif %}">{{ element.name|trans(transkeys,domain)|title }}</a>
 		</div>
 		{% if element.include is defined %}
-			<p>{% include "BM2SiteBundle:element:"~element.include~".html.twig" %}</p>
+			<p>{% include "element/"~element.include~".html.twig" %}</p>
 		{% endif %}
 		{% if element.description is defined %}
 			<p>{{ element.description|trans(transkeys,domain)|raw }}</p>
