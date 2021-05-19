@@ -469,7 +469,7 @@ class PlaceController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::Place/occupant.html.twig', [
+		return $this->render('Place/occupant.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -503,7 +503,7 @@ class PlaceController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('BM2SiteBundle::Place/occupier.html.twig', [
+		return $this->render('Place/occupier.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -528,7 +528,7 @@ class PlaceController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return $this->render('BM2SiteBundle::Place/occupationstart.html.twig', [
+		return $this->render('Place/occupationstart.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -551,7 +551,7 @@ class PlaceController extends Controller {
                         $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
                         return $this->redirectToRoute('bm2_actions');
                 }
-		return $this->render('BM2SiteBundle::Place/occupationend.html.twig', [
+		return $this->render('Place/occupationend.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
 		]);
 	}
@@ -582,7 +582,7 @@ class PlaceController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
 		}
-		return $this->render('BM2SiteBundle::Place/newplayer.html.twig', [
+		return $this->render('Place/newplayer.html.twig', [
 			'place'=>$place, 'form'=>$form->createView()
 		]);
 	}
