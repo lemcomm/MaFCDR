@@ -635,7 +635,6 @@ class CharacterController extends Controller {
 
 	/**
 	  * @Route("/family/{id}", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Account:familytree.html.twig")
 	  */
 	public function familyAction($id) {
 		$em = $this->getDoctrine()->getManager();
