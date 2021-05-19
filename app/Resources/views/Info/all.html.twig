@@ -1,7 +1,7 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
-{% include "BM2SiteBundle:element:toc.html.twig" with {"toc":toc} %}
+{% include "element/toc.html.twig" with {"toc":toc} %}
 
 <h1>{{ ('list.'~list)|trans }}</h1>
 <ul id="thelist">
@@ -20,6 +20,6 @@
 function sortAlpha(a,b){
     return $(a).find('a').text().toLowerCase() > $(b).find('a').text().toLowerCase() ? 1 : -1;
 };
- 
+
 $('#thelist li').sort(sortAlpha).appendTo('#thelist');
 {% endblock %}
