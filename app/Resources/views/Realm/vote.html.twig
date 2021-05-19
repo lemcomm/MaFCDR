@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ "votes.name"|trans({"%name%":election.name}, "politics")|title }}</h2>
@@ -92,7 +92,7 @@
 {% endblock %}
 
 {% block jquery %}
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 {% if not election.closed %}
 $("table.votes li.self").each(function(){
 	var vote = $(this).closest('td').find('button').data('vote');
