@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ "lists.name"|trans({},"politics")|title }}</h2>
@@ -7,7 +7,7 @@
 <ul>
 {% for listing in listings %}
 	<li>
-		<a href="{{ path('bm2_site_politics_list', {'id':listing.id}) }}">{{ listing.name }}</a> 
+		<a href="{{ path('bm2_site_politics_list', {'id':listing.id}) }}">{{ listing.name }}</a>
 		<small>
 			({{ "lists.creator"|trans({"%character%":link(listing.creator)},"politics")|raw }})</li>
 		</small>
