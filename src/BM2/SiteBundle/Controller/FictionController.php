@@ -26,15 +26,16 @@ class FictionController extends Controller {
 
 	/**
 	  * @Route("/{page}", name="bm2_fiction", defaults={"page"="index"})
-	  * @Template
 	  */
 	public function indexAction($page) {
-		return array("simple"=>true, "page"=>$page, "allpages"=>$this->pages);
+
+		return $this->render('Fiction/index.html.twig', [
+			"simple"=>true, "page"=>$page, "allpages"=>$this->pages
+		]);
 	}
 
 	/**
 	  * @Route("/content/{page}", name="bm2_fiction_content")
-	  * @Template
 	  */
 	public function contentAction($page) {
 		$pr = $this->get('pagereader');
@@ -42,10 +43,10 @@ class FictionController extends Controller {
 
 		$content = $pr->getPage('fiction', $page, $locale);
 
-		return array(
+		return $this->render('Fiction/content.html.twig', [
 			'title' => $page,
 			'content'=>$content
-		);
+		]);
 	}
 
 }
