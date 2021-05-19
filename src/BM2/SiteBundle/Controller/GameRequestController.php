@@ -569,7 +569,6 @@ class GameRequestController extends Controller {
 
 	/**
 	  * @Route("/manage", name="bm2_gamerequest_manage")
-	  * @Template
 	  */
 
 	public function manageAction() {
@@ -581,14 +580,13 @@ class GameRequestController extends Controller {
 		# TODO: Rework this to use dispatcher.
 		$requests = $this->get('game_request_manager')->findAllManageableRequests($character);
 
-		return array(
+		return $this->render('GameRequest/manage.html.twig', [
 			'gamerequests' => $requests
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/soldierfood", name="bm2_gamerequest_soldierfood")
-	  * @Template
 	  */
 
 	public function soldierfoodAction(Request $request) {
@@ -631,10 +629,11 @@ class GameRequestController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('request.soldierfood.sent', array('%settlement%'=>$data['target']->getName()), 'actions'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		return array(
+
+		return $this->render('GameRequest/soldierfood.html.twig', [
 			'form' => $form->createView(),
 			'size' => $character->getEntourage()->count()+$soldiers
-		);
+		]);
 	}
 
 
