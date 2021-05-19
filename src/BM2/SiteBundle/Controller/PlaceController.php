@@ -30,7 +30,6 @@ class PlaceController extends Controller {
 
 	/**
 	  * @Route("/{id}", name="maf_place", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Place:view.html.twig")
 	  */
 	public function indexAction(Place $id) {
 		$character = $this->get('appstate')->getCharacter(false, true, true);
@@ -75,18 +74,17 @@ class PlaceController extends Controller {
 			$inside = false;
 		}
 
-		return array(
+		return $this->render('Place/view.html.twig', [
 			'place' => $place,
 			'details' => $details,
 			'inside' => $inside,
 			'militia' => $militia,
 			'heralds' => $heralds
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/actionable", name="maf_place_actionable")
-	  * @Template
 	  */
 
 	public function actionableAction(Request $request) {
@@ -97,15 +95,14 @@ class PlaceController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$places = $this->get('geography')->findPlacesInActionRange($character);
 
-		return array(
+		return $this->render('Place/actionable.html.twig', [
 			'places' => $places,
 			'character' => $character
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/enter", requirements={"id"="\d+"}, name="maf_place_enter")
-	  * @Template
 	  */
 
 	public function enterPlaceAction(Place $id) {
@@ -126,7 +123,6 @@ class PlaceController extends Controller {
 
 	/**
 	  * @Route("/exit", name="maf_place_exit")
-	  * @Template
 	  */
 
 	public function exitPlaceAction() {
@@ -148,7 +144,6 @@ class PlaceController extends Controller {
 
 	/**
 	  * @Route("/{id}/permissions", requirements={"id"="\d+"}, name="maf_place_permissions")
-	  * @Template
 	  */
 
 	public function permissionsAction(Place $id, Request $request) {
@@ -200,16 +195,15 @@ class PlaceController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array(
+		return $this->render('Place/permissions.html.twig', [
 			'place' => $place,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('place'),
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/new", name="maf_place_new")
-	  * @Template
 	  */
 	public function newAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('placeCreateTest');
@@ -357,14 +351,14 @@ class PlaceController extends Controller {
 				return $this->redirectToRoute('maf_place_actionable');
 			}
 		}
-		return array(
+
+		return $this->render('Place/new.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/manage", requirements={"id"="\d+"}, name="maf_place_manage")
-	  * @Template
 	  */
 	public function manageAction(Place $id, Request $request) {
 		$place = $id;
@@ -409,10 +403,11 @@ class PlaceController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
 			}
 		}
-		return array(
+
+		return $this->render('Place/manage.html.twig', [
 			'place'=>$place,
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	#TODO: Combine this and checkRealmNames into a single thing in a HelperService.
