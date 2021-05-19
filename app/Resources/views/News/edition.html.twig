@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -70,7 +70,7 @@
 	{% if editor.author %}
 		<hr />
 		<h3>{{ "news.article.new"|trans({},"communication")|trans }}</h3>
-		{% include "BM2SiteBundle:element:editorfield.html.twig" with { "form":form, "url":url('bm2_site_news_newarticle'), "extended":true} %}
+		{% include "element/editorfield.html.twig" with { "form":form, "url":url('bm2_site_news_newarticle'), "extended":true} %}
 	{% endif %}
 
 {# TODO: update layout when submitting a new article! #}
