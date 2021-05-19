@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ position.name }} ({{ link(position.realm) }})</h2>
@@ -27,10 +27,10 @@
 
 	<dt>{{ 'position.retired'|trans({}, "politics") }}</dt>
 	<dd>{% if position.retired %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
-	
+
 	<dt>{{ 'position.keeponslumber'|trans({}, "politics") }}</dt>
 	<dd>{% if position.keeponslumber %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
-	
+
 	<dt>{{ 'position.term'|trans({}, "politics") }}</dt>
 	<dd>
 		{{ ('position.terms.'~position.term)|trans({}, "politics") }}
