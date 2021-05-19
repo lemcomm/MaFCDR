@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ "military.battles.join.name"|trans({},"actions")|title }}</h2>
@@ -64,7 +64,7 @@
 {% block jquery %}
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 {% endblock %}
