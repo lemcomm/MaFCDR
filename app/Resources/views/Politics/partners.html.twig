@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ "partners.name"|trans({},"politics")|title }}</h2>
@@ -44,7 +44,7 @@
 	<button type="submit">{{ "relation.choice.submitchange"|trans({},"politics") }}</button>
 	</form>
 	{% endif %}
-	
+
 	<h3>{{ "partners.new.name"|trans({},"politics")|title }}</h3>
 	{% if newavailable %}
 		<p>{{ "partners.new.intro"|trans({},"politics")|raw }}</p>
