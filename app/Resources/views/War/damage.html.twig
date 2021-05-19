@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block jquery %}
-{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+{% include "element/mapstrings.js.twig" %}
 mapinit('map', false, false, true);
 
 set_char_location({{ character.location.x }}, {{ character.location.y }}, true, {{ actdistance}}, {{ spotdistance }});
