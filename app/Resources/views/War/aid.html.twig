@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ "military.aid.name"|trans({},"actions")|title }}</h2>
@@ -16,7 +16,7 @@
 $("#form_submit").prop("disabled", true);
 charselect($("#target_ac"), targetchange);
 
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 
 function targetchange(id, name) {
 	console.log(id+" / "+name);
