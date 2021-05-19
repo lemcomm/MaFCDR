@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'diplomacy.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
@@ -20,7 +20,7 @@
 	<p><a href="{{ path('bm2_site_realm_hierarchy', {'realm':realm.id}) }}">{{ 'viewdetails'|trans|title }}</a></p>
 {% endif %}
 
-{% include "BM2SiteBundle:element:buttonlist.html.twig" with {"list":dispatcher.diplomacyActions, "domain":'politics', "who":'self'} %}
+{% include "element/buttonlist.html.twig" with {"list":dispatcher.diplomacyActions, "domain":'politics', "who":'self'} %}
 
 
 {% endblock %}
