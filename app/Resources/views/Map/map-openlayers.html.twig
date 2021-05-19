@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -217,7 +217,7 @@ $("#accordion").accordion({
 		}
 	}
 });
-{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+{% include "element/mapstrings.js.twig" %}
 mapinit('map');
 {% if character and character.location %}
 	addcharacters();
