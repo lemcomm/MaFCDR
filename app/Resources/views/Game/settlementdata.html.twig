@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -32,22 +32,22 @@ $(".plot").click(function(){
 
 	switch (id) {
 		case "population":
-			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options );
 			break;
 		case "peasants":
-			$.plot($("#graph"), [ {{data.peasants|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.peasants|json_encode|raw}} ], options );
 			break;
 		case "thralls":
-			$.plot($("#graph"), [ {{data.thralls|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.thralls|json_encode|raw}} ], options );
 			break;
 		case "militia":
-			$.plot($("#graph"), [ {{data.militia|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.militia|json_encode|raw}} ], options );
 			break;
 		case "starvation":
-			$.plot($("#graph"), [ {{data.starvation|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.starvation|json_encode|raw}} ], options );
 			break;
 		case "war_fatigue":
-			$.plot($("#graph"), [ {{data.war_fatigue|json_encode|raw}} ], options ); 
+			$.plot($("#graph"), [ {{data.war_fatigue|json_encode|raw}} ], options );
 			break;
 	}
 });
