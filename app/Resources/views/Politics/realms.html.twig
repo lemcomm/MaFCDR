@@ -1,9 +1,9 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <button id="style">toggle list style</button>
 <div id="actionlist" class="boxlist">
-{% include "BM2SiteBundle:element:linklist.html.twig" with {"list":dispatcher.politicsRealmsActions, "domain":'politics', "who":'self'} %}
+{% include "element/linklist.html.twig" with {"list":dispatcher.politicsRealmsActions, "domain":'politics', "who":'self'} %}
 </div>
 
 <br class="clear" />
@@ -26,7 +26,7 @@ $("#style").click(function(){
 	if (box) {
 		$("#actionlist").removeClass("linklist").addClass("boxlist");
 	} else {
-		$("#actionlist").removeClass("boxlist").addClass("linklist");	
+		$("#actionlist").removeClass("boxlist").addClass("linklist");
 	}
 });
 {% endblock %}
