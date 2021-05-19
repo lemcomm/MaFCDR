@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ "military.block.name"|trans({},"actions")|title }}</h2>
@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block jquery %}
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 charselect($("input[id$='_targetCharacter']"));
 realmselect($("input[id$='_targetRealm']"));
 {% endblock %}
