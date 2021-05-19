@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ 'battle.upcoming'|trans|title }}</h2>
@@ -58,7 +58,7 @@
 {% block jquery %}
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 {% endblock %}
