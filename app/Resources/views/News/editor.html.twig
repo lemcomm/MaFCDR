@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ paper.name }}</h2>
@@ -101,7 +101,7 @@ $(".action_change").click(function(){
 	$("#newseditor_owner").prop("checked", $(this).data("owner"));
 	$("#newseditor_editor").prop("checked", $(this).data("editor"));
 	$("#newseditor_author").prop("checked", $(this).data("author"));
-	$("#newseditor_publisher").prop("checked", $(this).data("publisher"));	
+	$("#newseditor_publisher").prop("checked", $(this).data("publisher"));
 	$("#change_dialog").dialog("open");
 });
 
@@ -209,7 +209,7 @@ $("#add_member").click(function(){
 	$("#add_dialog").dialog("open");
 	if (!is_loaded) {
 		is_loaded = true;
-		$("#add_dialog").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');       
+		$("#add_dialog").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');
 		$('#add_dialog').load('{{ path("bm2_site_news_editoraddform", {"paperId":paper.id}) }}');
 	}
 });
