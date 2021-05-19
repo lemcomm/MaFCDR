@@ -1,4 +1,4 @@
-{% extends app.request.isXmlHttpRequest ? "BM2SiteBundle::ajax.html.twig" : "BM2SiteBundle::layout.html.twig" %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
 
 {% block content %}
 	<h2>{{ ('building.'~buildingtype.name)|trans({}, "economy") }}</h2>
@@ -42,12 +42,12 @@
 		<li>{{ link(provides) }}</li>
 	{% endfor %}
 	{% for provides in buildingtype.providesEquipment %}
-		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes", 
+		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes",
 		which is roughly the dumbest thing it could possibly do in that situation, but hey, brains were out apparently. #}
 		<li>{{ link(provides) }}</li>
 	{% endfor %}
 	{% for provides in buildingtype.providesTraining %}
-		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes", 
+		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes",
 		which is roughly the dumbest thing it could possibly do in that situation, but hey, brains were out apparently. #}
 		<li>{{ 'trainingfor'|trans({'%item%':link(provides)}, "economy")|raw }}</li>
 	{% endfor %}
