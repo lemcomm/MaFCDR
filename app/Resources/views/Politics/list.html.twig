@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% macro member_row(member) %}
 {% spaceless %}
@@ -45,7 +45,7 @@
 		{{ form_row(form.inheritFrom) }}
 	{% endif %}
 	<br />
-	
+
 	<h3>{{ 'lists.members'|trans({},"politics")|title }}</h3>
 	<table class="members">
 		<thead><tr>
@@ -67,7 +67,7 @@
 			</tfoot>
 		{% endif %}
 	</table>
-	
+
 	<br /><br />
 
 	<div id="changes" class="warning" style="display:none">
@@ -108,7 +108,7 @@
 
 {% block jquery %}
 
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 
 // Get the ul that holds the collection of tags
 var collectionHolder = $('table.members');
