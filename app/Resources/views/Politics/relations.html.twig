@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% macro show_partnership(character, partnership) %}
 	{% if partnership.active %}
@@ -17,7 +17,7 @@
 {% import _self as macros %}
 
 {% block content %}
-{% include "BM2SiteBundle:element:buttonlist.html.twig" with {"list":dispatcher.relationsActions, "domain":'politics', "who":'self'} %}
+{% include "element/buttonlist.html.twig" with {"list":dispatcher.relationsActions, "domain":'politics', "who":'self'} %}
 
 <div class="act">
 	<h2>{{ 'character.family'|trans|title }}</h2>
