@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ war.summary }}</h2>
@@ -57,6 +57,6 @@ score: {{ war.score }}
 </table>
 
 <h3>{{ link(war.log)|title|raw }}</h3>
-{% include "BM2SiteBundle:Events:eventdata.html.twig" with { "log":war.log, "metas":false, "research":false} %}
+{% include "Events/eventdata.html.twig" with { "log":war.log, "metas":false, "research":false} %}
 
 {% endblock %}
