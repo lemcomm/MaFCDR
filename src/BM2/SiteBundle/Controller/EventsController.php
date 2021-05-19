@@ -21,9 +21,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class EventsController extends Controller {
 
 	/**
-		* @Route("/", name="bm2_events")
-		* @Template("BM2SiteBundle:Events:events.html.twig")
-		*/
+	* @Route("/", name="bm2_events")
+	*/
 	public function eventsAction() {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -76,14 +75,15 @@ class EventsController extends Controller {
 			}
 		}
 
-		return array('logs'=>$logs);
+		return $this->render('Events/events.html.twig', [
+			'logs'=>$logs
+		]);
 	}
 
 
 	/**
-		* @Route("/log/{id}", name="bm2_eventlog", requirements={"id"="\d+"})
-		* @Template
-		*/
+	* @Route("/log/{id}", name="bm2_eventlog", requirements={"id"="\d+"})
+	*/
 	public function eventlogAction($id, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -149,18 +149,18 @@ class EventsController extends Controller {
 			$formView = null;
 		}
 
-		return array(
+		return $this->render('Events/log.html.twig', [
 			'log'=>$log,
 			'metas'=>$metas,
 			'scholars'=>$myscholars->count(),
 			'research'=>$research,
 			'form'=>$formView
-		);
+		]);
 	}
 
 	/**
-		* @Route("/allread/{log}")
-		*/
+	* @Route("/allread/{log}")
+	*/
 	public function allreadAction(EventLog $log) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -179,8 +179,8 @@ class EventsController extends Controller {
 	}
 
 	/**
-		* @Route("/fullread/{which}")
-		*/
+	* @Route("/fullread/{which}")
+	*/
 	public function fullreadAction($which) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -216,9 +216,8 @@ class EventsController extends Controller {
 	}
 
 	/**
-		* @Route("/soldierlog/{soldier}")
-		* @Template
-		*/
+	* @Route("/soldierlog/{soldier}")
+	*/
 	public function soldierlogAction(Soldier $soldier) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -233,9 +232,11 @@ class EventsController extends Controller {
 		}
 
 		if (!$access) {
-			throw new AccessDeniedHttpException('error.noaccess.log');			
+			throw new AccessDeniedHttpException('error.noaccess.log');
 		}
 
-		return array('soldier'=>$soldier);
+		return $this->render('Events/soldierlog.html.twig', [
+			'soldier'=>$soldier
+		]);
 	}
 }
