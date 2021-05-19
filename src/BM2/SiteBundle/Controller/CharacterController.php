@@ -330,7 +330,7 @@ class CharacterController extends Controller {
 			}
 		}
 
-		return $this->render('BM2SiteBundle::Character/start.html.twig', [
+		return $this->render('Character/start.html.twig', [
 			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse, 'retiree'=>$retiree
 		]);
 
