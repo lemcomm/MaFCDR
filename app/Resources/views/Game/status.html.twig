@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block title "BM2 Game Runner" %}
 
@@ -29,7 +29,7 @@ Time spent on run: {{ (time_spent*1000)|number_format(2) }} ms
 {% block jquery %}
 $(".progressbar").each(function(){
 	var percent = parseInt($(this).attr("value"));
- 	$(this).progressbar({value: percent });	
+ 	$(this).progressbar({value: percent });
 });
 $(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
 {% endblock %}
