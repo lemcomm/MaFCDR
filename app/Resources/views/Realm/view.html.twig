@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -172,7 +172,7 @@
 			$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
 		});
 	});
-	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+	{% include "element/mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}
 		{% if parentpoly and parentpoly != '' %}
