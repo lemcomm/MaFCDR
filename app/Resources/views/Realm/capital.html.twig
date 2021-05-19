@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block jquery %}
-	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+	{% include "element/mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}
 		{# TODO: also use the realm colour as fillcolour #}
