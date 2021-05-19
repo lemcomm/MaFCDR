@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
 <h2>{{ "oath.name"|trans({},"politics")|title }}</h2>
@@ -19,7 +19,7 @@
 	{% endif %}
 
 	<h3>{{ "oath.current"|trans({},"politics")|title }}</h3>
-	{% include "BM2SiteBundle:element:hierarchy.html.twig" with {"character":character, "who":'self'} only %}
+	{% include "element/hierarchy.html.twig" with {"character":character, "who":'self'} only %}
 
 	<h3>{{ "oath.swear"|trans({},"politics")|title }}</h3>
 	<p>{{ "oath.swearintro"|trans({},"politics")|raw }}</p>
@@ -27,7 +27,7 @@
 		{{ "oath.nobody"|trans({},"politics") }}
 	{% else %}
 		<form class="wide" action="{{ path('bm2_site_politics_oath') }}" method="post" {{ form_start(form) }}
-		{{ form_widget(form) }}		
+		{{ form_widget(form) }}
 		<button type="submit">{{ "oath.submit"|trans({},"politics") }}</button>
 		</form>
 	{% endif %}
