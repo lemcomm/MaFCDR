@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -78,12 +78,32 @@ class Realm {
 			if ($owner) {
 				$this->addRealmMember($owner);
 			}
+			foreach ($settlement->getVassals() as $knight) {
+				$this->addRealmMember($knight);
+			}
 		}
 
 		foreach ($this->getPositions() as $pos) {
 			foreach ($pos->getHolders() as $official) {
 				$this->addRealmMember($official);
 			}
+			foreach ($pos->getVassals() as $knight) {
+				$this->addRealmMember($knight);
+			}
+		}
+
+		foreach ($this->getPlaces() as $place) {
+			$owner = $place->getOwner();
+			if ($owner) {
+				$this->addRealmMember($owner);
+			}
+			foreach ($place->getVassals() as $knight) {
+				$this->addRealmMember($knight);
+			}
+		}
+
+		foreach ($this->getVassals() as $knight) {
+			$this->addRealmMember($knight);
 		}
 
 		if ($with_subs) {
@@ -113,6 +133,29 @@ class Realm {
 				if ($official->isActive(true)) {
 					$this->addActiveRealmMember($official);
 				}
+			}
+			foreach ($pos->getVassals() as $knight) {
+				if ($kngiht->isActive(true)) {
+					$this->addActiveRealmMember($knight);
+				}
+			}
+		}
+
+		foreach ($this->getPlaces() as $place) {
+			$owner = $place->getOwner();
+			if ($owner AND $owner->isActive(true)) {
+				$this->addActiveRealmMember($owner);
+			}
+			foreach ($place->getVassals() as $knight) {
+				if ($kngiht->isActive(true)) {
+					$this->addActiveRealmMember($knight);
+				}
+			}
+		}
+
+		foreach ($this->getVassals() as $knight) {
+			if ($kngiht->isActive(true)) {
+				$this->addActiveRealmMember($knight);
 			}
 		}
 
