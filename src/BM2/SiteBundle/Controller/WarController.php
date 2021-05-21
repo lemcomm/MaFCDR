@@ -39,15 +39,16 @@ class WarController extends Controller {
 
 	/**
 	  * @Route("/view/{id}")
-	  * @Template
 	  */
 	public function viewAction(War $id) {
-		return array('war'=>$id);
+
+		return $this->render('War/view.html.twig', [
+			'war'=>$id
+		]);
 	}
 
 	/**
 	  * @Route("/declare/{realm}")
-	  * @Template
 	  */
 	public function declareAction(Realm $realm, Request $request) {
 		$this->get('dispatcher')->setRealm($realm);
@@ -113,12 +114,14 @@ class WarController extends Controller {
 			$em->flush();
 			return $this->redirectToRoute('bm2_site_war_view', array('id'=>$war->getId()));
 		}
-		return array('form'=>$form->createView());
+
+		return $this->render('War/declare.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/settlement/defend")
-	  * @Template
 	  */
 	public function defendSettlementAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryDefendSettlementTest', true);
@@ -133,14 +136,21 @@ class WarController extends Controller {
 			$act->setType('settlement.defend')->setCharacter($character)->setTargetSettlement($settlement);
 			$act->setBlockTravel(false);
 			$result = $this->get('action_manager')->queue($act);
-			return array('settlement'=>$settlement, 'result'=>$result);
+
+			#TODO: Turn this into a flash and redirect.
+
+			return $this->render('War/defendSettlement.html.twig', [
+				'settlement'=>$settlement, 'result'=>$result
+			]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+
+		return $this->render('War/defendSettlement.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/place/defend")
-	  * @Template
 	  */
 	public function defendPlaceAction(Request $request) {
 		list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militaryDefendPlaceTest', true, null, true);
@@ -155,9 +165,17 @@ class WarController extends Controller {
 			$act->setType('place.defend')->setCharacter($character)->setTargetPlace($place);
 			$act->setBlockTravel(false);
 			$result = $this->get('action_manager')->queue($act);
-			return array('place'=>$settlement, 'result'=>$result);
+
+			#TODO: Convert to flash and redirect.
+
+			return $this->render('War/defendPlace.html.twig', [
+				'place'=>$settlement, 'result'=>$result
+			]);
 		}
-		return array('place'=>$place, 'form'=>$form->createView());
+
+		return $this->render('War/defendPlace.html.twig', [
+			'place'=>$place, 'form'=>$form->createView()
+		]);
 	}
 
 	/**
@@ -165,7 +183,6 @@ class WarController extends Controller {
 	  * @Route("/siege/")
 	  * @Route("/siege/place")
 	  * @Route("/siege/place/{place}", requirements={"place"="\d+"}, name="maf_war_siege_place")
-	  * @Template
 	  */
 	public function siegeAction(Request $request, Place $place = null) {
 		# Security check.
@@ -648,7 +665,7 @@ class WarController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('War/sieges.html.twig', [
 			'character'=>$character,
 			'settlement'=>$settlement,
 			'place'=>$place,
@@ -657,12 +674,11 @@ class WarController extends Controller {
 			'action'=>$action,
 			'status'=>$action,
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/settlement/loot")
-	  * @Template
 	  */
 	public function lootSettlementAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryLootSettlementTest', false, true);
@@ -1017,10 +1033,14 @@ class WarController extends Controller {
 			}
 			$em->flush();
 
-			return array('result'=>$result, 'target'=>$destination);
+			return $this->render('War/lootSettlement.html.twig', [
+				'result'=>$result, 'target'=>$destination
+			]);
 		}
 
-		return array('form'=>$form->createView(), 'settlement'=>$settlement);
+		return $this->render('War/lootSettlement.html.twig', [
+			'form'=>$form->createView(), 'settlement'=>$settlement
+		]);
 	}
 
 	private function lootvalue($max) {
@@ -1036,7 +1056,6 @@ class WarController extends Controller {
 
 	/**
 	  * @Route("/disengage")
-	  * @Template
 	  */
 	public function disengageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDisengageTest');
@@ -1103,18 +1122,19 @@ class WarController extends Controller {
 				}
 			}
 
-			return array('results'=>$results);
+			return $this->render('War/disengage.html.twig', [
+				'results'=>$results
+			]);
 		}
 
-		return array(
+		return $this->render('War/disengage.html.twig', [
 			'takes'=>$this->get('war_manager')->calculateDisengageTime($character),
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/evade")
-	  * @Template
 	  */
 	public function evadeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryEvadeTest');
@@ -1133,16 +1153,19 @@ class WarController extends Controller {
 			$act->setBlockTravel(false);
 			$result = $this->get('action_manager')->queue($act);
 
-			return array('result'=>$result);
+			return $this->render('War/evade.html.twig', [
+				'result'=>$result
+			]);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('War/evade.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/block")
-	  * @Template
 	  */
 	public function blockAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryBlockTest', false, true);
@@ -1178,15 +1201,18 @@ class WarController extends Controller {
 				->setTargetListing($data['target']);
 			$result = $this->get('action_manager')->queue($act);
 
-			return array('result'=>$result);
+			return $this->render('War/block.html.twig', [
+				'result'=>$result
+			]);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('War/block.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/damage")
-	  * @Template
 	  */
 	public function damageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDamageFeatureTest', false, true);
@@ -1240,26 +1266,25 @@ class WarController extends Controller {
 				$em->flush();
 			}
 
-			return array(
+			return $this->render('War/damage.html.twig', [
 				'result' => $result,
 				'featuretype' => $target->getType(),
 				'actdistance'	=>	$actdistance,
 				'spotdistance'	=>	$spotdistance
-			);
+			]);
 		}
 
-		return array(
+		return $this->render('War/damage.html.twig', [
 			'features'		=> $features,
 			'form'			=> $form->createView(),
 			'actdistance'	=>	$actdistance,
 			'spotdistance'	=>	$spotdistance
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/nobles/attack")
-	  * @Template
 	  */
 	public function attackOthersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackNoblesTest', true);
@@ -1288,12 +1313,14 @@ class WarController extends Controller {
 			}
 		}
 
-		return array('form'=>$form->createView(), 'result'=>$result);
+		return $this->render('War/attackOthers.html.twig', [
+			'form'=>$form->createView(),
+			'result'=>$result
+		]);
 	}
 
 	/**
 	  * @Route("/battles/aid")
-	  * @Template
 	  */
 	public function aidAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryAidTest');
@@ -1329,12 +1356,15 @@ class WarController extends Controller {
 			$target = $data['target'];
 		}
 
-		return array('form'=>$form->createView(), 'success'=>$success, 'target'=>$target);
+		return $this->render('War/aid.html.twig', [
+			'form'=>$form->createView(),
+			'success'=>$success,
+			'target'=>$target
+		]);
 	}
 
 	/**
 	  * @Route("/battles/join")
-	  * @Template
 	  */
 	public function battleJoinAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryJoinBattleTest', true);
@@ -1357,7 +1387,12 @@ class WarController extends Controller {
 			}
 		}
 
-		return array('battles'=>$battles, 'now'=>new \DateTime("now"), 'form'=>$form->createView(), 'success'=>$success);
+		return $this->render('War/battleJoin.html.twig', [
+			'battles'=>$battles,
+			'now'=>new \DateTime("now"),
+			'form'=>$form->createView(),
+			'success'=>$success
+		]);
 	}
 
 }
