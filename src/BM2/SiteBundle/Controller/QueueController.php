@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @Route("/queue")
  */
 class QueueController extends Controller {
-	 
+
 	/**
 	  * @Route("/")
 	  * @Template
@@ -27,7 +27,10 @@ class QueueController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array("queue" => $character->getActions(), "now" => new \DateTime("now"));
+		return $this->render('Queue/manage.html.twig', [
+			"queue" => $character->getActions(),
+			"now" => new \DateTime("now")
+		]);
 	}
 
 	/**
@@ -58,7 +61,10 @@ class QueueController extends Controller {
 			}
 		}
 
-		return array("action" => $action, "now" => new \DateTime("now"));
+		return $this->render('Queue/details.html.twig', [
+			"action" => $action,
+			"now" => new \DateTime("now")
+		]);
 	}
 
 
@@ -91,7 +97,11 @@ class QueueController extends Controller {
 
 		// TODO: add progress and time when battle will happen (see above)
 
-		return array("battle" => $battle, "location" => $location, "now" => new \DateTime("now"));
+		return $this->render('Queue/battle.html.twig', [
+			"battle" => $battle,
+			"location" => $location,
+			"now" => new \DateTime("now")
+		]);
 	}
 
 
@@ -176,7 +186,7 @@ class QueueController extends Controller {
 			$em->flush();
 			return new JsonResponse(true);
 		} else {
-            return new JsonResponse(false);
+			return new JsonResponse(false);
 		}
 	}
 
