@@ -489,9 +489,11 @@ class ConversationManager {
 
         public function leaveAllConversations(Character $char) {
                 $change = false;
+                $now = new \DateTime("now");
                 foreach ($char->getConvPermissions() as $perm) {
                         if ($perm->getActive()) {
                                 $perm->setActive(false);
+                                $perm->setEndTime($now);
                                 if (!$change) {
                                         $change = true;
                                 }
@@ -518,45 +520,42 @@ class ConversationManager {
         }
 
         public function updateMembers(Conversation $conv) {
-                #TODO: This function is supposed to update all realm conversations with the correct participants. Legacy code follows.
-                /*
-                $realm = $conversation->getAppReference();
+                $realm = $conv->getRealm();
+                $house = $conv->getHouse();
                 $added = 0;
                 $removed = 0;
+                $now = new \DateTime("now");
 
                 if ($realm) {
-                        $members = $realm->findMembers();
+                        $entity = $realm;
+                        $members = $realm->findMemebers();
+                } else {
+                        $entity = $house;
+                        $members = $house->findAllLiving();
+                }
 
+                if ($entity) {
                         if ($members && !$members->isEmpty()) {
-                                $query = $this->em->createQuery('SELECT u FROM MsgBundle:User u WHERE u.app_user IN (:members)');
-                                $query->setParameter('members', $members->toArray());
-                                $users = new ArrayCollection($query->getResult());
-
-                                $query = $this->em->createQuery('SELECT u FROM MsgBundle:User u JOIN u.conversations_metadata m WHERE m.conversation = :conversation');
-                                $query->setParameter('conversation', $conversation);
-                                $participants = new ArrayCollection($query->getResult());
-
-                                foreach ($users as $user) {
-                                        if (!$participants->contains($user)) {
+                                $perms = $conv->findActivePermissions();
+                                foreach ($members as $member) {
+                                        if (!$conv->findActiveCharPermission($member)) {
                                                 // this user is missing from the conversation, but should be there
-                                                $this->addParticipant($conversation, $user);
-                                                $participants->add($user); // make sure we don't add anyone twice
+                                                $this->addParticipant($conversation, $member);
                                                 $added++;
                                         }
                                 }
 
-                                foreach ($participants as $part) {
-                                        if (!$users->contains($part)) {
-                                                // this user is in the conversation, but shouldn't - remove him
-                                                $this->removeParticipant($conversation, $part);
-                                                $participants->removeElement($part);
+                                foreach ($conv->findActivePermissions() as $perm) {
+                                        if (!$members->contains($perm->getCharacter())) {
+                                                # Should no longer have active participation. Inactivate their permissions.
+                                                $perm->setActive(FALSE);
+                                                $perm->setEndTime($now);
                                                 $removed++;
                                         }
                                 }
                         }
                 }
                 return array('added'=>$added, 'removed'=>$removed);
-                */
         }
 
         public function sendNewCharacterMsg(Realm $realm = null, House $house = null, Place $place, Character $char) {
