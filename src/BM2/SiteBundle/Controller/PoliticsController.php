@@ -36,7 +36,6 @@ class PoliticsController extends Controller {
 
    /**
      * @Route("/", name="bm2_politics")
-     * @Template("BM2SiteBundle:Politics:politics.html.twig")
      */
 	public function indexAction() {
 		$character = $this->get('dispatcher')->gateway();
@@ -44,12 +43,11 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array();
+		return $this->render('Politics/politics.html.twig');
 	}
 
    /**
      * @Route("/realms", name="bm2_politics_realms")
-     * @Template("BM2SiteBundle:Politics:realms.html.twig")
      */
 	public function realmsAction() {
 		$character = $this->get('dispatcher')->gateway();
@@ -57,12 +55,11 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array();
+		return $this->render('Politics/realms.html.twig');
 	}
 
    /**
      * @Route("/relations", name="bm2_relations")
-     * @Template("BM2SiteBundle:Politics:relations.html.twig")
      */
 	public function relationsAction() {
 		$character = $this->get('dispatcher')->gateway();
@@ -70,12 +67,11 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array();
+		return $this->render('Politics/relations.html.twig');
 	}
 
    /**
      * @Route("/hierarchy")
-     * @Template
      */
 	public function hierarchyAction() {
 		$character = $this->get('dispatcher')->gateway();
@@ -85,27 +81,29 @@ class PoliticsController extends Controller {
 
 		$this->addToHierarchy($character);
 
-   	$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin
-		   1 => array("pipe", "w"),  // stdout
-		   2 => array("pipe", "w") // stderr
-		);
+	   	$descriptorspec = array(
+			   0 => array("pipe", "r"),  // stdin
+			   1 => array("pipe", "w"),  // stdout
+			   2 => array("pipe", "w") // stderr
+			);
 
-   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
+	   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
-   	if (is_resource($process)) {
-   		$dot = $this->renderView('BM2SiteBundle:Politics:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
+	   	if (is_resource($process)) {
+	   		$dot = $this->renderView('BM2SiteBundle:Politics:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
 
-   		fwrite($pipes[0], $dot);
-   		fclose($pipes[0]);
+	   		fwrite($pipes[0], $dot);
+	   		fclose($pipes[0]);
 
-   		$svg = stream_get_contents($pipes[1]);
-   		fclose($pipes[1]);
+	   		$svg = stream_get_contents($pipes[1]);
+	   		fclose($pipes[1]);
 
-   		$return_value = proc_close($process);
-   	}
+	   		$return_value = proc_close($process);
+	   	}
 
-		return array('svg'=>$svg);
+		return $this->render('Politics/hierarchy.html.twig', [
+			'svg'=>$svg
+		]);
 	}
 
 	private function addToHierarchy(Character $character) {
@@ -122,7 +120,6 @@ class PoliticsController extends Controller {
 
 	/**
 	  * @Route("/vassals")
-	  * @Template
 	  */
 	public function vassalsAction() {
 		$character = $this->get('dispatcher')->gateway();
@@ -130,12 +127,13 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('vassals'=>$character->getVassals());
+		return $this->render('Politics/vassals.html.twig', [
+			'vassals'=>$character->getVassals()
+		]);
 	}
 
 	/**
 	  * @Route("/disown/{vassal}")
-	  * @Template
 	  */
 	public function disownAction(Request $request, Character $vassal) {
 		$character = $this->get('dispatcher')->gateway();
@@ -158,12 +156,14 @@ class PoliticsController extends Controller {
 			return array('vassal'=>$vassal, 'success'=>true);
 		}
 
-		return array('vassal'=>$vassal, 'form'=>$form->createView());
+		return $this->render('Politics/disown.html.twig', [
+			'vassal'=>$vassal,
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/offeroath", name="maf_politics_oath_offer")
-	  * @Template
 	  */
 	public function offerOathAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('hierarchyOfferOathTest');
@@ -269,14 +269,14 @@ class PoliticsController extends Controller {
 			$this->addFlash('success', $this->get('translator')->trans('oath.offered', array(), 'politics'));
 			return $this->redirectToRoute('bm2_relations');
 		}
-                return [
+
+		return $this->render('Politics/offerOath.html.twig', [
 			'form' => $form->createView(),
-		];
+		]);
 	}
 
    /**
      * @Route("/breakoath")
-     * @Template
      */
 	public function breakoathAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('hierarchyIndependenceTest');
@@ -289,12 +289,12 @@ class PoliticsController extends Controller {
 			$this->addFlash('success', $this->get('translator')->trans('oath.broken', array(), 'politics'));
 			return $this->redirectToRoute('bm2_relations');
 		}
-		return array();
+
+		return $this->render('Politics/breakoath.html.twig');
 	}
 
    /**
      * @Route("/successor")
-     * @Template
      */
 	public function successorAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('InheritanceSuccessorTest');
@@ -365,18 +365,21 @@ class PoliticsController extends Controller {
 			);
 
 			$em->flush();
-			return array('success'=>true);
+
+			#TODO: Convert this to a redirect and flash.
+			return $this->render('Politics/successor.html.twig', [
+				'success'=>true
+			]);
 		}
 
-		return array(
+		return $this->render('Politics/successor.html.twig', [
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 
    /**
      * @Route("/partners/{type}", defaults={"type":null})
-     * @Template
      */
 	public function partnersAction(Request $request, $type=null) {
 		$character = $this->get('dispatcher')->gateway('partnershipsTest');
@@ -527,31 +530,30 @@ class PoliticsController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Politics/partners.html.twig', [
 			'newavailable' => $newavailable,
 			'form_old'=>$form_old_view,
 			'form_new'=>$form_new_view
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/lists", name="bm2_lists")
-	  * @Template
 	  */
 	public function listsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway();
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-		return array(
+
+		return $this->render('Politics/lists.html.twig', [
 			'listings' => $character->getUser()->getListings(),
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/list/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function listAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
@@ -669,8 +671,7 @@ class PoliticsController extends Controller {
 			}
 		}
 
-
-		return array(
+		return $this->render('Politics/list.html.twig', [
 			'listing' => $listing,
 			'used_by' => $used_by,
 			'can_delete' => $can_delete,
@@ -678,13 +679,12 @@ class PoliticsController extends Controller {
 			'is_new' => $is_new,
 			'form' => $form->createView(),
 			'form_delete' => $can_delete?$form_delete->createView():null
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/prisoners")
-	  * @Template
 	  */
 	public function prisonersAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalPrisonersTest');
@@ -769,15 +769,14 @@ class PoliticsController extends Controller {
 			$form = $this->createForm(new PrisonersManageType($prisoners, $others));
 		}
 
-		return array(
+		return $this->render('Politics/prisoners.html.twig', [
 			'form' => $form->createView(),
 			'results' => $results
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/claims")
-	  * @Template
 	  */
 	public function claimsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalClaimsTest');
@@ -785,14 +784,15 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('claims'=>$character->getSettlementClaims());
+		return $this->render('Politics/claims.html.twig', [
+			'claims'=>$character->getSettlementClaims()
+		]);
 	}
 
 
 
 	/**
 	  * @Route("/claimadd/{settlement}")
-	  * @Template
 	  */
 	public function claimaddAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
@@ -830,7 +830,6 @@ class PoliticsController extends Controller {
 
 	/**
 	  * @Route("/claimcancel/{settlement}")
-	  * @Template
 	  */
 	public function claimcancelAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
