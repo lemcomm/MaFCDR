@@ -23,7 +23,6 @@ class QuestsController extends Controller {
 
 	/**
 	  * @Route("/local")
-	  * @Template
 	  */
 	public function localQuestsAction() {
 		$character = $this->get('dispatcher')->gateway('locationQuestsTest', false, false);
@@ -34,12 +33,13 @@ class QuestsController extends Controller {
 		$geo = $this->get('geography')->findMyRegion($character);
 		$settlement = $geo->getSettlement();
 
-		return array('quests'=>$settlement->getQuests());
+		return $this->render('Quests/localQuests.html.twig', [
+			'quests'=>$settlement->getQuests()
+		]);
 	}
 
 	/**
 	  * @Route("/my")
-	  * @Template
 	  */
 	public function myQuestsAction() {
 		$character = $this->get('appstate')->getCharacter();
@@ -47,13 +47,15 @@ class QuestsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('my_quests'=>$character->getQuestings(), 'owned_quests'=>$character->getQuestsOwned());
+		return $this->render('Quests/myQuests.html.twig', [
+			'my_quests'=>$character->getQuestings(),
+			'owned_quests'=>$character->getQuestsOwned()
+		]);
 	}
 
 
 	/**
 	  * @Route("/details/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function detailsAction(Quest $id) {
 		$character = $this->get('appstate')->getCharacter();
@@ -71,7 +73,10 @@ class QuestsController extends Controller {
 		}
 		$em->flush();
 
-		return array('quest'=>$quest, 'metas'=>$metas);
+		return $this->render('Quests/details.html.twig', [
+			'quest'=>$quest,
+			'metas'=>$metas
+		]);
 	}
 
 	/**
@@ -109,14 +114,13 @@ class QuestsController extends Controller {
 			return $this->redirectToRoute('bm2_site_settlement_quests', array('id'=>$settlement->getId()));
 		}
 
-		return array(
+		return $this->render('Quests/create.html.twig', [
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/join/{quest}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function joinAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
@@ -155,7 +159,6 @@ class QuestsController extends Controller {
 
 	/**
 	  * @Route("/leave/{quest}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function leaveAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
@@ -187,7 +190,6 @@ class QuestsController extends Controller {
 
 	/**
 	  * @Route("/completed/{quest}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function completedAction(Quest $quest) {
 		$character = $this->get('appstate')->getCharacter();
@@ -218,7 +220,6 @@ class QuestsController extends Controller {
 
 	/**
 	  * @Route("/confirm/{quester}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function confirmAction(Quester $quester) {
 		$character = $this->get('appstate')->getCharacter();
@@ -250,7 +251,6 @@ class QuestsController extends Controller {
 
 	/**
 	  * @Route("/reject/{quester}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function rejectAction(Quester $quester) {
 		$character = $this->get('appstate')->getCharacter();
