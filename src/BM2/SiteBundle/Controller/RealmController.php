@@ -69,7 +69,6 @@ class RealmController extends Controller {
 
 	/**
 	  * @Route("/{id}/view", name="bm2_realm", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Realm:view.html.twig")
 	  */
 	public function viewAction(Realm $id) {
 		$realm = $id;
@@ -124,12 +123,8 @@ class RealmController extends Controller {
 				}
 			}
 		}
-		/* if (!$realm->getActive() && in_array($character, $superrulers)) {
-			$restorable = TRUE;
-			echo $restorable;
-		}*/
 
-		return array(
+		return $this->render('Realm/view.html.twig', [
 			'realm' =>		$realm,
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'parentpoly' => $parentpoly,
@@ -140,14 +135,13 @@ class RealmController extends Controller {
 			'nobles' =>		$realm->findMembers()->count(),
 			'diplomacy' =>	$diplomacy,
 			'restorable' => $restorable
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/new")
-	  * @Template
 	  */
-   public function newAction(Request $request) {
+	public function newAction(Request $request) {
 		$character = $this->gateway(false, 'hierarchyCreateRealmTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -175,7 +169,9 @@ class RealmController extends Controller {
 			}
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Realm/new.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	private function checkRealmNames($form, $name, $formalname, $me=null) {
@@ -199,7 +195,6 @@ class RealmController extends Controller {
 
 	/**
 	  * @Route("/{realm}/manage", requirements={"realm"="\d+"}, name="bm2_site_realm_manage")
-	  * @Template
 	  */
 	public function manageAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyManageRealmTest');
@@ -233,13 +228,16 @@ class RealmController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('realm.manage.success', array(), 'politics'));
 			}
 		}
-		return array('realm'=>$realm, 'form'=>$form->createView());
+
+		return $this->render('Realm/manage.html.twig', [
+			'realm'=>$realm,
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/description", requirements={"realm"="\d+"}, name="bm2_site_realm_description")
-	  * @Template
 	  */
 	public function descriptionAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyManageDescriptionTest');
@@ -265,13 +263,16 @@ class RealmController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
 		}
-		return array('realm'=>$realm, 'form'=>$form->createView());
+
+		return $this->render('Realm/description.html.twig', [
+			'realm'=>$realm,
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/newplayer", requirements={"realm"="\d+"}, name="bm2_site_realm_newplayer")
-	  * @Template
 	  */
 	public function newplayerAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyNewPlayerInfoTest');
@@ -295,12 +296,15 @@ class RealmController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
 		}
-		return array('realm'=>$realm, 'form'=>$form->createView());
+
+		return $this->render('Realm/newplayer.html.twig', [
+			'realm'=>$realm,
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/spawns", requirements={"realm"="\d+"}, name="maf_realm_spawn")
-	  * @Template
 	  */
 	public function realmSpawnAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyRealmSpawnsTest');
@@ -308,7 +312,9 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('realm'=>$realm);
+		return $this->render('Realm/realmSpawn.html.twig', [
+			'realm'=>$realm
+		]);
 	}
 
 	/**
@@ -333,7 +339,6 @@ class RealmController extends Controller {
 
 	/**
 	  * @Route("/{realm}/abdicate", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function abdicateAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyAbdicateTest');
@@ -356,13 +361,17 @@ class RealmController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 			$success=true;
 		}
-		return array('realm'=>$realm, 'form'=>$form->createView(), 'success'=>$success);
+
+		return $this->render('Realm/abdicate.html.twig', [
+			'realm'=>$realm,
+			'form'=>$form->createView(),
+			'success'=>$success
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/abolish", requirements={"realm"="\d+"}, name="bm2_site_realm_abolish")
-	  * @Template
 	  */
 	public function abolishAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyAbolishRealmTest');
@@ -460,17 +469,18 @@ class RealmController extends Controller {
 				return $this->redirectToRoute('bm2_politics');
 			} else {
 				$this->addFlash('error', $this->get('translator')->trans('realm.abolish.fail', array(), 'politics')); # 'You have not validated your certainty.'
-				return array('realm'=>$realm, 'form'=>$form->createView());
 			}
 
 		}
-		return array('realm'=>$realm,
-			     'form'=>$form->createView());
+
+		return $this->render('Realm/abolish.html.twig', [
+			'realm'=>$realm,
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/laws", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function lawsAction(Realm $realm, Request $request) {
 		// FIXME: these should be visible to all realm members - seperate method or same?
@@ -479,16 +489,15 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array(
+		return $this->render('Realm/laws.html.twig', [
 			'realm' => $realm,
 			'laws' => $realm->getLaws(),
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/positions", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function positionsAction(Realm $realm, Request $request) {
 		// FIXME: these should be visible to all realm members - seperate method or same?
@@ -497,15 +506,14 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array(
+		return $this->render('Realm/positions.html.twig', [
 			'realm' => $realm,
 			'positions' => $realm->getPositions(),
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/viewposition/{id}", requirements={"id"="\d+"}, name="bm2_position")
-	  * @Template
 	  */
 	public function viewpositionAction(RealmPosition $id) {
 		$character = $this->gateway();
@@ -513,12 +521,13 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('position'=>$id);
+		return $this->render('Realm/viewposition.html.twig', [
+			'position'=>$id
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/position/{position}", requirements={"realm"="\d+", "position"="\d+"})
-	  * @Template
 	  */
 	public function positionAction(Realm $realm, Request $request, RealmPosition $position=null) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
@@ -594,17 +603,16 @@ class RealmController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Realm/position.html.twig', [
 			'realm' => $realm,
 			'position' => $position,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('realm'),
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/officials/{position}", requirements={"realm"="\d+", "position"="\d+"})
-	  * @Template
 	  */
 	public function officialsAction(Realm $realm, RealmPosition $position, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
@@ -680,16 +688,16 @@ class RealmController extends Controller {
 			}
 			return $this->redirectToRoute('bm2_site_realm_positions', array('realm'=>$realm->getId()));
 		}
-		return array(
+
+		return $this->render('Realm/officials.html.twig', [
 			'realm' => $realm,
 			'position' => $position,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
    /**
      * @Route("/{realm}/diplomacy", requirements={"realm"="\d+"})
-     * @Template
      */
 	public function diplomacyAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchyDiplomacyTest');
@@ -697,12 +705,13 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		return array('realm'=>$realm);
+		return $this->render('Realm/diplomacy.html.twig', [
+			'realm'=>$realm
+		]);
 	}
 
    /**
      * @Route("/{realm}/hierarchy", requirements={"realm"="\d+"})
-     * @Template
      */
 	public function hierarchyAction(Realm $realm) {
 		$this->addToHierarchy($realm);
@@ -727,7 +736,9 @@ class RealmController extends Controller {
 	   		$return_value = proc_close($process);
 	   	}
 
-		return array('svg'=>$svg);
+		return $this->render('Realm/hierarchy.html.twig', [
+			'svg'=>$svg
+		]);
 	}
 
 	private function addToHierarchy(Realm $realm) {
@@ -746,7 +757,6 @@ class RealmController extends Controller {
 
    /**
      * @Route("/{realm}/join", requirements={"id"="\d+"})
-     * @Template
      */
 	public function joinAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyHierarchyTest');
@@ -788,7 +798,11 @@ class RealmController extends Controller {
 		}
 
 		if ($realms->isEmpty()) {
-			return array('realm'=>$realm, 'unavailable'=>$unavailable);
+
+			return $this->render('Realm/join.html.twig', [
+				'realm'=>$realm,
+				'unavailable'=>$unavailable
+			]);
 		}
 
 		$form = $this->createForm(new RealmSelectType($realms, 'join'));
@@ -813,13 +827,17 @@ class RealmController extends Controller {
 
 		}
 
-		return array('realm'=>$realm, 'unavailable'=>$unavailable, 'choices'=>$available, 'form'=>$form->createView());
+		return $this->render('Realm/join.html.twig', [
+			'realm'=>$realm,
+			'unavailable'=>$unavailable,
+			'choices'=>$available,
+			'form'=>$form->createView()
+		]);
 	}
 
 
    /**
      * @Route("/{realm}/subrealm", requirements={"realm"="\d+"})
-     * @Template
      */
 	public function subrealmAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacySubrealmTest');
@@ -877,16 +895,15 @@ class RealmController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Realm/subrealm.html.twig', [
 			'realm' => $realm,
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/capital", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function capitalAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'hierarchySelectCapitalTest');
@@ -927,16 +944,15 @@ class RealmController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Realm/capital.html.twig', [
 			'realm' => $realm,
 			'realmpoly' =>	$this->get('geography')->findRealmPolygon($realm),
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/restore", requirements={"id"="\d+"})
-	  * @Template
 	  */
 
 	public function restoreAction(Realm $id) {
@@ -964,13 +980,13 @@ class RealmController extends Controller {
 		);
 		$em->flush();
 
+		#TODO: Turn this into a redirect back to the source and add a flash.
 		return new Response();
 
 	}
 
 	/**
 	  * @Route("/{realm}/break", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function breakAction(Realm $realm, Request $request) {
 		$character = $this->gateway($realm, 'diplomacyBreakHierarchyTest');
@@ -1001,16 +1017,21 @@ class RealmController extends Controller {
 
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
-			return array('realm'=>$realm, 'success'=>true);
+
+			return $this->render('Realm/break.html.twig', [
+				'realm'=>$realm,
+				'success'=>true
+			]);
 		}
 
-		return array('realm'=>$realm);
+		return $this->render('Realm/break.html.twig', [
+			'realm'=>$realm
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/relations", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function relationsAction(Realm $realm, Request $request) {
 		$relations = array();
@@ -1027,17 +1048,16 @@ class RealmController extends Controller {
 		$test = $this->get('dispatcher')->diplomacyRelationsTest();
 		$canedit = isset($test['url']);
 
-		return array(
+		return $this->render('Realm/relations.html.twig', [
 			'realm' => $realm,
 			'relations' => $relations,
 			'canedit' => $canedit
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/{realm}/editrelation/{relation}/{target}", requirements={"id"="\d+", "relation"="\d+", "target"="\d+"}, defaults={"target":0})
-	  * @Template
 	  */
 	public function editrelationAction(Realm $realm, Request $request, RealmRelation $relation=null, Realm $target=null) {
 		$character = $this->gateway($realm, 'diplomacyRelationsTest');
@@ -1084,15 +1104,14 @@ class RealmController extends Controller {
 			return $this->redirectToRoute('bm2_site_realm_relations', array('realm'=>$realm->getId()));
 		}
 
-		return array(
+		return $this->render('Realm/editrelation.html.twig', [
 			'realm' => $realm,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/deleterelation/{relation}/{target}", requirements={"id"="\d+", "relation"="\d+", "target"="\d+"}, defaults={"target":0})
-	  * @Template
 	  */
 	public function deleterelationAction(Realm $realm, Request $request, RealmRelation $relation=null, Realm $target=null) {
 		$character = $this->gateway($realm, 'diplomacyRelationsTest');
@@ -1105,7 +1124,6 @@ class RealmController extends Controller {
 
 			$em->remove($relation);
 			$em->flush();
-
 		}
 
 		return $this->redirectToRoute('bm2_site_realm_relations', array('realm'=>$realm->getId()));
@@ -1113,7 +1131,6 @@ class RealmController extends Controller {
 
 	/**
 	  * @Route("/{realm}/viewrelations/{target}", requirements={"realm"="\d+", "target"="\d+"})
-	  * @Template
 	  */
 	public function viewrelationsAction(Realm $realm, Realm $target) {
 		$character = $this->gateway();
@@ -1148,20 +1165,18 @@ class RealmController extends Controller {
 			$member_of_target = false;
 		}
 
-		return array(
-			'myrealm'		=> $realm,
-			'targetrealm'	=> $target,
-			'we_to_them'	=> $we_to_them,
-			'they_to_us'	=> $they_to_us,
+		return $this->render('Realm/viewrelations.html.twig', [
+			'myrealm' => $realm,
+			'targetrealm' => $target,
+			'we_to_them' => $we_to_them,
+			'they_to_us' => $they_to_us,
 			'member_of_source' => $member_of_source,
 			'member_of_target' => $member_of_target
-		);
-
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/elections", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function electionsAction(Realm $realm) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
@@ -1169,29 +1184,14 @@ class RealmController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		/*
-		I'm not sure if this was sneaky or lazy, but there's no need for this code to be here any longer.
-		And yes, you're reading this right, elections only used to be counted when someone was viewing the list of elections in a realm.
-		--Andrew 20170918
-
-		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT e FROM BM2SiteBundle:Election e WHERE e.closed = false AND e.complete < :now');
-		$query->setParameter('now', new \DateTime("now"));
-		foreach ($query->getResult() as $election) {
-			$this->get('realm_manager')->countElection($election);
-		}
-		$em->flush();
-		*/
-
-		return array(
+		return $this->render('Realm/elections.html.twig', [
 			'realm'=>$realm,
 			'nopriest'=>($character->getEntourageOfType('priest')->count()==0)
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/{realm}/election/{election}", requirements={"realm"="\d+", "election"="\d+"})
-	  * @Template
 	  */
 	public function electionAction(Realm $realm, Request $request, Election $election=null) {
 		$character = $this->gateway($realm, 'hierarchyElectionsTest');
@@ -1250,16 +1250,15 @@ class RealmController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Realm/election.html.twig', [
 			'realm' => $realm,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/vote/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function voteAction(Election $id, Request $request) {
 		if ($id->getRealm()) {
@@ -1381,13 +1380,13 @@ class RealmController extends Controller {
 
 		$my_weight = $this->get('realm_manager')->getVoteWeight($election, $character);
 
-		return array(
+		return $this->render('Realm/vote.html.twig', [
 			'election' => $election,
 			'votes' => $votes,
 			'my_weight' => $my_weight,
 			'form' => $form->createView(),
 			'form_votes' => $form_votes->createView()
-		);
+		]);
 	}
 
 
