@@ -44,6 +44,7 @@
 		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="armour" target-entity="EquipmentType"/>
 		<many-to-one field="equipment" target-entity="EquipmentType"/>
+		<many-to-one field="mount" target-entity="EquipmentType"/>
 
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
