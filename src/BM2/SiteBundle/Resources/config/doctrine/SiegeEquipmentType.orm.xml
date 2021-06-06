@@ -7,7 +7,6 @@
 		<field name="name" type="string"/>
 		<field name="ranged" type="boolean"/>
 		<field name="hours" type="integer"/>
-		<field name="builders" type="integer"/>
 		<field name="soldiers" type="integer"/>
 		<field name="contacts" type="integer"/>
 	</entity>
