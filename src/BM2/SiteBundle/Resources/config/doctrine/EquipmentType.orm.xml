@@ -15,6 +15,7 @@
 
 		<many-to-one field="provider" target-entity="BuildingType" inversed-by="provides_equipment" />
 		<many-to-one field="trainer" target-entity="BuildingType" inversed-by="provides_training" />
+		<many-to-one field="skill" target-entity="SkillType" inversed-by="used_by"/>
 
 	</entity>
 </doctrine-mapping>
