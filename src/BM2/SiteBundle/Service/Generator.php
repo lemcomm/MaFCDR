@@ -54,18 +54,19 @@ class Generator {
 		return $name->getName();
 	}
 
-	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, Settlement $home=null, $corruption=0, Unit $unit) {
+	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, EquipmentType $mount=null, Settlement $home=null, $corruption=0, Unit $unit) {
 		$soldier = new Soldier;
 		$soldier->setName($this->randomName($home));
 		$soldier->setLocked(false);
 		$soldier->setRouted(false)->setHungry(0)->setWounded(0);
-		$soldier->setHasWeapon(true)->setHasArmour(true)->setHasEquipment(true);
+		$soldier->setHasWeapon(true)->setHasArmour(true)->setHasEquipment(true)->setHasMount(true);
 
 		$soldier->setExperience(0)->setTraining(0);
 		if ($home) {
 			if ($this->milman->acquireItem($home, $weapon, true, false)
 				&& $this->milman->acquireItem($home, $armour, true, false)
-				&& $this->milman->acquireItem($home, $equipment, true, false)) {
+				&& $this->milman->acquireItem($home, $equipment, true, false)
+				&& $this->milman->acquireItem($home, $mount, true, false)) {
 
 				$this->milman->acquireItem($home, $weapon, true);
 				$soldier->setWeapon($weapon);
@@ -73,6 +74,8 @@ class Generator {
 				$soldier->setArmour($armour);
 				$this->milman->acquireItem($home, $equipment, true);
 				$soldier->setEquipment($equipment);
+				$this->milman->acquireItem($home, $mount, true);
+				$soldier->setMount($mount);
 			} else {
 				return null;
 			}
@@ -80,12 +83,14 @@ class Generator {
 			$soldier->setWeapon($weapon);
 			$soldier->setArmour($armour);
 			$soldier->setEquipment($equipment);
+			$soldier->setMount($mount);
 		}
 		// this is somewhat duplicated in military->retrain, but not trivial to merge
 		$train = 10; // FIXME - shouldn't this be a global variable?
 		if ($soldier->getWeapon()) { $train += $soldier->getWeapon()->getTrainingRequired(); }
 		if ($soldier->getArmour()) { $train += $soldier->getArmour()->getTrainingRequired(); }
 		if ($soldier->getEquipment()) { $train += $soldier->getEquipment()->getTrainingRequired(); }
+		if ($soldier->getMount()) { $train += $soldier->getMount()->getTrainingRequired(); }
 
 		// effect of corruption: double corruption in training time demand % penalty
 		// so at 4% corruption, training will take 8% longer
