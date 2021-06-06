@@ -860,6 +860,7 @@ class CharacterController extends Controller {
 		$opt['wpns'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
 		$opt['arms'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'armour']);
 		$opt['othr'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'equipment']);
+		$opt['mnts'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'mount']);
 
 		$form = $this->createForm(new CharacterLoadoutType($opt), $character);
 		$form->handleRequest($request);
