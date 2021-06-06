@@ -593,13 +593,14 @@ class UnitController extends Controller {
 			}
      			$corruption = $this->get('economy')->calculateCorruption($settlement);
      			for ($i=0; $i<$data['number']; $i++) {
-     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $corruption, $data['unit'])) {
+     				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $data['mount'], $settlement, $corruption, $data['unit'])) {
      					$this->get('history')->addToSoldierLog(
      						$soldier, 'recruited',
      						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(),
      							'%link-item-1%'=>$data['weapon']?$data['weapon']->getId():0,
      							'%link-item-2%'=>$data['armour']?$data['armour']->getId():0,
-     							'%link-item-3%'=>$data['equipment']?$data['equipment']->getId():0
+     							'%link-item-3%'=>$data['equipment']?$data['equipment']->getId():0,
+     							'%link-item-4%'=>$data['mount']?$data['mount']->getId():0
      						)
      					);
      					$count++;
