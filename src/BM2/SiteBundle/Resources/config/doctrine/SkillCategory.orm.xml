@@ -5,6 +5,8 @@
                 </id>
 
                 <field name="name" type="string" />
+                <many-to-one field="category" target-entity="SkillCategory" inversed-by="sub_categories"/>
+                <one-to-many field="sub_categories" target-entity="SkillCategory" mapped-by="category"/>
                 <one-to-many field="skills" target-entity="SkillType" mapped-by="category"/>
         </entity>
 </doctrine-mapping>
