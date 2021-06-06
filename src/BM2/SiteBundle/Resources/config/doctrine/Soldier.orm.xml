@@ -13,12 +13,15 @@
 		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="armour" target-entity="EquipmentType"/>
 		<many-to-one field="equipment" target-entity="EquipmentType"/>
+		<many-to-one field="mount" target-entity="EquipmentType"/>
 		<field name="has_weapon" type="boolean"/>
 		<field name="has_armour" type="boolean"/>
 		<field name="has_equipment" type="boolean"/>
+		<field name="has_mount" type="boolean" nullable="true"/>
 		<many-to-one field="old_weapon" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_armour" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_equipment" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
+		<many-to-one field="old_mount" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="character" target-entity="Character" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
 		<many-to-one field="base" target-entity="Settlement" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
 		<many-to-one field="liege" target-entity="Character" inversed-by="soldiers_given" fetch="EXTRA_LAZY"/>
