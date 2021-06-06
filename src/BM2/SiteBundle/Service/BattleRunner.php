@@ -600,9 +600,13 @@ class BattleRunner {
 			$rangedHits = 0;
 			$routed = 0;
 			$capture = 0;
+			$chargeCapture = 0;
 			$wound = 0;
+			$chargeWound = 0;
 			$kill = 0;
+			$chargeKill = 0;
 			$fail = 0;
+			$chargeFail =0;
 			$missed = 0;
 			$crowded = 0;
 			#$attSlain = $this->attSlain; # For Sieges.
@@ -761,7 +765,19 @@ class BattleRunner {
 				foreach ($group->getFightingSoldiers() as $soldier) {
 					$result = false;
 					$target = false;
-					if ($soldier->isRanged() && $doRanged) {
+					if ($doRanged && $phase == 2 && $soldier->isLancer() && $this->battle->getType() == 'field') {
+						// Lancers will always perform a cavalry charge in the opening melee phase!
+						// A cavalry charge can only happen if there is a ranged phase (meaning, there is ground to fire/charge across)
+						$this->log(10, $soldier->getName()." (Lancer) attacks ");
+						$target = $this->getRandomSoldier($enemyCollection);
+						if ($target) {
+							$strikes++;
+							$result = $this->ChargeAttack($soldier, $target);
+						} else {
+							// no more targets
+							$this->log(10, "but finds no target\n");
+						}
+					} else if ($soldier->isRanged() && $doRanged) {
 						// Continure firing with a reduced hit chance in regular battle. If we skipped the ranged phase due to this being the last battle in a siege, we forego ranged combat to pure melee instead.
 						// TODO: friendly fire !
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") fires - ");
@@ -813,6 +829,13 @@ class BattleRunner {
 						}
 						*/
 					}
+					if (strpos($result, ' ') !== false) {
+						$results = explode(' ', $result);
+						$result = $results[0];
+						$result2 = 'charge' . $results[1];
+					} else {
+						$result2 = false;
+					}
 					if ($result) {
 						if ($result=='kill'||$result=='capture') {
 							$enemies--;
@@ -852,8 +875,17 @@ class BattleRunner {
 						}
 						*/
 					}
+					if ($result2) {
+						if ($result2=='chargewound') {
+							$chargeWound++;
+						} elseif ($result2=='chargecapture') {
+							$chargeCapture++;
+						} elseif ($result2=='chargekill') {
+							$chargeKill++;
+						}
+					}
 				}
-				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$notarget, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill,);
+				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$notarget, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'chargefail' => $chargeFail, 'chargewound'=>$chargeWound, 'chargecapture'=>$chargeCapture, 'chargekill'=>$chargeKill);
 			}
 			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
@@ -1247,7 +1279,11 @@ class BattleRunner {
 
 	private function MeleeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
-		$soldier->gainExperience(1*$xpMod);
+		if ($soldier->isNoble()) {
+			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+		} else {
+			$soldier->gainExperience(1*$xpMod);
+		}
 		$result='miss';
 
 		$defense = $target->DefensePower();
@@ -1265,7 +1301,11 @@ class BattleRunner {
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'melee');
-			$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
+			if ($soldier->isNoble()) {
+				$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+			} else {
+				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
+			}
 		} else {
 			// armour saved our target
 			$this->log(10, "no damage\n");
@@ -1277,12 +1317,57 @@ class BattleRunner {
 		return $result;
 	}
 
-	private function RangedHit(Soldier $soldier, Soldier $target) {
+	private function ChargeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
-		$soldier->gainExperience(1*$xpMod);
+		if ($soldier->isNoble()) {
+			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+		} else {
+			$soldier->gainExperience(1*$xpMod);
+		}
 		$result='miss';
 
-		$defense = $target->DefensePower();
+		$attack = $soldier->ChargePower();
+		$defense = $target->DefensePower(false)*0.75;
+
+		$eWep = $target->getWeapon();
+		if ($eWep->getType()->getSkill()->getCategory()->getName() == 'polearms') {
+			$antiCav = True;
+		} else {
+			$antiCav = False;
+		}
+
+
+		$this->log(10, $target->getName()." (".$target->getType().") - ");
+		$this->log(15, (round($attack*10)/10)." vs. ".(round($defense*10)/10)." - ");
+		if (rand(0,$attack) > rand(0,$defense)) {
+			// defense penetrated
+			$result = $this->resolveDamage($soldier, $target, $attack, 'charge', $antiCav);
+			if ($soldier->isNoble()) {
+				$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+			} else {
+				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
+			}
+		} else {
+			// armour saved our target
+			$this->log(10, "no damage\n");
+			$result='fail';
+		}
+		$target->addAttack(5);
+		$this->equipmentDamage($soldier, $target, 'charge', $antiCav);
+
+		return $result;
+	}
+
+	private function RangedHit(Soldier $soldier, Soldier $target) {
+		$xpMod = $this->xpMod;
+		if ($soldier->isNoble()) {
+			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+		} else {
+			$soldier->gainExperience(1*$xpMod);
+		}
+		$result='miss';
+
+		$defense = $target->DefensePower(false);
 		if ($target->isFortified()) {
 			$defense += $this->defenseBonus;
 		}
@@ -1349,19 +1434,26 @@ class BattleRunner {
 		}
 	}
 
-	private function resolveDamage(Soldier $soldier, Soldier $target, $power, $phase) {
+	private function resolveDamage(Soldier $soldier, Soldier $target, $power, $phase, $antiCav = false) {
 		// this checks for penetration again AND low-damage weapons have lower lethality AND wounded targets die more easily
 		// TODO: attacks on mounted soldiers could kill the horse instead
 		if (rand(0,$power) > rand(0,max(1,$target->DefensePower() - $target->getWounded(true)))) {
 			// penetrated again = kill
 			switch ($phase) {
+				case 'charge':  $surrender = 90; break;
 				case 'ranged':	$surrender = 60; break;
 				case 'hunt':	$surrender = 85; break;
 				case 'melee':
 				default:	$surrender = 75; break;
 			}
 			// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
-			if ($target->isNoble() && !$target->getCharacter()->isNPC() && rand(0,100) < $surrender && $soldier->getCharacter()) {
+			if (($soldier->getMount() && $target->getMount() && rand(0,100) < 50) || $soldier->getMount() && !$target->getMount() && rand(0,100) < 70) {
+				$this->log(10, "killed mount & wounded\n");
+				$target->wound(rand(max(1, round($power/10)), $power));
+				$target->dropMount();
+				$this->history->addToSoldierLog($target, 'wounded.'.$phase);
+				$result='wound';
+			} else if ($target->isNoble() && !$target->getCharacter()->isNPC() && rand(0,100) < $surrender && $soldier->getCharacter()) {
 				$this->log(10, "captured\n");
 				$this->character_manager->imprison_prepare($target->getCharacter(), $soldier->getCharacter());
 				$this->history->logEvent($target->getCharacter(), 'event.character.capture', array('%link-character%'=>$soldier->getCharacter()->getId()), History::HIGH, true);
@@ -1386,6 +1478,12 @@ class BattleRunner {
 			$this->history->addToSoldierLog($target, 'wounded.'.$phase);
 			$result='wound';
 			$target->gainExperience(1*$this->xpMod); // it hurts, but it is a teaching experience...
+		}
+		if ($antiCav) {
+			$innerResult = $this->meleeAttack($target, $soldier); // Basically, an attack of opportunity.
+			$result = $result . " " . $innerResult;
+		} else {
+			$innerResult = null;
 		}
 
 		$soldier->addCasualty();
