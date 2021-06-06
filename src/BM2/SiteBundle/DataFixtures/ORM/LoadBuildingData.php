@@ -84,7 +84,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Empty Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Palisade')),
 		'Filled Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Empty Moat'), 'conditions'=>true),
 		'Quarry'		=> array('auto' =>      0, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter'), 'conditions'=>true),
-		
+
 		'Hunters Lodge'		=> array('auto' =>	0, 'min' =>	50, 'work' =>	5000, 'ratio' =>  1200, 'builtin' => ['city', 'fort'], 'requires' => ['Bowyer'], 'conditions'=>true),
 	);
 
@@ -159,7 +159,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Empty Moat'		=> array('wood'=>array('construction'=>500), 'metal'=>array('construction'=>50), 'goods'=>array('construction'=>300, 'operation'=>2)),
 		'Filled Moat'		=> array('wood'=>array('construction'=>5000), 'metal'=>array('construction'=>200), 'goods'=>array('construction'=>300, 'operation'=>3)),
 		'Quarry'		=> array('wood'=>array('construction'=>3000, 'operation'=>100), 'metal'=>array('construction'=>1000, 'operation'=>50, 'bonus'=>20), 'goods'=>array('construction'=>300, 'operation'=>2, 'bonus'=>1)),
-		
+
 		'Hunters Lodge'         => array('wood'=>array('construction'=>1800, 'bonus'=>1), 'metal'=>array('construction'=>100), 'food'=>array('provides'=>5, 'bonus'=>5)),
 	);
 
@@ -167,7 +167,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 	 * {@inheritDoc}
 	 */
 	public function getOrder() {
-		return 10; // requires resourcedata and settlementdata
+		return 9; // requires resourcedata and settlementdata
 	}
 
 	/**
