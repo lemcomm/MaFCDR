@@ -15,11 +15,13 @@ class CharacterLoadoutType extends AbstractType {
         private $weapons;
         private $armor;
         private $equipment;
+        private $mounts;
 
         public function __construct($data) {
                 $this->weapons = $data['wpns'];
                 $this->armor = $data['arms'];
                 $this->equipment = $data['othr'];
+                $this->mounts = $data['mnts'];
         }
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -56,6 +58,15 @@ class CharacterLoadoutType extends AbstractType {
                         'choice_translation_domain' => 'messages',
                         'class'=>EquipmentType::class,
                         'choices'=>$this->equipment
+                ));
+                $builder->add('mount', EntityType::class, array(
+                        'label'=>'loadout.mount',
+                        'placeholder'=>'loadout.none',
+                        'required'=>True,
+                        'choice_label'=>'nameTrans',
+                        'choice_translation_domain' => 'messages',
+                        'class'=>EquipmentType::class,
+                        'choices'=>$this->mounts
                 ));
 
 		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
