@@ -18,14 +18,14 @@ class LoadSiegeEquipmentData extends AbstractFixture implements OrderedFixtureIn
 		'tower'		=> array('hours' => 48, 'ranged' => false, 'soldiers' => 4, 'contacts' => 4),
 		'trebuchet'	=> array('hours' => 48, 'ranged' => true,  'soldiers' => 4, 'contacts' => 0)
 	);
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getOrder() {
 		return 1000; // or anywhere, really
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -39,7 +39,7 @@ class LoadSiegeEquipmentData extends AbstractFixture implements OrderedFixtureIn
 			$type->setName($name);
 			$type->setHours($data['hours']);
 			$type->setRanged($data['ranged']);
-			$type->setSoldies($data['soldiers']);
+			$type->setSoldiers($data['soldiers']);
 			$type->setContacts($data['contacts']);
 			$manager->persist($type);
 		}
