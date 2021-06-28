@@ -520,7 +520,9 @@ class Dispatcher {
 		if ($house) {
 			$actions[] = array("title"=>$house->getName());
 			$actions[] = array("name"=>"house.view.name", "url"=>"maf_house", "parameters"=>array("id"=>$this->house->getId()), "description"=>"house.view.description", "long"=>"house.view.longdesc");
-			if ($house->getHead() == $this->getCharacter()) {
+			if (!$house->getActive()) {
+				$actions[] = $this->houseManageReviveTest();
+			} elseif ($house->getHead() == $this->getCharacter()) {
 				$actions[] = $this->houseManageHouseTest();
 				$actions[] = $this->houseManageRelocateTest();
 				$actions[] = $this->houseManageApplicantsTest();
@@ -3023,6 +3025,20 @@ class Dispatcher {
 			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
 		}
 		return array("name"=>"house.new.name", "url"=>"maf_house_create", "description"=>"house.new.description", "long"=>"house.new.longdesc");
+	}
+
+	public function houseManageReviveTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.manage.house.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house && $this->house->getActive()) {
+			return array("name"=>"house.manage.house.name", "description"=>"unavailable.isactive");
+		} else {
+			return $this->action("house.revive.house", "maf_house_revive", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
 	}
 
 	public function houseManageHouseTest() {
