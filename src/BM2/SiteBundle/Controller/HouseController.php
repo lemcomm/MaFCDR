@@ -490,4 +490,44 @@ class HouseController extends Controller {
 			'form'=>$form->createView()
 		]);
 	}
+
+	/**
+	  * @Route("/revive", name="maf_house_revive")
+	  */
+
+	public function reviveAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageReviveTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($data['sure'] == true) {
+				$house = $character->getHouse();
+				$house->setActive(true);
+				$house->setHead($character);
+				#Create revival event in House's event log
+				$this->get('history')->logEvent(
+					$house,
+					'event.house.revived',
+					array('%link-character%'=>$character->getId()),
+					History::HIGH, true
+				);
+				$em->flush();
+				#Add "success" flash message to the top of the redirected page for feedback.
+				$this->addFlash('notice', $this->get('translator')->trans('house.updated.revived', array(), 'messages'));
+				return $this->redirectToRoute('bm2_politics', array());
+			} else {
+				/* You shouldn't ever reach this. The form requires input. */
+			}
+		}
+		return $this->render('House/revive.html.twig', [
+			'name' => $house->getName(),
+			'form' => $form->createView()
+		]);
+	}
 }
