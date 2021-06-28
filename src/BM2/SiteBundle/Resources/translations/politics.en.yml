@@ -909,6 +909,14 @@ house:
     You can do this whenever you so desire, so long as you are in a Home in which you own--moving
     isn't so simple as forming a House, and it's not seen an inalienable right of First Ones to do.<br /><br />
     If you're sure about moving to the settlement you're currently in, simple check the box below, and click 'submit'.
+  revive:
+   name:        Revive the House
+   name2:       Revive the %name%
+   description: Revive your house and assume control of it.
+   longdesc:    For whatever reason, your house appears to have fallen into disrepair. You could opt to fix that, if you'd like.
+   intro: >
+     As a member of the defunct house of <b>%name%</b> it is within your abilities to re-establish the House under your control, regardless of what others may think about this.<br /><br />
+     Please be aware though, that this puts you, specifically, in charge. If you want someone else to run the House, have them use this action instead.
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
    approve:     Approve
