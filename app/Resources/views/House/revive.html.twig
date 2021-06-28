@@ -1,0 +1,13 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'house.manage.revive.name2'|trans({"%name%":name},"politics") }}</h2>
+	<p>{{ 'house.manage.revive.intro'|trans({"%name%":name},"politics")|raw|manuallinks }}</p>
+
+	{{ form_start(form) }}
+	{{ form_errors(form) }}<br />
+	{{ form_row(form.sure) }}<br />
+	{{ form_row(form.submit) }}
+	{{ form_end(form) }}
+
+{% endblock %}
