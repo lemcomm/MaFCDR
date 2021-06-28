@@ -86,7 +86,7 @@ class InfoController extends Controller {
 	  * @Route("/equipmenttypes")
 	  */
 	public function allequipmenttypesAction() {
-
+		
 		return $this->render('Info/all.html.twig', $this->alltypes('EquipmentType'));
 	}
 
@@ -108,8 +108,7 @@ class InfoController extends Controller {
 
 	private function alltypes($type) {
 		$em = $this->getDoctrine()->getManager();
-		// TOOD: sort alphabetical, it currently works mostly BY RANDOM CHANCE
-		$all = $em->getRepository('BM2SiteBundle:'.$type)->findAll();
+		$all = $em->getRepository('BM2SiteBundle:'.$type)->findBy([], ['name'=>'asc']);
 		$toc = $this->get('pagereader')->getPage('manual', 'toc', $this->getRequest()->getLocale());
 
 		return array(
