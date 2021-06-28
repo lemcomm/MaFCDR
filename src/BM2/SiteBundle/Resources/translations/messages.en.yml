@@ -1184,6 +1184,10 @@ battle:
   crowded:      %i% was unable to reach a target|%i% were unable to reach thier targets
   routed:       %i% soldier was routed|%i% soldiers were routed
   strikes:      %i% melee hit|%i% melee hits
+  chargefail:   %i% was unable to do any damage in the charge|%i% were unable to do any damage in the charge
+  chargewound:  %i% enemy wounded in the charge|%i% enemies wounded in the charge
+  chargecapture: %i% enemy First One captured during charge|%i% enemy First Ones captured during charge
+  chargekill:   %i% enemy killed in charge|%i% enemies killed in charge
  hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
@@ -1632,6 +1636,7 @@ house:
   created:     You have formalized your House!
   background:  The details of your House have been udpated.
   relocated:   You have relocated your House!
+  revived:     You have revived and assumed control of your house.
  cadet:
   success:     You have offered your house as a cadet to another.
   fail:        Your uncertainty has prevented this request. Are you sure you want to do this?
