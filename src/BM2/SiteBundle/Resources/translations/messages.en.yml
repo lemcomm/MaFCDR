@@ -1054,24 +1054,35 @@ item:
  none:             (none)
  food:             unit of food
  choose:           -- choose --
+ club:             club
  current:          (current)
  axe:              axe
  broadsword:       broadsword
  chainmail:        chainmail
  cloth armour:     cloth armor
  crossbow:         crossbow
+ glaive:           glaive
+ great axe:        great axe
+ halberd:          halberd
  horse:            horse
  improvised:       improvised
  javelin:          javelin
+ lance:            lance
  leather armour:   leather armor
  longbow:          longbow
  mace:             mace
+ machete:          machete
+ morning star:     morning star
+ pavise:           pavise
  pike:             halberd
  plate armour:     plate armor
  scale armour:     scale armor
  shield:           shield
  shortbow:         shortbow
  short sword:      short sword
+ sling:            sling
+ staff:            staff
+ staff sling:      staff sling
  spear:            spear
  sword:            sword
  war horse:        war horse
@@ -1184,10 +1195,10 @@ battle:
   crowded:      %i% was unable to reach a target|%i% were unable to reach thier targets
   routed:       %i% soldier was routed|%i% soldiers were routed
   strikes:      %i% melee hit|%i% melee hits
-  chargefail:   %i% was unable to do any damage in the charge|%i% were unable to do any damage in the charge
-  chargewound:  %i% enemy wounded in the charge|%i% enemies wounded in the charge
-  chargecapture: %i% enemy First One captured during charge|%i% enemy First Ones captured during charge
-  chargekill:   %i% enemy killed in charge|%i% enemies killed in charge
+  chargefail:   %i% was counter-attacked in the charge, but took no damage|%i% were counter-attacked in the charge, but took no damage
+  chargewound:  %i% was wounded by the enemy in the charge|%i% were wounded by the enemy in the charge
+  chargecapture: %i% was captured by the enemy in the carge|%i% were captured by the enemy in the carge
+  chargekill:   %i% was killed by the enemy in the charge|%i% were killed by the enemy in the charge
  hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
