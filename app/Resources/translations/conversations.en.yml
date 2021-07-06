@@ -12,6 +12,7 @@ index:
  msgshort:  %day%
  ref:       Conversations for %ref%:
  ref2:      Private and Group Conversations:
+ localpre:  Local
  letter:    Letter from %sender% on %day% (%ts%)
  legacy:    Letter from %sender% on %day% (%ts%)
  report:    Report from %sender% on %day% (%ts%)
@@ -27,7 +28,10 @@ index:
  conversation: Sent to "%conv%" (%i% recipients)
  conversation2: Sent to "%conv%"
  local: %topic% (%i% recipients)
- toomany:   It looks like you have a significant number of conversations here. Perhaps you might want to consider leaving some of the older ones, potentially after exporting them?
+ viewlocal: View in Conversation
+ toomany:   It looks like you have a significant number of conversations here. Perhaps you might want to consider removing yourself from some of the older ones, potentially after exporting them?
+ private:  Private Conversations
+ org:      Organization Conversations
 
 orgs:
  title: Organization Conversations
@@ -48,9 +52,13 @@ summary:
  new2:    %new% new messages
  nonew:		You have no new messages.
  total:   You are participating in %conversations% conversations, %active% of them actively.
- nototal: You are not participating in any conversations currently.
+ nototal: You are not participating in any conversations.
  flagged: You have flagged %messages% messages.
  noflagged: You have no flagged messages.
+ private: You are participating in %conversations% private conversations, %active% of them actively.
+ noprivate: You are not participating in any private conversations.
+ org: You are participating in %conversations% organization conversations, %active% of them actively.
+ noorg: You are not participating in any organization conversations.
 
 unread:
  title:		your unread messages
@@ -64,11 +72,11 @@ flagged:
 conversation:
  title:		  Conversation
  new:
-  title:		new conversation
+  title:		  New Private Conversation
   title2:   New Conversation within %realm%
   title3:   New Local Message
-  label:    create a new conversation
-  desc:     start a new topic and invite participants
+  label:    Create a new private conversation
+  desc:     Start a new topic and invite participants
  target:
   label:  Recipients
   choose: (select recipients)
@@ -102,20 +110,20 @@ conversation:
  participants:
   label:    %count% participants
  leave:
-  label:    leave conversation
-  help:     remove yourself from this conversation.
+  label:    Leave Conversation
+  help:     Leave this conversation, but retain your copies of it.
  remove:
-  label:    remove conversation
-  help:     leave the conversation and delete your copies of it.
+  label:    Remove Conversation
+  help:     Delete your copies of this conversation, leaving it if you haven't already.
  old:
-  show:     show older messages
-  hide:     hide old messages
+  show:     Show Older Messages
+  hide:     Hide Old Messages
  created:   Your message has been created. You can view it <a href="%url%">here</a>.
  kick:
-  label:    Remove participant
+  label:    Remove Participant
   help:     Remove this character from the conversation.
  demote:
-  label:    Demote participant
+  label:    Demote Participant
   help:     Demote this character's role in the conversation (owner to manager, or manager to participant)
  promote:
   label:    Promote Participant
@@ -137,6 +145,7 @@ message:
  reply:
   title:		Reply to Message
   submit:	  send reply
+ send:      Send Message
  new:       new
  response:  in response to:
  responses: responses
@@ -175,9 +184,12 @@ error:
   noright:      You do not have the required right on this conversation.
 
 button:
- reply:   reply
- split:   split
- show:    show here
+ reply:   Reply
+ split:   Split
+ show:    Show Here
+ nolocalreply: No Quick Reply
+ writereply: Write A Reply
+ remove:  Trash Message
 
 flag:
  important:   important
@@ -221,5 +233,7 @@ recent:
 
 local:
  title: Local Messages
+ desc:  Read letters from those nearby.
  new:
   title: New Local Message
+  desc:  You can always send a message to those around you.
