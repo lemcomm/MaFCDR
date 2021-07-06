@@ -18,7 +18,7 @@ realmselect($("#realmsearch"), realmchange);
 settlementselect($("#settlementsearch"), settlementchange);
 charselect($("#charactersearch"), characterchange);
 
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 
 function search_insert(insert) {
 	var caretPos = document.getElementById("new_conversation_content").selectionStart;
