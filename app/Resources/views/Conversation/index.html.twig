@@ -20,7 +20,7 @@
 		{% endif %}
 	</td>
 	<td>
-		<a href="{{path('maf_conv_print', {"conv":conv.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
+		<a href="{{path('maf_conv_print', {"conv":conv.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a> | <a href="{{path('maf_conv_remove', {"conv":conv.id, "var":1}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
 	</td>
 </tr>
 
