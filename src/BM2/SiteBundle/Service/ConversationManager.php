@@ -53,6 +53,36 @@ class ConversationManager {
                 return $query->getSingleScalarResult();
         }
 
+        public function getOrgConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
+        public function getPrivateConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
+        public function getActiveConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
+        public function getActiveOrgConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
+        public function getActivePrivateConversationsCount(Character $char) {
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND c.realm IS NULL AND c.house IS NULL');
+                $query->setParameter('me', $char);
+                return $query->getSingleScalarResult();
+        }
+
         public function getLegacyContacts(Character $char) {
                 $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (SELECT conv FROM BM2SiteBundle:Conversation conv JOIN conv.permissions perm WHERE perm.character = :me AND perm.active = TRUE)');
                 $query->setParameter('me', $char);
@@ -69,52 +99,101 @@ class ConversationManager {
                 return $char->getConvPermissions()->matching($criteria);
         }
 
+        public function getActivePrivatePermissions(Character $char) {
+                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.active = true and c.realm is null and c.house is null and p.character = :me');
+                $query->setParameters(['me'=>$char]);
+                return new ArrayCollection($query->getResult());
+        }
+
         public function getAllRecentMessages(Character $char, string $string) {
-                #TODO: This function is possibly one of the slowest in the game. Like the conversation list, it scales with the number of conversations and permissions we have.
-                # The main thing slowing it down is that you have to check every message against the character permissions to see if should be rendered or not.
-                # If it was just "you're in this conversation or not" we could do this in two queries. Because you can be in the conversation historically but not actively participating though, we have to sort things out.
-		# Ideally, we should look into a way to do this is a single SQL query.
-                $endTime = new \DateTime($string);
-                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p WHERE p.character = :me AND (p.end_time > :end_time OR p.end_time IS NULL)');
-                $query->setParameters(['end_time' => $endTime, 'me' => $char]);
-                $allConv = [];
-                foreach ($query->getResult() as $perm) {
-                        if ($perm->getUnread() > 0) {
-                                $perm->setUnread(0);
+                # Start simple, get a datetime object of the earliest mesage we want to se, get a datetime object of now.
+                $startTime = new \DateTime($string);
+                $now = new \DateTime("now");
+
+                # Get all the permissions that end after the earliest date or don't have an end set (are null) that are for our character and where the associated conversation actually has relevant messages.
+                $query = $this->em->createQuery('SELECT p.id as perm, c.id as conv, p.start_time as start, p.end_time FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.character = :me AND (p.end_time > :start_time OR p.end_time IS NULL) AND (c.updated >= :start_time)');
+                $query->setParameters(['start_time' => $startTime, 'me' => $char]);
+                $perms = $query->getResult();
+
+                # Variable preparation. $megaString is used for our main query.
+                $allPerms = [];
+                $megaString = 'SELECT m, c, p FROM BM2SiteBundle:Message m JOIN m.sender p JOIN m.conversation c WHERE';
+                $first = true;
+                $i = 1;
+                $sets = [];
+                $allConvs = [];
+                foreach ($perms as $perm) {
+                        # First we need to standardize out un-ended permissions, so we decare end as now if there isn't an end.
+                        $start = $perm['start'];
+                        if (array_key_exists('end', $perm)) {
+                                $end = $perm['end'];
+                        } else {
+                                $end = $now;
                         }
-                        $perm->setLastAccess(new \DateTime("now"));
-                        if (!in_array($perm->getConversation(), $allConv)) {
-                                $allConv[] = $perm->getConversation();
+
+                        # For every set we need three variables for the query, the conversation id, the start time, and the end time.
+                        $sets[$i] = [
+                                'conv'=>$perm['conv'],
+                                'start'=>$start,
+                                'end'=>$end
+                        ];
+
+                        # The first needs just a WHERE while the rest need OR WHERE in order for the query to build right.
+                        if (!$first) {
+                                $megaString .=' OR (m.conversation = :conv'.$i.' AND m.sent >= :startTime AND m.sent >= :start'.$i.' AND m.sent <= :end'.$i.')';
+                        } else {
+                                $megaString .=' (m.conversation = :conv'.$i.' AND m.sent >= :startTime AND m.sent >= :start'.$i.' AND m.sent <= :end'.$i.')';
+                                $first = false;
                         }
+
+                        # Add the permission to the processing stack and increment $i.
+                        $allPerms[] = $perm['perm'];
+                        if (!in_array($perm['conv'], $allConvs)) {
+                                $allConvs[] = $perm['conv'];
+                        }
+                        $i++;
+                }
+                $i--; # Set pointer back one after end of foreach looping.
+
+                # Unload our $sets array of arrays into a singular parameter array for passing into the query. Since order doesn't matter, we just decrement $i until it's 0.
+                $parameters = [];
+                while ($i > 0) {
+                        $parameters['conv'.$i] = $sets[$i]['conv'];
+                        $parameters['start'.$i] = $sets[$i]['start'];
+                        $parameters['end'.$i] = $sets[$i]['end'];
+                        $i--;
                 }
 
-                $allMsg = new ArrayCollection();
-                foreach ($allConv as $conv) {
-                        foreach ($conv->findMessagesInWindow($char, $endTime) as $msg) {
-                                $allMsg->add($msg);
+                # Side load local conversations into the stack, if a local conversation exists for this character.
+                if ($local = $char->getLocalConversation()) {
+                        if (!$first) {
+                                $megaString .= ' OR';
                         }
+                        $megaString .= ' (m.conversation = :local AND m.sent >= :startTime)';
+                        $parameters['local'] = $local->getId();
+                        $parameters['startTime'] = $startTime;
                 }
-                /* TODO: Figure out how to make the recent menu smart enough to handle replies to *either* local or regular conversations.
-                Currently, the main issue is that you need a character to get the reply-to list for local conversations, unless we also store the target group.
-                Even then, we need a way to correlate whether or not we can send to that group specifically, which again, we need a character for.
-                It might be easier to just have the local use the same filtering system as the recent.
-                One way to solve this would be to rebuild the entire message loading templates. */
-		if ($local = $char->getLocalConversation()) {
-			foreach ($local->getMessages() as $msg) {
-				if ($msg->getSent() >= $endTime) {
-					if (!$msg->getRead()) {
-						$msg->setRead(true);
-					}
-					$allMsg->add($msg);
-				}
-			}
-		}
-                $iterator = $allMsg->getIterator();
-                $iterator->uasort(function($a, $b) {
-                        return ($a->getSent() > $b->getSent()) ? 1 : -1 ;
-                });
-                $this->em->flush();
-                return new ArrayCollection(iterator_to_array($iterator));
+
+                # Ordering for the query.
+                $megaString .= ' ORDER BY m.sent ASC';
+
+                # Load our megaString into our megaQuery.
+                $megaQuery = $this->em->createQuery($megaString);
+
+                # Load paramters into query.
+                $megaQuery->setParameters($parameters);
+                $allMsgs = $megaQuery->getResult();
+
+                # Update permissions for conversations that we've viewed to show that we've viewed them.
+                $query = $this->em->createQuery('UPDATE BM2SiteBundle:ConversationPermission p SET p.unread = 0, p.last_access = :date WHERE p in (:perms)');
+                $query->setParameters(['date'=>$now, 'perms'=>$allPerms]);
+                $query->execute();
+                if ($local) {
+                        $query = $this->em->createQuery('UPDATE BM2SiteBundle:Message m SET m.read = TRUE WHERE m.conversation = :local AND m.sent >= :startTime');
+                        $query->setParameters(['local'=>$local, 'startTime'=>$startTime]);
+                        $query->execute();
+                }
+                return new ArrayCollection($allMsgs);
         }
 
         public function getAllUnreadMessages(Character $char) {
@@ -208,16 +287,17 @@ class ConversationManager {
                         $valid = $conv->findActiveCharPermission($char);
                 }
                 if ($valid) {
+                        $now = new \DateTime("now");
                         $new = new Message();
                         $this->em->persist($new);
                         $new->setType($type);
                         $new->setCycle($this->appstate->getCycle());
-                        $new->setSent(new \DateTime("now"));
+                        $new->setSent($now);
                         $new->setContent($text);
                         if ($type != 'system') {
                                 $new->setSender($char);
                         }
-                        if ($replyTo !== NULL) {
+                        if ($replyTo) {
                                 $target = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
                                 if ($target) {
                                         $new->setReplyTo($target);
@@ -226,6 +306,7 @@ class ConversationManager {
                         $count = $conv->findActivePermissions()->count();
                         $new->setRecipientCount($count);
                         $new->setConversation($conv);
+                        $conv->setUpdated($now);
                         $this->em->flush();
                         return $new;
                 } else {
