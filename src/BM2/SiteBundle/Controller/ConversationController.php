@@ -3,8 +3,6 @@
 namespace BM2\SiteBundle\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Dompdf\Dompdf;
-use Dompdf\Options as PdfOpt;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -80,8 +78,10 @@ class ConversationController extends Controller {
                 }
 
 		$unread = $this->get('conversation_manager')->getUnreadConvPermissions($char); #ArrayCollection
-		$active = $this->get('conversation_manager')->getActiveConvPermissions($char); #ArrayCollection
-		$total = $this->get('conversation_manager')->getConversationsCount($char); #Integer
+		$private = $this->get('conversation_manager')->getPrivateConversationsCount($char); #Integer
+		$privateActive = $this->get('conversation_manager')->getActivePrivateConversationsCount($char); #Integer
+		$org = $this->get('conversation_manager')->getOrgConversationsCount($char); #Integer
+		$orgActive = $this->get('conversation_manager')->getActiveOrgConversationsCount($char); #Integer
 
 		$new = ['messages' => 0, 'conversations' => 0];
 		foreach ($unread as $perm) {
@@ -90,8 +90,10 @@ class ConversationController extends Controller {
 		}
 
 		return $this->render('Conversation/summary.html.twig', [
-			'active' => $active->count(),
-			'total' => $total,
+			'private' => $private,
+			'privateActive' =>$privateActive,
+			'org' => $org,
+			'orgActive' => $orgActive,
 			'new' => $new,
 			'flagged' => 0,
 			'unread' => $unread,
@@ -260,6 +262,36 @@ class ConversationController extends Controller {
 	}
 
 	/**
+	  * @Route("/recent/reply/{msg}/{window}", name="maf_conv_recent_reply", requirements={"msg"="\d+","window"="\d+"})
+	  */
+	public function replyRecentAction(Request $request, Message $msg, string $window='0') {
+
+		$form = $this->createForm(new MessageReplyType());
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+
+			$conv = $data['conversation'];
+			$em = $this->getDoctrine()->getManager();
+			$conv = $em->getRepository(Conversation::class)->findOneById($conv);
+	                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
+	                if (! $char instanceof Character) {
+	                        return $this->redirectToRoute($char);
+	                }
+
+			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+			$message = $this->get('conversation_manager')->writeMessage($conv, $msg, $char, $data['content'], $data['type']);
+
+			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
+		}
+
+		return $this->render('Conversation/reply.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+	/**
 	  * @Route("/recent")
 	  * @Route("/recent/")
 	  * @Route("/recent/{window}", name="maf_conv_recent")
@@ -351,7 +383,9 @@ class ConversationController extends Controller {
 			'unread' => $unread,
 			'veryold' => $veryold,
 			'last' => $last,
+			'manager' => $lastPerm->getManager() ? true : $lastPerm->getOwner(),
 			'active'=> $lastPerm->getActive(),
+			'archive'=> false
 		]);
 	}
 
@@ -389,65 +423,9 @@ class ConversationController extends Controller {
 			'unread' => $unread,
 			'veryold' => $veryold,
 			'local'=> true,
-		]);
-	}
-
-	/**
-	  * @Route("/export/{conv}", name="maf_conv_export", requirements={"conv"="\d+"})
-	  */
-	public function exportAction(Conversation $conv) {
-		if ($conv->getLocalFor() != NULL) {
-	                $char = $this->get('dispatcher')->gateway('conversationLocalTest', false, true, false, $conv);
-	                if (! $char instanceof Character) {
-	                        return $this->redirectToRoute($char);
-	                }
-			$messages = $conv->getMessages();
-			$local = true;
-			$perms = $conv->findCharPermissions($char);
-			$lastPerm = $perms->last();
-		} else {
-	                $char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
-	                if (! $char instanceof Character) {
-	                        return $this->redirectToRoute($char);
-	                }
-			$messages = $conv->findMessages($char);
-			$local = false;
-		}
-
-		$total = $messages->count();
-
-		#Find the timestamp of the last read message.
-
-		$veryold = new \DateTime('now');
-		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
-		if ($local) {
-			$view = $this->renderView('Conversation/archive.html.twig', [
-				'conversation' => $conv,
-				'messages' => $messages,
-				'total' => $total,
-				'unread' => 0,
-				'veryold' => $veryold,
-				'local'=> $local,
-			]);
-		} else {
-			$view = $this->renderView('Conversation/archive.html.twig', [
-				'conversation' => $conv,
-				'messages' => $messages,
-				'total' => $total,
-				'unread' => 0,
-				'veryold' => $veryold,
-				'last' => NULL,
-				'active'=> false,
-			]);
-		}
-
-
-		set_time_limit(240);
-		$pdf = new Dompdf();
-		$pdf->loadHtml($view);
-		$pdf->render();
-		return $pdf->stream('msgArchive'.$conv->getId().'.pdf', [
-			"Attachment" => true
+			'active'=> false,
+			'manager'=> false,
+			'archive'=> false
 		]);
 	}
 
@@ -683,8 +661,10 @@ class ConversationController extends Controller {
 
 	/**
 	  * @Route("/{conv}/remove", name="maf_conv_remove", requirements={"conv"="\d+"})
+  	  * @Route("/{conv}/remove/", name="maf_conv_remove", requirements={"conv"="\d+"})
+  	  * @Route("/{conv}/remove/{var}", name="maf_conv_remove", requirements={"conv"="\d+", "var"="\d+"})
 	  */
-	public function removeAction(Conversation $conv) {
+	public function removeAction(Conversation $conv, $var = null) {
                 $char = $this->get('dispatcher')->gateway('conversationRemoveTest', false, true, false, $conv);
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
@@ -715,7 +695,11 @@ class ConversationController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.badremoved', ["%id%"=>$conv->getId()], 'conversations'));
 		}
 
-		return new RedirectResponse($this->generateUrl('maf_conv_summary'));
+		if ($var == 1) {
+			return new RedirectResponse($this->generateUrl('maf_convs'));
+		} else {
+			return new RedirectResponse($this->generateUrl('maf_conv_summary'));
+		}
 	}
 
 	/**
@@ -739,36 +723,6 @@ class ConversationController extends Controller {
 			$message = $this->get('conversation_manager')->writeMessage($conv, $replyTo, $char, $data['content'], $data['type']);
 
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
-		}
-
-		return $this->render('Conversation/reply.html.twig', [
-			'form' => $form->createView()
-		]);
-	}
-
-	/**
-	  * @Route("/recent/reply/{window}", name="maf_conv_recent_reply", requirements={"window"="\d+"})
-	  */
-	public function replyRecentAction(Request $request, string $window='0') {
-
-		$form = $this->createForm(new MessageReplyType());
-
-		$form->handleRequest($request);
-		if ($form->isValid() && $form->isSubmitted()) {
-			$data = $form->getData();
-
-			$conv = $data['conversation'];
-			$em = $this->getDoctrine()->getManager();
-			$conv = $em->getRepository(Conversation::class)->findOneById($conv);
-	                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
-	                if (! $char instanceof Character) {
-	                        return $this->redirectToRoute($char);
-	                }
-
-			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
-			$message = $this->get('conversation_manager')->writeMessage($conv, $data['reply_to'], $char, $data['content'], $data['type']);
-
-			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
 		}
 
 		return $this->render('Conversation/reply.html.twig', [
@@ -816,23 +770,32 @@ class ConversationController extends Controller {
 	}
 
 	/**
-	  * @Route("/local/remove/{msg}", name="maf_conv_local_remove", requirements={"msg"="\d+"})
+	  * @Route("/local/remove/{msg}/{source}", name="maf_conv_local_remove", requirements={"msg"="\d+", "source"="\d+"})
 	  */
-	public function removeLocalAction(Request $request, Message $msg) {
+	public function removeLocalAction(Request $request, Message $msg, $source=1) {
                 $char = $this->get('dispatcher')->gateway('conversationLocalRemoveTest', false, true, false, $msg);
 		$em = $this->getDoctrine()->getManager();
 
-		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Message m WHERE m.conversation = :conv AND m.sent <= :date ORDER BY m.sent DESC');
-                $query->setParameters(['conv'=>$msg->getConversation(), 'date'=>$msg->getSent()]);
-		$query->setMaxResults(1);
-                $nextOldest = $query->getResult();
+		if ($source==1) {
+			$query = $em->createQuery('SELECT m FROM BM2SiteBundle:Message m WHERE m.conversation = :conv AND m.sent <= :date ORDER BY m.sent DESC');
+	                $query->setParameters(['conv'=>$msg->getConversation(), 'date'=>$msg->getSent()]);
+			$query->setMaxResults(1);
+	                $nextOldest = $query->getResult();
+		} else {
+			$nextOldest = false;
+		}
 
 		$em->remove($msg);
 		$em->flush();
-		if ($nextOldest) {
-			return new RedirectResponse($this->generateUrl('maf_conv_local').'#'.$nextOldest->getId());
+		if ($source==1) {
+			$url = 'maf_conv_local';
 		} else {
-			return new RedirectResponse($this->generateUrl('maf_conv_local'));
+			$url = 'maf_conv_recent';
+		}
+		if ($nextOldest) {
+			return new RedirectResponse($this->generateUrl($url).'#'.$nextOldest[0]->getId());
+		} else {
+			return new RedirectResponse($this->generateUrl($url));
 		}
 	}
 }
