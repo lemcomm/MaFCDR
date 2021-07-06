@@ -6,14 +6,14 @@
 {% include "Conversation/single_menu.html.twig" with {"conversation": conversation, "active": active} %}
 
 {% if local is not defined %}
-	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": false} %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": false, "manager": manager} %}
 {% else %}
-	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local, "archive": false} %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local, "archive": false, "manager": manager} %}
 {% endif %}
 
 <div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
-	{% include "Conversation/syntax.html.twig" %}
 	{% if local is not defined %}
+		{% include "Conversation/syntax.html.twig" %}
 		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
 	{% endif %}
 </div>
@@ -28,7 +28,7 @@ realmselect($("#realmsearch"), realmchange);
 settlementselect($("#settlementsearch"), settlementchange);
 charselect($("#charactersearch"), characterchange);
 
-{% include "BM2SiteBundle:element:autocomplete.js.twig" %}
+{% include "element/autocomplete.js.twig" %}
 
 function search_insert(insert) {
 	var caretPos = document.getElementById("message_reply_content").selectionStart;
