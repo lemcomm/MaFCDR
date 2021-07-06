@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
@@ -3337,6 +3338,13 @@ class Dispatcher {
 			return ["name"=>"conv.local.name", "description"=>"unavailable.conv.nopermission"];
 		}
 		return ["name"=>"conv.local.name", "url"=>"maf_conv_local", "description"=>"conv.new.description"];
+	}
+
+	public function conversationLocalRemoveTest($ignored, Message $msg) {
+		if ($msg->getConversation()->getLocalFor() != $this->getCharacter()) {
+			return ["name"=>"conv.localremove.name", "description"=>"unavailable.conv.nopermission"];
+		}
+		return ["name"=>"conv.localremove.name", "url"=>"maf_conv_local_remove", "description"=>"conv.localremove.description"];
 	}
 
 	public function conversationSingleTest($ignored, Conversation $conv) {
