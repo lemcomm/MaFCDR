@@ -61,6 +61,7 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 	                        $participants = new ArrayCollection();
 	                        $foundStart = false;
 	                        $foundOwner = false;
+				$oldest = null;
 				$start = null;
 				$counter++;
 				$microCounter++;
@@ -103,6 +104,9 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 							$newConv->setCreated($start);
 		                                        $foundStart = true;
 		                                }
+						if (!$oldest || $oldest < $oldMsg->getTs()) {
+							$oldest = $oldMsg->getTs();
+						}
 
 		                                # Carryover old msg send date.
 		                                $newMsg->setSent($oldMsg->getTs());
@@ -145,6 +149,9 @@ class UpdateConversationsCommand extends ContainerAwareCommand {
 		                        }
 					if (!$foundStart) {
 						$newConv->setCreated(new \DateTime("now")); #Sigh.
+					}
+					if ($oldest) {
+						$newConv->setUpdated($oldest);
 					}
 					if ($realm) {
 						$output->writeln("Creating new realm conversation permissions...");
