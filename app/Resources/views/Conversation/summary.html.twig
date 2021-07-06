@@ -5,31 +5,52 @@
 
 <div id="actionlist" class="boxlist">
 	<ul>
-		{% if total > 0 %}
+		{% if private > 0 %}
 			<li>
-				<a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a>
-				{{ 'summary.total'|trans({"%conversations%":total, "%active%":active}, "conversations") }}
+				<a href="{{ path('maf_convs') }}">{{ 'index.private'|trans({}, "conversations") }}</a>
+				{{ 'summary.private'|trans({"%conversations%":private, "%active%":privateActive}, "conversations") }}
 			</li>
 		{% else %}
 			<li class="disabled">
-				<span class="nolink">{{ 'index.title'|trans({}, "conversations") }}</span>
-				{{ 'summary.nototal'|trans({}, "conversations") }}
+				<span class="nolink">{{ 'index.private'|trans({}, "conversations") }}</span>
+				{{ 'summary.noprivate'|trans({}, "conversations") }}
 			</li>
 		{% endif %}
-		{% if flagged > 0 %}
+		{% if org > 0 %}
 			<li>
-				<a href="{{ path('maf_conv_flagged') }}">{{ 'flagged.title'|trans({}, "conversations") }}</a>
-				{{ 'summary.flagged'|trans({"%messages%":flagged}, "conversations") }}
+				<a href="{{ path('maf_convs') }}">{{ 'index.org'|trans({}, "conversations") }}</a>
+				{{ 'summary.org'|trans({"%conversations%":org, "%active%":orgActive}, "conversations") }}
 			</li>
 		{% else %}
 			<li class="disabled">
-				<span class="nolink">{{ 'flagged.title'|trans({}, "conversations") }}</span>
-				{{ 'summary.noflagged'|trans({}, "conversations") }}
+				<span class="nolink">{{ 'index.org'|trans({}, "conversations") }}</span>
+				{{ 'summary.noorg'|trans({}, "conversations") }}
 			</li>
 		{% endif %}
+		{#
+			{% if flagged > 0 %}
+				<li>
+					<a href="{{ path('maf_conv_flagged') }}">{{ 'flagged.title'|trans({}, "conversations") }}</a>
+					{{ 'summary.flagged'|trans({"%messages%":flagged}, "conversations") }}
+				</li>
+			{% else %}
+				<li class="disabled">
+					<span class="nolink">{{ 'flagged.title'|trans({}, "conversations") }}</span>
+					{{ 'summary.noflagged'|trans({}, "conversations") }}
+				</li>
+			{% endif %}
+		#}
 		<li>
 			<a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.label'|trans({}, "conversations") }}</a>
 			{{ 'conversation.new.desc'|trans({}, "conversations") }}
+		</li>
+		<li>
+			<a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a>
+			{{ 'local.desc'|trans({}, "conversations") }}
+		</li>
+		<li>
+			<a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a>
+			{{ 'local.new.desc'|trans({}, "conversations") }}
 		</li>
 	</ul>
 </div>
@@ -39,7 +60,7 @@
 {% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
 
 {% if not local_news.isempty %}
-	{% include "BM2SiteBundle:element:newslist.html.twig" with {"title":"news.local2"|trans({},"communication")|title, "list":local_news} only %}
+	{% include "element/newslist.html.twig" with {"title":"news.local2"|trans({},"communication")|title, "list":local_news} only %}
 {% endif %}
 
 {% endblock %}
