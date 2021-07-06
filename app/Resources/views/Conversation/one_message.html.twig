@@ -2,6 +2,7 @@
 	<hr>
 	<div class="cmsg_message">
 {% else %}
+	{% set archive = false %}
 	<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}">
 {% endif %}
 	<div class="cmsg_message_wrapper_{{message.type}}">
@@ -13,12 +14,18 @@
 			{% endif %}
 
 			{% if not archive %}<a id="{{message.id}}"></a>{% endif %}
+			{% if message.target %}{{ 'index.localpre' |trans({}, "conversations")|raw }}{% endif %}
 			{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
 			--
-			{% if local is not defined %}
-				{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":message.recipientCount}, "conversations")|raw }}
+			{% if message.recipientCount %}
+				{% set recips = message.recipientCount %}
 			{% else %}
-				{{ 'index.local' |trans({"%topic%":message.topic, "%i%":message.recipientCount}, "conversations")|raw }}
+				{% set recips = '???' %}
+			{% endif %}
+			{% if not message.target %}
+				{{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":recips}, "conversations")|raw }}
+			{% else %}
+				{{ 'index.local' |trans({"%topic%":message.topic, "%i%":recips}, "conversations")|raw }}
 			{% endif %}
 			{% if message.replyTo %}
 				 --
@@ -46,10 +53,20 @@
 					{% if last is defined and last is not null and last.timestamp < message.sent.timestamp %}
 						<li>{{ 'message.new'|trans({},"conversations") }}</li>
 					{% endif %}
-					{% if not message.target %}
-						<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li>
+					{% if not message.target and recent is defined %}
+						<li><a href="{{ path('maf_conv_recent_reply', {"msg":message.id, "window":period}) }}"><button class="reply cmsg_button">{{ 'button.writereply'|trans({},"conversations") }}</button></a></li> |
+						<li><a href="{{ path('maf_conv_read', {"conv":message.conversation.id}) }}#{{message.id}}"><button class="cmsg_button" id="view_conv">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li>
+					{% elseif not message.target %}
+						<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li> |
+						<li><a href="{{ path('maf_conv_read', {"conv":message.conversation.id}) }}#{{message.id}}"><button class="cmsg_button" id="view_conv">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li>
 					{% else %}
-						<a href="{{ path('maf_conv_local') }}#{{message.id}}"><button id="view_local">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a>
+						<li><button class="local_reply cmsg_button" disabled>{{ 'button.nolocalreply'|trans({},"conversations") }}</button></li> |
+						<li><a href="{{ path('maf_conv_local') }}#{{message.id}}"><button class="cmsg_button" id="view_local">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li> |
+						{% if recent is defined %}
+							<li><a href="{{ path('maf_conv_local_remove', {"msg":message.id, "source":'2'}) }}"><button class="cmsg_button" id="remove_local">{{ 'button.remove'|trans({},"conversations") }}</button></a></li>
+						{% else %}
+							<li><a href="{{ path('maf_conv_local_remove', {"msg":message.id}) }}"><button class="cmsg_button" id="remove_local">{{ 'button.remove'|trans({},"conversations") }}</button></a></li>
+						{% endif %}
 					{% endif %}
 				</ul>
 				{% if message.replies and message.replies.count > 0 %}<br>
