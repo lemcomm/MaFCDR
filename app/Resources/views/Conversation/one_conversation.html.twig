@@ -57,6 +57,6 @@
 	{# FIXME: this only counts top-level messages, for some reason #}
 	{% if not archive and messages.count > 5 %}
 		<br/>
-		{{ macros.general(conversation, participants) }}
+		{{ macros.general(conversation, participants, manager, active) }}
 	{% endif %}
 </div>
