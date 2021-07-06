@@ -1,11 +1,17 @@
 {% set participants = conversation.findActivePermissions %}
-{% macro general(conversation, participants) %}
+{% macro general(conversation, participants, manager, active) %}
 	<div class="cmsg_general">
-		<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> |
-		<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %}
-		 class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"
-	 	{% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
- 		{% if not conversation.realm and not conversation.house %} | <a href="{{path('maf_conv_add', {"conv":conversation.id}) }}"><button class="convo_add cmsg_button" title="{{ 'conversation.add.help'|trans({}, "conversations") }}">{{ 'conversation.add.label'|trans({}, "conversations") }}</button></a>{% endif %}
+		{% if conversation.localFor %}
+			<a href="{{path('maf_conv_local_new') }}"><button class="cmsg_button">{{ 'button.writereply'|trans({}, "conversations") }}</button></a>
+		{% else %}
+			{% if active %}
+				<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> |
+			{% endif %}
+			<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %} class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"{% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
+			{% if manager %}
+		 		| <a href="{{path('maf_conv_add', {"conv":conversation.id}) }}"><button class="convo_add cmsg_button" title="{{ 'conversation.add.help'|trans({}, "conversations") }}">{{ 'conversation.add.label'|trans({}, "conversations") }}</button></a>
+			{% endif %}
+		{% endif %}
 	</div>
 {% endmacro %}
 
@@ -23,7 +29,7 @@
 	{% endif %}
 
 	{% if not archive %}
-		{{ macros.general(conversation, participants) }}
+		{{ macros.general(conversation, participants, manager, active) }}
 	{% endif %}
 
 	{% set in_hidden = false %}
