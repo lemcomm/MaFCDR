@@ -449,7 +449,7 @@ class CharacterController extends Controller {
 				$this->get('history')->logEvent(
 					$settlement,
 					'event.place.charstart',
-					array('%link-character%'=>$character->getId()),
+					array('%link-character%'=>$character->getId(), 'link-place%'=>$place->getId()),
 					History::MEDIUM, true, 15
 				);
 				$this->get('history')->visitLog($settlement, $character);
