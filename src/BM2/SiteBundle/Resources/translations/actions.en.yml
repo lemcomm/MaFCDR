@@ -1065,6 +1065,9 @@ meta:
  settings:
   name:         Settings
   description:  Change character settings
+ loadout:
+  name:         Loadout
+  description:  Change character loadout
  respawn:
   name:         Respawn
   description:  Return character to pool
