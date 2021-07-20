@@ -130,11 +130,12 @@ class PlaceController extends Controller {
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
+		$id = $character->getInsidePlace();
 
 		$result = null;
 		if ($this->get('interactions')->characterLeavePlace($character)) {
 			$this->getDoctrine()->getManager()->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('place.exit.success', array(), 'actions'));
+			$this->addFlash('notice', $this->get('translator')->trans('place.exit.success', array('%name%' => $id->getName()), 'actions'));
 			return $this->redirectToRoute('maf_place_actionable');
 		} else {
 			$this->addFlash('error', $this->get('translator')->trans('place.exit.failure', array(), 'actions'));
@@ -269,7 +270,7 @@ class PlaceController extends Controller {
 		}
 		$diplomacy = $character->findForeignAffairsRealms(); #Returns realms or null.
 		if ($diplomacy) {
-			$rights[] = 'diplomat';
+			$rights[] = 'ambassador';
 		}
 		if ($settlement->getGeoData()->getCoast() && $settlement->hasBuildingNamed('Dockyard')) {
 			$rights[] = 'port';
