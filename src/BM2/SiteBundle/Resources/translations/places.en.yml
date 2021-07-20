@@ -55,6 +55,7 @@ place:
   deactivate:  Disable Spawning
 
 by:
+ ambassador: As a Manager of Diplomacy...
  lord:    As the Lord...
  castle:  From the Castle...
  none:    As a First One...
@@ -67,6 +68,7 @@ arena:    Arena
 capital:  Capital
 castle:   Castle
 cave:     Cave
+embassy:  Embassy
 home:     Home
 inn:      Inn
 library:  Library
@@ -80,10 +82,21 @@ realm:
  label:   Realm
  empty:   (none)
 
+hosting:
+ label: Hosted by Realm
+
+owning:
+ label: Used by Realm
+
+ambassador:
+ label: Appointed Ambassador
+ empty: (none)
+
 help:
  new:
   name:       The short name of this place. It should be memorable, but also to the point.
   formalname: The formal name of this place. Perhaps something ostentatious?
+  realm:      Which realm shall this Place of Interest belong to? This is particularly important for Embassies and Palaces, but it applies to all.
   type:       Select the type of place this is. You can only choose this once, so choose carefully.
   shortdesc:  This is the short description of this place, viewable by those outside of it.
   longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it and also used to lure new characters to spawn here. Make it good!
