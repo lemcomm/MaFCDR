@@ -18,7 +18,7 @@
 		{% endif %}
 		{% if org > 0 %}
 			<li>
-				<a href="{{ path('maf_convs') }}">{{ 'index.org'|trans({}, "conversations") }}</a>
+				<a href="{{ path('maf_convs_orgs') }}">{{ 'index.org'|trans({}, "conversations") }}</a>
 				{{ 'summary.org'|trans({"%conversations%":org, "%active%":orgActive}, "conversations") }}
 			</li>
 		{% else %}
