@@ -648,6 +648,7 @@ class Dispatcher {
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
 			}
+			$actions[] = $this->metaLoadoutTest();
 			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaRenameTest();
 			$actions[] = $this->metaRetireTest();
@@ -2348,22 +2349,18 @@ class Dispatcher {
 			return array("name"=>"place.embassy.name", "description"=>"unavailable.wrongplacetype");
 		}
 		if (
-			(!$place->getHostingRealm() && (
-				($place->getRealm() == $settlement->getRealm() && $settlement->getOwner() != $character) ||
-				($place->getRealm()->findAllSuperiors()->contains($settlement->getRealm()) && $settlement->getOwner() != $character) ||
-				($place->getRealm()->findAllInferiors()->contains($settlement->getRealm()) && $settlement->getOwner() != $character)
-			)) ||
-			(!$place->getOwningRealm() && !$place->getHostingRealm()->findRulers()->contains($character)) ||
-			(!$place->getAmbassador() && !$place->getOwningRealm()->findRulers()->contains($character)) ||
-			($place->getAmbassador() != $character)
+			$place->getAmbassador() == $character ||
+			(!$place->getAmbassador() && $place->getOwningRealm() && $place->getOwningRealm()->findRulers()->contains($character)) ||
+			(!$place->getAmbassador() && !$place->getOwningRealm() && $place->getHostingRealm() && $place->getHostingRealm()->findRulers()->conntains($character)) ||
+			(!$place->getAmbassador() && !$place->getOwningRealm() && !$place->getHostingRealm() && $place->getOwner() == $character)
 		) {
+			return $this->action("place.embassy", "maf_place_embassy", true,
+					array('place'=>$place->getId()),
+					array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+				);
+		} else {
 			return array("name"=>"place.embassy.name", "description"=>"unavailable.notowner");
 		}
-
-		return $this->action("place.embassy", "maf_place_embassy", true,
-				array('place'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-			);
 	}
 
 	public function placeEnterTest($check_duplicate=false, Place $place) {
@@ -3265,6 +3262,13 @@ class Dispatcher {
 			return array("name"=>"meta.background.name", "description"=>"unavailable.npc");
 		}
 		return array("name"=>"meta.rename.name", "url"=>"bm2_site_character_rename", "description"=>"meta.rename.description");
+	}
+
+	public function metaLoadoutTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"meta.loadout.name", "description"=>"unavailable.npc");
+		}
+		return array("name"=>"meta.loadout.name", "url"=>"maf_character_loadout", "description"=>"meta.loadout.description");
 	}
 
 	public function metaSettingsTest() {
