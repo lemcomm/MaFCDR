@@ -69,7 +69,7 @@ class CharacterLoadoutType extends AbstractType {
                         'choices'=>$this->mounts
                 ));
 
-		$builder->add('submit', SubmitType::class, array('label'=>'submit'));
+		$builder->add('submit', SubmitType::class, array('label'=>'button.submit'));
 	}
 
 	public function getName() {
