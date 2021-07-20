@@ -22,6 +22,8 @@ loadout:
  armor:     Armor
  weapon:    Weapon
  equipment: Equipment
+ mount:     Mount
+ success:   Character loadout successfully updated!
  none:      (select)
 
 unit:
