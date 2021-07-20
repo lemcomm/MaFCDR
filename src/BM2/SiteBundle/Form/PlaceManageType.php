@@ -2,7 +2,11 @@
 
 namespace BM2\SiteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,7 +40,7 @@ class PlaceManageType extends AbstractType {
 		$short = $me->getShortDescription();
 		$description = $this->description;
 
-		$builder->add('name', 'text', array(
+		$builder->add('name', TextType::class, array(
 			'label'=>'names.name',
 			'required'=>true,
 			'data'=>$name,
@@ -46,7 +50,7 @@ class PlaceManageType extends AbstractType {
 				'title'=>'help.new.name'
 			)
 		));
-		$builder->add('formal_name', 'text', array(
+		$builder->add('formal_name', TextType::class, array(
 			'label'=>'names.formalname',
 			'required'=>true,
 			'data'=>$formal,
@@ -57,13 +61,13 @@ class PlaceManageType extends AbstractType {
 			)
 		));
 
-		$builder->add('short_description', 'textarea', array(
+		$builder->add('short_description', TextareaType::class, array(
 			'label'=>'description.short',
 			'data'=>$short,
 			'attr' => array('title'=>'help.new.shortdesc'),
 			'required'=>true,
 		));
-		$builder->add('description', 'textarea', array(
+		$builder->add('description', TextareaType::class, array(
 			'label'=>'description.full',
 			'attr' => array('title'=>'help.new.longdesc'),
 			'data'=>$description,
@@ -79,11 +83,11 @@ class PlaceManageType extends AbstractType {
 			if ($me->getOwner()) {
 				$builder->add('realm', EntityType::class, [
 					'required'=>false,
-					'choices'=> $hosting,
+					'choices'=> $me->getOwner()->findRealms(),
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
-					'placeholder'=>'manage.realm.empty',
-					'label'=>'manage.realm.name'
+					'placeholder'=>'realm.empty',
+					'label'=>'realm.label'
 				]);
 			}
 			if (!$me->getHostingRealm()) {
@@ -92,8 +96,8 @@ class PlaceManageType extends AbstractType {
 					'choices'=> $me->getRealm()->findHierarchy(true),
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
-					'placeholder'=>'manage.hosting.empty',
-					'label'=>'manage.hosting.name'
+					'placeholder'=>'realm.empty',
+					'label'=>'hosting.label'
 				]);
 				$builder->add('owning_realm', HiddenType::class, [
 					'data'=>false
@@ -110,8 +114,8 @@ class PlaceManageType extends AbstractType {
 					'choices'=> $me->getHostingRealm()->findFriendlyRelations(),
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
-					'placeholder'=>'manage.hosted.empty',
-					'label'=>'manage.hosted.name'
+					'placeholder'=>'realm.empty',
+					'label'=>'owning.label'
 				]);
 				$builder->add('ambassador', HiddenType::class, [
 					'data'=>false
@@ -128,8 +132,8 @@ class PlaceManageType extends AbstractType {
 					'choices'=>$me->getOwningRealm()->findActiveMembers(),
 					'class'=>'BM2SiteBundle:Character',
 					'choice_label' => 'name',
-					'placeholder'=>'manage.ambassador.empty',
-					'label'=>'manage.ambassador.name'
+					'placeholder'=>'ambassador.empty',
+					'label'=>'ambassador.label'
 				]);
 			}
 		}
