@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Entity;
 
 use BM2\SiteBundle\Entity\Character;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 
