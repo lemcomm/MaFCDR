@@ -34,7 +34,7 @@
 			{% endif %}
 			{% if character.insideSettlement != unit.settlement %}
 				 | <a href="{{ path('maf_unit_rebase', {"unit":unit.id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
-			{% endif %}{% if unit.settlement != null %} |
+			{% endif %}{% if unit.settlement != null and unit.settlement.owner == character %} |
 				<a href="{{ path('maf_unit_appoint', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.appoint'|trans({},"actions") }}</button></a>
 			{% endif %}
 			{% if unit.settlement == null or unit.settlement.owner == character %} |
