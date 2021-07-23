@@ -238,7 +238,6 @@ class HouseController extends Controller {
 
 		return $this->render('House/applicants.html.twig', [
 			'name' => $house->getName(),
-			'form' => $form->createView()
 		]);
 	}
 
