@@ -557,7 +557,7 @@ class CharacterController extends Controller {
 			$my_rating->setCharacter($char);
 		}
 		$form = $this->createForm(new CharacterRatingType, $my_rating);
-		return $this->render('Character/view.html.twig', [
+		return $this->render('Character/reputation.html.twig', [
 			'char'		=> $char,
 			'ratings'	=> $data,
 			'respect'	=> $respect,
