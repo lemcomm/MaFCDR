@@ -464,8 +464,13 @@ class ConversationManager {
         public function newSystemMessage(Conversation $conv, $type, ArrayCollection $data=null, Character $originator=null, $flush=true, $extra=null) {
                 $now = new \DateTime("now");
                 $cycle = $this->appstate->getCycle();
+                if ($originator) {
+                        $origin = '[c:'.$originator->getId().']';
+                } else {
+                        $origin = '*The System*';
+                }
                 if ($type == 'newperms') {
-                        $content = '[c:'.$originator->getId().'] has added the following people to the conversation: ';
+                        $content = $origin.' has added the following people to the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
                                 $content .= $data[0]->getName();
@@ -481,7 +486,7 @@ class ConversationManager {
                                 }
                         }
                 } elseif ($type == 'removal') {
-                        $content = '[c:'.$originator->getId().'] has removed the following people from the conversation: ';
+                        $content = $origin.' has removed the following people from the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
                                 $content .= '[c:'.$data[0]->getId().'].';
@@ -497,25 +502,25 @@ class ConversationManager {
                                 }
                         }
                 } elseif ($type == 'left') {
-                        $content = $originator->getName().' has left the conversation.';
+                        $content = $origin.' has left the conversation.';
                 } elseif ($type == 'realmnew') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the realm as a knight at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of '.$origin.' has appeared in the realm as a knight at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmnew2') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of '.$origin.' has appeared in the subrealm of [r:'.$extra['realm'].'] as a knight at [p:'.$extra['where'].'].';
                 } elseif ($type == 'housenew') {
-                        $content = 'A new First One by the name of [c:'.$originator->getId().'] has sworn allegiance to the house at [p:'.$extra['where'].'].';
+                        $content = 'A new First One by the name of '.$origin.' has sworn allegiance to the house at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinplace') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinplace2') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinsettlement') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [e:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [e:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinsettlement2') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [e:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [e:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinposition') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the realm as a knight of [realmpos:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [realmpos:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinposition2') {
-                        $content = 'A First One by the name of [c:'.$originator->getId().'] at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['where'].'].';
                 }
 
                 # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
@@ -603,13 +608,13 @@ class ConversationManager {
         public function updateMembers(Conversation $conv) {
                 $realm = $conv->getRealm();
                 $house = $conv->getHouse();
-                $added = 0;
-                $removed = 0;
+                $added = new ArrayCollection();
+                $removed = new ArrayCollection();
                 $now = new \DateTime("now");
 
                 if ($realm) {
                         $entity = $realm;
-                        $members = $realm->findMemebers();
+                        $members = $realm->findMembers();
                 } else {
                         $entity = $house;
                         $members = $house->findAllLiving();
@@ -622,7 +627,7 @@ class ConversationManager {
                                         if (!$conv->findActiveCharPermission($member)) {
                                                 // this user is missing from the conversation, but should be there
                                                 $this->addParticipant($conversation, $member);
-                                                $added++;
+                                                $added->add($member);
                                         }
                                 }
 
@@ -631,10 +636,16 @@ class ConversationManager {
                                                 # Should no longer have active participation. Inactivate their permissions.
                                                 $perm->setActive(FALSE);
                                                 $perm->setEndTime($now);
-                                                $removed++;
+                                                $removed->add($member);
                                         }
                                 }
                         }
+                }
+                if ($added->count() > 0) {
+                        $this->newSystemMessage($conv, 'newperms', $added, null, false, null);
+                }
+                if ($removed->count() > 0) {
+                        $this->newSystemMessage($conv, 'removal', $added, null, false, null);
                 }
                 return array('added'=>$added, 'removed'=>$removed);
         }
