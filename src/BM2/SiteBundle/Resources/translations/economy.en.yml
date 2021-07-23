@@ -53,6 +53,7 @@ building:
  Guild District: Guild District
  Guild Square: Guild Square
  Heavy Armourer: Heavy Armorer
+ Hunters Lodge: Hunters Lodge
  Imperial Seat: Imperial Seat
  Inn: Inn
  Irrigation Ditches: Irrigation Ditches
@@ -203,12 +204,12 @@ description:
  Heavy Armourer: >
    A rare specialist for heavy armor who can work miracles with metal and create the rare and valuable plate armor, the
    ultimate in personal armor.
- Imperial Seat: >   
+ Imperial Seat: >
    The Seat of Power for an Empire, the Imperial Seat supports the administration of such world powers, and contains
    the various bureaucratic workers and offices that keep it all working. The completion of such a complex array of offices
    and buildings, tends to be quite an accomplishment.
  Inn: >
-   The village inn or for towns and cities a collection of roadhouses, inns, brothels and similar places for travellers to 
+   The village inn or for towns and cities a collection of roadhouses, inns, brothels and similar places for travellers to
    rest and spend the night, this is where you can also find the odd talent to hire or meet shady figures at corner tables
    who can provide you with mercenaries.
  Irrigation Ditches: >
@@ -220,7 +221,7 @@ description:
  Library: >
    Storage place for books and manuscripts of both holy and secular importance. <br />
    This building is also required to create your own publications.
- Local Seat: >   
+ Local Seat: >
    The Seat of Power for a Barony or County, the Local Seat supports the administration of such powers, and contains
    the various bureaucratic workers and offices that keep it all working.
  Lumber Yard: >
@@ -257,7 +258,7 @@ description:
    Regardless of what is actually being raced, race tracks tend to boost the local economy either by drawing people to the city
    or by increasing morale, and thus a person's willingness to spend. Many also include formal betting houses, though the
    legitimacy of such establishments can vary from city to city.
- Regional Seat: >   
+ Regional Seat: >
    The Seat of Power for a March or Duchy, the Regional Seat supports the administration of such regional powers, and contains
    the various bureaucratic workers and offices that keep it all working.
  Royal Mews: >
