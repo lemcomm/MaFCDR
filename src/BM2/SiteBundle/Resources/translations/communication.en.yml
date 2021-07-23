@@ -293,12 +293,20 @@ event:
      subrealm:  With the abolishment of %realm%, the realm has become autonomous.
      realm:     With the dismantling of the realm, the formal vassal of %realm% has gained it's autonomy.
     estate:     With the dismantling of %realm%, the estate is effectively rogue.
+    place:      With the dismantling of %realm%, the place of interest is effectively rogue.
    notsovereign:
     inferior:
      subrealm:  With the abolishment of its superior realm, %realm-1%, %realm-2%'s superior is now %realm-3%.
      realm:     With the abolishment of the realm, %realm-1% assumes superiorship over %realm-2%.
      superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
     estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
+    place:      With the dismantling of %realm-1%, the place of interest now falls under %realm-2%.
+   vassals:
+    place:      With the dismantling of %realm%, you can no longer be a knight of the now abolished position of %realmposition%.
+    estate:
+     notsov:    With the dismantling of %realm%, your allegiance is now part of %realm-2%.
+     sov:       With the dismantling of %realm%, your allegiance is now part of no realm.
+
   capital:      Declared that its capital shall now be %settlement%.
   arrival:      %character% has arrived in the realm at %place%.
  subrealm:
