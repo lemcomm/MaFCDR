@@ -2715,7 +2715,7 @@ class Dispatcher {
 			return array("name"=>"realm.new.name", "description"=>'unavailable.'.$check);
 		}
 		// create a new realm - only available if we are independent and don't yet have a realm
-		if ($this->getCharacter()->getLiege()) {
+		if ($this->getCharacter()->findLiege()) {
 			return array("name"=>"realm.new.name", "description"=>"unavailable.vassal");
 		}
 		if ($this->getCharacter()->isRuler()) {
