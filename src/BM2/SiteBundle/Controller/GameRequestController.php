@@ -108,7 +108,6 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$settlement = $id->getToSettlement();
 					$character = $id->getFromCharacter();
-					$character->setSoldierFood($settlement);
 					$this->get('history')->logEvent(
 						$settlement,
 						'event.military.supplier.food.start',
