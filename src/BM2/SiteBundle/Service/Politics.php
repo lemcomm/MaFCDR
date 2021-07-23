@@ -157,14 +157,86 @@ class Politics {
 	}
 
 	public function disown(Character $character) {
-		$this->history->logEvent(
-			$character,
-			'politics.oath.disowned',
-			array('%link-character%'=>$character->getLiege()->getId()),
-			History::MEDIUM, true
-		);
-		// TODO: notify my vassals
-		$character->setLiege(null);
+		if ($character->getLiege()) {
+			$this->history->logEvent(
+				$character,
+				'politics.oath.disowned',
+				array('%link-character%'=>$character->getLiege()->getId()),
+				History::MEDIUM, true
+			);
+			$this->history->logEvent(
+				$character->findAllegiance(),
+				'politics.oath.disowner',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$character->setLiege(null);
+			return true;
+		}
+		if ($character->getLiegeLand()) {
+			$this->history->logEvent(
+				$character,
+				'politics.oath.landdisowned',
+				array('%link-settlement%'=>$character->getLiegeLand()->getId()),
+				History::MEDIUM, true
+			);
+			$this->history->logEvent(
+				$character->findAllegiance(),
+				'politics.oath.disowner',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$character->setLiegeLand(null);
+			return true;
+		}
+		if ($character->getLiegePlace()) {
+			$this->history->logEvent(
+				$character,
+				'politics.oath.placedisowned',
+				array('%link-place%'=>$character->getLiegePlace()->getId()),
+				History::MEDIUM, true
+			);
+			$this->history->logEvent(
+				$character->findAllegiance(),
+				'politics.oath.disowner',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$character->setLiegePlace(null);
+			return true;
+		}
+		if ($character->getLiegePosition()) {
+			$this->history->logEvent(
+				$character,
+				'politics.oath.positiondisowned',
+				array('%link-place%'=>$character->getLiegePosition()->getId()),
+				History::MEDIUM, true
+			);
+			$this->history->logEvent(
+				$character->findAllegiance(),
+				'politics.oath.disowner',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+			$character->setLiegePosition(null);
+			return true;
+		}
+		if ($character->getRealm()) {
+			$this->history->logEvent(
+				$character,
+				'politics.oath.realmdisowned',
+				array('%link-realm%'=>$character->getRealm()->getId()),
+				History::MEDIUM, true
+			);
+			$this->history->logEvent(
+				$character->findAllegiance(),
+				'politics.oath.disowner',
+				array('%link-character%'=>$character->getId()),
+				History::LOW, true
+			);
+			$character->setLiegePosition(null);
+			return true;
+		}
 	}
 
 
