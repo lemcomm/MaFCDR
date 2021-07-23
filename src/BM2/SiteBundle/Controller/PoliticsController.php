@@ -90,7 +90,7 @@ class PoliticsController extends Controller {
 	   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 	   	if (is_resource($process)) {
-	   		$dot = $this->renderView('BM2SiteBundle:Politics:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
+	   		$dot = $this->renderView('Politics/hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
 
 	   		fwrite($pipes[0], $dot);
 	   		fclose($pipes[0]);
@@ -109,10 +109,16 @@ class PoliticsController extends Controller {
 	private function addToHierarchy(Character $character) {
 		if (!isset($this->hierarchy[$character->getId()])) {
 			$this->hierarchy[$character->getId()] = $character;
-			if ($character->getLiege()) {
-				$this->addToHierarchy($character->getLiege());
+			if ($liege = $character->findLiege()) {
+				if ($liege instanceof ArrayCollection) {
+					foreach ($liege as $one) {
+						$this->addToHierarchy($one);
+					}
+				} else {
+					$this->addToHierarchy($liege);
+				}
 			}
-			foreach ($character->getVassals() as $vassal) {
+			foreach ($character->findVassals() as $vassal) {
 				$this->addToHierarchy($vassal);
 			}
 		}
@@ -141,7 +147,18 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		if ($vassal->getLiege() != $character) {
+		$liege = $vassal->findLiege();
+		if ($liege instanceof ArrayCollection) {
+			if (!$liege->contains($character)) {
+				$access = false;
+			}
+		} else {
+			if ($liege != $character) {
+				$access = false;
+			}
+		}
+
+		if (!$access) {
 			throw new AccessDeniedHttpException("error.noaccess.vassal");
 		}
 
