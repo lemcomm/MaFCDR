@@ -2597,9 +2597,6 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
-		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
-			return array("name"=>"recruit.troops.name", "description"=>"unavailable.$check");
-		}
 		if ($unit->getCharacter() == $character || ($unit->getSettlement() && $unit->getSettlement()->getOwner() == $character) || ($unit->getMarshal() == $character)) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
