@@ -85,7 +85,7 @@ class UnitSettingsType extends AbstractType {
 				$retreat = $settings->getRetreatThreshold();
 			}
 			if ($settings->getReinforcements()) {
-				$retreat = $settings->getRetreatThreshold();
+				$reinforcements = $settings->getReinforcements();
 			}
 		}
 		if($renamable !== false) {
@@ -182,7 +182,7 @@ class UnitSettingsType extends AbstractType {
 			'required'=>false
 		));
 		$builder->add('reinforcements', CheckboxType::class, array(
-			'label'=>'unit.usefort',
+			'label'=>'unit.reinforcements',
 			'data'=>$reinforcements,
 			'required'=>false
 		));
