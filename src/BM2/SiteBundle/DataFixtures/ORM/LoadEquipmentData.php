@@ -47,7 +47,7 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 			'ranged' =>  0, 'melee' =>  35, 'defense' =>   0,
 			'train' => 30, 'resupply' => 35,
 			'provider' => 'Weaponsmith',  'trainer' => 'Guardhouse',
-			'icon' => 'items/hellebarde2.png', 'skill'=> 'glaive'),
+			'icon' => null, 'skill'=> 'glaive'),
 		'halberd' => array(
 			'type' => 'weapon',
 			'ranged' =>  0, 'melee' =>  40, 'defense' =>   0,
@@ -71,13 +71,13 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 			'ranged' =>  0, 'melee' =>  65, 'defense' =>   0,
 			'train' => 60, 'resupply' =>100,
 			'provider' => 'Weaponsmith',  'trainer' => 'Barracks',
-			'icon' => 'items/hellebarde2.png', 'skill'=> 'mace'),
+			'icon' => null, 'skill'=> 'mace'),
 		'morning star'  => array(
 			'type' => 'weapon',
 			'ranged' =>  0, 'melee' =>  75, 'defense' =>   0,
 			'train' => 90, 'resupply' =>110,
 			'provider' => 'Weaponsmith',  'trainer' => 'Garrison',
-			'icon' => 'items/hellebarde2.png', 'skill'=> 'mace'),
+			'icon' => null, 'skill'=> 'mace'),
 		'broadsword' => array(
 			'type' => 'weapon',
 			'ranged' =>  0, 'melee' =>  90, 'defense' =>   0,
