@@ -163,6 +163,9 @@ class GameRequestController extends Controller {
 			case 'oath.offer':
 				if ($allowed) {
 					$character = $id->getFromCharacter();
+					if ($id->findAllegiance()) {
+						$this->get('politics')->breakoath($id);
+					}
 					if ($id->getToSettlement()) {
 						$settlement = $id->getToSettlement();
 						$character->setLiegeLand($settlement);
