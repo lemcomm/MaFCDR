@@ -149,7 +149,7 @@ class EventsController extends Controller {
 			$formView = null;
 		}
 
-		return $this->render('Events/log.html.twig', [
+		return $this->render('Events/eventlog.html.twig', [
 			'log'=>$log,
 			'metas'=>$metas,
 			'scholars'=>$myscholars->count(),
