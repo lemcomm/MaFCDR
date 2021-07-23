@@ -467,6 +467,33 @@ class Character {
 		return null;
 	}
 
+	public function findVassals() {
+		$vassals = new ArrayCollection();
+		foreach ($this->getPositions() as $key) {
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		foreach ($this->getOwnedPlaces() as $key) {
+			if ($key->getType()->getName() != 'embassy') {
+				foreach ($key->getVassals() as $val) {
+					$vassals->add($val);
+				}
+			}
+		}
+		foreach ($this->getOwnedSettlements() as $key) {
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		foreach ($this->getAmbassadorships() as $key) {
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		return $vassals;
+	}
+
 	public function findPrimaryRealm() {
 		if ($this->realm) {
 			return $this->getRealm();
@@ -479,6 +506,30 @@ class Character {
 		}
 		if ($this->liege_position) {
 			return $this->getLiegePosition()->getRealm();
+		}
+		return null;
+	}
+
+	public function findLiege() {
+		if ($this->getLiege()) {
+			return $this->getLiege();
+		}
+		$alleg = $this->findAllegiance();
+		if ($alleg instanceof Realm) {
+			return $alleg->findRulers();
+		}
+		if ($alleg instanceof Settlement) {
+			return $alleg->getOwner();
+		}
+		if ($alleg instanceof Place) {
+			if ($alleg->getType()->getName() != 'embassy') {
+				return $alleg->getOwner();
+			} else {
+				return $alleg->getAmbassador();
+			}
+		}
+		if ($alleg instanceof RealmPosition) {
+			return $alleg->getHolders();
 		}
 		return null;
 	}
