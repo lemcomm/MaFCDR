@@ -1,4 +1,4 @@
-{% extends "BM2SiteBundle::layout.html.twig" %}
+{% extends "layout.html.twig" %}
 
 {% block includes %}
 	{{ parent() }}
@@ -14,7 +14,7 @@
 		<p>{{ 'recruit.manage.limited'|trans({},"actions") }}</p>
 	{% endif %}
 
-	{% include "BM2SiteBundle:element:soldierslist.html.twig" with {
+	{% include "element/soldierslist.html.twig" with {
 		"settlement":settlement,
 		"submitpath":path('maf_unit_soldiers', {"unit":unit.id}),
 		"listpath":path('maf_unit_soldiers', {"unit":unit.id})
