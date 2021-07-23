@@ -626,7 +626,7 @@ class ConversationManager {
                                 foreach ($members as $member) {
                                         if (!$conv->findActiveCharPermission($member)) {
                                                 // this user is missing from the conversation, but should be there
-                                                $this->addParticipant($conversation, $member);
+                                                $this->addParticipant($conv, $member);
                                                 $added->add($member);
                                         }
                                 }
