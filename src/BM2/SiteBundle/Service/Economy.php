@@ -221,6 +221,7 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'hunters lodge':
 			case 'lumber yard':	// only in forests
 				$geo = $settlement->getGeoData()->getBiome()->getName();
 				if (!in_array($geo, array('forest', 'dense forest'))) {
