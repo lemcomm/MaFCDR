@@ -213,14 +213,24 @@ class RealmManager {
 
 	public function removeRulerLiege(Realm $realm, Character $newruler) {
 		if ($liege = $newruler->getLiege()) {
-			$this->history->logEvent(
-				$liege,
-				'politics.oath.nowruler',
-				array('%link-realm%'=>$realm->getId(), '%link-character%'=>$newruler->getId()),
-				History::MEDIUM, true
-			);
+			if ($liege instanceof ArrayCollection) {
+				foreach ($liege as $one) {
+					$this->history->logEvent(
+						$one,
+						'politics.oath.nowruler',
+						array('%link-realm%'=>$realm->getId(), '%link-character%'=>$newruler->getId()),
+						History::MEDIUM, true
+					);
+				}
+			} else {
+				$this->history->logEvent(
+					$liege,
+					'politics.oath.nowruler',
+					array('%link-realm%'=>$realm->getId(), '%link-character%'=>$newruler->getId()),
+					History::MEDIUM, true
+				);
+			}
 			$liege->removeVassal($newruler);
-			$newruler->setLiege(null);
 		}
 	}
 
@@ -391,6 +401,15 @@ class RealmManager {
 					array('%link-realm%'=>$realm->getId()),
 					History::HIGH
 				); # 'With the dismantling of %link-realm%, the estate is effectively rogue.'
+				foreach ($settlement->getVassals() as $vassal) {
+					$this->history->logEvent(
+						$vassal,
+						'event.realm.abolished.vassals.estate.sov',
+						array('%link-realm%'=>$realm->getId()),
+						History::MEDIUM
+					);
+					$vassal->setLiegeLand(null);
+				}
 				$settlement->setRealm(null);
 				$realm->removeSettlement($settlement);
 				$this->em->flush();
@@ -401,12 +420,82 @@ class RealmManager {
 					array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
 					History::HIGH
 				); # 'With the dismantling of %link-realm%, the estate now falls under %link-realm-2%.'
+				foreach ($settlement->getVassals() as $vassal) {
+					$this->history->logEvent(
+						$vassal,
+						'event.realm.abolished.vassals.estate.notsov',
+						array('%link-realm%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+						History::MEDIUM
+					);
+					$vassal->setLiegeLand(null);
+				}
 				$realm->removeSettlement($settlement);
 				$settlement->setRealm($superior);
 				$superior->addSettlement($settlement);
 				$this->em->flush();
 			}
 		}
+		foreach ($realm->getPlaces() as $place) {
+			if ($sovereign) {
+				$this->history->logEvent(
+					$place,
+					'event.realm.abolished.sovereign.place',
+					array('%link-realm%'=>$realm->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the place is effectively rogue.'
+				foreach ($place->getVassals() as $vassal) {
+					$this->history->logEvent(
+						$vassal,
+						'event.realm.abolished.vassals.estate.sov',
+						array('%link-realm%'=>$realm->getId()),
+						History::MEDIUM
+					);
+					$vassal->setLiegePlace(null);
+				}
+				$place->setRealm(null);
+				$realm->removePlace($place);
+			} else {
+				$this->history->logEvent(
+					$place,
+					'event.realm.abolished.notsovereign.estate',
+					array('%link-realm-1%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+					History::HIGH
+				); # 'With the dismantling of %link-realm%, the estate now falls under %link-realm-2%.'
+				foreach ($place->getVassals() as $vassal) {
+					$this->history->logEvent(
+						$vassal,
+						'event.realm.abolished.vassals.estate.notsov',
+						array('%link-realm%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+						History::MEDIUM
+					);
+					$vassal->setLiegePlace(null);
+				}
+				$realm->removePlace($place);
+				$place->setRealm($superior);
+				$superior->addSettlement($place);
+			}
+		}
+		$this->em->flush();
+		foreach ($realm->getVassals() as $vassl) {
+			if ($sovereign) {
+				$this->history->logEvent(
+					$vassal,
+					'event.realm.abolished.vassals.estate.sov',
+					array('%link-realm%'=>$realm->getId()),
+					History::MEDIUM
+				);
+				$vassal->setRealm($superior);
+			} else {
+				$this->history->logEvent(
+					$vassal,
+					'event.realm.abolished.vassals.estate.notsov',
+					array('%link-realm%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
+					History::MEDIUM
+				);
+				$vassal->setRealm(null);
+			}
+		}
+		$this->em->flush();
 		foreach ($realm->getPositions() as $position) {
 			if ($position->getHolders()) {
 				foreach ($position->getHolders() as $holder) {
@@ -422,9 +511,18 @@ class RealmManager {
 							History::MEDIUM
 						); # 'Lost the position of %link-realmposition% due to the dismantling of %link-realm%.'
 					}
-					$this->em->flush();
+				}
+				foreach ($position->getVassals() as $vassal) {
+					$this->history->logEvent(
+						$vassal,
+						'event.realm.abolished.vassals.place',
+						array('%link-realm%'=>$realm->getId(), '%link-realmposition%'=>$position->getId()),
+						History::MEDIUM
+					);
+					$vassal->setLiegePosition(null);
 				}
 			}
 		}
+		$this->em->flush();
 	}
 }
