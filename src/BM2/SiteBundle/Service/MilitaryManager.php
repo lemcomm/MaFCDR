@@ -728,6 +728,9 @@ class MilitaryManager {
 		if ($data['supplier']) {
 			$settings->getUnit()->setSupplier($data['supplier']);
 		}
+		if ($data['reinforcements']) {
+			$settings->setReinforcements($data['reinforcements']);
+		}
 		$this->em->flush();
 		return true;
 	}
