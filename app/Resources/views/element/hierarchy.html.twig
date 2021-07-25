@@ -4,7 +4,7 @@
 
 {% macro realm_hierarchy(realm, gender_he) %}
 
-{# 
+{#
 
 For reasons I literally do not understand, if this exists, it breaks pages. If it's commented out, the world keeps turning.
 More than likely, it's due to a change in the update from Twig 1.23 to Twig 2.0. So far, I've not seen anything indicating that this
@@ -25,7 +25,7 @@ is still required, but we'll leave it in the code just in case. --Andrew
 
 {% if character.liege %}
 	<p>{{ ("status."~who~".vassal")|trans({"%He%":gender_he, "%liege%":link(character.liege)},"politics")|raw }}</p>
-{% elseif character.vassals is empty %}
+{% elseif character.findVassals is empty %}
 	{% if character.ownedSettlements is empty %}
 		{% if character.positions is empty %}
 			<p>{{ ("status."~who~".landless")|trans({"%He%":gender_he, },"politics") }}</p>
@@ -77,9 +77,9 @@ is still required, but we'll leave it in the code just in case. --Andrew
 	</li>
 {% endfor %}
 
-{% if character.vassals is not empty %}
+{% if character.findVassals is not empty %}
 	<li>{{ ("status."~who~".liege")|trans({},"politics") }}<ul class="shortlist">
-	{% for vassal in character.vassals  %}
+	{% for vassal in character.findVassals  %}
 		<li>{{ link(vassal) }}</li>
 	{% endfor %}
 	</ul></li>
