@@ -1119,6 +1119,8 @@ personal:
   intro: >
     From here you can manage any of the requests that are pending to you, your lands, your house, or your realms, if applicable, to include canceling already agreed to requests, if you so desire.
     Please be advised that requests are sorted primarily by whether or not it's already accepted, and then by the date it was received, so you may find a request for food for your soldiers right next to a request to join your house.
+  accepted: Conversely, you can also cancel some requests that you've previously accepted.
+  cancelable:  Previously Accepted Requests
   list:        Pending Requests
   empty:       For better or worse, it doesn't look like you have any request to review.
  request:
@@ -1128,7 +1130,9 @@ personal:
   approved:    The request from %link-character% has been approved.
   deny:        Deny
   denied:      The request from %link-character% has been denied.
-  soldierfood: %character% has requested that they be allowed to use the food stores of %settlement% to feed their mobilized forces, and has provided the following message explaining their request.
+  cancel:      Revoke
+  cancelled:   The request from %linke-character% has been revoked.
+  soldierfood: %link-character% has requested that they be allowed to use the food stores of %link-settlement% to feed their mobilized forces, and has provided the following message explaining their request.
   expires:     This request allows this until %date%.
   noexpire:    This request is good forever, or until circumstances change (see the manual).
  soldierfood:
