@@ -226,7 +226,7 @@ class UnitController extends Controller {
                                 }
                         }
                         foreach ($character->getUnits() as $mine) {
-                                if (!$mine->getSettlement()) {
+                                if (!$mine->getSettlement() || ($mine->getSettlement() && $mine->getSettlement()->getOwner() == $character)) {
                                         # Units created from legacy soldiers that don't have a base act as if they ALWAYS are at their base.
                                         $local->add($mine);
                                 }
