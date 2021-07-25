@@ -16,6 +16,8 @@ use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\MessageRecipient;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
+use BM2\SiteBundle\Entity\Settlement;
 
 class ConversationManager {
 
@@ -645,7 +647,7 @@ class ConversationManager {
                         $this->newSystemMessage($conv, 'newperms', $added, null, false, null);
                 }
                 if ($removed->count() > 0) {
-                        $this->newSystemMessage($conv, 'removal', $added, null, false, null);
+                        $this->newSystemMessage($conv, 'removal', $removed, null, false, null);
                 }
                 return array('added'=>$added, 'removed'=>$removed);
         }
