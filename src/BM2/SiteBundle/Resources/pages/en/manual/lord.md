@@ -7,7 +7,7 @@ Responsibilities of a Lord
 --------------------------
 Keeping the [settlements] under your control (your estates) running is a primary responsibility for a lord, because these settlements supply resources and soldiers to you, your vassals and your realm.
 
-Managing an estate includes construction of buildings, roads and other features as well as trade and general economy.
+Managing a settlement includes construction of buildings, roads and other features as well as trade and general economy.
 
 
 Challenges of a Lord
