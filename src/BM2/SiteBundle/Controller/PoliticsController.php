@@ -134,7 +134,7 @@ class PoliticsController extends Controller {
 		}
 
 		return $this->render('Politics/vassals.html.twig', [
-			'vassals'=>$character->getVassals()
+			'vassals'=>$character->findVassals()
 		]);
 	}
 
@@ -147,18 +147,7 @@ class PoliticsController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$liege = $vassal->findLiege();
-		if ($liege instanceof ArrayCollection) {
-			if (!$liege->contains($character)) {
-				$access = false;
-			}
-		} else {
-			if ($liege != $character) {
-				$access = false;
-			}
-		}
-
-		if (!$access) {
+		if (!$character->findVassals()->contains($vassal)) {
 			throw new AccessDeniedHttpException("error.noaccess.vassal");
 		}
 
@@ -170,7 +159,10 @@ class PoliticsController extends Controller {
 			$this->get('politics')->disown($vassal);
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
-			return array('vassal'=>$vassal, 'success'=>true);
+			return $this->render('Politics/disown.html.twig', [
+				'vassal'=>$vassal,
+				'success'=>true
+			]);
 		}
 
 		return $this->render('Politics/disown.html.twig', [
