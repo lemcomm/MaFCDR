@@ -47,25 +47,29 @@ Important Terms
 ---------------
 There are a few in-game terms that are very useful to understand:
 
-Noble
-:	All player [characters] are nobles, members of the ruling class and of the First Ones race (see [fiction](http://mightandfealty.com/fiction)). In general, there are 3½ ranks or levels of nobility:
+First Ones
+:	All player [characters] are First Ones, members of the ruling class and of the First Ones race (see [fiction](http://mightandfealty.com/fiction)). In general, there are 3½ ranks or levels of nobility:
 
  	* A simple **knight** is a noble without land, usually sworn to a liege.
- 	* A **lord** is a noble with one or more estates, who may or may not be personally bound to a liege and may also have knights of his own, so at this intermediate level characters can be both vassals and lieges.
+ 	* A **lord** is a noble with one or more estates, who may or may not be personally bound to a ruler and may also have knights of his own, so at this intermediate level characters can be both vassals and lieges.
  	* A **ruler** controls a realm, small or large, and as per <span class="tt_bot" title="French for 'the state, that is me' - a famous quote attributed to King Louis XIV, the Sun King">*L’État c’est moi*</span>, rulers are never bound by personal oaths, but their realms might be part of larger realms.
  	* Finally, there is an intermediate level between lord and ruler, as many realms have realm positions below the ruler, with limited powers.
 
-Estate
-:	Estates are [settlements] that are being controlled by a noble.
+Second Ones
+:       Commonly referred to as [mortals], commoners, or peasants, these are the NPCs that do the work and fight for you. Before you ask, no, you're not part mortal. Nor can you have children with one. The Gods did not design you or them that way.
+
+Settlements
+:	Controlled by a first one, [settlements] are villages, towns, or cities where the [mortals] primarily live and reside.
+
+Places
+:       Formally, "Places of Interest", but commonly just [places], are locations on the map created by other players.
 
 Realm
 :	Political entities, [Realms] are collections of [settlements] and [characters] under one name and purpose.
 	Realms can contain other realms in a hierarchy (kingdoms contain duchies, duchies contain baronies, etc.)
 
-Fealty
-:	Personal loyalty between nobles of lower ranks. The liege-vassal relationship defined through [fealty] greatly determines a feudal society.
+Fealty & Allegiances
+:	Personal loyalty between First Ones of lower ranks. The liege-vassal relationship defined through [fealty] greatly determines a feudal society.
 
 Entourage
 :	Servants and other non-fighting people in the employ of a noble. See [entourage] for details.
-
-
