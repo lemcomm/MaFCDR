@@ -475,7 +475,7 @@ class ConversationManager {
                         $content = $origin.' has added the following people to the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
-                                $content .= $data[0]->getName();
+                                $content .= '[c:'.$data[0]->getId().']';
                         } else {
                                 $i = 0;
                                 foreach ($data as $char) {
