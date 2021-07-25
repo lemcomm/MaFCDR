@@ -607,8 +607,7 @@ class GameRequestController extends Controller {
 				$settlements->add($realm->getCapital());
 			}
 		}
-		if ($character->getLiege()) {
-			$liege = $character->getLiege();
+		if ($liege = $character->findLiege()) {
 			foreach ($liege->getOwnedSettlements() as $settlement) {
 				if ($settlement->getFeedSoldiers() && !$settlements->contains($settlement)) {
 					$settlements->add($settlement);
