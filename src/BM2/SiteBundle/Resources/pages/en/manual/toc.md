@@ -20,8 +20,10 @@ Entities
 * [Settlements](settlements)
 * [Places](places)
 * [Characters](characters)
+* [Units](units)
 * [Soldiers](soldiers)
 * [Entourage](entourage)
+* [Siege](sieges)
 
 Interaction
 -----------
@@ -31,7 +33,6 @@ Interaction
 * [Fealty](fealty)
 * [Claims](claims)
 * [Prison](prison)
-* [Bandits](bandits)
 * [History](history)
 * [Location](location)
 
@@ -54,9 +55,7 @@ Concepts
 
 Experimental
 ------------
-* [Units](units)
 * [Battles](battles2)
-* [Siege](sieges)
 
 Other
 -----
