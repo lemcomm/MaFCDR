@@ -1138,6 +1138,28 @@ personal:
  soldierfood:
   name:        Request Food for Your Unit
   description: Formalize a request for provisions.
+  intro: >
+    While you may not require food, the soldiers you command, unfortunately, do. Here you can formalize requests to others in order for them to handle feeding your soldiers for you.
+  subject:
+   name:    Request Subject
+   desc:    A formal subject for this food request.
+  text:
+   name:    Request Text
+   desc:    Perhaps you want to keep it short or maybe you're feeling particularly fanciful? This is probably where you should explain the how and/or why of your request.
+  source:
+   name:    Food Source
+   desc:    This will list, automatically, the owned settlements of your liege, the realm capital, and the settlement you're currently in. This determines where your request is sent.
+  limit:
+   name:    Request upper limit
+   desc:    An upper limit to the amount of food this request allows.
+  expiration:
+   name:    Request Expiration Date
+   desc:    This isn't required, and the individual sending food can cancel it early if they decide to, but this lest you have a request time out automatically.
+   year:    (year)
+   month:   (month)
+   day:     (day)
+   hour:    (hour)
+   minute:  (minute)
 
 mercenaries:
  title:     Available Mercenary Groups
@@ -1259,6 +1281,7 @@ unit:
   empty:    (Select a Character)
   select:   "Available Characters:"
   submit:   Appoint Marshal
+  success:  Marshal appointed successfully!
  new:
   name:     Create A Unit
   description: Organize a new unit under your authority.
