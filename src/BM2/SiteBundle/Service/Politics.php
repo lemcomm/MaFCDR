@@ -142,7 +142,7 @@ class Politics {
 				array('%link-character%'=>$character->getId()),
 				History::LOW, true
 			);
-			$character->setLiegePosition(null);
+			$character->setRealm(null);
 			return true;
 		}
 	}
