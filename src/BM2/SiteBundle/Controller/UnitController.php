@@ -35,8 +35,12 @@ class UnitController extends Controller {
 
         private function findUnits(Character $character) {
                 $em = $this->getDoctrine()->getManager();
-                if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
+                $settlement = $character->getInsideSettlement();
+                if ($settlement && ($settlement->getOwner() == $character || $settlement->getOccupant() == $character)) {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR u.settlement = :settlement OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
+                        $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
+                } elseif ($character->getInsideSettlement()) {
+                        $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } else {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char ORDER BY s.name ASC');
@@ -67,15 +71,36 @@ class UnitController extends Controller {
                 }
                 $em = $this->getDoctrine()->getManager();
 
-                if ($character->getInsideSettlement() && $character->getInsideSettlement()->getOwner() == $character) {
-                        $lord = true;
-                } else {
-                        $lord = false;
+                $all = $this->findUnits($character);
+                $units = [];
+                foreach ($all as $each) {
+                        $id = $each->getId();
+                        $units[$id] = [];
+                        $units[$id]['obj'] = $each;
+                        $settlement = $each->getSettlement();
+                        if (!$settlement || ($settlement == $character->getInsideSettlement() && ($settlement->getOwner() == $character && !$settlement->getOccupier() || $settlement->getOccupant())))  {
+                                $units[$id]['owner'] = true;
+                        } else {
+                                $units[$id]['owner'] = false;
+                        }
+                        if ($settlement) {
+                                $units[$id]['base'] = true;
+                        } else {
+                                $units[$id]['base'] = false;
+                        }
+                        if ($each->getMarshal() == $character) {
+                                $units[$id]['marshal'] = true;
+                        } else {
+                                $units[$id]['marshal'] = false;
+                        }
+                        if ($each->getCharacter() == $character) {
+                                $units[$id]['mine'] = true;
+                        } else {
+                                $units[$id]['mine'] = false;
+                        }
                 }
-                $units = $this->findUnits($character);
 
                 return $this->render('Unit/units.html.twig', [
-                        'lord' => $lord,
                         'units' => $units,
                         'character' => $character
                 ]);
