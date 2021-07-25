@@ -1,14 +1,12 @@
-### This manual page is detailing an upcoming feature to be added in the next update. Units and Unit Settings will be implemented next update, but many settings won't take effect until the battle overhaul (Soon(tm)) ###
-
-Units are the primary unit of organization between you and your soldiers, allowing you to set orders and manage hundreds of individuals soldiers at once. Each unit under your command will have it's own supply source, battle strategy, tactics, name, and deployment settings, allowing you as their leader to maximize their use on the field.
+Units are the primary unit of organization between you and your soldiers, allowing you to set orders and manage hundreds of individuals soldiers at once. Each unit under your command will have it's own supply source, battle strategy, tactics, name, and deployment settings, allowing you as their leader to maximize their use on the field. At this time, many of these settings, with exception for unit name and supply source, are not implemented.
 
 Generally speaking, units are best when made up of soldiers all using relatively the same equipment. Archers with archers, cavalry with cavalry. In battle a unit will only move as slow as it's slowest soldier, and while it can be said that a disorganized mess is hard to fight against, it's also hard to deploy effectively.
 
-For more detailed guidance on how exactly units work in the field, we recommend you read the [new battles](battles2) page.
+For more detailed guidance on how exactly units work in the field, we recommend you read the [battles] page.
 
 Supplies
 --------
-Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, or the settlement of the Unit's origin. Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
+Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, the settlement of the Unit's origin, or the settlement of someone who has agreed to supply you. Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
 
 Strategy & Tactics (Planned Feature)
 ------------------
@@ -28,14 +26,10 @@ Simply put, these control where your forces deploy in relation to their allies a
 
 Reinforcements, Recalls, Rebasing & Disbanding
 --------------
-Units will always have a home base, and the lord of their home base is the person who has final say on whether a unit remains deployed or not. The lord of a unit's base will be able to train new soldiers for a distant unit or outright recall them. Both of these actions will involve travel times that will prevent a unit from being assigned otherwise.
+Units will usually have a home base, and the lord of their home base is the person who has final say on whether a unit remains deployed or not. The lord of a unit's base will be able to train new soldiers for a distant unit or outright recall them. Both of these actions will involve travel times that will prevent a unit from being assigned otherwise. If you find yourself no longer in need of a unit in the field, you can also opt to return them yourself.
 
-Units being recalled to a besieged settlement will maintain a safe distance outside of the siege until an assault or sortie happens, at which point they'll join the defenders as external reinforcements (possibly giving flanking bonuses).
-
-If you find that your soldiers would be better based elsewhere, you can order them to any settlement you have permissions in, or generate a request for a nearby lord or the lord of the settlement you're in to take on basing them. As with reinforcements and recalls, the unit will require some travel time between settlements and will likely not be immediately available.
-
-Finally, a unit with soldiers cannot be disbanded, so you'll have to recall them first, reassign or disband the individual soldiers, and then you'll be able to disband the unit as a whole.
+Units can also be rebased to another settlement. Typically this requires the lord to command the unit and be in another settlement, but if the unit is currently without a base to work from, this can be done by the character commanding the unit.
 
 Captivity
 ---------
-Taking a first one captive will also take their units captive. However, units and their leader are handled separately for captivity purposes, and captive soldiers cannot be reinforced or recalled, and the captor will gain some limited setting management. It is entirely possible to release the units to go back to their base while keeping the first one, or releasing the first ones while holding their soldiers captive. 
+Taking a first one captive will also take their units captive. However, units and their leader are handled separately for captivity purposes, and captive soldiers cannot be reinforced or recalled, and the captor will gain some limited setting management. It is entirely possible to release the units to go back to their base while keeping the first one, or releasing the first ones while holding their soldiers captive.
