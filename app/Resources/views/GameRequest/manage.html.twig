@@ -19,7 +19,7 @@
 			<div class="subcontent inline_announcements" style="color:#460702">
 			<h4>{{ gamerequest.subject|title }}</h4>
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
-			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'personal.request.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'personal.request.deny'|trans({},"politics") }}</button></a>
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'personal.request.approve'|trans({},"actions") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'personal.request.deny'|trans({},"actions") }}</button></a>
 			</div>
 		{% elseif gamerequest.type == 'house.cadet' %}
 			<hr>
@@ -47,7 +47,15 @@
 			</div>
 		{% elseif gamerequest.type == 'oath.offer' %}
 			<hr>
-			{{ 'oath.offer.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-settlement%":link(gamerequest.toSettlement), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{% if gamerequest.toSettlement %}
+				{{ 'oath.offer.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-settlement%":link(gamerequest.toSettlement), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{% elseif gamerequest.toRealm %}
+				{{ 'oath.offer.preamble2'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-realm%":link(gamerequest.toRealm), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{% elseif gamerequest.toPlace %}
+				{{ 'oath.offer.preamble3'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-place%":link(gamerequest.toPlace), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{% else %}
+				{{ 'oath.offer.preamble4'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-realmposition%":link(gamerequest.toRealmPosition), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			{% endif %}
 			<div class="subcontent inline_announcements" style="color:#460702">
 			<h4>{{ gamerequest.subject|title }}</h4>
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
@@ -65,5 +73,28 @@
 	{% else %}
 		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
 	{% endfor %}
+	{% if approved|length > 0 %}
+		<hr>
+		<p>{{ 'personal.requests.accepted'|trans({},"actions")|raw }}</p>
+
+		<h3> {{ 'personal.requests.cancelable'|trans({},"actions")|title }}</h3>
+		{% for gamerequest in approved %}
+			{% if gamerequest.type == 'soldier.food' %}
+				<hr>
+				{{ 'personal.request.soldierfood'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-settlement%":link(gamerequest.toSettlement)}, "actions")|raw }}
+				{{ 'personal.request.created'|trans({"%date%":gamerequest.created|date("D, d M Y H:i:s")}, "actions")|raw }}
+				{% if gamerequest.expires %}
+					{{ 'personal.request.expires'|trans({"%date%":gamerequest.expires|date("D, d M Y H:i:s")}, "actions")|raw }}
+				{% else %}
+					{{ 'personal.request.noexpire'|trans({}, "actions")|raw }}
+				{% endif %}
+				<div class="subcontent inline_announcements" style="color:#460702">
+				<h4>{{ gamerequest.subject|title }}</h4>
+				{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+				<a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'personal.request.cancel'|trans({},"actions") }}</button></a>
+				</div>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
 
 {% endblock %}
