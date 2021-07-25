@@ -75,6 +75,7 @@ unit:
   name:     Can this unit be renamed?
  retreat:
   name:     Withdraw/Retreat Percentage
+ reinforcements: Accept reinfocements?
 
 
 update:
