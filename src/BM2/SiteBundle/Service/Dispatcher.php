@@ -496,7 +496,7 @@ class Dispatcher {
 		if ($this->getCharacter()->findAllegiance()) {
 			$actions[] = array("name"=>"oath.view.name", "url"=>"bm2_site_politics_hierarchy", "description"=>"oath.view.description", "long"=>"oath.view.longdesc");
 		}
-		if ($this->getCharacter()->getVassals()) {
+		if ($this->getCharacter()->findVassals()) {
 			$actions[] = array("name"=>"vassals.view.name", "url"=>"bm2_site_politics_vassals", "description"=>"vassals.view.description", "long"=>"vassals.view.longdesc");
 		}
 		$actions[] = $this->hierarchyOathTest();
