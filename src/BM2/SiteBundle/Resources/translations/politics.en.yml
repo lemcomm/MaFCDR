@@ -156,6 +156,9 @@ oath:
   rejected:     You have rejected the oath of vassalage from %name%
  offer:
   preamble:     "%link-character% has offered an oath of fealty to you, in your position as the lord of %link-settlement%, on %date% and has provided the following message:"
+  preamble2:     "%link-character% has offered an oath of fealty to you, in your position as the ruler of %link-realm%, on %date% and has provided the following message:"
+  preamble3:     "%link-character% has offered an oath of fealty to you, in your position as the owner of %link-place%, on %date% and has provided the following message:"
+  preamble4:     "%link-character% has offered an oath of fealty to you, in your position as the holder of %link-realmposition%, on %date% and has provided the following message:"
   approve:      Accept their fealty
   deny:         Reject their fealty
 
