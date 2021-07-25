@@ -579,11 +579,12 @@ class GameRequestController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		$requests = $this->get('game_request_manager')->findAllManageableRequests($character);
+		$requests = $this->get('game_request_manager')->findAllManageableRequests($character, false); # Not accepted/rejected
+		$approved = $this->get('game_request_manager')->findAllManageableRequests($character, true); # Only accepted
 
 		return $this->render('GameRequest/manage.html.twig', [
-			'gamerequests' => $requests
+			'gamerequests' => $requests,
+			'approved' => $approved
 		]);
 	}
 
