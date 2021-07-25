@@ -1074,7 +1074,7 @@ item:
  machete:          machete
  morning star:     morning star
  pavise:           pavise
- pike:             halberd
+ pike:             pike
  plate armour:     plate armor
  scale armour:     scale armor
  shield:           shield
@@ -1265,9 +1265,11 @@ description:
  broadsword:      A heavy and sturdy sword designed more for massive impact force than speed.
  chainmail:       Interlocking metal rings providing impressive armor and yet fairly low weight.
  cloth armour:    Reinforced clothing, basically several layers of thick cloth. Does not really make much of a difference against real weapons, but can help against weak or glancing blows.
+ club:            There are many things that can be used as clubs, everything from axe handles to tree branches to even old blunted swords.
  crossbow:        Technically advanced ranged weapon that requires less training than a bow and provides more accurate power, but requires longer loading times.
  glaive:          A polearm consisting of a a single-edged blade on the end of a pole.
  great axe:       Sometimes referred to as a battle axe historically, in Might & Fealty this refers to the heavier two handed variety. On par with a broadsword.
+ halberd:         A two handed pole weapon topped with a battle axe, a spike, and a hook, designed for grappling mounted foes.
  horse:           Riding horse trained to suffer through the heat of battle without too much complaining.
  improvised:      Farm tools, other tools, big sticks - anything that was lying around and just might hurt someone.
  javelin:         A short spear, balanced for throwing. One-use weapon that gives melee troops a single, but powerful ranged attack. Use with camp followers to resupply in the field.
@@ -1276,6 +1278,7 @@ description:
  longbow:         The ultimate one-man ranged weapon, requiring long training and strong arms to use. Can pierce even solid metal armor at great distances.
  machete:         A broad bladed knife that doubles as an agricultural implement. Much easier to train and produce than a sword, though not as effective.
  mace:            A stick with a spiky metal head. Feared on the battlefield because of its combination of powerful impact and small point, punching through even strong armour.
+ morning star:    Sometimes referred to as a "ball and chain", the morning star bears similarity to a mace, save for the fact that the stick and the spiky ball are connected by a length of chain or tether.
  pavise:          A shield large enough to cover the entire body, commonly carried by archers and crossbowmen, but sometimes utilized by other infantry. Makes for a good thing to hide behind when under attack by ranged enemies.
  pike:            A long pole-arm weapon with a blade and point, easy to learn and often the first serious weapon for conscripts to pick up.
  plate armour:    The ultimate in armor protection, consisting of solid metal plates covering every part of the body, interlocked and reinforced.
@@ -1284,6 +1287,8 @@ description:
  shortbow:        A very common type of bow, used mainly for hunting but quite effective against lightly armored enemies, too.
  sling:           An easy to produce ranged weapon that is used to launch a, usually, blunt projectile.
  spear:           Another simple and common weapon, popular due to its considerable reach and easy training.
+ staff:           A staff is a long rod, usually made of wood. While not as conventionally deadly as other things, it's reach and ease to create makes it a viable weapon.
+ staff sling:     A sling attached to a long rod, providing longer range or the ability to launch heavier missiles or at steeper arcs.
  sword:           Rare among the lower ranks, common amongst the nobility and those who can afford proper weaponsmiths.
  short sword:     A smaller sidearm to be used mostly as a fallback melee option for ranged troops, or as reserve weapon.
  war horse:       A large and heavy horse, specifically trained for battle and equipped with horse armor.
