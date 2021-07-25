@@ -81,7 +81,7 @@ class GameRequestManager {
 		$this->em = $em;
 	}
 
-	public function findAllManageableRequests(Character $char) {
+	public function findAllManageableRequests(Character $char, $accepted = false) {
 		# Build a list of all realms we are in, using their IDs.
 		$realms = $char->findRealms();
 		$realmIDs =  [];
@@ -114,11 +114,17 @@ class GameRequestManager {
 		}
 		# Now we build the query, or two of them.
 		# TODO: See if we need to actually differentiate these. I'm suspeting Doctrine is smart enough to know what to do here.
-		if ($houseID) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)');
+		if ($houseID && !$accepted) {
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND (r.accepted = FALSE AND r.rejected = FALSE)');
+			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
+		} elseif (!$houseID && !$accepted) {
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND (r.accepted = FALSE AND r.rejected = FALSE)');
+			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
+		} elseif ($houseID && $accepted) {
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND r.accepted = TRUE');
 			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
 		} else {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND ((r.accepted = FALSE AND r.rejected = FALSE) OR r.accepted = TRUE)');
+			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND r.accepted = TRUE');
 			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
 		}
 		try {
