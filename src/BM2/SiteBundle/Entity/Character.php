@@ -470,6 +470,11 @@ class Character {
 	public function findVassals() {
 		$vassals = new ArrayCollection();
 		foreach ($this->getPositions() as $key) {
+			if ($key->getRuler()) {
+				foreach ($key->getRealm()->getVassals() as $val) {
+					$vassals->add($val);
+				}
+			}
 			foreach ($key->getVassals() as $val) {
 				$vassals->add($val);
 			}
