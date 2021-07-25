@@ -6,64 +6,53 @@
 
 	<h3> {{ 'unit.list.list'|trans({},"actions")|title }}</h3>
         {% for unit in units %}
-                {% if unit.settlement == null or unit.settlement.owner == character or unit.marshal == character %}
-                        <hr>
-                        <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
-                        {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br />
-			{% if unit.character == character %}
-                		{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}
-			{% elseif unit.character %}
-				{{ 'unit.list.commander'|trans({"%name%":link(unit.character)}, "actions")|raw }}
-			{% else %}
-				{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}
-			{% endif %}<br />
-			{{ 'unit.list.supplied'|trans({},"actions")|raw }}: {% if unit.supplier %}{{ 'unit.list.source'|trans({"%settlement%":link(unit.supplier)}, "actions")|raw }}{% else %}{{'unit.list.nosupplier'|trans({}, "actions")|raw }}{% endif %}<br />
-			{{ 'unit.list.base'|trans({},"actions")|raw }}: {% if unit.settlement %}{{ 'unit.list.based'|trans({"%settlement%":link(unit.settlement)}, "actions")|raw }}{% else %}{{'unit.list.nobase'|trans({}, "actions")|raw }}{% endif %}
-			{% if unit.marshal %}
-				<br />{{ 'unit.list.marshal'|trans({"%character%":link(unit.marshal)}, "actions")|raw }}
-			{% elseif not unit.settlement == null %}
-				<br />{{ 'unit.list.nomarshal'|trans({}, "actions")|raw }}
+		{% set id = unit.obj.id %}
+                <hr>
+                <h4>{{ unit.obj.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
+                {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.obj.soldiers.count}, "actions") }}<br />
+		{% if unit.obj.character == character %}
+        		{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}
+		{% elseif unit.obj.character %}
+			{{ 'unit.list.commander'|trans({"%name%":link(unit.obj.character)}, "actions")|raw }}
+		{% else %}
+			{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}
+		{% endif %}<br />
+		{{ 'unit.list.supplied'|trans({},"actions")|raw }}: {% if unit.obj.supplier %}{{ 'unit.list.source'|trans({"%settlement%":link(unit.obj.supplier)}, "actions")|raw }}{% else %}{{'unit.list.nosupplier'|trans({}, "actions")|raw }}{% endif %}<br />
+		{{ 'unit.list.base'|trans({},"actions")|raw }}: {% if unit.base %}{{ 'unit.list.based'|trans({"%settlement%":link(unit.obj.settlement)}, "actions")|raw }}{% else %}{{'unit.list.nobase'|trans({}, "actions")|raw }}{% endif %}
+		{% if unit.obj.marshal %}
+			<br />{{ 'unit.list.marshal'|trans({"%character%":link(unit.obj.marshal)}, "actions")|raw }}
+		{% elseif not unit.obj.settlement == null %}
+			<br />{{ 'unit.list.nomarshal'|trans({}, "actions")|raw }}
+		{% endif %}
+		<br /><br />
+        	<a href="{{ path('maf_unit_manage', {"unit":id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
+		 | <a href="{{ path('maf_unit_soldiers', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
+		{% if unit.owner %}
+			{% if not unit.obj.character %}
+				 | <a href="{{ path('maf_unit_assign', {"unit":id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a>
+			{% elseif unit.obj.character != character and unit.base %}
+				 | <a href="{{ path('maf_unit_recall', {"unit":id}) }}"><button id="assign">{{ 'unit.list.recall'|trans({},"actions") }}</button></a>
 			{% endif %}
-			<br /><br />
-                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> |
-			<a href="{{ path('maf_unit_soldiers', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
-			{% if not unit.character %}
-				 | <a href="{{ path('maf_unit_assign', {"unit":unit.id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a>
-			{% elseif unit.character != character %}
-				 | <a href="{{ path('maf_unit_recall', {"unit":unit.id}) }}"><button id="assign">{{ 'unit.list.recall'|trans({},"actions") }}</button></a>
+			{% if unit.base %}
+				 | <a href="{{ path('maf_unit_appoint', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.appoint'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if character.insideSettlement != unit.settlement %}
-				 | <a href="{{ path('maf_unit_rebase', {"unit":unit.id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
-			{% endif %}{% if unit.settlement != null and unit.settlement.owner == character %} |
-				<a href="{{ path('maf_unit_appoint', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.appoint'|trans({},"actions") }}</button></a>
+			{% if character.insideSettlement != unit.obj.settlement %}
+				 | <a href="{{ path('maf_unit_rebase', {"unit":id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if unit.settlement == null or unit.settlement.owner == character %} |
-			<a href="{{ path('maf_unit_disband', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.disband'|trans({},"actions") }}</button></a>{% endif %}
-                {% else %}
-                        <hr>
-                        <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
-                        {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.soldiers.count}, "actions") }}<br />
-			{% if unit.character %}
-                        	{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}
-			{% else %}
-				{{ 'unit.list.commander'|trans({"%name%":link(unit.character)}, "actions")|raw }}
-			{% endif %}<br />
-			{{ 'unit.list.supplied'|trans({},"actions")|raw }}: {% if unit.supplier %}{{ 'unit.list.source'|trans({"%settlement%":link(unit.supplier)}, "actions")|raw }}{% else %}{{'unit.list.nosupplier'|trans({}, "actions")|raw }}{% endif %}<br />
-			{{ 'unit.list.base'|trans({},"actions")|raw }}: {% if unit.settlement %}{{ 'unit.list.based'|trans({"%settlement%":link(unit.settlement)}, "actions")|raw }}{% else %}{{'unit.list.nobase'|trans({}, "actions")|raw }}{% endif %}
-			{% if unit.marshal %}
-				<br />{{ 'unit.list.marshal'|trans({"%character%":link(unit.marshal)}, "actions")|raw }}
-			{% else %}
-				<br />{{ 'unit.list.nomarshal'|trans({}, "actions")|raw }}
-			{% endif %}<br />
-                        <a href="{{ path('maf_unit_manage', {"unit":unit.id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a> |
-			<a href="{{ path('maf_unit_soldiers', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a> |
-			{% if unit.settlement %}
-				<a href="{{ path('maf_unit_return', {"unit":unit.id}) }}"><button id="assign">{{ 'unit.list.return'|trans({},"actions") }}</button></a>
-			{% else %}
-				<a href="{{ path('maf_unit_disband', {"unit":unit.id}) }}"><button id="soldiers">{{ 'unit.list.disband'|trans({},"actions") }}</button></a>
+			 | <a href="{{ path('maf_unit_disband', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.disband'|trans({},"actions") }}</button></a>
+		{% endif %}
+		{% if unit.base %}
+			{% if unit.mine %}
+				 | <a href="{{ path('maf_unit_return', {"unit":id}) }}"><button id="assign">{{ 'unit.list.return'|trans({},"actions") }}</button></a>
 			{% endif %}
-
-                {% endif %}
+		{% endif %}
+		{% if unit.marshal and not unit.owner %}
+			{% if not unit.obj.character %}
+				 | <a href="{{ path('maf_unit_assign', {"unit":id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a>
+			{% elseif unit.obj.character != character and unit.base %}
+				 | <a href="{{ path('maf_unit_recall', {"unit":id}) }}"><button id="assign">{{ 'unit.list.recall'|trans({},"actions") }}</button></a>
+			{% endif %}
+		{% endif %}
         {% else %}
                 {{ 'unit.list.empty' |trans({},"actions")|raw }}
         {% endfor %}
