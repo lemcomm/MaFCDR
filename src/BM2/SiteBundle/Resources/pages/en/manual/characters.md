@@ -1,6 +1,8 @@
 Your characters are your window into the world of Might & Fealty. You can play more than one character, and they can be related in any way you want. So you could play one family or clan, Game of Thrones style, or you could play a collection of unrelated individuals, or anything inbetween.
 
-Other than most games, your characters do not have attributes, skills or such. They are whatever you want them to be and whatever you play them as. In battle, all player characters are equally skilled (and much better than mortal soldiers). In diplomacy, intrigue and politics, they are as capable as you are.
+Like some games, your character does have and gain skills as they use them. Unlike some of those games, they can also lose those skills if they don't use them.
+
+They are whatever you want them to be and whatever you play them as. In battle, all player characters are equally skilled (and much better than mortal soldiers). In diplomacy, intrigue and politics, they are as capable as you are. In formal tournaments (coming with the Activites Update), your character is as skilled as you trained them to be within the game's mechanics.
 
 
 Character Conditions
