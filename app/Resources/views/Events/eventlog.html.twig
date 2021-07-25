@@ -1,7 +1,7 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-<h2>{{ 'events.logtitle'|trans({'%subject%':link(log.subject)})|title|raw }}</h2>
+<h2>{{ 'events.logtitle'|trans({'%subject%':link(log.subject)})|raw }}</h2>
 {% if log.realm or log.settlement %}
 	<button id="allread">{{ 'events.allread'|trans }}</button>
 {% elseif log.character and log.character == character and character.alive == false %}
