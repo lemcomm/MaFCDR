@@ -19,6 +19,11 @@ fos_user_security_detect:
     requirements:
         _method: GET|POST
 
+maf_patreon:
+ pattern: /payment/patreon/{creator}
+ defaults:
+  _controller: BM2SiteBundle:Payment:patreon
+
 _catcher:
  path:	/{url}
  defaults:
