@@ -51,7 +51,7 @@ class MapController extends Controller {
 			]);
 		} else {
 
-			return $this->render('Info/map-openlayers.html.twig', [
+			return $this->render('Map/map-openlayers.html.twig', [
 			]);
 		}
 	}
