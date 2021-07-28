@@ -26,6 +26,15 @@
 	<button>{{ 'account.sub.submit'|trans }}</button>
 </form>
 
+<h3>{{ 'account.patreon.title'|trans|title}}</h3>
+{{ 'account.patreon.info'|trans|raw }}
+
+<dl>
+{% for each in creators %}
+	<dt>{{ 'account.patreon.' ~ each.creator ~ '.andrew.name'|trans }}</dt>
+	<dd><a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ each.clientId }}&redirect_uri={{ each.returnUri|url_encode }}&scope=identity">{{ 'account.patreon.' ~ each.creator ~ '.connect'|trans }}</a></dd>
+{% endfor %}
+</dl>
 <div class="footnote">
 	{{ 'account.sub.remaining'|trans({"%refund%":refund}) }}
 </div>
