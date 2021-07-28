@@ -173,8 +173,8 @@ class ConversationManager {
                         }
                         $megaString .= ' (m.conversation = :local AND m.sent >= :startTime)';
                         $parameters['local'] = $local->getId();
-                        $parameters['startTime'] = $startTime;
                 }
+                $parameters['startTime'] = $startTime;
 
                 # Ordering for the query.
                 $megaString .= ' ORDER BY m.sent ASC';
@@ -698,6 +698,10 @@ class ConversationManager {
                         $realm = $place->getRealm();
                 } elseif ($realm === NULL && $pos && $pos->getRealm()) {
                         $realm = $pos->getRealm();
+                }
+
+                if (!$realm) {
+                        return [false, false]; #No realm to join, thus, no message to send.
                 }
 
                 $ultimate = null;
