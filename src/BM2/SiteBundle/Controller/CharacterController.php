@@ -123,7 +123,8 @@ class CharacterController extends Controller {
 			'battles' => $this->get('geography')->findBattlesNearMe($character, Geography::DISTANCE_BATTLE),
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
-			'actrange' => $this->get('geography')->calculateInteractionDistance($character)
+			'actrange' => $this->get('geography')->calculateInteractionDistance($character),
+			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character)
 		]);
 	}
 
