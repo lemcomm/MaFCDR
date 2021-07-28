@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Patron">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="access_token" type="string"/>
+		<field name="refresh_token" type="string"/>
+
+		<many-to-one field="creator" target-entity="Patreon" inversed-by="patrons"/>
+		<many-to-one field="user" target-entity="User" inversed-by="patronizing"/>
+	</entity>
+</doctrine-mapping>
