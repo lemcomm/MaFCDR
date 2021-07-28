@@ -490,14 +490,14 @@ class ActionsController extends Controller {
 				}
 			}
 
-			return $this->render('Actions/changerealm.html.twig', [
+			return $this->render('Actions/changeRealm.html.twig', [
 				'settlement'=>$settlement,
 				'result'=>$result,
 				'newrealm'=>$targetrealm
 			]);
 		}
 
-		return $this->render('Actions/changerealm.html.twig', [
+		return $this->render('Actions/changeRealm.html.twig', [
 			'settlement'=>$settlement,
 			'form'=>$form->createView()
 		]);
