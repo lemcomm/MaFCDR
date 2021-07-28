@@ -2,9 +2,13 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Patreon;
+use BM2\SiteBundle\Entity\Patron;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\GiftType;
 use BM2\SiteBundle\Form\SubscriptionType;
+use Patreon\API as PAPI;
+use Patreon\OAuth as POA;
 use PayPal;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -22,6 +26,19 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 class PaymentController extends Controller {
 
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
+
+	private function fetchPatreon($creator = null) {
+		$em = $this->getDoctrine()->getManager();
+		if (!$creator) {
+			$query = $em->createQuery("SELECT p FROM BM2SiteBundle:Patreon p WHERE p.id > 0");
+			$result = $query->getResult();
+		} else {
+			$query = $em->createQuery("SELECT p FROM BM2SiteBundle:Patreon p WHERE p.creator = :name");
+			$query->setParameters(["name"=>$creator]);
+			$result = $query->getSingleResult();
+		}
+		return $result;
+	}
 
 	// FIXME: the secrets, etc. should probably not be in here, but in a safe place
 	// PayPal
@@ -274,8 +291,47 @@ class PaymentController extends Controller {
 			'refund' => $this->get('payment_manager')->calculateRefund($user),
 			'levels' => $levels,
 			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept'),
+			'creators' => $this->fetchPatreon(),
 			'form'=> $form->createView()
 		]);
+	}
+
+   /**
+     * @Route("/patreon/{creator}", name="maf_patreon", requirements={"amount"="\d+"})
+     */
+	public function patreonAction(Request $request, $creator) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+
+		$code = $request->query->get('code');
+		echo $creator;
+		echo '1';
+		echo $code;
+		$creator = $this->fetchPatreon($creator);
+		if (isset($code) && !empty($code)) {
+			echo '1';
+			$auth = new POA($creator->getClientId(), $creator->getClientSecret());
+			$tokens = $auth->get_tokens($code, $creator->getReturnUri());
+			echo '1';
+			echo $creator->getId();
+			$patron = $em->getRepository('BM2SiteBundle:Patron')->findOneBy(["user"=>$user, "creator"=>$creator]);
+			if (!$patron) {
+				$patron = new Patron();
+				$em->persist($patron);
+				$patron->setUser($user);
+				$patron->setCreator($creator);
+			}
+			echo '1';
+			$patron->setAccessToken($tokens['access_token']);
+			$patron->setRefreshToken($tokens['refresh_token']);
+			$em->flush();
+			echo '1';
+			$this->addFlash('notice', 'account.patronizing');
+			return $this->redirectToRoute('bm2_payment');
+		}
 	}
 
    /**
