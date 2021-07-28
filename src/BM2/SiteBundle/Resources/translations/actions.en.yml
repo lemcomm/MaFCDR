@@ -1123,6 +1123,11 @@ personal:
   cancelable:  Previously Accepted Requests
   list:        Pending Requests
   empty:       For better or worse, it doesn't look like you have any request to review.
+  summary:
+   title:      Pending Requests
+   none:       You don't currently have any pending requests.
+   pending:    There are currently pending:
+   some:       %i% request|%i% requests
  request:
   premable:    You've received a request from %link-character%, on %date%, as follows:
   created:     Request received at %date%.
