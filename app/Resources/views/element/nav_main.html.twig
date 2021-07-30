@@ -38,6 +38,9 @@
 		<a href="#"{% if character.hasnewmessages %} class="new"{% endif %}>{{ 'menu.messages'|trans }}</a>
 		<div class="sub">
 			<ul class="row">
+				<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations")|title }}</a></li>
+				<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+				<hr>
 				<li class="part">
 					<h3>{{ 'menu.messages2'|trans|title }}</h3>
 					<ul>
@@ -53,14 +56,8 @@
 					</ul>
 				</li>
 				<li class="part">
-					<h3>{{ 'menu.messages4'|trans|title }}</h3>
-					<ul>
-						<li><a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a></li>
-						<li><a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a></li>
-					</ul>
 					<h3>{{ 'menu.messages3'|trans|title }}</h3>
 					<ul>
-						<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
 						<li><a href="{{ path('maf_convs_orgs') }}">{{ 'orgs.title'|trans({}, "conversations") }}</a></li>
@@ -68,9 +65,10 @@
 					</ul>
 				</li>
 				<li class="part">
-					<h3>{{ 'menu.news'|trans|title }}</h3>
+					<h3>{{ 'menu.messages4'|trans|title }}</h3>
 					<ul>
-						<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+						<li><a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a></li>
 					</ul>
 				</li>
 			</ul>
