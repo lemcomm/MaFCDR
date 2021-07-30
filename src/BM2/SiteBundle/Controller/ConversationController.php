@@ -397,9 +397,15 @@ class ConversationController extends Controller {
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
+		#Find the timestamp of the last read message. We do this early so we can reuse the current time.
+		$now = new \DateTime('now');
 
 		$em = $this->getDoctrine()->getManager();
 		$conv = $char->getLocalConversation();
+		if (!$conv) {
+			$conv = $this->get('conversation_manager')->newLocalConversation($char, $now);
+			$em->flush();
+		}
 		$messages = $conv->getMessages();
 		$unread = $conv->findLocalUnread();
 		$total = $messages->count();
@@ -411,10 +417,7 @@ class ConversationController extends Controller {
 			$em->flush();
 		}
 
-		#Find the timestamp of the last read message.
-
-		$veryold = new \DateTime('now');
-		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
+		$veryold = $now->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
 
 		return $this->render('Conversation/conversation.html.twig', [
 			'conversation' => $conv,
