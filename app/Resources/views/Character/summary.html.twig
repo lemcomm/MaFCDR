@@ -68,10 +68,10 @@
 {% endif %}
 
 <h3>{{ 'personal.requests.summary.title'|trans({}, "actions")|title }}</h3>
-{% if not requests %}
+{% if requests|length < 1 %}
 	{{ 'personal.requests.summary.none'|trans({}, "actions")|raw }}
 {% else %}
-	{{ 'personal.requests.summary.pending'|trans({}, "actions")|raw }}: <a href="{{ path('bm2_gamerequest_manage') }}">{{ 'personal.requests.summary.some'|transchoice(requests.count, {"%i%":requests.count}, "actions")}}</a>
+	{{ 'personal.requests.summary.pending'|trans({}, "actions")|raw }} <a href="{{ path('bm2_gamerequest_manage') }}">{{ 'personal.requests.summary.some'|transchoice(requests|length, {"%i%":requests|length}, "actions")}}</a>
 {% endif %}
 
 <h3>{{ 'unread.title'|trans({}, "conversations")|title }}</h3>
