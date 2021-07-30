@@ -269,7 +269,7 @@ class PaymentController extends Controller {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
-		$levels = $this->get('payment_manager')->getPaymentLevels();
+		$levels = $this->get('payment_manager')->getPaymentLevels($user);
 
 		$form = $this->createForm(new SubscriptionType($levels, $user->getAccountLevel()));
 		$form->handleRequest($request);
@@ -297,7 +297,38 @@ class PaymentController extends Controller {
 	}
 
    /**
-     * @Route("/patreon/{creator}", name="maf_patreon", requirements={"amount"="\d+"})
+     * @Route("/patreon/update", name="maf_patreon_update")
+     */
+	public function patreonUpdateAction(Request $request) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$now = new \DateTime('now');
+		$threeWeeks = $now->sub(new \DateInterval("P21D"));
+		$patreons = $user->getPatronizing();
+		foreach ($patreons as $patron) {
+			if ($patron->getLastUpdate() < $threeWeeks) {
+				$creator = $patron->getCreator();
+				$poa = new POA($creator->getClientId(), $creator->getClientSecret());
+				$tokens = $poa->refresh_token($patron->getRefreshToken(), null);
+				$patron->setAccessToken($tokens['access_token']);
+				$patron->setRefreshToken($tokens['refresh_token']);
+				$patron->setLastUpdate($now);
+			}
+			$papi = new PAPI($patron->getAccessToken());
+			$member = $papi->fetch_user();
+			$this->addFlash('notice', print_r($member));
+			$patron->setStatus($member['included'][0]['attributes']['patron_status']);
+			$patron->setCurrentAmount($entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents']);
+			$em->flush();
+			return $this->redirectToRoute('bm2_account');
+		}
+	}
+
+   /**
+     * @Route("/patreon/{creator}", name="maf_patreon", requirements={"creator"="[A-Za-z]+"})
      */
 	public function patreonAction(Request $request, $creator) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -307,15 +338,10 @@ class PaymentController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		$code = $request->query->get('code');
-		echo $creator;
-		echo '1';
-		echo $code;
 		$creator = $this->fetchPatreon($creator);
 		if (isset($code) && !empty($code)) {
-			echo '1';
 			$auth = new POA($creator->getClientId(), $creator->getClientSecret());
 			$tokens = $auth->get_tokens($code, $creator->getReturnUri());
-			echo '1';
 			echo $creator->getId();
 			$patron = $em->getRepository('BM2SiteBundle:Patron')->findOneBy(["user"=>$user, "creator"=>$creator]);
 			if (!$patron) {
@@ -324,13 +350,19 @@ class PaymentController extends Controller {
 				$patron->setUser($user);
 				$patron->setCreator($creator);
 			}
-			echo '1';
 			$patron->setAccessToken($tokens['access_token']);
 			$patron->setRefreshToken($tokens['refresh_token']);
+			$patron->setLastUpdate(new \DateTime('now'));
+			$papi = new PAPI($tokens['access_token']);
+			$member = $papi->fetch_user();
+			$patron->setStatus($member['included'][0]['attributes']['patron_status']);
+			$patron->setCurrentAmount($entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents']);
 			$em->flush();
-			echo '1';
 			$this->addFlash('notice', 'account.patronizing');
-			return $this->redirectToRoute('bm2_payment');
+			return $this->redirectToRoute('bm2_account');
+		} else {
+			$this->addFlash('notice', 'account.patronfailure');
+			return $this->redirectToRoute('bm2_site_payment_subscription');
 		}
 	}
 
