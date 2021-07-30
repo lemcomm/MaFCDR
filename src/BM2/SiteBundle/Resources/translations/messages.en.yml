@@ -198,6 +198,7 @@ account:
   10: Casual
   20: Basic
   21: Volunteer
+  22: Traveler (Andrew's Patron)
   40: Intense
   41: Developer
   50: Ultimate
@@ -415,6 +416,12 @@ account:
      <p>Your friend with the e-mail address %mail% has made their first subscription. Since your invite helped win this new player to the game,
      we have credited your account with %credits% credits, as promised.<p>
      <p>Thank you so much for helping the game become bigger and better.</p>
+ patreon:
+  title: Support Development via Patreon
+  info:  If you decide you'd rather forego a regular subscription and buying game credits through Calitarus GmbH, you can instead opt to become Andrew's Patron on Patreon for 2 US Dollars and get a free M&F subscription. In order to faciliate this, once you've become a Patron, you come back here and click the link below to let M&F authenticate with and request your user information and membership level from Patreon. We then apply that to your account here and unlock and display the Patreon-only subscription levels above.
+  andrew:
+   name: Support Andrew through Patreon:
+   connect: Login with Patreon.
 
 newcharacter:
  title: Create Character
