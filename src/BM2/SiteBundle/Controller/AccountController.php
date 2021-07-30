@@ -716,7 +716,7 @@ class AccountController extends Controller {
 		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 		if (is_resource($process)) {
-			$dot = $this->renderView('BM2SiteBundle:Account:familytree.dot.twig', array('characters'=>$this->getUser()->getNonNPCCharacters()));
+			$dot = $this->renderView('Account/familytree.dot.twig', array('characters'=>$this->getUser()->getNonNPCCharacters()));
 
 			fwrite($pipes[0], $dot);
 			fclose($pipes[0]);
