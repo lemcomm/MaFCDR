@@ -1137,7 +1137,9 @@ class CharacterController extends Controller {
                 }
 
 		if (empty($available)) {
-			return array('nocrests'=>true);
+			return $this->render('Character/crest.html.twig', [
+				'nocrests'=>true
+			]);
 		}
 		$form = $this->createFormBuilder()
 			->add('crest', 'entity', array(
