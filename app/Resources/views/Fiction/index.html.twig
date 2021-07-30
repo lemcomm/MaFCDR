@@ -2,7 +2,11 @@
 {% extends "layout.html.twig" %}
 
 {% block jqueryuitheme %}
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% if app.request.isSecure %}
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% else %}
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -30,4 +34,3 @@
 {% block jquery %}
 $('#tabs').tabs().addClass('ui-tabs-vertical');
 {% endblock %}
-
