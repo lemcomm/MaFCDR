@@ -10,7 +10,7 @@
 		{% endif %}
 		{% if settlement.owner %}
 			{% if character.daysingame < 3 %}
-				<div class="error">{{ "control.take.newbie"|trans({"%url%":path("cmsg_summary")},"actions")|raw }}</div>
+				<div class="error">{{ "control.take.newbie"|trans({"%url%":path("maf_conv_new")},"actions")|raw }}</div>
 			{% endif %}
 			<p>{{ "control.take.owned"|trans({"%owner%":link(settlement.owner)},"actions")|raw }}</p>
 			{% if settlement.isDefended %}
