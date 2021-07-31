@@ -958,30 +958,6 @@ class ActionsController extends Controller {
 	}
 
 	/**
-	  * @Route("/occupation/start", name="maf_settlement_occupation_start")
-	  */
-	public function occupationStartAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationStartTest', true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'occupy'));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			$targetrealm = $data['target'];
-
-			$result = $this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
-			$this->getDoctrine()->getManager()->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
-			return $this->redirectToRoute('bm2_actions');
-		}
-		return $this->render('Settlement/occupationstart.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
-		]);
-	}
-
-	/**
 	  * @Route("/occupation/end", name="maf_settlement_occupation_end")
 	  */
 	public function occupationEndAction(Request $request) {
