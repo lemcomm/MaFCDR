@@ -282,8 +282,8 @@ class ConversationManager {
                 }
         }
 
-        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type) {
-                if ($type == 'system') {
+        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null) {
+                if ($type == 'system' || $total) {
                         $valid = true;
                 } else {
                         $valid = $conv->findActiveCharPermission($char);
@@ -305,13 +305,18 @@ class ConversationManager {
                                         $new->setReplyTo($target);
                                 }
                         }
-                        $count = $conv->findActivePermissions()->count();
+                        if (!$total) {
+                                $count = $conv->findActivePermissions()->count();
+                        } else {
+                                $count = $total;
+                        }
                         $new->setRecipientCount($count);
                         $new->setConversation($conv);
                         $conv->setUpdated($now);
                         $this->em->flush();
                         return $new;
                 } else {
+                        echo 'failure!';
                         return 'noActivePerm';
                 }
         }
@@ -417,6 +422,7 @@ class ConversationManager {
                         $conv->setSystem($system);
                 }
                 $added = [];
+                $this->em->flush();
 
                 if (!$realm && !$house && !$local) {
                         $creator = new ConversationPermission();
@@ -439,6 +445,7 @@ class ConversationManager {
                 } elseif ($local) {
                         $conv->setLocalFor($character);
                 }
+                $this->em->flush();
                 $counter = 0;
                 foreach ($recipients as $recipient) {
                         if (!in_array($recipient, $added)) {
@@ -461,13 +468,15 @@ class ConversationManager {
                                 #Do nothing, duplicate recipient.
                         }
                 }
+                $this->em->flush();
 
-                # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+                # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $count)
                 if ($content) {
-                        $msg = $this->writeMessage($conv, null, $char, $content, $type);
+                        # For reasons I can't figure out, writeMessages's call to find the active permissions of the new conversation bugs out and always returns empty. But only on new conversations.
+                        # On existing conversations it works fine. So we pass the count manually, and use that passed count as a flag that this is a new conversation and that the message is trusted.
+                        $msg = $this->writeMessage($conv, null, $char, $content, $type, count($added));
                 }
 
-                $this->em->flush();
                 return $conv;
         }
 
