@@ -841,8 +841,12 @@ class WarManager {
 							$this->interactions->characterEnterSettlement($char, $target, true);
 
 					}
-					if ($victor->getLeader()) {
-						$this->politics->changeSettlementOccupier($victor->getLeader(), $target, $siege->getRealm());
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					if ($leader) {
+						$this->politics->changeSettlementOccupier($leader, $target, $siege->getRealm());
 					}
 					foreach ($target->getSuppliedUnits() as $unit) {
 						if ($unit->getCharacter() != $victor->getLeader() && $unit->getSettlement() != $target) {
@@ -888,8 +892,12 @@ class WarManager {
 							$this->interactions->characterEnterPlace($char, $target, true);
 
 					}
-					if ($victor->getLeader()) {
-						$this->politics->changePlaceOccupier($victor->getLeader(), $target, $siege->getRealm());
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					if ($leader) {
+						$this->politics->changePlaceOccupier($leader, $target, $siege->getRealm());
 					}
 					foreach ($target->getUnits() as $unit) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
