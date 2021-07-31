@@ -42,7 +42,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CharacterController extends Controller {
 
-	# A minor change.
 
 	private function getSpottings(Character $character) {
 		$em = $this->getDoctrine()->getManager();
@@ -76,7 +75,7 @@ class CharacterController extends Controller {
 			$settlement=array_shift($nearest);
 			$location = $settlement->getGeoData();
 		} else {
-			return $this->redirectToRoute('bm2_site_character_start');
+			return $this->redirectToRoute('maf_character_start');
 		}
 		return $this->render('Character/character.html.twig', [
 			'location' => $location,
@@ -104,7 +103,7 @@ class CharacterController extends Controller {
 		}
 
 		if (!$character->getLocation()) {
-			return $this->redirectToRoute('bm2_site_character_start');
+			return $this->redirectToRoute('maf_character_start');
 		}
 
 		$em = $this->getDoctrine()->getManager();
