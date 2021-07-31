@@ -32,6 +32,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
  */
 class AccountController extends Controller {
 
+	# A minor change.
+
 	private $sellerIdentifier = "12386652935808730771";
 	private $sellerSecret = "FDZFTp7L9tFpeSRvEdCVYQ"; // this is the sandbox secret. real one should not actually be here, but in a safe place
 

@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
  */
 class PaymentController extends Controller {
 
+	# A minor change.
+
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
 
 	private function fetchPatreon($creator = null) {

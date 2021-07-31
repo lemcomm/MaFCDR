@@ -42,6 +42,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CharacterController extends Controller {
 
+	# A minor change.
 
 	private function getSpottings(Character $character) {
 		$em = $this->getDoctrine()->getManager();
