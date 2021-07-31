@@ -725,7 +725,7 @@ class RealmController extends Controller {
    		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 	   	if (is_resource($process)) {
-	   		$dot = $this->renderView('BM2SiteBundle:Realm:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$realm));
+	   		$dot = $this->renderView('Realm/hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$realm));
 
 	   		fwrite($pipes[0], $dot);
 	   		fclose($pipes[0]);
