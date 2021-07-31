@@ -10,6 +10,7 @@
 		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
 		<field name="alive" type="boolean"/>
+		<field name="battling" type="boolean" nullable="true"/>
 		<field name="retired" type="boolean" nullable="true"/>
 		<field name="retired_on" type="datetime" nullable="true"/>
 		<field name="generation" type="smallint"/>
