@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block jquery %}
-	{% include "BM2SiteBundle:element:mapstrings.js.twig" %}
+	{% include "element/mapstrings.js.twig" %}
 	mapinit('map', false, false, false);
 
 	var style = new OpenLayers.Style({
