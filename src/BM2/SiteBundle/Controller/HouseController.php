@@ -502,11 +502,11 @@ class HouseController extends Controller {
 
 		$em = $this->getDoctrine()->getManager();
 		$form = $this->createForm(new AreYouSureType());
+		$house = $character->getHouse();
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			if ($data['sure'] == true) {
-				$house = $character->getHouse();
 				$house->setActive(true);
 				$house->setHead($character);
 				#Create revival event in House's event log
