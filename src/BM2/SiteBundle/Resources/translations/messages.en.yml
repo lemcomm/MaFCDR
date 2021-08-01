@@ -1601,6 +1601,7 @@ unavailable:
  nohome:        You need a Place to call Home to do this.
  nosuperiorhouse: Your house is not a cadet of any other house.
  hassuperiorhouse: Your house must first be independent before becoming the cadet of another house.
+ wrongplacetype: You are in the wrong type of place for this action.
 marker:
  name:      Marker name
  type:      Marker type
