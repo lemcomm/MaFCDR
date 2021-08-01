@@ -116,7 +116,11 @@
 		<h2>{{ 'npc.units'|transchoice(units.count)|capitalize }}</h2>
 		<ul>
 		{% for unit in units %}
-			<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
+			{% if unit.settlement %}
+				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
+			{% else %}
+				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':'-','%amount%':unit.soldiers.count})|raw}}</li>
+			{% endif %}
 		{% endfor %}
 		</ul>
 	{% endif %}
