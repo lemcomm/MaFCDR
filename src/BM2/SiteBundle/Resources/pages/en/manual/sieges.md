@@ -1,4 +1,4 @@
-Sometimes, your need to [battle](battles) someone leads you to discover they holed themselves up inside a defensible location, either a settlement or [place]. When this happens, you can declare a siege.
+Sometimes, your need to [battle](battles) someone leads you to discover they holed themselves up inside a defensible location, either a settlement or [place](places). When this happens, you can declare a siege.
 
 Sieges allow the more militarily inclined to force their way into a defended location, incrementally working their way through multiple layers of defenses. When a siege is first declared a calculation is done based on the types of defenses present at a location to determine the number of Stages a siege will have. This can be anywhere from a base value of one up to a max value of five. The following structures directly influence this: Wood Walls, Wood Castle, Fortress, & Citadel.
 

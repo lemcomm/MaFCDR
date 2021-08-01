@@ -1086,7 +1086,10 @@ class CharacterController extends Controller {
 			$act->setBlockTravel(false);
 			$result = $this->get('action_manager')->queue($act);
 
-			return array('queued'=>true, 'hours'=>$hours);
+			return $this->render('Character/surrender.html.twig', [
+				'queued'=>true,
+				'hours'=>$hours
+			]);
 		}
 
 		return $this->render('Character/surrender.html.twig', [

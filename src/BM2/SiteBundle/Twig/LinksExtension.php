@@ -91,7 +91,6 @@ class LinksExtension extends \Twig_Extension {
 				case 'war':
 					$type = 'War';
 					break;
-				case 'n':
 				case 'news':
 				case 'newspaper':
 				case 'newsedition':

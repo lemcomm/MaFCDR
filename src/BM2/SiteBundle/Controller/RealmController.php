@@ -975,10 +975,8 @@ class RealmController extends Controller {
 			History::HIGH, true
 		);
 		$em->flush();
-
-		#TODO: Turn this into a redirect back to the source and add a flash.
-		return new Response();
-
+		$this->addFlash('notice', $this->get('translator')->trans('realm.restore.success', array(), 'politics'));
+		return $this->redirectToRoute('bm2_realm', ["id"=>$id]);
 	}
 
 	/**
