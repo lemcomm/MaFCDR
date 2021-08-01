@@ -622,8 +622,13 @@ class Economy {
 				$georesource->setBuildingsBase($building_resource);
 				$georesource->setBuildingsBonus(round($building_bonus*100));
 			} else {
-				$building_resource = $georesource->getBuildingsBase();
-				$building_bonus = $georesource->getBuildingsBonus()/100;
+				if ($georesource) {
+					$building_resource = $georesource->getBuildingsBase();
+					$building_bonus = $georesource->getBuildingsBonus()/100;
+				} else {
+					$building_resource = 0;
+					$building_bonus = 0;
+				}
 			}
 		}
 		$baseresource += $building_resource;
@@ -839,22 +844,7 @@ class Economy {
 		if ($settlement->hasBuildingNamed('Wood Towers')) {
 			$security += 0.05;
 		}
-		
-		/* The following can't affect the result since 0.2 + 0.12 from buildings + 0.05 from population is always less than 1.0
-		if ($security < 0.2) {
-			// if you are insecure, then some fake security works, too:
-			if ($settlement->hasBuildingNamed('Shrine')) {
-				$security += 0.02;
-			}
-			if ($settlement->hasBuildingNamed('Temple')) {
-				$security += 0.05;
-			}
-			if ($settlement->hasBuildingNamed('Great Temple')) {
-				$security += 0.05;
-			}
-		}
-		*/
-		
+
 		// finally, there's security in numbers - wild animals will avoid large settlements
 		if ($pop > 4000) {
 			$security += 0.05;
