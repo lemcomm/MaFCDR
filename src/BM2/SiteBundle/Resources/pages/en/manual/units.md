@@ -4,6 +4,14 @@ Generally speaking, units are best when made up of soldiers all using relatively
 
 For more detailed guidance on how exactly units work in the field, we recommend you read the [battles] page.
 
+Militia and Mobile Forces
+-------------------------
+You can station units at your estates or you can have them follow you around as a mobile army. You cannot send units out on their own, they always need to be led by a player character.
+
+Militia (units stationed at estates) will always automatically defend a settlement when it is being attacked. Mobile forces only defend settlements they are at automatically if they have the "defend settlement" action set. Otherwise they need to explicitly join the battle.
+
+As the world we simulate does not have professional standing armies, stationed militia continue to work their old jobs for half of the day and thus contributes to the local economy and resource production. They cannot, however, be used for construction work. Recruits in training need all their time for training and do not contribute to the local economy.
+
 Supplies
 --------
 Gone are the days of First Ones telling the mortals to steal from the locals in order to feed themselves--apparently, even at the behest of a First One they weren't too happy about it--now this is handled entirely under "supply". Supply is either drawn from a settlement under your command, the settlement of the Unit's origin, or the settlement of someone who has agreed to supply you. Presently, this is strictly for food, but once a proper method to delay arrival of goods is added, this will also allow field resupply of armor, weapons, and other gear.
@@ -33,3 +41,13 @@ Units can also be rebased to another settlement. Typically this requires the lor
 Captivity
 ---------
 Taking a first one captive will also take their units captive. However, units and their leader are handled separately for captivity purposes, and captive soldiers cannot be reinforced or recalled, and the captor will gain some limited setting management. It is entirely possible to release the units to go back to their base while keeping the first one, or releasing the first ones while holding their soldiers captive.
+
+
+---
+
+Related Topics
+==============
+* [soldiers]
+* [battles]
+* [supply] and [entourage]
+* [settlements]
