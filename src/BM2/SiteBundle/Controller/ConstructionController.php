@@ -504,7 +504,6 @@ class ConstructionController extends Controller {
 	/**
 	  * @Route("/focus")
 	  * @Method({"POST"})
-	 * @Template("BM2SiteBundle:element:buildingrow.html.twig")
 	  */
 	public function focusAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
@@ -539,7 +538,7 @@ class ConstructionController extends Controller {
 		);
 
 		$em->flush();
-		
+
 		return $this->render('Construction/buildingrow.html.twig', [
 			'build'=>$building
 		]);
