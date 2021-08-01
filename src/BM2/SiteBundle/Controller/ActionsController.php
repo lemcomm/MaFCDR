@@ -736,13 +736,13 @@ class ActionsController extends Controller {
 		}
 
 		$settlementsdata = array();
-		foreach ($character->getOwnedSettlements() as $settlement) {
-			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $settlement, $merchants->count()>0);
+		foreach ($character->getOwnedSettlements() as $other) {
+			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $other, $merchants->count()>0);
 			$settlement_resources = array();
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
-				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
-				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
+				$production = $this->get('economy')->ResourceProduction($other, $resource);
+				$demand = $this->get('economy')->ResourceDemand($other, $resource);
+				$trade = $this->get('economy')->TradeBalance($other, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
 					$settlement_resources[] = array(
@@ -755,7 +755,7 @@ class ActionsController extends Controller {
 				}
 			}
 			$settlementsdata[] = array(
-				'settlement' => $settlement,
+				'settlement' => $other,
 				'resources' => $settlement_resources
 			);
 		}
