@@ -18,15 +18,17 @@
 		<th>{{ "economy.trade.to"|trans({},"actions") }}</th>
 		<th data-sorter="false"></th><th data-sorter="false"></th>
 	</tr></thead><tbody>
-	{% for trade in settlement.tradesOutbound %}
-		<tr>
-			<td>{{ trade.name }}</td>
-			<td align="right">{{ trade.amount }}</td>
-			<td>{{ trade.resourcetype.name|trans }}</td>
-			<td>{{ link(trade.destination) }}</td>
-			<!-- <td>TODO: ? edit</td>-->
-			<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
-		</tr>
+	{% for trade in trades %}
+		{% if trade.source == settlement %}
+			<tr>
+				<td>{{ trade.name }}</td>
+				<td align="right">{{ trade.amount }}</td>
+				<td>{{ trade.resourcetype.name|trans }}</td>
+				<td>{{ link(trade.destination) }}</td>
+				<!-- <td>TODO: ? edit</td>-->
+				<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
+			</tr>
+		{% endif %}
 	{% endfor %}
 	</tbody></table>
 
@@ -38,17 +40,19 @@
 		<th>{{ "economy.trade.from"|trans({},"actions") }}</th>
 		<th data-sorter="false"></th><th data-sorter="false"></th>
 	</tr></thead><tbody>
-	{% for trade in settlement.tradesInbound %}
-		<tr>
-			<td>{{ trade.name }}</td>
-			<td align="right">{{ trade.amount }}</td>
-			<td>{{ trade.resourcetype.name|trans }}</td>
-			<td>{{ link(trade.source) }}</td>
-			{% if trade.source.owner == character %}
-				<!-- <td>TODO: ? edit</td>-->
-				<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
-			{% endif %}
-		</tr>
+	{% for trade in trades %}
+		{% if trade.destination == settlement %}
+			<tr>
+				<td>{{ trade.name }}</td>
+				<td align="right">{{ trade.amount }}</td>
+				<td>{{ trade.resourcetype.name|trans }}</td>
+				<td>{{ link(trade.source) }}</td>
+				{% if trade.source.owner == character %}
+					<!-- <td>TODO: ? edit</td>-->
+					<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
+				{% endif %}
+			</tr>
+		{% endif %}
 	{% endfor %}
 	</tbody></table>
 
