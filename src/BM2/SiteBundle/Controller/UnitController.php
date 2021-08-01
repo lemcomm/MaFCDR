@@ -209,7 +209,7 @@ class UnitController extends Controller {
                 $canRecruit=false;
                 $canReassign=false;
 
-		if ($settlement == $unit->getSettlement() && (($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement()==$settlement) || !$unit->getCharacter())) {
+		if ($settlement && $settlement == $unit->getSettlement() && (($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement()==$settlement) || !$unit->getCharacter())) {
                         # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
 			if ($settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
                                 $canResupply = true;

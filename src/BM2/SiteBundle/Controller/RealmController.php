@@ -516,10 +516,6 @@ class RealmController extends Controller {
 	  * @Route("/viewposition/{id}", requirements={"id"="\d+"}, name="bm2_position")
 	  */
 	public function viewpositionAction(RealmPosition $id) {
-		$character = $this->gateway();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
 
 		return $this->render('Realm/viewposition.html.twig', [
 			'position'=>$id
