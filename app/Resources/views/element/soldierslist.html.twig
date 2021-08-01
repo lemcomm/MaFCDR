@@ -12,6 +12,7 @@
 		<th>{{ 'weapon'|trans }}</th>
 		<th>{{ 'armour'|trans }}</th>
 		<th>{{ 'equipment'|trans }}</th>
+		<th>{{ 'mount'|trans }}</th>
 		<th>{{ 'home'|trans }}</th>
 		<th>{{ 'events.log'|trans }}</th>
 	</tr></thead>
@@ -73,6 +74,14 @@
 						<td>{{ link(man.equipment) }}</td>
 					{% elseif man.trainedequipment %}
 						<td class="disabled">{{ ('item.'~man.trainedequipment.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
+
+					{% if man.mount %}
+						<td>{{ link(man.mount) }}</td>
+					{% elseif man.trainedmount %}
+						<td class="disabled">{{ ('item.'~man.trainedmount.name)|trans }}</td>
 					{% else %}
 						<td></td>
 					{% endif %}
