@@ -214,6 +214,7 @@ event:
    subcreated:  Formalized the %house% as a cadet of %house-2%.
    subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
    newhead:     Took over leadership of the house after the passing of %character%.
+   revived:     Revived under the leadership of %character%.
   siege:
    disband:     By declaration of %character% the siege of the settlement of %settlement% has concluded peacefully.
    disband2:    By declaration of %character% the siege of the place of %place% has concluded peacefully.
