@@ -148,7 +148,7 @@ class UnitSoldiersType extends AbstractType {
 			));
 		}
 		if (!empty($avail_train)) {
-			$fields = array('weapon', 'armour', 'equipment');
+			$fields = array('weapon', 'armour', 'equipment', 'mount');
 			foreach ($fields as $field) {
 				$builder->add($field, EntityType::class, array(
 					'label'=>$field,
