@@ -121,13 +121,9 @@ class Dispatcher {
 			$settlement = $this->getActionableSettlement();
 			if ($getPlace) {
 				$place = $this->geography->findNearestActionablePlace($character);
-			}
-		}
-		if ($getSettlement) {
-			if (!$getPlace) {
-				return array($character, $settlement); #Most common first.
+				return array($character, $settlement, $place);
 			} else {
-				return array($character, $settlement, $place); #This is currently used on a couple pages. Should be rarest of three.
+				return array($character, $settlement);
 			}
 		} else {
 			if ($getPlace) {
