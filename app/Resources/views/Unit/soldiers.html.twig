@@ -36,6 +36,7 @@
 				<th>{{ 'weapon'|trans }}</th>
 				<th>{{ 'armour'|trans }}</th>
 				<th>{{ 'equipment'|trans }}</th>
+				<th>{{ 'mount'|trans }}</th>
 				<th>{{ "soldier.train"|trans|title }}</th>
 				<th>{{ "soldier.complete"|trans|title }}</th>
 			</thead>
@@ -73,6 +74,15 @@
 							<td>{{ link(soldier.equipment) }}</td>
 						{% else %}
 							<td class="disabled">{{ link(soldier.equipment) }}</td>
+						{% endif %}
+					{% else %}
+						<td></td>
+					{% endif %}
+					{% if soldier.mount %}
+						{% if soldier.oldmount != soldier.mount %}
+							<td>{{ link(soldier.mount) }}</td>
+						{% else %}
+							<td class="disabled">{{ link(soldier.mount) }}</td>
 						{% endif %}
 					{% else %}
 						<td></td>

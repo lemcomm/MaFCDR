@@ -42,7 +42,8 @@ class SoldiersRecruitType extends AbstractType {
 				'number' => new Assert\Range(array('min'=>1)),
 				'weapon' => null,
 				'armour' => null,
-				'equipment' => null
+				'equipment' => null,
+				'mount' => null
 		        ))
 		));
 	}

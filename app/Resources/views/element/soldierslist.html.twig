@@ -12,6 +12,7 @@
 		<th>{{ 'weapon'|trans }}</th>
 		<th>{{ 'armour'|trans }}</th>
 		<th>{{ 'equipment'|trans }}</th>
+		<th>{{ 'mount'|trans }}</th>
 		<th>{{ 'home'|trans }}</th>
 		<th>{{ 'events.log'|trans }}</th>
 	</tr></thead>
@@ -76,6 +77,14 @@
 					{% else %}
 						<td></td>
 					{% endif %}
+
+					{% if man.mount %}
+						<td>{{ link(man.mount) }}</td>
+					{% elseif man.trainedmount %}
+						<td class="disabled">{{ ('item.'~man.trainedmount.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
 				{% else %}
 					<td colspan="5" class="disabled">{{ 'islocked'|trans }}</td>
 				{% endif %}
@@ -128,6 +137,8 @@
 	{{ form_widget(form.armour) }}
 	{{ form_label(form.equipment) }}
 	{{ form_widget(form.equipment) }}
+	{{ form_label(form.mount) }}
+	{{ form_widget(form.mount) }}
 </div>
 {% endif %}
 

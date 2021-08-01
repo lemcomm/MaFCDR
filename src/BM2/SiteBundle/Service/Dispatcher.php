@@ -293,8 +293,6 @@ class Dispatcher {
 				$actions[] = $this->controlOccupationEndTest(true);
 				$actions[] = $this->controlChangeOccupantTest(true);
 				$actions[] = $this->controlChangeOccupierTest(true);
-			} elseif (!$settlement->getOccupant() && $settlement->getOwner() != $char) {
-				$actions[] = $this->controlOccupationStartTest(true);
 			}
 			$actions[] = $this->controlChangeRealmTest(true);
 			$actions[] = $this->controlSettlementDescriptionTest(null, $settlement);
@@ -3024,12 +3022,12 @@ class Dispatcher {
 
 	public function houseManageReviveTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
-			return array("name"=>"house.manage.house.name", "description"=>"unavailable.$check");
+			return array("name"=>"house.manage.revive.name", "description"=>"unavailable.$check");
 		}
 		if ($this->house && $this->house->getActive()) {
-			return array("name"=>"house.manage.house.name", "description"=>"unavailable.isactive");
+			return array("name"=>"house.manage.revive.name", "description"=>"unavailable.isactive");
 		} else {
-			return $this->action("house.revive.house", "maf_house_revive", true,
+			return $this->action("house.manage.revive", "maf_house_revive", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);

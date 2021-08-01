@@ -140,15 +140,19 @@
 					<li class="part">
 						<h3>{{ 'menu.military'|trans|title }}</h3>
 						<ul>
+							{% set check = dispatcher.unitNewTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
+							{% set check = dispatcher.personalAssignedUnitsTest() %}
+							{% if check.url is defined %}
+								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
+							{% endif %}
 							{% set check = dispatcher.personalEntourageTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
 							{% set check = dispatcher.unitRecruitTest() %}
-							{% if check.url is defined %}
-								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
-							{% endif %}
-							{% set check = dispatcher.personalAssignedUnitsTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
