@@ -1140,7 +1140,7 @@ class CharacterController extends Controller {
                 }
 
 		if (empty($available)) {
-			return $this->render('Character/crest.html.twig', [
+			return $this->render('Character/heraldry.html.twig', [
 				'nocrests'=>true
 			]);
 		}
@@ -1162,7 +1162,7 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_character');
 		}
 
-		return $this->render('Character/crest.html.twig', [
+		return $this->render('Character/heraldry.html.twig', [
 			'form'=>$form->createView()
 		]);
 	}
