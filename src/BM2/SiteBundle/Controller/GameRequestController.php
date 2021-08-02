@@ -55,7 +55,7 @@ class GameRequestController extends Controller {
 					$result = false;
 				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
 					$result = false;
-				} elseif ($id->getToPosition() && $id->getToPosition()->getCharacter() != $char) {
+				} elseif ($id->getToPosition() && !$id->getToPosition()->getHolders()->contains($char)) {
 					$result = false;
 				} else {
 					$result = true;
@@ -217,12 +217,14 @@ class GameRequestController extends Controller {
 						$pos = $id->getToPosition();
 						$character->setLiegePosition($pos);
 						$character->setOathCurrent(TRUE);
+						/* FIXME: Positions don't currently have logs. Should they? Hm.
 						$this->get('history')->logEvent(
 							$pos,
 							'event.position.newknight',
 							array('%link-character%'=>$id->getFromCharacter()->getId()),
 							History::HIGH, true
 						);
+						*/
 						$this->get('history')->logEvent(
 							$character,
 							'event.character.newliege.position',
