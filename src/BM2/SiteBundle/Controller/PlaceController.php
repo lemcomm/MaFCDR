@@ -401,7 +401,8 @@ class PlaceController extends Controller {
 				}
 
 				$this->getDoctrine()->getManager()->flush();
-				$this->addFlash('notice', $this->get('translator')->trans('manage.success', array(), 'places'));
+				$this->addFlash('notice', $this->get('translator')->trans('place.manage.success', array(), 'places'));
+				return $this->redirectToRoute('maf_place_actionable');
 			}
 		}
 
