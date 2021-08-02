@@ -8,7 +8,7 @@
         {% for unit in units %}
 		{% set id = unit.obj.id %}
                 <hr>
-                <h4>{{ unit.obj.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|title }}</h4><br>
+                <h4>{{ unit.obj.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>') }}</h4><br>
                 {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.obj.soldiers.count}, "actions") }}<br />
 		{% if unit.obj.character == character %}
         		{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}

@@ -19,6 +19,12 @@ status:
   landless2:    %He% is a landless noble.
   independent:	%He% is an independent lord.
   vassal:			  %He% is a vassal of %liege%.
+  realmvassal: %He% is a vassal of %liege%.
+  landvassal:  %He% is a vassal of the land of %liege% in %realm%.
+  landvassal2: %He% is a vassal of the land of %liege% which is independent.
+  placevassal: %He% is a vassal of the place of %liege% in %realm%.
+  placevassal2: %He% is a vassal of the place of %liege% which is independent.
+  positionvassal: %He% is a vassal of the position of %liege% in %realm%.
   realm:        %He% is a member of %realm%
   ultimate:     %He% is an independent leader, but has not formed a realm yet.
   liege:        Liege of:

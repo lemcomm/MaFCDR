@@ -11,10 +11,7 @@ More than likely, it's due to a change in the update from Twig 1.23 to Twig 2.0.
 is still required, but we'll leave it in the code just in case. --Andrew
 
 {% spaceless %}
-	{% if realm.superior %}
-		{{ ("status.realm.partof")|trans({"%He%":gender_he, "%superior%":link(realm.superior)},"politics")|raw }}
-		{{ _self.realm_hierarchy(realm.superior) }}
-	{% endif %}
+
 {% endspaceless %}
 
 #}
@@ -23,7 +20,23 @@ is still required, but we'll leave it in the code just in case. --Andrew
 
 {% import _self as macros %}
 
-{% if character.liege %}
+{% if character.realm %}
+	<p>{{ ("status."~who~".realmvassal")|trans({"%He%":gender_he, "%liege%":link(character.realm)},"politics")|raw }}</p>
+{% elseif character.liegeLand %}
+	{% if character.liegeLand.realm %}
+		<p>{{ ("status."~who~".landvassal")|trans({"%He%":gender_he, "%liege%":link(character.liegeLand), "%realm%":link(character.liegeLand.realm)},"politics")|raw }}</p>
+	{% else %}
+		<p>{{ ("status."~who~".landvassal2")|trans({"%He%":gender_he, "%liege%":link(character.liegeLand)},"politics")|raw }}</p>
+	{% endif %}
+{% elseif character.liegePlace %}
+	{% if character.liegePlace.realm %}
+		<p>{{ ("status."~who~".placevassal")|trans({"%He%":gender_he, "%liege%":link(character.liegePlace), "%realm%":link(character.liegePlace.realm)},"politics")|raw }}</p>
+	{% else %}
+		<p>{{ ("status."~who~".placevassal2")|trans({"%He%":gender_he, "%liege%":link(character.liegePlace)},"politics")|raw }}</p>
+	{% endif %}
+{% elseif character.liegePosition %}
+	<p>{{ ("status."~who~".positionvassal")|trans({"%He%":gender_he, "%liege%":link(character.liegePosition), "%realm%":link(character.liegePosition.realm)},"politics")|raw }}</p>
+{% elseif character.liege %}
 	<p>{{ ("status."~who~".vassal")|trans({"%He%":gender_he, "%liege%":link(character.liege)},"politics")|raw }}</p>
 {% elseif character.findVassals is empty %}
 	{% if character.ownedSettlements is empty %}
@@ -48,10 +61,8 @@ is still required, but we'll leave it in the code just in case. --Andrew
 	<li>
 		{% if character.house.head == character %}
 			{{ ("status."~who~".househead")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
-			{{ macros.realm_hierarchy(character.house, gender_he) }}.
 		{% else %}
 			{{ ("status."~who~".housememb")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
-			{{ macros.realm_hierarchy(character.house, gender_he) }}.
 		{% endif %}
 	</li>
 {% endif %}
@@ -73,7 +84,6 @@ is still required, but we'll leave it in the code just in case. --Andrew
 {% for realm in character.findrealms %}
 	<li>
 	{{ ("status."~who~".realm")|trans({"%He%":gender_he, "%realm%":link(realm)},"politics")|raw }}
-	{{ macros.realm_hierarchy(realm, gender_he) }}.
 	</li>
 {% endfor %}
 
