@@ -818,7 +818,7 @@ class Geography {
 			if ($character->getPrisoners()) {
 				foreach ($character->getPrisoners() as $prisoner) {
 					$prisonerSoldiers = 0;
-					foreach ($prisoner->getUnit() as $unit) {
+					foreach ($prisoner->getUnits() as $unit) {
 						$prisonerSoldiers += $unit->getSoldiers()->count();
 					}
 					$prisonercount += $prisonerSoldiers + ($prisoner->getEntourage()->count()/2);
