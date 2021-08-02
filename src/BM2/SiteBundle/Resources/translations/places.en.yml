@@ -32,6 +32,7 @@ place:
   button:    Manage Place
   name:      Place Details
   intro:     While there's not much here right now, you can presently change the name and descriptions of your Place. In time, we plan to expand this menu greatly.
+  success:   Place details updated successfully.
  permissions:
   name:      Place Permissions
   intro:     From this screen you can manage the many aspects of this Place, from changing individual permissions (which are further detailed in the manual) to allowing those who know about this location to spawn here (TODO: soon ;) ).
