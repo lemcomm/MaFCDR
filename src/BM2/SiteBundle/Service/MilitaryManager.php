@@ -570,7 +570,10 @@ class MilitaryManager {
 		$unit = new Unit();
 		$this->em->persist($unit);
 		$unit->setSettlement($home);
-		$unit->setSupplier($data['supplier']);
+		if ($data) {
+			$unit->setSupplier($data['supplier']);
+			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
+		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
 		$this->em->flush();
 		return $unit;
