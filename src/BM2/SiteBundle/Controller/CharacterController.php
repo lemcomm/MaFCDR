@@ -404,7 +404,7 @@ class CharacterController extends Controller {
 						$this->get('history')->logEvent(
 							$realm->findUltimate(),
 							'event.subrealm.arrival',
-							array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
 							History::MEDIUM, true, 15
 						);
 					}
@@ -812,7 +812,12 @@ class CharacterController extends Controller {
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
 
-			return array('result'=>array('success'=>true), 'newname'=>$newname);
+			return $this->render('Character/rename.html.twig', [
+				'result'=>array('success'=>true),
+				'newname'=>$newname
+			]);
+
+			return array();
 		}
 
 		return $this->render('Character/rename.html.twig', [
