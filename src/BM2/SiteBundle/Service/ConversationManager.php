@@ -308,7 +308,9 @@ class ConversationManager {
                         if (!$total) {
                                 $count = 0;
                                 foreach ($conv->findActivePermissions() as $perm) {
-                                        $perm->setUnread($perm->getUnread()+1);
+                                        if ($perm->getCharacter() != $char) {
+                                                $perm->setUnread($perm->getUnread()+1);
+                                        }
                                         $count++;
                                 }
                         } else {
