@@ -25,8 +25,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
  */
 class PaymentController extends Controller {
 
-	# A minor change.
-
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
 
 	private function fetchPatreon($creator = null) {
@@ -258,7 +256,6 @@ class PaymentController extends Controller {
 
 		return $this->render('Payment/credits.html.twig', [
 			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
-			'levels' => $this->get('payment_manager')->getPaymentLevels(),
 			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept')
 		]);
 	}
