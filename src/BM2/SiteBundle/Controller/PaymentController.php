@@ -270,6 +270,12 @@ class PaymentController extends Controller {
 		$user = $this->getUser();
 		$levels = $this->get('payment_manager')->getPaymentLevels($user);
 
+		foreach ($user->getPatronizing() as $patron) {
+			if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron') {
+				$sublevel = $patron->getCurrentAmount();
+			}
+		}
+
 		$form = $this->createForm(new SubscriptionType($levels, $user->getAccountLevel()));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -289,6 +295,7 @@ class PaymentController extends Controller {
 			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
 			'refund' => $this->get('payment_manager')->calculateRefund($user),
 			'levels' => $levels,
+			'sublevel' => $sublevel,
 			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept'),
 			'creators' => $this->fetchPatreon(),
 			'form'=> $form->createView()
