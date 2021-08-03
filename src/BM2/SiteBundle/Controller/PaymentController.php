@@ -270,6 +270,7 @@ class PaymentController extends Controller {
 		$user = $this->getUser();
 		$levels = $this->get('payment_manager')->getPaymentLevels($user);
 
+		$sublevel = -1;
 		foreach ($user->getPatronizing() as $patron) {
 			if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron') {
 				$sublevel = $patron->getCurrentAmount();
