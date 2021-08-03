@@ -312,6 +312,7 @@ event:
   arrival:      %character% has arrived in the realm at %place%.
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
+  arrival:      %character% has joined the realm by becoming a vassal of %realm%.
  position:
   inactivekept: The holder of %realmposition%, %character%, has succumbed to the slumber.
   inherited:
