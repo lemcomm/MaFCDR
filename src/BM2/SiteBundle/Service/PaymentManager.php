@@ -28,38 +28,19 @@ class PaymentManager {
 		$this->logger = $logger;
 	}
 
-	public function getPaymentLevels(User $user = null) {
-		if ($user) {
-			$patron = false;
-			foreach ($user->getPatronizing() as $patron) {
-				if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron' && $patron->getCurrentAmount() >= 200) {
-					$patron = true;
-					break;
-				}
-			}
-			if ($patron) {
-				return [
-					 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false),
-					10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true),
-					20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true),
-					21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false),
-					22 =>   array('name' => 'patron',	'characters' =>   10, 'fee' =>   0, 'selectable' => true),
-					40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true),
-					41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false),
-					50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true),
-				];
-			}
-		}
-		return array(
-			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false),
-			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true),
-			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true),
-			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false),
-			22 =>   array('name' => 'patron',	'characters' =>   10, 'fee' =>   0, 'selectable' => false),
-			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true),
-			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false),
-			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true),
-		);
+	public function getPaymentLevels(User $user = null, $system = false) {
+		return [
+			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
+			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true, 'patreon'=>false),
+			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true, 'patreon'=>false),
+			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
+			22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>200),
+			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true, 'patreon'=>false),
+			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
+			42 =>   array('name' => 'explorer',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>300),
+			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true, 'patreon'=>false),
+			51 =>   array('name' => 'explorer+',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>400),
+		];
 	}
 
 	public function calculateUserFee(User $user) {
@@ -172,9 +153,33 @@ class PaymentManager {
 		$oldlevel = $user->getAccountLevel();
 		$oldpaid = $user->getPaidUntil();
 
-		$refund = $this->calculateRefund($user);
-		$user->setAccountLevel($newlevel);
+		$levels = $this->getPaymentLevels(null, true);
+		if ($levels[$newlevel]['patreon'] != false) {
+			$valid = false;
+			foreach ($user->getPatronizing() as $patron) {
+				if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron' && $patron->getCurrentAmount() >= $levels[$newlevel]['patreon']) {
+					$valid = true;
+					if ($valid) {
+						break;
+					}
+				}
+			}
+			if ($valid) {
+				if ($user->getRestricted()) {
+					$user->setRestricted(false);
+				}
+				$refund = $this->calculateRefund($user);
+				$user->setAccountLevel($newlevel);
+				$user->setPaidUntil(new \DateTime("now"));
+				$em->flush();
+				return true;
+			}
+			# Either they are a valid patron, and the above returns true. Or they aren't, and this call fails. The rest doesn't matter.
+			return false;
+		}
+
 		$fee = $this->calculateUserFee($user);
+		$refund = $this->calculateRefund($user);
 
 		if ($fee > $user->getCredits()+$refund) {
 			return false;
@@ -182,6 +187,7 @@ class PaymentManager {
 			if ($refund>0) {
 				$this->spend($user, 'refund', -$refund, false);
 			}
+			$user->setAccountLevel($newlevel);
 			$user->setPaidUntil(new \DateTime("now"));
 			$check = $this->spend($user, 'subscription', $fee, true);
 			if ($check) {
