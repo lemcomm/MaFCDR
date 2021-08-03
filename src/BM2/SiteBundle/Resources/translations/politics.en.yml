@@ -988,6 +988,7 @@ house:
    As a First One, the public details of any house are always available to you.
    This naturally includes the public (and private) details of your own house.
   head:         Head
+  nohead:       no one
   founder:      Founder
   cadets:       Cadets
   superior:     Superior
