@@ -653,7 +653,7 @@ class CharacterController extends Controller {
 		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 		if (is_resource($process)) {
-			$dot = $this->renderView('BM2SiteBundle:Account:familytree.dot.twig', array('characters'=>$characters));
+			$dot = $this->renderView('Account/familytree.dot.twig', array('characters'=>$characters));
 
 			fwrite($pipes[0], $dot);
 			fclose($pipes[0]);
