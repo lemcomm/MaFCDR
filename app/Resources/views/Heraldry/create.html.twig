@@ -271,11 +271,23 @@ function check_colours(good) {
 			$("#msglist").append("<li>{{ 'warning.same'|trans({},"heraldry") }}</li>");
 			good=false;
 		} else {
-			if ( (shield=="rgb(240,240,240)" || shield=="rgb(255,220,10)" || shield=="rgb(184,115,51)" || shield=="rgb(161,157,148)" || shield=="rgb(68,79,83)" || shield=="rgb(230,178,115)") && (other=="rgb(240,240,240)" || other=="rgb(255,220,10)" || other=="rgb(184,115,51)" || other=="rgb(161,157,148)" || other=="rgb(68,79,83)" || other=="rgb(230,178,115)") ) {
+			if (
+				(
+					shield=="rgb(240,240,240)" || shield=="rgb(255,220,10)" || shield=="rgb(184,115,51)" || shield=="rgb(161,157,148)" || shield=="rgb(68,79,83)" || shield=="rgb(230,178,115)"
+				) && (
+					other=="rgb(240,240,240)" || other=="rgb(255,220,10)" || other=="rgb(184,115,51)" || other=="rgb(161,157,148)" || other=="rgb(68,79,83)" || other=="rgb(230,178,115)"
+				) 
+			) {
 				$("#msglist").append("<li>{{ 'warning.metals'|trans({},"heraldry") }}</li>");
 				good=false;
 			}
-			if ( (shield!="rgb(240,240,240)" || shield!="rgb(255,220,10)" || shield!="rgb(184,115,51)" || shield!="rgb(161,157,148)" || shield!="rgb(68,79,83)" || shield!="rgb(230,178,115)") && (other!="rgb(240,240,240)" || other!="rgb(255,220,10)" || other!="rgb(184,115,51)" || other!="rgb(161,157,148)" || other!="rgb(68,79,83)" || other!="rgb(230,178,115)") ) {
+			if (
+				(
+					shield!="rgb(240,240,240)" && shield!="rgb(255,220,10)" && shield!="rgb(184,115,51)" && shield!="rgb(161,157,148)" && shield!="rgb(68,79,83)" && shield!="rgb(230,178,115)"
+				) && (
+					other!="rgb(240,240,240)" && other!="rgb(255,220,10)" && other!="rgb(184,115,51)" && other!="rgb(161,157,148)" && other!="rgb(68,79,83)" && other!="rgb(230,178,115)"
+				)
+			) {
 				$("#msglist").append("<li>{{ 'warning.colours'|trans({},"heraldry") }}</li>");
 				good=false;
 			}

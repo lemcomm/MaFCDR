@@ -493,7 +493,7 @@ class AccountController extends Controller {
 	}
 
 	private function checkCharacterLimit(User $user) {
-		$levels = $this->get('payment_manager')->getPaymentLevels();
+		$levels = $this->get('payment_manager')->getPaymentLevels($user);
 		$level = $levels[$user->getAccountLevel()];
 		$characters_allowed = $level['characters'];
 		$characters_active = $user->getActiveCharacters()->count();

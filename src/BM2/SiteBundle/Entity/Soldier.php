@@ -167,7 +167,7 @@ class Soldier extends NPC {
 		return null;
 	}
 	public function getMount() {
-		if ($this->has_mount) return $this->equipment;
+		if ($this->has_mount) return $this->mount;
 		return null;
 	}
 	public function getTrainedWeapon() {

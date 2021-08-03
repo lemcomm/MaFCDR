@@ -201,7 +201,9 @@ account:
   22: Traveler (Andrew's Patron)
   40: Intense
   41: Developer
+  42: Explorer (Andrew's Patron)
   50: Ultimate
+  51: Explorer+ (Andrew's Patron)
   name: Account level
   limit: Character limit
   cpm: Credits/month
@@ -418,7 +420,7 @@ account:
      <p>Thank you so much for helping the game become bigger and better.</p>
  patreon:
   title: Support Development via Patreon
-  info:  If you decide you'd rather forego a regular subscription and buying game credits through Calitarus GmbH, you can instead opt to become Andrew's Patron on Patreon for 2 US Dollars and get a free M&F subscription. In order to faciliate this, once you've become a Patron, you come back here and click the link below to let M&F authenticate with and request your user information and membership level from Patreon. We then apply that to your account here and unlock and display the Patreon-only subscription levels above.
+  info:  If you decide you'd rather forego a regular subscription and buying game credits through Calitarus GmbH, you can instead opt to become Andrew's Patron on Patreon for at least 2 US Dollars and get a free M&F subscription of an equivalent amount. In order to faciliate this, once you've become a Patron, you come back here and click the link below to let M&F authenticate with and request your user information and membership level from Patreon. We then apply that to your account here and unlock and display the Patreon-only subscription levels above.
   andrew:
    name: Support Andrew through Patreon:
    connect: Login with Patreon.

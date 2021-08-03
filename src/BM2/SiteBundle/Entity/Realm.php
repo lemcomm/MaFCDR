@@ -147,7 +147,7 @@ class Realm {
 				$this->addActiveRealmMember($owner);
 			}
 			foreach ($place->getVassals() as $knight) {
-				if ($kngiht->isActive(true)) {
+				if ($knight->isActive(true)) {
 					$this->addActiveRealmMember($knight);
 				}
 			}

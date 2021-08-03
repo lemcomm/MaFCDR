@@ -306,7 +306,13 @@ class ConversationManager {
                                 }
                         }
                         if (!$total) {
-                                $count = $conv->findActivePermissions()->count();
+                                $count = 0;
+                                foreach ($conv->findActivePermissions() as $perm) {
+                                        if ($perm->getCharacter() != $char) {
+                                                $perm->setUnread($perm->getUnread()+1);
+                                        }
+                                        $count++;
+                                }
                         } else {
                                 $count = $total;
                         }

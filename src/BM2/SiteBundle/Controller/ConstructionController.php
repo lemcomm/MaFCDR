@@ -539,7 +539,7 @@ class ConstructionController extends Controller {
 
 		$em->flush();
 
-		return $this->render('Construction/buildingrow.html.twig', [
+		return $this->render('element/buildingrow.html.twig', [
 			'build'=>$building
 		]);
 	}

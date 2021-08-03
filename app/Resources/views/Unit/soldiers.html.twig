@@ -91,7 +91,7 @@
 					<td align="right">{% if time < 1 %}{{ 'today'|trans }}{% else %}{{ time|number_format }} {{ "day"|transchoice(time|number_format) }}{% endif %}</td>
 					<td>
 						<a href="{{ path('maf_recruit_cancel', {"unit":unit.id, "recruit":soldier.id}) }}"><button class="canceltraining" value="{{ soldier.id }}">{{ 'recruit.troops.cancel'|trans({},"actions") }}</button></a>
-						{% if soldier.oldweapon or soldier.oldarmour or soldier.oldequipment %}
+						{% if soldier.oldweapon or soldier.oldarmour or soldier.oldequipment or soldier.oldmount %}
 							{{ 'recruit.troops.returns'|trans({},"actions") }}
 						{% else %}
 							{{ 'recruit.troops.disbands'|trans({},"actions") }}

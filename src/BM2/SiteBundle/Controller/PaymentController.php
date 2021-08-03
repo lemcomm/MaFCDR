@@ -25,8 +25,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
  */
 class PaymentController extends Controller {
 
-	# A minor change.
-
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
 
 	private function fetchPatreon($creator = null) {
@@ -258,7 +256,6 @@ class PaymentController extends Controller {
 
 		return $this->render('Payment/credits.html.twig', [
 			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
-			'levels' => $this->get('payment_manager')->getPaymentLevels(),
 			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept')
 		]);
 	}
@@ -272,6 +269,13 @@ class PaymentController extends Controller {
 		}
 		$user = $this->getUser();
 		$levels = $this->get('payment_manager')->getPaymentLevels($user);
+
+		$sublevel = -1;
+		foreach ($user->getPatronizing() as $patron) {
+			if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron') {
+				$sublevel = $patron->getCurrentAmount();
+			}
+		}
 
 		$form = $this->createForm(new SubscriptionType($levels, $user->getAccountLevel()));
 		$form->handleRequest($request);
@@ -292,6 +296,7 @@ class PaymentController extends Controller {
 			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
 			'refund' => $this->get('payment_manager')->calculateRefund($user),
 			'levels' => $levels,
+			'sublevel' => $sublevel,
 			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept'),
 			'creators' => $this->fetchPatreon(),
 			'form'=> $form->createView()
