@@ -167,11 +167,13 @@
 {% endblock %}
 
 {% block jquery %}
-	$("#restorerealm").click(function(){
-		$.post("{{ path('bm2_site_realm_restore', {"id":realm.id}) }}", function() {
-			$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
+	{% if restorable %}
+		$("#restorerealm").click(function(){
+			$.post("{{ path('bm2_site_realm_restore', {"id":realm.id}) }}", function() {
+				$("#restore_wrapper").replaceWith('<div class="success">{{ "diplomacy.restore.success"|trans ({}, "politics")}}</div>');
+			});
 		});
-	});
+	{% endif %}
 	{% include "element/mapstrings.js.twig" %}
 	mapinit('map', false, false, true);
 	{% if realmpoly %}

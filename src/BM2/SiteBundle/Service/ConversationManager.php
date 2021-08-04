@@ -308,7 +308,7 @@ class ConversationManager {
                         if (!$total) {
                                 $count = 0;
                                 foreach ($conv->findActivePermissions() as $perm) {
-                                        if ($perm->getCharacter() != $char) {
+                                        if ($perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
                                                 $perm->setUnread($perm->getUnread()+1);
                                         }
                                         $count++;
@@ -464,7 +464,7 @@ class ConversationManager {
                                 $perm->setOwner(false);
                                 $perm->setManager(false);
                                 $perm->setActive(true);
-                                if ($content) {
+                                if ($content && (!$realm || !$recipient->getAutoReadRealms())) {
                                         $perm->setUnread(1);
                                 } else {
                                         $perm->setUnread(0);
@@ -535,24 +535,28 @@ class ConversationManager {
                 } elseif ($type == 'housenew') {
                         $content = 'A new First One by the name of '.$origin.' has sworn allegiance to the house at [p:'.$extra['where'].'].';
                 } elseif ($type == 'realmjoinplace') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [p:'.$extra['place'].'].';
                 } elseif ($type == 'realmjoinplace2') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [p:'.$extra['place'].'].';
                 } elseif ($type == 'realmjoinsettlement') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [e:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [e:'.$extra['settlement'].'].';
                 } elseif ($type == 'realmjoinsettlement2') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [e:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [e:'.$extra['settlement'].'].';
                 } elseif ($type == 'realmjoinposition') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [realmpos:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the realm as a knight of [realmpos:'.$extra['pos'].'].';
                 } elseif ($type == 'realmjoinposition2') {
-                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['where'].'].';
+                        $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['pos'].'].';
                 }
 
                 # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
                 $msg = $this->writeMessage($conv, null, null, $content, 'system');
 
-                foreach ($conv->findActivePermissions() as $perm) {
-                        $perm->setUnread($perm->getUnread()+1);
+                if (!in_array($type, ['newperms', 'removal', 'left'])) {
+                        foreach ($conv->findActivePermissions() as $perm) {
+                                if (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms()) {
+                                        $perm->setUnread($perm->getUnread()+1);
+                                }
+                        }
                 }
 
                 if ($flush) {

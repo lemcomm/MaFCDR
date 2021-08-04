@@ -110,7 +110,7 @@ class PoliticsController extends Controller {
 		if (!isset($this->hierarchy[$character->getId()])) {
 			$this->hierarchy[$character->getId()] = $character;
 			if ($liege = $character->findLiege()) {
-				if ($liege instanceof ArrayCollection) {
+				if (!($liege instanceof Character)) {
 					foreach ($liege as $one) {
 						$this->addToHierarchy($one);
 					}
