@@ -2,11 +2,8 @@
 
 {% macro permission_row(permission, lord) %}
 {% spaceless %}
-<td style="display:none">{% if lord %}
-	{{ form_widget(permission.settlement) }}
-{% else %}
-	{{ form_widget(permission.occupied_settlement) }}
-{% endif %}</td>
+<td style="display:none">
+{{ form_widget(permission.settlement) }}</td>
 <td>{{ form_widget(permission.permission) }}</td>
 <td>{{ form_widget(permission.value) }}</td>
 <td>{{ form_widget(permission.reserve) }}</td>
