@@ -172,9 +172,11 @@ class SettlementController extends Controller {
 		if ($settlement->getOwner() == $character) {
 			$lord = true;
 			$original_permissions = clone $settlement->getPermissions();
+			$page = 'Settlement/permissions.html.twig';
 		} else {
 			$lord = false;
 			$original_permissions = clone $settlement->getOccupationPermissions();
+			$page = 'Settlement/occupationPermissions.html.twig';
 		}
 
 
@@ -198,6 +200,8 @@ class SettlementController extends Controller {
 				foreach ($original_permissions as $orig) {
 					if (!$settlement->getPermissions()->contains($orig)) {
 						$em->remove($orig);
+					} else {
+						$em->persist($orig);
 					}
 				}
 			} else {
@@ -218,7 +222,7 @@ class SettlementController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return $this->render('Settlement/permissions.html.twig', [
+		return $this->render($page, [
 			'settlement' => $settlement,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('settlement'),
 			'form' => $form->createView(),
