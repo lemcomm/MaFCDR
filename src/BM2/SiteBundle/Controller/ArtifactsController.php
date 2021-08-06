@@ -24,7 +24,7 @@ class ArtifactsController extends Controller {
 	public function ownedAction() {
 		$user = $this->getUser();
 
-		return $this->render('Artifact/owned.html.twig', [
+		return $this->render('Artifacts/owned.html.twig', [
 			'artifacts'=>$user->getArtifacts(),
 		]);
 	}
@@ -86,11 +86,11 @@ class ArtifactsController extends Controller {
 				return $this->redirectToRoute('bm2_site_artifacts_details', array('id'=>$artifact->getId()));
 			}
 
-			return $this->render('Artifact/create.html.twig', [
+			return $this->render('Artifacts/create.html.twig', [
 				'form'=>$form->createView(),
 			]);
 		} else {
-			return $this->render('Artifact/create.html.twig', [
+			return $this->render('Artifacts/create.html.twig', [
 				'limit_reached' => false,
 			]);
 		}
@@ -100,7 +100,7 @@ class ArtifactsController extends Controller {
 	  * @Route("/details/{id}", requirements={"id"="\d+"})")
 	  */
 	public function detailsAction(Artifact $id) {
-		return $this->render('Artifact/details.html.twig', [
+		return $this->render('Artifacts/details.html.twig', [
 			'artifact'=>$id,
 		]);
 	}
@@ -139,11 +139,11 @@ class ArtifactsController extends Controller {
 			);
 
 			$this->getDoctrine()->getManager()->flush();
-			return $this->render('Artifact/assign.html.twig', [
+			return $this->render('Artifacts/assign.html.twig', [
 				'artifact'=>$artifact, 'givento'=>$data['target']
 			]);
 		}
-		return $this->render('Artifact/assign.html.twig', [
+		return $this->render('Artifacts/assign.html.twig', [
 			'artifact'=>$artifact, 'form'=>$form->createView()
 		]);
 	}
@@ -193,7 +193,7 @@ class ArtifactsController extends Controller {
 			);
 
 		}
-		return $this->render('Artifact/spawn.html.twig', [
+		return $this->render('Artifacts/spawn.html.twig', [
 			'artifact'=>$artifact, 'form'=>$form->createView()
 		]);
 	}
@@ -229,11 +229,11 @@ class ArtifactsController extends Controller {
 				History::MEDIUM, true, 20
 			);
 			$em->flush();
-			return $this->render('Artifact/give.html.twig', [
+			return $this->render('Artifacts/give.html.twig', [
 				'success'=>true, 'artifact'=>$artifact, 'target'=>$target
 			]);
 		}
-		return $this->render('Artifact/give.html.twig', [
+		return $this->render('Artifacts/give.html.twig', [
 			'form'=>$form->createView()
 		]);
 	}
