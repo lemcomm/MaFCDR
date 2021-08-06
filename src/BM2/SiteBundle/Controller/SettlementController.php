@@ -240,8 +240,8 @@ class SettlementController extends Controller {
 		}
 
 		return $this->render('Settlement/quests.html.twig', [
-			'quests'=>$settlement->getQuests(),
-			'settlement' => $settlement
+			'quests'=>$id->getQuests(),
+			'settlement' => $id
 		]);
 	}
 
