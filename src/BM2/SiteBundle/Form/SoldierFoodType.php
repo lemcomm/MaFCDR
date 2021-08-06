@@ -71,7 +71,11 @@ class SoldierFoodType extends AbstractType {
 			#	return $qb;
 			#},
 			'group_by' => function($val, $key, $index) {
-				return $val->getRealm()->getName();
+				if ($val->getRealm()) {
+					return $val->getRealm()->getName();
+				} else {
+					return '--';
+				}
 			},
 			'attr' => array('title'=>'request.soldierfood.estatehelp')
 		));
