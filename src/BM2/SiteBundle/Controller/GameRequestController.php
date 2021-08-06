@@ -163,7 +163,7 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$character = $id->getFromCharacter();
 					if ($character->findAllegiance()) {
-						$this->get('politics')->breakoath($id);
+						$this->get('politics')->breakoath($character);
 					}
 					if ($id->getToSettlement()) {
 						$settlement = $id->getToSettlement();
