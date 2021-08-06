@@ -1215,6 +1215,11 @@ request:
    subject:    A title for your request, similar to those used in regular messages.
    text:       Here you can put a message to go along with your request. The same formating that is useable in other text boxes in the game can be used here. For more details on that, please see the manual.
    expires:    This will determine how long this request will be considered valid. Only valid requests will confer their benefits, like granting access or allowing food usage.
+  year:        (year)
+  month:       (month)
+  day:         (day)
+  hour:        (hour)
+  minute:      (min)
  soldierfood:
   estate:      Supplying Settlement
   estatehelp:  The estate from which food will be drawn, up to the limit set in this request. This list is generated from all settlements of all realms you are part of.
