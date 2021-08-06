@@ -21,10 +21,7 @@ class DailyNewsCommand extends ContainerAwareCommand {
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$mailer = $this->getContainer()->get('mailer');
-		$spool = NULL;
-		if ($mailer->getTransport()->getSpool()) {
-			$spool = $mailer->getTransport()->getSpool();
-		}
+
 		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 		$translator = $this->getContainer()->get('translator');
 		$em = $this->getContainer()->get('doctrine')->getManager();
@@ -98,15 +95,9 @@ class DailyNewsCommand extends ContainerAwareCommand {
 			}
 
 			if (($i++ % $batchsize) == 0) {
-				if ($spool) {
-					$spool->flushQueue($transport);
-				}
 				$em->flush();
 				$em->clear();
 			}
-		}
-		if ($spool) {
-			$spool->flushQueue($transport);
 		}
 		$em->flush();
 		$em->clear();

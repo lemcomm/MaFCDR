@@ -171,7 +171,7 @@ class PaymentManager {
 				$refund = $this->calculateRefund($user);
 				$user->setAccountLevel($newlevel);
 				$user->setPaidUntil(new \DateTime("now"));
-				$em->flush();
+				$thi->em->flush();
 				return true;
 			}
 			# Either they are a valid patron, and the above returns true. Or they aren't, and this call fails. The rest doesn't matter.

@@ -696,25 +696,22 @@ class ConversationManager {
                 $supConv = null;
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
-                        $this->addParticipant($conv, $char);
                         $general = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'general']);
+                        $this->addParticipant($conv, $char);
                         $this->addParticipant($general, $char);
-                        $em->flush();
                         $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                         $this->newSystemMessage($general, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
-                        $this->addParticipant($conv, $char);
                         $general = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'general']);
+                        $this->addParticipant($conv, $char);
                         $this->addParticipant($general, $char);
-                        $em->flush();
                         $this->newSystemMessage($conv, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                         $this->newSystemMessage($general, 'realmnew', null, $char, null, ['where'=>$place->getId()]);
                         $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
+                        $supGeneral = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'general']);
                         $this->addParticipant($supConv, $char);
-                        $supGeneral = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'general']);
                         $this->addParticipant($supGeneral, $char);
-                        $em->flush();
                         $this->newSystemMessage($supConv, 'realmnew2', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
                         $this->newSystemMessage($supGeneral, 'realmnew2', null, $char, null, ['realm'=>$realm->getId(), 'where'=>$place->getId()]);
                 } elseif ($house) {
@@ -722,10 +719,10 @@ class ConversationManager {
                         $general = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'general']);
                         $this->addParticipant($conv, $char);
                         $this->addParticipant($general, $char);
-                        $em->flush();
                         $this->newSystemMessage($conv, 'housenew', null, $char, null, ['where'=>$place->getId()]);
                         $this->newSystemMessage($general, 'housenew', null, $char, null, ['where'=>$place->getId()]);
                 }
+                $em->flush();
                 return [$conv, $supConv];
         }
 

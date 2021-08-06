@@ -56,7 +56,7 @@ class SettlementPermissionsSetType extends AbstractType {
 			));
 		} else {
 			$builder->add('occupation_permissions', 'collection', array(
-				'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em, $lord),
+				'type'		=> new SettlementOccupationPermissionsType($builder->getData(), $this->me, $this->em, $lord),
 				'allow_add'	=> true,
 				'allow_delete' => true,
 				'cascade_validation' => true

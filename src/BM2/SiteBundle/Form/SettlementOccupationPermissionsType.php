@@ -12,7 +12,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
 
 
-class SettlementPermissionsType extends AbstractType {
+class SettlementOccupationPermissionsType extends AbstractType {
 
 	private $settlement;
 	private $me;
@@ -37,7 +37,7 @@ class SettlementPermissionsType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$lord = $this->lord;
 		$s = $this->settlement;
-		$builder->add('settlement', 'entity', array(
+		$builder->add('occupied_settlement', 'entity', array(
 			'required' => true,
 			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
 				return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);

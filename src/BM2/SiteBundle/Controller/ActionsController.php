@@ -310,7 +310,7 @@ class ActionsController extends Controller {
 			]);
 		}
 
-		return $this->render('Actions/givegold.html.twig', [
+		return $this->render('Actions/giveGold.html.twig', [
 			'form'=>$form->createView(), 'gold'=>$character->getGold()
 		]);
 	}
