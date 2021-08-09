@@ -780,9 +780,10 @@ class ActionsController extends Controller {
 			}
 		}
 
+
 		return $this->render('Actions/trade.html.twig', [
 			'settlement'=>$settlement,
-			'owned' => ($settlement->getOwner()==$character?true:false),
+			'owned' => $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', false, $settlement->getOccupier()?true:false),
 			'settlements' => $settlementsdata,
 			'local' => $local_resources,
 			'trades' => $trades,
