@@ -54,7 +54,6 @@ class SoldiersRecruitType extends AbstractType {
 
 		$builder->add('unit', EntityType::class, array(
 			'label' => 'recruit.troops.unit',
-			'placeholder'=>'recruit.troops.nounit',
 			'required' => true,
 			'class' => Unit::class,
 			'choice_label' => 'settings.name',

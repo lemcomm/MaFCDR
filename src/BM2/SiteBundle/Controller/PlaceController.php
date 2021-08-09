@@ -291,8 +291,15 @@ class PlaceController extends Controller {
 			$em = $this->getDoctrine()->getManager();
 			$data = $form->getData();
 			$fail = $this->checkPlaceNames($form, $data['name'], $data['formal_name']);
-			if ($this->get('geography')->checkPlacePlacement($character)) {
+			if (!$fail && $this->get('geography')->checkPlacePlacement($character)) {
 				$fail = TRUE; #You shouldn't even have access but players will be players, best check anyways.
+				$this->addFlash('error', $this->get('translator')->trans('unavailable.placestooclose', [], 'messages'));
+			}
+			if (!$fail && $data['type']->getRequires()=='ruler') {
+				if (!$character->findRulerships()->contains($data['realm'])) {
+					$fail = TRUE;
+					$this->addFlash('error', $this->get('translator')->trans('unavailable.notrulerofthatrealm', [], 'messages'));
+				}
 			}
 			if (!$fail) {
 				$place = new Place();

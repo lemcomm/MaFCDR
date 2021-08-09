@@ -1301,6 +1301,7 @@ unit:
   settlement: "New Base:"
   success:  Unit has been rebased!
   fail:     Rebasing has failed.
+  none:     (Select a Settlement)
  recall:
   name:     Recall %name%
   intro:    Decide it is time to call a Unit back? Simply confirm your choice below and the message will be sent, recalling %name% from whatever distant land they may be in.

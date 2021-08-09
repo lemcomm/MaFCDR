@@ -382,19 +382,15 @@ class Character {
 	}
 
 	public function hasNewMessages() {
-		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getActive() == true;});
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getUnread() > 0;});
 		if ($permissions->count() > 0) {
-			foreach ($permissions as $perm) {
-				if ($perm->getUnread() > 0) {
-					return true;
-				}
-			}
+			return true;
 		}
 		return false;
 	}
 
 	public function countNewMessages() {
-		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getActive() == true;});
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getUnread() > 0;});
 		$total = 0;
 		if ($permissions->count() > 0) {
 			foreach ($permissions as $perm) {

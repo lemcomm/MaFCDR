@@ -54,7 +54,7 @@
 			{% elseif gamerequest.toPlace %}
 				{{ 'oath.offer.preamble3'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-place%":link(gamerequest.toPlace), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
 			{% else %}
-				{{ 'oath.offer.preamble4'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-realmposition%":link(gamerequest.toRealmPosition), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+				{{ 'oath.offer.preamble4'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-realmposition%":link(gamerequest.toPosition), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
 			{% endif %}
 			<div class="subcontent inline_announcements" style="color:#460702">
 			<h4>{{ gamerequest.subject|title }}</h4>

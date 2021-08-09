@@ -1604,6 +1604,8 @@ unavailable:
  nosuperiorhouse: Your house is not a cadet of any other house.
  hassuperiorhouse: Your house must first be independent before becoming the cadet of another house.
  wrongplacetype: You are in the wrong type of place for this action.
+ notrulerofthatrealm: You do not appear to be ruler of the realm you are making a capital for.
+ placestooclose: You are too close to another settlement or place to create a new place here.
 marker:
  name:      Marker name
  type:      Marker type
