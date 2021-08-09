@@ -66,14 +66,14 @@
 			</div>
 			{{ macros.others(char) }}
 			{{ macros.history(char, "queue secondary") }}
-		{% else %}		
+		{% else %}
 			{{ macros.history(char, "queue") }}
 			{{ macros.others(char) }}
 		{% endif %}
 	{% endif %}
 {% endif %}
 
-<h2>{{ char.purename }} 
+<h2>{{ char.purename }}
 	{% if char.male %}♂{% else %}♀{% endif %}
 	{% if not char.alive %}
 		<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" height="24px" align="bottom" />
@@ -83,7 +83,7 @@
 	<h3 class="subtitle">{{ 'character.knownas'|trans({'%name%':char.knownas}) }}</h3>
 {% endif %}
 
-{% if char.alive and char.slumbering %}
+{% if char.alive and char.slumbering and not char.retired %}
 <p class="inactive">
 	<img src="{{ asset('bundles/bm2site/images/zzz.png') }}" alt="{{ 'inactive'|trans }}" height="16px" align="bottom" />
 	{{ 'character.inactive'|trans }}
@@ -132,7 +132,7 @@
 		{{ 'character.father'|trans|title }}
 	{% else %}
 		{{ 'character.mother'|trans|title }}
-	{% endif %}: 
+	{% endif %}:
 	{{ link(parent) }}<br />
 {% endfor %}
 
