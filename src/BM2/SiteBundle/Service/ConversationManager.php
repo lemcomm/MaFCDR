@@ -282,7 +282,7 @@ class ConversationManager {
                 }
         }
 
-        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null) {
+        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true) {
                 if ($type == 'system' || $total) {
                         $valid = true;
                 } else {
@@ -319,7 +319,9 @@ class ConversationManager {
                         $new->setRecipientCount($count);
                         $new->setConversation($conv);
                         $conv->setUpdated($now);
-                        $this->em->flush();
+                        if ($flush) {
+                                $this->em->flush();
+                        }
                         return $new;
                 } else {
                         echo 'failure!';
@@ -554,7 +556,7 @@ class ConversationManager {
                 }
 
                 # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
-                $msg = $this->writeMessage($conv, null, null, $content, 'system', $antiTickUp);
+                $msg = $this->writeMessage($conv, null, null, $content, 'system', $antiTickUp, $flush);
 
                 if ($flush) {
                         $this->em->flush();
@@ -626,6 +628,7 @@ class ConversationManager {
                                 $change = true;
                         }
                 }
+                $this->em->flush();
                 foreach ($allConvs as $conv) {
                         $this->pruneConversation($conv);
                 }
@@ -649,20 +652,26 @@ class ConversationManager {
                 if ($entity) {
                         if ($members && !$members->isEmpty()) {
                                 $perms = $conv->findActivePermissions();
-                                foreach ($members as $member) {
-                                        if (!$conv->findActiveCharPermission($member)) {
-                                                // this user is missing from the conversation, but should be there
-                                                $this->addParticipant($conv, $member);
-                                                $added->add($member);
-                                        }
-                                }
 
-                                foreach ($conv->findActivePermissions() as $perm) {
-                                        if (!$members->contains($perm->getCharacter())) {
+                                foreach ($perms as $perm) {
+                                        $char = $perm->getCharacter();
+                                        if (!$members->contains($char) || !$char->getAlive() || $char->getRetired()) {
                                                 # Should no longer have active participation. Inactivate their permissions.
                                                 $perm->setActive(FALSE);
                                                 $perm->setEndTime($now);
-                                                $removed->add($member);
+                                                if (!$removed->contains($member)) {
+                                                        $removed->add($member);
+                                                }
+                                        }
+                                }
+
+                                foreach ($members as $member) {
+                                        if ($member->getAlive() && !$member->getRetired() && !$conv->findActiveCharPermission($member)) {
+                                                // this user is missing from the conversation, but should be there
+                                                $this->addParticipant($conv, $member);
+                                                if (!$added->contains($member)) {
+                                                        $added->add($member); #This shouldn't be possible, but just in case.
+                                                }
                                         }
                                 }
                         }
@@ -673,6 +682,7 @@ class ConversationManager {
                 if ($removed->count() > 0) {
                         $this->newSystemMessage($conv, 'removal', $removed, null, false, null);
                 }
+                $this->em->flush();
                 return array('added'=>$added, 'removed'=>$removed);
         }
 

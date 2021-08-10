@@ -216,7 +216,6 @@ class GameRunner {
 			$conversation = $row[0];
 			$this->convman->updateMembers($conversation);
 		}
-		$this->em->flush();
 
 		$this->logger->info("  Checking for dead and slumbering characters that need sorting...");
 		// NOTE: We're going to want to change this from c.system is null to something else, or build additional logic down the line, when we have more thant 'procd_inactive' as the system flag.
