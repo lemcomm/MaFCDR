@@ -228,7 +228,7 @@ class GameRequestController extends Controller {
 						$this->get('history')->logEvent(
 							$character,
 							'event.character.newliege.position',
-							array('%link-position%'=>$pos->getId()),
+							array('%link-realmposition%'=>$pos->getId()),
 							History::ULTRA, true
 						);
 						$this->addFlash('notice', $this->get('translator')->trans('oath.position.approved', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
@@ -477,7 +477,7 @@ class GameRequestController extends Controller {
 						$this->get('history')->logEvent(
 							$character,
 							'event.character.liegerejected.position',
-							array('%link-position%'=>$pos->getId()),
+							array('%link-realmposition%'=>$pos->getId()),
 							History::ULTRA, true
 						);
 						$this->addFlash(
