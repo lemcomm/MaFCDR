@@ -403,7 +403,7 @@ class CharacterController extends Controller {
 					if ($realm->getSuperior()) {
 						$this->get('history')->logEvent(
 							$realm->findUltimate(),
-							'event.realm.subrealm.arrival',
+							'event.subrealm.arrival',
 							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
 							History::MEDIUM, true, 15
 						);
