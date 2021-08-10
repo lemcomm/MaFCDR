@@ -654,7 +654,8 @@ class ConversationManager {
                                 $perms = $conv->findActivePermissions();
 
                                 foreach ($perms as $perm) {
-                                        if (!$members->contains($perm->getCharacter())) {
+                                        $char = $perm->getCharacter();
+                                        if (!$members->contains($char) || !$char->getAlive() || $char->getRetired()) {
                                                 # Should no longer have active participation. Inactivate their permissions.
                                                 $perm->setActive(FALSE);
                                                 $perm->setEndTime($now);
@@ -665,7 +666,7 @@ class ConversationManager {
                                 }
 
                                 foreach ($members as $member) {
-                                        if (!$conv->findActiveCharPermission($member)) {
+                                        if ($member->getAlive() && !$member->getRetired() && !$conv->findActiveCharPermission($member)) {
                                                 // this user is missing from the conversation, but should be there
                                                 $this->addParticipant($conv, $member);
                                                 if (!$added->contains($member)) {
