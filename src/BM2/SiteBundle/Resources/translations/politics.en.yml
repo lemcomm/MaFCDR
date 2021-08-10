@@ -14,6 +14,12 @@ status:
   position:     %position% of %realm%.
   househead:    You are head of the %house%
   housememb:    You are part of the %house%
+  realmvassal:  You are a knight of the realm of %liege%.
+  landvassal:   You are a knight of the settlement of %liege% in %realm%.
+  landvassal2:  You are a knight of the independent settlement of %liege%.
+  liegeplace:   You are a knight of the place of %liege% in the realm of %realm%.
+  liegeplace2:  You are a knight of the independent place of %liege%.
+  liegeposition: You are a knight of the %liege% of %realm%.
  other:
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
@@ -30,6 +36,12 @@ status:
   liege:        Liege of:
   househead:    %He% is head of the %house%
   housememb:    %He% is part of the %house%
+  realmvassal:  %He% is a knight of the realm of %liege%.
+  landvassal:   %He% is a knight of the settlement of %liege% in %realm%.
+  landvassal2:  %He% is a knight of the independent settlement of %liege%.
+  liegeplace:   %He% is a knight of the place of %liege% in the realm of %realm%.
+  liegeplace2:  %He% is a knight of the independent place of %liege%.
+  liegeposition: %He% is a knight of the %liege% of %realm%.
  realm:
   independent:  %name% is an independent realm.
   ultimate:     %name% is a sovereign realm.
