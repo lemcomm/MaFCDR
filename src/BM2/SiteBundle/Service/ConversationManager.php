@@ -628,6 +628,7 @@ class ConversationManager {
                                 $change = true;
                         }
                 }
+                $this->em->flush();
                 foreach ($allConvs as $conv) {
                         $this->pruneConversation($conv);
                 }
