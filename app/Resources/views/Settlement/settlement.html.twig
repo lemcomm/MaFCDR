@@ -21,8 +21,12 @@
 			<button>{{ 'character.start.submit'|trans|title }}</button>
 		</form>
 	{% endif %}
-	{% if character is not null and character == settlement.owner %}
-		{% set isowner = true %}
+	{% if character is not null %}
+	 	{% if character == settlement.owner or character == settlement.steward %}
+			{% set isowner = true %}
+		{% else %}
+			{% set isowner = false %}
+		{% endif %}
 	{% else %}
 		{% set isowner = false %}
 	{% endif %}
@@ -81,6 +85,10 @@
 		{% endif %}
 	{% else %}
 		{{ 'settlement.independent'|trans }}
+	{% endif %}
+	{% if settlement.steward %}
+		</p><p class="condensed">
+		{{ 'settlement.stewardedby'|trans({'%steward%':link(settlement.steward)})|raw }}
 	{% endif %}
 	</p>
 	<p class="condensed">
