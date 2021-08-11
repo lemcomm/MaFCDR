@@ -177,6 +177,9 @@ class ActionResolution {
 			if ($settlement->getOwner()) {
 				$this->history->closeLog($settlement, $settlement->getOwner());
 			}
+			if ($settlement->getSteward()) {
+				$this->history->closeLog($settlement, $settlement->getSteward());
+			}
 			$this->history->openLog($settlement, $action->getCharacter());
 
 			// the actual change
