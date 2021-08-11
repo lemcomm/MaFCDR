@@ -202,6 +202,15 @@ class Politics {
 						History::HIGH, true
 					);
 				}
+				if ($settlement->getSteward() && $settlement->getSteward() != $character) {
+					$this->history->logEvent(
+						$settlement->getSteward(),
+						'event.settlement.ownership.lost',
+						array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$character->getId()),
+						History::HIGH, true
+					);
+				}
+				$settlement->setSteward(null);
 				$this->history->logEvent(
 					$character,
 					'event.settlement.ownership.gained',
@@ -233,6 +242,17 @@ class Politics {
 					array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$oldowner->getId()),
 					History::HIGH, true
 				);
+				if ($settlement->getSteward() && $settlement->getSteward() != $character) {
+					$this->history->logEvent(
+						$settlement->getSteward(),
+						'event.character.wasgranted',
+						array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$oldowner->getId()),
+						History::HIGH, true
+					);
+				}
+				if ($settlement->getSteward() == $character) {
+					$settlement->setSteward(null);
+				}
 				break;
 			case 'grant_fief':
 				$this->history->logEvent(
@@ -253,6 +273,17 @@ class Politics {
 					array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$oldowner->getId()),
 					History::HIGH, true
 				);
+				if ($settlement->getSteward() && $settlement->getSteward() != $character) {
+					$this->history->logEvent(
+						$settlement->getSteward(),
+						'event.character.wasgranted2',
+						array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$oldowner->getId()),
+						History::HIGH, true
+					);
+				}
+				if ($settlement->getSteward() == $character) {
+					$settlement->setSteward(null);
+				}
 				// add a claim for the old owner
 				// FIXME: He should have ruled for some time before this becomes an enforceable claim
 				// or maybe more general change: all enforceable claims last only for (1x, 2x, 3x) as long as you had ruled?
