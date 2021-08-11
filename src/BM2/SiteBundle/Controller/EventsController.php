@@ -227,7 +227,7 @@ class EventsController extends Controller {
 		$access = false;
 		if ($soldier->getCharacter() == $character) {
 			$access = true;
-		} elseif ($soldier->getBase() && $soldier->getBase()->getOwner() == $character) {
+		} elseif ($soldier->getBase() && ($soldier->getBase()->getOwner() == $character || $soldier->getBase()->getSteward() == $character)) {
 			$access = true;
 		}
 
