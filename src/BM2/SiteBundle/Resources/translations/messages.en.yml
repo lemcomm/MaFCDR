@@ -263,6 +263,14 @@ account:
      You can continue playing at this level as long as you wish, or renew your subscription by
      adding additional credits and choosing a subscription level.<br />
      To do so, simply log in and go to your profile page.</p>
+   insufficient:  "[Might & Fealty] Subscription Downgraded"
+   insufficient2: >
+     <p>Your subscription for <a href="http://mightandfealty.com">Might &amp; Fealty</a> was to be renewed,
+     but your patron status no longer shows you supporting the developers.</p>
+     <p>As such, we have changed your subscription back to trial level.<br />
+     You can continue playing at this level as long as you wish, or renew your subscription by
+     adding additional credits and choosing a subscription level or by once more becoming a Patron.<br />
+     To do so, simply log in and go to your profile page.</p>
  code:
   title:    Redeem Code
   intro:    If you have a code from a friend or the crowdfunding campaign, you can redeem it here.
@@ -424,6 +432,9 @@ account:
   andrew:
    name: Support Andrew through Patreon:
    connect: Login with Patreon.
+  title2: Patron Status
+  current: You are an active patron of %name% and are contributing $%amount% per month. Thank you!
+  link: Update Your Patronage
 
 newcharacter:
  title: Create Character

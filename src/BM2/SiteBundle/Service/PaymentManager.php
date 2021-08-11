@@ -8,6 +8,8 @@ use BM2\SiteBundle\Entity\User;
 use BM2\SiteBundle\Entity\UserPayment;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
+use Patreon\API as PAPI;
+use Patreon\OAuth as POA;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class PaymentManager {
@@ -30,16 +32,16 @@ class PaymentManager {
 
 	public function getPaymentLevels(User $user = null, $system = false) {
 		return [
-			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
-			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true, 'patreon'=>false),
-			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true, 'patreon'=>false),
-			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
-			22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>200),
-			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true, 'patreon'=>false),
-			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false),
-			42 =>   array('name' => 'explorer',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>300),
-			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true, 'patreon'=>false),
-			51 =>   array('name' => 'explorer+',	'characters' =>   10, 'fee' =>   0, 'selectable' => true, 'patreon'=>400),
+			 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+			10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
+			20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
+			21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+			22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>200,   'creator'=>'andrew'),
+			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
+			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+			42 =>   array('name' => 'explorer',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
+			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
+			51 =>   array('name' => 'explorer+',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
 		];
 	}
 
@@ -84,6 +86,7 @@ class PaymentManager {
 
 	public function paymentCycle() {
 		$free = 0;
+		$patron = 0;
 		$active = 0;
 		$expired = 0;
 		$storage = 0;
@@ -100,9 +103,11 @@ class PaymentManager {
 			$this->em->flush();
 		}
 		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
-		$query->setParameters(array('now'=>new \DateTime("now")));
+		$now = new \DateTime("now");
+		$query->setParameters(array('now'=>$now));
 		foreach ($query->getResult() as $user) {
 			$myfee = $this->calculateUserFee($user);
+			$levels = $this->getPaymentLevels();
 			if ($myfee > 0) {
 				if ($this->spend($user, 'subscription', $myfee, true)) {
 					$active++;
@@ -113,6 +118,26 @@ class PaymentManager {
 					$this->ChangeNotification($user, 'expired', 'expired2');
 					// TODO: check that this recalculates correctly if someone is far beyond the due date and then renews subscription
 					$expired++;
+				}
+			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
+				$patronLevel = $levels[$user->getAccountLevel()]['patreon'];
+				$patrons = $user->getPatronizing();
+				foreach ($patreons as $patron) {
+					if ($patron->getExpires() < $now) {
+						$this->refreshPatreonTokens($patron);
+					}
+					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
+					if ($patreonLevel < $entitlement) {
+						# insufficient pledge level
+						$user->setAccountLevel(10);
+						$this->ChangeNotification($user, 'insufficient', 'insufficient2');
+						$expired++;
+					} else {
+						$this->spend($user, 'subscription', $myfee, true);
+						$active++;
+						$patron++;
+						# TODO: Give overpledge back as credits?
+					}
 				}
 			} else {
 				if ($user->getLastLogin()) {
@@ -129,7 +154,33 @@ class PaymentManager {
 				}
 			}
 		}
+		$this->em->flush();
 		return array($free, $active, $credits, $expired, $storage, $bannedcount);
+	}
+
+	public function refreshPatreonTokens($patron) {
+		$now = new \DateTime("now");
+		if ($patron->getExpires() < $now) {
+			$creator = $patron->getCreator();
+			$poa = new POA($creator->getClientId(), $creator->getClientSecret());
+			$tokens = $poa->refresh_token($patron->getRefreshToken(), null);
+			$patron->setAccessToken($tokens['access_token']);
+			$patron->setRefreshToken($tokens['refresh_token']);
+			$patron->setExpires($tokens['expires_in']);
+		}
+	}
+
+	public function refreshPatreonPledge($patron) {
+		$papi = new PAPI($patron->getAccessToken());
+		$member = $papi->fetch_user();
+		if (!$patron->getPatreonId()) {
+			$patron->setPatreonId($member['data']['id']);
+		}
+		$status = $member['included'][0]['attributes']['patron_status'];
+		$patron->setStatus($status);
+		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
+		$patron->setCurrentAmount($entitlement);
+		return [$status, $entitlement];
 	}
 
 	private function ChangeNotification(User $user, $subject, $text) {
@@ -153,14 +204,16 @@ class PaymentManager {
 		$oldlevel = $user->getAccountLevel();
 		$oldpaid = $user->getPaidUntil();
 
-		$levels = $this->getPaymentLevels(null, true);
+		$levels = $this->getPaymentLevels();
 		if ($levels[$newlevel]['patreon'] != false) {
 			$valid = false;
 			foreach ($user->getPatronizing() as $patron) {
-				if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron' && $patron->getCurrentAmount() >= $levels[$newlevel]['patreon']) {
-					$valid = true;
-					if ($valid) {
-						break;
+				if ($levels[$newlevel]['creator'] == $patron->getCreator()->getCreator()) {
+					if ($patron->getStatus() == 'active_patron' && $patron->getCurrentAmount() >= $levels[$newlevel]['patreon']) {
+						$valid = true;
+						if ($valid) {
+							break;
+						}
 					}
 				}
 			}

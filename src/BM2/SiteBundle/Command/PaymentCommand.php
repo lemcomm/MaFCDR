@@ -109,8 +109,9 @@ class PaymentCommand extends ContainerAwareCommand {
 
 
 		$pm = $this->getContainer()->get('payment_manager');
-		list($free, $active, $credits, $expired, $storage, $banned) = $pm->paymentCycle();
+		list($free, $patron, $active, $credits, $expired, $storage, $banned) = $pm->paymentCycle();
 		$output->writeln("$free free accounts");
+		$output->writeln("$patron patron accounts");
 		$output->writeln("$storage accounts moved into storage");
 		$output->writeln("$credits credits collected from $active users");
 		$output->writeln("$expired accounts with insufficient credits");

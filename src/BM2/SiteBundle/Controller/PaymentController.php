@@ -95,7 +95,6 @@ class PaymentController extends Controller {
 		]);
 	}
 
-
 	/**
 	  * @Route("/paypal/{amount}", name="bm2_paypal", requirements={"amount"="\d+"})
 	  */
@@ -268,12 +267,12 @@ class PaymentController extends Controller {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
-		$levels = $this->get('payment_manager')->getPaymentLevels($user);
+		$levels = $this->get('payment_manager')->getPaymentLevels();
 
-		$sublevel = -1;
+		$sublevel = [];
 		foreach ($user->getPatronizing() as $patron) {
 			if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron') {
-				$sublevel = $patron->getCurrentAmount();
+				$sublevel['andrew'] = $patron->getCurrentAmount();
 			}
 		}
 
@@ -312,25 +311,17 @@ class PaymentController extends Controller {
 		}
 		$user = $this->getUser();
 		$em = $this->getDoctrine()->getManager();
-		$now = new \DateTime('now');
-		$threeWeeks = $now->sub(new \DateInterval("P21D"));
 		$patreons = $user->getPatronizing();
+		$pm = $this->get('payment_manager');
+
+		$now = new \DateTime('now');
 		foreach ($patreons as $patron) {
-			if ($patron->getLastUpdate() < $threeWeeks) {
-				$creator = $patron->getCreator();
-				$poa = new POA($creator->getClientId(), $creator->getClientSecret());
-				$tokens = $poa->refresh_token($patron->getRefreshToken(), null);
-				$patron->setAccessToken($tokens['access_token']);
-				$patron->setRefreshToken($tokens['refresh_token']);
-				$patron->setLastUpdate($now);
+			if ($patron->getExpires() < $now) {
+				$pm->refreshPatreonTokens($patron);
 			}
-			$papi = new PAPI($patron->getAccessToken());
-			$member = $papi->fetch_user();
-			$this->addFlash('notice', print_r($member));
-			$patron->setStatus($member['included'][0]['attributes']['patron_status']);
-			$patron->setCurrentAmount($entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents']);
+			$pm->refreshPatreonPledge($patron);
 			$em->flush();
-			return $this->redirectToRoute('bm2_account');
+			return $this->redirectToRoute('bm2_site_payment_subscription');
 		}
 	}
 
@@ -347,9 +338,9 @@ class PaymentController extends Controller {
 		$code = $request->query->get('code');
 		$creator = $this->fetchPatreon($creator);
 		if (isset($code) && !empty($code)) {
+			$pm = $this->get('payment_manager');
 			$auth = new POA($creator->getClientId(), $creator->getClientSecret());
 			$tokens = $auth->get_tokens($code, $creator->getReturnUri());
-			echo $creator->getId();
 			$patron = $em->getRepository('BM2SiteBundle:Patron')->findOneBy(["user"=>$user, "creator"=>$creator]);
 			if (!$patron) {
 				$patron = new Patron();
@@ -359,11 +350,8 @@ class PaymentController extends Controller {
 			}
 			$patron->setAccessToken($tokens['access_token']);
 			$patron->setRefreshToken($tokens['refresh_token']);
-			$patron->setLastUpdate(new \DateTime('now'));
-			$papi = new PAPI($tokens['access_token']);
-			$member = $papi->fetch_user();
-			$patron->setStatus($member['included'][0]['attributes']['patron_status']);
-			$patron->setCurrentAmount($entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents']);
+			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
+			$pm->refreshPatreonPledge($patron);
 			$em->flush();
 			$this->addFlash('notice', 'account.patronizing');
 			return $this->redirectToRoute('bm2_account');

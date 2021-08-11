@@ -80,7 +80,7 @@ class Realm {
 			}
 			$steward = $settlement->getSteward();
 			if ($steward) {
-				$this->addRealmMemeber($steward);
+				$this->addRealmMember($steward);
 			}
 			foreach ($settlement->getVassals() as $knight) {
 				$this->addRealmMember($knight);
@@ -132,7 +132,7 @@ class Realm {
 			}
 			$steward = $settlement->getSteward();
 			if ($steward AND $steward->isActive(true)) {
-				$this->addRealmMemeber($steward);
+				$this->addActiveRealmMember($steward);
 			}
 		}
 

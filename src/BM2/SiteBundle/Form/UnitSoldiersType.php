@@ -123,7 +123,7 @@ class UnitSoldiersType extends AbstractType {
 					$actions = array('bury' => 'recruit.manage.bury');
 				}
 			} // endif locked
-			if (!is_empty($actions)) {
+			if (!empty($actions)) {
 				$field->add('action', ChoiceType::class, array(
 					'choices' => $actions,
 					'required' => false,

@@ -301,6 +301,15 @@ class ConversationController extends Controller {
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
+		$now = new \DateTime('now');
+
+		$em = $this->getDoctrine()->getManager();
+		$conv = $char->getLocalConversation();
+		if (!$conv) {
+			$conv = $this->get('conversation_manager')->newLocalConversation($char, $now);
+			$em->flush();
+		}
+		
 		$search = null;
 		switch ($window) {
 			case '0':

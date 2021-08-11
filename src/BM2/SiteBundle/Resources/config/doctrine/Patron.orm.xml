@@ -4,9 +4,10 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="access_token" type="string"/>
-		<field name="refresh_token" type="string"/>
-		<field name="last_update" type="datetime" nullable="true"/>
+		<field name="patreon_id" type="integer" nullable="true"/>
+		<field name="access_token" type="string" nullable="true"/>
+		<field name="refresh_token" type="string" nullable="true"/>
+		<field name="expires" type="datetime" nullable="true"/>
 		<field name="current_amount" type="integer" nullable="true"/>
 		<field name="status" type="string" nullable="true"/>
 
