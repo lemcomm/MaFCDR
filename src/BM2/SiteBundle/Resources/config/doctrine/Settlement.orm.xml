@@ -29,6 +29,7 @@
 		-->
 
 		<many-to-one field="owner" target-entity="Character" inversed-by="owned_settlements"/>
+		<many-to-one field="steward" target-entity="Character" inversed-by="stewarding_settlements"/>
 		<many-to-one field="realm" target-entity="Realm" inversed-by="settlements"/>
 		<one-to-many field="capital_of" target-entity="Realm" mapped-by="capital"/>
 		<many-to-one field="occupant" target-entity="Character" inversed-by="occupied_settlements"/>
