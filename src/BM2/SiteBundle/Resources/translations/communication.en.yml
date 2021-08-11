@@ -106,6 +106,8 @@ event:
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
   steward:      %character% has been appointed as the new steward.
+  stewarddeath: Is now steward-less due to the passing of %character%.
+  stewardretire: Is now steward-less due to the retiring of %character%.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
