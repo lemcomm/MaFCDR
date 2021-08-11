@@ -546,7 +546,7 @@ class ConversationController extends Controller {
 					$em->flush();
 				}
 			}
-			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $data['contacts'], $char, false);
+			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', new ArrayCollection($data['contacts']), $char, false);
 			$em->flush();
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
 		}
