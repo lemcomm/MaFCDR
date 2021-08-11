@@ -332,6 +332,13 @@ control:
   keepclaim2:   If you keep a claim to the estate, you grant it "in fief", but you continue to consider it your property. The claim will allow you to take it back easily.
   success:      You have now given control over this settlement to %newowner%.
   queued:       You will soon be meeting with %newowner% and arrange the details of the transfer, as well as informing the settlement leaders.
+ steward:
+  name:         Appoint Steward
+  description:  Delegate most of your responsibilies.
+  intro: >
+    Any settlement you control fully can have an appointed steward to manage it in your stead. This individual has the vast majority of your same abilities over the lands they're appointed to, but cannot grant control or appoint their replacement.
+  to:           Appoint
+  success:      You have now appointed %name% as your new Steward.
  rename:
   name:         Rename settlement
   description:  Change the name of this settlement.
