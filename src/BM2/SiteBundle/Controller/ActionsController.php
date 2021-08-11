@@ -731,7 +731,7 @@ class ActionsController extends Controller {
 			$manageable->add($owned);
 			$sources[] = $owned->getId();
 		}
-		foreach ($character->getStewardingSettlement() as $stewarded) {
+		foreach ($character->getStewardingSettlements() as $stewarded) {
 			$manageable->add($stewarded);
 			$sources[] = $stewarded->getId();
 		}
