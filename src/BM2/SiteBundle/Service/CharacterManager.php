@@ -364,6 +364,15 @@ class CharacterManager {
 				$this->failInheritRealm($character, $realm);
 			}
 		}
+		foreach ($character->getStewardingSettlements() as $settlement) {
+			$settlement->setSteward(null);
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.stewarddeath',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+		}
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the retire method below, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
@@ -591,6 +600,15 @@ class CharacterManager {
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
 			}
+		}
+		foreach ($character->getStewardingSettlements() as $settlement) {
+			$settlement->setSteward(null);
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.stewardretire',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
 		}
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the kill method above, with switch on event firing for different circumstances.
