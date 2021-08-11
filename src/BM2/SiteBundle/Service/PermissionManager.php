@@ -116,7 +116,7 @@ class PermissionManager {
 
 	public function checkSettlementPermission(Settlement $settlement, Character $character, $permission, $return_details=false, $occupied = false) {
 		// settlement owner always has all permissions without limits
-		if (($settlement->getOwner() == $character && $settlement->getOccupant() == false) OR $settlement->getOccupant() == $character) {
+		if ((($settlement->getOwner() == $character || $settlement->getSteward() == $character) && $settlement->getOccupant() == false) OR $settlement->getOccupant() == $character) {
 			if ($return_details) {
 				return array(true, null, 'owner', null);
 			} else {
