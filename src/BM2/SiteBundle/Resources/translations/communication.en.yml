@@ -105,6 +105,7 @@ event:
   besieged:     %character% has declared a siege of the Settlement.
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
+  steward:      %character% has been appointed as the new steward.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -226,6 +227,7 @@ event:
    land:        The lord of %settlement% has rejected your offer of vassalge.
    place:       The owner of %place% has rejected your offer of vassalge.
    position:    The %realmposition% has rejected your offer of vassalge.
+  steward:      Has been appointed as the steward of %settlement%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
