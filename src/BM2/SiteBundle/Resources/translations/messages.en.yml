@@ -700,6 +700,7 @@ settlement:
  unowned:     Independent
  owner:       Owner
  ownedby:     This settlement is ruled by %owner%.
+ stewardedby: %steward% is serving as steward.
  realm:       This settlement is part of %realm%.
  realm2:      Realm
  sovereignty: Sovereignty
@@ -1159,6 +1160,9 @@ interaction:
  surrender:
   name:     First One to surrender to
   submit:   surrender yourself
+ steward:
+  name:     First One to Appoint
+  submit:   Delegate
 
 battle:
  title:         Battle Report
