@@ -691,7 +691,7 @@ class MilitaryManager {
 		} else {
 			$settings = $unit->getSettings();
 		}
-		if ($unit->getSettlement() && $char == $unit->getSettlement()->getOwner()) {
+		if ($unit->getSettlement() && ($char == $unit->getSettlement()->getOwner() || $char == $unit->getSettlement()->getSteward())) {
 			$lord = true;
 		} else {
 			$lord = false;
@@ -781,6 +781,22 @@ class MilitaryManager {
 	public function rebaseUnit ($data, $options, Unit $unit) {
 		if ($options->contains($data['settlement']) && !$unit->getTravelDays()) {
 			$origin = $unit->getSettlement();
+			$senders = [];
+			if ($origin) {
+				if ($origin->getOwner()) {
+					$senders[] = $origin->getOwner()->getId();
+				}
+				if ($origin->getSteward()) {
+					$senders[] = $origin->getSteward()->getId();
+				}
+			}
+			$rcvs = [];
+			if ($data['settlement']->getOwner()) {
+				$rcvs[] = $data['settlement']->getOwner()->getId();
+			}
+			if ($data['settlement']->getSteward()) {
+				$rcvs[] = $data['settlement']->getSteward()->getId();
+			}
 			$unit->setSettlement($data['settlement']);
 			if (!$unit->getCharacter() && $origin) {
 				$this->returnUnitHome($unit, 'rebase', $origin);
@@ -788,9 +804,9 @@ class MilitaryManager {
 			if ((
 				$origin && $unit->getSupplier() == $data['settlement']
 			) OR (
-				$origin && $data['settlement']->getOwner() == $origin->getOwner()
+				$origin && in_array($senders, $rcvs)
 			) OR (
-				$unit->getCharacter() && $data['settlement']->getOwner() == $unit->getCharacter()
+				!$origin && $unit->getCharacter() && in_array($unit->getCharacter(), $rcvs)
 			)) {
 				# Nada. It's just easier to rule out the positives.
 			} else {
