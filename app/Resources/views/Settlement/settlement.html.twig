@@ -21,20 +21,20 @@
 			<button>{{ 'character.start.submit'|trans|title }}</button>
 		</form>
 	{% endif %}
+	{% set isowner = false %}
+	{% set issteward = false %}
 	{% if character is not null %}
-	 	{% if character == settlement.owner or character == settlement.steward %}
+	 	{% if character == settlement.owner %}
 			{% set isowner = true %}
-		{% else %}
-			{% set isowner = false %}
+		{% elseif character == settlement.steward %}
+			{% set issteward = true %}
 		{% endif %}
-	{% else %}
-		{% set isowner = false %}
 	{% endif %}
 	<ul class="simple">
 		{% if settlement.capitalOf is not empty %}<li>{{ 'settlement.capital'|trans }}: {% for capitalOf in settlement.capitalOf %}<a href="{{ path('bm2_realm', {'id':capitalOf.id})}}">{{ capitalOf.name }}, </a>{% endfor %}</li>{% endif %}
 		<li>{% if settlement.fortified %}{{ 'settlement.fortified'|trans }} {% endif %}{{ settlement.type|trans }}, {{ ('biome.'~settlement.geodata.biome.name)|trans }}</li>
 		<li>{{ 'settlement.culture'|trans }}: {{ ('culture.'~settlement.culture.name)|trans }}</li>
-		{% if isowner %}
+		{% if isowner or issteward %}
 			<li class="tt_botleft">{{ 'settlement.population'|trans }}: {{ settlement.fullpopulation }}
 			<br />({{ settlement.population }} {{ 'settlement.civilians'|trans }}
 			{% if settlement.countDefenders > 0 %}, {{ settlement.countDefenders }} {{ 'settlement.militia2'|trans }}{% endif %}
@@ -62,10 +62,10 @@
 		<li>{% if settlement.allowthralls %}{{ 'settlement.allowthralls.yes'|trans }}{% else %}{{ 'settlement.allowthralls.no'|trans }}{% endif %}</li>
 		{% if familiarity %}<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>{% endif %}
 		<li>{{ area|area }}</li>
-		{% if isowner %}
+		{% if isowner or issteward %}
 		<li>{{ density|number_format }} {{ 'popdensity'|trans }}</li>
 		{% endif %}
-		{% if details.spot or isowner %}
+		{% if details.spot or isowner or issteward %}
 			<li class="tt_botleft" title="{{ ('settlement.security.tt')|trans }}">{{ ('settlement.security.'~security)|trans }}</li>
 		{% endif %}
 		{% if isowner %}
@@ -77,10 +77,12 @@
 	<p class="condensed">
 	{% if settlement.owner %}
 		{{ 'settlement.ownedby'|trans({'%owner%':link(settlement.owner)})|raw }}
-		{% if isowner %}
+		{% if isowner or issteward %}
 			<br /><a href="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}">{{ 'control.permissions.name'|trans({},"actions") }}</a>
 			- <a href="{{ path('bm2_site_settlement_quests', {'id':settlement.id}) }}">{{ 'control.quests.name'|trans({},"actions") }}</a>
 			- <a href="{{ path('bm2_site_settlement_description', {'id':settlement.id}) }}">{{ 'control.description.settlement.name'|trans({},"actions") }}</a>
+		{% endif %}
+		{% if isowner %}
 			- <a href="{{ path('bm2_site_settlement_abandon', {'id':settlement.id}) }}">{{ 'control.abandon.name'|trans({},"actions") }}</a>
 		{% endif %}
 	{% else %}
@@ -123,7 +125,7 @@
 		{% endif %}
 	{% endif %}
 
-	{% if details.spot and ( details.spy or isowner ) %}
+	{% if details.spot and ( details.spy or isowner or issteward ) %}
 {# TODO: maybe a summary for others #}
 		<h3>{{ 'workforce'|trans|title }}</h3>
 		<ul>
@@ -143,14 +145,14 @@
 		</ul>
 	{% endif %}
 
-	{% if details.spot or isowner %}
+	{% if details.spot or isowner or issteward %}
 		<h2>{{ 'npc.soldier'|transchoice(10)|capitalize }}</h2>
 		{% if settlement.countDefenders > 0 %}
 			{{ 'settlement.militiacount'|trans({"%count%":settlement.countDefenders}) }}
 		{% else %}
 			{{ 'none'|trans }}
 		{% endif %}
-		{% if details.spy or isowner %}
+		{% if details.spy or isowner or issteward %}
 			<ul>
 			{% for type,number in militia %}
 				<li>{{number}} {{ ("soldier."~type)|transchoice(number) }}</li>
@@ -160,14 +162,14 @@
 			{% endif %}
 			</ul>
 		{% endif %}
-		{% if details.spot and isowner %}
+		{% if details.spot and isowner or issteward %}
 			<a href="{{ path('maf_units') }}">{{ 'viewdetails'|trans|title }}</a>
 			--
 			<a href="{{ path('maf_recruit') }}">{{ 'recruit.troops.name'|trans({},"actions")|title }}</a>
 		{% endif %}
 	{% endif %}
 
-	{% if details.spot or isowner %}
+	{% if details.spot or isowner or issteward %}
 		<h2>{{ 'settlement.economy'|trans|title }}</h2>
 
 		<h3>{{ 'building'|transchoice(10)|title }}</h3>
@@ -182,7 +184,7 @@
 		</ul>
 
 		<h3>{{ 'resources'|trans|title }} </h3>
-		{% if details.spot and ( details.prospector or isowner ) %}
+		{% if details.spot and ( details.prospector or isowner or issteward) %}
 			<table>
 				<thead><tr>
 					<th>{{ 'settlement.resources.type'|trans|title }}</th>
@@ -191,39 +193,39 @@
 						<th class="bar"><ul>
 						<li class="bar_prod_base">{{ 'settlement.resources.current'|trans|title }}<br /><small>{{ 'settlement.resources.base'|trans }}</small></li>
 						<li class="bar_prod_build">{{ 'settlement.resources.current'|trans|title }}<br /><small>{{ 'settlement.resources.buildings'|trans }}</small></li>
-						{% if details.merchant or isowner %}
+						{% if details.merchant or isowner or issteward %}
 							<li class="bar_trade_in">{{ 'settlement.resources.trade.name'|trans|title }}<br /><small>{{ 'settlement.resources.trade.in'|trans }}</small></li>
 						{% endif %}
 						<li class="bar_dem_base">{{ 'settlement.resources.demand'|trans|title }}<br /><small>{{ 'settlement.resources.base'|trans }}</small></li>
 						<li class="bar_corruption">&nbsp;<br /><small>{{ 'settlement.resources.corruption'|trans }}</small></li>
 						<li class="bar_dem_build">{{ 'settlement.resources.demand'|trans|title }}<br /><small>{{ 'settlement.resources.buildings'|trans }}</small></li>
 						<li class="bar_dem_constr">{{ 'settlement.resources.demand'|trans|title }}<br /><small>{{ 'settlement.resources.construction'|trans }}</small></li>
-						{% if details.merchant or isowner %}
+						{% if details.merchant or isowner or issteward %}
 							<li class="bar_trade_out">{{ 'settlement.resources.trade.name'|trans|title }}<br /><small>{{ 'settlement.resources.trade.out'|trans }}</li>
 						{% endif %}
 					{% else %}
 						<th class="bar"><ul>
 						<li class="bar_prod_base">{{ 'settlement.resources.current'|trans|title }}</li>
-						{% if details.merchant or isowner %}
+						{% if details.merchant or isowner or issteward %}
 							<li class="bar_trade_in">{{ 'settlement.resources.trade.name'|trans|title }}<br /><small>{{ 'settlement.resources.trade.in'|trans }}</small></li>
 						{% endif %}
 						<li class="bar_dem_base">{{ 'settlement.resources.demand'|trans|title }}</li>
-						{% if details.merchant or isowner %}
+						{% if details.merchant or isowner or issteward %}
 							<li class="bar_trade_out">{{ 'settlement.resources.trade.name'|trans|title }}<br /><small>{{ 'settlement.resources.trade.out'|trans }}</li>
 						{% endif %}
 					{% endif %}
 					</ul></th>
-					{% if details.merchant or isowner %}
+					{% if details.merchant or isowner or issteward %}
 						<th>{{ 'settlement.resources.balance'|trans|title }}</th>
 					{% endif %}
-					{% if isowner %}
+					{% if isowner or issteward %}
 						<th>{{ 'settlement.resources.storage'|trans|title }}</th>
 					{% endif %}
 				</tr></thead><tbody>
 			{% for eco in economy %}
 				{% set prod_div = eco.total_production %}
 				{% set dem_div = eco.total_demand %}
-				{% if details.merchant or isowner %}
+				{% if details.merchant or isowner or issteward %}
 					{% if eco.tradebalance > 0 %}
 						{% set prod_div = eco.total_production + eco.tradebalance %}
 					{% elseif eco.tradebalance < 0 %}
@@ -253,7 +255,7 @@
 							{% if eco.building_prod > 0 %}
 								<li class="data bar_prod_build" style="width:{{ (100*eco.building_prod/my_div)|number_format }}%">{{ eco.building_prod }}</li>
 							{% endif %}
-							{% if (details.merchant or isowner) and eco.tradebalance > 0 %}
+							{% if (details.merchant or isowner or issteward) and eco.tradebalance > 0 %}
 								<li class="data bar_trade_in" style="width:{{ (100*eco.tradebalance/my_div)|number_format }}%">{{ eco.tradebalance }}</li>
 							{% endif %}
 							</ul>
@@ -270,28 +272,28 @@
 							{% if eco.building_construction > 0 %}
 								<li class="data bar_dem_constr" style="width:{{ (100*eco.building_construction/my_div)|number_format }}%">{{ eco.building_construction }}</li>
 							{% endif %}
-							{% if (details.merchant or isowner) and eco.tradebalance < 0 %}
+							{% if (details.merchant or isowner or issteward) and eco.tradebalance < 0 %}
 								<li class="data bar_trade_out" style="width:{{ (-100*eco.tradebalance/my_div)|number_format }}%">{{ -eco.tradebalance }}</li>
 							{% endif %}
 						{% else %}
 							<td class="bar"><ul>
 							<li class="data bar_prod_base" style="width:{{ (100*eco.total_production/my_div)|number_format }}%">{{ eco.total_production }}</li>
-							{% if (details.merchant or isowner) and eco.tradebalance > 0 %}
+							{% if (details.merchant or isowner or issteward) and eco.tradebalance > 0 %}
 								<li class="data bar_trade_in" style="width:{{ (100*eco.tradebalance/my_div)|number_format }}%">{{ eco.tradebalance }}</li>
 							{% endif %}
 							</ul>
 							<ul>
 							<li class="data bar_dem_base" style="width:{{ (100*eco.total_demand/my_div)|number_format }}%">{{ eco.total_demand }}</li>
-							{% if (details.merchant or isowner) and eco.tradebalance < 0 %}
+							{% if (details.merchant or isowner or issteward) and eco.tradebalance < 0 %}
 								<li class="data bar_trade_out" style="width:{{ (-100*eco.tradebalance/my_div)|number_format }}%">{{ -eco.tradebalance }}</li>
 							{% endif %}
 						{% endif %}
 						</ul></td>
-						{% if details.merchant or isowner %}
+						{% if details.merchant or isowner or issteward %}
 							{% set balance = eco.total_production + eco.tradebalance - eco.total_demand %}
 							<td align="right">{{ balance }}</td>
 						{% endif %}
-						{% if isowner %}
+						{% if isowner or issteward %}
 							<td align="right">{{ eco.storage }}</td>
 						{% endif %}
 					</tr>
