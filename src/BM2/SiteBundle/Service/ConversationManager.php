@@ -498,7 +498,7 @@ class ConversationManager {
                 } else {
                         $origin = '*The System*';
                 }
-                if ($type == 'newperms') {
+                if ($type == 'newperms' && $data->first()) {
                         $antiTickUp = true;
                         $content = $origin.' has added the following people to the conversation: ';
                         $count = $data->count();
@@ -515,7 +515,7 @@ class ConversationManager {
                                         }
                                 }
                         }
-                } elseif ($type == 'removal') {
+                } elseif ($type == 'removal' && $data->first()) {
                         $antiTickUp = true;
                         $content = $origin.' has removed the following people from the conversation: ';
                         $count = $data->count();
@@ -659,8 +659,8 @@ class ConversationManager {
                                                 # Should no longer have active participation. Inactivate their permissions.
                                                 $perm->setActive(FALSE);
                                                 $perm->setEndTime($now);
-                                                if (!$removed->contains($member)) {
-                                                        $removed->add($member);
+                                                if (!$removed->contains($char)) {
+                                                        $removed->add($char);
                                                 }
                                         }
                                 }
