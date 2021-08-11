@@ -572,6 +572,52 @@ class ActionsController extends Controller {
 	}
 
    /**
+     * @Route("/steward", name="maf_actions_steward")
+     */
+	public function stewardAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlStewardTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new InteractionType(
+			'steward',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['target'] != $character) {
+				$settlement->setSteward($data['target']);
+
+				$this->get('history')->logEvent(
+					$settlement,
+					'event.settlement.steward',
+					array('%link-character%'=>$data['target']->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->get('history')->logEvent(
+					$data['target'],
+					'event.character.steward',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->addFlash('notice', $this->get('translator')->trans('control.steward.success', ["%name%"=>$data['target']->getName()], 'actions'));
+				$this->getDoctrine()->getManager()->flush();
+				return $this->redirectToRoute('bm2_actions');
+			}
+
+		}
+
+		return $this->render('Actions/steward.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
+	}
+
+   /**
      * @Route("/rename")
      */
 	public function renameAction(Request $request) {
