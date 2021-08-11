@@ -854,6 +854,9 @@ class RealmController extends Controller {
 				if ($e->getOwner()) {
 					$chars->add($e->getOwner());
 				}
+				if ($e->getSteward()) {
+					$chars->add($e->getSteward());
+				}
 			}
 			if ($newsize==0 || $newsize==$realm->getSettlements()->count()) {
 				$form->addError(new FormError($this->get('translator')->trans("diplomacy.subrealm.invalid.size", array(), 'politics')));

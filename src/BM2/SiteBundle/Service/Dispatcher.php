@@ -295,6 +295,7 @@ class Dispatcher {
 			$actions[] = $this->controlGrantTest(true);
 			$actions[] = $this->controlRenameTest(true);
 			$actions[] = $this->controlCultureTest(true);
+			$actions[] = $this->controlStewardTest(true);
 			$actions[] = $this->controlPermissionsTest(null, $settlement);
 			$actions[] = $this->controlQuestsTest(null, $settlement);
 		}
@@ -472,7 +473,11 @@ class Dispatcher {
 			return 'notinside';
 		}
 		if (!$this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), $test)) {
-			return 'notyours';
+			if ($test == 'recruit' && $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'units')) {
+				return $this->veryGenericTests();
+			} else {
+				return 'notyours';
+			}
 		}
 
 		return $this->veryGenericTests();
@@ -697,6 +702,7 @@ class Dispatcher {
 
 		if ($this->getCharacter()->isPrisoner()) {
 			if ($settlement->getOwner() == $this->getCharacter()) {
+				# Delierately no stewards.
 				return array("name"=>"location.enter.name", "url"=>"bm2_site_actions_enter", "description"=>"location.enter.description2");
 			} else {
 				return array("name"=>"location.enter.name", "description"=>"unavailable.enter.notyours");
@@ -940,6 +946,7 @@ class Dispatcher {
 		}
 	}
 
+	/* Only implemented for testing. Starting an occupation requires a siege.
 	public function controlOccupationStartTest($check_duplicate=false, $check_regroup=true) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.$check");
@@ -964,6 +971,7 @@ class Dispatcher {
 		}
 		return $this->action("control.occupationstart", "maf_settlement_occupation_start");
 	}
+	*/
 
 	public function controlOccupationEndTest($check_duplicate=false, $check_regroup=true) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
@@ -1072,6 +1080,28 @@ class Dispatcher {
 		return $this->action("control.grant", "bm2_site_actions_grant");
 	}
 
+	public function controlStewardTest($check_duplicate=false) {
+		if (($check = $this->controlActionsGenericTests()) !== true) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.$check");
+		}
+		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.grant')) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.already");
+		}
+		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.nosettlement");
+		}
+		if ($settlement->getOccupier()) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.occupied");
+		}
+		if ($settlement->getOwner() != $this->getCharacter()) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.notyours2");
+		}
+		if (!$this->getActionableCharacters()) {
+			return array("name"=>"control.steward.name", "description"=>"unavailable.nobody");
+		}
+		return $this->action("control.steward", "maf_actions_steward");
+	}
+
 	public function controlAbandonTest($check_duplicate=false, $settlement) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.$check");
@@ -1114,7 +1144,8 @@ class Dispatcher {
 		if ($settlement->getOccupier()) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.occupied");
 		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
+		$char = $this->getCharacter();
+		if ($settlement->getOwner() == $char || $settlement->getSteward() == $char) {
 			return $this->action("control.rename", "bm2_site_actions_rename");
 		} else {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.notyours2");
@@ -1132,7 +1163,8 @@ class Dispatcher {
 		if ($settlement->getOccupier()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.occupied");
 		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
+		$char = $this->getCharacter();
+		if ($settlement->getOwner() == $char || $settlement->getSteward() == $char) {
 			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.notyours2");
@@ -1146,7 +1178,8 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
+		$char = $this->getCharacter();
+		if ($settlement->getOwner() == $char || $settlement->getSteward() == $char) {
 			return $this->action("control.culture", "bm2_site_actions_changeculture");
 		} else {
 			return array("name"=>"control.culture.name", "description"=>"unavailable.notyours2");
@@ -1157,7 +1190,8 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupant() == $this->getCharacter()) {
+		$char = $this->getCharacter();
+		if (($settlement->getOwner() == $char || $settlement->getSteward() == $char) || $settlement->getOccupant() == $char) {
 			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.notyours2");
@@ -1171,7 +1205,8 @@ class Dispatcher {
 		if ($settlement->getOccupier()) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.occupied");
 		}
-		if ($settlement->getOwner() == $this->getCharacter()) {
+		$char = $this->getCharacter();
+		if ($settlement->getOwner() == $char || $settlement->getSteward() == $char) {
 			return $this->action("control.quests", "bm2_site_settlement_quests", false, array('id'=>$settlement->getId()));
 		} else {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.notyours2");
@@ -2517,11 +2552,12 @@ class Dispatcher {
 	/* ========== Unit Actions ========== */
 
 	public function unitNewTest() {
+		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"unit.new.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOwner() != $this->getCharacter()) {
+		if (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units')) {
 			return array("name"=>"unit.new.name", "description"=>"unavailable.notyours2");
 		}
 
@@ -2530,15 +2566,16 @@ class Dispatcher {
 
 	public function unitManageTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
+		$settlement = $unit->getSettlement();
 		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
+			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') || $unit->getMarshal() != $character)) {
 				if($unit->getSettlement() != $character->getInsideSettlement()) {
 					return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
-				} elseif ($unit->getSettlement()->getOwner() != $character) {
-					return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
 				}
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
 			}
+		} elseif ($unit->getCharacter() != $character) {
+			return array("name"=>"unit.new.name", "description"=>"unavailable.notyourunit");
 		}
 		return $this->action("unit.manage.name", "maf_unit_manage");
 	}
@@ -2546,7 +2583,7 @@ class Dispatcher {
 	public function unitRebaseTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement() && $unit->getSettlement()->getOwner() != $character) {
+		if($unit->getSettlement() && !$this->permission_manager->checkSettlementPermission($unit->getSettlement(), $character, 'units')) {
 			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
 		}
 		if(!$settlement) {
@@ -2561,7 +2598,7 @@ class Dispatcher {
 	public function unitAssignTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if(($unit->getSettlement() && $unit->getSettlement()->getOwner() != $character) && $unit->getMarshal() != $character) {
+		if(($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) || $unit->getMarshal() != $character) {
 			return array("name"=>"unit.assign.name", "description"=>"unavailable.notmarshal");
 		}
 		if(!$settlement) {
@@ -2576,7 +2613,7 @@ class Dispatcher {
 	public function unitAppointTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement() && $unit->getSettlement()->getOwner() != $character) {
+		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
 			return array("name"=>"unit.appoint.name", "description"=>"unavailable.notlord");
 		}
 		if(!$settlement) {
@@ -2591,7 +2628,7 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
-		if ($unit->getCharacter() == $character || ($unit->getSettlement() && $unit->getSettlement()->getOwner() == $character) || ($unit->getMarshal() == $character)) {
+		if ($unit->getCharacter() == $character || ($unit->getSettlement() && ($unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character)) || ($unit->getMarshal() == $character) || $this->permission_manager->checkSettlementPermission($settlement, $character, 'recruit')) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
@@ -2612,9 +2649,12 @@ class Dispatcher {
 
 	public function unitCancelTrainingTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
+		$settlement = $unit->getSettlement();
+		if (($check = $this->recruitActionsGenericTests($settlement)) !== true) {
+			return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.$check");
+		}
 		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
+			if($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character) {
 				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notlord");
 			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
 				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notinside");
@@ -2628,12 +2668,16 @@ class Dispatcher {
 
 	public function unitDisbandTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
-				return array("name"=>"unit.disband.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+		$settlement = $unit->getSettlement();
+		$permission = $this->permission_manager->checkSettlementPermission($settlement, $character, 'units');
+		if ($unit->getCharacter()) {
+			return array("name"=>"unit.disband.name", "description"=>"unavailable.recallfirst");
+		}
+		if ($settlement && !$character->getUnits()->contains($unit)) {
+			if(!$character->getInsideSettlement() || $settlement != $character->getInsideSettlement()) {
 				return array("name"=>"unit.disband.name", "description"=>"unavailable.notinside");
+			} elseif($settlement && !$permission) {
+				return array("name"=>"unit.disband.name", "description"=>"unavailable.notlord");
 			}
 		}
 		if ($unit->getSoldiers()->count() > 0) {
@@ -2654,18 +2698,24 @@ class Dispatcher {
 		if (!$unit->getSettlement()) {
 			return array("name"=>"unit.return.name", "description"=>"unavailable.nobase");
 		}
+		if (!$this->permission_manager->checkSettlementPermission($unit->getSettlement(), $character, 'units')) {
+			return array("name"=>"unit.return.name", "description"=>"unavailable.notyourunit");
+		}
 		return $this->action("unit.return.name", "maf_unit_return");
 	}
 
 	public function unitRecallTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
+		$settlement = $unit->getSettlement();
 		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character) {
+			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') || $unit->getMarshal() != $character)) {
+				if($unit->getSettlement() != $character->getInsideSettlement()) {
+					return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
+				}
 				return array("name"=>"unit.recall.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
-				return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
 			}
+		} elseif ($unit->getCharacter() != $character) {
+			return array("name"=>"unit.recall.name", "description"=>"unavailable.notyourunit");
 		}
 
 		if ($unit->getTravelDays() > 0) {

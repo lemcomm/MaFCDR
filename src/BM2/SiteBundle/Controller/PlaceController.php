@@ -233,7 +233,7 @@ class PlaceController extends Controller {
 		}
 
 		# Check for lord and castles...
-		if ($character == $settlement->getOwner()) {
+		if ($character == $settlement->getOwner() || $character == $settlement->getSteward()) {
 			$rights[] = 'lord';
 			if ($character->getInsideSettlement() && $settlement->hasBuildingNamed('Wood Castle')) {
 				$rights[] = 'castle';

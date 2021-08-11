@@ -503,7 +503,7 @@ class ConversationManager {
                         $content = $origin.' has added the following people to the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
-                                $content .= '[c:'.$data[0]->getId().']';
+                                $content .= '[c:'.$data->first()->getId().']';
                         } else {
                                 $i = 0;
                                 foreach ($data as $char) {
@@ -520,7 +520,7 @@ class ConversationManager {
                         $content = $origin.' has removed the following people from the conversation: ';
                         $count = $data->count();
                         if ($count == 1) {
-                                $content .= '[c:'.$data[0]->getId().'].';
+                                $content .= '[c:'.$data->first()->getId().'].';
                         } else {
                                 $i = 0;
                                 foreach ($data as $char) {
@@ -676,10 +676,10 @@ class ConversationManager {
                                 }
                         }
                 }
-                if ($added->count() > 0) {
+                if (!$added->isEmpty() && $added->count() > 0) {
                         $this->newSystemMessage($conv, 'newperms', $added, null, false, null);
                 }
-                if ($removed->count() > 0) {
+                if (!$removed->isEmpty() && $removed->count() > 0) {
                         $this->newSystemMessage($conv, 'removal', $removed, null, false, null);
                 }
                 $this->em->flush();

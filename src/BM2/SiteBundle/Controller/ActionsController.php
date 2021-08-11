@@ -16,6 +16,7 @@ use BM2\SiteBundle\Form\TradeType;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\Dispatcher;
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -571,6 +572,52 @@ class ActionsController extends Controller {
 	}
 
    /**
+     * @Route("/steward", name="maf_actions_steward")
+     */
+	public function stewardAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlStewardTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new InteractionType(
+			'steward',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['target'] != $character) {
+				$settlement->setSteward($data['target']);
+
+				$this->get('history')->logEvent(
+					$settlement,
+					'event.settlement.steward',
+					array('%link-character%'=>$data['target']->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->get('history')->logEvent(
+					$data['target'],
+					'event.character.steward',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->addFlash('notice', $this->get('translator')->trans('control.steward.success', ["%name%"=>$data['target']->getName()], 'actions'));
+				$this->getDoctrine()->getManager()->flush();
+				return $this->redirectToRoute('bm2_actions');
+			}
+
+		}
+
+		return $this->render('Actions/steward.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
+	}
+
+   /**
      * @Route("/rename")
      */
 	public function renameAction(Request $request) {
@@ -670,19 +717,45 @@ class ActionsController extends Controller {
 		$query->setParameters(array('here'=>$settlement, 'me'=>$character));
 		$trades = $query->getResult();
 
-		$trade = new Trade;
+		/*
+		The lines below this comment exist to check if a given character is not the owner but has owner-level trade access to this settlement.
+		Because we'd have to build the owned settlements list for the foreach after these we just build it ourselves first, check if we have not-owner trade rights,
+		add the local settlement if we do, and move on.
 
-		// FIXME: to get trade permissions working, this and the code in TradeType.php need to be refactored to include permissions
-		$sources = array();
-		foreach ($character->getOwnedSettlements() as $e) {
-			$sources[] = $e->getId();
+		Technically speaking, it'd also be possible to get all lists a character is on that grant them trade rights, and also build that into this,
+		but that means people have even less they have to travel for in game, so no. If you own it, fine. If you only have permission to it, you have to travel to each.
+		*/
+		$manageable = new ArrayCollection();
+		$sources = [];
+		foreach ($character->getOwnedSettlements() as $owned) {
+			$manageable->add($owned);
+			$sources[] = $owned->getId();
 		}
+		foreach ($character->getStewardingSettlement() as $stewarded) {
+			$manageable->add($stewarded);
+			$sources[] = $stewarded->getId();
+		}
+		$permission = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', true, $settlement->getOccupier()?true:false);
+		# permission[0] returns true or false depending on if they have permission by any means.
+		if ($permission[0]) {
+			$allowed = true;
+			if ($permission[2] != 'owner') {
+				if (!$manageable->contains($settlement)) {
+					$manageable->add($settlement);
+				}
+				$sources[] = $settlement->getId();
+			}
+		} else {
+			$allowed = false;
+		}
+
+		$trade = new Trade;
 		foreach ($trades as $t) {
 			$sources[] = $t->getSource()->getId();
 		}
 		$sources = array_unique($sources);
 
-		$form = $this->createForm(new TradeType($character, $settlement, $sources), $trade);
+		$form = $this->createForm(new TradeType($character, $settlement, $sources, $allowed), $trade);
 		$cancelform = $this->createForm(new TradeCancelType($trades, $character));
 
 		$merchants = $character->getAvailableEntourageOfType('Merchant');
@@ -736,7 +809,7 @@ class ActionsController extends Controller {
 		}
 
 		$settlementsdata = array();
-		foreach ($character->getOwnedSettlements() as $other) {
+		foreach ($manageable as $other) {
 			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $other, $merchants->count()>0);
 			$settlement_resources = array();
 			foreach ($resources as $resource) {
@@ -761,7 +834,7 @@ class ActionsController extends Controller {
 		}
 
 		$local_resources = array();
-		if ($settlement->getOwner() == $character) {
+		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character) {
 			// TODO: maybe require a merchant and/or prospector ?
 			foreach ($resources as $resource) {
 				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
@@ -783,7 +856,7 @@ class ActionsController extends Controller {
 
 		return $this->render('Actions/trade.html.twig', [
 			'settlement'=>$settlement,
-			'owned' => $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', false, $settlement->getOccupier()?true:false),
+			'owned' => $permission[0],
 			'settlements' => $settlementsdata,
 			'local' => $local_resources,
 			'trades' => $trades,

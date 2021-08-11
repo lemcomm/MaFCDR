@@ -960,7 +960,7 @@ class WarController extends Controller {
 						}
 						break;
  					case 'wealth':
- 						if ($character == $settlement->getOwner()) {
+ 						if ($character == $settlement->getOwner() || $character == $settlement->getSteward()) {
  							// forced tax collection - doesn't depend on soldiers so much
  							if ($ratio >= 0.02) {
  								$mod = 0.3;

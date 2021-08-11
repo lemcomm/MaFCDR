@@ -83,7 +83,7 @@ class Interactions {
 		$character->setTravel(null)->setProgress(null)->setSpeed(null);
 
 		// open history log
-		if ($settlement->getOwner() != $character) {
+		if ($settlement->getOwner() != $character || $settlement->getSteward() != $character) {
 			$this->history->visitLog($settlement, $character);
 		}
 
@@ -117,7 +117,7 @@ class Interactions {
 			$prisoner->setInsideSettlement($settlement);
 			$prisoner->setLocation($loc);
 			$settlement->addCharactersPresent($prisoner);
-			if ($settlement->getOwner() != $prisoner) {
+			if ($settlement->getOwner() != $prisoner || $settlement->getSteward() != $prisoner) {
 				$this->history->visitLog($settlement, $prisoner);
 			}
 		}
@@ -153,7 +153,7 @@ class Interactions {
 		$character->setInsideSettlement(null);
 
 		// close history log
-		if ($settlement->getOwner() != $character) {
+		if ($settlement->getOwner() != $character || $settlement->getSteward() != $character) {
 			$this->history->closeLog($settlement, $character);
 		}
 
@@ -176,7 +176,7 @@ class Interactions {
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsideSettlement(null);
 			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???
-			if ($settlement->getOwner() != $prisoner) {
+			if ($settlement->getOwner() != $prisoner || $settlement->getSteward() != $prisoner) {
 				$this->history->closeLog($settlement, $prisoner);
 			}
 		}

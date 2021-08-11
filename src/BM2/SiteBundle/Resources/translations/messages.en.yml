@@ -700,6 +700,7 @@ settlement:
  unowned:     Independent
  owner:       Owner
  ownedby:     This settlement is ruled by %owner%.
+ stewardedby: %steward% is serving as steward.
  realm:       This settlement is part of %realm%.
  realm2:      Realm
  sovereignty: Sovereignty
@@ -1159,6 +1160,9 @@ interaction:
  surrender:
   name:     First One to surrender to
   submit:   surrender yourself
+ steward:
+  name:     First One to Appoint
+  submit:   Delegate
 
 battle:
  title:         Battle Report
@@ -1606,6 +1610,7 @@ unavailable:
  wrongplacetype: You are in the wrong type of place for this action.
  notrulerofthatrealm: You do not appear to be ruler of the realm you are making a capital for.
  placestooclose: You are too close to another settlement or place to create a new place here.
+ notyourunit:   This isn't your unit to manage.
 marker:
  name:      Marker name
  type:      Marker type

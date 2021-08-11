@@ -56,7 +56,7 @@ class SettlementController extends Controller {
 
 		$militia = [];
 		$recruits = 0;
-		if ($details['spy'] || $settlement->getOwner() == $character) {
+		if ($details['spy'] || ($settlement->getOwner() == $character || $settlement->getSteward() == $character)) {
 			foreach ($settlement->getUnits() as $unit) {
 				if ($unit->isLocal()) {
 					foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
@@ -103,7 +103,7 @@ class SettlementController extends Controller {
 				$storage = 0;
 			}
 
-			if ($details['spot'] && ($details['prospector'] || $settlement->getOwner() == $character)) {
+			if ($details['spot'] && ($details['prospector'] || $settlement->getOwner() == $character || $settlement->getSteward() == $character)) {
 				// TODO: we should fuzz corruption a bit to prevent people spotting same users by comparing corruption
 				$full_demand = $this->get('economy')->ResourceDemand($settlement, $resource, true);
 				$demand = 0;
@@ -169,7 +169,7 @@ class SettlementController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $id;
-		if ($settlement->getOwner() == $character) {
+		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character) {
 			$lord = true;
 			$original_permissions = clone $settlement->getPermissions();
 			$page = 'Settlement/permissions.html.twig';

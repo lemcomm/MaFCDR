@@ -10,7 +10,6 @@
 		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
 		<field name="alive" type="boolean"/>
-		<field name="battling" type="boolean" nullable="true"/>
 		<field name="retired" type="boolean" nullable="true"/>
 		<field name="retired_on" type="datetime" nullable="true"/>
 		<field name="generation" type="smallint"/>
@@ -89,6 +88,7 @@
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
 		<one-to-many field="owned_settlements" target-entity="Settlement" mapped-by="owner"/>
+		<one-to-many field="stewarding_settlements" target-entity="Settlement" mapped-by="steward"/>
 		<one-to-many field="settlement_claims" target-entity="SettlementClaim" mapped-by="character" fetch="EXTRA_LAZY"/>
 		<one-to-many field="occupied_settlements" target-entity="Settlement" mapped-by="occupant"/>
 

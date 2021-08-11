@@ -36,7 +36,7 @@ class UnitController extends Controller {
         private function findUnits(Character $character) {
                 $em = $this->getDoctrine()->getManager();
                 $settlement = $character->getInsideSettlement();
-                if ($settlement && ($settlement->getOwner() == $character || $settlement->getOccupant() == $character)) {
+                if ($settlement && ($settlement->getOwner() == $character || $settlement->getOccupant() == $character || $settlement->getSteward() == $character)) {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR u.settlement = :settlement OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } elseif ($character->getInsideSettlement()) {
@@ -78,7 +78,7 @@ class UnitController extends Controller {
                         $units[$id] = [];
                         $units[$id]['obj'] = $each;
                         $settlement = $each->getSettlement();
-                        if (!$settlement || ($settlement == $character->getInsideSettlement() && ($settlement->getOwner() == $character && !$settlement->getOccupier() || $settlement->getOccupant())))  {
+                        if (!$settlement || ($settlement == $character->getInsideSettlement() && (($settlement->getOwner() == $character || $settlement->getSteward() == $character) && !$settlement->getOccupier() || $settlement->getOccupant())))  {
                                 $units[$id]['owner'] = true;
                         } else {
                                 $units[$id]['owner'] = false;
@@ -167,7 +167,7 @@ class UnitController extends Controller {
                 Lord -> Local units and lead units
                 */
                 $lord = false;
-                if ($character->getInsideSettlement() && $character == $character->getInsideSettlement()->getOwner()) {
+                if ($character->getInsideSettlement() && ($character == $character->getInsideSettlement()->getOwner() || $character == $character->getInsideSettlement()->getSteward())) {
                         $lord = true;
                 }
 
@@ -226,7 +226,7 @@ class UnitController extends Controller {
                                 }
                         }
                         foreach ($character->getUnits() as $mine) {
-                                if (!$mine->getSettlement() || ($mine->getSettlement() && $mine->getSettlement()->getOwner() == $character)) {
+                                if (!$mine->getSettlement() || ($mine->getSettlement() && ($mine->getSettlement()->getOwner() == $character || $mine->getSettlement()->getSteward() == $character))) {
                                         # Units created from legacy soldiers that don't have a base act as if they ALWAYS are at their base.
                                         $local->add($mine);
                                 }

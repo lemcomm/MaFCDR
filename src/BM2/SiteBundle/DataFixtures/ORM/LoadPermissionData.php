@@ -22,7 +22,8 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 			'recruit'	=> array('use_value'=>true, 'reserve'=>false, 'translation'=>'perm.recruit', 'desc'=>'perm.desc.recruit'),
 			'trade'    	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.trade', 'desc'=>'perm.desc.trade'),
 			'placeinside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeinside', 'desc'=>'perm.desc.placeinside'),
-			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeoutside', 'desc'=>'perm.desc.placeoutside')
+			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeoutside', 'desc'=>'perm.desc.placeoutside'),
+			'units'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.units', 'desc'=>'perm.desc.units')
 		),
 		'realm' => array(
 			'expel'   	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.expel', 'desc'=>'perm.desc.expel'),

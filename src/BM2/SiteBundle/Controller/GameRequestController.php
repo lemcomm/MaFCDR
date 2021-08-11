@@ -37,7 +37,7 @@ class GameRequestController extends Controller {
 		$result;
 		switch ($id->getType()) {
 			case 'soldier.food':
-				if ($id->getToSettlement()->getOwner() != $char) {
+				if ($id->getToSettlement()->getOwner() != $char || $id->getToSettlement()->getSteward() != $char) {
 					$result = false;
 				} else {
 					$result = true;
@@ -51,7 +51,7 @@ class GameRequestController extends Controller {
 				}
 				break;
 			case 'oath.offer':
-				if ($id->getToSettlement() && $id->getToSettlement()->getOwner() != $char) {
+				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char || $id->getToSettlement()->getSteward() != $char)) {
 					$result = false;
 				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
 					$result = false;
@@ -114,12 +114,21 @@ class GameRequestController extends Controller {
 						array('%link-character%'=>$id->getFromCharacter()->getId()),
 						History::LOW, true
 					);
-					$this->get('history')->logEvent(
-						$id->getFromCharacter(),
-						'event.military.supplied.food.start',
-						array('%link-character%'=>$settlement->getOwner()->getId(), '%link-settlement%'=>$settlement->getId()),
-						History::LOW, true
-					);
+					if ($character == $settlement->getOwner()) {
+						$this->get('history')->logEvent(
+							$id->getFromCharacter(),
+							'event.military.supplied.food.start',
+							array('%link-character%'=>$settlement->getOwner()->getId(), '%link-settlement%'=>$settlement->getId()),
+							History::LOW, true
+						);
+					} else {
+						$this->get('history')->logEvent(
+							$id->getFromCharacter(),
+							'event.military.supplied.food.start',
+							array('%link-character%'=>$settlement->getSteward()->getId(), '%link-settlement%'=>$settlement->getId()),
+							History::LOW, true
+						);
+					}
 					$id->setAccepted(true);
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('military.settlement.food.supplied', array('%character%'=>$id->getFromCharacter()->getName(), '%settlement%'=>$id->getToSettlement()->getName()), 'actions'));
