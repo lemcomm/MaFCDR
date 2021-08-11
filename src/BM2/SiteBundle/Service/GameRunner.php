@@ -210,12 +210,20 @@ class GameRunner {
 
 		// TODO: this probably deserves its own update cycle soon...
 		// conversations update
+		$this->logger->info("  Updating conversation permissions...");
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c WHERE c.realm IS NOT NULL');
 		$iterableResult = $query->iterate();
+		$added = 0;
+		$removed = 0;
+		$convs = 0;
 		while ($row = $iterableResult->next()) {
 			$conversation = $row[0];
-			$this->convman->updateMembers($conversation);
+			$rtn = $this->convman->updateMembers($conversation);
+			$convs++;
+			$removed += $rtn['removed'];
+			$added += $rtn['added'];
 		}
+		$this->logger->info("  Result: ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
 
 		$this->logger->info("  Checking for dead and slumbering characters that need sorting...");
 		// NOTE: We're going to want to change this from c.system is null to something else, or build additional logic down the line, when we have more thant 'procd_inactive' as the system flag.
