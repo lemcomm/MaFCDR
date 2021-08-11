@@ -75,7 +75,7 @@ class UnitSoldiersType extends AbstractType {
 		}
 
 		foreach ($this->soldiers as $soldier) {
-			$actions = false;
+			$actions = [];
 			if ($in_battle == -1) {
 				if ($soldier->getCharacter()) {
 					$in_battle = $soldier->getCharacter()->isInBattle();
@@ -98,9 +98,9 @@ class UnitSoldiersType extends AbstractType {
 				if ($soldier->isAlive()) {
 					if (!$in_battle) {
 						if ($local) {
-							$actions = array('disband'=>'recruit.manage.disband');
 							if (!empty($avail_train) && $soldier->isActive()) {
 								$actions['retrain'] = 'recruit.manage.retrain';
+								$actions['disband'] = 'recruit.manage.disband';
 							}
 							if ($this->reassign) {
 								$actions['assignto'] = 'recruit.manage.reassign';
@@ -123,7 +123,7 @@ class UnitSoldiersType extends AbstractType {
 					$actions = array('bury' => 'recruit.manage.bury');
 				}
 			} // endif locked
-			if ($actions) {
+			if (!is_empty($actions)) {
 				$field->add('action', ChoiceType::class, array(
 					'choices' => $actions,
 					'required' => false,
