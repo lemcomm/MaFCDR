@@ -3286,7 +3286,7 @@ class Dispatcher {
 		if ($this->house && $this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.spawntoggle", "maf_house_newplayer", true,
+			return $this->action("house.spawntoggle", "maf_house_spawn_toggle", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
