@@ -1030,3 +1030,6 @@ house:
     It should be noted, that you won't be able to undo this on your own, though you will retain control over your own house otherwise.
   subject: Offer Subject
   text:    Offer Text
+ spawntoggle:
+  name:    Toggle Spawning
+  description: Allow players to spawn into your House.
