@@ -47,8 +47,10 @@ class PaymentManager {
 
 	public function calculateUserFee(User $user) {
 		$days = 0;
+		$now = new \DateTime("now");
 		if ($user->getLastLogin()) {
-			$days = (int)$user->getLastLogin()->diff(new \DateTime("now"))->format("%r%a");
+			$diff = $user->getLastLogin()->diff($now);
+			$days = $diff->d;
 		}
 
 		$fees = $this->getPaymentLevels();
