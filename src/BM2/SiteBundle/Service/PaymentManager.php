@@ -39,9 +39,9 @@ class PaymentManager {
 			22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>200,   'creator'=>'andrew'),
 			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
 			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-			42 =>   array('name' => 'explorer',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
+			42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
 			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-			51 =>   array('name' => 'explorer+',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
+			51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
 		];
 	}
 
@@ -224,7 +224,7 @@ class PaymentManager {
 				$refund = $this->calculateRefund($user);
 				$user->setAccountLevel($newlevel);
 				$user->setPaidUntil(new \DateTime("now"));
-				$thi->em->flush();
+				$this->em->flush();
 				return true;
 			}
 			# Either they are a valid patron, and the above returns true. Or they aren't, and this call fails. The rest doesn't matter.
