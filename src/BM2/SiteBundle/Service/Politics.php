@@ -34,22 +34,15 @@ class Politics {
 	}
 
 	public function breakoath(Character $character) {
-		# This will slowly no longer be relevant, so we check for it separately.
-		if ($character->getLiege()) {
-			$this->history->logEvent(
-				$character->getLiege(),
-				'politics.oath.broken',
-				array('%link-character%'=>$character->getId()),
-				History::MEDIUM, true
-			);
-			$character->setLiege(null);
-		}
 		$this->history->logEvent(
 			$character->findAllegiance(),
 			'politics.oath.broken',
 			array('%link-character%'=>$character->getId()),
 			History::MEDIUM, true
 		);
+		if ($character->getLiege()) {
+			$character->setLiege(null);
+		}
 		if ($character->getRealm()) {
 			$character->setRealm(NULL);
 		}
