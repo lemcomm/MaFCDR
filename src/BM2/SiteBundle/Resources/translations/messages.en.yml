@@ -1536,6 +1536,7 @@ unavailable:
  inside:        You are inside the settlement.
  outside:       You are not currently inside a settlement.
  outsideplace:  You are not currently inside a place.
+ outsideall:    You are not inside either a place or settlement.
  noregion:      You are not in an inhabited area.
  nodock:        There are no docks nearby.
  noship:        You do not have a ship nearby.
