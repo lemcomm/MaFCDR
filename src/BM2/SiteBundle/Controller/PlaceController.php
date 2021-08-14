@@ -301,6 +301,12 @@ class PlaceController extends Controller {
 					$this->addFlash('error', $this->get('translator')->trans('unavailable.notrulerofthatrealm', [], 'messages'));
 				}
 			}
+			if (!$fail && $data['type']->getRequies()=='ambassador') {
+				if ($character->findRealms()->isEmpty()) {
+					$fail = TRUE;
+					$this->addFlash('error', $this->get('translator')->trans('unavailable.norealm', [], 'messages'));
+				}
+			}
 			if (!$fail) {
 				$place = new Place();
 				$this->getDoctrine()->getManager()->persist($place);
