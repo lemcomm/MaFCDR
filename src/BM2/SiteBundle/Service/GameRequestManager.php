@@ -87,7 +87,7 @@ class GameRequestManager {
 		$realmIDs =  [];
 		foreach ($realms as $realm) {
 			foreach ($realm->findRulers() as $ruler) {
-				if ($char == $ruler) {
+				if ($char === $ruler) {
 					$realmIDs[] = $realm->getId();
 				}
 			}
@@ -104,7 +104,7 @@ class GameRequestManager {
 		}
 		# Check if we're in a house, and if we are, check who the head of it is. If we are, grab the ID.
 		$houseID = null;
-		if ($char->getHouse() && $char->getHouse()->getHead() == $char) {
+		if ($char->getHouse() && $char->getHouse()->getHead() === $char) {
 			$houseID = $char->getHouse()->getId();
 		}
 		# Build a list of all positions we hold, using their IDs.
