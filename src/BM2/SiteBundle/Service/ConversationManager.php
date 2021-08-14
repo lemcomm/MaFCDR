@@ -293,8 +293,8 @@ class ConversationManager {
                 }
         }
 
-        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true) {
-                if ($type == 'system' || $total) {
+        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true, $antiTickUp = false, $internal = false) {
+                if ($type == 'system' || $internal) {
                         $valid = true;
                 } else {
                         $valid = $conv->findActiveCharPermission($char);
@@ -319,7 +319,7 @@ class ConversationManager {
                         if (!$total) {
                                 $count = 0;
                                 foreach ($conv->findActivePermissions() as $perm) {
-                                        if ($perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
+                                        if (!$antiTickUp && $perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
                                                 $perm->setUnread($perm->getUnread()+1);
                                         }
                                         $count++;
@@ -566,8 +566,8 @@ class ConversationManager {
                         $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['pos'].'].';
                 }
 
-                #public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true)
-                $msg = $this->writeMessage($conv, null, null, $content, 'system', $antiTickUp, $flush);
+                #public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true, $antiTickUp = false, $internal = false)
+                $msg = $this->writeMessage($conv, null, null, $content, 'system', null, $flush, $antiTickUp, true);
 
                 if ($flush) {
                         $this->em->flush();
