@@ -31,14 +31,14 @@
 			<dd>{{ house.motto }} </dd>
 		{% endif %}
 		<dt>{{ 'house.view.home'|trans({},"politics") }}</dt>
-		{% if house.insidePlace %}
-			{% if house.insidePlace.insideSettlement %}
-				<dd> {{ link(house.insidePlace) }}, {{ link(house.insidePlace.insideSettlement) }}</dd>
+		{% if house.home %}
+			{% if house.home.settlement %}
+				<dd> {{ link(house.home) }}, {{ link(house.home.settlement) }}</dd>
 			{% else %}
-				<dd> {{ link(house.insidePlace) }}</dd>
+				<dd> {{ link(house.home) }}</dd>
 			{% endif %}
 		{% else %}
-			<dd>{{ link(house.insideSettlement) }}</dt>
+			<dd>{{ link(house.settlement) }}</dt>
 		{% endif %}
 		{% if house.superior %}
 			<dt>{{ 'house.view.superior'|trans({}, "politics") }}</dt>
