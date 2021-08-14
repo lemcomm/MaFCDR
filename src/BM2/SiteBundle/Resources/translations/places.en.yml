@@ -16,7 +16,7 @@ type:
 
 new:
  name:       Formalize a New Place
- intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.
+ intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.<br /><br />Please be advised, both capitals and embassies require you to be in a realm.
  success:    Successfully created %name%
 
 description:
