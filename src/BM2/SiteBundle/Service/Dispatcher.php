@@ -3054,14 +3054,18 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
 		}
+		if ($this->getCharacter()->getHouse()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+		}
 		if (!$this->getCharacter()->getInsideSettlement() AND !$this->getCharacter()->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
 		}
 		if ($this->getCharacter()->getInsidePlace() && $this->getCharacter()->getInsidePlace()->getType()->getName() != "home") {
 			return array("name"=>"house.new.name", "description"=>"unavailable.wrongplacetype");
 		}
-		if ($this->getCharacter()->getHouse()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getOwner() != $this->getCharacter()) {
+			#TODO: Rework this for permissions when we add House permissions (if we do).
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notyours2");
 		}
 		return array("name"=>"house.new.name", "url"=>"maf_house_create", "description"=>"house.new.description", "long"=>"house.new.longdesc");
 	}
