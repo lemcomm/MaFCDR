@@ -124,7 +124,11 @@ class ConversationManager {
                 $i = 1;
                 $sets = [];
                 $allConvs = [];
+                $hasPerms = false;
                 foreach ($perms as $perm) {
+                        if (!$hasPerms) {
+                                $hasPerms = true;
+                        }
                         # First we need to standardize out un-ended permissions, so we decare end as now if there isn't an end.
                         $start = $perm['start'];
                         if (array_key_exists('end', $perm)) {
@@ -168,11 +172,18 @@ class ConversationManager {
 
                 # Side load local conversations into the stack, if a local conversation exists for this character.
                 if ($local = $char->getLocalConversation()) {
+                        if (!$hasPerms) {
+                                $hasPerms = true;
+                        }
                         if (!$first) {
                                 $megaString .= ' OR';
                         }
                         $megaString .= ' (m.conversation = :local AND m.sent >= :startTime)';
                         $parameters['local'] = $local->getId();
+                }
+                if (!$hasPerms) {
+                        # No conversations to query, return empty array collection;
+                        return new ArrayCollection();
                 }
                 $parameters['startTime'] = $startTime;
 
@@ -555,7 +566,7 @@ class ConversationManager {
                         $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['pos'].'].';
                 }
 
-                # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+                #public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true)
                 $msg = $this->writeMessage($conv, null, null, $content, 'system', $antiTickUp, $flush);
 
                 if ($flush) {
