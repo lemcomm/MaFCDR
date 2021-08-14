@@ -3103,7 +3103,7 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
 		}
 		if (($character->getInsideSettlement() && $character->getInsideSettlement()->getHousesPresent()->isEmpty()) OR (!$character->getInsideSettlement() && $character->getInsidePlace() && !$character->getInsidePlace()->getHouse())) {
 			return array("name"=>"house.join.name", "description"=>"unavailable.housenothere");
@@ -3124,7 +3124,7 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if (!$character->getInsidePlace()) {
-			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notinside");
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.outsideplace");
 		}
 		if ($character->getInsidePlace() && $character->getInsidePlace()->getType()->getName() != "home") {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.wrongplacetype");
