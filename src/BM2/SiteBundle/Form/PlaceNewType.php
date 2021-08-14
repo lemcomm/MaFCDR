@@ -67,7 +67,7 @@ class PlaceNewType extends AbstractType {
 		));
 		$builder->add('realm', 'entity', array(
 			'label'=>'realm.label',
-			'required'=>true,
+			'required'=>false,
 			'placeholder' => 'realm.empty',
 			'attr' => array('title'=>'help.new.realm'),
 			'class' => 'BM2SiteBundle:Realm',
