@@ -17,13 +17,11 @@ class SettlementPermissionsType extends AbstractType {
 	private $settlement;
 	private $me;
 	private $em;
-	private $lord;
 
-	public function __construct(Settlement $settlement, Character $me, EntityManager $em, $lord) {
+	public function __construct(Settlement $settlement, Character $me, EntityManager $em) {
 		$this->settlement = $settlement;
 		$this->me = $me;
 		$this->em = $em;
-		$this->lord = $lord;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -35,7 +33,6 @@ class SettlementPermissionsType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$lord = $this->lord;
 		$s = $this->settlement;
 		$builder->add('settlement', 'entity', array(
 			'required' => true,
