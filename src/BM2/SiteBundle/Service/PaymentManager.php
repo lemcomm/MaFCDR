@@ -124,22 +124,26 @@ class PaymentManager {
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
 				$patronLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$patrons = $user->getPatronizing();
+				$sufficient = false;
 				foreach ($patreons as $patron) {
 					if ($patron->getExpires() < $now) {
 						$this->refreshPatreonTokens($patron);
 					}
 					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
-					if ($patreonLevel < $entitlement) {
-						# insufficient pledge level
-						$user->setAccountLevel(10);
-						$this->ChangeNotification($user, 'insufficient', 'insufficient2');
-						$expired++;
-					} else {
-						$this->spend($user, 'subscription', $myfee, true);
-						$active++;
-						$patron++;
-						# TODO: Give overpledge back as credits?
+					if ($patreonLevel >= $entitlement) {
+						$sufficient = true;
 					}
+				}
+				if (!$sufficient) {
+					# insufficient pledge level
+					$user->setAccountLevel(10);
+					$this->ChangeNotification($user, 'insufficient', 'insufficient2');
+					$expired++;
+				} else {
+					$this->spend($user, 'subscription', $myfee, true);
+					$active++;
+					$patron++;
+					# TODO: Give overpledge back as credits?
 				}
 			} else {
 				if ($user->getLastLogin()) {
