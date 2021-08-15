@@ -58,6 +58,9 @@ menu:
   start:    Character Placement
  dungeon:   Dungeon
  military:  Military
+ pbbg:      Supporter of PBBG.com
+ patreon:
+  andrew:   Support Development on Patreon!
 
 contact:
  title:     Contact
@@ -1174,6 +1177,9 @@ interaction:
  steward:
   name:     First One to Appoint
   submit:   Delegate
+ placetransfer:
+  name:     New Owner
+  submit:   Transfer
 
 battle:
  title:         Battle Report
