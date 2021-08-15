@@ -13,10 +13,12 @@ class PlacePermissionsSetType extends AbstractType {
 
 	private $me;
 	private $em;
+	private $owner;
 
-	public function __construct(Character $me, EntityManager $em) {
+	public function __construct(Character $me, EntityManager $em, $owner) {
 		$this->me = $me;
 		$this->em = $em;
+		$this->owner = $owner;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -28,19 +30,29 @@ class PlacePermissionsSetType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		if ($p->getType()->getPublic() === false) {
-			$builder->add('public', 'checkbox', [
-				'required'=> false,
-				'label'=> 'control.place.public',
-			]);
-		}
+		$owner = $this->owner;
+		if ($owner) {
+			if ($p->getType()->getPublic() === false) {
+				$builder->add('public', 'checkbox', [
+					'required'=> false,
+					'label'=> 'control.place.public',
+				]);
+			}
 
-		$builder->add('permissions', 'collection', array(
-			'type'		=> new PlacePermissionsType($builder->getData(), $this->me, $this->em),
-			'allow_add'	=> true,
-			'allow_delete' => true,
-			'cascade_validation' => true
-		));
+			$builder->add('permissions', 'collection', array(
+				'type'		=> new PlacePermissionsType($builder->getData(), $this->me, $this->em),
+				'allow_add'	=> true,
+				'allow_delete' => true,
+				'cascade_validation' => true
+			));
+		} else {
+			$builder->add('permissions', 'collection', array(
+				'type'		=> new PlaceOccupationPermissionsType($builder->getData(), $this->me, $this->em),
+				'allow_add'	=> true,
+				'allow_delete' => true,
+				'cascade_validation' => true
+			));
+		}
 	}
 
 	public function getName() {
