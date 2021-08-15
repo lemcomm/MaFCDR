@@ -49,14 +49,14 @@ class SettlementPermissionsSetType extends AbstractType {
 			));
 
 			$builder->add('permissions', 'collection', array(
-				'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em, $lord),
+				'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em),
 				'allow_add'	=> true,
 				'allow_delete' => true,
 				'cascade_validation' => true
 			));
 		} else {
 			$builder->add('occupation_permissions', 'collection', array(
-				'type'		=> new SettlementOccupationPermissionsType($builder->getData(), $this->me, $this->em, $lord),
+				'type'		=> new SettlementOccupationPermissionsType($builder->getData(), $this->me, $this->em),
 				'allow_add'	=> true,
 				'allow_delete' => true,
 				'cascade_validation' => true
