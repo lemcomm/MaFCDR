@@ -39,16 +39,18 @@ class PaymentManager {
 			22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>200,   'creator'=>'andrew'),
 			40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
 			41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-			42 =>   array('name' => 'explorer',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
+			42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
 			50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-			51 =>   array('name' => 'explorer+',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
+			51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
 		];
 	}
 
 	public function calculateUserFee(User $user) {
 		$days = 0;
+		$now = new \DateTime("now");
 		if ($user->getLastLogin()) {
-			$days = (int)$user->getLastLogin()->diff(new \DateTime("now"))->format("%r%a");
+			$diff = $user->getLastLogin()->diff($now);
+			$days = $diff->d;
 		}
 
 		$fees = $this->getPaymentLevels();
@@ -122,22 +124,26 @@ class PaymentManager {
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
 				$patronLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$patrons = $user->getPatronizing();
+				$sufficient = false;
 				foreach ($patreons as $patron) {
 					if ($patron->getExpires() < $now) {
 						$this->refreshPatreonTokens($patron);
 					}
 					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
-					if ($patreonLevel < $entitlement) {
-						# insufficient pledge level
-						$user->setAccountLevel(10);
-						$this->ChangeNotification($user, 'insufficient', 'insufficient2');
-						$expired++;
-					} else {
-						$this->spend($user, 'subscription', $myfee, true);
-						$active++;
-						$patron++;
-						# TODO: Give overpledge back as credits?
+					if ($patreonLevel >= $entitlement) {
+						$sufficient = true;
 					}
+				}
+				if (!$sufficient) {
+					# insufficient pledge level
+					$user->setAccountLevel(10);
+					$this->ChangeNotification($user, 'insufficient', 'insufficient2');
+					$expired++;
+				} else {
+					$this->spend($user, 'subscription', $myfee, true);
+					$active++;
+					$patron++;
+					# TODO: Give overpledge back as credits?
 				}
 			} else {
 				if ($user->getLastLogin()) {
@@ -224,7 +230,7 @@ class PaymentManager {
 				$refund = $this->calculateRefund($user);
 				$user->setAccountLevel($newlevel);
 				$user->setPaidUntil(new \DateTime("now"));
-				$thi->em->flush();
+				$this->em->flush();
 				return true;
 			}
 			# Either they are a valid patron, and the above returns true. Or they aren't, and this call fails. The rest doesn't matter.

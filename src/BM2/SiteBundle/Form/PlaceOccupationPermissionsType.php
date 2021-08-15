@@ -9,35 +9,34 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\Place;
 
+class PlaceOccupationPermissionsType extends AbstractType {
 
-class SettlementPermissionsType extends AbstractType {
-
-	private $settlement;
+	private $place;
 	private $me;
 	private $em;
 
-	public function __construct(Settlement $settlement, Character $me, EntityManager $em) {
-		$this->settlement = $settlement;
+	public function __construct(Place $place, Character $me, EntityManager $em) {
+		$this->place = $place;
 		$this->me = $me;
 		$this->em = $em;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
-			'intention'       => 'settlementpermissions_68956351',
-			'translation_domain' => 'politics',
-			'data_class'		=> 'BM2\SiteBundle\Entity\SettlementPermission',
+			'intention'       => 'placepermissions_68351',
+			'translation_domain' => 'places',
+			'data_class'		=> 'BM2\SiteBundle\Entity\PlacePermission',
 		));
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$s = $this->settlement;
-		$builder->add('settlement', 'entity', array(
+		$p = $this->place;
+		$builder->add('occupied_place', 'entity', array(
 			'required' => true,
-			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($s) {
-				return $er->createQueryBuilder('s')->where('s = :s')->setParameter('s',$s);
+			'class'=>'BM2SiteBundle:Place', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($p) {
+				return $er->createQueryBuilder('p')->where('p = :p')->setParameter('p',$p);
 			}
 		));
 		// TODO: filter according to what's available? (e.g. no permission for docks at regions with no coast)
@@ -47,7 +46,7 @@ class SettlementPermissionsType extends AbstractType {
 			'class'=>'BM2SiteBundle:Permission',
 			'choice_label'=>'translation_string',
 			'query_builder'=>function(EntityRepository $er) {
-				return $er->createQueryBuilder('p')->where('p.class = :class')->setParameter('class', 'settlement');
+				return $er->createQueryBuilder('p')->where('p.class = :class')->setParameter('class', 'place');
 			}
 		));
 		$builder->add('value', 'integer', array(
@@ -68,6 +67,6 @@ class SettlementPermissionsType extends AbstractType {
 	}
 
 	public function getName() {
-		return 'settlementpermissions';
+		return 'placepermissions';
 	}
 }

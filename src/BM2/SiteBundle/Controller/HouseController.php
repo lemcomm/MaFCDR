@@ -346,7 +346,7 @@ class HouseController extends Controller {
 			if (!$fail) {
 				#Update House location
 				if (!$place) {
-					$place->setHouse(null);
+					$house->setHome(null);
 					$house->setInsideSettlement($settlement);
 					#Create relocation event in House's event log
 					$this->get('history')->logEvent(
@@ -356,7 +356,7 @@ class HouseController extends Controller {
 						History::HIGH, true
 					);
 				} else {
-					$place->setHouse($house);
+					$house->setHome($place);
 					$house->setInsideSettlement(null);
 					#Create relocation event in House's event log
 					$this->get('history')->logEvent(
@@ -405,6 +405,7 @@ class HouseController extends Controller {
 			}
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+			return $this->redirectToRoute('bm2_politics');
 		}
 		return $this->render('House/newplayer.html.twig', [
 			'house'=>$house, 'form'=>$form->createView()
@@ -421,13 +422,19 @@ class HouseController extends Controller {
 		}
 
 		$em = $this->getDoctrine()->getManager();
-		if($spawn->getActive()) {
-			$spawn->setActive(false);
-		} else {
-			$spawn->setActive(true);
+		if ($place = $house->getHome()) {
+			if ($spawn = $place->getSpawn()) {
+				if($spawn->getActive()) {
+					$spawn->setActive(false);
+					$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.stop', ["%name%"=>$place->getName()], 'actions'));
+				} else {
+					$spawn->setActive(true);
+					$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.start', ["%name%"=>$place->getName()], 'actions'));
+				}
+				$em->flush();
+			}
 		}
-		$em->flush();
-		return new RedirectResponse($this->generateUrl('bm2_politics'));
+		return $this->redirectToRoute('bm2_politics');
 	}
 
 	/**

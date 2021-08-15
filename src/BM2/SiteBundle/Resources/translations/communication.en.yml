@@ -230,6 +230,7 @@ event:
    place:       The owner of %place% has rejected your offer of vassalge.
    position:    The %realmposition% has rejected your offer of vassalge.
   steward:      Has been appointed as the steward of %settlement%.
+  recvdplace:   Has received ownership of %place%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -367,6 +368,7 @@ event:
   charstart:    A new First One named %character% has appared at %place%.
   newknight:    %character% has been accepted as a vassal of the place.
   rejectknight: %character% has been rejected as a potential vassal of the place.
+  newowner:     Onwership has been transferred to %character%.
 
 report:
  building:

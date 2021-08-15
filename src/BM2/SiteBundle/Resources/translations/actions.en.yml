@@ -458,6 +458,9 @@ control:
   success:
    start:       You have enabled spawning at %name%, further action may be required by the realm rulers or house head, as appropriate.
    stop:        You have disabled all spawning at %name%. No further characters may appear here.
+  manage:
+   start:       You have enabled spawning at %name%.
+   stop:        You have disabled spawning at %name%.
 
 military:
  name:          Military actions

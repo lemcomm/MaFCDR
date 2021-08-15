@@ -1018,12 +1018,10 @@ house:
    are not already part of another.
  newplayer:
   name:         Setup Intro Message
+  name2:        Update the Arrival Description of %name%
   description:  Alter the message new character receive
   longdesc:     As the head of your house, you directly control the introduction those who arrive here receive
- spawntoggle:
-  name:         Toggle Arrivals
-  description:  Enable or disable new characters spawning here
-  longdesc:     You can, at any time, change whether or not you allow people to arrive in the world at your Home.
+  intro:        Here you can alter the house information that is displayed to players creating a new character or considering to join %name% at an Arrival location. It is understood that this will, likely, include propaganda about your realm, but that is your choice.
  cadet:
   name:        Offer Subordination
   description: Offer to merge your house into another house as a cadet house.
@@ -1032,3 +1030,6 @@ house:
     It should be noted, that you won't be able to undo this on your own, though you will retain control over your own house otherwise.
   subject: Offer Subject
   text:    Offer Text
+ spawntoggle:
+  name:    Toggle Spawning
+  description: Allow players to spawn into your House.

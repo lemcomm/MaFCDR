@@ -665,7 +665,7 @@ class WarController extends Controller {
 			}
 		}
 
-		return $this->render('War/sieges.html.twig', [
+		return $this->render('War/siege.html.twig', [
 			'character'=>$character,
 			'settlement'=>$settlement,
 			'place'=>$place,

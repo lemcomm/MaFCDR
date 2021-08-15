@@ -124,7 +124,11 @@ class ConversationManager {
                 $i = 1;
                 $sets = [];
                 $allConvs = [];
+                $hasPerms = false;
                 foreach ($perms as $perm) {
+                        if (!$hasPerms) {
+                                $hasPerms = true;
+                        }
                         # First we need to standardize out un-ended permissions, so we decare end as now if there isn't an end.
                         $start = $perm['start'];
                         if (array_key_exists('end', $perm)) {
@@ -168,11 +172,18 @@ class ConversationManager {
 
                 # Side load local conversations into the stack, if a local conversation exists for this character.
                 if ($local = $char->getLocalConversation()) {
+                        if (!$hasPerms) {
+                                $hasPerms = true;
+                        }
                         if (!$first) {
                                 $megaString .= ' OR';
                         }
                         $megaString .= ' (m.conversation = :local AND m.sent >= :startTime)';
                         $parameters['local'] = $local->getId();
+                }
+                if (!$hasPerms) {
+                        # No conversations to query, return empty array collection;
+                        return new ArrayCollection();
                 }
                 $parameters['startTime'] = $startTime;
 
@@ -282,8 +293,8 @@ class ConversationManager {
                 }
         }
 
-        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true) {
-                if ($type == 'system' || $total) {
+        public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true, $antiTickUp = false, $internal = false) {
+                if ($type == 'system' || $internal) {
                         $valid = true;
                 } else {
                         $valid = $conv->findActiveCharPermission($char);
@@ -308,7 +319,7 @@ class ConversationManager {
                         if (!$total) {
                                 $count = 0;
                                 foreach ($conv->findActivePermissions() as $perm) {
-                                        if ($perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
+                                        if (!$antiTickUp && $perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
                                                 $perm->setUnread($perm->getUnread()+1);
                                         }
                                         $count++;
@@ -555,8 +566,8 @@ class ConversationManager {
                         $content = 'A First One by the name of '.$origin.' at has joined the subrealm of [r:'.$extra['realm'].'] as a knight of [realmpos:'.$extra['pos'].'].';
                 }
 
-                # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
-                $msg = $this->writeMessage($conv, null, null, $content, 'system', $antiTickUp, $flush);
+                #public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true, $antiTickUp = false, $internal = false)
+                $msg = $this->writeMessage($conv, null, null, $content, 'system', null, $flush, $antiTickUp, true);
 
                 if ($flush) {
                         $this->em->flush();

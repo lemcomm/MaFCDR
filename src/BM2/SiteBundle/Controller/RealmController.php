@@ -329,8 +329,10 @@ class RealmController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		if($spawn->getActive()) {
 			$spawn->setActive(false);
+			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.stop', ["%name%"=>$spawn->getPlace()->getName()], 'actions'));
 		} else {
 			$spawn->setActive(true);
+			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.start', ["%name%"=>$spawn->getPlace()->getName()], 'actions'));
 		}
 		$em->flush();
 		return new RedirectResponse($this->generateUrl('maf_realm_spawn', ['realm' => $realm->getId()]).'#'.$spawn->getPlace()->getId());

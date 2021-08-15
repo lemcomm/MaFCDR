@@ -39,6 +39,10 @@
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
+				{% set check = dispatcher.placeTransferTest(null, place) %}
+				{% if check.url is defined %}
+					<a href="{{path('maf_place_transfer', {"id":place.id}) }}"><button id="transfer">{{ 'place.transfer.name'|trans({}, "places")|raw }}</button></a>
+				{% endif %}
 				{% set check = dispatcher.placeNewPlayerInfoTest(null, place) %}
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="spawn_description">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
@@ -54,9 +58,6 @@
 				{% endif %}
 				{% if inside %}
 					{% if place.getType.getDefensible() %}
-						{% if place.getOwner() != character and place.getOccupant() and place.getOccupant() != character %}
-							<a href="{{path('maf_place_occupation_start', {"id":place.id}) }}"><button id="siege">{{ 'place.occupy.button.start'|trans({}, "places")|raw }}</button></a>
-						{% endif %}
 						{% if place.getOccupier() == character %}
 							<a href="{{path('maf_place_occupant', {"place":place.id}) }}"><button id="siege">{{ 'place.occupant.button'|trans({}, "places")|raw }}</button></a>
 							<a href="{{path('maf_place_occupier', {"place":place.id}) }}"><button id="siege">{{ 'place.occupier.button'|trans({}, "places")|raw }}</button></a>

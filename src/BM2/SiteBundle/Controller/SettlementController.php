@@ -190,6 +190,7 @@ class SettlementController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
+			# TODO: This can be combined with the code in PlaceController as part of a service function.
 			if ($lord) {
 				foreach ($settlement->getPermissions() as $permission) {
 					$permission->setValueRemaining($permission->getValue());

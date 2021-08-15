@@ -2291,6 +2291,24 @@ class Dispatcher {
 		}
 	}
 
+	public function placeTransferTest($ignored, Place $place) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
+		}
+		if ($place->getOwner() !== $this->getCharacter()) {
+			return ["name"=>"place.transfer.name", "description"=>"unavailable.notowner"];
+		}
+		if ($place->getOwner() && $place->getOwner()->getInsidePlace() !== $place) {
+			return ["name"=>"place.transfer.name", "description"=>"unavailable.outsideplace"];
+		}
+		return [
+			$this->action("place.transfer", "maf_place_transfer", true,
+				['place'=>$place->getId()],
+				['%name%'=>$place->getName(), '%formalname%'=>$place->getFormalName()]
+			)
+		];
+	}
+
 	public function placeNewPlayerInfoTest($ignored, $place) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.$check");
@@ -2598,7 +2616,12 @@ class Dispatcher {
 	public function unitAssignTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if(($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) || $unit->getMarshal() != $character) {
+		if(
+			(
+				$unit->getSettlement() && (
+					$unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units')
+				)
+			) || $unit->getMarshal() != $character) {
 			return array("name"=>"unit.assign.name", "description"=>"unavailable.notmarshal");
 		}
 		if(!$settlement) {
@@ -2613,7 +2636,7 @@ class Dispatcher {
 	public function unitAppointTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
+		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
 			return array("name"=>"unit.appoint.name", "description"=>"unavailable.notlord");
 		}
 		if(!$settlement) {
@@ -2628,7 +2651,12 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
-		if ($unit->getCharacter() == $character || ($unit->getSettlement() && ($unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character)) || ($unit->getMarshal() == $character) || $this->permission_manager->checkSettlementPermission($settlement, $character, 'recruit')) {
+		if (
+			$unit->getCharacter() == $character || (
+				$unit->getSettlement() && (
+					$unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character
+				)
+			) || ($unit->getMarshal() == $character) || $this->permission_manager->checkSettlementPermission($settlement, $character, 'recruit')) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
@@ -3054,14 +3082,19 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->getCharacter()->getInsideSettlement() AND !$this->getCharacter()->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+		$character = $this->getInsidePlace();
+		if ($character->getHouse()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
 		}
-		if ($this->getCharacter()->getInsidePlace() && $this->getCharacter()->getInsidePlace()->getType()->getName() != "home") {
+		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
+		}
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getType()->getName() != "home") {
 			return array("name"=>"house.new.name", "description"=>"unavailable.wrongplacetype");
 		}
-		if ($this->getCharacter()->getHouse()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getOwner() !== $character) {
+			#TODO: Rework this for permissions when we add House permissions (if we do).
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notyours2");
 		}
 		return array("name"=>"house.new.name", "url"=>"maf_house_create", "description"=>"house.new.description", "long"=>"house.new.longdesc");
 	}
@@ -3103,7 +3136,7 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.notinside");
+			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
 		}
 		if (($character->getInsideSettlement() && $character->getInsideSettlement()->getHousesPresent()->isEmpty()) OR (!$character->getInsideSettlement() && $character->getInsidePlace() && !$character->getInsidePlace()->getHouse())) {
 			return array("name"=>"house.join.name", "description"=>"unavailable.housenothere");
@@ -3124,7 +3157,7 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if (!$character->getInsidePlace()) {
-			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.notinside");
+			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.outsideplace");
 		}
 		if ($character->getInsidePlace() && $character->getInsidePlace()->getType()->getName() != "home") {
 			return array("name"=>"house.manage.relocate.name", "description"=>"unavailable.wrongplacetype");
@@ -3282,7 +3315,7 @@ class Dispatcher {
 		if ($this->house && $this->house->getHead() != $this->getCharacter()) {
 			return array("name"=>"house.spawntoggle.name", "description"=>"unavailable.nothead");
 		} else {
-			return $this->action("house.spawntoggle", "maf_house_newplayer", true,
+			return $this->action("house.spawntoggle", "maf_house_spawn_toggle", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);

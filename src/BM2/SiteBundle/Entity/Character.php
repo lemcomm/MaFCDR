@@ -460,6 +460,9 @@ class Character {
 		if ($this->liege_position) {
 			return $this->getLiegePosition();
 		}
+		if ($this->liege) {
+			return $this->getLiege();
+		}
 		return null;
 	}
 
@@ -512,10 +515,9 @@ class Character {
 	}
 
 	public function findLiege() {
-		if ($this->getLiege()) {
-			return $this->getLiege();
+		if ($alleg instanceof Character) {
+			return $alleg;
 		}
-		$alleg = $this->findAllegiance();
 		if ($alleg instanceof Realm) {
 			return $alleg->findRulers();
 		}
