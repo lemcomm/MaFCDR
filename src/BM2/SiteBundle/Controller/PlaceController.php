@@ -154,32 +154,48 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-		/* Not sure if we'll need this just yet.
-		$place = $em->getRepository('BM2SiteBundle:Place')->find($id);
-			throw $this->createNotFoundException('error.notfound.place');
+		if ($place->getOwner() == $character) {
+			$owner = true;
+			$original_permissions = clone $place->getPermissions();
+			$page = 'Place/permissions.html.twig';
+		} else {
+			$owner = false;
+			$original_permissions = clone $place->getOccupationPermissions();
+			$page = 'Place/occupationPermissions.html.twig';
 		}
-		if ($place->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.place');
-		}
-		*/
 
-		$original_permissions = clone $place->getPermissions();
-
-		$form = $this->createForm(new PlacePermissionsSetType($character, $this->getDoctrine()->getManager()), $place);
+		$form = $this->createForm(new PlacePermissionsSetType($character, $this->getDoctrine()->getManager(), $owner), $place);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			foreach ($place->getPermissions() as $permission) {
-				$permission->setValueRemaining($permission->getValue());
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			# TODO: This can be combined with the code in SettlementController as part of a service function.
+			if ($owner) {
+				foreach ($place->getPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$place->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$place->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					} else {
+						$em->persist($orig);
+					}
+				}
+			} else {
+				foreach ($place->getOccupationPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
+				}
+				foreach ($original_permissions as $orig) {
+					if (!$place->getOccupationPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
 			}
 			$em->flush();
@@ -368,6 +384,50 @@ class PlaceController extends Controller {
 
 		return $this->render('Place/new.html.twig', [
 			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/transfer", requirements={"id"="\d+"}, name="maf_place_transfer")
+	  */
+	public function transferAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeTransferTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new InteractionType('placetransfer',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['target'] != $character) {
+				$place->setOwner($data['target']);
+
+				$this->get('history')->logEvent(
+					$place,
+					'event.place.newowner',
+					array('%link-character%'=>$data['target']->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->get('history')->logEvent(
+					$data['target'],
+					'event.character.recvdplace',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->addFlash('notice', $this->get('translator')->trans('control.placetransfer.success', ["%name%"=>$data['target']->getName()], 'actions'));
+				$this->getDoctrine()->getManager()->flush();
+				return $this->redirectToRoute('maf_place_actionable');
+			}
+		}
+
+		return $this->render('Place/transfer.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
 		]);
 	}
 
