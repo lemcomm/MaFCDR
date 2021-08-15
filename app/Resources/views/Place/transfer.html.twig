@@ -1,0 +1,16 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "place.transfer.name"|trans({},"places")|title }}</h2>
+
+	<p>{{ "place.transfer.intro"|trans({},"places")|raw}}</p>
+
+	{{ form_start(form) }}
+	{{ form_errors(form) }}
+
+	{{ form_row(form.target) }}<br />
+	{{ form_row(form.submit) }}
+
+	{{ form_end(form) }}
+
+{% endblock %}
