@@ -2586,11 +2586,11 @@ class Dispatcher {
 		$character = $this->getCharacter();
 		$settlement = $unit->getSettlement();
 		if (!$character->getUnits()->contains($unit)) {
-			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') || $unit->getMarshal() != $character)) {
+			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character)) {
 				if($unit->getSettlement() != $character->getInsideSettlement()) {
 					return array("name"=>"unit.manage.name", "description"=>"unavailable.notinside");
 				}
-				return array("name"=>"unit.manage.name", "description"=>"unavailable.notlord");
+				return array("name"=>"unit.manage.name", "description"=>"unavailable.notmarshal");
 			}
 		} elseif ($unit->getCharacter() != $character) {
 			return array("name"=>"unit.new.name", "description"=>"unavailable.notyourunit");
@@ -2602,7 +2602,7 @@ class Dispatcher {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		if($unit->getSettlement() && !$this->permission_manager->checkSettlementPermission($unit->getSettlement(), $character, 'units')) {
-			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notlord");
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notowner");
 		}
 		if(!$settlement) {
 			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notinside");
@@ -2803,15 +2803,10 @@ class Dispatcher {
 	private function checkVassals(Character $char) {
 		$valid = false;
 		$settlements = $char->getOwnedSettlements()->count();
-		foreach ($char->getVassals() as $vassal) {
+		foreach ($char->findVassals() as $vassal) {
 			if ($vassal->getUser() != $char->getUser()) {
 				$valid=true;
 			}
-			list($v, $e) = $this->checkVassals($vassal);
-			if ($v) {
-				$valid = true;
-			}
-			$settlements += $e;
 		}
 		return array($valid, $settlements);
 	}
