@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -45,7 +45,7 @@ class House {
 		$all_members = $this->findAllMembers();
 		foreach ($all_members as $member) {
 			if ($member->isAlive() && !$member->getRetired() && !$member->getSlumbering()) {
-				$all_living[] = $member;
+				$all_active[] = $member;
 			}
 		}
 		return $all_active;
