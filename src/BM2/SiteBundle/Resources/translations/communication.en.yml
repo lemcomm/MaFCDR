@@ -130,10 +130,12 @@ event:
   killartifact: You took the %artifact% from the body of %character%.
   child:        Had a child, %character%.
   inherit:
+   place:       Inhereited the place of %place% from %character%.
    estate:      Inherited the settlement %settlement% from %character%.
    position:    Inherited the position of %position% from %character%.
    realm:       Inherited the realm %realm% from %character%.
   inheritvia:
+   place:       Inhereited the place of %place% from %character-1% (via %character-2%).
    estate:      Inherited the settlement %settlement% from %character-1% (via %character-2%).
    position:    Inherited the position of %position% from %character-1% (via %character-2%).
    realm:       Inherited the realm %realm% from %character-1% (via %character-2%).
@@ -218,6 +220,7 @@ event:
    subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
    newhead:     Took over leadership of the house after the passing of %character%.
    revived:     Revived under the leadership of %character%.
+   arrival:      %character% has arrived in the house at %place%.
   siege:
    disband:     By declaration of %character% the siege of the settlement of %settlement% has concluded peacefully.
    disband2:    By declaration of %character% the siege of the place of %place% has concluded peacefully.
@@ -369,6 +372,8 @@ event:
   newknight:    %character% has been accepted as a vassal of the place.
   rejectknight: %character% has been rejected as a potential vassal of the place.
   newowner:     Onwership has been transferred to %character%.
+  inherited:    Was inherited by %character%.
+  inherifail:   Fell to independence on the death of %character%, who left no heir.
 
 report:
  building:
