@@ -3082,12 +3082,12 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
 		}
-		$character = $this->getInsidePlace();
+		$character = $this->getCharacter();
 		if ($character->getHouse()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
 		}
-		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
+		if (!$character->getInsidePlace()) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.outsideplace");
 		}
 		if ($character->getInsidePlace() && $character->getInsidePlace()->getType()->getName() != "home") {
 			return array("name"=>"house.new.name", "description"=>"unavailable.wrongplacetype");

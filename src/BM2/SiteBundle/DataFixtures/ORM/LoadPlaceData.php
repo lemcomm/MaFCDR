@@ -20,7 +20,8 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'cave'		=> array('requires' => '',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'embassy'	=> array('requires' => 'ambassador',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 2),
 		'fort'		=> array('requires' => 'fort',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
-		'home'		=> array('requires' => 'dynasty head',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>true,	'pop' => 0),
+		'guild house'	=> array('requires' => 'guilds',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
+		'home'		=> array('requires' => '',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>true,	'pop' => 0),
 		'inn'		=> array('requires' => 'inn',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'library'	=> array('requires' => '',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'monument'	=> array('requires' => 'lord',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
@@ -28,6 +29,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'port'		=> array('requires' => 'docks',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>true,	'pop' => 0),
 		'portal' 	=> array('requires' => 'magic',		'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'passage'	=> array('requires' => 'warren',	'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
+		'temple'	=> array('requires' => 'temple',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'track'		=> array('requires' => 'track',		'visible' => true,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'tavern'	=> array('requires' => 'tavern',	'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
 		'tournament'	=> array('requires' => 'lord',		'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 10)
@@ -37,9 +39,12 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'memorial'	=> array('type' =>	'monument'),
 		'statue'	=> array('type' =>	'monument'),
 		'obelisk'	=> array('type' =>	'monument'),
+		'tomb'		=> array('type' =>	'monument'),
 		'market'	=> array('type' =>	'plaza'),
 		'scenic'	=> array('type' =>	'plaza'),
 		'event'		=> array('type' =>	'plaza'),
+		'personal'	=> array('type' =>	'house'),
+		'dynastic'	=> array('type' =>	'house'),
 	);
 
 	private $placeupgradetypes = array(

@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\SettlementClaim;
 
@@ -34,12 +35,15 @@ class Politics {
 	}
 
 	public function breakoath(Character $character) {
-		$this->history->logEvent(
-			$character->findAllegiance(),
-			'politics.oath.broken',
-			array('%link-character%'=>$character->getId()),
-			History::MEDIUM, true
-		);
+		$alleg = $character->findAllegiance();
+		if (!$alleg instanceof RealmPosition) {
+			$this->history->logEvent(
+				$alleg,
+				'politics.oath.broken',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
+		}
 		if ($character->getLiege()) {
 			$character->setLiege(null);
 		}
