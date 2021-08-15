@@ -51,7 +51,7 @@ class GameRequestController extends Controller {
 				}
 				break;
 			case 'oath.offer':
-				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char || $id->getToSettlement()->getSteward() != $char)) {
+				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char)) {
 					$result = false;
 				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
 					$result = false;
@@ -413,6 +413,8 @@ class GameRequestController extends Controller {
 			case 'house.join':
 				if ($allowed) {
 					$house = $id->getToHouse();
+					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'house.join' AND r.id != :id AND r.from_character = :char");
+					$query->setParameters(['id'=>$id->getId(), 'char'=>$character->getId()]);
 					$this->get('history')->logEvent(
 						$id->getFromCharacter(),
 						'event.character.joinhouse.denied',
@@ -422,6 +424,7 @@ class GameRequestController extends Controller {
 					$em->remove($id);
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					$query->execute();
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
@@ -430,6 +433,8 @@ class GameRequestController extends Controller {
 			case 'oath.offer':
 				if ($allowed) {
 					$character = $id->getFromCharacter();
+					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'oath.offer' AND r.id != :id AND r.from_character = :char");
+					$query->setParameters(['id'=>$id->getId(), 'char'=>$character->getId()]);
 					if ($id->getToSettlement()) {
 						$settlement = $id->getToSettlement();
 						$this->get('history')->logEvent(
@@ -447,6 +452,7 @@ class GameRequestController extends Controller {
 						$this->addFlash('notice', $this->get('translator')->trans('oath.settlement.rejected', array('%name%'=>$id->getFromCharacter()->getName()), 'politics'));
 						$em->remove($id);
 						$em->flush();
+						$query->execute();
 						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPlace()) {
@@ -473,16 +479,17 @@ class GameRequestController extends Controller {
 						);
 						$em->remove($id);
 						$em->flush();
+						$query->execute();
 						return $this->redirectToRoute($route);
 					}
 					if ($id->getToPosition()) {
 						$pos = $id->getToPlace();
-						$this->get('history')->logEvent(
+						/*$this->get('history')->logEvent(
 							$pos,
 							'event.position.rejectknight',
 							array('%link-character%'=>$id->getFromCharacter()->getId()),
 							History::HIGH, true
-						);
+						);*/
 						$this->get('history')->logEvent(
 							$character,
 							'event.character.liegerejected.position',
@@ -499,6 +506,7 @@ class GameRequestController extends Controller {
 						);
 						$em->remove($id);
 						$em->flush();
+						$query->execute();
 						return $this->redirectToRoute($route);
 					}
 				} else {
@@ -517,6 +525,8 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$target = $id->getToRealm();
 					$realm = $id->getFromRealm();
+					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'realm.join' AND r.id != :id AND r.from_realm = :realm");
+					$query->setParameters(['id'=>$id->getId(), 'realm'=>$realm->getId()]);
 
 					$this->get('history')->logEvent(
 						$realm,
@@ -536,6 +546,7 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
+					$query->execute();
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notruler');
@@ -544,6 +555,8 @@ class GameRequestController extends Controller {
 			case 'house.cadet':
 				if ($allowed) {
 					$house = $id->getToHouse();
+					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'house.cadet' AND r.id != :id AND r.from_house = :house");
+					$query->setParameters(['id'=>$id->getId(), 'house'=>$id->getFromHouse()->getId()]);
 					$this->get('history')->logEvent(
 						$id->getFromHouse(),
 						'event.house.joinhouse.denied',
@@ -552,6 +565,7 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
+					$query->execute();
 					$this->addFlash('notice', $this->get('translator')->trans('house.cadet.denied', array('%character%'=>$id->getFromHouse()->getName()), 'politics'));
 					return $this->redirectToRoute($route);
 				} else {
