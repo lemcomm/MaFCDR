@@ -8,8 +8,10 @@
 
 		<field name="users" type="integer"/>
 		<field name="active_users" type="integer"/>
+		<field name="really_active_users" type="integer" nullable="true"/>
 		<field name="ever_paid_users" type="integer"/>
 		<field name="paying_users" type="integer"/>
+		<field name="active_patrons" type="integer" nullable="true"/>
 		<field name="characters" type="integer"/>
 		<field name="living_characters" type="integer"/>
 		<field name="active_characters" type="integer"/>
