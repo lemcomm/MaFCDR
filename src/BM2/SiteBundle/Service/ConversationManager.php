@@ -457,10 +457,14 @@ class ConversationManager {
                         $added[] = $char;
                 } elseif ($realm) {
                         $conv->setRealm($realm);
-                        $recipients = $realm->findMembers();
+                        if (!$recipients) {
+                                $recipients = $realm->findMembers();
+                        }
                 } elseif ($house) {
                         $conv->setHouse($house);
-                        $recipients = $house->findAllLiving();
+                        if (!$recipients) {
+                                $recipients = $house->findAllLiving();
+                        }
                 } elseif ($local) {
                         $conv->setLocalFor($character);
                 }
@@ -645,7 +649,7 @@ class ConversationManager {
                 }
         }
 
-        public function updateMembers(Conversation $conv) {
+        public function updateMembers(Conversation $conv, ArrayCollection $members=null) {
                 $realm = $conv->getRealm();
                 $house = $conv->getHouse();
                 $added = new ArrayCollection();
@@ -654,10 +658,14 @@ class ConversationManager {
 
                 if ($realm) {
                         $entity = $realm;
-                        $members = $realm->findMembers();
+                        if (!$members) {
+                                $members = $realm->findMembers();
+                        }
                 } else {
                         $entity = $house;
-                        $members = $house->findAllLiving();
+                        if (!$members) {
+                                $members = $house->findAllActive();
+                        }
                 }
 
                 if ($entity) {
