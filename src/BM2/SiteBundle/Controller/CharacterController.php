@@ -410,7 +410,13 @@ class CharacterController extends Controller {
 					}
 				} else {
 					$house = $spawn->getHouse();
-					$character->setHouse();
+					$character->setHouse($house);
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.arrival',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, true, 15
+					);
 				}
 			} else {
 				$house = $character->getHouse();
