@@ -2616,7 +2616,12 @@ class Dispatcher {
 	public function unitAssignTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if(($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) || $unit->getMarshal() != $character) {
+		if(
+			(
+				$unit->getSettlement() && (
+					$unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units')
+				)
+			) || $unit->getMarshal() != $character) {
 			return array("name"=>"unit.assign.name", "description"=>"unavailable.notmarshal");
 		}
 		if(!$settlement) {
@@ -2631,7 +2636,7 @@ class Dispatcher {
 	public function unitAppointTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character || $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
+		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
 			return array("name"=>"unit.appoint.name", "description"=>"unavailable.notlord");
 		}
 		if(!$settlement) {
@@ -2646,7 +2651,12 @@ class Dispatcher {
 	public function unitSoldiersTest($ignored, Unit $unit) {
 		$settlement = $this->getCharacter()->getInsideSettlement();
 		$character = $this->getCharacter();
-		if ($unit->getCharacter() == $character || ($unit->getSettlement() && ($unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character)) || ($unit->getMarshal() == $character) || $this->permission_manager->checkSettlementPermission($settlement, $character, 'recruit')) {
+		if (
+			$unit->getCharacter() == $character || (
+				$unit->getSettlement() && (
+					$unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character
+				)
+			) || ($unit->getMarshal() == $character) || $this->permission_manager->checkSettlementPermission($settlement, $character, 'recruit')) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
