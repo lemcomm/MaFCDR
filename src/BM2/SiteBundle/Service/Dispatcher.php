@@ -2291,6 +2291,24 @@ class Dispatcher {
 		}
 	}
 
+	public function placeTransferTest($ignored, Place $place) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
+		}
+		if ($place->getOwner() !== $this->getCharacter()) {
+			return ["name"=>"place.transfer.name", "description"=>"unavailable.notowner"];
+		}
+		if ($place->getOwner() && $place->getOwner()->getInsidePlace() !== $place) {
+			return ["name"=>"place.transfer.name", "description"=>"unavailable.outsideplace"];
+		}
+		return [
+			$this->action("place.transfer", "maf_place_transfer", true,
+				['place'=>$place->getId()],
+				['%name%'=>$place->getName(), '%formalname%'=>$place->getFormalName()]
+			)
+		];
+	}
+
 	public function placeNewPlayerInfoTest($ignored, $place) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.$check");
