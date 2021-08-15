@@ -1,0 +1,143 @@
+{% extends "layout.html.twig" %}
+
+{% macro permission_row(permission, owner) %}
+{% spaceless %}<td style="display:none">
+{{ form_widget(permission.occupied_place) }}</td>
+<td>{{ form_widget(permission.permission) }}</td>
+<td>{{ form_widget(permission.value) }}</td>
+<td>{{ form_widget(permission.reserve) }}</td>
+<td>{{ form_widget(permission.listing) }}</td>
+{% endspaceless %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block content %}
+	<h2>{{ "place.permissions.name"|trans({},"places")|title }}</h2>
+	<p>{{ "place.permissions.intro"|trans({"%place%":link(place), "%listsurl%":path('bm2_lists')},"places")|raw }}</p>
+
+	<div class="warning">
+		{# TODO: remove warning when permissions are done #}
+		Permission limits are incomplete. Right now, permissions are all-or-nothing, so if you give someone recruit permissions, they can if they want recruit <b>all</b> of your militia. Do not give permissions to people you do not trust 100%.
+	</div>
+
+	<table style="display:none">
+	<tr id="prototype">
+		{% if owner %}
+			{{ macros.permission_row(form.permissions.vars.prototype, owner) }}
+		{% else %}
+			{{ macros.permission_row(form.occupation_permissions.vars.prototype, owner) }}
+		{% endif %}
+	</tr>
+	</table>
+	<form class="wide" action="{{ path('maf_place_permissions', {'id':place.id}) }}" method="post" {{ form_start(form) }}
+		{{ form_errors(form) }}
+		{{ form_widget(form._token) }}
+		<h3>{{ "place.permissions.manage"|trans({},"places")|title }}</h3>
+		<table class="permissions">
+			<thead><tr>
+				<th>{{ 'perm.name'|trans({}, "politics") }}</th>
+				<th>{{ 'perm.value'|trans({}, "politics") }}</th>
+				<th>{{ 'perm.reserve'|trans({}, "politics") }}</th>
+				<th>{{ 'perm.listing'|trans({}, "politics") }}</th>
+			</tr></thead>
+			<tbody>
+			{% if owner %}
+				{% for permission in form.permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% else %}
+				{% for permission in form.occupation_permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% endif %}
+			</tbody>
+		</table>
+
+		<br /><br />
+
+		<button type="submit" name="submit">{{ "buttons.submit"|trans({},"places") }}</button>
+	</form>
+
+	<hr />
+	<h2>{{ "perm.desc.title"|trans({},"places")|title }}</h2>
+	<dl class="wide">
+		{% for perm in permissions %}
+			<dt>{{ perm.translationstring|trans({},"politics") }}</dt>
+			<dd>{{ perm.description|trans({},"politics") }}</dd>
+		{% endfor %}
+	</dl>
+
+{% endblock %}
+
+
+{% block jquery %}
+// Get the ul that holds the collection of tags
+var collectionHolder = $('table.permissions');
+
+// setup an "add a tag" link
+var newLink = $('<button type="button" class="add_tag_link">{{ 'perm.add'|trans({}, "politics") }}</button>');
+
+// add the "add a tag" anchor and li to the tags ul
+collectionHolder.after(newLink);
+
+// add a delete link to all of the existing tag form li elements
+collectionHolder.find('tbody').find('tr').each(function() {
+	addActionButtons($(this));
+});
+
+// count the current form inputs we have (e.g. 2), use that as the new
+// index when inserting a new item (e.g. 2)
+collectionHolder.data('index', collectionHolder.find(':input').length);
+
+newLink.on('click', function(e) {
+	// add a new tag form (see next code block)
+	addTagForm(collectionHolder);
+});
+
+
+function addTagForm(collectionHolder) {
+	// Get the data-prototype explained earlier
+	var prototype = $("#prototype").html();
+
+	// get the new index
+	var index = collectionHolder.data('index');
+
+	// Replace '__name__' in the prototype's HTML to
+	// instead be a number based on how many items we have
+	var newForm = prototype.replace(/__name__/g, index);
+
+	// increase the index with one for the next item
+	collectionHolder.data('index', index + 1);
+
+	// Display the form in the page in an li, before the "Add a tag" link li
+	var newRow = $('<tr></tr>').append(newForm);
+	$('table.permissions tbody').append(newRow);
+
+	// add a delete link to the new form
+	addActionButtons(newRow);
+
+	// set priority
+	newRow.find('input[id$="_priority"]').val(prio);
+	prio++;
+
+	// defaults
+	newRow.find("input[id$='_allowed']").prop('checked', true)
+	newRow.find("input[id$='_includeSubs']").prop('checked', true)
+	realmselect(newRow.find("input[id$='_targetRealm']"));
+	charselect(newRow.find("input[id$='_targetCharacter']"));
+}
+
+function addActionButtons(row) {
+	var field = $('<td></td>');
+	row.append(field);
+
+	var removeButton = $('<button type="button">{{ 'perm.del'|trans({}, "politics") }}</button>');
+	field.append(removeButton);
+	removeButton.on('click', function(e) {
+		row.remove();
+	});
+
+}
+
+{% endblock %}
