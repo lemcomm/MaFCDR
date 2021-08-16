@@ -1146,16 +1146,32 @@ class GameRunner {
 	public function runConversationsCycle() {
 		# This has to be under runRealmsCycle so we don't update dead realms and so we don't have to force update members.
 		$last = $this->appstate->getGlobal('cycle.convs', 0);
+		$lastRealm = $this->appstate->getGlobal('cycle.convs.realm', 0);
+		$lastHouse = $this->appstate->getGlobal('cycle.convs.house', 0);
 		if ($last==='complete') return true;
+		$lastRealm=(int)$lastRealm;
+		$lastHouse=(int)$lastHouse;
 		$this->logger->info("Conversation Cycle...");
 		$this->logger->info("  Updating realm conversation permissions...");
-		$query = $this->em->createQuery("SELECT r, c from BM2SiteBundle:Realm r JOIN r.conversations c WHERE r.active = TRUE");
-		$realms = $query->getResult();
+		$query = $this->em->createQuery("SELECT r from BM2SiteBundle:Realm r WHERE r.active = TRUE AND r.id > :last ORDER BY r.id ASC");
+		$query->setParameters(['last'=>$lastRealm]);
 		$added = 0;
 		$total = 0;
 		$removed = 0;
 		$convs = 0;
-		foreach ($realms as $realm) {
+		$iterableResult = $query->iterate();
+
+		$done = false;
+		$complete = false;
+		while (!$done) {
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				$complete=true;
+				break;
+			}
+			$realm = $row[0];
+			$lastRealm = $realm->getId();
 			$this->logger->info("  -- Updating ".$realm->getName()."...");
 			$total++;
 			$members = $realm->findMembers();
@@ -1166,15 +1182,37 @@ class GameRunner {
 				$added += $rtn['added']->count();
 			}
 		}
+
+		if ($complete) {
+			$this->appstate->setGlobal('cycle.convs.realm', 'complete');
+		} else {
+			$this->appstate->setGlobal('cycle.convs.realm', $lastRealm);
+		}
 		$this->logger->info("  Result: ".$total." realms, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
+
 		$this->logger->info("  Updating house conversation permissions...");
-		$query = $this->em->createQuery("SELECT h, c from BM2SiteBundle:House h JOIN h.conversations c WHERE h.active = TRUE OR h.active IS NULL");
+		$query = $this->em->createQuery("SELECT h from BM2SiteBundle:House h WHERE (h.active = TRUE OR h.active IS NULL) AND h.id > :last ORDER BY h.id ASC");
+		$query->setParameters(['last'=>$lastHouse]);
 		$houses = $query->getResult();
 		$added = 0;
 		$total = 0;
 		$removed = 0;
 		$convs = 0;
-		foreach ($houses as $house) {
+		$iterableResult = $query->iterate();
+
+		$done = false;
+		$complete = false;
+		while (!$done) {
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				$complete=true;
+				break;
+			}
+			$house = $row[0];
+			$lastHouse = $realm->getId();
 			$this->logger->info("  -- Updating ".$house->getName()."...");
 			$total++;
 			$members = $house->findAllActive();
@@ -1185,7 +1223,17 @@ class GameRunner {
 				$added += $rtn['added']->count();
 			}
 		}
+
+		if ($complete) {
+			$this->appstate->setGlobal('cycle.convs.house', 'complete');
+		} else {
+			$this->appstate->setGlobal('cycle.convs.house', $lastHouse);
+		}
 		$this->logger->info("  Result: ".$total." houses, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
+		$this->appstate->setGlobal('cycle.convs', 'complete');
+		return true;
 	}
 
 	public function runPositionsCycle() {
