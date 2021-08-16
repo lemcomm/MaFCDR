@@ -612,6 +612,9 @@ character:
    title:     Arriving in %name%
    intro:     As one of the many realms of the game, joining %name% will immediately start you as part of their realm as a member but otherwise unaligned First One. This will get you in their conversations, announce your arrival, and, hopefully, get you towards something to do fairly quickly. Even though your presence is announced, it is suggested that you also introduce yourself as well.<br /><br />Note: Might & Fealty is a slower game, so it's entirely possible you won't get a response for several hours.
   join:      Make your debut at %name%
+  house:
+   title:     Arriving in %name%
+   intro:     As one of the many houses of the game, joining %name% will immediately start you as part of their house as a member but otherwise unaligned First One. This will get you in their conversations, announce your arrival, and, hopefully, get you towards something to do fairly quickly. Even though your presence is announced, it is suggested that you also introduce yourself as well.<br /><br />Note: Might & Fealty is a slower game, so it's entirely possible you won't get a response for several hours.
  details:
   realm:      realm(s)
   ultimate:   sovereign realm(s)

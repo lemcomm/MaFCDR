@@ -12,7 +12,7 @@
 		<hr>
         {% elseif house %}
         	<h2>{{ 'character.spawn.house.title'|trans({"%name%":house.name})|title }}</h2>
-                <p>{{ 'character.start.nobles'|trans|raw }}: {{ house.findActiveMembers.count }}</p>
+                <p>{{ 'character.start.nobles'|trans|raw }}: {{ house.findAllActive.count }}</p>
         	<p>{{ 'character.spawn.house.intro'|trans({"%name%":house.name})|raw }}</p>
 		<hr>
 	{% endif %}

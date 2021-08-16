@@ -28,6 +28,8 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 		$cycle = $this->getContainer()->get('appstate')->getCycle();
 		$economy = $this->getContainer()->get('economy');
 		$debug = $input->getOption('debug');
+		$oneWeek = new \DateTime("-1 week");
+		$twoDays = new \DateTime("-2 days");
 
 		if ($debug) { $output->writeln("gathering global statistics..."); }
 		$global = new StatisticGlobal;
@@ -35,13 +37,20 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u');
 		$global->setUsers($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
+		$query->setParameters(['time'=>$oneWeek]);
 		$global->setActiveUsers($query->getSingleScalarResult());
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
+		$query->setParameters(['time'=>$twoDays]);
+		$global->setReallyActiveUsers($query->getSingleScalarResult());
 		// FIXME: this is hardcoded, but it could be made better by calling payment_manager and checking which levels have fees
 		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 10');
 		$global->setPayingUsers($query->getSingleScalarResult());
 		$query = $em->createQuery('SELECT count(distinct u.id) FROM BM2SiteBundle:User u JOIN u.payments p');
 		$global->setEverPaidUsers($query->getSingleScalarResult());
+		$query = $em->createQuery('SELECT count(distinct u.id) FROM BM2SiteBundle:User u JOIN u.patronizing p WHERE p.status = :active');
+		$query->setParameters(['active'=>'active_patron']);
+		$global->setActivePatrons($query->getSingleScalarResult());
 
 		$query = $em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Character c');
 		$global->setCharacters($query->getSingleScalarResult());

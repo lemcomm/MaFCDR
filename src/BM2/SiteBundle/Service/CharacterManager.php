@@ -356,12 +356,18 @@ class CharacterManager {
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
+			foreach ($character->getOwnedPlaces() as $place) {
+				$this->bequeathPlace($place, $heir, $character, $via);
+			}
 		} else {
 			foreach ($character->getOwnedSettlements() as $settlement) {
 				$this->failInheritEstate($character, $settlement);
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
+			}
+			foreach ($character->getOwnedPlaces() as $place) {
+				$this->failInheritPlace($character, $place);
 			}
 		}
 		foreach ($character->getStewardingSettlements() as $settlement) {
@@ -419,6 +425,15 @@ class CharacterManager {
 					$house->setSuperior($successor->getHouse());
 					$successor->setHouse($house);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner($successor);
+					$this->history->logEvent(
+						$house,
+						'event.place.inherited.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
@@ -447,9 +462,17 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner(null);
+					$this->history->logEvent(
+						$house,
+						'event.place.abandoned.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
-
 
 		// close all logs except my personal one
 		foreach ($character->getReadableLogs() as $log) {
@@ -656,6 +679,15 @@ class CharacterManager {
 					$house->setSuperior($successor->getHouse());
 					$successor->setHouse($house);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner($successor);
+					$this->history->logEvent(
+						$house,
+						'event.place.inherited.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
@@ -681,6 +713,15 @@ class CharacterManager {
 						$house,
 						'event.house.collapsed.retire',
 						array(),
+						History::ULTRA, true
+					);
+				}
+				if ($home = $house->getHome()) {
+					$home->setOwner(null);
+					$this->history->logEvent(
+						$house,
+						'event.place.abandoned.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
 						History::ULTRA, true
 					);
 				}
@@ -775,6 +816,69 @@ class CharacterManager {
 		$this->politics->changeSettlementOwner($settlement, null);
 		$this->history->logEvent(
 			$settlement, 'event.settlement.inherifail',
+			array('%link-character%'=>$character->getId()),
+			HISTORY::HIGH, true
+		);
+
+	}
+
+	public function bequeathPlace(Place $place, Character $heir, Character $from, Character $via=null) {
+		$oldowner = $place->getOwner();
+		if ($oldowner) {
+			$oldowner->removeOwnedPlace($settlement);
+		}
+		if ($heir) {
+			$heir->addOwnedPlace($settlement);
+		}
+		$place->setOwner($heir);
+		foreach ($place->getPermissions() as $perm) {
+			$place->removePermission($perm);
+			$this->em->remove($perm);
+		}
+
+		$this->history->closeLog($place, $from);
+		$this->history->openLog($place, $heir);
+
+		// Note that this CAN leave a character the lord of estates in seperate realms.
+		if ($from == $via || $via == null) {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inherit.place',
+				array('%link-place%'=>$settlement->getId(), '%link-character%'=>$from->getId()),
+				HISTORY::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inheritvia.place',
+				array('%link-place%'=>$settlement->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				History::HIGH, true
+			);
+		}
+		$this->history->logEvent(
+			$place,
+			'event.place.inherited',
+			array('%link-character%'=>$from->getId()),
+			History::HIGH, true
+		);
+	}
+
+	private function failInheritPlace(Character $character, Place $place) {
+		$oldowner = $place->getOwner();
+		if ($oldowner) {
+			$oldowner->removeOwnedPlace($settlement);
+		}
+		if ($character) {
+			$character->addOwnedPlace($settlement);
+		}
+		$place->setOwner(null);
+		foreach ($place->getPermissions() as $perm) {
+			$place->removePermission($perm);
+			$this->em->remove($perm);
+		}
+		$this->politics->changeSettlementOwner($place, null);
+		$this->history->logEvent(
+			$place, 'event.place.inherifail',
 			array('%link-character%'=>$character->getId()),
 			HISTORY::HIGH, true
 		);

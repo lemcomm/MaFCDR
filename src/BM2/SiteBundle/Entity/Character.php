@@ -320,11 +320,15 @@ class Character {
 			$alg = $this->findAllegiance();
 			if (!$alg instanceof Realm) {
 				if ($alg->getRealm() != NULL) {
-					$realms->add($alg->getRealm());
+					if (!$realms->contains($alg->getRealm())) {
+						$realms->add($alg->getRealm());
+					}
 				}
 			} else {
 				if ($alg != NULL) {
-					$realms->add($alg);
+					if (!$realms->contains($alg)) {
+						$realms->add($alg);
+					}
 				}
 			}
 		} elseif ($check_lord && $this->getLiege()) {
