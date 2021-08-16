@@ -37,10 +37,10 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u');
 		$global->setUsers($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.last_login >= :time');
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
 		$query->setParameters(['time'=>$oneWeek]);
 		$global->setActiveUsers($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.last_login >= :time');
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
 		$query->setParameters(['time'=>$twoDays]);
 		$global->setReallyActiveUsers($query->getSingleScalarResult());
 		// FIXME: this is hardcoded, but it could be made better by calling payment_manager and checking which levels have fees
