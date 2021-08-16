@@ -50,7 +50,7 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 		$global->setEverPaidUsers($query->getSingleScalarResult());
 		$query = $em->createQuery('SELECT count(distinct u.id) FROM BM2SiteBundle:User u JOIN u.patronizing p WHERE p.status = :active');
 		$query->setParameters(['active'=>'active_patron']);
-		$global->setPatrons($query->getSingleScalarResult());
+		$global->setActivePatrons($query->getSingleScalarResult());
 
 		$query = $em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Character c');
 		$global->setCharacters($query->getSingleScalarResult());
