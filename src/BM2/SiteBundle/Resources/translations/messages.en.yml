@@ -196,6 +196,8 @@ account:
  identities:    Authentication
  authmail:      Username/email and password
  locked:        Your characters are currently locked because you have run out of game-time. Please renew your subscription on the profile page.
+ patronizing:   Your patronage ($%entitlement%) has been updated in our database.
+ patronfailure: Update has failed. Try again later.
  level:
   0: Locked
   10: Casual
