@@ -407,4 +407,17 @@ class Interactions {
 
 		return true;
 	}
+
+	public function abandonSettlement(Character $character, Settlement $settlement, $keepRealm) {
+		if ($settlement->getOwner() == $character) {
+			if (!$keepRealm) {
+				$settlement->setRealm(null);
+			}
+			$settlement->setOwner(null);
+			$this->em->flush();
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
