@@ -209,43 +209,24 @@ class UnitController extends Controller {
                 $canRecruit=false;
                 $canReassign=false;
 
-		if ($settlement && $settlement == $unit->getSettlement() && (($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement()==$settlement) || !$unit->getCharacter())) {
+		if ($settlement) {
                         # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
 			if ($settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
                                 $canResupply = true;
 				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
 			}
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
+			if ($unit->getSettlement() == $settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
                                 $canRecruit = true;
 				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 			}
-                        $local = new ArrayCollection();
-                        foreach ($settlement->getUnits() as $each) {
-                                if (!$each->getCharacter() && !$each->getPlace()) {
-                                        $local->add($each);
-                                }
-                        }
-                        foreach ($character->getUnits() as $mine) {
-                                if (!$mine->getSettlement() || ($mine->getSettlement() && ($mine->getSettlement()->getOwner() == $character || $mine->getSettlement()->getSteward() == $character))) {
-                                        # Units created from legacy soldiers that don't have a base act as if they ALWAYS are at their base.
-                                        $local->add($mine);
-                                }
-                        }
-                        # So we get all local units, check if our unit is in it,
-                        # if it is we see if we have unit management here and build a list of all other units if we do,
-                        # along with set the flag enabling reassignment of soldiers.
-                        # Yes, I wrote this because I stared at this for several minutes trying to figure it out.
-                        if ($local->contains($unit)) {
-                                if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
-                                        foreach ($local as $localUnit) {
-                                                if ($unit != $localUnit) {
-                                                        $units[] = $localUnit;
-                                                }
+
+                        # If we can manage units, we can reassign. Build the list.
+                        if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
+                                foreach ($settlement->getUnits() as $each) {
+                                        if (!$each->getCharacter() && !$each->getPlace()) {
+                                                $units[] = $each;
                                         }
-                                        $canReassign=true;
                                 }
-			} else {
-                                #This unit not available for reassining soldiers due to not being local.
                         }
 		} else {
 			foreach ($character->getEntourage() as $entourage) {
@@ -258,6 +239,18 @@ class UnitController extends Controller {
 				}
 			}
 		}
+
+                # Check if we can also handle our own units.
+                foreach ($character->getUnits() as $mine) {
+                        if (!$mine->getSettlement() || ($mine->getSettlement() && $this->get('permission_manager')->checkSettlementPermission($mine->getSettlement(), $character, 'units'))) {
+                                $units[] = $mine;
+                        }
+                }
+
+                if ($units) {
+                        $canReassign = true;
+                }
+
 		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character));
 
 		$form->handleRequest($request);
@@ -503,6 +496,7 @@ class UnitController extends Controller {
                 }
 
                 return $this->render('Unit/return.html.twig', [
+                        'unit'=>$unit,
                         'form'=>$form->createView()
                 ]);
         }
