@@ -70,7 +70,7 @@ class UnitSoldiersType extends AbstractType {
 		$me = $this->me;
 
 		$local = false;
-		if ($unit->getCharacter() == $me || (!$unit->getCharacter() && ($unit->getMarshal() == $me || $unit->getSettlement()->getOwner() == $me))) {
+		if ($unit->getCharacter() == $me || (!$unit->getCharacter() && ($unit->getMarshal() == $me || $unit->getSettlement()->getOwner() == $me || $unit->getSettlement()->getSteward() == $me))) {
 			$local = true;
 		}
 
@@ -104,6 +104,8 @@ class UnitSoldiersType extends AbstractType {
 							}
 							if ($this->reassign) {
 								$actions['assignto'] = 'recruit.manage.reassign';
+								$actions['disband'] = 'recruit.manage.disband';
+								# This might be duplicate, or it might not. Array key, so doesn't matter.
 							}
 						}
 					}
