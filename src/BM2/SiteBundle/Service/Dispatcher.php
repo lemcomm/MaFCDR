@@ -2682,9 +2682,7 @@ class Dispatcher {
 			return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.$check");
 		}
 		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character) {
-				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+			if ($unit->getSettlement() != $character->getInsideSettlement()) {
 				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notinside");
 			}
 		}
