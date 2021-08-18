@@ -122,7 +122,7 @@ class PaymentManager {
 					$expired++;
 				}
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
-				$patronLevel = $levels[$user->getAccountLevel()]['patreon'];
+				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$patrons = $user->getPatronizing();
 				$sufficient = false;
 				foreach ($patreons as $patron) {
