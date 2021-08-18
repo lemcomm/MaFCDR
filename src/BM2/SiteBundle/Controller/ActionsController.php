@@ -732,7 +732,9 @@ class ActionsController extends Controller {
 			$sources[] = $owned->getId();
 		}
 		foreach ($character->getStewardingSettlements() as $stewarded) {
-			$manageable->add($stewarded);
+			if (!$manageable->contains($stewarded)) {
+				$manageable->add($stewarded);
+			}
 			$sources[] = $stewarded->getId();
 		}
 		$permission = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', true, $settlement->getOccupier()?true:false);
@@ -834,7 +836,7 @@ class ActionsController extends Controller {
 		}
 
 		$local_resources = array();
-		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character) {
+		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character || $permission[0]) {
 			// TODO: maybe require a merchant and/or prospector ?
 			foreach ($resources as $resource) {
 				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
