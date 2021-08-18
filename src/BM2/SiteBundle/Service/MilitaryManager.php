@@ -159,7 +159,7 @@ class MilitaryManager {
 					}
 					break;
 				case 'disband':
-					if ($canReassign) {
+					if ($canReassign || $canRecruit) {
 						$this->disband($soldier);
 					}
 					break;
