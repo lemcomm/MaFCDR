@@ -60,6 +60,7 @@ class InteractionType extends AbstractType {
 						$qb->andWhere('c.inside_settlement IS NULL');
 					}
 				}
+				$qb->orderBy('c.name', 'ASC');
 				return $qb;
 		}));
 
