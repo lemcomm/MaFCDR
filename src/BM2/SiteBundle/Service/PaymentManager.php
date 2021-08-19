@@ -125,7 +125,7 @@ class PaymentManager {
 				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$patrons = $user->getPatronizing();
 				$sufficient = false;
-				foreach ($patreons as $patron) {
+				foreach ($patrons as $patron) {
 					if ($patron->getExpires() < $now) {
 						$this->refreshPatreonTokens($patron);
 					}
