@@ -1103,7 +1103,7 @@ class Dispatcher {
 	}
 
 	public function controlAbandonTest($check_duplicate=false, $settlement) {
-		if (($check = $this->controlActionsGenericTests()) !== true) {
+		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.$check");
 		}
 		if ($settlement->getOwner() != $this->getCharacter()) {
