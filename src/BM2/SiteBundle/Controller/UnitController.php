@@ -70,6 +70,7 @@ class UnitController extends Controller {
                         return $this->redirectToRoute($character);
                 }
                 $em = $this->getDoctrine()->getManager();
+                $pm = $this->get('permission_manager');
 
                 $all = $this->findUnits($character);
                 $units = [];
@@ -78,7 +79,7 @@ class UnitController extends Controller {
                         $units[$id] = [];
                         $units[$id]['obj'] = $each;
                         $settlement = $each->getSettlement();
-                        if (!$settlement || ($settlement == $character->getInsideSettlement() && (($settlement->getOwner() == $character || $settlement->getSteward() == $character) && !$settlement->getOccupier() || $settlement->getOccupant())))  {
+                        if (!$settlement || ($settlement == $character->getInsideSettlement() && $pm->checkSettlementPermission($settlement, $character, 'units')))  {
                                 $units[$id]['owner'] = true;
                         } else {
                                 $units[$id]['owner'] = false;
