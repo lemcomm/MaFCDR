@@ -2298,9 +2298,6 @@ class Dispatcher {
 		if ($place->getOwner() !== $this->getCharacter()) {
 			return ["name"=>"place.transfer.name", "description"=>"unavailable.notowner"];
 		}
-		if ($place->getOwner() && $place->getOwner()->getInsidePlace() !== $place) {
-			return ["name"=>"place.transfer.name", "description"=>"unavailable.outsideplace"];
-		}
 		return [
 			$this->action("place.transfer", "maf_place_transfer", true,
 				['place'=>$place->getId()],
