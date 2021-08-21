@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9",
+        "php": "^7.0",
         "symfony/symfony": "2.8.*",
         "doctrine/orm": "~2.2,>=2.2.3,<2.5",
         "doctrine/dbal": "<2.5",
@@ -30,7 +30,8 @@
         "creof/doctrine2-spatial": "dev-master",
         "knplabs/knp-markdown-bundle": "1.4.*@dev",
         "codeception/codeception": "*",
-        "paypal/merchant-sdk-php":"*"
+        "paypal/merchant-sdk-php":"*",
+        "kagurati/patreon": "dev-master"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
