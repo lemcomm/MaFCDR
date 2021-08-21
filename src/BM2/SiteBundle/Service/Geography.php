@@ -450,10 +450,14 @@ class Geography {
 	}
 
 	public function findPlacesNearMe(Character $character, $maxdistance) {
-		if ($character->getInsideSettlement()) {
+		if ($settlement = $character->getInsideSettlement()) {
 			$results = [];
-			foreach ($character->getInsideSettlement()->getPlaces() as $place) {
-				$results[] = $place;
+			if (!$settlement->getPlaces()->isEmpty()) {
+				foreach ($character->getInsideSettlement()->getPlaces() as $place) {
+					$results[] = $place;
+				}
+			} else {
+				return NULL;
 			}
 		} else {
 			#$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:Place p WHERE ST_Distance(:me, p.location) < :maxdistance');
