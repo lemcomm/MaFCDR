@@ -35,8 +35,9 @@ class UnitController extends Controller {
 
         private function findUnits(Character $character) {
                 $em = $this->getDoctrine()->getManager();
+                $pm = $this->get('permission_manager');
                 $settlement = $character->getInsideSettlement();
-                if ($settlement && ($settlement->getOwner() == $character || $settlement->getOccupant() == $character || $settlement->getSteward() == $character)) {
+                if ($settlement && ($pm->checkSettlementPermission($settlement, $character, 'units'))) {
                         $query = $em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN BM2SiteBundle:UnitSettings s WHERE u.character = :char OR u.settlement = :settlement OR (u.marshal = :char AND u.settlement = :settlement) ORDER BY s.name ASC');
                         $query->setParameters(array('char'=>$character, 'settlement'=>$character->getInsideSettlement()));
                 } elseif ($character->getInsideSettlement()) {
@@ -133,17 +134,26 @@ class UnitController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 		$em = $this->getDoctrine()->getManager();
-
+                $pm = $this->get('permission_manager');
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
+                $here = $charater->getInsideSettlement();
+                if ($pm->checkSettlementPermission($here, $character, 'units')) {
+                        $settlements[] = $here->getId();
+                }
+
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
                         $data = $form->getData();
-                        $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), $data);
-                        if ($unit) {
-                                $this->addFlash('notice', $this->get('translator')->trans('unit.manage.created', array(), 'actions'));
-                                return $this->redirectToRoute('maf_units');
+                        if (in_array($data['supplier']->getId(), $settlements)) {
+                                $unit = $this->get('military_manager')->newUnit($character, $character->getInsideSettlement(), $data);
+                                if ($unit) {
+                                        $this->addFlash('notice', $this->get('translator')->trans('unit.manage.created', array(), 'actions'));
+                                        return $this->redirectToRoute('maf_units');
+                                }
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('unit.manage.supplierinvalid', [], 'actions'));
                         }
                 }
 
@@ -211,24 +221,29 @@ class UnitController extends Controller {
                 $canReassign=false;
 
 		if ($settlement) {
-                        # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
-			if ($settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
-                                $canResupply = true;
-				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
-			}
-			if ($unit->getSettlement() == $settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
-                                $canRecruit = true;
-				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
-			}
-
-                        # If we can manage units, we can reassign. Build the list.
-                        if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
+                        # If we can manage units, we can reassign and resupply. Build the list.
+                        if ($hasUnitsPerm = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
                                 foreach ($settlement->getUnits() as $each) {
                                         if (!$each->getCharacter() && !$each->getPlace()) {
                                                 $units[] = $each;
                                         }
                                 }
+                                $canResupply = true;
+				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+                                $canRecruit = true;
+				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
                         }
+
+                        # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
+			if (!$canResupply || $settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
+                                $canResupply = true;
+				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+			}
+			if (!$canRecruit || $unit->getSettlement() == $settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
+                                $canRecruit = true;
+				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
+			}
+
 		} else {
 			foreach ($character->getEntourage() as $entourage) {
 				if ($entourage->getEquipment()) {
@@ -252,7 +267,7 @@ class UnitController extends Controller {
                         $canReassign = true;
                 }
 
-		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character));
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character, $hasUnitsPerm));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -370,7 +385,7 @@ class UnitController extends Controller {
                 # Check if the unit has a settlement, and if so, set $realm to the realm of that settlement, if any, and check if realm exists.
                 if ($unit->getSettlement() && $realm = $unit->getSettlement()->getRealm()) {
                         # Get all members of the ultimate realm of the settlement.
-                        foreach ($realm->findUltimate()->findMembers() as $char) {
+                        foreach ($realm->findUltimate()->findActiveMembers() as $char) {
                                 # Check if we already have them, if not: add.
                                 if (!in_array($char, $options)) {
                                         $options[] = $char;
