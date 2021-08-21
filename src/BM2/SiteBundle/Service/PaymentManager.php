@@ -86,7 +86,7 @@ class PaymentManager {
 		return $fees[$user->getAccountLevel()]['characters'];
 	}
 
-	public function paymentCycle() {
+	public function paymentCycle($patronsOnly = false) {
 		$this->logger->info("Payment Cycle...");
 		$free = 0;
 		$patronCount = 0;
@@ -105,22 +105,26 @@ class PaymentManager {
 			$this->logger->info("$bannedusername has been banned, and email notifications have been disabled.");
 			$this->em->flush();
 		}
-		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
 		$now = new \DateTime("now");
-		$query->setParameters(array('now'=>$now));
+		if (!$patronsOnly) {
+			$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
+			$query->setParameters(array('now'=>$now));
+		} else {
+			$query = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		}
 		$this->logger->info("  User Subscription Processing...");
 		foreach ($query->getResult() as $user) {
 			$this->logger->info("  --Calculating ".$user->getUsername()." (".$user->getId().")...");
 			$myfee = $this->calculateUserFee($user);
 			$levels = $this->getPaymentLevels();
 			if ($myfee > 0) {
-				$this->logger->info("  --Fee of ".$myfee." detected...");
+				$this->logger->info("    --Fee of ".$myfee." detected...");
 				if ($this->spend($user, 'subscription', $myfee, true)) {
-					$this->logger->info("  --Credit spend successful...");
+					$this->logger->info("    --Credit spend successful...");
 					$active++;
 					$credits += $myfee;
 				} else {
-					$this->logger->info("  --Credit spend failed. Reducing account...");
+					$this->logger->info("    --Credit spend failed. Reducing account...");
 					// not enough credits left! - change to trial
 					$user->setAccountLevel(10);
 					$this->ChangeNotification($user, 'expired', 'expired2');
@@ -128,61 +132,61 @@ class PaymentManager {
 					$expired++;
 				}
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
-				$this->logger->info("  --Patron detected...");
+				$this->logger->info("    --Patron detected...");
 				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$sufficient = false;
 				#TODO: We'll need to expand this to support other creators, if we add any.
 				foreach ($user->getPatronizing() as $patron) {
-					$this->logger->info("  --Supporter of creator ".$patron->getCreator()->getCreator()."...");
+					$this->logger->info("    --Supporter of creator ".$patron->getCreator()->getCreator()."...");
 					$status = null;
 					$entitlement = null;
 
 					if ($patron->getExpires() < $now) {
-						$this->logger->info("  --Access tokens expired. Refreshing...");
+						$this->logger->info("    --Access tokens expired. Refreshing...");
 						$this->refreshPatreonTokens($patron);
 					}
 
-					$this->logger->info("  --Checking pledge status...");
+					$this->logger->info("    --Checking pledge status...");
 					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
-					$this->logger->info("  --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
+					$this->logger->info("    --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
 
 					if ($patreonLevel <= $entitlement) {
-						$this->logger->info("  --Pledge is sufficient...");
+						$this->logger->info("    --Pledge is sufficient...");
 						$sufficient = true;
 					}
 				}
 				if (!$sufficient) {
-					$this->logger->info("  --Pledge insufficient, reducing subscription...");
+					$this->logger->info("    --Pledge insufficient, reducing subscription...");
 					# insufficient pledge level
 					$user->setAccountLevel(10);
 					$this->ChangeNotification($user, 'insufficient', 'insufficient2');
 					$expired++;
 				} else {
-					$this->logger->info("  --Pledge sufficent, running spend routine...");
+					$this->logger->info("    --Pledge sufficent, running spend routine...");
 					$this->spend($user, 'subscription', $myfee, true);
 					$active++;
 					$patronCount++;
 					# TODO: Give overpledge back as credits?
 				}
 			} else {
-				$this->logger->info("  --Non-payer detected, either trial or dev account...");
+				$this->logger->info("    --Non-payer detected, either trial or dev account...");
 				if ($user->getLastLogin()) {
 					$inactive_days = $user->getLastLogin()->diff(new \DateTime("now"), true)->days;
 				} else {
 					$inactive_days = $user->getCreated()->diff(new \DateTime("now"), true)->days;
 				}
 				if ($inactive_days > 60) {
-					$this->logger->info("  --Account inactive, storing account...");
+					$this->logger->info("    --Account inactive, storing account...");
 					// after 2 months, we put you into storage
 					$user->setAccountLevel(0);
 					$storage++;
 				} else {
-					$this->logger->info("  --Accont active, logging as free...");
+					$this->logger->info("    --Accont active, logging as free...");
 					$free++;
 				}
 			}
 		}
-		$this->logger->info("  --Cycle ended. Flushing...");
+		$this->logger->info("  Cycle ended. Flushing...");
 		$this->em->flush();
 		return array($free, $patronCount, $active, $credits, $expired, $storage, $bannedcount);
 	}
@@ -192,16 +196,16 @@ class PaymentManager {
 		if ($patron->getExpires() < $now) {
 			$creator = $patron->getCreator();
 			$poa = new POA($creator->getClientId(), $creator->getClientSecret());
-			$tokens = $poa->refresh_token($patron->getRefreshToken(), null);
+			$tokens = $poa->refresh_token($patron->getRefreshToken());
 			$patron->setAccessToken($tokens['access_token']);
 			$patron->setRefreshToken($tokens['refresh_token']);
 			$patron->setExpires($tokens['expires_in']);
 		}
 	}
 
-	public function refreshPatreonPledge($patron) {
+	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
 		$papi = new PAPI($patron->getAccessToken());
-		$member = $papi->fetch_user();
+		$member = $papi->fetch_user($args);
 		if (!$patron->getPatreonId()) {
 			$patron->setPatreonId($member['data']['id']);
 		}
