@@ -418,6 +418,24 @@ class UnitController extends Controller {
         }
 
         /**
+	  * @Route("/units/{unit}/revoke", name="maf_unit_revoke", requirements={"unit"="\d+"})
+	  */
+
+        public function unitRevokeAction(Request $request, Unit $unit) {
+		$character = $this->get('dispatcher')->gateway('unitAppointTest', false, true, false, $unit);
+                # Distpatcher->getTest('test', default, default, default, UnitId)
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+                $em = $this->getDoctrine()->getManager();
+                $unit->setMarshal(null);
+                $em->flush();
+                $this->addFlash('notice', $this->get('translator')->trans('unit.revoke.success', array(), 'actions'));
+                return $this->redirectToRoute('maf_units');
+        }
+
+        /**
 	  * @Route("/units/{unit}/rebase", name="maf_unit_rebase", requirements={"unit"="\d+"})
 	  */
 
