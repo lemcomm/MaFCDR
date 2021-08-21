@@ -343,7 +343,7 @@ class ConversationManager {
         public function newLocalConversation(Character $char, $now, $cycle = null) {
                 $conv = new Conversation();
                 $this->em->persist($conv);
-                $conv->setLocalFor($rec);
+                $conv->setLocalFor($char);
                 $conv->setCreated($now);
                 $conv->setActive(true);
                 if (!$cycle) {
