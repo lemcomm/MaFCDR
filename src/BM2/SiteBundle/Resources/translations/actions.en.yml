@@ -1286,6 +1286,7 @@ unit:
   disband:  Disband Unit
   return:   Send Unit Home
   recall:   Recall Unit
+  traveling: Unit is currently traveling back to base and will arrive in %days% days.
  assigned:
  assign:
   name:     Assign a Leader to %name%
