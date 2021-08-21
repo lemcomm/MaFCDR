@@ -25,8 +25,9 @@ class UnitSoldiersType extends AbstractType {
 	private $reassign;
 	private $unit;
 	private $me;
+	private $hasUnitsPerm;
 
-	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement, $reassign, $unit, $me) {
+	public function __construct($em, $soldiers, $available_resupply, $available_training, $units, $settlement, $reassign, $unit, $me, $hasUnitsPerm) {
 		$this->em = $em;
 		if (is_array($soldiers)) {
 			$this->soldiers = $soldiers;
@@ -48,6 +49,7 @@ class UnitSoldiersType extends AbstractType {
 		$this->reassign = $reassign;
 		$this->unit = $unit;
 		$this->me = $me;
+		$this->hasUnitsPerm = $hasUnitsPerm;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -70,7 +72,7 @@ class UnitSoldiersType extends AbstractType {
 		$me = $this->me;
 
 		$local = false;
-		if ($unit->getCharacter() == $me || (!$unit->getCharacter() && ($unit->getMarshal() == $me || $unit->getSettlement()->getOwner() == $me || $unit->getSettlement()->getSteward() == $me))) {
+		if ($unit->getCharacter() == $me || (!$unit->getCharacter() && ($this->hasUnitsPerm || $unit->getMarshal() == $me))) {
 			$local = true;
 		}
 
@@ -114,6 +116,7 @@ class UnitSoldiersType extends AbstractType {
 						if ( (!$soldier->getHasWeapon() && $this->available_resupply->contains($soldier->getTrainedWeapon()))
 							|| (!$soldier->getHasArmour() && $this->available_resupply->contains($soldier->getTrainedArmour()))
 							|| (!$soldier->getHasEquipment() && $this->available_resupply->contains($soldier->getTrainedEquipment()))
+							|| (!$soldier->getHasMount() && $this->available_resupply->contains($soldier->getTrainedMount()))
 						) {
 							$resupply = true;
 						}
