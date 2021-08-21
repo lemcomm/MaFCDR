@@ -519,6 +519,7 @@ class Character {
 	}
 
 	public function findLiege() {
+		$alleg = $this->findAllegiance();
 		if ($alleg instanceof Character) {
 			return $alleg;
 		}
