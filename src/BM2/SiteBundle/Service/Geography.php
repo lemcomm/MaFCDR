@@ -452,8 +452,8 @@ class Geography {
 	public function findPlacesNearMe(Character $character, $maxdistance) {
 		if ($settlement = $character->getInsideSettlement()) {
 			$results = [];
-			if (!$settlement->getPlaces()->isEmpty()) {
-				foreach ($character->getInsideSettlement()->getPlaces() as $place) {
+			if ($settlement->getPlaces()) {
+				foreach ($settlement->getPlaces() as $place) {
 					$results[] = $place;
 				}
 			} else {
