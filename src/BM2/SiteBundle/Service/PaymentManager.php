@@ -88,7 +88,7 @@ class PaymentManager {
 
 	public function paymentCycle() {
 		$free = 0;
-		$patron = 0;
+		$patronCount = 0;
 		$active = 0;
 		$expired = 0;
 		$storage = 0;
@@ -123,14 +123,15 @@ class PaymentManager {
 				}
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
 				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
-				$patrons = $user->getPatronizing();
 				$sufficient = false;
-				foreach ($patrons as $patron) {
+				foreach ($user->getPatronizing() as $patron) {
+					$status = null;
+					$entitlement = null;
 					if ($patron->getExpires() < $now) {
 						$this->refreshPatreonTokens($patron);
 					}
 					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
-					if ($patreonLevel >= $entitlement) {
+					if ($patreonLevel <= $entitlement) {
 						$sufficient = true;
 					}
 				}
@@ -142,7 +143,7 @@ class PaymentManager {
 				} else {
 					$this->spend($user, 'subscription', $myfee, true);
 					$active++;
-					$patron++;
+					$patronCount++;
 					# TODO: Give overpledge back as credits?
 				}
 			} else {
@@ -161,7 +162,7 @@ class PaymentManager {
 			}
 		}
 		$this->em->flush();
-		return array($free, $active, $credits, $expired, $storage, $bannedcount);
+		return array($free, $patronCount, $active, $credits, $expired, $storage, $bannedcount);
 	}
 
 	public function refreshPatreonTokens($patron) {
