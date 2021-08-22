@@ -998,18 +998,9 @@ class Dispatcher {
 		return $this->action("control.occupationend", "maf_settlement_occupation_end");
 	}
 
-	public function controlChangeRealmTest($check_duplicate=false) {
-		if (($check = $this->controlActionsGenericTests()) !== true) {
+	public function controlChangeRealmTest($check_duplicate=false, $settlement) {
+		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.$check");
-		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.changerealm')) {
-			return array("name"=>"control.changerealm.name", "description"=>"unavailable.already");
-		}
-		// FIXME: this still sometimes gives a "you are not inside" message when it shouldn't, I think?
-		if ($this->settlement) {
-			$settlement = $this->settlement;
-		} else {
-			$settlement = $this->getCharacter()->getInsideSettlement();
 		}
 		if (!$settlement) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notsettlement");
