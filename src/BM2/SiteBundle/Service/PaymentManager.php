@@ -199,7 +199,7 @@ class PaymentManager {
 			$tokens = $poa->refresh_token($patron->getRefreshToken());
 			$patron->setAccessToken($tokens['access_token']);
 			$patron->setRefreshToken($tokens['refresh_token']);
-			$patron->setExpires($tokens['expires_in']);
+			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
 		}
 	}
 
