@@ -4,7 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\KnightOffer;
+use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Trade;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\CultureType;
@@ -450,18 +450,12 @@ class ActionsController extends Controller {
    /**
      * @Route("/changerealm/{id}", requirements={"id"="\d+"})
      */
-	public function changeRealmAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
+	public function changeRealmAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest', false, true, false, $id);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		$this->get('dispatcher')->setSettlement($settlement);
+		$settlement = $id;
 
 		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changerealm'));
 		$form->handleRequest($request);
