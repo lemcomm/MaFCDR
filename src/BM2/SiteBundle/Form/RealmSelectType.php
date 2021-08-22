@@ -27,7 +27,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= '';
 				$this->label	= 'control.changerealm.realm';
 				$this->submit	= 'control.changerealm.submit';
-				$this->msg      = 'control.changerealm.msg';
+				$this->msg      = null;
 				$this->domain	= 'actions';
 				break;
 			case 'take':
