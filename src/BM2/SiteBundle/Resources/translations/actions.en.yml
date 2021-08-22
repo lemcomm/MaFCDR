@@ -1286,6 +1286,8 @@ unit:
   disband:  Disband Unit
   return:   Send Unit Home
   recall:   Recall Unit
+  revoke:   Remove Marshal
+  traveling: Unit is currently traveling back to base and will arrive in %days% days.
  assigned:
  assign:
   name:     Assign a Leader to %name%
@@ -1302,6 +1304,8 @@ unit:
   select:   "Available Characters:"
   submit:   Appoint Marshal
   success:  Marshal appointed successfully!
+ revoke:
+  success:  Marshal removed successfully!
  new:
   name:     Create A Unit
   description: Organize a new unit under your authority.

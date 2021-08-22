@@ -315,14 +315,24 @@ class PaymentController extends Controller {
 		$pm = $this->get('payment_manager');
 
 		$now = new \DateTime('now');
+		$amount = 0;
+
 		foreach ($patreons as $patron) {
 			if ($patron->getExpires() < $now) {
 				$pm->refreshPatreonTokens($patron);
 			}
-			$pm->refreshPatreonPledge($patron);
-			$em->flush();
-			return $this->redirectToRoute('bm2_site_payment_subscription');
+			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
+			# NOTE: Expand this later for other creators if we have any.
+			if ($patron->getCreator()->getCreator()=='andrew') {
+				$amount += $entitlement;
+			}
 		}
+		if ($amount > 0) {
+			$amount = $amount/100;
+		}
+		$em->flush();
+		$this->addFlash('notice', $this->get('translator')->trans('account.patronizing', ['%entitlement%'=>$amount]));
+		return $this->redirectToRoute('bm2_account');
 	}
 
    /**
@@ -351,12 +361,12 @@ class PaymentController extends Controller {
 			$patron->setAccessToken($tokens['access_token']);
 			$patron->setRefreshToken($tokens['refresh_token']);
 			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
-			$pm->refreshPatreonPledge($patron);
+			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
 			$em->flush();
-			$this->addFlash('notice', 'account.patronizing');
+			$this->addFlash('notice', $this->get('translator')->trans('account.patronizing', ['%entitlement%'=>$entitlement/100]));
 			return $this->redirectToRoute('bm2_account');
 		} else {
-			$this->addFlash('notice', 'account.patronfailure');
+			$this->addFlash('notice', $this->get('translator')->trans('account.patronfailure'));
 			return $this->redirectToRoute('bm2_site_payment_subscription');
 		}
 	}

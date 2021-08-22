@@ -701,6 +701,7 @@ perm:
  laws:      Change Laws
  wars:      Manage Wars
  describe:  Update Description
+ units:     Manage Units
  realmdescribe: Update Description
  placeinside: Construct Place Inside
  placeoutside: Construct Place Outside
@@ -712,10 +713,7 @@ perm:
     Allows others to resupply their soldiers at your settlement, up to a number of items per day that you can
     limit with the <em>amount</em> value. This amount is shared by everyone on the list.
   mobilize: >
-    Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of
-    soldiers that can be mobilized per day is limited by the <em>amount</em> value, which is shared by everyone on the list.<br />
-    To prevent depletion of your defenses, you can also set a <em>reserve</em> value declaring that the reserve number of soldiers
-    always has to remain in the settlement.
+    Currently not in use.
   construct: >
     Allows others to initiate and manage construction projects in your settlement.<br />
     To prevent excessive building, you can define a <em>reserve</em> value, which is the percentage of peasants that must remain
@@ -724,6 +722,8 @@ perm:
     Allows others to train new soldiers in your settlement.<br />
     To prevent excessive recruitment, you can set the <em>amount</em> value, which limits the number of new soldiers sent into
     training per day. This value is shared by everyone on the list.
+  units: >
+    Allows others to manage the units and recruitment in your settlement. This includes appointing marshals, training soldiers, disbanding soldiers, assign units to others, and disbanding entire units.
   trade: >
     Allows others to initiate trades from your settlement towards others, i.e. outbound trade.<br />
     Be very careful with this option as it cannot be limited, and someone trading all your food away can very quickly bring ruin
@@ -843,7 +843,8 @@ house:
    It is worth note however, that any of your future descendants will, if the other parent either has no house, or is part of the
    same house, also join your house automatically.<br />
    Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't a legal
-   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.
+   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.<br /><br />
+   <em>NOTE: Houses are not for guilds, associations, religions, cults, societies, or anything guild or religion like. Those will come in a future update.</em>
  background:
   name:
    name:        Name of the House

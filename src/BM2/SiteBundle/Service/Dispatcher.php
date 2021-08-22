@@ -998,18 +998,9 @@ class Dispatcher {
 		return $this->action("control.occupationend", "maf_settlement_occupation_end");
 	}
 
-	public function controlChangeRealmTest($check_duplicate=false) {
-		if (($check = $this->controlActionsGenericTests()) !== true) {
+	public function controlChangeRealmTest($check_duplicate=false, $settlement) {
+		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.$check");
-		}
-		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.changerealm')) {
-			return array("name"=>"control.changerealm.name", "description"=>"unavailable.already");
-		}
-		// FIXME: this still sometimes gives a "you are not inside" message when it shouldn't, I think?
-		if ($this->settlement) {
-			$settlement = $this->settlement;
-		} else {
-			$settlement = $this->getCharacter()->getInsideSettlement();
 		}
 		if (!$settlement) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notsettlement");
@@ -1103,7 +1094,7 @@ class Dispatcher {
 	}
 
 	public function controlAbandonTest($check_duplicate=false, $settlement) {
-		if (($check = $this->controlActionsGenericTests()) !== true) {
+		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.$check");
 		}
 		if ($settlement->getOwner() != $this->getCharacter()) {
@@ -2298,9 +2289,6 @@ class Dispatcher {
 		if ($place->getOwner() !== $this->getCharacter()) {
 			return ["name"=>"place.transfer.name", "description"=>"unavailable.notowner"];
 		}
-		if ($place->getOwner() && $place->getOwner()->getInsidePlace() !== $place) {
-			return ["name"=>"place.transfer.name", "description"=>"unavailable.outsideplace"];
-		}
 		return [
 			$this->action("place.transfer", "maf_place_transfer", true,
 				['place'=>$place->getId()],
@@ -2682,9 +2670,7 @@ class Dispatcher {
 			return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.$check");
 		}
 		if (!$character->getUnits()->contains($unit)) {
-			if($unit->getSettlement()->getOwner() != $character || $unit->getSettlement()->getSteward() != $character) {
-				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notlord");
-			} elseif($unit->getSettlement() != $character->getInsideSettlement()) {
+			if ($unit->getSettlement() != $character->getInsideSettlement()) {
 				return array("name"=>"unit.canceltraining.name", "description"=>"unavailable.notinside");
 			}
 		}

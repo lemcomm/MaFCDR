@@ -335,7 +335,6 @@ class ConversationManager {
                         }
                         return $new;
                 } else {
-                        echo 'failure!';
                         return 'noActivePerm';
                 }
         }
@@ -343,7 +342,7 @@ class ConversationManager {
         public function newLocalConversation(Character $char, $now, $cycle = null) {
                 $conv = new Conversation();
                 $this->em->persist($conv);
-                $conv->setLocalFor($rec);
+                $conv->setLocalFor($char);
                 $conv->setCreated($now);
                 $conv->setActive(true);
                 if (!$cycle) {
@@ -493,11 +492,11 @@ class ConversationManager {
                 }
                 $this->em->flush();
 
-                # writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $count)
+                # public function writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type, $total = null, $flush = true, $antiTickUp = false, $internal = false)
                 if ($content) {
                         # For reasons I can't figure out, writeMessages's call to find the active permissions of the new conversation bugs out and always returns empty. But only on new conversations.
                         # On existing conversations it works fine. So we pass the count manually, and use that passed count as a flag that this is a new conversation and that the message is trusted.
-                        $msg = $this->writeMessage($conv, null, $char, $content, $type, count($added));
+                        $msg = $this->writeMessage($conv, null, $char, $content, $type, count($added), true, null, true);
                 }
 
                 return $conv;
