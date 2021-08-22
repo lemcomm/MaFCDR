@@ -136,7 +136,7 @@ class UnitController extends Controller {
 		$em = $this->getDoctrine()->getManager();
                 $pm = $this->get('permission_manager');
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
-                $here = $charater->getInsideSettlement();
+                $here = $character->getInsideSettlement();
                 if ($pm->checkSettlementPermission($here, $character, 'units')) {
                         $settlements[] = $here->getId();
                 }
@@ -219,19 +219,23 @@ class UnitController extends Controller {
                 $canResupply=false;
                 $canRecruit=false;
                 $canReassign=false;
+                $hasUnitsPerm=false;
 
 		if ($settlement) {
                         # If we can manage units, we can reassign and resupply. Build the list.
-                        if ($hasUnitsPerm = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
+                        if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
                                 foreach ($settlement->getUnits() as $each) {
                                         if (!$each->getCharacter() && !$each->getPlace()) {
                                                 $units[] = $each;
                                         }
                                 }
+                                if ($unit->getSettlement() == $settlement) {
+                                        $hasUnitsPerm = true;
+                                        $canRecruit = true;
+        				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
+                                }
                                 $canResupply = true;
 				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
-                                $canRecruit = true;
-				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
                         }
 
                         # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
