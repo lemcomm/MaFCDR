@@ -2601,37 +2601,13 @@ class Dispatcher {
 		return $this->action("unit.rebase.name", "maf_unit_rebase");
 	}
 
-	public function unitAssignTest($ignored, Unit $unit) {
-		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if(
-			(
-				$unit->getSettlement() && (
-					$unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units')
-				)
-			) || $unit->getMarshal() != $character) {
-			return array("name"=>"unit.assign.name", "description"=>"unavailable.notmarshal");
-		}
-		if(!$settlement) {
-			return array("name"=>"unit.assign.name", "description"=>"unavailable.notinside");
-		}
-		if ($unit->getTravelDays() > 0) {
-			return array("name"=>"unit.assign.name", "description"=>"unavailable.rebasing");
-		}
-		return $this->action("unit.assign.name", "maf_unit_assign");
-	}
-
 	public function unitAppointTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
-		$settlement = $this->getCharacter()->getInsideSettlement();
-		if($unit->getSettlement() && ($unit->getSettlement()->getOwner() != $character && $unit->getSettlement()->getSteward() != $character && $this->permission_manager->checkSettlementPermission($settlement, $character, 'units'))) {
+		$settlement = $unit->getSettlement();
+		if($settlement && !$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') && $unit->getSettlement() != $character->getInsideSettlement()) {
 			return array("name"=>"unit.appoint.name", "description"=>"unavailable.notlord");
-		}
-		if(!$settlement) {
+		} elseif(!$settlement) {
 			return array("name"=>"unit.appoint.name", "description"=>"unavailable.notinside");
-		}
-		if ($unit->getTravelDays() > 0) {
-			return array("name"=>"unit.appoint.name", "description"=>"unavailable.rebasing");
 		}
 		return $this->action("unit.appoint.name", "maf_unit_appoint");
 	}
