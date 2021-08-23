@@ -347,7 +347,7 @@ class ActionResolution {
 			} else {
 				$reason = 'grant_fief';
 			}
-			$this->politics->changeSettlementOwner($settlement, $to, 'grant');
+			$this->politics->changeSettlementOwner($settlement, $to, $reason);
 
 			if (strpos($action->getStringValue(), 'clear_realm') !== false && $settlement->getRealm()) {
 				$this->politics->changeSettlementRealm($settlement, null, 'grant');
