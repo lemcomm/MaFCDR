@@ -103,12 +103,10 @@ class UnitSettingsType extends AbstractType {
 				'expanded'=>false,
 				'class'=>'BM2SiteBundle:Settlement',
 				'choice_label'=>'name',
-				'query_builder'=>function(EntityRepository $er) use ($char, $settlements) {
+				'query_builder'=>function(EntityRepository $er) use ($settlements) {
 					$qb = $er->createQueryBuilder('s');
-					$qb->where('s.owner = :char')
-					->orWhere('s.feed_soldiers = TRUE and s.owner = :liege')
-					->orWhere('s IN (:settlements)')
-					->setParameters(array('char'=>$char, 'liege'=>$char->getLiege(), 'settlements'=>$settlements));
+					$qb->where('s IN (:settlements)')
+					->setParameters(array('settlements'=>$settlements));
 					$qb->orderBy('s.name');
 					return $qb;
 				},

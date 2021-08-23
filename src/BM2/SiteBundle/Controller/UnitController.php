@@ -136,10 +136,6 @@ class UnitController extends Controller {
 		$em = $this->getDoctrine()->getManager();
                 $pm = $this->get('permission_manager');
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
-                $here = $character->getInsideSettlement();
-                if ($pm->checkSettlementPermission($here, $character, 'units')) {
-                        $settlements[] = $here->getId();
-                }
 
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
 
@@ -342,7 +338,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitAssignAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitAssignTest', false, true, false, $unit);
+		$character = $this->get('dispatcher')->gateway('unitManageTest', false, true, false, $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);

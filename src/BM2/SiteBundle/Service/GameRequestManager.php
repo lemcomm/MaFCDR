@@ -432,18 +432,24 @@ class GameRequestManager {
 	public function getAvailableFoodSuppliers(Character $char) {
 		# Build the list of settlements we can get food from...
                 $query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE r.type = :type AND r.from_character = :char AND r.accepted = TRUE')->setParameters(array('char'=>$char, 'type'=>'soldier.food'));
-                $results = $query->getResult();
                 # Doctrine will lose it's mind if it tries to pass a null variable to a query, so we trick it by declaring this as '0'.
                 # Doctrine will process this as a integer, and then check to see if any request has an ID that is in 0.
                 # Which will never happen.
-                if (count($results) < 1) {
-                        $settlements = 0;
-                } else {
-                        $settlements = array();
-                        foreach ($query->getResult() as $result) {
-                                $settlements[] = $result->getToSettlement()->getId();
-                        }
+                $settlements = [];
+                foreach ($query->getResult() as $result) {
+                        $settlements[] = $result->getToSettlement()->getId();
                 }
+		$query2 = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.owner = :char OR s.steward = :char')->setParameters(['char'=>$char]);
+		foreach ($query2->getResult() as $result2) {
+			if (!in_array($result2->getId(), $settlements)) {
+				$settlements[] = $result2->getId();
+			}
+		}
+		if ($char->findLiege() instanceof Settlement) {
+			if ($liege = $char->findLiege()->getFeedSoldiers() && !in_array($liege->getId(), $settlements)) {
+				$settlements[] = $$liege->getId();
+			}
+		}
 		return $settlements;
 	}
 }
