@@ -16,12 +16,14 @@ class TradeType extends AbstractType {
 	private $character;
 	private $settlement;
 	private $sources;
+	private $dests;
 	private $allowed;
 
-	public function __construct(Character $character, Settlement $settlement, $sources, $allowed) {
+	public function __construct(Character $character, Settlement $settlement, $sources, $dests, $allowed) {
 		$this->character = $character;
 		$this->settlement = $settlement;
 		$this->sources = $sources;
+		$this->dests = $dests;
 		$this->allowed = $allowed;
 	}
 
@@ -40,6 +42,7 @@ class TradeType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$character = $this->character;
 		$sources = $this->sources;
+		$dests = $this->dests;
 		$builder->add('name', 'text', array(
 			'label'=>'tradename',
 			'required'=>false,
@@ -79,12 +82,12 @@ class TradeType extends AbstractType {
 		if ($this->allowed) {
 			$builder->add('destination', 'entity', array(
 				'label' => 'destination',
-				'placeholder' => (count($sources)>1?'form.choose':false),
-				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($sources) {
+				'placeholder' => (count($dests)>1?'form.choose':false),
+				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($dests) {
 					$qb = $er->createQueryBuilder('s');
-					$qb->where('s.id in (:sources)');
+					$qb->where('s.id in (:dests)');
 					$qb->orderBy('s.name');
-					$qb->setParameter('sources', $sources);
+					$qb->setParameter('dests', $dests);
 					return $qb;
 				},
 			));

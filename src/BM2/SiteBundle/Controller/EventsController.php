@@ -225,18 +225,15 @@ class EventsController extends Controller {
 		}
 
 		$access = false;
-		if ($soldier->getCharacter() == $character) {
-			$access = true;
-		} elseif ($soldier->getBase() && ($soldier->getBase()->getOwner() == $character || $soldier->getBase()->getSteward() == $character)) {
-			$access = true;
-		}
-
-		if (!$access) {
+		$unit = $soldier->getUnit();
+		$base = $unit->getSettlement();
+		$perm = $this->get('permission_manager')->checkSettlementPermission($base, $character, 'units');
+		if ($unit->getCharacter() === $character || $perm || $unit->getMarshal() === $character) {
+			return $this->render('Events/soldierlog.html.twig', [
+				'soldier'=>$soldier
+			]);
+		} else {
 			throw new AccessDeniedHttpException('error.noaccess.log');
 		}
-
-		return $this->render('Events/soldierlog.html.twig', [
-			'soldier'=>$soldier
-		]);
 	}
 }
