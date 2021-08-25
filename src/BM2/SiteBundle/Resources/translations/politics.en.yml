@@ -15,8 +15,9 @@ status:
   househead:    You are head of the %house%
   housememb:    You are part of the %house%
   realmvassal:  You are a knight of the realm of %liege%.
-  landvassal:   You are a knight of the settlement of %liege% in %realm%.
+  landvassal:   You are a knight of the settlement of %liege% in the realm of %realm%.
   landvassal2:  You are a knight of the independent settlement of %liege%.
+  positionvassal: You are a knight of the position of %liege% in the realm of %realm%.
   liegeplace:   You are a knight of the place of %liege% in the realm of %realm%.
   liegeplace2:  You are a knight of the independent place of %liege%.
   liegeposition: You are a knight of the %liege% of %realm%.
