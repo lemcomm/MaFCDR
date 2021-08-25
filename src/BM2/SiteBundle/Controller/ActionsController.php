@@ -746,48 +746,58 @@ class ActionsController extends Controller {
 		}
 
 		$trade = new Trade;
-		foreach ($trades as $t) {
-			$sources[] = $t->getSource()->getId();
-		}
-		$sources = array_unique($sources);
 
-		$form = $this->createForm(new TradeType($character, $settlement, $sources, $allowed), $trade);
+		$sources = array_unique($sources);
+		$dests = $sources;
+		if (!$permission) {
+			# No permission, can't source here.
+			$key = array_search($settlement->getId(), $sources); #Find this settlement ID,
+			unset($sources[$key]); #Remove it.
+		} else {
+			# If we do have permission, we can send back to anyone sending us stuff. Add their IDs.
+			foreach ($trades as $t) {
+				$dests[] = $t->getSource()->getId();
+			}
+			# Remove duplicates.
+			$dests = array_unique($dests);
+		}
+
+		$form = $this->createForm(new TradeType($character, $settlement, $sources, $dests, $allowed), $trade);
 		$cancelform = $this->createForm(new TradeCancelType($trades, $character));
 
 		$merchants = $character->getAvailableEntourageOfType('Merchant');
 
 		// FIXME: check which form was submitted - code snippet to do this:
 		//   194  		if ($request->isMethod('POST') && $request->request->has("charactercreation")) {
-		if ($request->isMethod('POST')) {
-			if ($form) {
-		                $form->handleRequest($request);
-	                	if ($form->isValid()) {
-					if ($trade->getAmount()>0) {
-						if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
-							$form->addError(new FormError("trade.allremote"));
-						} elseif ($trade->getSource()==$trade->getDestination()) {
-							$form->addError(new FormError("trade.same"));
+		if ($request->isMethod('POST') && $request->request->has('trade')) {
+	                $form->handleRequest($request);
+                	if ($form->isValid()) {
+				if ($trade->getAmount()>0) {
+					if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
+						$form->addError(new FormError("trade.allremote"));
+					} elseif ($trade->getSource()==$trade->getDestination()) {
+						$form->addError(new FormError("trade.same"));
+					} else {
+						// TODO: check if we don't already have such a deal (same source, destination and resource)
+						// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
+						$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
+						if ($trade->getAmount() > $available) {
+							$form->addError(new FormError("trade.toomuch"));
 						} else {
-							// TODO: check if we don't already have such a deal (same source, destination and resource)
-							// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
-							$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
-							if ($trade->getAmount() > $available) {
-								$form->addError(new FormError("trade.toomuch"));
-							} else {
-								$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
-								if ($merchants->count() > 0 ) {
-									// remove a merchant!
-									$stay = $merchants->first();
-									$em->remove($stay);
-								}
-								$em->persist($trade);
-								$em->flush();
-								return $this->redirect($request->getUri());
+							$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
+							if ($merchants->count() > 0 ) {
+								// remove a merchant!
+								$stay = $merchants->first();
+								$em->remove($stay);
 							}
+							$em->persist($trade);
+							$em->flush();
+							return $this->redirect($request->getUri());
 						}
 					}
 				}
 			}
+		} elseif ($request->isMethod('POST') && $request->request->has('tradecancel')) {
 			$cancelform->handleRequest($request);
 			if ($cancelform->isValid()) {
 				$data = $cancelform->getData();
