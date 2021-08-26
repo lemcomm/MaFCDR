@@ -86,6 +86,7 @@
 
 	<h3>{{ "economy.trade.towards"|trans({},"actions")|title }}</h3>
 	<table class="tsort"><thead><tr>
+		<th></th>
 		<th>{{ "economy.trade.amount"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.res"|trans({},"actions") }}</th>
 		<th>{{ "economy.trade.from"|trans({},"actions") }}</th>
@@ -94,6 +95,7 @@
 	</tr></thead><tbody>
 	{% for trade in trades %}
 		<tr>
+			<td>{{ trade.name }}</td>
 			<td align="right">{{ trade.amount }}</td>
 			<td>{{ trade.resourcetype.name|trans }}</td>
 			<td>{{ link(trade.source) }}</td>
