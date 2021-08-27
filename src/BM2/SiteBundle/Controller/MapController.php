@@ -398,13 +398,8 @@ class MapController extends Controller {
 	private function dataSettlements($mode, $lowleft, $upright) {
 		$features = array();
 		$em = $this->getDoctrine()->getManager();
-		if ($mode=='start') {
-			$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c WHERE s.owner IS NOT NULL AND s.allow_spawn=true AND ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true');
-			$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
-		} else {
-			$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, g.center');
-			$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
-		}
+		$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, g.center');
+		$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
 		foreach ($query->getResult() as $r) {
 			$def = 0;
 			if (isset($r['defenses'])) {

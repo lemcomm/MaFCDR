@@ -33,11 +33,6 @@ class SettlementPermissionsSetType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$lord = $this->lord;
 		if ($lord) {
-			$builder->add('allow_spawn', 'checkbox', array(
-				'label' => "control.permissions.spawn",
-				'required' => false,
-			));
-
 			$builder->add('allow_thralls', 'checkbox', array(
 				'label' => "control.permissions.thralls",
 				'required' => false,

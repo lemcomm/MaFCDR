@@ -13,7 +13,6 @@
 		<field name="war_fatigue" type="integer"/>
 		<field name="abduction_cooldown" type="integer" nullable="true"/>
 
-		<field name="allow_spawn" type="boolean"/>
 		<field name="allow_thralls" type="boolean"/>
 		<field name="feed_soldiers" type="boolean" nullable="true"/>
 
