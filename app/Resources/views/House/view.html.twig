@@ -38,7 +38,7 @@
 				<dd> {{ link(house.home) }}</dd>
 			{% endif %}
 		{% else %}
-			<dd>{{ link(house.settlement) }}</dt>
+			<dd>{{ link(house.insideSettlement) }}</dt>
 		{% endif %}
 		{% if house.superior %}
 			<dt>{{ 'house.view.superior'|trans({}, "politics") }}</dt>
