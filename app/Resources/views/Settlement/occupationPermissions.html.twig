@@ -35,10 +35,7 @@
 		{{ form_widget(form._token) }}
 		{% if lord %}
 			<h3>{{ "control.permissions.general"|trans({},"actions")|title }}</h3>
-			<div style="clear:both">
-				{{ form_label(form.allow_spawn) }}
-				{{ form_widget(form.allow_spawn) }}
-			</div><div style="clear:both; margin-top: 1em">
+			<div style="clear:both; margin-top: 1em">
 				{{ form_label(form.allow_thralls) }}
 				{{ form_widget(form.allow_thralls) }}
 			</div><div style="clear:both; margin-top: 1em">
