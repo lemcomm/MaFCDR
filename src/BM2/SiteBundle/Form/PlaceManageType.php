@@ -77,9 +77,6 @@ class PlaceManageType extends AbstractType {
 			$builder->add('for_realm', HiddenType::class, [
 				'data'=>false
 			]);
-			$builder->add('allow_spawn', HiddenType::class, [
-				'data'=>false
-			]);
 			if ($me->getOwner()) {
 				$builder->add('realm', EntityType::class, [
 					'required'=>false,
