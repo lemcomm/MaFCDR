@@ -54,8 +54,9 @@ class NotificationEventListener {
 				}
 			}
 		}
-
-		if ($text != false && $user && $user->getNotifications() != false) {
+		
+		$twoMonths = new \DateTime("-2 months");
+		if ($text != false && $user && $user->getNotifications() != false && $user->getLastLogin() > $twoMonths) {
 			$text.= $this->msgtrans->eventTranslate($event->getEvent(), true)."<br /><br />\n\n";
 			$text.= $this->translator->trans('mail.footer', array(), "communication");
 

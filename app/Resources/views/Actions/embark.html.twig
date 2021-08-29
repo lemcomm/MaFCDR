@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "location.embark.name"|trans({},"actions")|title }}</h2>
+	{% if ships is defined %}
+		{{ "location.embark.done2"|trans({},"actions")|raw }}
+	{% else %}
+		{{ "location.embark.done"|trans({"%dockname%":dockname},"actions")|raw }}
+	{% endif %}
+{% endblock %}

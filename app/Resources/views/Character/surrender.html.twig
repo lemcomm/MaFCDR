@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "surrender.name"|trans({},"actions")|title }}</h2>
+	{% if success is defined %}
+		{{ "surrender.success"|trans({"%target%":target.name},"actions")|raw }}
+	{% else %}
+		<p>{{ "surrender.intro"|trans({},"actions")|raw }}</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

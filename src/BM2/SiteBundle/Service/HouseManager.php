@@ -18,9 +18,9 @@ class HouseManager {
 		$this->descman = $descman;
 	}
 
-	public function create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement=null, $crest = null, Character $founder) {
-		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$house = $this->_create($name, $description, $private_description, $secret_description, null, $settlement, $crest, $founder);
+	public function create($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $superior = null, $place=null, $settlement=null, $crest = null, Character $founder) {
+		# _create(name, description, private description, secret description, superior house, place, settlement, crest, and founder)
+		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, null, $place, $settlement, $crest, $founder);
 
 		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
@@ -39,14 +39,14 @@ class HouseManager {
 		return $house;
 	}
 
-	public function subcreate(Character $character, $name, $description = null, $place = null, $settlement = null, $founder, House $id) {
+	public function subcreate(Character $character, $name, $motto = null, $description = null, $place = null, $settlement = null, $founder, House $id) {
 		# Cadet houses won't be created with these so we set them to null in order to ensure they exist for passing to _create.
 		$private_description = null;
 		$secret_description = null;
 		$crest = $founder->getCrest();
-		
+
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$house = $this->_create($name, $description, $private_description, $secret_description, $id, $crest, $settlement, $founder);
+		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, $id, $crest, $settlement, $founder);
 
 		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
@@ -76,21 +76,28 @@ class HouseManager {
 		return $house;
 	}
 
-	private function _create($name, $description = null, $private_description = null, $secret_description = null, $superior = null, $settlement = null, $crest = null, Character $founder) {
+	private function _create($name, $motto, $description = null, $private_description = null, $secret_description = null, $superior = null, $place = null, $settlement = null, $crest = null, Character $founder) {
 		$house = new House;
 		$this->em->persist($house);
 		$house->setName($name);
+		$house->setMotto($motto);
 		$house->setPrivate($private_description);
 		$house->setSecret($secret_description);
 		if ($superior) {
 			$house->setSuperior($superior);
 			$superior->addCadet($house);
 		}
-		$house->setInsideSettlement($settlement);
+		if ($place) {
+			$house->setHome($place);
+		}
+		if ($settlement) {
+			$house->setInsideSettlement($settlement);
+		}
 		$house->setCrest($crest);
 		$house->setFounder($founder);
 		$house->setHead($founder);
 		$house->setGold(0);
+		$house->setActive(true);
 		$founder->setHouse($house);
 		$this->em->flush();
 		if ($description) {
@@ -99,5 +106,5 @@ class HouseManager {
 
 		return $house;
 	}
-	
+
 }

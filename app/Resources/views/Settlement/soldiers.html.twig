@@ -1,0 +1,139 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/ui-progress-bar.css') }}" />
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/tablesorter/parsers/parser-input-select.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'settlement.militia'|trans({"%name%":settlement.name})|title }}</h2> {# FIXME: would prefer to use the link function, but links and |title don't mix #}
+{% if soldiers is empty %}
+	{{ 'none'|trans }}
+{% else %}
+	<p>{{ 'recruit.manage.intro'|trans({},"actions") }}</p>
+
+	{% set prev = max(0, start - slice) %}
+	{% set next = min(start + slice, total_soldiers) %}
+
+	{% if next < total_soldiers or start > 0 %}
+		{# FIXME: translate #}
+		showing soldiers {{ start }} - {{ next }} of {{ total_soldiers }} -
+		{% if start > 0 %}
+			<a href="{{ path("bm2_site_settlement_soldiers", {'id':settlement.id, 'start':prev}) }}"><button>previous {{ slice }}</button></a>
+		{% endif %}
+		{% if next < total_soldiers %}
+			{% if start > 0 %} - {% endif %}
+			<a href="{{ path("bm2_site_settlement_soldiers", {'id':settlement.id, 'start':next}) }}"><button>next {{ slice }}</button></a>
+		{% endif %}
+	{% endif %}
+
+	{% include "element/soldierslist.html.twig" with {
+		"settlement":settlement,
+		"submitpath":path('bm2_site_settlement_soldiers', {'id':settlement.id, 'start':start}),
+		"listpath":path('bm2_site_settlement_soldiers', {'id':settlement.id, 'start':start}),
+		"groupurl":null
+	} %}
+
+{% endif %}
+
+<hr />
+
+<h2>{{ 'settlement.recruits'|trans({"%name%":settlement.name})|title }}</h2>
+{% if recruits is empty %}
+	<p>{{ 'none'|trans }}</p>
+	<p>{{ "recruit.troops.recruitlink"|trans({"%url%":path("bm2_site_actions_soldiers") },"actions")|raw }}</p>
+{% else %}
+	<div id="oncancel" class="hidden" style="margin-bottom:1em">
+		{{ 'recruit.troops.canceldone'|trans({},"actions") }}<br />
+		<i>{{ 'recruit.troops.aftercancel'|trans({},"actions") }}</i>
+	</div>
+	<p>{{ "recruit.troops.cancelinfo"|trans({},"actions") }}</p>
+	<p>{{ "recruit.troops.recruitlink"|trans({"%url%":path("bm2_site_actions_soldiers") },"actions")|raw }}</p>
+	<table>
+		<thead>
+			<th>{{ "soldier.name"|trans|title }}</th>
+			<th>{{ 'weapon'|trans }}</th>
+			<th>{{ 'armour'|trans }}</th>
+			<th>{{ 'equipment'|trans }}</th>
+			<th>{{ "soldier.train"|trans|title }}</th>
+			<th>{{ "soldier.complete"|trans|title }}</th>
+		</thead>
+		<tbody>
+		{% if settlement.singleTrainingPoints < settlement.trainingPoints/recruits|length %}
+			{% set tp = settlement.singleTrainingPoints %}
+		{% else %}
+			{% set tp = settlement.trainingPoints/recruits|length %}
+		{% endif %}
+		{% for soldier in recruits %}
+			{% set time = (soldier.trainingRequired-soldier.training)/tp %}
+			{% set progress = soldier.training*100/soldier.trainingRequired %}
+			<tr id="recruit_{{ soldier.id }}">
+				<td>{{ soldier.name }}</td>
+				{% if soldier.weapon %}
+					{% if soldier.oldweapon != soldier.weapon %}
+						<td>{{ link(soldier.weapon) }}</td>
+					{% else %}
+						<td class="disabled">{{ link(soldier.weapon) }}</td>
+					{% endif %}
+				{% else %}
+					<td>{{ 'item.improvised'|trans }}</td>
+				{% endif %}
+				{% if soldier.armour %}
+					{% if soldier.oldarmour != soldier.armour %}
+						<td>{{ link(soldier.armour) }}</td>
+					{% else %}
+						<td class="disabled">{{ link(soldier.armour) }}</td>
+					{% endif %}
+				{% else %}
+					<td></td>
+				{% endif %}
+				{% if soldier.equipment %}
+					{% if soldier.oldequipment != soldier.equipment %}
+						<td>{{ link(soldier.equipment) }}</td>
+					{% else %}
+						<td class="disabled">{{ link(soldier.equipment) }}</td>
+					{% endif %}
+				{% else %}
+					<td></td>
+				{% endif %}
+				<td class="progress_column"><div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ soldier.training|number_format }} / {{ soldier.trainingRequired }}</span></div></td>
+				<td align="right">{% if time < 1 %}{{ 'today'|trans }}{% else %}{{ time|number_format }} {{ "day"|transchoice(time|number_format) }}{% endif %}</td>
+				<td>
+					<button class="canceltraining" value="{{ soldier.id }}" data-name="{{ soldier.name }}" data-type="{{ ("soldier."~soldier.type)|transchoice(1) }}">{{ 'recruit.troops.cancel'|trans({},"actions") }}</button>
+					{% if soldier.oldweapon or soldier.oldarmour or soldier.oldequipment %}
+						{{ 'recruit.troops.returns'|trans({},"actions") }}
+					{% else %}
+						{{ 'recruit.troops.disbands'|trans({},"actions") }}
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% if recruits is not empty %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+
+$(".canceltraining").click(function(){
+	$("#oncancel").hide();
+	var id = $(this).val();
+	var name = $(this).data('name');
+	var type = $(this).data('type');
+	$.post("{{ path('bm2_site_settlement_canceltraining') }}", { "settlement":{{ settlement.id }}, "recruit": id }, function(){
+		var newString = $("#oncancel").html().replace(/%name%/g, name).replace(/%type%/g, type);
+		$("#oncancel").html(newString).show();
+		$("#recruit_"+id).remove();
+	});
+});
+{% endif %}
+{% endblock %}

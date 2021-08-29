@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -7,11 +7,12 @@ class Soldier extends NPC {
 
 	protected $morale=0;
 	protected $is_fortified=false;
-	protected $ranged=-1, $melee=-1, $defense=-1;
+	protected $ranged=-1, $melee=-1, $defense=-1, $charge=-1;
 	protected $isNoble = false;
 	protected $isFighting = false;
 	protected $attacks = 0;
 	protected $casualties = 0;
+	protected $xp_gained = 0;
 
 
 	public function __toString() {
@@ -20,13 +21,8 @@ class Soldier extends NPC {
 		return "soldier #{$this->id} ({$this->getName()}, {$this->getType()}, base $base, char $char)";
 	}
 
-	public function isSoldier() {
-		return true;
-	}
-
-
 	public function isActive($include_routed=false) {
-		if (!$this->isAlive()) return false;
+		if (!$this->isAlive() || $this->getTrainingRequired() > 0 || $this->getTravelDays() > 0) return false;
 		if ($this->getType()=='noble') {
 			// nobles have their own active check
 			return $this->getCharacter()->isActive($include_routed, true);
@@ -72,6 +68,10 @@ class Soldier extends NPC {
 		$this->attacks = 0;
 	}
 
+	public function addXP($xp) {
+		$this->xp_gained += $xp;
+	}
+
 	public function addCasualty() {
 		$this->casualties++;
 	}
@@ -87,24 +87,11 @@ class Soldier extends NPC {
 	public function reduceMorale($value=1) { $this->morale-=$value; return $this; }
 	public function gainMorale($value=1) { $this->morale+=$value; return $this; }
 
-	public function getUnit() {
-		if ($this->getCharacter()) {
-			return $this->getCharacter()->getSoldiers();
-		} elseif ($this->getBase()) {
-			return $this->getBase()->getSoldiers();
-		} else {
-			return null;
+	public function getAllInUnit() {
+		if ($this->isNoble) {
+			return $this;
 		}
-	}
-
-	public function getGroupName() {
-		if ($this->group!==null) {
-			$groups = range('a','z');
-			return $groups[$this->group];
-		} else {
-			return '';
-		}
-
+		return $this->getUnit()->getSoldiers();
 	}
 
 	public function getType() {
@@ -115,7 +102,7 @@ class Soldier extends NPC {
 		if ($this->armour) { $def += $this->armour->getDefense(); }
 		if ($this->equipment) { $def += $this->equipment->getDefense(); }
 
-		if ($this->equipment && ($this->equipment->getName()=='horse' || $this->equipment->getName()=='war horse') ) {
+		if ($this->mount) {
 			if ($this->weapon && $this->weapon->getRanged() > 0) {
 				return 'mounted archer';
 			} else {
@@ -169,15 +156,19 @@ class Soldier extends NPC {
 
 	public function getWeapon() {
 		if ($this->has_weapon) return $this->weapon;
-		return null; 
+		return null;
 	}
 	public function getArmour() {
 		if ($this->has_armour) return $this->armour;
-		return null; 
+		return null;
 	}
 	public function getEquipment() {
 		if ($this->has_equipment) return $this->equipment;
-		return null; 
+		return null;
+	}
+	public function getMount() {
+		if ($this->has_mount) return $this->mount;
+		return null;
 	}
 	public function getTrainedWeapon() {
 		return $this->weapon;
@@ -187,6 +178,9 @@ class Soldier extends NPC {
 	}
 	public function getTrainedEquipment() {
 		return $this->equipment;
+	}
+	public function getTrainedMount() {
+		return $this->mount;
 	}
 	public function setWeapon(EquipmentType $item=null) {
 		$this->weapon = $item;
@@ -203,6 +197,11 @@ class Soldier extends NPC {
 		$this->has_equipment = true;
 		return $this;
 	}
+	public function setMount(EquipmentType $item=null) {
+		$this->mount = $item;
+		$this->has_mount = true;
+		return $this;
+	}
 	public function dropWeapon() {
 		$this->has_weapon = false;
 		return $this;
@@ -213,6 +212,10 @@ class Soldier extends NPC {
 	}
 	public function dropEquipment() {
 		$this->has_equipment = false;
+		return $this;
+	}
+	public function dropMount() {
+		$this->has_mount = false;
 		return $this;
 	}
 
@@ -236,15 +239,16 @@ class Soldier extends NPC {
 		return ($this->getTrainingRequired()>0);
 	}
 
-	public function cleanOffers() {
-		if ($this->getOfferedAs()) {
-			$this->getOfferedAs()->removeSoldier($this);
-			$this->setOfferedAs(null);
+	public function isRanged() {
+		if ($this->getWeapon() && $this->getWeapon()->getRanged() > $this->getWeapon()->getMelee()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
-	public function isRanged() {
-		if ($this->getWeapon() && $this->getWeapon()->getRanged() > $this->getWeapon()->getMelee()) {
+	public function isLancer() {
+		if ($this->getMount() && $this->getEquipment() && $this->getEquipment()->getName() == 'Lance') {
 			return true;
 		} else {
 			return false;
@@ -272,11 +276,15 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this quite a bit
 
-		$fighters = $this->getUnit()->count();
-		if ($fighters>1) {
-			$this->ranged = $power * pow($fighters, 0.96)/$fighters;
-		} else {
+		if ($this->isNoble) {
 			$this->ranged = $power;
+		}else {
+			$fighters = $this->getAllInUnit()->count();
+			if ($fighters>1) {
+				$this->ranged = $power * pow($fighters, 0.96)/$fighters;
+			} else {
+				$this->ranged = $power;
+			}
 		}
 		return $this->ranged;
 	}
@@ -293,7 +301,12 @@ class Soldier extends NPC {
 			$power += 5;
 		}
 		if ($this->getEquipment()) {
-			$power += $this->getEquipment()->getMelee();
+			if ($this->getEquipment()->getName() != 'Lance') {
+				$power += $this->getEquipment()->getMelee();
+			}
+		}
+		if ($this->getMount()) {
+			$power += $this->getMount()->getMelee();
 		}
 		if ($power>0) {
 			$power += $this->ExperienceBonus($power);
@@ -301,16 +314,38 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this a little
 
-		$fighters = $this->getUnit()->count();
-		if ($fighters>1) {
-			$this->melee = $power * pow($fighters, 0.96)/$fighters;
-		} else {
+		if ($this->isNoble) {
 			$this->melee = $power;
+		} else {
+			$fighters = $this->getAllInUnit()->count();
+			if ($fighters>1) {
+				$this->melee = $power * pow($fighters, 0.96)/$fighters;
+			} else {
+				$this->melee = $power;
+			}
 		}
 		return $this->melee;
 	}
 
-	public function DefensePower() {
+	public function ChargePower() {
+//		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
+
+		if (!$this->getMount()) {
+			return 0;
+		}
+		if ($this->getEquipment()) {
+			$power = $this->getEquipment()->getMelee();
+		}
+		if ($this->getMount()) {
+			$power += $this->getMount()->getMelee();
+		}
+		$power += $this->ExperienceBonus($power);
+
+		$this->charge = $power;
+		return $this->charge;
+	}
+
+	public function DefensePower($melee = true) {
 //		if (!$this->getAlive() || $this->isWounded()) return 0;
 		if ($this->defense!=-1) return $this->defense;
 
@@ -319,7 +354,18 @@ class Soldier extends NPC {
 			$power += $this->getArmour()->getDefense();
 		}
 		if ($this->getEquipment()) {
-			$power += $this->getEquipment()->getDefense();
+			if ($this->getEquipment()->getName() != 'Pavise') {
+				$power += $this->getEquipment()->getDefense();
+			} elseif ($this->hasMount()) {
+				$power += $this->getEquipment()->getDefense()/10; #It isn't worthless, but it can't be used effectively.
+			} elseif ($melee) {
+				$power += $this->getEquipment()->getDefense()/5;
+			} else {
+				$power += $this->getEquipment()->getDefense();
+			}
+		}
+		if ($this->getMount()) {
+			$power += $this->getMount()->getDefense();
 		}
 
 		$power += $this->ExperienceBonus($power);
@@ -334,19 +380,18 @@ class Soldier extends NPC {
 
 
 	public function onPreRemove() {
-		$this->cleanOffers();
+		if ($this->getUnit()) {
+			$this->getUnit()->removeSoldier($this);
+		}
 		if ($this->getCharacter()) {
-			$this->getCharacter()->removeSoldier($this);
+			$this->getCharacter()->removeSoldiersOld($this);
 		}
 		if ($this->getBase()) {
-			$this->getBase()->removeSoldier($this);
+			$this->getBase()->removeSoldiersOld($this);
 		}
 		if ($this->getLiege()) {
-			$this->getLiege()->removeSoldier($this);			
-		}
-		if ($this->getMercenary()) {
-			$this->getMercenary()->removeSoldier($this);
+			$this->getLiege()->removeSoldiersGiven($this);
 		}
 	}
-
+	
 }

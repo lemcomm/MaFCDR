@@ -168,14 +168,14 @@ class Economy {
 			}
                         $workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
-				// Just how many people are we short!? All we have left is defenses... 
+				// Just how many people are we short!? All we have left is defenses...
 				foreach ($settlement->getBuildings() as $building) {
 					if ($building->isActive()) {
 						$building->setActive(false);
 						$building->setCondition(-rand(10,200));
 					}
 				}
-			} 
+			}
 			$workforce = $settlement->getAvailableWorkforce();
 			if ($workforce < 0) {
 				// This should be utterly impossible to ever happen (but it does, occasionally), so log if it does because that means something is really wrong
@@ -221,6 +221,7 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'hunters lodge':
 			case 'lumber yard':	// only in forests
 				$geo = $settlement->getGeoData()->getBiome()->getName();
 				if (!in_array($geo, array('forest', 'dense forest'))) {
@@ -323,7 +324,7 @@ class Economy {
 				/* TODO: I don't think I want these implemented quite yet.
 				if ($settlement->getGeoData()->getHills() == false && $settlement->getGeoData()->getBiome()->getName() != 'rock' && $settlement->getGeoData()->getBiome()->getName() != 'scrublands' && $settlement->getGeoData()->getBiome()->getName() != 'thin scrublands') {
 					return false;
-				} 
+				}
 				*/
 				return false;
 				break;
@@ -476,10 +477,10 @@ class Economy {
 					);
 				}
 			}
-			
+
 			if ($settlement->getStarvation() < 10) {
 				// starvation effect = (x/10)^2 - meaning that the first few days it's barely noticeable, and full effect after 10 days of 0 food or the equivalent of some shortage
-				$starvation = pow($settlement->getStarvation()/10,2); 
+				$starvation = pow($settlement->getStarvation()/10,2);
 				if ($settlement->getStarvation() >= 9) {
 					$this->history->logEvent(
 						$settlement,
@@ -511,7 +512,7 @@ class Economy {
 		}
 
 		// TODO: take other resources, especially goods, into consideration as well
-		// TODO: only grow when we've had a bit of a surplus for some days, otherwise we will never have a reserve, I think. 
+		// TODO: only grow when we've had a bit of a surplus for some days, otherwise we will never have a reserve, I think.
 		//			Basically, population should not follow food production so closely as it does now
 		//			we could code this by checking for the surplus storage
 		$growth = sqrt(1-exp(-pow($shortage,2)))*$sign;
@@ -539,97 +540,71 @@ class Economy {
 			$settlement->setThralls($settlement->getThralls() + $thrallschange);
 		}
 
-		// effect on troops (militia and mobile)
-		// soldiers can eat with a little shortage, else they would almost never get anything,
-		// because moving into a region in balance drops food supply
-		if ($shortage>0.25 || $real_shortage>0.25) {
-			$severity=1;
-			if ($shortage>0.5 || $real_shortage>0.5) $severity++;
-			if ($shortage>0.75 || $real_shortage>0.75) $severity++;
-			$severity += min(3, round($settlement->getStarvation()/10));
-			foreach ($settlement->getSoldiers() as $militia) {
-				if ($militia->isAlive()) {
-					$militia->makeHungry($severity);
-					// militia can take several days of starvation without danger of death
-					if (rand(100, 200) < $militia->getHungry()) {
-						$militia->kill();
-						$this->history->addToSoldierLog($militia, 'starved');
+		/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
+		$units = $this->FindFeedableUnits($settlement);
+		foreach ($units as $unit) {
+			$this->supplySoldiers($unit, $real_shortage);
+		}
+		$this->em->flush();
+		*/
+	}
+
+	public function getSupplyTravelTime(Settlement $start, Unit $end) {
+		if ($unit->getDefendingSettlement()) {
+			$distance = $this->geo->calculateDistanceBetweenSettlements($start, $unit->getDefendingSettlement());
+		} elseif ($unit->getCharacter()) {
+			$distance = $this->geo->calculateDistanceToSettlement($end, $start);
+		} elseif ($unit->getPlace()) {
+			$place = $unit->getPlace();
+			if ($place->getInsideSettlement()) {
+				$distance = $this->geo->calculateDistanceBetweenSettlements($start, $place->getInsideSettlement());
+			} else {
+				$distance = $this->geo->calculateDistanceBetweenSettlements($start, $place->getGeoData()->getSettlement());
+			}
+		}
+		$speed = $this->geo->getbaseSpeed() / exp(sqrt(1/200)); #This is the regular travel speed for M&F.
+		$days = $distance / $speed;
+		return ($days*1.33)-1; #Average travel speed of all region types.
+	}
+
+	public function supplySoldiers(Unit $unit, $shortage, Settlement $settlement) {
+		$count = $unit->getLivingSoldiers()->count();
+		if($shortage > 0) {
+			$deduct = $count*$shortage;
+		}
+
+		$qty = $count - $deduct;
+		$here = false;
+		if (!$unit->getCharacter() || ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() == $settlement) || ($unit->getPlace() && $unit->getPlace()->getInsideSettlement() == $settlement)) {
+			$here = true;
+		}
+		if ($qty > 0 && !$here) {
+			$supply = new Resupply();
+			$this->em->persist($supply);
+			$supply->setOrigin($settlement);
+			$supply->setUnit($unit);
+			$supply->setType('food');
+			$supply->setQuantity($qty);
+			$supply->setTravelDays($this->getSupplyTravelTime($settlement, $unit));
+		} elseif ($qty > 0 && $here) {
+			$found = false;
+			if ($unit->getSupplies()) {
+				foreach ($unit->getSupplies() as $supply) {
+					if ($supply->getType() == $resupply->getType()) {
+						$found = true;
+						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
+						break;
 					}
 				}
 			}
-			foreach ($this->geo->findCharactersInArea($settlement->getGeoData()) as $char) {
-				if ($char->getInsideSettlement() == $settlement) {
-					$my_severity = $severity;
-				} else {
-					// outside settlement, it becomes very tricky in starvation times
-					// (this is mostly to balance sieges)
-					$my_severity = round($severity*1.75);
-				}
-				$this->feedSoldiers($char, $my_severity);
-			}
-		} else {
-			// got food
-			foreach ($settlement->getMilitia() as $militia) {
-				if ($militia->isAlive()) {		
-					$militia->feed();
-				}
-			}
-			foreach ($this->geo->findCharactersInArea($settlement->getGeoData()) as $char) {
-				foreach ($char->getLivingSoldiers() as $soldier) {
-					$soldier->feed();
-				}
-				foreach ($char->getLivingEntourage() as $ent) {
-					$ent->feed();
-				}
+			if (!$found) {
+				$supply = new Supply();
+				$this->em->persist($supply);
+				$supply->setUnit($unit);
+				$supply->setType('food');
+				$supply->setQuantity($qty);
 			}
 		}
-	}
-
-	public function feedSoldiers(Character $char, $my_severity) {
-		$my_severity = min($my_severity, 6); // can't starve to death in less than 10 days or so
-		$food_followers = $char->getEntourage()->filter(function($entry) {
-			return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
-		})->toArray();
-		foreach ($char->getLivingSoldiers() as $soldier) {
-			if (!empty($food_followers)) {
-				$soldier->feed();
-				shuffle($food_followers);
-				$has = $food_followers[0]->getSupply();
-				if ($has<=1) {
-					$food_followers[0]->setSupply(0);
-					unset($food_followers[0]);
-				} else {
-					$food_followers[0]->setSupply($has-1);
-				}
-			} else {
-				$soldier->makeHungry($my_severity);
-				// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
-				if (rand(90, 180) < $soldier->getHungry()) {
-					$soldier->kill();
-					$this->history->addToSoldierLog($soldier, 'starved');
-				}
-			}
-		}
-		foreach ($char->getLivingEntourage() as $ent) {
-			if (!empty($food_followers)) {
-				$ent->feed();
-				shuffle($food_followers);
-				$has = $food_followers[0]->getSupply();
-				if ($has<=1) {
-					$food_followers[0]->setSupply(0);
-					unset($food_followers[0]);
-				} else {
-					$food_followers[0]->setSupply($has-1);
-				}
-			} else {
-				$ent->makeHungry($my_severity);
-				// entourage also can take several days of starvation without danger of death, like soldiers
-				if (rand(80, 160) < $ent->getHungry()) {
-					$ent->kill();
-				}
-			}
-		}
-		// TODO: event to the character if we use up food from followers? - and also when we don't have any left?
 	}
 
 	public function ResourceProduction(Settlement $settlement, ResourceType $resource, $ignore_buildings=false, $force_recalc=false) {
@@ -647,8 +622,13 @@ class Economy {
 				$georesource->setBuildingsBase($building_resource);
 				$georesource->setBuildingsBonus(round($building_bonus*100));
 			} else {
-				$building_resource = $georesource->getBuildingsBase();
-				$building_bonus = $georesource->getBuildingsBonus()/100;
+				if ($georesource) {
+					$building_resource = $georesource->getBuildingsBase();
+					$building_bonus = $georesource->getBuildingsBonus()/100;
+				} else {
+					$building_resource = 0;
+					$building_bonus = 0;
+				}
 			}
 		}
 		$baseresource += $building_resource;
@@ -667,8 +647,8 @@ class Economy {
 			return 0;
 		}
 
-		// formula is y=ln(y*(x+1/y)) with 
-		// x = workforce/baseresource and y an arbitrary growth factor. 
+		// formula is y=ln(y*(x+1/y)) with
+		// x = workforce/baseresource and y an arbitrary growth factor.
 		// 3 seems to work out to about 2x food = sustainable population
 		// the +1/3 is just to ensure that 0 = 0
 		if ($resource->getName() == 'food') {
@@ -677,7 +657,7 @@ class Economy {
 		} else {
 			$production = log(3 * (($workforce / $baseresource) + 1/3));
 		}
-		
+
 		switch ($resource->getName()) {
 			case 'food':	// security bonus - only for food and money
 			case 'money':
@@ -688,7 +668,7 @@ class Economy {
 				break;
 		}
 
-		/* TODO: 
+		/* TODO:
 			land-intensive resources (food, to a lesser extent wood, even less metal) should decline
 			with increasing population density as more and more land is used as living space
 			basically: production *= min(1, x/density);
@@ -698,7 +678,7 @@ class Economy {
 
 			one idea would be to actually calculate an "arabale land area" value for a geodata. but that would only make sense for food, at least using that term.
 
-			One or more of these ideas would make regions possible that create constant amounts of surplus food without simply growing 
+			One or more of these ideas would make regions possible that create constant amounts of surplus food without simply growing
 			because of it (or rather, which have an equilibrium point with surplus food).
 		*/
 
@@ -708,8 +688,7 @@ class Economy {
 	}
 
 	public function ResourceFromBuildings(Settlement $settlement, ResourceType $resource) {
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:BuildingResource r JOIN r.resource_type t JOIN r.building_type bt JOIN bt.buildings b JOIN b.settlement s
-			WHERE s=:here AND t=:resource AND b.active=true AND (r.provides_operation>0 OR r.provides_operation_bonus>0)');
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:BuildingResource r JOIN r.resource_type t JOIN r.building_type bt JOIN bt.buildings b JOIN b.settlement s WHERE s=:here AND t=:resource AND b.active=true AND (r.provides_operation>0 OR r.provides_operation_bonus>0)');
 		$query->setParameters(array('here'=>$settlement, 'resource'=>$resource));
 		$base = 0; $bonus = 0;
 		foreach ($query->getResult() as $result) {
@@ -719,24 +698,40 @@ class Economy {
 		return array($base, 1.0+($bonus/100));
 	}
 
+	public function FindFeedableUnits(Settlement $settlement) {
+		$units = new ArrayCollection();
+		foreach ($settlement->getSuppliedUnits() as $unit) {
+			if (!$units->contains($unit)) {
+				$units->add($unit);
+			}
+		}
+		foreach ($settlement->getUnits() as $unit) {
+			if (!$unit->getSupplier() && $unit->isLocal() && !$units->contains($unit)) {
+				$units->add($unit);
+			}
+		}
+		return $units;
+	}
+
 	public function ResourceDemand(Settlement $settlement, ResourceType $resource, $split_results=false) {
 		// this is the population used for all resources except food, which has its own calculation
-		$militia = $settlement->getSoldiers()->count();
-		$population = $settlement->getPopulation() + $settlement->getThralls()/2 + $militia/2;
+		$militia = $settlement->countDefenders();
+		$population = $settlement->getPopulation() + $settlement->getThralls()/2;
 
 		$buildings_operation = $this->ResourceForBuildingOperation($settlement, $resource);
 		$buildings_construction = $this->ResourceForBuildingConstruction($settlement, $resource);
 
 		switch (strtolower($resource->getName())) {
 			case 'food':
-				$query = $this->em->createQuery('SELECT count(s) FROM BM2SiteBundle:Character c JOIN c.soldiers s, BM2SiteBundle:GeoData g WHERE ST_Contains(g.poly, c.location)=true AND g.id=:here AND s.base IS NULL AND s.alive=true');
-				$query->setParameter('here', $settlement->getGeoData());
-				$soldiers = $query->getSingleScalarResult();
-				$query = $this->em->createQuery('SELECT count(e) FROM BM2SiteBundle:Character c JOIN c.entourage e, BM2SiteBundle:GeoData g WHERE ST_Contains(g.poly, c.location)=true AND g.id=:here AND e.alive=true');
-				$query->setParameter('here', $settlement->getGeoData());
-				$entourage = $query->getSingleScalarResult();
-				// mobile soldiers and entourage take a little food "magically" from hunting and scavenging. Also, to reduce the impact of large armies marching through
-				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $militia + ($soldiers + $entourage)*0.8;
+				$suppliedNPCs = 0;
+				/*TODO: When settlements feeding remote goes live, uncomment this.
+				$units = $this->FindFeedableUnits($settlement);
+				foreach ($units as $unit) {
+					$suppliedNPCs += $unit->getLivingSoldiers()->count();
+				}
+				$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
+				*/
+				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs;
 				break;
 			case 'wood':
 				$base = sqrt($population) + exp(sqrt($population)/150) - 5;
@@ -758,9 +753,9 @@ class Economy {
 		$corruption = $this->calculateCorruption($settlement);
 		if ($split_results) {
 			return array(
-				'base' => round($need), 
-				'operation' => round($buildings_operation), 
-				'construction' => round($buildings_construction), 
+				'base' => round($need),
+				'operation' => round($buildings_operation),
+				'construction' => round($buildings_construction),
 				'corruption' => round($total * $corruption)
 			);
 		} else {
@@ -801,8 +796,8 @@ class Economy {
 	public function EconomicSecurity(Settlement $settlement) {
 		$security = 1.0;
 
-		// militia patrolling the area will drive off wild animals and bandits, but beyond 100 there's no additional effect
-		$militia = $settlement->getActiveMilitia()->count();
+		# Originally this just counted militia. Since we no longer really have "militia", it just counts defenders.
+		$militia = $settlement->countDefenders();
 		$pop = $settlement->getPopulation();
 		if ($pop < 100) {
 			$militia *= 2.0;
@@ -818,7 +813,7 @@ class Economy {
 		if ($militia >= 100) {
 			$security += 0.1;
 		} else {
-			$security += sqrt($militia/100)/10; 
+			$security += sqrt($militia/100)/10;
 		}
 
 		$thralls = $settlement->getThralls();
@@ -850,19 +845,6 @@ class Economy {
 			$security += 0.05;
 		}
 
-		if ($security < 0.2) {
-			// if you are insecure, then some fake security works, too:
-			if ($settlement->hasBuildingNamed('Shrine')) {
-				$security += 0.02;
-			}
-			if ($settlement->hasBuildingNamed('Temple')) {
-				$security += 0.05;
-			}
-			if ($settlement->hasBuildingNamed('Great Temple')) {
-				$security += 0.05;
-			}
-		}
-
 		// finally, there's security in numbers - wild animals will avoid large settlements
 		if ($pop > 4000) {
 			$security += 0.05;
@@ -879,7 +861,6 @@ class Economy {
 		return max(1.0, $security);
 	}
 
-
 	public function TradeBalance(Settlement $settlement, ResourceType $resource) {
 		$amount = 0;
 
@@ -887,15 +868,14 @@ class Economy {
 		$query->setParameters(array('resource'=>$resource, 'here'=>$settlement));
 
 		foreach ($query->getResult() as $trade) {
-			if ($trade->getDestination() == $settlement) {
-				// incoming trade
+			if ($trade->getDestination() == $settlement && ((!$trade->getSource()->getSiege() || ($trade->getSource()->getSiege() && !$trade->getSource()->getSiege()->getEncirlced())) || ($settlement->getSiege() && $settlement->getSiege()->getEncircled()))) {
+				// incoming trade; only counts if source isn't encirlced AND we're not encircled.
 				$amount += $trade->getAmount();
-			} else {
-				// outgoing trade
+			} else if (!($settlement->getSiege() && $settlement->getSiege()->getEncircled())) {
+				// outgoing trade, only counts if we're not encircled.
 				$amount -= $trade->getAmount();
 			}
 		}
-
 		return $amount;
 	}
 
@@ -1028,7 +1008,7 @@ class Economy {
 		if ($feature->getCondition() + $workhours >= 0) {
 			$feature->setActive(true);
 			$feature->setCondition(0);
-			$feature->setWorkers(0);			
+			$feature->setWorkers(0);
 			return true;
 		} else {
 			$feature->setCondition($feature->getCondition()+round($workhours));
@@ -1062,14 +1042,14 @@ class Economy {
 
 	public function calculateCorruption(Settlement $settlement) {
 		if (false === $settlement->corruption) {
-			$estates = 0;
+			$settlements = 0;
 			if ($settlement->getOwner()) {
 				$user = $settlement->getOwner()->getUser();
 				$query = $this->em->createQuery('SELECT count(s) FROM BM2SiteBundle:Settlement s JOIN s.owner c WHERE c.user = :user');
 				$query->setParameter('user', $user);
-				$estates = $query->getSingleScalarResult();
+				$settlements = $query->getSingleScalarResult();
 			}
-			$settlement->corruption = $estates/500;
+			$settlement->corruption = $settlements/500;
 		}
 		return $settlement->corruption;
 	}

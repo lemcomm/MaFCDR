@@ -1,0 +1,17 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'loadout.title'|trans({},"settings")|title }}</h2>
+	<p>{{ 'loadout.description'|trans({},"settings")|raw }}</p>
+
+<form id="characterloadout" class="wide" action="{{ path('maf_character_loadout') }}" method="post" {{ form_start(form) }}
+	{{ form_errors(form) }}
+	{{ form_widget(form._token) }}
+	{{ form_row (form.weapon) }}<br><br>
+	{{ form_row (form.armour) }}<br><br>
+	{{ form_row (form.equipment) }}<br><br>
+	{{ form_row (form.mount) }}<br><br>
+	{{ form_row (form.submit) }}
+</form>
+
+{% endblock %}

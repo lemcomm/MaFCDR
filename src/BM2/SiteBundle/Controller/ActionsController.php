@@ -3,20 +3,20 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
-use BM2\SiteBundle\Entity\KnightOffer;
+use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Trade;
-use BM2\SiteBundle\Form\AssignedSoldiersType;
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\EntourageRecruitType;
 use BM2\SiteBundle\Form\InteractionType;
-use BM2\SiteBundle\Form\KnightOfferType;
 use BM2\SiteBundle\Form\RealmSelectType;
-use BM2\SiteBundle\Form\SoldiersRecruitType;
 use BM2\SiteBundle\Form\TradeCancelType;
 use BM2\SiteBundle\Form\TradeType;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\Dispatcher;
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -30,10 +30,12 @@ class ActionsController extends Controller {
 
    /**
      * @Route("/", name="bm2_actions")
-     * @Template("BM2SiteBundle:Actions:actions.html.twig")
      */
 	public function indexAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($settlement) {
 			$pagetitle = $this->get('translator')->trans('settlement.title', array(
@@ -45,16 +47,26 @@ class ActionsController extends Controller {
 			$pagetitle = $this->get('translator')->trans('settlement.area', array(
 				'%name%' => $this->get('twig.extension.links')->ObjectLink($settlement) ));
 		}
-
-		return array('pagetitle'=>$pagetitle);
+		# I can't think of an instnace where we'd have a siege with no groups, but just in case...
+		if ($settlement->getSiege() && $settlement->getSiege()->getGroups()) {
+			$siege=$settlement->getSiege()->getCharacters()->contains($character);
+		} else {
+			$siege = FALSE;
+		}
+		return $this->render('Actions/actions.html.twig', [
+			'pagetitle'=>$pagetitle,
+			'siege'=>$siege
+		]);
 	}
 
 	/**
 	  * @Route("/support", name="bm2_actionsupport")
-	  * @Template
 	  */
 	public function supportAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -93,26 +105,32 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-
-			return array(
+			return $this->render('Actions/support.html.twig', [
 				'action'=>$action,
-				'result'=>array(
+				'result'=>[
 					'success' => true,
 					'target' => $action->getTargetSettlement()
-				)
-			);
+				]
+			]);
 		} else {
-			return array('action'=>null, 'result'=>array('success'=>false, 'message'=>'either.invalid.noid'));
+			return $this->render('Actions/support.html.twig', [
+				'action'=>null,
+				'result'=>[
+					'success'=>false,
+					'message'=>'either.invalid.noid'
+				]
+			]);
 		}
 	}
 
 	/**
 	  * @Route("/oppose", name="bm2_actionoppose")
-	  * @Template
 	  */
 	public function opposeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true);
-
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST') && $request->request->has("id")) {
 			$em = $this->getDoctrine()->getManager();
@@ -147,116 +165,71 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-
-			return array(
+			return $this->render('Actions/oppose.html.twig', [
 				'action'=>$action,
-				'result'=>array(
+				'result'=>[
 					'success' => true,
 					'target' => $action->getTargetSettlement()
-				)
-			);
+				]
+			]);
 		} else {
-			return array('action'=>null, 'result'=>array('success'=>false, 'message'=>'either.invalid.noid'));
+			return $this->render('Actions/oppose.html.twig', [
+				'action'=>null,
+				'result'=>[
+					'success'=>false,
+					'message'=>'either.invalid.noid'
+				]
+			]);
 		}
 	}
 
 
 	/**
 	  * @Route("/enter")
-	  * @Template
 	  */
 	public function enterAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEnterTest', true, true);
-
-		$result = null;
-		if ($this->get('interactions')->characterEnterSettlement($character, $settlement)) {
-			$result = 'entered';
-		} else {
-			$result = 'denied';
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
 
-		$this->getDoctrine()->getManager()->flush();
-		return array('settlement'=>$settlement, 'result'=>$result);
+		if ($this->get('interactions')->characterEnterSettlement($character, $settlement)) {
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('location.enter.result.entered', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
+		} else {
+			$this->addFlash($this->get('translator')->trans('location.enter.result.denied', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
+		}
 	}
 
 	/**
 	  * @Route("/exit")
-	  * @Template
 	  */
 	public function exitAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationLeaveTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		$result = null;
 		if ($this->get('interactions')->characterLeaveSettlement($character)) {
-			$result = 'left';
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('location.exit.result.left', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		} else {
-			$result = 'denied';
+			$this->addFlash($this->get('translator')->trans('location.exit.result.denied', array("%settlement%"=>$settlement->getName()), "actions"));
+			return $this->redirectToRoute('bm2_actions');
 		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('settlement'=>$settlement, 'result'=>$result);
-	}
-	
-	/**
-	  * @Route("/places")
-	  * @Template
-	  */
-	public function placesAction() {
-		$character = $this->get('appstate')->getCharacter(true, true, true); # Ensure user has a character selected.
-		
-		$places[] = $this->get('geography')->findPlacesNearMe($character); # Find nearby places that we can see.
-		
-		foreach ($places as $place) {
-			$visit = false; # Create place.visit variable for each place in the twig.
-			if ($this->get('permission_manager')->checkPlacePermission($place, $character, 'visit')) {
-				$visit = true; # Set place.visit = true for twig.
-			}
-		}
-		
-		return array('places'=>$places); # Pass places array to the twig for display.
-	}
-	
-	/**
-	  * @Route("/place/{id}/enter")
-	  * @Template
-	  */
-	public function enterPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeEnterTest', true, true);
-
-		$result = null;
-		if ($this->get('interactions')->characterEnterPlace($character, $place)) {
-			$result = 'entered';
-		} else {
-			$result = 'denied';
-		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
 	}
 
-	/**
-	  * @Route("/place/exit")
-	  * @Template
-	  */
-	public function exitPlaceAction() {
-		list($character, $place) = $this->get('dispatcher')->gateway('placeLeaveTest', true, true);
-
-		$result = null;
-		if ($this->get('interactions')->characterLeavePlace($character)) {
-			$result = 'left';
-		} else {
-			$result = 'denied';
-		}
-
-		$this->getDoctrine()->getManager()->flush();
-		return array('place'=>$place, 'result'=>$result);
-	}
 	   /**
 	     * @Route("/embark")
-	     * @Template
 	     */
 	public function embarkAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationEmbarkTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$act = $this->get('geography')->calculateInteractionDistance($character);
 		$embark_ship = false;
@@ -292,18 +265,24 @@ class ActionsController extends Controller {
 		$em->flush();
 
 		if ($embark_ship) {
-			return array('ships'=>true);
+			return $this->render('Actions/embark.html.twig', [
+				'ships'=>true
+			]);
 		} else {
-			return array('dockname'=>$dock->getName());
+			return $this->render('Actions/embark.html.twig', [
+				'dockname'=>$dock->getName()
+			]);
 		}
 	}
 
    /**
      * @Route("/givegold")
-     * @Template
      */
 	public function giveGoldAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationGiveGoldTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('givegold', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -327,18 +306,24 @@ class ActionsController extends Controller {
 				History::MEDIUM, true, 20
 			);
 			$em->flush();
-			return array('success'=>true, 'amount'=>$data['amount'], 'target'=>$data['target']);
+			return $this->render('Actions/givegold.html.twig', [
+				'success'=>true, 'amount'=>$data['amount'], 'target'=>$data['target']
+			]);
 		}
 
-		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
+		return $this->render('Actions/giveGold.html.twig', [
+			'form'=>$form->createView(), 'gold'=>$character->getGold()
+		]);
 	}
 
    /**
      * @Route("/giveship")
-     * @Template
      */
 	public function giveShipAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('locationGiveShipTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('giveship', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -362,33 +347,44 @@ class ActionsController extends Controller {
 					History::MEDIUM, true, 20
 				);
 				$em->flush();
+
+				return $this->render('Actions/giveship.html.twig', [
+					'success'=>true
+				]);
 				return array('success'=>true);
 			} else {
 				// TODO: form error, but this should never happen!
 			}
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Actions/giveship.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/spy")
-	  * @Template
 	  */
 	public function spyAction() {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('nearbySpyTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-
-		return array('settlement'=>$settlement);
+		return $this->render('Actions/spy.html.twig', [
+			'settlement'=>$settlement
+		]);
 	}
 
 
 	/**
 	  * @Route("/take")
-	  * @Template
 	  */
 	public function takeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlTakeTest', true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$realms = $character->findRealms();
 		if ($realms->isEmpty()) {
@@ -425,7 +421,7 @@ class ActionsController extends Controller {
 			$complete = new \DateTime("now");
 			$complete->add(new \DateInterval("PT".$time_to_take."S"));
 			$act->setComplete($complete);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			$this->get('history')->logEvent(
 				$settlement,
@@ -434,35 +430,32 @@ class ActionsController extends Controller {
 				History::HIGH, true, 20
 			);
 			$this->getDoctrine()->getManager()->flush();
+			$endTime = new \DateTime("+ ".$time_to_take." Seconds");
 
-			return array(
-				'settlement'	=> $settlement,
-				'timetotake' 	=> $time_to_take,
-				'result'		=> $result
-			);
+			if ($result) {
+				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.take.start', ["%time%"=>$endTime->format('Y-M-d H:i:s')], 'communication'));
+				return $this->redirectToRoute('bm2_actions');
+			}
 		}
 
-		return array(
+		return $this->render('Actions/take.html.twig', [
 			'settlement' => $settlement,
 			'others' => $others,
 			'timetotake' => $time_to_take,
 			'limit' => $character->isTrial()?Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT:-1,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
    /**
      * @Route("/changerealm/{id}", requirements={"id"="\d+"})
-     * @Template
      */
-	public function changeRealmAction($id, Request $request) {
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
+	public function changeRealmAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		$this->get('dispatcher')->setSettlement($settlement);
-		$character = $this->get('dispatcher')->gateway('controlChangeRealmTest');
+		$settlement = $id;
 
 		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changerealm'));
 		$form->handleRequest($request);
@@ -491,20 +484,31 @@ class ActionsController extends Controller {
 					}
 				}
 			}
-			return array('settlement'=>$settlement, 'result'=>$result, 'newrealm'=>$targetrealm);
+
+			return $this->render('Actions/changeRealm.html.twig', [
+				'settlement'=>$settlement,
+				'result'=>$result,
+				'newrealm'=>$targetrealm
+			]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+
+		return $this->render('Actions/changeRealm.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/grant")
-     * @Template
      */
 	public function grantAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlGrantTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType(
-			$settlement->getRealm()?'grant':'grant2', 
+			$settlement->getRealm()?'grant':'grant2',
 			$this->get('geography')->calculateInteractionDistance($character), $character)
 		);
 
@@ -524,7 +528,7 @@ class ActionsController extends Controller {
 			}
 
 			if ($data['target']) {
-				if ($data['target']->isTrial() && $data['target']->getEstates()->count() >= 3) {
+				if ($data['target']->isTrial() && $data['target']->getOwnedSettlements()->count() >= 3) {
 					$form->addError(new FormError("settlement.grant.free2"));
 				} elseif ($data['target']->isNPC()) {
 					$form->addError(new FormError("settlement.grant.npc"));
@@ -535,26 +539,86 @@ class ActionsController extends Controller {
 					$act->setBlockTravel(true);
 					// depending on size of settlement and soldiers count, this gives values roughly between
 					// an hour for a small village and 10 hours for a large city with many soldiers
-					$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($settlement->getSoldiers()->count()))*3);
+					$soldiers = 0;
+					foreach ($settlement->getUnits() as $unit) {
+						$soldiers += $unit->getSoldiers()->count();
+					}
+					$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
 					$complete = new \DateTime("now");
 					$complete->add(new \DateInterval("PT".$time_to_grant."M"));
 					$act->setComplete($complete);
-					$result = $this->get('action_resolution')->queue($act);
-					return array('settlement'=>$settlement, 'result'=>$result, 'newowner'=>$data['target']);
+					$result = $this->get('action_manager')->queue($act);
+
+					return $this->render('Actions/grant.html.twig', [
+						'settlement'=>$settlement,
+						'result'=>$result,
+						'newowner'=>$data['target']
+					]);
 				}
 			}
 
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/grant.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
+	}
+
+   /**
+     * @Route("/steward", name="maf_actions_steward")
+     */
+	public function stewardAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlStewardTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new InteractionType(
+			'steward',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['target'] != $character) {
+				$settlement->setSteward($data['target']);
+
+				$this->get('history')->logEvent(
+					$settlement,
+					'event.settlement.steward',
+					array('%link-character%'=>$data['target']->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->get('history')->logEvent(
+					$data['target'],
+					'event.character.steward',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::MEDIUM, true, 20
+				);
+				$this->addFlash('notice', $this->get('translator')->trans('control.steward.success', ["%name%"=>$data['target']->getName()], 'actions'));
+				$this->getDoctrine()->getManager()->flush();
+				return $this->redirectToRoute('bm2_actions');
+			}
+
+		}
+
+		return $this->render('Actions/steward.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/rename")
-     * @Template
      */
 	public function renameAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlRenameTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions', 'attr'=>array('class'=>'wide')))
 			->add('name', 'text', array(
@@ -580,21 +644,30 @@ class ActionsController extends Controller {
 				$complete = new \DateTime("now");
 				$complete->add(new \DateInterval("PT6H"));
 				$act->setComplete($complete);
-				$result = $this->get('action_resolution')->queue($act);
+				$result = $this->get('action_manager')->queue($act);
 
-				return array('settlement'=>$settlement, 'result'=>$result, 'newname'=>$newname);
+				return $this->render('Actions/rename.html.twig', [
+					'settlement'=>$settlement,
+					'result'=>$result,
+					'newname'=>$newname
+				]);
 			}
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/rename.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
    /**
      * @Route("/changeculture")
-     * @Template
      */
 	public function changecultureAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlCultureTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new CultureType($character->getUser(), true, $settlement->getCulture()));
 		$form->handleRequest($request);
@@ -604,19 +677,32 @@ class ActionsController extends Controller {
 			// this is a meta action and thus executed immediately
 			$settlement->setCulture($culture);
 			$this->getDoctrine()->getManager()->flush();
-			return array('settlement'=>$settlement, 'result'=>array('success'=>true, 'immediate'=>true), 'culture'=>$culture->getName());
+
+			return $this->render('Actions/changeculture.html.twig', [
+				'settlement'=>$settlement,
+				'result'=>[
+					'success'=>true,
+					'immediate'=>true
+				],
+				'culture'=>$culture->getName()
+			]);
 		}
 
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Actions/changeculture.html.twig', [
+			'settlement'=>$settlement,
+			'form'=>$form->createView()
+		]);
 	}
 
 
   /**
      * @Route("/trade")
-     * @Template
      */
 	public function tradeAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyTradeTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$resources = $em->getRepository('BM2SiteBundle:ResourceType')->findAll();
@@ -625,55 +711,93 @@ class ActionsController extends Controller {
 		$query->setParameters(array('here'=>$settlement, 'me'=>$character));
 		$trades = $query->getResult();
 
+		/*
+		The lines below this comment exist to check if a given character is not the owner but has owner-level trade access to this settlement.
+		Because we'd have to build the owned settlements list for the foreach after these we just build it ourselves first, check if we have not-owner trade rights,
+		add the local settlement if we do, and move on.
+
+		Technically speaking, it'd also be possible to get all lists a character is on that grant them trade rights, and also build that into this,
+		but that means people have even less they have to travel for in game, so no. If you own it, fine. If you only have permission to it, you have to travel to each.
+		*/
+		$manageable = new ArrayCollection();
+		$sources = [];
+		foreach ($character->getOwnedSettlements() as $owned) {
+			$manageable->add($owned);
+			$sources[] = $owned->getId();
+		}
+		foreach ($character->getStewardingSettlements() as $stewarded) {
+			if (!$manageable->contains($stewarded)) {
+				$manageable->add($stewarded);
+			}
+			$sources[] = $stewarded->getId();
+		}
+		$permission = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', true, $settlement->getOccupier()?true:false);
+		# permission[0] returns true or false depending on if they have permission by any means.
+		if ($permission[0]) {
+			$allowed = true;
+			if ($permission[2] != 'owner') {
+				if (!$manageable->contains($settlement)) {
+					$manageable->add($settlement);
+				}
+				$sources[] = $settlement->getId();
+			}
+		} else {
+			$allowed = false;
+		}
+
 		$trade = new Trade;
 
-		// FIXME: to get trade permissions working, this and the code in TradeType.php need to be refactored to include permissions
-		$sources = array();
-		foreach ($character->getEstates() as $e) {
-			$sources[] = $e->getId();
-		}
-		foreach ($trades as $t) {
-			$sources[] = $t->getSource()->getId();
-		}
 		$sources = array_unique($sources);
+		$dests = $sources;
+		if (!$permission) {
+			# No permission, can't source here.
+			$key = array_search($settlement->getId(), $sources); #Find this settlement ID,
+			unset($sources[$key]); #Remove it.
+		} else {
+			# If we do have permission, we can send back to anyone sending us stuff. Add their IDs.
+			foreach ($trades as $t) {
+				$dests[] = $t->getSource()->getId();
+			}
+			# Remove duplicates.
+			$dests = array_unique($dests);
+		}
 
-		$form = $this->createForm(new TradeType($character, $settlement, $sources), $trade);
+		$form = $this->createForm(new TradeType($character, $settlement, $sources, $dests, $allowed), $trade);
 		$cancelform = $this->createForm(new TradeCancelType($trades, $character));
 
 		$merchants = $character->getAvailableEntourageOfType('Merchant');
 
 		// FIXME: check which form was submitted - code snippet to do this:
 		//   194  		if ($request->isMethod('POST') && $request->request->has("charactercreation")) {
-		if ($request->isMethod('POST')) {
-			if ($form) {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-					if ($trade->getAmount()>0) {
-						if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
-							$form->addError(new FormError("trade.allremote"));
-						} elseif ($trade->getSource()==$trade->getDestination()) {
-							$form->addError(new FormError("trade.same"));
+		if ($request->isMethod('POST') && $request->request->has('trade')) {
+	                $form->handleRequest($request);
+                	if ($form->isValid()) {
+				if ($trade->getAmount()>0) {
+					if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
+						$form->addError(new FormError("trade.allremote"));
+					} elseif ($trade->getSource()==$trade->getDestination()) {
+						$form->addError(new FormError("trade.same"));
+					} else {
+						// TODO: check if we don't already have such a deal (same source, destination and resource)
+						// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
+						$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
+						if ($trade->getAmount() > $available) {
+							$form->addError(new FormError("trade.toomuch"));
 						} else {
-							// TODO: check if we don't already have such a deal (same source, destination and resource)
-							// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
-							$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
-							if ($trade->getAmount() > $available) {
-								$form->addError(new FormError("trade.toomuch"));
-							} else {
-								$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
-								if ($merchants->count() > 0 ) {
-									// remove a merchant!
-									$stay = $merchants->first();
-									$em->remove($stay);
-								}
-								$em->persist($trade);
-								$em->flush();
-								return $this->redirect($request->getUri());
+							$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
+							if ($merchants->count() > 0 ) {
+								// remove a merchant!
+								$stay = $merchants->first();
+								$em->remove($stay);
 							}
+							$em->persist($trade);
+							$em->flush();
+							return $this->redirect($request->getUri());
 						}
 					}
 				}
 			}
+		} elseif ($request->isMethod('POST') && $request->request->has('tradecancel')) {
 			$cancelform->handleRequest($request);
 			if ($cancelform->isValid()) {
 				$data = $cancelform->getData();
@@ -690,17 +814,17 @@ class ActionsController extends Controller {
 			}
 		}
 
-		$estatesdata = array();
-		foreach ($character->getEstates() as $estate) {
-			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $estate, $merchants->count()>0);
-			$estate_resources = array();
+		$settlementsdata = array();
+		foreach ($manageable as $other) {
+			$tradecost = $this->get('economy')->TradeCostBetween($settlement, $other, $merchants->count()>0);
+			$settlement_resources = array();
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($other, $resource);
+				$demand = $this->get('economy')->ResourceDemand($other, $resource);
+				$trade = $this->get('economy')->TradeBalance($other, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
-					$estate_resources[] = array(
+					$settlement_resources[] = array(
 						'type' => $resource,
 						'production' => $production,
 						'demand' => $demand,
@@ -709,19 +833,19 @@ class ActionsController extends Controller {
 					);
 				}
 			}
-			$estatesdata[] = array(
-				'settlement' => $estate,
-				'resources' => $estate_resources
+			$settlementsdata[] = array(
+				'settlement' => $other,
+				'resources' => $settlement_resources
 			);
 		}
 
 		$local_resources = array();
-		if ($settlement->getOwner() == $character) {
+		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character || $permission[0]) {
 			// TODO: maybe require a merchant and/or prospector ?
 			foreach ($resources as $resource) {
-				$production = $this->get('economy')->ResourceProduction($estate, $resource);
-				$demand = $this->get('economy')->ResourceDemand($estate, $resource);
-				$trade = $this->get('economy')->TradeBalance($estate, $resource);
+				$production = $this->get('economy')->ResourceProduction($settlement, $resource);
+				$demand = $this->get('economy')->ResourceDemand($settlement, $resource);
+				$trade = $this->get('economy')->TradeBalance($settlement, $resource);
 
 				if ($production!=0 || $demand!=0 || $trade!=0) {
 					$local_resources[] = array(
@@ -735,24 +859,27 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return array(
+
+		return $this->render('Actions/trade.html.twig', [
 			'settlement'=>$settlement,
-			'owned' => ($settlement->getOwner()==$character?true:false),
-			'estates' => $estatesdata,
+			'owned' => $permission[0],
+			'settlements' => $settlementsdata,
 			'local' => $local_resources,
 			'trades' => $trades,
 			'form' => $form->createView(),
 			'cancelform' => $cancelform->createView()
-		);
+		]);
 	}
 
 
    /**
      * @Route("/entourage")
-     * @Template
      */
 	public function entourageAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('personalEntourageTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$query = $em->createQuery('SELECT e as type, p as provider FROM BM2SiteBundle:EntourageType e LEFT JOIN e.provider p LEFT JOIN p.buildings b
@@ -817,336 +944,118 @@ class ActionsController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array('settlement'=>$settlement, 'entourage'=>$entourage, 'form'=>$form->createView());
-	}
-
-   /**
-     * @Route("/soldiers")
-     * @Template
-     */
-	public function soldiersAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalSoldiersTest', true);
-		$em = $this->getDoctrine()->getManager();
-
-		$query = $em->createQuery('SELECT COUNT(s) as number, SUM(s.training_required) AS training FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required > 0');
-		$query->setParameter('here', $settlement);
-		$allocated = $query->getSingleResult();
-
-		$available = $this->get('military')->findAvailableEquipment($settlement, true);
-		$form = $this->createForm(new SoldiersRecruitType($available));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			$generator = $this->get('generator');
-
-			if ($data['number'] > $settlement->getPopulation()) {
-				$form->addError(new FormError("recruit.troops.toomany"));
-				return array(
-					'settlement'=>$settlement,
-					'allocated'=>$allocated,
-					'form'=>$form->createView()
-				);
-			}
-			if ($data['number'] > $settlement->getRecruitLimit()) {
-				$form->addError(new FormError($this->get('translator')->trans("recruit.troops.toomany2"), null, array('%max%'=>$settlement->getRecruitLimit(true))));
-				return array(
-					'settlement'=>$settlement,
-					'allocated'=>$allocated,
-					'form'=>$form->createView()
-				);
-			}
-
-			for ($i=0; $i<$data['number']; $i++) {
-				if (!$data['weapon']) {
-					$form->addError(new FormError("recruit.troops.noweapon"));
-					return array(
-						'settlement'=>$settlement,
-						'allocated'=>$allocated,
-						'form'=>$form->createView()
-					);
-				}
-			}
-			$count = 0;
-			$corruption = $this->get('economy')->calculateCorruption($settlement);
-			for ($i=0; $i<$data['number']; $i++) {
-				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $settlement, $corruption)) {
-					$this->get('history')->addToSoldierLog(
-						$soldier, 'recruited',
-						array('%link-character%'=>$character->getId(), '%link-settlement%'=>$settlement->getId(), 
-							'%link-item-1%'=>$data['weapon']?$data['weapon']->getId():0, 
-							'%link-item-2%'=>$data['armour']?$data['armour']->getId():0, 
-							'%link-item-3%'=>$data['equipment']?$data['equipment']->getId():0
-						)
-					);
-					$count++;
-				}
-			}
-			// TODO: if $count < $data['number'] then some couldn't be recruited
-			if ($count < $data['number']) {
-				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.supply', array('%only%'=> $count, '%planned%'=>$data['number']), 'actions'));
-			}
-
-			$settlement->setPopulation($settlement->getPopulation()-$count);
-			$settlement->setRecruited($settlement->getRecruited()+$count);
-			$em->flush();
-			return $this->redirectToRoute('bm2_site_settlement_soldiers', array('id'=>$settlement->getId()));
-		}
-
-		return array(
+		return $this->render('Actions/entourage.html.twig', [
 			'settlement'=>$settlement,
-			'allocated'=>$allocated,
-			'training'=>$this->get('military')->findAvailableEquipment($settlement, true),
-			'soldierscount' => $settlement->getSoldiers()->count(),
-
+			'entourage'=>$entourage,
 			'form'=>$form->createView()
-		);
-	}
-
-   /**
-     * @Route("/offers")
-     * @Template
-     */
-	public function offersAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
-		$em = $this->getDoctrine()->getManager();
-		$depth = 1;
-		if ($settlement->getRealm()->getSuperior()) {
-			$depth = 2;
-			if (($settlement->getRealm()->findUltimate() != $settlement->getRealm()) AND ($settlement->getRealm()->findUltimate() != $settlement->getRealm()->getSuperior())) {
-				$depth = 3;
-			}
-		}
-		switch ($depth) {
-			case 3:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true) OR (p.realm = :ultimate AND p.welcomer = true)');
-				$query->setParameter('realm', $settlement->getRealm());
-				$query->setParameter('superior', $settlement->getRealm()->getSuperior());
-				$query->setParameter('ultimate', $settlement->getRealm()->findUltimate());
-				break;
-			case 2:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE (p.realm = :realm AND p.welcomer = true) OR (p.realm = :superior AND p.welcomer = true)');
-				$query->setParameter('realm', $settlement->getRealm());
-				$query->setParameter('superior', $settlement->getRealm()->findUltimate());
-				break;
-			case 1:
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:RealmPosition p WHERE p.realm = :realm AND p.welcomer = true');
-				$query->setParameter('realm', $settlement->getRealm());
-				break;
-		}
-
-		$form = $this->createForm(new KnightOfferType($settlement, $query->getResult()));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			if ($data['givesettlement']==false && count($data['soldiers']) < 1) {
-				$form->addError(new FormError("recruit.offer.empty"));
-			} else {
-				$ok = true;
-				if ($data['givesettlement']) {
-					$already = false;
-					foreach ($settlement->getKnightOffers() as $offer) {
-						if ($offer->getGiveSettlement()) {
-							$already = true;
-							break;
-						}
-					}
-					if ($already) {
-						$ok = false;
-						$form->addError(new FormError("recruit.offer.givealready"));
-					}
-				}
-				if ($ok) {
-					$em = $this->getDoctrine()->getManager();
-
-					$offer = new KnightOffer;
-					$offer->setSettlement($settlement);
-					$offer->setDescription($data['intro']);
-					$offer->setGiveSettlement($data['givesettlement']);
-					$offer->setWelcomers($data['welcomers']);
-					$em->persist($offer);
-					if ($data['givesettlement'] == false) {
-						foreach ($data['soldiers'] as $soldier) {
-							$soldier->setOfferedAs($offer);
-						}
-					}
-					$em->flush();
-					return $this->redirect($request->getUri());
-				}
-			}
-		}
-
-		return array(
-			'settlement'=>$settlement,
-			'militia'=>$settlement->getSoldiers(),
-			'offers'=>$settlement->getKnightOffers(),
-			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	/**
-	  * @Route("/offerdetails/{offer}")
-	  * @Template
-	  */
-	public function offerdetailsAction(KnightOffer $offer) {
-		return array('offer'=>$offer);
-	}
-
-	/**
-	  * @Route("/offerdelete/{offer}")
-	  * @Template
-	  */
-	public function offerdeleteAction(KnightOffer $offer) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalOffersTest', true);
-
-		if ($offer->getSettlement() == $settlement) {
-			$em = $this->getDoctrine()->getManager();
-			$settlement->removeKnightOffer($offer);
-			foreach ($offer->getSoldiers() as $soldier) {
-				$soldier->setOfferedAs(null);
-			}
-			foreach ($offer->getEntourage() as $entourage) {
-				$entourage->setOfferedAs(null);
-			}
-			$em->remove($offer);
-			$em->flush();
-		}
-
-		return $this->redirectToRoute('bm2_site_actions_offers');
-	}
-
-
-	/**
-	  * @Route("/assigned")
-	  * @Template
-	  */
-	public function assignedAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('personalAssignedSoldiersTest');
-
-		$form = $this->createForm(new AssignedSoldiersType($character));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			$em = $this->getDoctrine()->getManager();
-
-			$cycle = $this->get('appstate')->getCycle();
-			$deserting = 0;
-			$returning = 0;
-			$staying = 0;
-			$reclaimed = array();
-			$group = '(no)';
-
-			foreach ($data['soldiers'] as $soldier) {
-				if (!$soldier->isAlive()) continue; // skip dead soldiers
-				// FIXME: if in battle, can't recall but there should be a message
-				if ($soldier->getCharacter() && $soldier->getCharacter()->isInBattle()) continue;
-				if ($soldier->getCharacter() && $soldier->getCharacter()->isDoingAction('military.regroup')) continue;
-				// FIXME: can't recall from your own estates or characters, but there should also be a message:
-				// if ($soldier->getCharacter() && $soldier->getCharacter()->getUser() == $character->getUser()) continue;
-				// if ($soldier->getBase() && $soldier->getBase()->getOwner() && $soldier->getBase()->getOwner()->getUser() == $character->getUser()) continue;
-
-				if ($soldier->getAssignedSince() == -1) {
-					$days = 0;
-				} else {
-					$days = $cycle - $soldier->getAssignedSince();
-				}
-				if ($days<=0 || $days>=50) {
-					$desert = 0;
-				} else {
-					if ($days <= 25) {
-						$desert = round($days/1.25);
-					} else {
-						$desert = round((50-$days)/1.25);
-					}
-				}
-				if ($soldier->getCharacter()) {
-					if (!isset($reclaimed[$soldier->getCharacter()->getId()])) {
-						$reclaimed[$soldier->getCharacter()->getId()] = array('char'=>$soldier->getCharacter(), 'total'=>0, 'stay'=>0);
-					}
-					$reclaimed[$soldier->getCharacter()->getId()]['total']++;
-				}
-				if (rand(0,99)<$desert) {
-					// deserts - vanish
-					$this->get('military')->disband($soldier, $soldier->getCharacter()?$soldier->getCharacter():$soldier->getBase());
-					$deserting++;
-				} else if (rand(0,99) < ($days*2)) {
-					// stays with new lord
-					$soldier->setLiege(null)->setAssignedSince(null);
-					$staying++;
-					if ($soldier->getCharacter()) {
-						$reclaimed[$soldier->getCharacter()->getId()]['stay']++;
-					}
-				} else {
-					// returns to liege
-					$settlement = $soldier->getBase();
-					$group = $this->get('military')->assign($soldier, $character);
-					$soldier->setLiege(null)->setAssignedSince(null);
-					// in training - interrupt that and reset equipment
-					if ($soldier->getTrainingRequired() > 0) {
-						if ($soldier->getOldWeapon() || $soldier->getOldArmour() || $soldier->getOldEquipment()) {
-							if ($soldier->getOldWeapon() != $soldier->getWeapon()) {
-								$this->get('military')->returnItem($settlement, $soldier->getWeapon());
-								$soldier->setWeapon($soldier->getOldWeapon());
-							}
-							if ($soldier->getOldArmour() != $soldier->getArmour()) {
-								$this->get('military')->returnItem($settlement, $soldier->getArmour());
-								$soldier->setArmour($soldier->getOldArmour());
-							}
-							if ($soldier->getOldEquipment() != $soldier->getEquipment()) {
-								$this->get('military')->returnItem($settlement, $soldier->getEquipment());
-								$soldier->setEquipment($soldier->getOldEquipment());
-							}
-						}
-						$soldier->setTraining(0)->setTrainingRequired(0);
-					}
-					$returning++;
-				}
-			}
-
-			if ($returning > 0) {
-				$act = new Action;
-				$act->setType('military.reclaim')->setCharacter($character);
-				$act->setBlockTravel(true);
-				$complete = new \DateTime("now");
-				$takes = 16;
-				$complete->add(new \DateInterval("PT".$takes."H"));
-				$act->setComplete($complete);
-				$this->get('action_resolution')->queue($act);
-			}
-
-			foreach ($reclaimed as $rec) {
-				$this->get('history')->logEvent(
-					$rec['char'],
-					'event.military.reclaimed',
-					array('%link-character%'=>$character->getId(),'%count%'=>$rec['total'],'%stay%'=>$rec['stay']),
-					History::MEDIUM, false, 40
-				);
-			}
-
-			$em->flush();
-
-			return array(
-				'return' => $returning,
-				'lost' => $deserting+$staying,
-				'group' => $group
-			);
-		}
-
-		return array(
-			'assigned' => $character->getSoldiersGiven(),
-			'form'=>$form->createView()
-		);
-	}
-
-
-	/**
-	  * @Route("/dungeons", name="bm2_dungeons"))
-	  * @Template
+	  * @Route("/dungeons", name="bm2_dungeons")
 	  */
 	public function dungeonsAction() {
 		$character = $this->get('dispatcher')->gateway('locationDungeonsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array('dungeons'=>$this->get('geography')->findDungeonsInActionRange($character));
+		return $this->render('Actions/dungeons.html.twig', [
+			'dungeons'=>$this->get('geography')->findDungeonsInActionRange($character)
+		]);
 	}
 
+	/**
+	  * @Route("/changeoccupant", name="maf_settlement_occupant")
+	  */
+	public function changeOccupantAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlChangeOccupantTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
+		$form = $this->createForm(new InteractionType('occupier',
+			$this->get('geography')->calculateInteractionDistance($character),
+			$character
+		));
+
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$result = array(
+				'success'=>true
+			);
+			if ($data['target']) {
+				$act = new Action;
+				$act->setType('settlement.occupant')->setCharacter($character);
+				$act->setTargetSettlement($settlement)->setTargetCharacter($data['target']);
+				$act->setBlockTravel(true);
+				$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
+				$complete = new \DateTime("+2 hours");
+				$act->setComplete($complete);
+				$result = $this->get('action_manager')->queue($act);
+				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
+				return $this->redirectToRoute('bm2_actions');
+			}
+		}
+
+		return $this->render('Settlement/occupant.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/changeoccupier", name="maf_settlement_occupier")
+	  */
+	public function changeOccupierAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlChangeOccupierTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$this->get('dispatcher')->setSettlement($settlement);
+
+		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changeoccupier'));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$targetrealm = $data['target'];
+
+			if ($settlement->getOccupier() == $targetrealm) {
+				$result = 'same';
+			} else {
+				$result = 'success';
+				$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+				$this->getDoctrine()->getManager()->flush();
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
+			return $this->redirectToRoute('bm2_actions');
+		}
+		return $this->render('Settlement/occupier.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/occupation/end", name="maf_settlement_occupation_end")
+	  */
+	public function occupationEndAction(Request $request) {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('controlOccupationEndTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $this->get('politics')->endOccupation($settlement, 'manual');
+			$this->getDoctrine()->getManager()->flush();
+                        $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
+                        return $this->redirectToRoute('bm2_actions');
+                }
+		return $this->render('Settlement/occupationend.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
 }

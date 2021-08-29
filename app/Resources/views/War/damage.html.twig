@@ -1,0 +1,52 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<div style="float:right">
+		&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+		<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
+	</div>
+	<h2>{{ "military.damage.name"|trans({},"actions")|title }}</h2>
+	{% if result is defined %}
+		<p>
+		{% if result.success %}
+			{% if result.destroyed %}
+				{{ "military.damage.success"|trans({"%featuretype%":link(featuretype)},"actions")|raw }}
+			{% elseif result.disabled %}
+				{{ "military.damage.success2"|trans({"%featuretype%":link(featuretype)},"actions")|raw }}
+			{% else %}
+				{{ "military.damage.success3"|trans({"%featuretype%":link(featuretype), "%damage%":result.damage},"actions")|raw }}
+			{% endif %}
+		{% else %}
+			{{ result.message|trans({},"actions") }}
+		{% endif %}
+		</p>
+	{% else %}
+		<p>{{ "military.damage.intro"|trans({},"actions")|raw }}</p>
+		<ul>
+		{% for row in features %}
+			<li>
+				{{ row.feature.type.name|trans({},"economy") }} "{{ row.feature.name }}"
+				{% if row.feature.active == false %}
+					{{ 'military.damage.inactive'|trans({},"actions") }}
+				{% endif %}
+			</li>
+		{% endfor %}
+		</ul>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% include "element/mapstrings.js.twig" %}
+mapinit('map', false, false, true);
+
+set_char_location({{ character.location.x }}, {{ character.location.y }}, true, {{ actdistance}}, {{ spotdistance }});
+zoomto({{ character.location.x }}, {{ character.location.y }}, 8);
+{% endblock %}

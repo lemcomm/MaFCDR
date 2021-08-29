@@ -23,6 +23,7 @@ class Geography {
 
 	private $embark_distance = 200;
 	private $road_buffer = 200;
+	private $place_separation = 500;
 
 	private $base_speed = 12000; // 12km a day base speed
 	private $spotBase = -1;
@@ -82,7 +83,9 @@ class Geography {
 	}
 
 	public function travelDetails(Character $character, $to=1.0) {
-		$query = $this->em->createQuery('SELECT s as place,b.name as biome,ST_Length(ST_Intersection(g.poly,ST_Line_Substring(c.travel, c.progress, :to)) as length from BM2SiteBundle:Settlement s JOIN s.geo_data g JOIN g.biome b, BM2SiteBundle:Character c WHERE c = :me AND ST_Intersects(g.poly, ST_Line_Substring(c.travel, c.progress, :to)) = true');
+		$query = $this->em->createQuery('
+			SELECT s as place,b.name as biome,ST_Length(ST_Intersection(g.poly,ST_Line_Substring(c.travel, c.progress, :to)) as length from BM2SiteBundle:Settlement s JOIN s.geo_data g JOIN g.biome b, BM2SiteBundle:Character c WHERE c = :me AND ST_Intersects(g.poly, ST_Line_Substring(c.travel, c.progress, :to)) = true
+		'); #For reasons unfathomable, this query is tripping up the highlighing on my new editor. Putting it on a new line fixes it.
 		$query->setParameters(array('me'=>$character, 'to'=>$to));
 		return $query->getResult();
 	}
@@ -142,16 +145,16 @@ class Geography {
 	}
 
 	public function findRealmPolygon(Realm $realm, $format='text', $with_subs='true') {
-		$estate_ids=array();
-		foreach ($realm->findTerritory($with_subs) as $estate) {
-			$estate_ids[] = $estate->getId();
+		$settlement_ids=array();
+		foreach ($realm->findTerritory($with_subs) as $settlement) {
+			$settlement_ids[] = $settlement->getId();
 		}
-		if (empty($estate_ids)) {
+		if (empty($settlement_ids)) {
 			return null;
 		} else {
 			if ($format=='json') { $as='ST_AsGeoJSON'; } else { $as='ST_AsText'; }
-			$query = $this->em->createQuery('SELECT '.$as.'(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:estates)');
-			$query->setParameters(array('estates'=>$estate_ids));
+			$query = $this->em->createQuery('SELECT '.$as.'(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:settlements)');
+			$query->setParameters(array('settlements'=>$settlement_ids));
 			$data = $query->getSingleResult();
 			return $data['poly'];
 		}
@@ -175,15 +178,15 @@ class Geography {
 
 
 	public function calculateRealmArea(Realm $realm) {
-		$estate_ids=array();
-		foreach ($realm->findTerritory() as $estate) {
-			$estate_ids[] = $estate->getId();
+		$settlement_ids=array();
+		foreach ($realm->findTerritory() as $settlement) {
+			$settlement_ids[] = $settlement->getId();
 		}
-		if (empty($estate_ids)) {
+		if (empty($settlement_ids)) {
 			return 0;
 		} else {
-			$query = $this->em->createQuery('SELECT ST_Area(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:estates)');
-			$query->setParameters(array('estates'=>$estate_ids));
+			$query = $this->em->createQuery('SELECT ST_Area(ST_UNION(g.poly)) as poly FROM BM2SiteBundle:GeoData g JOIN g.settlement s WHERE s.id IN (:settlements)');
+			$query->setParameters(array('settlements'=>$settlement_ids));
 			return $query->getSingleScalarResult(); // this is in square m
 		}
 	}
@@ -283,10 +286,18 @@ class Geography {
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
 	}
-	
+
 	public function findNearestPlace(Character $character) {
-		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
+		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char AND p.location IS NOT NULL ORDER BY distance ASC');
 		$query->setParameter('char', $character);
+		$query->setMaxResults(1);
+		return $query->getOneOrNullResult();
+	}
+
+	public function findNearestActionablePlace(Character $character) {
+		$maxdistance = $this->calculateInteractionDistance($character);
+		$query = $this->em->createQuery('SELECT p, ST_Distance(p.location, c.location) AS distance FROM BM2SiteBundle:Place p JOIN BM2SiteBundle:Character c WHERE c = :char AND p.location IS NOT NULL AND ST_Distance(c.location, p.location) < :maxdistance ORDER BY distance ASC');
+		$query->setParameters(array('char'=>$character, 'maxdistance'=>$maxdistance));
 		$query->setMaxResults(1);
 		return $query->getOneOrNullResult();
 	}
@@ -351,7 +362,7 @@ class Geography {
 			return $this->calculateDistanceToSettlement($a, $b->getSettlement());
 		}
 	}
-	
+
 	public function calculateDistanceToCharacter(Character $a, Character $b) {
 		$query = $this->em->createQuery('SELECT ST_Distance(a.location, b.location) AS distance FROM BM2SiteBundle:Character a, BM2SiteBundle:Character b WHERE a=:a and b=:b');
 		$query->setParameters(array('a'=>$a, 'b'=>$b));
@@ -359,7 +370,7 @@ class Geography {
 	}
 
 
-	public function findCharactersNearMe(Character $character, $maxdistance, $only_outside=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false) {
+	public function findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false) {
 		$qb = $this->em->createQueryBuilder();
 		$qb->select('c as character, ST_Distance(me.location, c.location) AS distance')
 			->from('BM2SiteBundle:Character', 'me')
@@ -367,18 +378,32 @@ class Geography {
 			->where('c.alive = true')
 			->andWhere('me = :me')
 			->andWhere('me != c');
-		if ($character->getInsideSettlement()) {
+		if ($character->getInsidePlace()) {
+			if ($character->getInsideSettlement()) {
+				$qb->andWhere(
+					$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement')
+				);
+			}
 			$qb->andWhere($qb->expr()->orX(
-					$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement'),
-					$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
-				));
+				$qb->expr()->eq('c.inside_place', 'me.inside_place'),
+				$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
+			));
+		} elseif ($character->getInsideSettlement()) {
+			$qb->andWhere($qb->expr()->orX(
+				$qb->expr()->eq('c.inside_settlement', 'me.inside_settlement'),
+				$qb->expr()->lt('ST_Distance(me.location, c.location)', ':maxdistance')
+			));
 		} else {
 			$qb->andWhere('ST_Distance(me.location, c.location) < :maxdistance');
 		}
+
 		if ($exclude_slumbering) {
 			$qb->andWhere('c.slumbering = false');
 		}
-		if ($only_outside) {
+		if ($only_oustide_place) {
+			$qb->andWhere('c.inside_place is NULL');
+		}
+		if ($only_outside_settlement) {
 			$qb->andWhere('c.inside_settlement is NULL');
 		}
 		$qb->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
@@ -396,9 +421,9 @@ class Geography {
 	public function findCharactersInSpotRange(Character $character) {
 		return $this->findCharactersNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	public function findCharactersInActionRange(Character $character, $only_outside=false, $match_battle=false) {
+	public function findCharactersInActionRange(Character $character, $only_outside_settlement=false, $match_battle=false, $only_outside_place=false) {
 		// FIXME: this should also include characters in the same settlement
-		return $this->findCharactersNearMe($character, $this->calculateInteractionDistance($character), $only_outside, true, $match_battle);
+		return $this->findCharactersNearMe($character, $this->calculateInteractionDistance($character), $only_outside_settlement, true, $match_battle, null, $only_outside_place);
 	}
 
 	public function findCharactersInArea($geo) {
@@ -423,29 +448,67 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
-	
+
 	public function findPlacesNearMe(Character $character, $maxdistance) {
-		$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
-		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
-		$places = [];
-		foreach ($query->getResult() as $result) {
-			if($this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible() OR $result->getOwner == $character) {
-				$places[] = $result;
+		if ($settlement = $character->getInsideSettlement()) {
+			$results = [];
+			if ($settlement->getPlaces()) {
+				foreach ($settlement->getPlaces() as $place) {
+					$results[] = $place;
+				}
+			} else {
+				return NULL;
 			}
+		} else {
+			#$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:Place p WHERE ST_Distance(:me, p.location) < :maxdistance');
+			$query = $this->em->createQuery('SELECT p as place, ST_Distance(me.location, p.location) AS distance, ST_Azimuth(me.location, p.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Place p WHERE me.id = :me AND ST_Distance(me.location, p.location) < :maxdistance');
+			$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
+			$results = $query->getResult();
+
+			/* So Doctrine loses its mind if we try to select an object and get zero, but you'll notice every single other one of these works without a try/catch, likely because we're not selecting an object but specific data. If *that* returns 0 rows, well, it don't care I guess.
+			try {
+				$results = $query->getResult();
+			} catch (\Doctrine\DBAL\DBALException $e) {
+				$results = NULL;
+				# No results :(
+			}
+			*/
 		}
-		return $places;
+		if ($results) {
+			$places = array();
+			foreach ($results as $result) {
+				if($result->getOwner() == $character OR $this->pm->checkPlacePermission($result, $character, 'see') OR $result->getVisible()) {
+					$places[] = $result;
+				}
+			}
+			return $places;
+		} else {
+			return NULL;
+		}
 	}
 
 	public function findPlacesInSpotRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
-	public function findPlacesInActionRange($character) {
+
+	public function findPlacesInActionRange(Character $character) {
 		return $this->findPlacesNearMe($character, $this->calculateInteractionDistance($character));
 	}
 
+	public function checkPlacePlacement(Character $character) {
+		if ($this->findPlacesNearMe($character, $this->place_separation)) {
+			return false; #Too close!
+		}
+		$settlement = $this->findNearestSettlement($character)[0];
+		$distance = $this->calculateDistancetoSettlement($character, $settlement);
+		if ($distance < $this->place_separation) {
+			return false; #Too close!
+		}
+		return true; #Good to go!
+	}
+
 	public function findBattlesNearMe(Character $character, $maxdistance) {
-		$query = $this->em->createQuery('SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance');
+		$query = $this->em->createQuery('SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance AND b.siege IS NULL');
 		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
 		return $query->getResult();
 	}
@@ -453,7 +516,7 @@ class Geography {
 	public function findBattlesInSpotRange(Character $character) {
 		return $this->findBattlesNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findBattlesInActionRange($character) {
 		return $this->findBattlesNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -469,11 +532,11 @@ class Geography {
 		$query = $qb->getQuery();
 		return $query->getResult();
 	}
-	
+
 	public function findDungeonsInSpotRange(Character $character) {
 		return $this->findDungeonsNearMe($character, $this->calculateSpottingDistance($character));
 	}
-	
+
 	public function findDungeonsInActionRange($character) {
 		return $this->findDungeonsNearMe($character, $this->calculateInteractionDistance($character));
 	}
@@ -522,7 +585,8 @@ class Geography {
 				->from('BM2SiteBundle:GeoData', 'g')
 				->join('g.biome', 'b')
 				->from('BM2SiteBundle:Character', 'c')
-				->leftJoin('c.soldiers', 's', 'WITH', 's.alive=true')
+				->leftJoin('c.units', 'u')
+				->leftJoin('u.soldiers', 's', 'WITH', 's.alive=true')
 				->leftJoin('c.entourage', 'e', 'WITH', '(e.type = :scout AND e.alive=true)')
 				->where($qb->expr()->eq('ST_Contains(g.poly, c.location)', 'true'))
 				->andWhere($qb->expr()->eq('c', ':me'))
@@ -569,7 +633,8 @@ class Geography {
 			$qb->select(array('c as spotter', '(:base + SQRT(count(DISTINCT e))*:mod + POW(count(DISTINCT s), 0.3333333)) as spotdistance'));
 		}
 		$qb->from('BM2SiteBundle:Character', 'c')
-			->leftJoin('c.soldiers', 's', 'WITH', 's.alive=true')
+			->leftJoin('c.units', 'u')
+			->leftJoin('u.soldiers', 's', 'WITH', 's.alive=true')
 			->leftJoin('c.entourage', 'e', 'WITH', '(e.type = :scout AND e.alive=true)')->setParameter('scout', $scout)
 			->where($qb->expr()->eq('ST_Contains(g.poly, c.location)', 'true'))
 			->groupBy('c')
@@ -598,7 +663,11 @@ class Geography {
 		$actScout = $this->appstate->getGlobal('act.scoutmod');
 
 		$act = $actBase; // base distance a noble on his own has
-		$act += sqrt($character->getSoldiers()->count()); // add a tiny amount for his troops
+		$count = 0;
+		foreach ($character->getUnits() as $unit) {
+			$count += $unit->getSoldiers()->count();
+		}
+		$act += sqrt($count); // add a tiny amount for his troops
 
 		// add in scouts
 		$scouts = $character->getEntourageOfType('scout')->count();
@@ -752,10 +821,18 @@ class Geography {
 			$prisonercount = 0;
 			if ($character->getPrisoners()) {
 				foreach ($character->getPrisoners() as $prisoner) {
-					$prisonercount += $prisoner->getSoldiers()->count() + ($prisoner->getEntourage()->count()/2);
+					$prisonerSoldiers = 0;
+					foreach ($prisoner->getUnits() as $unit) {
+						$prisonerSoldiers += $unit->getSoldiers()->count();
+					}
+					$prisonercount += $prisonerSoldiers + ($prisoner->getEntourage()->count()/2);
 				}
 			}
-			$men = $character->getSoldiers()->count() + $prisonercount + ($character->getEntourage()->count()/2);
+			$charSoldiers = 0;
+			foreach ($character->getUnits() as $unit) {
+				$charSoldiers += $unit->getSoldiers()->count();
+			}
+			$men = $charSoldiers + $prisonercount + ($character->getEntourage()->count()/2);
 			$base_speed = $this->base_speed / exp(sqrt($men/200));
 			if ($prisonercount > 0) {
 				$base_speed *= 0.9;
@@ -787,8 +864,6 @@ class Geography {
 
 		return true;
 	}
-
-
 
 	public function findRandomPoint() {
 		// FIXME: this should run on the database using the passable check and code from here: http://trac.osgeo.org/postgis/wiki/UserWikiRandomPoint
@@ -836,34 +911,9 @@ class Geography {
 		}
 		return array(false,false, false);
 	}
-	
-	public function findNearestHouse(Character $character) {
-		$query = $this->em->createQuery('SELECT f, ST_Distance(f.location, c.location) AS distance FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :char AND t.name = :type AND f.active = true ORDER BY distance ASC');
-		$query->setParameters(array('char'=> $character, 'type'=>'house'));
-		$query->setMaxResults(1);
-		$results = $query->getResult();
-		if ($results) {
-			return $results[0];
-		} else {
-			return false;
-		}
-	}
-	
-	public function findHousesNearMe(Character $character, $maxdistance=-1) {
-		if ($maxdistance==-1) {
-			$maxdistance = $this->calculateInteractionDistance($character);
-		}
-		$query = $this->em->createQuery('SELECT f as feature FROM BM2SiteBundle:GeoFeature f JOIN f.type t, BM2SiteBundle:Character c WHERE c = :me AND t.hidden = false AND t.name = :type AND ST_DWithin(f.location, c.location, :maxdistance) = true');
-		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance, 'type'=>'house'));
-		return $query->getResult();
-	}
-	
-	public function findHousesInSpotRange(Character $character) {
-		return $this->findHousesNearMe($character, $this->calculateSpottingDistance($character));
-	}
-	
-	public function findHousesInActionRange($character) {
-		return $this->findHousesNearMe($character);
+
+	public function getBaseSpeed() {
+		return $this->base_speed;
 	}
 
 }

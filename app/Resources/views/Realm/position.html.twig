@@ -1,0 +1,36 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'realm.positions.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+
+{% if position.ruler %}
+	<h3>
+		{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
+	</h3>
+{% endif %}
+
+{{ form(form) }}
+
+{% if not position.ruler %}
+	<hr />
+	<h2>{{ "perm.desc.title"|trans({},"politics")|title }}</h2>
+	<dl class="wide">
+		{% for perm in permissions %}
+			<dt>{{ perm.translationstring|trans({},"politics") }}</dt>
+			<dd>{{ perm.description|trans({},"politics") }}</dd>
+		{% endfor %}
+	</dl>
+{% endif %}
+{% endblock %}
+
+
+{% block jquery %}
+{# FIXME: on mobile/touch devices this makes 2 clicks necessary :-( #}
+var tooltips = $("[title]").tooltip({
+	position: {
+		my: "left+20 center",
+		at: "right center",
+		collision: "fit"
+	}
+});
+{% endblock %}

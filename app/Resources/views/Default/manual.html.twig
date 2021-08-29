@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+{% include "element/toc.html.twig" with {"toc":toc} %}
+
+<h1>{{ ('manual.'~page)|trans|title }}</h1>
+
+{{ content|markdown|manuallinks }}
+
+<div class="clear"></div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "diplomacy.claims.name"|trans({},"politics")|title }}</h2>
+<p>{{ "diplomacy.claims.intro"|trans({},"politics")|raw }}</p>
+
+<table>
+	<thead><tr>
+		<th></th>
+		<th>{{ "diplomacy.claims.enforce"|trans({},"politics") }}</th>
+	</tr></thead>
+	<tbody>
+	{% for claim in claims %}
+		<tr>
+			<td>{{ link(claim.settlement) }}</td>
+			<td>{{ (claim.enforceable?'yes':'no')|trans }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

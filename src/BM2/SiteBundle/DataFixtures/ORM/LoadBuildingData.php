@@ -30,7 +30,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'City Hall'             => array('auto' =>  50000, 'min' =>   5000, 'work' =>  25000, 'ratio' =>  3500, 'builtin' => array('city'), 'requires' => array('Town Hall')),
 		'Dirt Streets'          => array('auto' =>    400, 'min' =>     50, 'work' =>   5000, 'ratio' =>  1000, 'builtin' => array('city','port')),
 		'Fairground'            => array('auto' =>  10000, 'min' =>   1200, 'work' =>  10000, 'ratio' =>  1000, 'builtin' => array('city'), 'requires' => array('Carpenter','Market')),
-		'Fortress'              => array('auto' =>      0, 'min' =>   4000, 'work' => 500000, 'ratio' =>  4000, 'builtin' => array('city','fort'), 'defenses' => 60, 'requires' => array('Paved Streets','Armoury','Stone Castle','Mason'), 'conditions'=>true),
+		'Fortress'              => array('auto' =>      0, 'min' =>   4000, 'work' => 500000, 'ratio' =>  4000, 'builtin' => array('city','fort'), 'defenses' => 50, 'requires' => array('Paved Streets','Armoury','Stone Castle','Mason'), 'conditions'=>true),
 		'Garrison'              => array('auto' =>      0, 'min' =>    400, 'work' =>  15000, 'ratio' =>  8000, 'builtin' => array('city','fort'), 'requires' => array('Carpenter','Barracks')),
 		'Great Temple'          => array('auto' =>  50000, 'min' =>   5000, 'work' =>  50000, 'ratio' =>  3000, 'builtin' => array('city'), 'requires' => array('University','Temple','Master Mason','Paved Streets')),
 		'Guardhouse'            => array('auto' =>      0, 'min' =>    200, 'work' =>   8000, 'ratio' =>  5000, 'builtin' => array('city','fort'), 'requires' => array('Training Ground')),
@@ -44,16 +44,16 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Merchants Quarter'     => array('auto' =>  60000, 'min' =>   3000, 'work' =>  25000, 'ratio' =>  1200, 'builtin' => array('city'), 'requires' => array('Paved Streets','Fairground','Warehouse','Mason','Tailor')),
 		'Mill'  		=> array('auto' =>    500, 'min' =>    200, 'work' =>  14000, 'ratio' =>  2500, 'builtin' => array('city'), 'icon'=>'rpg_map/windmill.svg', 'icon'=>'buildings/mill.png'),
 		'Mine'                  => array('auto' =>      0, 'min' =>    100, 'work' =>  20000, 'ratio' =>   400, 'builtin' => array('city'), 'requires' => array('Blacksmith','Carpenter'), 'conditions'=>true, 'icon'=>'rpg_map/mine.svg'),
-		'Palisade'              => array('auto' =>   3000, 'min' =>    400, 'work' =>  25000, 'ratio' =>  1000, 'builtin' => array('city','fort','port'), 'defenses' => 25),
+		'Palisade'              => array('auto' =>   3000, 'min' =>    400, 'work' =>  25000, 'ratio' =>  1000, 'builtin' => array('city','fort','port'), 'defenses' => 10),
 		'Paved Streets'         => array('auto' =>   5000, 'min' =>    500, 'work' =>  20000, 'ratio' =>  1000, 'builtin' => array('city','port'), 'requires' => array('Dirt Streets','Mason')),
 		'Royal Mews'            => array('auto' =>      0, 'min' =>   5000, 'work' =>  25000, 'ratio' =>  2500, 'builtin' => array('city'), 'requires' => array('Armourer', 'Saddler', 'Training Ground'), 'conditions'=>true),
 		'Saddler'               => array('auto' =>   2600, 'min' =>    250, 'work' =>   8000, 'ratio' =>   800, 'builtin' => array('city'), 'requires' => array('Leather Tanner')),
 		'School'                => array('auto' =>   3000, 'min' =>    300, 'work' =>  15000, 'ratio' =>  3000, 'builtin' => array('city')),
 		'Shrine'                => array('auto' =>    500, 'min' =>     50, 'work' =>   5000, 'ratio' =>  4000, 'builtin' => array('city','fort','port','temple','graveyard')),
-		'Stables'               => array('auto' =>   3200, 'min' =>    200, 'work' =>  10000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Saddler'), 'conditions'=>true, 'icon'=>'rpg_map/stables.svg'),
-		'Stone Castle'          => array('auto' =>      0, 'min' =>   2000, 'work' => 300000, 'ratio' =>  1600, 'builtin' => array('city','fort'), 'defenses' => 50, 'requires' => array('Stone Wall','Stone Towers','Wood Castle','Dirt Streets','Mason'), 'icon'=>'rpg_map/fortress.svg'),
-		'Stone Towers'          => array('auto' =>  50000, 'min' =>   1500, 'work' => 160000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 30, 'requires' => array('Wood Towers','Stone Wall','Mason'), 'icon'=>'rpg_map/tower_square.svg'),
-		'Stone Wall'            => array('auto' =>  25000, 'min' =>   1000, 'work' => 120000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 35, 'requires' => array('Wood Wall','Mason')),
+		'Stables'               => array('auto' =>      0, 'min' =>    200, 'work' =>  10000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Saddler'), 'conditions'=>true, 'icon'=>'rpg_map/stables.svg'),
+		'Stone Castle'          => array('auto' =>      0, 'min' =>   2000, 'work' => 300000, 'ratio' =>  1600, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Stone Wall','Stone Towers','Wood Castle','Dirt Streets','Mason'), 'icon'=>'rpg_map/fortress.svg'),
+		'Stone Towers'          => array('auto' =>  50000, 'min' =>   1500, 'work' => 160000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 5, 'requires' => array('Wood Towers','Stone Wall','Mason'), 'icon'=>'rpg_map/tower_square.svg'),
+		'Stone Wall'            => array('auto' =>  25000, 'min' =>   1000, 'work' => 120000, 'ratio' =>  2000, 'builtin' => array('city','fort','port'), 'defenses' => 10, 'requires' => array('Wood Wall','Mason')),
 		'Tailor'                => array('auto' =>    300, 'min' =>     30, 'work' =>   8000, 'ratio' =>   250, 'builtin' => array('city','port')),
 		'Tavern' 		=> array('auto' =>    250, 'min' =>    100, 'work' =>   4000, 'ratio' =>   400, 'builtin' => array('city','port')),
 		'Temple'                => array('auto' =>   2400, 'min' =>    200, 'work' =>  20000, 'ratio' =>  2500, 'builtin' => array('city','port','temple'), 'requires' => array('Shrine','Mason')),
@@ -61,9 +61,9 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Training Ground'       => array('auto' =>      0, 'min' =>     60, 'work' =>   6000, 'ratio' =>  3500, 'builtin' => array('city','fort')),
 		'University'            => array('auto' =>  80000, 'min' =>   8000, 'work' =>  30000, 'ratio' => 10000, 'builtin' => array('city'), 'requires' => array('Paved Streets','Library','Alchemist','Mason')),
 		'Weaponsmith'           => array('auto' =>   5000, 'min' =>    600, 'work' =>  10000, 'ratio' =>  2000, 'builtin' => array('city'), 'requires' => array('Blacksmith')),
-		'Wood Castle'           => array('auto' =>      0, 'min' =>   1200, 'work' =>  80000, 'ratio' =>  1200, 'builtin' => array('city','fort'), 'defenses' => 50, 'requires' => array('Carpenter','Wood Wall','Wood Towers'), 'icon'=>'rpg_map/fort.svg'),
-		'Wood Towers'           => array('auto' =>  10000, 'min' =>   1000, 'work' =>  50000, 'ratio' =>  1200, 'builtin' => array('city','fort','port'), 'defenses' => 25, 'requires' => array('Carpenter','Wood Wall')),
-		'Wood Wall'             => array('auto' =>   6000, 'min' =>    800, 'work' =>  40000, 'ratio' =>  1200, 'builtin' => array('city','fort','port'), 'defenses' => 35, 'requires' => array('Carpenter','Palisade')),
+		'Wood Castle'           => array('auto' =>      0, 'min' =>   1200, 'work' =>  80000, 'ratio' =>  1200, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Carpenter','Wood Wall','Wood Towers'), 'icon'=>'rpg_map/fort.svg'),
+		'Wood Towers'           => array('auto' =>  10000, 'min' =>   1000, 'work' =>  50000, 'ratio' =>  1200, 'builtin' => array('city','fort','port'), 'defenses' => 5, 'requires' => array('Carpenter','Wood Wall')),
+		'Wood Wall'             => array('auto' =>   6000, 'min' =>    800, 'work' =>  40000, 'ratio' =>  1200, 'builtin' => array('city','fort','port'), 'defenses' => 10, 'requires' => array('Carpenter','Palisade')),
 
 		'Fishery'           	=> array('auto' =>   1800, 'min' =>    500, 'work' =>   6000, 'ratio' =>   800, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
 		'Lumber Yard'           => array('auto' =>      0, 'min' =>    600, 'work' =>   8000, 'ratio' =>  1400, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
@@ -80,10 +80,12 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Race Track'		=> array('auto' =>      0, 'min' =>   7500, 'work' =>  96000, 'ratio' =>  1500, 'builtin' => array('city'), 'requires' => array('Bank','Stables')),
 		'Warehouse'		=> array('auto' =>   2000, 'min' =>    250, 'work' =>   5000, 'ratio' =>  3000, 'builtin' => array('city','port'), 'requires' => array('Dirt Streets','Carpenter')),
 		'Dockyard'		=> array('auto' =>   3000, 'min' =>    750, 'work' =>  10000, 'ratio' =>  2500, 'builtin' => array('city','port'), 'requires' => array('Warehouse','Mason','Inn'), 'conditions'=>true),
-		'Guild Square'		=> array('auto' =>      0, 'min' =>    500, 'work' =>   7500, 'ratio' =>  3000, 'builtin' => array('port','fort'), 'requires' => array('Carpenter','Mason')),
+		'Guild Square'		=> array('auto' =>      0, 'min' =>    500, 'work' =>   7500, 'ratio' =>  3000, 'builtin' => array('city','port','fort'), 'requires' => array('Carpenter','Mason')),
 		'Empty Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Palisade')),
 		'Filled Moat'		=> array('auto' =>      0, 'min' =>    100, 'work' =>  10000, 'ratio' =>   400, 'builtin' => array('city','fort'), 'defenses' => 5, 'requires' => array('Empty Moat'), 'conditions'=>true),
 		'Quarry'		=> array('auto' =>      0, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter'), 'conditions'=>true),
+
+		'Hunters Lodge'		=> array('auto' =>	0, 'min' =>	50, 'work' =>	5000, 'ratio' =>  1200, 'builtin' => ['city', 'fort'], 'requires' => ['Bowyer'], 'conditions'=>true),
 	);
 
 	private $resources = array(
@@ -157,13 +159,15 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Empty Moat'		=> array('wood'=>array('construction'=>500), 'metal'=>array('construction'=>50), 'goods'=>array('construction'=>300, 'operation'=>2)),
 		'Filled Moat'		=> array('wood'=>array('construction'=>5000), 'metal'=>array('construction'=>200), 'goods'=>array('construction'=>300, 'operation'=>3)),
 		'Quarry'		=> array('wood'=>array('construction'=>3000, 'operation'=>100), 'metal'=>array('construction'=>1000, 'operation'=>50, 'bonus'=>20), 'goods'=>array('construction'=>300, 'operation'=>2, 'bonus'=>1)),
+
+		'Hunters Lodge'         => array('wood'=>array('construction'=>1800, 'bonus'=>1), 'metal'=>array('construction'=>100), 'food'=>array('provides'=>5, 'bonus'=>5)),
 	);
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function getOrder() {
-		return 10; // requires resourcedata and settlementdata
+		return 9; // requires resourcedata and settlementdata
 	}
 
 	/**

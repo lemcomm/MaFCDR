@@ -1,4 +1,4 @@
-The term *knight* refers to any character who does not hold land, does not have an estate.
+The term *knight* refers to any character who does not hold land and does not have an estate.
 
 This is the lowest rank available to player characters and is also the rank that new characters begin at. There is no pressure to ever leave this rank, playing as a knight is perfectly fine, especially for those interested mostly in warfare and less in economy and diplomacy.
 
@@ -19,9 +19,6 @@ Outside of war, knights often struggle to find much activity, which is the main 
 If there is no war or other duties, you can also [explore dungeons](http://forum.mightandfealty.com/index.php/board,20.0.html).
 
 
-
 Becoming a Lord
 ---------------
 If your character is ambitious and wants to become more than a knight, the next step up the ladder is not so far away. All you need to do is capture or be given an estate, a settlement to hold as yours. Whether independent, by conquest or as a vassalage, as soon as you own land, you are [lord].
-
-

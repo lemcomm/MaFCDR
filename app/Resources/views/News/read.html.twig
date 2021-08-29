@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/jquery.gridster.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/jquery.gridster.css') }}" />
+{% endblock %}
+
+{% block content %}
+	<div class="newspaper">
+		<div class="newsheader">
+			<h1>{{ paper.name }}</h1>
+			<span id="number">{{ "news.number"|trans({"%number%":edition.number},"communication")|title }}</span>
+			<span id="pubdate">{{ edition.published|date }}</span>
+		</div>
+
+		<div class="gridster">
+		<ul>
+		{% for article in edition.articles %}
+			<li data-article="{{ article.id }}" data-row="{{ article.row }}" data-col="{{ article.col }}" data-sizex="{{ article.sizex }}" data-sizey="{{ article.sizey}}">
+				<h2>{{ article.title }}</h2>
+				<div class="author">{{ "news.article.author"|trans({"%name%":link(article.author)},"communication")|raw }}</div>
+				{{ article.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+			</li>
+		{% endfor %}
+		</ul>
+		</div>
+	</div>
+
+
+	{% if can_subscribe %}
+		<h2>{{ "news.subscribe.title"|trans({},"communication")|title }}</h2>
+		<p>{{ "news.subscribe.intro"|trans({},"communication")|raw }}</p>
+		<a href="{{ path("bm2_site_news_subscribe", {'edition':edition.id}) }}"><button>{{ "news.subscribe.submit"|trans({},"communication") }}</button></a>
+	{% endif %}
+
+
+{% endblock %}
+
+{% block jquery %}
+var gridster = $(".gridster ul").gridster({
+	widget_margins: [20, 20],
+	widget_base_dimensions: [200, 200],
+	max_cols: 4,
+	max_size_x: 4,
+}).data("gridster");
+gridster.disable();
+
+{% endblock %}

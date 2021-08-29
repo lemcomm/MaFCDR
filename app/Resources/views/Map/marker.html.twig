@@ -1,0 +1,50 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<div style="float:right">
+		&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+		<div id="map" style="min-width:40em;min-height:30em;margin-left:2em"></div>
+	</div>
+	<h2>{{ "marker.set.name"|trans|title }}</h2>
+	<p>{{ "marker.set.intro"|trans|raw }}</p>
+
+	{% if limit %}
+		<p>{{ "marker.set.limit"|trans }}</p>
+	{% else %}
+		{{ form(form) }}
+	{% endif %}
+
+	{% if mymarkers|length > 0 %}
+	<h3>{{ "marker.set.remove"|trans|title }}</h3>
+	<table>
+	<tbody>
+		{% for marker in mymarkers %}
+		<tr>
+			<td>{{ marker.name }}</td>
+			<td>{{ ('marker.'~marker.type)|trans }}</td>
+			<td>{{ link(marker.realm) }}</td>
+			<td><button class="removemarker" data-path="{{ path('bm2_removemarker', {'marker':marker.id}) }}">{{ 'marker.set.removelink'|trans }}</button></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% include "element/mapstrings.js.twig" %}
+mapinit('map', false, 'setmarker', false);
+zoomto({{ character.location.getX }}, {{ character.location.getY }}, 5);
+
+$(".removemarker").click(function(){
+	$.post($(this).data("path"));
+	$(this).closest("tr").remove();
+});
+{% endblock %}

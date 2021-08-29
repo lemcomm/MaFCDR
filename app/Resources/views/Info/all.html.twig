@@ -1,0 +1,25 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+{% include "element/toc.html.twig" with {"toc":toc} %}
+
+<h1>{{ ('list.'~list)|trans }}</h1>
+<ul id="thelist">
+	{% for item in all %}
+		{% if item.hidden is not defined or item.hidden == false %}
+			<li>{{ link(item) }}</li>
+		{% endif %}
+	{% endfor %}
+</ul>
+
+<div class="clear"></div>
+
+{% endblock %}
+
+{% block jquery %}
+function sortAlpha(a,b){
+    return $(a).find('a').text().toLowerCase() > $(b).find('a').text().toLowerCase() ? 1 : -1;
+};
+
+$('#thelist li').sort(sortAlpha).appendTo('#thelist');
+{% endblock %}

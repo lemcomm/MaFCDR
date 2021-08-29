@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "oath.name"|trans({},"politics")|title }}</h2>
+
+	<p>{{ "oath.intro"|trans({},"politics")|raw }}</p>
+
+	<form class="wide" action="{{ path('maf_politics_oath_offer') }}" method="post" {{ form_start(form) }}
+	{{ form_widget(form) }}
+	</form>
+
+{% endblock %}

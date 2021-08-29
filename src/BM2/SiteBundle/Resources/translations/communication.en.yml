@@ -6,6 +6,8 @@ rss:
  desc:        Might & Fealty Event Log Summary
  feed:        Get event updates via RSS
 
+
+
 event:
  artifact:
   created:      Created
@@ -22,7 +24,6 @@ event:
   scouts:       Your scouts have spotted %character% %distance% towards the %direction%.
   tower:        Your scouts spotted %character% from the watchtower %tower% at %distance% towards the %direction%.
   estate:       The watchtower %tower% near %settlement% has spotted %character% %distance% towards the %direction%.
- 
  description:
   updated:
    artifact:    The description of this artifact has changed.
@@ -30,7 +31,6 @@ event:
    realm:       %character% has updated the description of the realm.
    place:       %character% has changed the description of %place%.
    settlement:  %character% has updated the description of %settlement%.
-
  feature2:
   damaged:      The %featuretype% %name% is deteriorating. Workers should be assigned for repair.
   disabled:     The %featuretype% %name% has become inoperative due to deterioration. Workers should be assigned for repair.
@@ -44,6 +44,7 @@ event:
   take:
    started:     %character% has initiated actions to take control.
    stopped:     %character% has abandoned attempts to take control.
+   start:       You have begun the process of forcefully taking control of this settlement. It will end at %time%, server time.
   taken:				Control established by %character%.
   taken2:       Control established by %character% of %realm%.
   loot:         The settlement is being looted by %character%.
@@ -95,6 +96,18 @@ event:
    cancelled:   %character% has withdrawn their claim to this settlement.
   charstart:    A new First One named %character% has appeared here.
   newyear:      The New Year has been celebrated. A festive atmosphere with many alcoholic drinks has resulted in an additional %babies% children coming of age.
+  newplace:     %character% has formalized %place% as a location of interst.
+  occupied:     %character% has delcared an occupation in the name of %realm%.
+  occupied2:    %character% has taken over %realm%'s occupation.
+  endoccupation:
+   manual:      %character% has declared an end to the occupation by %realm%.
+   warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
+  besieged:     %character% has declared a siege of the Settlement.
+  newknight:    %character% has been accepted as a vassal of the settlement.
+  rejectknight: %character% has been rejected as a potential vassal of the settlement.
+  steward:      %character% has been appointed as the new steward.
+  stewarddeath: Is now steward-less due to the passing of %character%.
+  stewardretire: Is now steward-less due to the retiring of %character%.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -102,12 +115,14 @@ event:
  character:
   created:      First mention in family chronicle.
   start:        Has appeared at %settlement%.
+  start2:        Has appeared at %place%.
   renamed:      Has changed name from "%oldname%" to "%newname%".
   knownas1:     Now known as "%newname%".
   knownas2:     No longer known as "%oldname%".
   death:        Died.
   death2:       Died in battle.
   retired:      Has retired from war and politics.
+  liegeretired: No longer has a liege after the retirement of %character%.
   npcdeath:     Without troops, disappeared and died.
   desertions:   %complaining% soldiers are complaining about being too far away from home. %gone% of them deserted.
   deathreclaim: %amount% soldiers returned to you upon the death of %character%, whom you had them assigned to.
@@ -115,10 +130,12 @@ event:
   killartifact: You took the %artifact% from the body of %character%.
   child:        Had a child, %character%.
   inherit:
+   place:       Inhereited the place of %place% from %character%.
    estate:      Inherited the settlement %settlement% from %character%.
    position:    Inherited the position of %position% from %character%.
    realm:       Inherited the realm %realm% from %character%.
   inheritvia:
+   place:       Inhereited the place of %place% from %character-1% (via %character-2%).
    estate:      Inherited the settlement %settlement% from %character-1% (via %character-2%).
    position:    Inherited the position of %position% from %character-1% (via %character-2%).
    realm:       Inherited the realm %realm% from %character-1% (via %character-2%).
@@ -194,21 +211,51 @@ event:
    liege:       Your liege, %character%, has not been heard of for some time. Some say they have been affected by slumberblight.
    partner:     Your partner %character% seems to have succumbed to slumberblight.
    position:    The %realmposition% %character% has not been seen for a long time and can be assumed to be a victim of slumberblight.
-  newplace:     Formalized %place% by %link-character%.
-  joinhouse: 
+  joinhouse:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
   house:
-   founded:     By your words, the %house% has been formalized.
-   subcreated:  By your words, the %house% has been formalized as a cadet of your house, under leadership of %character%.
-   subfouned:   By the decree of %character% from the %link-house-1%, you have been made the first heirarch of the %house-2%.
-   newhead:     You have been made the new head of %house% after the death of %character%.
+   founded:     Formalized the %house%.
+   subcreated:  Formalized the %house% as a cadet of %house-2%.
+   subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
+   newhead:     Took over leadership of the house after the passing of %character%.
+   revived:     Revived under the leadership of %character%.
+   arrival:      %character% has arrived in the house at %place%.
+  siege:
+   disband:     By declaration of %character% the siege of the settlement of %settlement% has concluded peacefully.
+   disband2:    By declaration of %character% the siege of the place of %place% has concluded peacefully.
+  newliege:
+   land:        Your oath of vassalage to the lord of %settlement% has been accepted.
+   place:       Your oath of vassalage to the owner of %place% has been accepted.
+   position:    Your oath of vassalage to the %realmposition% has been accepted.
+  liegerejected:
+   land:        The lord of %settlement% has rejected your offer of vassalge.
+   place:       The owner of %place% has rejected your offer of vassalge.
+   position:    The %realmposition% has rejected your offer of vassalge.
+  steward:      Has been appointed as the steward of %settlement%.
+  recvdplace:   Has received ownership of %place%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
   reclaimed:    %character% has reclaimed %count% soldiers assigned to you. %stay% of them decided to remain under your command.
   battlejoin:   %character% has joined the battle with %soldiers% soldiers.
-
+  supplier:
+   food:
+    start:      %character% was granted authority to pull food from the storehouses for their troops.
+  supplied:
+   food:
+    start:      %character% has authorized you to pull food from their storehouses at %settlement% for your troops.
+    rejected:   Your request for food to be supplied from %settlement% was rejected by the lord.
+    end:        Your ability to draw food from %settlement% has reached the agreed upon conclusion.
+  soldierarrivals:  "New soldiers have recently arrived to and joined up with the unit: %unit%"
+ unit:
+  assigned:     %character% has given you command of %unit%.
+  appointed:    %character% has appointed you marshal of %unit%.
+  basetaken:    %settlement% has been occupied by %realm%, leaving this unit to your direct command.
+  basetaken2:   %settlement% has been taken by an unaligned first one, leaving this unit to your direct command.
+  defenselost:  The defense of %settlement% has failed, so the unit has returned home.
+  defenselost2:  The defense of %place% has failed, so the unit has returned home.
+  recalled:     %character% has recalled %unit% from your command.
  quest:
   created:      Quest created.
   started:      %character% has begun the quest.
@@ -216,13 +263,11 @@ event:
   completed:    %character% claims to have completed the quest.
   confirmed:    %character% has been confirmed to have completed the quest.
   rejected:     The claim of %character% to have completed the quest has been rejected.
-
  war:
   started:      The war has been declared.
   settlement:   Attack on %settlement% started.
-
  realm:
-  founded:      Founded by %character%.  
+  founded:      Founded by %character%.
   inherited:    Rulership passed to %character-2% upon the death of %character-1%.
   inherifail:   Rulership disputed after the death of %character%, who left no heir.
   inheriteddeath:    Rulership passed to %character-2% upon the death of %character-1%.
@@ -233,6 +278,7 @@ event:
   elected2:     %character% was elected to the position of %realmposition%.
   joined:       Became a part of %realm%.
   wasjoined:    Acquired control of %realm%.
+  subjoined:    The subrealm of %realm% aquired controler of %realm-2%.
   left:         Left %realm% and became independent.
   wasleft:      Lost control of %realm%, which declared itself independent.
   gained:       Gained ownership of %settlement%.
@@ -252,19 +298,29 @@ event:
    superior:    By order of %character%, the realm's subrealm of %realm% has been dismantled.
    character:   Ordered the dismantling of the realm of %realm%.
    sovereign:
-    inferior:   
+    inferior:
      subrealm:  With the abolishment of %realm%, the realm has become autonomous.
      realm:     With the dismantling of the realm, the formal vassal of %realm% has gained it's autonomy.
     estate:     With the dismantling of %realm%, the estate is effectively rogue.
+    place:      With the dismantling of %realm%, the place of interest is effectively rogue.
    notsovereign:
     inferior:
      subrealm:  With the abolishment of its superior realm, %realm-1%, %realm-2%'s superior is now %realm-3%.
      realm:     With the abolishment of the realm, %realm-1% assumes superiorship over %realm-2%.
      superior:  With the abolishment of its inferior realm, %realm-1%, the realm assumes superiorship over %realm-2%.
     estate:     With the dismantling of %realm-1%, the estate now falls under %realm-2%.
+    place:      With the dismantling of %realm-1%, the place of interest now falls under %realm-2%.
+   vassals:
+    place:      With the dismantling of %realm%, you can no longer be a knight of the now abolished position of %realmposition%.
+    estate:
+     notsov:    With the dismantling of %realm%, your allegiance is now part of %realm-2%.
+     sov:       With the dismantling of %realm%, your allegiance is now part of no realm.
+
   capital:      Declared that its capital shall now be %settlement%.
+  arrival:      %character% has arrived in the realm at %place%.
  subrealm:
   founded:      Founded by %character-1% as a subrealm of %realm% with rulership granted to %character-2%.
+  arrival:      %character% has joined the realm by becoming a vassal of %realm%.
  position:
   inactivekept: The holder of %realmposition%, %character%, has succumbed to the slumber.
   inherited:
@@ -272,33 +328,52 @@ event:
    death:       The position of %position% has been inherited by %character-2% after the death of %character-1%.
   death:        %character% has died and thus left the office of %realmposition%.
   inactive:     %character% has fallen to slumberblight and thus left the office of %realmposition%.
+  newknight:    %character% has been accepted as a vassal of the position.
+  rejectknight: %character% has been rejected as a potential vassal of the position.
  house:
-  founded:      By decree of %character% the house has been formalized!
-  newmember:    %character% has been accepted into the ranks.
-  subfounded:   By decree of %character-1%, the %house% has been formalized as a Cadet under leadership of %character-2% 
-  subcreated:   By decree of %character-1% of the %house-1%, the %house-2% has been formalized under them with leadership granted to %character-2%.
-  exile:
-   ruler:       By decree of %character-1%, %character-2%, ruler of %realm% has been cast out of the House.
-   knight:      By decree of %character-1%, %character-2% has been cast out of of the House.
+  founded:      By decree of %character% the house was formalized!
+  newmember:    %character% was accepted into the ranks.
+  subfounded:   By decree of %house%, the house was formalized.
+  subcreated:   By decree of %character%, the house was formalized as a cadet of %house%.
+  exile:        By decree of %character-1%, %character-2% has been cast out of of the House.
   merged:
-   death:       After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
-   retire:      After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
-   slumber:     After the passing of %character-1%, due to %link-character-2% taking leadership, the %link-house-1% is now a Cadet of %link-house-2%.
+   death:       After the passing of it's leader, due to another house taking leadership, became a cadet of %house%.
+   retire:      After the retirement of it's leader, due to another house taking leadership, became a cadet of %house%.
+   slumber:     After the slumber of it's leader, due to another house taking leadership, became a cadet of %house%.
   inherited:
-   death:       After the passing of %character-1%, %character-2% has taken leadership as the designated successor or heir.
-   retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
-   slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the designated successor or heir.
-  newhead:      
-   death:       After the passing of %character-1%, %character-2% has taken leadership as the eldest member.
-   retire:      After the retiring of %character-1%, %character-2% has assumed leadership as the eldest member.
-   slumber:     After the slumber of %character-1%, %character-2% has assumed leadership as the eldest member.
+   death:       After the passing of it's leader, %character% has inherited leadership.
+   retire:      After the retirement of it's leader, %character% has inherited leadership.
+   slumber:     After the slumbering of it's leader, %character% has inherited leadership.
+  newhead:
+   death:       After the passing of it's leader, %character% has assumed leadership.
+   retire:      After the retirement of it's leader, %character% has assumed leadership.
+   slumber:     After the slumbering of it's leader, %character% has assumed leadership.
   collapsed:
    death:       Unable to locate a successor after the passing of its last head, the house has collapsed.
    retire:	Unable to locate a successor after the retiring of its last head, the house has collapsed.
    slumber:     Unable to locate a successor after the slumber of its last head, the house has collapsed.
   relocated:
    settlement:  Relocated to the settlement of %settlement%.
- 
+   place:       Relocated to %place%.
+  newname:      Changed it's name to %name%.
+ place:
+  formalized:   Foramlized by %character% in the lands of %settlement%.
+  attacked:     The place is being attacked by troops of %character%.
+  battle:       %battle% was fought.
+  entered:      %character% has entered the place.
+  entered2:     %character% has entered the place with %soldiers% soldiers.
+  forceentered: %character% has forced his way into the place.
+  forceentered2: %character% has forced his way into the place with %soldiers% soldiers.
+  left:         %character% has been seen leaving.
+  forceleft:    %character% has been forced outside the walls during the battle.
+  besieged:     %character% has declared a siege of the location.
+  start:        A new First One named %character% has appeared here.
+  charstart:    A new First One named %character% has appared at %place%.
+  newknight:    %character% has been accepted as a vassal of the place.
+  rejectknight: %character% has been rejected as a potential vassal of the place.
+  newowner:     Onwership has been transferred to %character%.
+  inherited:    Was inherited by %character%.
+  inherifail:   Fell to independence on the death of %character%, who left no heir.
 
 report:
  building:
@@ -339,7 +414,7 @@ politics:
   offer2:     %character% has accepted your knight offer in %settlement% and become your knight.
   taken:      Has appeared as a knight of %character% at %settlement%.
   taken2:     Has appeared as a vassal of %character% and received lordship of %settlement%.
-  broken:     %character% has broken their oath of fealty to you and become a rogue.
+  broken:     %character% has broken their oath of fealty and become a rogue.
   disowned:   Oath of fealty dissolved by your liege, %character%.
   nowruler:   %character% has become ruler of %realm% and is thus no longer a vassal.
   changed:    %character-1% has broken the oath of fealty to you and sworn an oath to %character-2% instead.
@@ -377,6 +452,8 @@ resolution:
   evading:      Enemy troops are engaging you. As instructed, your troops will try to evade the battle, but if they fail to do so, the fight will occur in an estimated %time%.
  defend:
   success:      %settlement% is being attacked. As ordered, your troops are rallying to defend it. The battle is expected to occur in %time%.
+  success2:     %settlement% is being sieged by %character%. As ordered, your troops are rallying to defend it.
+  success3:     %place% is being sieged by %character%. As ordered, your troops are rallying to defend it.
   removed:      You are no longer defending %settlement%, because you have moved too far away from it.
  disengage:
   success:      You have successfully evaded a battle.
@@ -400,6 +477,17 @@ resolution:
 battle:
  participated:  Participated in %battle%.
  failed:        The battle failed to happen, most likely because all enemies evaded successfully.
+
+siege:
+ bypass:
+  attacker:     After the defenders failed to muster troops in %battle%, the siege concluded in a attacker victory.
+  defender:     After the attackers failed to muster troops in %battle%, the siege concluded in an defender victory.
+ advance:
+  attacker:     After the %battle%, the siege has advanced in favor of the attackers.
+  defender:     After the %battle%, the siege has advanced in favor of the defenders.
+ victor:
+  attacker:     After the final %battle%, the siege has concluded in favor of the attackers.
+  defender:     After the final %battle%, the siege has concluded in favor of the defenders.
 
 mail:
  sender:        Notification Service
@@ -475,7 +563,7 @@ news:
  subscribe:
   title:      Subscribe
   intro: >
-    If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the 
+    If you want to take a copy of this edition with you to reference it later, you can subscribe to it using the button below. This will add the
     edition to your readers list and you will be able to access it in the future. If the publication is set up as a periodical, you will also
     receive a notification and a copy of future editions.
   submit:     Subscribe now
@@ -525,4 +613,3 @@ trans:
    friend:        I am quite sorry, but I cannot accept your offer at this time.
    neutral:       I have to refuse your request.
    hostile:       You can have what is rightfully mine if you take it from my cold, dead hands.
-   

@@ -1,0 +1,205 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+  {{ parent() }}
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+
+  <style>
+
+  path {
+    fill: yellow;
+    stroke: #000;
+  }
+
+  circle {
+    fill: #fff;
+    stroke: #000;
+    pointer-events: none;
+  }
+
+  .h0{fill:rgb(0,0,10)}
+  .h1{fill:rgb(10,10,20)}
+  .h2{fill:rgb(20,20,40)}
+  .h3{fill:rgb(30,30,60)}
+  .h4{fill:rgb(40,40,80)}
+  .h5{fill:rgb(120,160,120)}
+  .h6{fill:rgb(140,180,140)}
+  .h7{fill:rgb(160,200,160)}
+  .h8{fill:rgb(200,220,180)}
+  .h9{fill:rgb(200,200,200)}
+  .h10{fill:rgb(240,240,240)}
+
+  .water{fill:rgb(0,0,200)}
+  .land{fill:rgb(0,200,0)}
+  .mountain{fill:rgb(200,200,200)}
+
+  </style>
+
+{% endblock %}
+
+{% block content %}
+
+<h2>Map #{{ seed }}</h2>
+<label for="waterlevel">water level</label><input id="waterlevel" type="range" min="-1" max="1" value="0.5" step="0.05" onChange="updateGraph()" /><br />
+<label for="mountains">mountains start</label><input id="mountains" type="range" min="-1" max="1" value="0.75" step="0.05" onChange="updateGraph()" /><br />
+<br />
+<label for="x">x</label><input id="x" type="text" value="0"/>
+<label for="y">y</label><input id="y" type="text" value="0"/>
+<br />
+<label for="scale">scale</label><input id="scale" type="text" value="250"/>
+
+<br />
+<br />
+<button onClick="generateSQL()">write to database</button>
+<br />
+<div id="prepare"></div>
+<div id="data"></div>
+<div id="points"></div>
+
+{#
+<img src="{{ path("bm2_site_game_heightmap", {'width':width_old, 'height':height_old, 'seed':seed}) }}" />
+#}
+
+{% endblock %}
+
+{% block javascript %}
+var width = {{width}}, height = {{ height }};
+var viewport = d3.geom.polygon([[0,0],[0,height],[width,height],[width,0]]);
+
+var vertices = {{ points|json_encode|raw }};
+var voronoi = d3.geom.voronoi(vertices);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.selectAll("path")
+    .data(voronoi)
+    .enter().append("path")
+    .attr("class", function(d, i) { var height = (vertices[i][2]+1)*5; return 'h'+Math.round(height) })
+    .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+/*
+svg.selectAll("circle")
+    .data(vertices.slice(1))
+    .enter().append("circle")
+    .attr("transform", function(d) { return "translate(" + d + ")"; })
+    .attr("r", 2);
+*/
+
+function generateSQL() {
+  var water = parseFloat($("#waterlevel").val());
+  var mountains = parseFloat($("#mountains").val());
+
+  $.post('{{ path('bm2_site_game_process') }}', {
+    'seed': {{ seed }},
+    'water': water,
+    'mountains': mountains,
+    'points': vertices,
+    'voronoi': voronoi.map(function(cell){ return viewport.clip(cell); }),
+    'x': $("#x").val(),
+    'y': $("#y").val(),
+    'scale': $("#scale").val(),
+  }, function(data){
+    alert("data submitted");
+  });
+
+  return;
+
+  $('#prepare').append("TRUNCATE GeoData, Settlement, GeoResource;<br />");
+  $('#prepare').append("ALTER TABLE GeoPoint ALTER coordinates TYPE GEOMETRY(POINTZ);<br />");
+
+
+
+  $('#data').append("INSERT INTO GeoData (center, altitude, polygon, coast, river, biome, passable) VALUES<br />");
+//  $('#points').append("INSERT INTO GeoPoint (coordinates) VALUES<br />");
+  var i=0;
+  var off_x = parseFloat($("#x").val());
+  var off_y = parseFloat($("#y").val());
+  voronoi.forEach(function(entry) {
+    var point = vertices[i];
+    i++;
+    var clipped = viewport.clip(entry);
+    var biome = "unknown";
+    var water = $("#waterlevel").val();
+    var mountains = $("#mountains").val();
+    var passable = 'true';
+    if (point[2]<=-1) {
+      biome="ocean"; passable='false';
+    } else if (point[2]<water) {
+      biome="water"; passable='false';
+    } else if (point[2]>mountains) {
+      biome="mountain";
+    } else {
+      biome="grass";
+    }
+
+    var x = myscale(point[0]) + off_x;
+    var y = myscale(point[1]) + off_y;
+    $('#data').append("(ST_Point("+x+","+y+"), "+myalt(point[2])+", ST_GeomFromText('POLYGON((");
+    entry.forEach(function(point) {
+      var x = myscale(point[0]) + off_x;
+      var y = myscale(point[1]) + off_y;
+      $('#data').append(x+" "+y+",");
+      if (biome!="ocean") {
+// settlement
+      }
+    });
+    x = myscale(entry[0][0]) + off_x;
+    y = myscale(entry[0][1]) + off_y;
+    $('#data').append(x+" "+y+"))'), false, false, '"+biome+"', "+passable+");<br />");
+  });
+}
+
+function myscale(number) {
+  var precision = 10;
+  var scale = 100; // this is our 100,000 scale
+  return Math.round(number*scale*precision)/precision;
+}
+
+function myalt(alt) {
+  // our highest mountains are 2km high
+  return Math.round(alt*2000);
+}
+
+function updateGraph() {
+  var water = parseFloat($("#waterlevel").val())+1;
+  var mountains = parseFloat($("#mountains").val())+1;
+  var land = mountains-water;
+  var m = 2-mountains;
+  console.log(water);
+  console.log(mountains);
+  console.log(land);
+  console.log(m);
+
+  svg.selectAll("path")
+      .transition()
+      .attr("class", function(d, i) {
+        var alt = 1+vertices[i][2];
+        if (alt < water*0.2) {
+          return "h0";
+        } else if (alt < water*0.4) {
+          return "h1";
+        } else if (alt < water*0.6) {
+          return "h2";
+        } else if (alt < water*0.8) {
+          return "h3";
+        } else if (alt < water) {
+          return "h4";
+        } else if (alt < water + land*0.333) {
+          return "h5";
+        } else if (alt < water + land*0.666) {
+          return "h6";
+        } else if (alt < water + land) {
+          return "h7";
+        } else if (alt < water + land + m*0.333) {
+          return "h8";
+        } else if (alt < water + land + m*0.666) {
+          return "h9";
+        } else {
+          return "h10";
+        }
+      });
+}
+
+{% endblock %}

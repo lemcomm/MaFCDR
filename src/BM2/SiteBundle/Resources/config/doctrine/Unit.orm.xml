@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Unit">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+                <field name="line" type="integer" nullable="true"/>
+		<field name="travel_days" type="smallint" nullable="true"/>
+		<field name="destination" type="string" nullable="true"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="unit"/>
+
+		<many-to-one field="character" target-entity="Character" inversed-by="units"/>
+		<many-to-one field="marshal" target-entity="Character" inversed-by="marshalling_units"/>
+                <many-to-one field="settlement" target-entity="Settlement" inversed-by="units"/>
+		<many-to-one field="defending_settlement" target-entity="Settlement" inversed-by="defending_units"/>
+                <many-to-one field="place" target-entity="Place" inversed-by="units"/>
+		<one-to-one field="settings" target-entity="UnitSettings" mapped-by="unit"/>
+		<many-to-one field="supplier" target-entity="Settlement" inversed-by="supplied_units"/>
+		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="unit" index-by="id" fetch="EXTRA_LAZY"/>
+		<one-to-many field="supplies" target-entity="Supply" mapped-by="unit"/>
+		<one-to-many field="incoming_supplies" target-entity="Resupply" mapped-by="unit" fetch="EXTRA_LAZY"/>
+
+	</entity>
+</doctrine-mapping>

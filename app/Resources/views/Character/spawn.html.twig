@@ -1,0 +1,43 @@
+{% extends "layout.html.twig" %}
+
+
+{% block content %}
+{# overwrite because this is the one page where it's ok to have a character without a location #}
+{% set character = appstate.getCharacter(true,false,true) %}
+        {% if realm %}
+        	<h2>{{ 'character.spawn.realm.title'|trans({"%name%":realm.name})|title }}</h2>
+                <p>{{ 'character.start.nobles'|trans|raw }}: {{ realm.findActiveMembers.count }}<br />
+                {{ 'character.start.regions'|trans|raw }}: {{ realm.findTerritory.count }}</p>
+        	<p>{{ 'character.spawn.realm.intro'|trans({"%name%":realm.name})|raw }}</p>
+		<hr>
+        {% elseif house %}
+        	<h2>{{ 'character.spawn.house.title'|trans({"%name%":house.name})|title }}</h2>
+                <p>{{ 'character.start.nobles'|trans|raw }}: {{ house.findAllActive.count }}</p>
+        	<p>{{ 'character.spawn.house.intro'|trans({"%name%":house.name})|raw }}</p>
+		<hr>
+	{% endif %}
+	{% if not spawns.isEmpty and not myHouse %}
+                {% if realm %}
+        		{% for spawn in spawns %}
+                                {# DO THIS AREA #}
+        			<h3><u>{{ spawn.place.name }}</u></h3>
+        			<p>{{ spawn.place.description.text }}</p>
+        			<a href="{{ path('maf_spawn_in', {"spawn":spawn.place.id}) }}">{{ 'character.spawn.join'|trans({"%name%":spawn.place.name})|raw }}</a></p>
+                		<hr>
+        		{% endfor %}
+                {% elseif house %}
+                        {% for spawn in spawns %}
+                                {# DO THIS AREA #}
+        			<h3><u>{{ spawn.place.name }}</u></h3>
+        			<p>{{ spawn.place.description.text }}</p>
+                                <a href="{{ path('maf_spawn_in', {"spawn":spawn.place.id}) }}">{{ 'character.spawn.join'|trans({"%name%":spawn.place.name})|raw }}</a></p>
+        			<hr>
+                        {% endfor %}
+                {% endif %}
+        {% elseif myHouse %}
+                {# DO THIS AREA #}
+		<h2>{{ 'character.spawn.myhouse'|trans|raw }}</h2>
+		<p>{{ 'character.spawn.myhouseintro'|trans({"%name%":myHouse.name})|raw }}</p>
+                <a href="{{ path('maf_spawn_home') }}">{{ 'character.spawn.join.myhouse'|trans({"%name%":myHouse.name})|raw }}</a></p>
+	{% endif %}
+{% endblock %}

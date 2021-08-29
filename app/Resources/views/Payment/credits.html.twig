@@ -1,0 +1,61 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.credits.title'|trans|title }}</h2>
+<p>{{ 'account.payment.credits'|trans({'%amount%':app.user.credits}) }}
+<a href="{{ path("bm2_payment") }}">{{ 'account.payment.link'|trans|title }}</a>
+
+<div data-role="collapsible" class="topspace">
+	<h3>{{ 'account.sub.title'|trans|title }}</h3>
+	<p>{{ 'account.sub.summary'|trans({"%myfee%":myfee, "%mylevel%":('account.level.'~app.user.accountlevel)|trans, "%until%":app.user.paiduntil|date('dateformat'|trans)})|raw }}</p>
+	<p>{{ 'account.sub.description'|trans({"%url%":concepturl})|raw }}</p>
+
+	<ul class="buttonlist">
+		<li><a href="{{ path("bm2_site_payment_subscription") }}">{{ 'account.sub.link'|trans|title }}</a></li>
+	</ul>
+
+</div>
+<div data-role="collapsible" class="topspace">
+
+	<h3>{{ 'account.credits.shop'|trans|title }}</h3>
+	<p>{{ 'account.credits.shopdesc'|trans|raw }}</p>
+
+	<ul class="buttonlist">
+		<li><a href="{{ path("bm2_heraldry") }}">{{ 'account.heraldry.link'|trans|title }}</a></li>
+		<li><a href="{{ path("bm2_site_artifacts_owned") }}">{{ 'account.artifacts.link'|trans|title }}</a></li>
+		<li><a href="{{ path("bm2_site_payment_culture") }}">{{ 'account.culture.link'|trans|title }}</a></li>
+	</ul>
+
+</div>
+<div data-role="collapsible" class="topspace">
+
+	<h3>{{ 'account.credits.gifts'|trans|title }}</h3>
+	<p>{{ 'account.credits.giftdesc'|trans|raw }}</p>
+
+	<ul class="buttonlist">
+		<li><a href="{{ path("bm2_site_payment_gift") }}">{{ 'account.gift.link'|trans|title }}</a></li>
+		<li><a href="{{ path("bm2_site_payment_invite") }}">{{ 'account.invite.link'|trans|title }}</a></li>
+	</ul>
+
+</div>
+
+<hr class="spacer">
+<h3>{{ 'account.credits.history'|trans|title }}</h3>
+<table>
+	<thead><tr>
+		<th>(type)</th>
+		<th>(date)</th>
+		<th>(credits)</th>
+	</tr></thead>
+	<tbody>
+	{% for credhist in app.user.credithistory %}
+		<tr>
+			<td>{{ credhist.type }}</td>
+			<td>{{ credhist.ts|date }}</td>
+			<td align="right">{{ credhist.credits }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

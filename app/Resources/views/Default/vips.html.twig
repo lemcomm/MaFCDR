@@ -1,0 +1,32 @@
+{% set biglogo = true %}
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'vip.title'|trans }}</h2>
+<p>{{ "vip.intro"|trans|raw }}</p>
+
+{% set last = 0 %}
+{% for vip in vips %}
+	{% if vip.vip_status != last %}
+		{% if last != 0 %}
+			</ul></div>
+		{% endif %}
+		{% if vip.vip_status == 30 %}
+			<div class="vip_column"><img src="{{ asset('bundles/bm2site/images/vip-immortal.png') }}"/>
+		{% elseif vip.vip_status == 20 %}
+			<div class="vip_column"><img src="{{ asset('bundles/bm2site/images/vip-legend.png') }}"/>
+		{% else %}
+			<div class="vip_column"><img src="{{ asset('bundles/bm2site/images/vip-hero.png') }}"/>
+		{% endif %}
+		<ul>
+		{% set last = vip.vip_status %}
+	{% endif %}
+	<li>{{ vip.display_name }}</li>
+{% endfor %}
+{% if last != 0 %}
+	</ul></div>
+{% endif %}
+
+<br class="clear" />
+
+{% endblock %}

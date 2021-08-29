@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.gift.title'|trans|title }}</h2>
+{% if error is defined %}
+	<p>{{ ('account.gift.error.'~error)|trans }}</p>
+{% elseif success is defined %}
+	<p>{{ 'account.gift.success'|trans({"%credits%":credits})|raw }}</p>
+{% else %}
+	<p>{{ 'account.gift.intro'|trans|raw }}</p>
+
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}

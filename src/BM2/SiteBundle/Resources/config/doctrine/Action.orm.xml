@@ -20,6 +20,7 @@
 
 		<many-to-one field="target_realm" target-entity="Realm"/>
 		<many-to-one field="target_settlement" target-entity="Settlement" inversed-by="related_actions"/>
+		<many-to-one field="target_place" target-entity="Place" inversed-by="related_actions"/>
 		<many-to-one field="target_character" target-entity="Character"/>
 		<many-to-one field="target_soldier" target-entity="Soldier"/>
 		<many-to-one field="target_entourage_type" target-entity="EntourageType"/>

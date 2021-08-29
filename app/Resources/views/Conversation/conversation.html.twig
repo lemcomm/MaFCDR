@@ -1,0 +1,95 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
+
+{% include "Conversation/single_menu.html.twig" with {"conversation": conversation, "active": active} %}
+
+{% if local is not defined %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": false, "manager": manager} %}
+{% else %}
+	{% include "Conversation/one_conversation.html.twig" with {"messages": messages, "conversation": conversation, "local": local, "archive": false, "manager": manager} %}
+{% endif %}
+
+<div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
+	{% if local is not defined %}
+		{% include "Conversation/syntax.html.twig" %}
+		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
+	{% endif %}
+</div>
+
+{% include "Conversation/single_menu.html.twig" with {"conversation": conversation, "active": active} %}
+
+{% endblock %}
+
+{% block jquery %}
+
+realmselect($("#realmsearch"), realmchange);
+settlementselect($("#settlementsearch"), settlementchange);
+charselect($("#charactersearch"), characterchange);
+
+{% include "element/autocomplete.js.twig" %}
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("message_reply_content").selectionStart;
+	var textAreaTxt = $("#message_reply_content").val();
+	$("#message_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+}
+
+function realmchange(id, name) {
+	search_insert("[r:"+id+"]");
+}
+function settlementchange(id, name) {
+	search_insert("[s:"+id+"]");
+}
+function characterchange(id, name) {
+	search_insert("[c:"+id+"]");
+}
+
+$("#syntaxhelp").click(function(){
+	$("#help").toggle();
+});
+
+$("#replydialog").dialog({
+	autoOpen: false,
+	width: "65%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+
+$(".cmsg_conversation").on("click", "button.topicreply", function(){
+	var id = $(this).data('id');
+	replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", id);
+});
+
+$(".cmsg_conversation").on("click", "button.reply", function(){
+	var id = $(this).closest('.cmsg_message').data('id');
+	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", {{ conversation.id }}, id);
+});
+
+function replyform(title, conversation, reply_to, ) {
+	$("#replydialog").dialog("option", "title", title);
+	$("#message_reply_topic").parent().hide();
+	$("#replydialog").dialog("open");
+	$("#message_reply_conversation").val(conversation);
+	$("#message_reply_reply_to").val(reply_to);
+	$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
+}
+
+var request;
+var target;
+
+$("#oldmessages").hide();
+var old_visible = false;
+$("#hidetoggle").click(function(){
+	if (old_visible) {
+		$("#hidetoggle").html("{{ 'conversation.old.show'|trans({},"conversations") }}");
+		$("#oldmessages").hide("blind", 1200);
+		old_visible = false;
+	} else {
+		$("#hidetoggle").html("{{ 'conversation.old.hide'|trans({},"conversations") }}");
+		$("#oldmessages").show("blind", 1200);
+		old_visible = true;
+	}
+});
+{% endblock %}

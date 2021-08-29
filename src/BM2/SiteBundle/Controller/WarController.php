@@ -2,17 +2,25 @@
 
 namespace BM2\SiteBundle\Controller;
 
-use BM2\SiteBundle\Entity\War;
-use BM2\SiteBundle\Entity\WarTarget;
-use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\BattleGroup;
-use BM2\SiteBundle\Form\WarType;
+use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
+use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\Siege;
+use BM2\SiteBundle\Entity\War;
+use BM2\SiteBundle\Entity\WarTarget;
+
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\BattleParticipateType;
 use BM2\SiteBundle\Form\DamageFeatureType;
+use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\LootType;
-use BM2\SiteBundle\Form\EntityToIdentifierTransformer;
+use BM2\SiteBundle\Form\SiegeType;
+use BM2\SiteBundle\Form\SiegeStartType;
+use BM2\SiteBundle\Form\WarType;
+
 use BM2\SiteBundle\Service\History;
 
 use Doctrine\ORM\EntityRepository;
@@ -31,19 +39,23 @@ class WarController extends Controller {
 
 	/**
 	  * @Route("/view/{id}")
-	  * @Template
 	  */
 	public function viewAction(War $id) {
-		return array('war'=>$id);
+
+		return $this->render('War/view.html.twig', [
+			'war'=>$id
+		]);
 	}
 
 	/**
 	  * @Route("/declare/{realm}")
-	  * @Template
 	  */
 	public function declareAction(Realm $realm, Request $request) {
 		$this->get('dispatcher')->setRealm($realm);
 		$character = $this->get('dispatcher')->gateway('hierarchyWarTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$war = new War;
 /*
 		$me = array();
@@ -55,7 +67,7 @@ class WarController extends Controller {
 		$me = array($realm->getId());
 
 		$form = $this->createForm(new WarType($me), $war);
-		$form->handleRequest($request);	
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($war);
@@ -102,91 +114,577 @@ class WarController extends Controller {
 			$em->flush();
 			return $this->redirectToRoute('bm2_site_war_view', array('id'=>$war->getId()));
 		}
-		return array('form'=>$form->createView());
-	}
 
+		return $this->render('War/declare.html.twig', [
+			'form'=>$form->createView()
+		]);
+	}
 
 	/**
 	  * @Route("/settlement/defend")
-	  * @Template
 	  */
 	public function defendSettlementAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryDefendSettlementTest', true);
-
 		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
 			->add('submit', 'submit', array(
 				'label'=>'military.settlement.defend.submit',
 				))
 			->getForm();
-
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$act = new Action;
 			$act->setType('settlement.defend')->setCharacter($character)->setTargetSettlement($settlement);
 			$act->setBlockTravel(false);
-			$result = $this->get('action_resolution')->queue($act);
-			return array('settlement'=>$settlement, 'result'=>$result);
+			$result = $this->get('action_manager')->queue($act);
+
+			#TODO: Turn this into a flash and redirect.
+
+			return $this->render('War/defendSettlement.html.twig', [
+				'settlement'=>$settlement, 'result'=>$result
+			]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+
+		return $this->render('War/defendSettlement.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
 	}
 
 	/**
-	  * @Route("/settlement/attack")
-	  * @Template
+	  * @Route("/place/defend")
 	  */
-	public function attackSettlementAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackSettlementTest', true);
-
-		// TODO: also allow attack on travel destination
-
-		$result=false;
-		$builder = $this->createFormBuilder();
-		$wars = array();
-		foreach ($settlement->getWarTargets() as $target) {
-			if ($character->findRealms()->contains($target->getWar()->getRealm())) {
-				$wars[] = $target->getWar()->getId();
-			}
-		}
-		if ($wars) {
-			$builder->add('war', 'entity', array(
-				'label'=>'military.settlement.attack.war',
-				'translation_domain'=>'actions',
-				'required'=>true,
-				'class'=>'BM2SiteBundle:War', 'choice_label'=>'summary', 'query_builder'=>function(EntityRepository $er) use ($wars) {
-					return $er->createQueryBuilder('w')->where('w IN (:wars)')->setParameters(array('wars'=>$wars));
-				}
-			));
-		}
-		$builder->add('submit', 'submit', array('label'=>'military.settlement.attack.submit', 'translation_domain'=>'actions'));
-		$form = $builder->getForm();
-
+	public function defendPlaceAction(Request $request) {
+		list($character, $settlement, $place) = $this->get('dispatcher')->gateway('militaryDefendPlaceTest', true, null, true);
+		$form = $this->createFormBuilder(null, array('translation_domain'=>'actions'))
+			->add('submit', 'submit', array(
+				'label'=>'military.place.defend.submit',
+				))
+			->getForm();
 		$form->handleRequest($request);
 		if ($form->isValid()) {
-			$em = $this->getDoctrine()->getManager();
-			$data = $form->getData();
-			$result = $this->get('action_resolution')->createBattle($character, $settlement);
-			if (isset($result['battle']) && isset($data['war'])) {
-				$target->setAttacked(true);
-				$this->get('history')->logEvent(
-					$data['war'],
-					'event.war.settlement',
-					array('%link-settlement%'=>$settlement->getId()),
-					History::LOW, true
-				);
-				$data['war']->addRelatedBattle($result['battle']);
-				$result['battle']->setWar($data['war']);
-			}
-			$em->flush();
+			$act = new Action;
+			$act->setType('place.defend')->setCharacter($character)->setTargetPlace($place);
+			$act->setBlockTravel(false);
+			$result = $this->get('action_manager')->queue($act);
+
+			#TODO: Convert to flash and redirect.
+
+			return $this->render('War/defendPlace.html.twig', [
+				'place'=>$settlement, 'result'=>$result
+			]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView(), 'result'=>$result);
+
+		return $this->render('War/defendPlace.html.twig', [
+			'place'=>$place, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/siege")
+	  * @Route("/siege/")
+	  * @Route("/siege/place")
+	  * @Route("/siege/place/{place}", requirements={"place"="\d+"}, name="maf_war_siege_place")
+	  */
+	public function siegeAction(Request $request, Place $place = null) {
+		# Security check.
+		list($character, $settlement) = $this->get('dispatcher')->gateway(false, true, false);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		if ($place) {
+			$nearby = $this->get('geography')->findPlacesInActionRange($character);
+			if ($nearby === null || ($nearby !== null && !in_array($place, $nearby))) {
+				$place = null; # Nice try.
+			}
+		}
+		if ($place) {
+			$settlement = null;
+		}
+		if ($action = $request->query->get('action')) {
+			$action = $request->query->get('action');
+		} else {
+			$action = 'select';
+		}
+		$siege = null;
+		if($settlement && $settlement->getSiege()) {
+			$siege = $settlement->getSiege();
+		} elseif($place && $place->getSiege()) {
+			$siege = $place->getSiege();
+		}
+		if($siege) {
+			switch($action) {
+				case 'leadership':
+					$character = $this->get('dispatcher')->gateway('militarySiegeLeadershipTest', false, true, false, $siege);
+					break;
+				/*
+				case 'build':
+					$character = $this->get('dispatcher')->gateway('militarySiegeBuildTest', false, true, false, $siege);
+					break;
+				*/
+				case 'assault':
+					$character = $this->get('dispatcher')->gateway('militarySiegeAssaultTest', false, true, false, $siege);
+					break;
+				case 'disband':
+					$character = $this->get('dispatcher')->gateway('militarySiegeDisbandTest', false, true, false, $siege);
+					break;
+				case 'leave':
+					$character = $this->get('dispatcher')->gateway('militarySiegeLeaveTest', false, true, false, $siege);
+					break;
+				/* TODO: Make suicide runs possible.
+				case 'attack':
+					$character = $this->get('dispatcher')->gateway('militarySiegeAttackTest', false, true, false, $siege);
+					break;
+				case 'joinattack':
+					$character = $this->get('dispatcher')->gateway('militarySiegeJoinAttackTest', false, true, false, $siege);
+					break;
+				*/
+				case 'joinsiege':
+					$character = $this->get('dispatcher')->gateway('militarySiegeJoinSiegeTest', false, true, false, $siege);
+					break;
+				case 'assume':
+					$character = $this->get('dispatcher')->gateway('militarySiegeAssumeTest', false, true, false, $siege);
+					break;
+				case 'select':
+				default:
+					$character = $this->get('dispatcher')->gateway('militarySiegeGeneralTest', false, true, false, $siege);
+					break;
+			}
+		} elseif (!$place) {
+			$character = $this->get('dispatcher')->gateway('militarySiegeSettlementTest');
+		} else {
+			$character = $this->get('dispatcher')->gateway('militarySiegePlaceTest', false, true, false, $place);
+		}
+
+		# Prepare other variables.
+		$leader = null; #TODO: Do we actually use this at all?
+		# Prepare entity manager referencing.
+		$em = $this->getDoctrine()->getManager();
+
+		# Figure out if we're in a siege already or not. Build appropriate form.
+		if ($siege) {
+			if ($siege->getSettlement()) {
+				$already = TRUE;
+				$form = $this->createForm(new SiegeType($character, $settlement, $siege, $action));
+			} else {
+				$already = TRUE;
+				$form = $this->createForm(new SiegeType($character, $place, $siege, $action));
+			}
+		} else {
+			$already = FALSE;
+			$realms = $character->findRealms();
+			$wars = [];
+			foreach ($realms as $realm) {
+				foreach($realm->getWars() as $war) {
+					$wars[] = $war;
+				}
+			}
+			$form = $this->createForm(new SiegeStartType($realms, $wars));
+		}
+
+		$form->handleRequest($request);
+		if ($form->isSubmitted() && $form->isValid()) {
+			$data = $form->getData();
+			# Figure out which form is being submitted.
+			if ($request->request->has('siegestart')) {
+				# For new sieges, this is easy, if not long. Mostly, we just need to make the siege, battle groups, and the events.
+				$siege = new Siege;
+				$em->persist($siege);
+				if ($data['war']) {
+					$siege->setWar($data['war']);
+					$siege->setRealm($data['war']->getRealm());
+				} elseif ($data['realm']) {
+					$siege->setRealm($data['realm']);
+				}
+				$siege->setStage(1);
+				if ($data['confirm'] && $settlement) {
+					$place = FALSE;
+					$siege->setSettlement($settlement);
+					$settlement->setSiege($siege);
+					$encirclement = intval($settlement->getFullPopulation()/3); #1/3 of population returned as flat integer (no decimals)
+					$count = 0;
+					foreach ($character->getUnits() as $unit) {
+						$count += $unit->getActiveSoldiers()->count();
+					}
+					if ($count >= $encirclement) {
+						$siege->setEncircled(TRUE);
+					} else {
+						$siege->setEncircled(FALSE);
+					}
+					$siege->setEncirclement($encirclement);
+					$maxstages = 1; # No defense, no siege, thus if we have a siege, we always have atleast one stage. This means we have at least a Palisade.
+					if($settlement->hasBuildingNamed('Wood Wall')) {
+						$maxstages++; # It may be a wall of sticks for the most part, but it's still *something*.
+					}
+					if($settlement->hasBuildingNamed('Wood Castle')) {
+						$maxstages++; # A small citadel, just big enough to offer a last ditch defense.
+					}
+					if($settlement->hasBuildingNamed('Fortress')) {
+						$maxstages++; # Think "curtain wall".
+					}
+					if($settlement->hasBuildingNamed('Citadel')) {
+						$maxstages++; # At this point, our castle has a large, enclosed compound of it's own, usually built at the same strength as the primary walls.
+					}
+					$siege->setMaxStage($maxstages); # Assuming we have everything, this will max out at 5.
+				} elseif ($data['confirm'] && $place) {
+					$settlement = FALSE;
+					$siege->setPlace($place);
+					$siege->setEncircled(TRUE); #For now, sieges always encircle places.
+					$place->setSiege($siege);
+					$siege->setMaxStage(1);
+				}
+				$em->flush(); # We need this flushed in order to link to it below.
+
+				if ($settlement) {
+					$this->get('history')->logEvent(
+						$settlement,
+						'event.settlement.besieged',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				} elseif ($place) {
+					$this->get('history')->logEvent(
+						$place,
+						'event.place.besieged',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, false, 60
+					);
+				}
+
+				# TODO: combine this code with the code in action resolution for battles so we have less code duplication.
+				# setup attacker (i.e. me)
+				$attackers = new BattleGroup;
+				$attackers->setSiege($siege);
+				$attackers->setAttackingInSiege($siege);
+				$attackers->addCharacter($character);
+				$attackers->setLeader($character);
+				$attackers->setAttacker(true);
+				$siege->addGroup($attackers);
+				$siege->setAttacker($attackers);
+				$em->persist($attackers);
+
+				# setup defenders
+				$defenders = new BattleGroup;
+				$defenders->setSiege($siege);
+				$defenders->setAttacker(false);
+				$siege->addGroup($defenders);
+				$em->persist($defenders);
+
+				# create character action
+				$act = new Action;
+				if ($settlement) {
+					$act->setType('military.siege')
+						->setCharacter($character)
+						->setTargetSettlement($settlement)
+						->setTargetBattlegroup($attackers)
+						->setCanCancel(false)
+						->setBlockTravel(true);
+				} elseif ($place) {
+					$act->setType('military.siege')
+						->setCharacter($character)
+						->setTargetPlace($place)
+						->setTargetBattlegroup($attackers)
+						->setCanCancel(false)
+						->setBlockTravel(true);
+				}
+				$this->get('action_manager')->queue($act);
+
+				$character->setTravelLocked(true);
+
+				if ($settlement) {
+					# add everyone who has a "defend settlement" action set
+					foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_settlement' => $settlement->getId(), 'type' => 'settlement.defend')) as $defender) {
+						$defenders->addCharacter($defender->getCharacter());
+
+						$act = new Action;
+						$act->setType('military.siege')
+							->setCharacter($defender->getCharacter())
+							->setTargetBattlegroup($defenders)
+							->setStringValue('forced')
+							->setCanCancel(true)
+							->setBlockTravel(true);
+						$this->get('action_manager')->queue($act);
+
+						# notify
+						$this->get('history')->logEvent(
+							$defender->getCharacter(),
+							'resolution.defend.success2', array(
+								"%link-settlement%"=>$settlement->getId(),
+								"%link-character%"=>$character->getId()
+							),
+							History::HIGH, false, 25
+						);
+						$defender->getCharacter()->setTravelLocked(true);
+					}
+				} elseif ($place) {
+					# add everyone who has a "defend place" action set
+					foreach ($em->getRepository('BM2SiteBundle:Action')->findBy(array('target_place' => $place->getId(), 'type' => 'place.defend')) as $defender) {
+						$defenders->addCharacter($defender->getCharacter());
+
+						$act = new Action;
+						$act->setType('military.siege')
+							->setCharacter($defender->getCharacter())
+							->setTargetBattlegroup($defenders)
+							->setStringValue('forced')
+							->setCanCancel(true)
+							->setBlockTravel(true);
+						$this->get('action_manager')->queue($act);
+
+						# notify
+						$this->get('history')->logEvent(
+							$defender->getCharacter(),
+							'resolution.defend.success3', array(
+								"%link-place%"=>$settlement->getId(),
+								"%link-character%"=>$character->getId()
+							),
+							History::HIGH, false, 25
+						);
+						$defender->getCharacter()->setTravelLocked(true);
+					}
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+			} else {
+				# Either request doesn't have AreYouSureType or data['sure'] did not equal true.
+				if($data['action'] != 'selected') {
+					# if action is not already selected that means we shouldn't be here yet, rereoute the user to whatever action is.
+					switch($data['action']){
+						case 'leadership':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'leadership'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leadership'));
+							}
+							break;
+						case 'build':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'build'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'build'));
+							}
+							break;
+						case 'assault':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'assault'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assault'));
+							}
+							break;
+						case 'disband':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'disband'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'disband'));
+							}
+							break;
+						case 'leave':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'leave'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'leave'));
+							}
+							break;
+						/*
+						case 'attack':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'attack'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'attack'));
+							}
+							break;
+						case 'joinattack':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'joinattack'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinattack'));
+							}
+							break;
+							*/
+						case 'joinsiege':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'joinsiege'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'joinsiege'));
+							}
+							break;
+						case 'assume':
+							if ($place) {
+								return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'assume'));
+							} else {
+								return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'assume'));
+							}
+							break;
+					}
+				} else {
+					# Selection dependent siege management, engage!
+					# This only engages if we've already got action set to "selected", so we start looking at what subaction we're processing.
+					switch($data['subaction']) {
+						case 'leadership':
+							if (($siege->getAttacker()->getLeader() == $character || $siege->getDefender()->getLeader() == $character) && $data['subaction'] == 'leadership' && $data['newleader']) {
+								# We already know they're *a* leader, now to figure out what group they lead.
+								#TODO: Later when we add more sides to a battle, we'll need to expand this.
+								if ($siege->getAttacker()->getCharacters()->contains($character)) {
+									$group = $siege->getAttackers();
+								} else {
+									$group = $siege->getDefender();
+								}
+								$group->setLeader($data['newleader']);
+								$em->flush();
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
+							} else {
+								throw $this->createNotFoundException('error.notfound.change');
+							}
+							break;
+						case 'build':
+							# Start constructing siege equipment!
+							if ($siege->getAttacker()->getCharacters()->contains($character) && data['subaction'] == 'build') {
+								$this->get('war_manager')->buildSiegeTools($data['type'], $data['quantity']);
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
+							}
+						case 'assault':
+							# We're either attackers assaulting or defenders sortieing! Battle type (assault vs sortie) is figured out by WarMan based on which group is passed as the attacker.
+							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'assault') {
+								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							} else if ($siege->getDefender()->getLeader() == $character && $data['subaction'] == 'assault') {
+								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getDefender(), $siege->getAttacker());
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							} else {
+								throw $this->createNotFoundException('error.notfound.leader');
+							}
+							break;
+						case 'disband':
+							# Stop the siege.
+							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'disband' && $data['disband'] == TRUE) {
+								$this->get('war_manager')->disbandSiege($siege, $character);
+								return $this->redirectToRoute('bm2_actions');
+							} else {
+								throw $this->createNotFoundException('error.notfound.change');
+							}
+							break;
+						case 'leave':
+							# Leave the siege.
+							if ($siege->getAttacker()->getLeader() == $character) {
+								# Leaders can't leave, though we may change this in the future. They must transfer leadership first, or just cancel the siege.
+								throw $this->createNotFoundException('error.notfound.areleader');
+							} else {
+								# Leave siege will remove the siege action and add a regroup action, as well as remove them from the siege battelgroup they're in.
+								$this->get('war_manager')->leaveSiege($character, $siege);
+								return $this->redirectToRoute('bm2_actions');
+							}
+							break;
+						/* I'm very mixed on whether or not to allow this. I'll leave this here for now though, since it should be functional.
+						case 'attack':
+							# Suicide run.
+							if ($data['action'] == 'attack') {
+								# Now, figure out if this character is part of defenders or attackers...
+								if ($siege->getAttacker()->getCharacters()->contains($character)) {
+									# An attacker is going solo, let createBattle make his group on the fly.
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, null, $siege->getDefender());
+								} else {
+									# Someone is sortieing solo, brave of them. That makes the "defenders" in this case, the besiegers.
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, null, $siege->getAttacker());
+								}
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							}
+							break;
+						case 'joinattack':
+							# Join someone else's suicide run.
+							if ($data['subaction'] == 'joinattack' && $data['target']) {
+								#TODO
+								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
+							}
+							break;
+						No attack, no joinattack. */
+						case 'joinsiege':
+							# Join an ongoing siege.
+							if ($data['subaction'] == 'joinsiege' && $data['side']) {
+								if($data['side'] == 'attackers') {
+									# User wants to join the attackers...
+									$side = $siege->getAttacker();
+									$side->addCharacter($character);
+									$character->addBattleGroup($side);
+								} elseif ($data['side'] == 'defenders') {
+									# User wants to join the defenders...
+									$side = $siege->getDefender();
+									$side->addCharacter($character);
+									$character->addBattleGroup($side);
+								}
+								$em->flush(); # So we can reference it below.
+								if ($side) {
+									if ($side == $siege->getAttacker() && !$siege->getEncircled()) {
+										# We aren't already encircling, check if we should now!
+										$siege->updateEncirclement();
+									}
+									# We should have a side, but just in case we don't, we don't make the action, because the user won't be able to unset this.
+									$act = new Action;
+									$act->setType('military.siege')
+										->setCharacter($character)
+										->setTargetSettlement($settlement)
+										->setTargetBattlegroup($side)
+										->setCanCancel(false)
+										->setBlockTravel(true);
+									$this->get('action_manager')->queue($act);
+								}
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
+							}
+							break;
+						case 'assume':
+							# Someone is assuming leadership.
+							if ($data['subaction'] == 'assume') {
+								# First, make sure they're in a position to actually do this.
+								#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
+								# TODO: expand this for attackers and other defenders. This is a good step 1 though.
+								if ($siege->getDefender()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
+									$siege->setLeader('defenders', $character);
+									$em->flush();
+								}
+								if ($place) {
+									return $this->redirectToRoute('maf_war_siege_place', array('place'=>$place->getId(), 'action'=>'select'));
+								} else {
+									return $this->redirectToRoute('bm2_site_war_siege', array('action'=>'select'));
+								}
+							}
+							break;
+						default:
+							# This shouldn't be possible, but just in case.
+							throw $this->createNotFoundException('error.notfound.noinput');
+							break;
+					}
+				}
+			}
+		}
+
+		return $this->render('War/siege.html.twig', [
+			'character'=>$character,
+			'settlement'=>$settlement,
+			'place'=>$place,
+			'siege'=>$siege,
+			'leader'=>$leader,
+			'action'=>$action,
+			'status'=>$action,
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/settlement/loot")
-	  * @Template
 	  */
 	public function lootSettlementAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryLootSettlementTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		if ($character->getInsideSettlement()) {
@@ -203,11 +701,14 @@ class WarController extends Controller {
 		}
 
 		$form = $this->createForm(new LootType($settlement, $em, $inside, $character->isNPC()));
-		$form->handleRequest($request);	
+		$form->handleRequest($request);
 		if ($form->isValid()) {
 
-// FIXME: shouldn't militia defend against looting?
-			$my_soldiers = $character->getActiveSoldiers()->count();
+		// FIXME: shouldn't militia defend against looting?
+			$my_soldiers = 0;
+			foreach ($character->getUnits() as $unit) {
+				$my_soldiers += $unit->getActiveSoldiers()->count();
+			}
 			$ratio = $my_soldiers / (100 + $settlement->getFullPopulation());
 			if ($ratio > 0.25) { $ratio = 0.25; }
 			if (!$inside) {
@@ -229,7 +730,7 @@ class WarController extends Controller {
 					// check if target settlement allows slaves
 					if ($data['target']->getAllowThralls()==false) {
 						$form->addError(new FormError("loot.noslaves"));
-						return array('form'=>$form->createView());						
+						return array('form'=>$form->createView());
 					}
 				}
 			}
@@ -248,7 +749,7 @@ class WarController extends Controller {
 			$complete = new \DateTime("now");
 			$complete->add(new \DateInterval("PT".$time."H"));
 			$act->setComplete($complete);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			if ($inside) {
 				$event = 'event.settlement.loot';
@@ -287,7 +788,7 @@ class WarController extends Controller {
 							} elseif ($cooldown <= -1) {
 								$mod = 0.225;
 							} elseif ($cooldown <= 0) {
-								$mod = 0.2; 
+								$mod = 0.2;
 							} elseif ($cooldown <= 6) {
 								$mod = 0.15;
 							} elseif ($cooldown <= 12) {
@@ -378,7 +879,7 @@ class WarController extends Controller {
 										if ($taken > 0) {
 											if ($follower->getSupply() < $max_supply) {
 												$items = floor($taken / $follower->getEquipment()->getResupplyCost());
-												if ($items > 0) { 
+												if ($items > 0) {
 													$follower->setSupply(min($max_supply, min($follower->getEquipment()->getResupplyCost()*$max_items, $follower->getSupply() + $items * $follower->getEquipment()->getResupplyCost() )));
 												}
 												if (!isset($result['supply'][$follower->getEquipment()->getName()])) {
@@ -459,7 +960,7 @@ class WarController extends Controller {
 						}
 						break;
  					case 'wealth':
- 						if ($character == $settlement->getOwner()) {
+ 						if ($character == $settlement->getOwner() || $character == $settlement->getSteward()) {
  							// forced tax collection - doesn't depend on soldiers so much
  							if ($ratio >= 0.02) {
  								$mod = 0.3;
@@ -532,16 +1033,20 @@ class WarController extends Controller {
 			}
 			$em->flush();
 
-			return array('result'=>$result, 'target'=>$destination);
+			return $this->render('War/lootSettlement.html.twig', [
+				'result'=>$result, 'target'=>$destination
+			]);
 		}
 
-		return array('form'=>$form->createView(), 'settlement'=>$settlement);
+		return $this->render('War/lootSettlement.html.twig', [
+			'form'=>$form->createView(), 'settlement'=>$settlement
+		]);
 	}
 
 	private function lootvalue($max) {
 		$a = max(rand(0, $max), rand(0, $max));
 		$b = max(rand(0, $max), rand(0, $max));
-		
+
 		if ($a < $b) {
 			return array($a, $b);
 		} else {
@@ -551,10 +1056,12 @@ class WarController extends Controller {
 
 	/**
 	  * @Route("/disengage")
-	  * @Template
 	  */
 	public function disengageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDisengageTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$engagements = array();
 		foreach ($character->findForcedBattles() as $act) {
@@ -593,43 +1100,47 @@ class WarController extends Controller {
 						}
 					}
 					if ($character->getActions()->exists(
-						function($key, $element) use ($bg) { 
+						function($key, $element) use ($bg) {
 							return ($element->getType() == 'military.intercepted' && $element->getTargetBattleGroup() == $bg);
 						}
 					)) {
 						$results[] = array("success"=>false, "message"=>"unavailable.intercepted");
 					} else {
-						$results[] = $this->get('action_resolution')->createDisengage($character, $bg, $action);
+						$results[] = $this->get('war_manager')->createDisengage($character, $bg, $action);
 					}
 				}
 			} else {
 				$bg = $engagements[0];
 				if ($character->getActions()->exists(
-					function($key, $element) use ($bg) { 
+					function($key, $element) use ($bg) {
 						return ($element->getType() == 'military.intercepted' && $element->getTargetBattleGroup() == $bg);
 					}
 				)) {
 					$results[] = array("success"=>false, "message"=>"unavailable.intercepted");
 				} else {
-					$results[] = $this->get('action_resolution')->createDisengage($character, $bg, $character->findForcedBattles()->first());
+					$results[] = $this->get('war_manager')->createDisengage($character, $bg, $character->findForcedBattles()->first());
 				}
 			}
 
-			return array('results'=>$results);
+			return $this->render('War/disengage.html.twig', [
+				'results'=>$results
+			]);
 		}
 
-		return array(
-			'takes'=>$this->get('action_resolution')->calculateDisengageTime($character),
+		return $this->render('War/disengage.html.twig', [
+			'takes'=>$this->get('war_manager')->calculateDisengageTime($character),
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/evade")
-	  * @Template
 	  */
 	public function evadeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryEvadeTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder()
 			->add('submit', 'submit', array('label'=>'military.evade.submit', 'translation_domain' => 'actions'))
@@ -640,21 +1151,27 @@ class WarController extends Controller {
 			$act = new Action;
 			$act->setType('military.evade')->setCharacter($character);
 			$act->setBlockTravel(false);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
-			return array('result'=>$result);
+			return $this->render('War/evade.html.twig', [
+				'result'=>$result
+			]);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('War/evade.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/block")
-	  * @Template
 	  */
 	public function blockAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryBlockTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$form = $this->createFormBuilder(null, array('attr'=>array('class'=>'wide')))
 			->add('mode', 'choice', array(
 				'required'=>true,
@@ -682,20 +1199,26 @@ class WarController extends Controller {
 				->setBlockTravel(true)
 				->setStringValue($data['mode'])
 				->setTargetListing($data['target']);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
-			return array('result'=>$result);
+			return $this->render('War/block.html.twig', [
+				'result'=>$result
+			]);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('War/block.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/damage")
-	  * @Template
 	  */
 	public function damageAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryDamageFeatureTest', false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$actdistance = $this->get('geography')->calculateInteractionDistance($character);
 		$spotdistance = $this->get('geography')->calculateSpottingDistance($character);
 
@@ -713,7 +1236,10 @@ class WarController extends Controller {
 			} else {
 				$hours = 4;
 			}
-			$men = $character->getActiveSoldiers()->count();
+			$men = 0;
+			foreach ($character->getUnits() as $unit) {
+				$men += $unit->getActiveSoldiers()->count();
+			}
 			$damage = round(rand(sqrt($men)*$hours*25, sqrt($men*2)*$hours*25)); // for 100 men, damage = 1000 - 2000 => 5-10 attacks to destroy a tower
 
 			$act = new Action;
@@ -722,7 +1248,7 @@ class WarController extends Controller {
 			$complete = new \DateTime("now");
 			$complete->add(new \DateInterval("PT".$hours."H"));
 			$act->setComplete($complete);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
 			if ($result['success'] == true) {
 				$settlement = $target->getGeoData()->getSettlement();
@@ -740,29 +1266,31 @@ class WarController extends Controller {
 				$em->flush();
 			}
 
-			return array(
+			return $this->render('War/damage.html.twig', [
 				'result' => $result,
 				'featuretype' => $target->getType(),
 				'actdistance'	=>	$actdistance,
 				'spotdistance'	=>	$spotdistance
-			);
+			]);
 		}
 
-		return array(
+		return $this->render('War/damage.html.twig', [
 			'features'		=> $features,
 			'form'			=> $form->createView(),
 			'actdistance'	=>	$actdistance,
 			'spotdistance'	=>	$spotdistance
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/nobles/attack")
-	  * @Template
 	  */
 	public function attackOthersAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryAttackNoblesTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$result = false;
 
@@ -775,34 +1303,30 @@ class WarController extends Controller {
 			if (count($data['target']) == 0) {
 				$form->addError(new FormError("attack.nobody"));
 			} else {
-				$result = $this->get('action_resolution')->createBattle($character, null, $data['target']);
+				$result = $this->get('war_manager')->createBattle($character, $character->getInsideSettlement(), null, $data['target']);
 				if ($result['outside'] && $character->getInsideSettlement()) {
 					// leave settlement if we attack targets outside
 					$character->setInsideSettlement(null);
 				}
 
-				// FIXME: incomplete - people joining later don't see this conversation!
-				//			=> it should be linked to battle, but maybe it should just be in the new message system?
-				$msg_user = $this->get('message_manager')->getMsgUser($character);
-				$recipients = array();
-				foreach ($data['target'] as $target) {
-					$recipients[] = $this->get('message_manager')->getMsgUser($target);
-				}
-				list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, 'attack by '.$character->getName(), $data['message']);
-
 				$em->flush();
 			}
 		}
 
-		return array('form'=>$form->createView(), 'result'=>$result);
+		return $this->render('War/attackOthers.html.twig', [
+			'form'=>$form->createView(),
+			'result'=>$result
+		]);
 	}
 
 	/**
 	  * @Route("/battles/aid")
-	  * @Template
 	  */
 	public function aidAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('militaryAidTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$success = false; $target = null;
@@ -828,55 +1352,47 @@ class WarController extends Controller {
 				->setCanCancel(true)
 				->setHourly(true)
 				->setBlockTravel(false);
-			$success = $this->get('action_resolution')->queue($act);
+			$success = $this->get('action_manager')->queue($act);
 			$target = $data['target'];
 		}
 
-		return array('form'=>$form->createView(), 'success'=>$success, 'target'=>$target);
+		return $this->render('War/aid.html.twig', [
+			'form'=>$form->createView(),
+			'success'=>$success,
+			'target'=>$target
+		]);
 	}
 
 	/**
 	  * @Route("/battles/join")
-	  * @Template
 	  */
 	public function battleJoinAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('militaryJoinBattleTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$success = false;
-		$nearby_battles = $this->get('geography')->findBattlesInActionRange($character);
-
-		if ($character->getInsideSettlement()) {
-			$battles = $nearby_battles;
-		} else {
-			$battles = array();
-			foreach ($nearby_battles as $b) {
-				$someone_outside = false;
-				foreach ($b['battle']->getGroups() as $group) {
-					foreach ($group->getCharacters() as $char) {
-						if ($char->getInsideSettlement() == false) {
-							$someone_outside = true;
-							break 2;
-						}
-					}
-				}
-				if ($someone_outside) {
-					$battles[] = $b;
-				}
-			}
-		}
+		$battles = $this->get('geography')->findBattlesInActionRange($character);
 
 		$form = $this->createForm(new BattleParticipateType($battles));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
+			$character->setInsideSettlement(NULL);
 			if (isset($data['group'])) {
-				$this->get('military')->joinBattle($character, $data['group']);
+				$this->get('war_manager')->joinBattle($character, $data['group']);
 				$this->getDoctrine()->getManager()->flush();
 				$success = $data['group']->getBattle();
 			}
 		}
 
-		return array('battles'=>$battles, 'now'=>new \DateTime("now"), 'form'=>$form->createView(), 'success'=>$success);
+		return $this->render('War/battleJoin.html.twig', [
+			'battles'=>$battles,
+			'now'=>new \DateTime("now"),
+			'form'=>$form->createView(),
+			'success'=>$success
+		]);
 	}
 
 }

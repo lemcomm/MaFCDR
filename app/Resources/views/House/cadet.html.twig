@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+        <h2>{{ 'house.cadet.name'|trans({"%house1%":house.name,"%house2%":myHouse.name}, "politics")|title }}</h2>
+        <p>{{ 'house.cadet.intro'|trans({},"politics")|raw }}</p>
+
+        <div class="fullwidth texts">
+        {{ form_start(form) }}
+        {{ form_errors(form) }}
+        	<h4>{{ "house.cadet.subject.name"|trans({}, "politics") }}</h4>
+        	{{ "house.cadet.subject.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.subject) }}
+
+        	<h4>{{ "house.cadet.text.name"|trans({}, "politics") }}</h4>
+        	{{ "house.cadet.text.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.text) }}
+
+        	<h4>{{ "house.cadet.sure.name"|trans({}, "politics") }}</h4>
+        	{{ "house.cadet.sure.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.sure) }}
+        <br /><br />{{ form_end(form) }}
+        </div>
+
+{% endblock %}

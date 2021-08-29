@@ -1,0 +1,22 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "control.culture.name"|trans({},"actions")|title }}</h2>
+	{% if result is defined %}
+		<p>
+		{% if result.success %}
+			{% if result.immediate %}
+				{{ "control.culture.success"|trans({"%culture%":('culture.'~culture)|trans},"actions")|raw }}
+			{% else %}
+				{{ "control.culture.queued"|trans({"%culture%":('culture.'~culture)|trans},"actions")|raw }}
+			{% endif %}
+		{% else %}
+			{{ result.message|trans({},"actions") }}
+		{% endif %}
+		</p>
+	{% else %}
+		<p>{{ "control.culture.intro"|trans({"%type%":settlement.getType|trans, "%current%":settlement.culture|trans},"actions")|raw }}</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

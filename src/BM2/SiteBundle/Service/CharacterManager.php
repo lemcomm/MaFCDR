@@ -8,11 +8,11 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Partnership;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\User;
-use Calitarus\MessagingBundle\Service\MessageManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -21,23 +21,25 @@ class CharacterManager {
 
 	protected $em;
 	protected $appstate;
-	protected $military;
+	protected $milman;
 	protected $history;
 	protected $politics;
 	protected $realmmanager;
-	protected $messagemanager;
+	protected $convman;
 	protected $dm;
+	protected $warman;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, History $history, Military $military, Politics $politics, RealmManager $realmmanager, MessageManager $messagemanager, DungeonMaster $dm) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
-		$this->military = $military;
+		$this->milman = $milman;
 		$this->politics = $politics;
 		$this->realmmanager = $realmmanager;
-		$this->messagemanager = $messagemanager;
+		$this->convman = $convman;
 		$this->dm = $dm;
+		$this->warman = $warman;
 	}
 
 
@@ -190,7 +192,7 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
 		// remove all votes
@@ -199,11 +201,14 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+		foreach ($character->getUnits() as $unit) {
+			$this->milman->returnUnitHome($unit, 'death', $character);
+		}
+		foreach($character->getMarshallingUnits() as $unit) {
+			$unit->setMarshal(null);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// remove all claims
@@ -290,7 +295,7 @@ class CharacterManager {
 		// dead men are free - TODO: but a notice to the captor would be in order - unless he is the killer (no need for redundancy)
 
 		foreach ($character->getVassals() as $vassal) {
-			if ($vassal->getEstates() || $vassal->getPositions()) {
+			if ($vassal->getOwnedSettlements() || $vassal->getPositions()) {
 				$this->history->logEvent(
 					$vassal,
 					'event.character.liegedied',
@@ -321,7 +326,7 @@ class CharacterManager {
 				$killer,
 				'event.character.killgold',
 				array("%link-character%"=>$character->getId(), "%gold%"=>$character->getGold()),
-				History::MEDIUM, false, 20 
+				History::MEDIUM, false, 20
 			);
 		}
 		$character->setGold(0);
@@ -345,29 +350,49 @@ class CharacterManager {
 		}
 
 		if ($heir) {
-			foreach ($character->getEstates() as $estate) {
-				$this->bequeathEstate($estate, $heir, $character, $via);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->bequeathEstate($settlement, $heir, $character, $via);
 			}
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
+			foreach ($character->getOwnedPlaces() as $place) {
+				$this->bequeathPlace($place, $heir, $character, $via);
+			}
 		} else {
-			foreach ($character->getEstates() as $estate) {
-				$this->failInheritEstate($character, $estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->failInheritEstate($character, $settlement);
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
 			}
+			foreach ($character->getOwnedPlaces() as $place) {
+				$this->failInheritPlace($character, $place);
+			}
+		}
+		foreach ($character->getStewardingSettlements() as $settlement) {
+			$settlement->setSteward(null);
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.stewarddeath',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
 		}
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the retire method below, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
 			$inheritor = false;
 			$difhouse = false;
-			if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+			if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
+				# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
-			} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+			} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
+				$character->getSuccessor()->getHouse() == $character->getHouse() OR (
+					$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
+				)
+			)) {
 				$inheritor = true;
 				$successor = $character->getSuccessor();
 				if ($successor->getHouse() != $character->getHouse()) {
@@ -400,13 +425,22 @@ class CharacterManager {
 					$house->setSuperior($successor->getHouse());
 					$successor->setHouse($house);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner($successor);
+					$this->history->logEvent(
+						$house,
+						'event.place.inherited.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
-					if ($best === null) {
+					if ($best === null && $member != $character) {
 						$best = $member;
 					}
-					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate() && $member != $character) {
 						$best = $member;
 					}
 				}
@@ -420,6 +454,7 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				} else {
+					$house->setActive(false);
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.death',
@@ -427,9 +462,17 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner(null);
+					$this->history->logEvent(
+						$house,
+						'event.place.abandoned.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
-		
 
 		// close all logs except my personal one
 		foreach ($character->getReadableLogs() as $log) {
@@ -439,12 +482,12 @@ class CharacterManager {
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
-		
+
 
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
 
-		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+		$this->convman->removeAllConversations($character);
 
 		return true;
 	}
@@ -477,15 +520,18 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getSoldiers() as $soldier) {
-			$this->military->disband($soldier, $character);
+		foreach ($character->getUnits() as $unit) {
+			$this->milman->returnUnitHome($unit, 'retire', $character);
+		}
+		foreach($character->getMarshallingUnits() as $unit) {
+			$unit->setMarshal(null);
 		}
 		foreach ($character->getEntourage() as $entourage) {
-			$this->military->disbandEntourage($entourage, $character);
+			$this->milman->disbandEntourage($entourage, $character);
 		}
 
 		// FIXME: Since they're not dead, do they lose their claims still? Hm.
-		/* 
+		/*
 		foreach ($character->getSettlementClaims() as $claim) {
 			if ($claim->getEnforceable()) {
 				// TODO: enforceable claims are inherited
@@ -493,7 +539,7 @@ class CharacterManager {
 			$claim->getSettlement()->removeClaim($claim);
 			$character->removeSettlementClaim($claim);
 			$this->em->remove($claim);
-		} 
+		}
 		*/
 
 		// assigned troops now can't be reclaimed anymore, as character is retired
@@ -533,7 +579,7 @@ class CharacterManager {
 		}
 
 		foreach ($character->getVassals() as $vassal) {
-			if ($vassal->getEstates() || $vassal->getPositions()) {
+			if ($vassal->getOwnedSettlements() || $vassal->getPositions()) {
 				$this->history->logEvent(
 					$vassal,
 					'event.character.liegeretired',
@@ -563,30 +609,44 @@ class CharacterManager {
 		// TODO: check for realm laws and decide if inheritance allowed
 
 		if ($heir) {
-			foreach ($character->getEstates() as $estate) {
-				$this->bequeathEstate($estate, $heir, $character, $via);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->bequeathEstate($settlement, $heir, $character, $via);
 			}
 
 			foreach ($character->getVassals() as $vassal) {
 				$this->updateVassal($vassal, $heir, $character, $via);
 			}
 		} else {
-			foreach ($character->getEstates() as $estate) {
-				$this->failInheritEstate($character, $estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$this->failInheritEstate($character, $settlement);
 			}
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
 			}
+		}
+		foreach ($character->getStewardingSettlements() as $settlement) {
+			$settlement->setSteward(null);
+			$this->history->logEvent(
+				$settlement,
+				'event.settlement.stewardretire',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true
+			);
 		}
 		if ($character->getHeadOfHouse()) {
 			#TODO: Make this it's own method on this page, and call it from GameRunner as well to process there and from the kill method above, with switch on event firing for different circumstances.
 			$house = $character->getHeadOfHouse();
 			$inheritor = false;
 			$difhouse = false;
-			if ($character->getHeadOfHouse()->getSuccessor() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
+			if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
+				# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 				$inheritor = true;
 				$successor = $character->getHeadOfHouse->getSuccessor();
-			} else if ($character->getSuccessor() && !$character->getSuccessor()->getRetired() && !$character->getSuccessor()->getSlumbering() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
+			} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
+				$character->getSuccessor()->getHouse() == $character->getHouse() OR (
+					$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
+				)
+			)) {
 				$inheritor = true;
 				$successor = $character->getSuccessor();
 				if ($successor->getHouse() != $character->getHouse()) {
@@ -619,13 +679,22 @@ class CharacterManager {
 					$house->setSuperior($successor->getHouse());
 					$successor->setHouse($house);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner($successor);
+					$this->history->logEvent(
+						$house,
+						'event.place.inherited.death',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			} else {
 				$best = null;
 				foreach ($house->findAllActive() as $member) {
-					if ($best === null) {
+					if ($best === null && $member != $character) {
 						$best = $member;
 					}
-					if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
+					if ($member->getHouseJoinDate() < $best->getHouseJoinDate() && $member != $character) {
 						$best = $member;
 					}
 				}
@@ -639,6 +708,7 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				} else {
+					$house->setActive(false);
 					$this->history->logEvent(
 						$house,
 						'event.house.collapsed.retire',
@@ -646,26 +716,35 @@ class CharacterManager {
 						History::ULTRA, true
 					);
 				}
+				if ($home = $house->getHome()) {
+					$home->setOwner(null);
+					$this->history->logEvent(
+						$house,
+						'event.place.abandoned.retire',
+						array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
 
 		// FIXME: Do we want to close logs for a character that could come back?
-		/* 
+		/*
 		foreach ($character->getReadableLogs() as $log) {
 			if ($log != $character->getLog()) {
 				$this->history->closeLog($log, $character);
 			}
-		} 
+		}
 		*/
 
 		// TODO: permission lists - plus clear out those of old dead characters!
-		
+
 
 		// clean out dungeon stuff
 		$this->dm->retireDungeoneer($character);
 		$character->setRetiredOn(new \DateTime("now"));
 
-		$this->messagemanager->leaveAllConversations($this->messagemanager->getMsgUser($character));
+		$this->convman->leaveAllConversations($character);
 
 		return true;
 	}
@@ -697,46 +776,109 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->military->removeCharacterFromBattlegroup($character, $bg);
+			$this->war_manager->removeCharacterFromBattlegroup($character, $bg);
 		}
 		$captor = $character->getPrisonerOf();
 		$character->setLocation($captor->getLocation());
 		$character->setInsideSettlement($captor->getInsideSettlement());
 	}
 
-	public function bequeathEstate(Settlement $estate, Character $heir, Character $from, Character $via=null) {
-		$this->politics->changeSettlementOwner($estate, $heir);
+	public function bequeathEstate(Settlement $settlement, Character $heir, Character $from, Character $via=null) {
+		$this->politics->changeSettlementOwner($settlement, $heir);
 
-		$this->history->closeLog($estate, $from);
-		$this->history->openLog($estate, $heir);
+		$this->history->closeLog($settlement, $from);
+		$this->history->openLog($settlement, $heir);
 
 		// Note that this CAN leave a character the lord of estates in seperate realms.
 		if ($from == $via || $via == null) {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inherit.estate',
-				array('%link-settlement%'=>$estate->getId(), '%link-character%'=>$from->getId()),
+				array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$from->getId()),
 				HISTORY::HIGH, true
 			);
 		} else {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inheritvia.estate',
-				array('%link-settlement%'=>$estate->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				array('%link-settlement%'=>$settlement->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
 				History::HIGH, true
 			);
 		}
 		$this->history->logEvent(
-			$estate, 'event.settlement.inherited',
+			$settlement, 'event.settlement.inherited',
 			array('%link-character%'=>$from->getId()),
 			History::HIGH, true
 		);
 	}
 
-	private function failInheritEstate(Character $character, Settlement $estate) {
-		$this->politics->changeSettlementOwner($estate, null);
+	private function failInheritEstate(Character $character, Settlement $settlement) {
+		$this->politics->changeSettlementOwner($settlement, null);
 		$this->history->logEvent(
-			$estate, 'event.settlement.inherifail',
+			$settlement, 'event.settlement.inherifail',
+			array('%link-character%'=>$character->getId()),
+			HISTORY::HIGH, true
+		);
+
+	}
+
+	public function bequeathPlace(Place $place, Character $heir, Character $from, Character $via=null) {
+		$oldowner = $place->getOwner();
+		if ($oldowner) {
+			$oldowner->removeOwnedPlace($settlement);
+		}
+		if ($heir) {
+			$heir->addOwnedPlace($settlement);
+		}
+		$place->setOwner($heir);
+		foreach ($place->getPermissions() as $perm) {
+			$place->removePermission($perm);
+			$this->em->remove($perm);
+		}
+
+		$this->history->closeLog($place, $from);
+		$this->history->openLog($place, $heir);
+
+		// Note that this CAN leave a character the lord of estates in seperate realms.
+		if ($from == $via || $via == null) {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inherit.place',
+				array('%link-place%'=>$settlement->getId(), '%link-character%'=>$from->getId()),
+				HISTORY::HIGH, true
+			);
+		} else {
+			$this->history->logEvent(
+				$heir,
+				'event.character.inheritvia.place',
+				array('%link-place%'=>$settlement->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				History::HIGH, true
+			);
+		}
+		$this->history->logEvent(
+			$place,
+			'event.place.inherited',
+			array('%link-character%'=>$from->getId()),
+			History::HIGH, true
+		);
+	}
+
+	private function failInheritPlace(Character $character, Place $place) {
+		$oldowner = $place->getOwner();
+		if ($oldowner) {
+			$oldowner->removeOwnedPlace($settlement);
+		}
+		if ($character) {
+			$character->addOwnedPlace($settlement);
+		}
+		$place->setOwner(null);
+		foreach ($place->getPermissions() as $perm) {
+			$place->removePermission($perm);
+			$this->em->remove($perm);
+		}
+		$this->politics->changeSettlementOwner($place, null);
+		$this->history->logEvent(
+			$place, 'event.place.inherifail',
 			array('%link-character%'=>$character->getId()),
 			HISTORY::HIGH, true
 		);
@@ -750,8 +892,8 @@ class CharacterManager {
 
 	public function findHeir(Character $character, Character $from=null) {
 		// NOTE: This should match the implemenation on GameRunner.php
-		if (!$from) { 
-			$from = $character; 
+		if (!$from) {
+			$from = $character;
 		}
 
 		if ($this->seen->contains($character)) {
@@ -852,18 +994,18 @@ class CharacterManager {
 			);
 		}
 	}
-	
+
 	public function failInheritPosition(Character $character, RealmPosition $position, $why='death') {
 		if ($why == 'death') {
 			$this->history->logEvent(
-				$position->getRealm(), 
+				$position->getRealm(),
 				'event.position.death',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
 			);
 		} else if ($why == 'slumber') {
 			$this->history->logEvent(
-				$position->getRealm(), 
+				$position->getRealm(),
 				'event.position.inactive',
 				array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$position->getId()),
 				History::LOW, true
@@ -1014,6 +1156,30 @@ class CharacterManager {
 	public function checkReturnability(Character $character) {
 		if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days < 7) {
 			throw new AccessDeniedHttpException('error.noaccess.notreturnable');
+		}
+	}
+
+	public function updateAllegiance(Character $character, Realm $realm = null, Place $place, Settlement $settlement = null, RealmPosition $position = null) {
+		if ($realm) {
+			$character->setRealm($realm);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition(null);
+		} elseif ($place) {
+			$character->setRealm(null);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace($place);
+			$character->setLiegePosition(null);
+		} elseif ($settlement) {
+			$character->setRealm(null);
+			$character->setLiegeLand($settlement);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition(null);
+		} elseif ($position) {
+			$character->setRealm(null);
+			$character->setLiegeLand(null);
+			$character->setLiegePlace(null);
+			$character->setLiegePosition($position);
 		}
 	}
 

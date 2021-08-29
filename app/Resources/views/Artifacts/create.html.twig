@@ -1,0 +1,16 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+<h2>{{ "artifact.create.title"|trans|title }}</h2>
+<p>{{ "artifact.create.limit"|trans({"%amount%":app.user.artifactslimit})|raw }}</p>
+
+{% if limit_reached is defined %}
+	You have reached the maximum number of artifacts you can create.<br />
+	In the future, you will be able to purchase additional artifacts for your account.
+{% else %}
+	<p>{{ "artifact.create.intro"|trans|raw }}</p>
+	{{ form(form, {'attr': {'class':'wide'}}) }}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'control.description.settlement.name'|trans({},"actions")|title }}</h2>
+	<p>{{ 'control.description.settlement.help'|trans({},"actions")|raw }}</p>
+	<form class="wide" action="{{ path('bm2_site_settlement_description', {'id':settlement.id}) }}" method="post"
+		{{ form_widget(form) }}
+		<button name="submit">{{ 'buttons.submit'|trans({},"places") }}</button>
+	</form>
+{% endblock %}

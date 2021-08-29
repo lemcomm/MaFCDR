@@ -18,27 +18,36 @@ class CharacterTransformer implements DataTransformerInterface {
 		if (null === $character) {
 			return "";
 		}
-
-		return $character->getName();
+		# This originally just returned the name, but we need to proof this against people with duplicate names. This returns "Name (ID: #)".
+		return $character->getListName();
 	}
 
-	public function reverseTransform($name) {
-		if (!$name) {
+	public function reverseTransform($input) {
+		if (!$input) {
 			return null;
 		}
-		
-		$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
-		
+		# First strip it of all non-numeric characters and see if we can find a character.
+		$id = preg_replace('/(?:[^123456790]*)/', '', $input);
+		if ($id) {
+			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$id, 'alive' => TRUE));
+		} else {
+			# Presumably, that wasn't an ID. Assume it's just a name. Strip out parantheses and numbers.
+			$name = trim(preg_replace('/(?:[123456790()]*)/', '', $input));
+			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
+		}
+
 		if (!$character) {
+			# There's a few ways this could happen. No matching name, malformed input (someone messing with the preformatted ones), or no matching ID.
 			return null;
 		}
-		
+		/*
 		if (null === $character) {
 			throw new TransformationFailedException(sprintf(
 				'Character named "%s" does not exist!',
 				$name
 			));
 		}
+		*/
 
 		return $character;
 	}

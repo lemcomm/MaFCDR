@@ -25,15 +25,18 @@ error:
 
 
 area:
- cave:	    	cave
- wild:		    wilderness
- ruin:		    ruin
- dungeon:	  dungeon
+ cave:      cave
+ wild:      wilderness
+ ruin:      ruin
+ dungeon:   dungeon
  lab:       labyrinth
  citadel:   citadel
  hold:      bandit hold
  glade:     infested glade
  roguefort: mortal fortress
+ flooded:   flooded town
+ mausoleum: mausoleum
+ shipgrave: ship graveyard
 
 areaintro:
  cave: >
@@ -59,7 +62,7 @@ areaintro:
    monsters that appear to have made it their home. Surely, even with all the fiends patrolling it, it must have something
    of worth within it's monster filled halls.
  hold: >
-   When you approached this palce, you were fairly certain the local authorities had built it, but now that you're closer
+   When you approached this place, you were fairly certain the local authorities had built it, but now that you're closer
    you can be quite certain that it's been taken over by a local brigand and his gang.
  glade: >
    When you imagine a glade, you don't normally expect it to be filled to the brim with monsters. But here you are, in a

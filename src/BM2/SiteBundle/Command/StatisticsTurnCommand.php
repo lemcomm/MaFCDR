@@ -28,6 +28,8 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 		$cycle = $this->getContainer()->get('appstate')->getCycle();
 		$economy = $this->getContainer()->get('economy');
 		$debug = $input->getOption('debug');
+		$oneWeek = new \DateTime("-1 week");
+		$twoDays = new \DateTime("-2 days");
 
 		if ($debug) { $output->writeln("gathering global statistics..."); }
 		$global = new StatisticGlobal;
@@ -35,13 +37,20 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u');
 		$global->setUsers($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
+		$query->setParameters(['time'=>$oneWeek]);
 		$global->setActiveUsers($query->getSingleScalarResult());
+		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.lastLogin >= :time');
+		$query->setParameters(['time'=>$twoDays]);
+		$global->setReallyActiveUsers($query->getSingleScalarResult());
 		// FIXME: this is hardcoded, but it could be made better by calling payment_manager and checking which levels have fees
 		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 10');
 		$global->setPayingUsers($query->getSingleScalarResult());
 		$query = $em->createQuery('SELECT count(distinct u.id) FROM BM2SiteBundle:User u JOIN u.payments p');
 		$global->setEverPaidUsers($query->getSingleScalarResult());
+		$query = $em->createQuery('SELECT count(distinct u.id) FROM BM2SiteBundle:User u JOIN u.patronizing p WHERE p.status = :active');
+		$query->setParameters(['active'=>'active_patron']);
+		$global->setActivePatrons($query->getSingleScalarResult());
 
 		$query = $em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Character c');
 		$global->setCharacters($query->getSingleScalarResult());
@@ -74,14 +83,14 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 		$query = $em->createQuery('SELECT count(r.id) FROM BM2SiteBundle:Realm r WHERE r.active = true AND r.superior IS NULL');
 		$global->setMajorRealms($query->getSingleScalarResult());
 
-		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s WHERE s.training_required = 0 AND s.base IS NULL');
+		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s JOIN s.unit u WHERE s.training_required = 0 AND u.character IS NOT NULL');
 		$global->setSoldiers($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s WHERE s.training_required = 0 AND s.base IS NOT NULL');
+		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s JOIN s.unit u WHERE s.training_required = 0 AND u.character IS NULL');
 		$global->setMilitia($query->getSingleScalarResult());
 		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s WHERE s.training_required > 0');
 		$global->setRecruits($query->getSingleScalarResult());
-		$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s WHERE s.offered_as IS NOT NULL');
-		$global->setOffers($query->getSingleScalarResult());
+		#$query = $em->createQuery('SELECT count(s.id) FROM BM2SiteBundle:Soldier s WHERE s.offered_as IS NOT NULL');
+		$global->setOffers(0);
 
 		$query = $em->createQuery('SELECT count(e.id) FROM BM2SiteBundle:Entourage e');
 		$global->setEntourage($query->getSingleScalarResult());
@@ -105,14 +114,23 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 				$militia = 0;
 				$nobles = $realm->findMembers();
 
-				foreach ($territory as $estate) {
-					$population += $estate->getFullPopulation();
-					$militia += $estate->getMilitia()->count();
+				foreach ($territory as $settlement) {
+					$population += $settlement->getFullPopulation();
+					foreach($settlement->getUnits() as $unit) {
+						if ($unit->isLocal()) {
+							$militia += $unit->getActiveSoldiers()->count();
+						}
+					}
+					foreach ($settlement->getDefendingUnits() as $unit) {
+						$militia += $unit->getActiveSoldiers()->count();
+					}
 				}
 
 				$players = array();
 				foreach ($nobles as $noble) {
-					$soldiers += $noble->getLivingSoldiers()->count();
+					foreach ($noble->getUnits() as $unit) {
+						$soldiers += $unit->getActiveSoldiers()->count();
+					}
 					$players[$noble->getUser()->getId()] = true;
 				}
 
@@ -159,7 +177,16 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 			$stat->setRealm($settlement->getRealm());
 			$stat->setPopulation($settlement->getPopulation());
 			$stat->setThralls($settlement->getThralls());
-			$stat->setMilitia($settlement->getMilitia()->count());
+			$militia = 0;
+			foreach($settlement->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					$militia += $unit->getActiveSoldiers()->count();
+				}
+			}
+			foreach ($settlement->getDefendingUnits() as $unit) {
+				$militia += $unit->getActiveSoldiers()->count();
+			}
+			$stat->setMilitia($militia);
 			$stat->setStarvation($settlement->getStarvation());
 			$stat->setWarFatigue($settlement->getWarFatigue());
 
@@ -171,7 +198,7 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 				$resource_stats[$resource->getName()]['supply'] += $supply;
 				$resource_stats[$resource->getName()]['demand'] += $demand;
-			}		
+			}
 
 			$em->persist($stat);
 
@@ -210,5 +237,3 @@ class StatisticsTurnCommand extends ContainerAwareCommand {
 
 
 }
-
-

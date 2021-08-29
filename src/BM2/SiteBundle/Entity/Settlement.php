@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -66,12 +66,21 @@ class Settlement {
 	}
 
 	public function getFullPopulation() {
-		return $this->population + $this->thralls + $this->soldiers->count();
+		$soldiers = 0;
+		foreach ($this->units as $unit) {
+			$soldiers += $unit->getSoldiers()->count();
+		}
+		return $this->population + $this->thralls + $soldiers;
 	}
 
-	public function getTimeToTake(Character $taker, $attackers=-1, $additional_defenders=0) {
-		if ($attackers == -1) {
-			$attackers = $taker->getActiveSoldiers()->count();
+	public function getTimeToTake(Character $taker, $supporters = null, $opposers = null) {
+		$supportCount = 1;
+		$opposeCount = 1;
+		if ($supporters) {
+			$supportCount = $supporters->count();
+		}
+		if ($opposers) {
+			$opposeCount = $opposers->count();
 		}
 		$enforce_claim = false;
 		foreach ($this->getClaims() as $claim) {
@@ -90,27 +99,23 @@ class Settlement {
 			$time_to_take *= 0.2;
 		}
 
-		// militia automatically opposes
-		$defenders = $this->countDefenders();
-		if ($defenders > 0) {
-			// inactive lords don't have much support from the local militia
-			if ($this->getOwner() && $this->getOwner()->getSlumbering()) {
-				$defenders *= 0.25;
-			}
-			$time_to_take *= 1 + sqrt($defenders);
-		}
-
-		$defenders += $additional_defenders;
-		$mod = ($defenders+10) / ($attackers+10);
-		if ($mod < 1.0) {
-			$mod = sqrt($mod);
-		}
-
 		// inactive lord = half time, in addition to the change above (which also includes inactive ones)
-		if ($this->getOwner() && $this->getOwner()->getAlive() && $this->getOwner()->getSlumbering()) {
-			$mod *= 0.5;
+		if ($owner = $this->getOwner() && $this->getOwner()->getAlive()) {
+			if ($this->getOwner()->getSlumbering()) {
+				$mod = 0.5;
+			} else {
+				if ($opposers && $opposers->countains($owner)) {
+					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
+				} else {
+					$mod = 10;
+				}
+			}
 		}
 		$time_to_take *= $mod;
+
+		$ratio = ($opposeCount/$supportCount);
+
+		$time_to_take *= $ratio;
 
 		return round($time_to_take);
 	}
@@ -142,61 +147,6 @@ class Settlement {
 		}
 	}
 
-	public function getMilitia() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isMilitia());
-			}
-		);
-	}
-	public function getActiveMilitia() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isActive() && $entry->isMilitia());
-			}
-		);
-	}
-	public function getRecruits() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isRecruit());
-			}
-		);
-	}
-
-	public function getActiveMilitiaByType() {
-		return $this->getSoldiersByType(true, true);
-	}
-	public function getMilitiaByType($active_only=false) {
-		return $this->getSoldiersByType(true, false);
-	}
-	public function getRecruitsByType() {
-		return $this->getSoldiersByType(false, false);
-	}
-
-	public function getSoldiersByType($militia=true, $active_only=false) {
-		$data = array();
-		if ($militia) {
-			if ($active_only) {
-				$soldiers = $this->getActiveMilitia();
-			} else {
-				$soldiers = $this->getMilitia();
-			}			
-		} else {
-			$soldiers = $this->getRecruits();
-		}
-		foreach ($soldiers as $soldier) {
-			$type = $soldier->getType();
-			if (isset($data[$type])) {
-				$data[$type]++;
-			} else {
-				$data[$type] = 1;
-			}
-		}
-		return $data;
-	}
-
-
 	public function findDefenders() {
 		// anyone with a "defend settlement" action who is nearby
 		$defenders = new ArrayCollection;
@@ -210,10 +160,17 @@ class Settlement {
 
 	public function countDefenders() {
 		$defenders = 0;
+		$militia = 0;
 		foreach ($this->findDefenders() as $char) {
-			$defenders += $char->getActiveSoldiers()->count();
+			foreach ($char->getUnits() as $unit) {
+				$defenders += $unit->getActiveSoldiers()->count();
+			}
 		}
-		$militia = $this->getActiveMilitia()->count();
+		foreach ($this->getUnits() as $unit) {
+			if ($unit->isLocal()) {
+				$militia += $unit->getActiveSoldiers()->count();
+			}
+		}
 		return $militia + $defenders;
 	}
 
@@ -259,7 +216,7 @@ class Settlement {
 	public function isFortified() {
 		$walls = $this->getBuildings()->filter(
 			function($entry) {
-				if (!$entry->isActive()) return false;
+				if (!$entry->isActive() && abs($entry->getCondition())/$entry->getType()->getBuildHours() < 0.3) return false;
 				return in_array($entry->getType()->getName(), array('Palisade', 'Wood Wall', 'Stone Wall'));
 			}
 		);
@@ -300,7 +257,7 @@ class Settlement {
 	}
 	public function getBuildingWorkers() {
 		return round($this->getBuildingWorkersPercent() * $this->getPopulation());
-	}	
+	}
 	public function getFeatureWorkersPercent($force_recalc=false) {
 		if ($force_recalc) $this->assignedFeatures=-1;
 		if ($this->assignedFeatures==-1) {
@@ -340,44 +297,5 @@ class Settlement {
 		if ($this->countDefenders()>0) return true;
 		return false;
 	}
-	/* Leftover code from when we were planning to make settlements subordinate to each other.
-	Doing this would make calculating region resources and the like a literal pain, as we'd have to add a bunch of conditions
-	that help the game determine if the settlement is supposed to have resources or not.
-	
-	The better idea is to make places entirely NOT settlements, and have them operate on separate code.
-	
-	public function getMinorSettlementWorkers($include_me=true) {
-		$total;
-		# $include_me set to true will include the settlement we're looking at. 
-		if ($include_me) {
-			$total += round($this->getBuildingWorkers() * $this->getPopulation());
-			foreach ($settlement->getInferiors() as $minor) {
-				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
-			}
-		} else {
-			foreach ($settlement->getInferiors() as $minor) {
-				$total += round($minor->getBuildingWorkersPercent() * $minor->getPopulation());
-			}
-		}
-		return $total;
-	}
-	
-	public function getMinorSettlementWorkersPercent($include_me=true) {
-		$total;
-		if ($include_me) {
-			$total += $this->getBuildingWorkersPercent();
-			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
-				$total =+ $minor->getBuildingWorkersPercent();
-			}
-		} else {
-			foreach ($settlement->findSuperior()->getInferiors() as $minor) {
-				$total =+ $minor->getBuildingWorkersPercent();
-			}
-		}
-		return $total;
-	}
-	
-	*/
-
 	
 }

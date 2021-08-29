@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/chosen.jquery.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/chosen.css') }}" />
+{% endblock %}
+
+{% block content %}
+<h2>{{ "military.war.name"|trans({},"actions")|title }}</h2>
+<p>{{ "military.war.description"|trans({},"actions") }}</p>
+
+<p><em>Attention: This feature is currently experimental and incomplete.</em></p>
+
+{{ form(form) }}
+
+{% endblock %}
+
+{% block jquery %}
+$("#war_targets").chosen();
+{% endblock %}

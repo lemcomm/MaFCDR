@@ -1,0 +1,79 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.sub.title'|trans|title }}</h2>
+<p>{{ 'account.sub.summary'|trans({"%myfee%":myfee, "%mylevel%":('account.level.'~app.user.accountlevel)|trans, "%until%":app.user.paiduntil|date('dateformat'|trans)})|raw }}</p>
+<p>{{ 'account.sub.description'|trans({"%url%":concepturl})|raw }}</p>
+
+<div id="leveldetails_wrapper">
+{% for i,level in levels %}
+	{% set creator = level.creator %}
+	{% if (level.selectable and not level.patreon) or (level.creator and sublevel[creator] is defined and sublevel[creator] >= level.patreon) %}
+		<div id="level_{{ i }}" data-index="{{i}}" class="leveldetails{% if i == app.user.accountlevel %} active{% endif %}{% if level.fee - refund > app.user.credits or not level.selectable %} disabled{% endif %}">
+			<h3>{{ ('account.level.'~i)|trans }}</h3>
+			<dl>
+				<dt>{{ 'account.level.limit'|trans}}</dt>
+				<dd>{{ level.characters }}</dd>
+				<dt>{{ 'account.level.cpm'|trans}}</dt>
+				<dd>{{ level.fee }}</dd>
+				<dt>{{ 'account.level.firstmonth'|trans}}</dt>
+				<dd>{{ level.fee - refund }}</dd>
+			</dl>
+		</div>
+	{% endif %}
+{% endfor %}
+</div>
+
+{{ form_start(form) }}
+	<span class="hidden">{{ form_widget(form) }}</span>
+	<button>{{ 'account.sub.submit'|trans }}</button>
+</form>
+
+<h3>{{ 'account.patreon.title'|trans|title}}</h3>
+{{ 'account.patreon.info'|trans|raw }}
+<p>
+<table>
+	<thead>
+		<tr>
+			{% for each in creators %}
+				<th>
+					{{ ('account.patreon.' ~ each.creator ~ '.name') |trans }}
+				</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			{% for each in creators %}
+				<td>
+					<center>
+					<a href="https://www.patreon.com/bePatron?u=25094465" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+					----------<br />
+					<a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id={{ each.clientId }}&redirect_uri={{ each.returnUri|url_encode }}&scope=identity"><img src="{{ asset('bundles/bm2site/images/login_with_patreon.png') }}" alt="{{ ('account.patreon.' ~ each.creator ~ '.connect') |trans }}"}}</a>
+					</center>
+				</td>
+			{% endfor %}
+		</tr>
+	</tbody>
+</table>
+</p>
+<div class="footnote">
+	{{ 'account.sub.remaining'|trans({"%refund%":refund}) }}
+</div>
+
+{% endblock %}
+
+{% block jquery %}
+$("input").click(function(){
+	var sel = $(this).val();
+	$(".leveldetails").removeClass("active");
+	$("#level_"+sel).addClass("active");
+});
+$(".leveldetails").not(".disabled").click(function(){
+	var sel = $(this).attr("data-index");
+	$(".leveldetails").removeClass("active");
+	$(this).addClass("active");
+	$("input[value="+sel+"]").prop("checked");
+	$('input[value="'+sel+'"]').prop("checked", true);
+})
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ quest.summary }}</h2>
+
+	<dl>
+		<dt>location</dt>
+		<dd>{{ link(quest.home) }}</dd>
+		<dt>creator</dt>
+		<dd>{{ link(quest.owner) }}</dd>
+		<dt>description</dt>
+		<dd>{{ quest.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
+		<dt>reward</dt>
+		<dd>{{ quest.reward|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</dd>
+		<dt>clarifications</dt>
+		<dd>{% if quest.notes %}
+			{{ quest.notes|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+			{% else %}&nbsp;{% endif %}</dd>
+		<dt>status</dt>
+		<dd>
+			{% if quest.completed %}
+				(completed)
+			{% else %}
+				(not completed)
+			{% endif %}
+		</dd>
+		<dt>questers</dt>
+		<dd>
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for quester in quest.questers %}
+						<tr>
+							<td>{{ link(quester.character) }}</td>
+							<td>{{ quester.started|gametime("short") }}</td>
+							<td>
+								{% if quester.claimcompleted is null %}
+									not yet completed
+								{% else %}
+									{% if quester.confirmedcompleted is null %}
+										{% if quest.owner == character %}
+											claims completed
+											<form style="display:inline-block" method="post" action="{{ path('bm2_site_quests_confirm', {'quester':quester.id}) }}">
+												<button type="submit">confirm</button>
+											</form>
+											<form style="display:inline-block" method="post" action="{{ path('bm2_site_quests_reject', {'quester':quester.id}) }}">
+												<button type="submit">reject</button>
+											</form>
+										{% else %}
+											claims completed, but not confirmed yet
+										{% endif %}
+									{% elseif quester.confirmedcompleted == -1 %}
+										claims completed, but found to be lying
+									{% else %}
+										{% if quester.rewardreceived is null %}
+											completed, but not received reward yet
+										{% elseif quester.rewardreceived == -1 %}
+											completed, but reward refused
+										{% else %}
+											completed and rewarded
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							</td>
+							<td>{{ quester.ownercomment }}</td>
+							<td>{{ quester.questercomment }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="5">
+							(no active questers)
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</dd>
+	</dl>
+
+	{% if quest.owner == character %}
+		(owner actions)
+	{% else %}
+		{% for quester in quest.questers if quester.character == character %}
+			<form method="post" action="{{ path('bm2_site_quests_leave', {'quest':quest.id}) }}">
+				<button type="submit">abandon this quest</button>
+			</form>
+			{% if quester.claimcompleted is null %}
+				<form method="post" action="{{ path('bm2_site_quests_completed', {'quest':quest.id}) }}">
+					<button type="submit">claim you have completed the quest</button>
+				</form>
+			{% endif %}
+		{% else %}
+			<form method="post" action="{{ path('bm2_site_quests_join', {'quest':quest.id}) }}">
+				<button type="submit">accept this quest</button>
+			</form>
+		{% endfor %}
+	{% endif %}
+
+	<h3>{{ link(quest.log)|title|raw }}</h3>
+	{% include "Events/eventdata.html.twig" with { "log":quest.log, "metas":metas, "research":false} %}
+
+{% endblock %}

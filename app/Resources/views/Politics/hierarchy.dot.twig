@@ -1,0 +1,18 @@
+digraph hierarchy {
+bgcolor=transparent;
+node [color="#e69e2fa0", fontcolor=white, style="bold, rounded, filled", shape=box, fillcolor="#380e00a0"];
+edge [color=black, fontcolor=black, arrowhead="vee"];
+
+{% for char in hierarchy %}
+	{% if char.user == me.user %}
+		{% set opacity = "d0" %}
+	{% else %}
+		{% set opacity = "a0" %}
+	{% endif %}
+	{{ char.id }} [label="{{ char.name }}", fillcolor="{% if char.male %}#380e00{{opacity}}{% else %}#8c0005{{opacity}}{% endif %}", url="{{ link(char, true) }}"];
+	{% if char.liege %}
+	{{ char.liege.id }} -> {{ char.id }};
+	{% endif %}
+{% endfor %}
+
+}

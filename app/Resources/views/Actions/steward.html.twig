@@ -1,0 +1,16 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "control.steward.name"|trans({},"actions")|title }}</h2>
+
+	<p>{{ "control.steward.intro"|trans({},"actions")|raw}}</p>
+
+	{{ form_start(form) }}
+	{{ form_errors(form) }}
+
+	{{ form_row(form.target) }}<br />
+	{{ form_row(form.submit) }}
+
+	{{ form_end(form) }}
+
+{% endblock %}

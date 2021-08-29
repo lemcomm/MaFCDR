@@ -1,0 +1,88 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'participants.title'|trans({}, "conversations")|title }}</h2>
+{% if conv.realm %}
+	<p>{{ 'participants.managed'|trans({"%reference%":link(conv.realm)}, "conversations")|raw }}</p>
+{% endif %}
+<table class="participants_table">
+	<thead>
+		<tr>
+			<th>{{ 'participants.table.names'|trans({}, 'conversations')|raw }}</th>
+			<th>{{ 'participants.table.start'|trans({}, 'conversations')|raw }}</th>
+			<th>{{ 'participants.table.end'|trans({}, 'conversations')|raw }}</th>
+			<th>{{ 'participants.table.current'|trans({}, 'conversations')|raw }}</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for perm in perms %}
+		<tr>
+			<td>{{ link(perm.character) }}</td>
+			{% if active or perm.character == me %}
+				<td>{{ perm.startTime|date('Y-m-d H:i:s') }}</td>
+				<td>
+					{% if perm.endTime %}
+						{{ perm.endTime|date('Y-m-d H:i:s') }}
+					{% endif %}
+				</td>
+			{% else %}
+				<td><i>{{ 'participants.table.unknown'|trans({}, 'conversations')|raw }}</i></td>
+				<td><i>{{ 'participants.table.unknown'|trans({}, 'conversations')|raw }}</i></td>
+			{% endif %}
+			<td align="center">
+				{% if perm.owner %}
+					{{ 'participants.role.owner'|trans({}, 'conversations')|raw }}
+				{% elseif perm.manager %}
+					{{ 'participants.role.manager'|trans({}, 'conversations')|raw }}
+				{% else %}
+					{{ 'participants.role.regular'|trans({}, 'conversations')|raw }}
+				{% endif %}
+			</td>
+			{% if owner and perm.character != me and perm.active %}
+				{% if not perm.manager %}
+					<td align="center"/>
+						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.kick.help'|trans({}, "conversations") }}">{{ 'conversation.kick.label'|trans({}, "conversations") }}</button></a>
+					</td>
+				{% else %}
+					<td align="center"/>
+						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.demote.help'|trans({}, "conversations") }}">{{ 'conversation.demote.label'|trans({}, "conversations") }}</button></a>
+					</td>
+				{% endif %}
+				{% if not perm.owner %}
+				<td align="center">
+					<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'1'}) }}"><button class="convo_promote cmsg_button" title="{{ 'conversation.promote.help'|trans({}, "conversations") }}">{{ 'conversation.promote.label'|trans({}, "conversations") }}</button></a>
+				</td>
+				{% endif %}
+			{% elseif manager and perm.character != me and perm.active %}
+				{% if not perm.manager %}
+					<td align="center">
+						<a href="{{path('maf_conv_change', {"conv":conv.id, "perm":perm.id, "var":'0'}) }}"><button class="convo_demote cmsg_button" title="{{ 'conversation.kick.help'|trans({}, "conversations") }}">{{ 'conversation.kick.label'|trans({}, "conversations") }}</button></a>
+					</td>
+				{% elseif perm.owner %}
+					<td align="center">{{ 'participants.role.owner'|trans({}, 'conversations')|raw }}</td>
+				{% else %}
+					<td align="center">{{ 'participants.role.manager'|trans({}, 'conversations')|raw }}</td>
+				{% endif %}
+			{% elseif perm.character == me %}
+				<td align="center">{{ 'participants.role.self'|trans({}, 'conversations')|raw }}</td>
+			{% endif %}
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
+{% block jquery %}
+$(".participants_table").tablesorter();
+$(".participants_table").bind("sortStart",function() {
+	$(".icon-forward").remove();
+});
+
+{% endblock %}

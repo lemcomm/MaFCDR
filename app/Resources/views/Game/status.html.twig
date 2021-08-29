@@ -1,0 +1,35 @@
+{% extends "layout.html.twig" %}
+
+{% block title "BM2 Game Runner" %}
+
+{% block includes %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/ui-progress-bar.css') }}" />
+{% endblock %}
+
+{% block content %}
+<h2>Current Cycle - {{ cycle }}</h2>
+<dl>
+{% for progress in status %}
+	<dt>{{ progress.name }}</dt>
+	<dd class="progress_column">
+		<div class="progressbar" value="{{progress.percent}}">
+			<span class="progress_value_dummy">{{ progress.done }} / {{ progress.total }}</span>
+		</div>
+	</dd>
+
+{% endfor %}
+</dl>
+{% if time_spent > 0 %}
+Time spent on run: {{ (time_spent*1000)|number_format(2) }} ms
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+{% endblock %}

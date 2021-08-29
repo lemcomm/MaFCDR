@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "nearby.spy.name"|trans({},"actions")|title }}</h2>
+	{% if success is defined %}
+		<p>
+		{% if result.success %}
+			{{ "nearby.spy.success"|trans({},"actions")|raw }}
+		{% else %}
+			{{ result.message|trans({},"actions") }}
+		{% endif %}
+		</p>
+	{% else %}
+		<p>
+			{% if character.insidesettlement %}
+				{{ "nearby.spy.intro"|trans({},"actions")|raw }}
+			{% else %}
+				{{ "nearby.spy.intro2"|trans({},"actions")|raw }}
+			{% endif %}
+		</p>
+{#
+		{{ form(form) }}
+#}
+	{% endif %}
+
+{% endblock %}

@@ -12,16 +12,17 @@ _bm2_intl:
     defaults:
      _locale: en
 
-msg:
-    resource: "@MsgBundle/Resources/config/routing.yml"
-#    prefix:   /
-# should work, but doesn't
-    prefix:   /{_locale}
+fos_user_security_detect:
+    prefix:  /{_locale}
+    pattern: /detect
+    defaults: { _controller: FOSUserBundle:Security:detect }
     requirements:
-     _locale: en|de|fr|it|es|ru
-    defaults:
-     _locale: en
+        _method: GET|POST
 
+maf_patreon:
+ pattern: /payment/patreon/{creator}
+ defaults:
+  _controller: BM2SiteBundle:Payment:patreon
 
 _catcher:
  path:	/{url}
@@ -30,4 +31,3 @@ _catcher:
   url:			-
  requirements:
   url:			".+"
-

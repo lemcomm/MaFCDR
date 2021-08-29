@@ -7,17 +7,18 @@ use BM2\SiteBundle\Entity\EntourageType;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Soldier;
+use BM2\SiteBundle\Entity\Unit;
 use Doctrine\ORM\EntityManager;
 
 
 class Generator {
 
 	protected $em;
-	protected $military;
+	protected $milman;
 
-	public function __construct(EntityManager $em, Military $military) {
+	public function __construct(EntityManager $em, MilitaryManager $milman) {
 		$this->em = $em;
-		$this->military = $military;
+		$this->milman = $milman;
 	}
 
 	public function randomName(Settlement $home=null, $gender=false) {
@@ -53,25 +54,28 @@ class Generator {
 		return $name->getName();
 	}
 
-	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, Settlement $home=null, $corruption=0) {
+	public function randomSoldier(EquipmentType $weapon=null, EquipmentType $armour=null, EquipmentType $equipment=null, EquipmentType $mount=null, Settlement $home=null, $corruption=0, Unit $unit) {
 		$soldier = new Soldier;
 		$soldier->setName($this->randomName($home));
 		$soldier->setLocked(false);
 		$soldier->setRouted(false)->setHungry(0)->setWounded(0);
-		$soldier->setHasWeapon(true)->setHasArmour(true)->setHasEquipment(true);
-	
+		$soldier->setHasWeapon(true)->setHasArmour(true)->setHasEquipment(true)->setHasMount(true);
+
 		$soldier->setExperience(0)->setTraining(0);
 		if ($home) {
-			if ($this->military->acquireItem($home, $weapon, true, false)
-				&& $this->military->acquireItem($home, $armour, true, false)
-				&& $this->military->acquireItem($home, $equipment, true, false)) {
+			if ($this->milman->acquireItem($home, $weapon, true, false)
+				&& $this->milman->acquireItem($home, $armour, true, false)
+				&& $this->milman->acquireItem($home, $equipment, true, false)
+				&& $this->milman->acquireItem($home, $mount, true, false)) {
 
-				$this->military->acquireItem($home, $weapon, true);
+				$this->milman->acquireItem($home, $weapon, true);
 				$soldier->setWeapon($weapon);
-				$this->military->acquireItem($home, $armour, true);
+				$this->milman->acquireItem($home, $armour, true);
 				$soldier->setArmour($armour);
-				$this->military->acquireItem($home, $equipment, true);
+				$this->milman->acquireItem($home, $equipment, true);
 				$soldier->setEquipment($equipment);
+				$this->milman->acquireItem($home, $mount, true);
+				$soldier->setMount($mount);
 			} else {
 				return null;
 			}
@@ -79,12 +83,14 @@ class Generator {
 			$soldier->setWeapon($weapon);
 			$soldier->setArmour($armour);
 			$soldier->setEquipment($equipment);
+			$soldier->setMount($mount);
 		}
 		// this is somewhat duplicated in military->retrain, but not trivial to merge
 		$train = 10; // FIXME - shouldn't this be a global variable?
 		if ($soldier->getWeapon()) { $train += $soldier->getWeapon()->getTrainingRequired(); }
 		if ($soldier->getArmour()) { $train += $soldier->getArmour()->getTrainingRequired(); }
 		if ($soldier->getEquipment()) { $train += $soldier->getEquipment()->getTrainingRequired(); }
+		if ($soldier->getMount()) { $train += $soldier->getMount()->getTrainingRequired(); }
 
 		// effect of corruption: double corruption in training time demand % penalty
 		// so at 4% corruption, training will take 8% longer
@@ -92,7 +98,8 @@ class Generator {
 
 		$soldier->setTrainingRequired(max(1,$train));
 
-		$soldier->setHome($home)->setDistanceHome(0)->setBase($home);
+		$soldier->setHome($home)->setDistanceHome(0);
+		$soldier->setUnit($unit);
 		$soldier->setAlive(true);
 
 		$this->em->persist($soldier);

@@ -1,0 +1,239 @@
+now:        now
+
+index:
+ title:     Private Conversations
+ topic:     topic
+ messages:  messages
+ unread:    unread
+ participants:  participants
+ first:     first message
+ last:      last message
+ msg:       by %sender% on %day% (%ts%)
+ msgshort:  %day%
+ ref:       Conversations for %ref%:
+ ref2:      Private and Group Conversations:
+ localpre:  Local
+ letter:    Letter from %sender% on %day% (%ts%)
+ legacy:    Letter from %sender% on %day% (%ts%)
+ report:    Report from %sender% on %day% (%ts%)
+ orders:    Orders from %sender% on %day% (%ts%)
+ ooc:       Out of Character Message from %sender% on %day% (%ts%)
+ admin:     Message from the Game Administration, sent by %sender%, on %day% (%ts%)
+ system:    System message, sent by %sender%, on %day% (%ts%)
+ request:   Request from %sender% on %day% (%ts%)
+ rp:        Roleplay from %sender% on %day% (%ts%)
+ reply:     replying to %sender% on %day% (%ts%)
+ replies:   "Replies to this message:"
+ repliedto: %sender% on %ts%
+ conversation: Sent to "%conv%" (%i% recipients)
+ conversation2: Sent to "%conv%"
+ local: %topic% (%i% recipients)
+ viewlocal: View in Conversation
+ toomany:   It looks like you have a significant number of conversations here. Perhaps you might want to consider removing yourself from some of the older ones, potentially after exporting them?
+ private:  Private Conversations
+ org:      Organization Conversations
+
+orgs:
+ title: Organization Conversations
+
+type:
+ letter: Letter
+ report: Report
+ request: Request
+ orders: Orders
+ ooc: Out of Character
+ admin: Admin Msg
+ system: System Msg
+ rp: Roleplay
+
+summary:
+ title:		messages summary
+ new:			You have %messages% new messages in %conversations% conversations.
+ new2:    %new% new messages
+ nonew:		You have no new messages.
+ total:   You are participating in %conversations% conversations, %active% of them actively.
+ nototal: You are not participating in any conversations.
+ flagged: You have flagged %messages% messages.
+ noflagged: You have no flagged messages.
+ private: You are participating in %conversations% private conversations, %active% of them actively.
+ noprivate: You are not participating in any private conversations.
+ org: You are participating in %conversations% organization conversations, %active% of them actively.
+ noorg: You are not participating in any organization conversations.
+
+unread:
+ title:		your unread messages
+ short:   unread messages
+
+flagged:
+ title:   your flagged messages
+ short:   flagged messages
+ msg:     in <a href="%url%">%topic%</a>
+
+conversation:
+ title:		  Conversation
+ new:
+  title:		  New Private Conversation
+  title2:   New Conversation within %realm%
+  title3:   New Local Message
+  label:    Create a new private conversation
+  desc:     Start a new topic and invite participants
+ target:
+  label:  Recipients
+  choose: (select recipients)
+  local:  All Nearby
+  settlement: All in this Settlement
+  place:  All in this Place
+ reply:
+  title:		New Conversation Message
+  label:		add a message
+ topic:
+  label:		Topic
+ local:
+  title:  Local Messages for %name%
+ parent:
+  label:		sub-topic of...
+  empty:		(nothing)
+  reference: parent conversation:
+ child:
+  reference: sub-topics to this:
+ nearby:
+  label:		characters in the vicinity that you can contact
+ captor:
+  label:		send a message to your captor
+ owner:
+  label:    leave a message for the owner of the nearby settlement
+ recipients:
+  label:		existing contacts that you can include
+ create:		create new conversation
+ messages:  %total% messages, %unread% unread
+ notmember: you are not a participant
+ participants:
+  label:    %count% participants
+ leave:
+  label:    Leave Conversation
+  help:     Leave this conversation, but retain your copies of it.
+ remove:
+  label:    Remove Conversation
+  help:     Delete your copies of this conversation, leaving it if you haven't already.
+ old:
+  show:     Show Older Messages
+  hide:     Hide Old Messages
+ created:   Your message has been created. You can view it <a href="%url%">here</a>.
+ kick:
+  label:    Remove Participant
+  help:     Remove this character from the conversation.
+ demote:
+  label:    Demote Participant
+  help:     Demote this character's role in the conversation (owner to manager, or manager to participant)
+ promote:
+  label:    Promote Participant
+  help:     Promote this character from participant to manager or manager to owner.
+ removed:   You have been removed from the "%name%" conversation.
+ badremoved: You do not have access to conversation id %id%.
+ left:      You have left the conversation.
+ add:
+  label:    Add Participants
+  help:     Add one or more people to this conversation.
+ recent:    Recent Messages
+ export:
+  print:    Basic Export
+
+message:
+ content:
+  label:		Content
+  type:   Type
+ reply:
+  title:		Reply to Message
+  submit:	  send reply
+ send:      Send Message
+ new:       new
+ response:  in response to:
+ responses: responses
+ from:      message from
+ fromshort: from
+
+participants:
+ title:     Conversation Participants
+ managed:   This conversation is linked to %reference% and its participants list is automatically updated.
+ do:
+  remove:   remove this participant
+ table:
+  names:   Character Name
+  start:  Permission Start Time
+  end:    Permission End Time
+  current:   Current Role
+  unknown:  Time Unknown
+ role:
+  owner:    Owner
+  manager:  Manager
+  regular:  Participant
+  self:     This is You
+
+
+right:
+ owner:                 owner
+ participants_add:      add
+ participants_remove:   remove
+ participants_edit:     edit
+ write:                 write
+
+error:
+ noaccess:			No access rights to this information.
+ conversation:
+  noaccess:     You do not have access to this conversation.
+  noright:      You do not have the required right on this conversation.
+
+button:
+ reply:   Reply
+ split:   Split
+ show:    Show Here
+ nolocalreply: No Quick Reply
+ writereply: Write A Reply
+ remove:  Trash Message
+
+flag:
+ important:   important
+ act:         action required
+ remind:      remind later
+ keep:        keep/archive
+
+permission:
+ promoted:
+  manager:    %name% has been promoted to conversation manager.
+  owner:      %name% has been given conversation ownership rights.
+  invalid:    %name% can't be promoted past owner.
+ demoted:
+  removed:    %name% has been removed from the conversation.
+  user:       %name% has been demoted from their manager role.
+  manager:    %name% no longer has ownership rights.
+ invalidrequest:  You do not have rights to change roles for %name%.
+ nopromoteright:  You do not have rights to promote %name%.
+
+add:
+ title: Add Participants to the "%name%" Conversation
+ description: From here you can select any of your contacts to add to this conversation.
+ empty: You don't seem to have any contacts you can add. Maybe they're all already part of the conversation?
+ submit: Add Selected
+
+reply:
+ title: Write a Reply
+ intro: From here you can write a reply to the below message, included here for your convenience.
+ outro: Below, you can select your message type, formulate your response, and send it.
+
+recent:
+ unread: Unread
+ 12h: 12 Hours
+ 24h: 1 Day
+ 3d: 3 Days
+ 1w: 1 Week
+ 2w: 2 Weeks
+ 1m: 1 Month
+ 2m: 2 Months
+ 3m: 3 Months
+
+local:
+ title: Local Messages
+ desc:  Read letters from those nearby.
+ new:
+  title: New Local Message
+  desc:  You can always send a message to those around you.

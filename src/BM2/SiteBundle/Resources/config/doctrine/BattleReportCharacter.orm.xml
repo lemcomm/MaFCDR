@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\BattleReportCharacter">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="standing" type="boolean"/>
+		<field name="wounded" type="boolean"/>
+		<field name="killed" type="boolean"/>
+
+		<field name="attacks" type="integer"/>
+		<field name="kills" type="integer"/>
+		<field name="hits_taken" type="integer"/>
+		<field name="hits_made" type="integer"/>
+
+		<many-to-one field="group_report" target-entity="BattleReportGroup" inversed-by="characters"/>
+		<many-to-one field="character" target-entity="Character"/>
+		<many-to-one field="captured_by" target-entity="Character"/>
+
+	</entity>
+</doctrine-mapping>

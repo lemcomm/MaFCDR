@@ -1,0 +1,54 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "control.take.name"|trans({},"actions")|title }}</h2>
+	{% if character != settlement.owner %}
+		<p>{{ "control.take.intro"|trans({"%type%":settlement.getType|trans, "%time%":timetotake|realtime},"actions")|raw}}</p>
+		{% if limit != -1 %}<p>{{ 'control.take.limit'|trans({},"actions") }}</p>{% endif %}
+		{% if timetotake > 250000 %}
+			<div class="warning">{{ "control.take.long"|trans({},"actions") }}</div>
+		{% endif %}
+		{% if settlement.owner %}
+			{% if character.daysingame < 3 %}
+				<div class="error">{{ "control.take.newbie"|trans({"%url%":path("maf_conv_new")},"actions")|raw }}</div>
+			{% endif %}
+			<p>{{ "control.take.owned"|trans({"%owner%":link(settlement.owner)},"actions")|raw }}</p>
+			{% if settlement.isDefended %}
+				<p>{{ "control.take.defended"|trans({},"actions")|raw }}</p>
+			{% else %}
+				{% set his = settlement.owner.gender("his")|trans %}
+				<p>{{ "control.take.undefended"|trans({"%his%":his},"actions") }}</p>
+			{% endif %}
+		{% endif %}
+
+		{{ form(form) }}
+
+	{% endif %}
+
+	{% if others is not empty %}
+		<h3>{{ "control.take.others.title"|trans({},"actions")|title }}</h3>
+		<p>{{ "control.take.others.intro"|trans({},"actions")|raw }}</p>
+		<ul class="inline">
+			{% for other in others %}
+				<li>
+					{{ link(other.character) }}
+					{% set have = false %}
+					{% for opposing in other.opposingactions %}
+						{% if opposing.character == character %}{% set have = "oppose" %}{% endif %}
+					{% endfor %}
+					{% for supporting in other.supportingactions %}
+						{% if supporting.character == character %}{% set have = "support" %}{% endif %}
+					{% endfor %}
+					{% if have == "oppose" %}
+						- {{ "oppose.already"|trans({},"actions") }}
+					{% elseif have == "support" %}
+						- {{ "support.already"|trans({},"actions") }}
+					{% else %}
+						<form action="{{ path('bm2_actionsupport') }}" method="post"><input type="hidden" name="id" value="{{ other.id }}" /><button type="submit">{{ "support.submit"|trans({},"actions") }}</button></form>
+						<form action="{{ path('bm2_actionoppose') }}" method="post"><input type="hidden" name="id" value="{{ other.id }}" /><button type="submit">{{ "oppose.submit"|trans({},"actions") }}</button></form>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

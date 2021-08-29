@@ -1,0 +1,8 @@
+<div id="sd_content">
+	knight offers in {{ link(offers[0].settlement) }}:
+	<ul>
+		{% for offer in offers %}
+		<li class="offersdetailslink" data-id="{{offer.id}}">{{ offer.soldiers.count }} {{ 'npc.soldier'|transchoice(offer.soldiers.count) }}</li>
+		{% endfor %}
+	</ul>
+</div>

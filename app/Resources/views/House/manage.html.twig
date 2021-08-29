@@ -1,0 +1,32 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'house.manage.details.name'|trans({},"politics")|title }}</h2>
+<p>{{ 'house.manage.details.intro'|trans({},"politics")|raw }}</p>
+
+<div class="fullwidth texts">
+{{ form_start(form) }}
+{{ form_errors(form) }}
+<dl>
+	<h3>{{ "house.background.name.name"|trans({}, "politics") }}</h3>
+	{{ "house.background.name.desc"|trans({}, "politics")|raw }}<br />
+	{{ form_widget(form.name) }}<br />
+	<dt>
+		<h3>{{ "house.background.description.name"|trans({}, "politics") }}</h3>
+		{{ "house.background.description.desc"|trans({}, "politics")|raw }}
+	</dt>
+	<dd>{{ form_widget(form.description) }}</dd>
+	<dt>
+		<h3>{{ "house.background.private.name"|trans({}, "politics") }}</h3>
+		{{ "house.background.private.desc"|trans({}, "politics")|raw }}
+	</dt>
+	<dd>{{ form_widget(form.private) }}</dd>
+	<dt>
+		<h3>{{ "house.background.secret.name"|trans({}, "politics") }}</h3>
+		{{ "house.background.secret.desc"|trans({}, "politics")|raw }}
+	</dt>
+	<dd>{{ form_widget(form.secret) }}</dd>
+{{ form_end(form) }}
+</div>
+
+{% endblock %}

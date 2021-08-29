@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Doctrine\Common\Collections\ArrayCollection;
 
 class PaymentCommand extends ContainerAwareCommand {
 
@@ -44,7 +45,7 @@ class PaymentCommand extends ContainerAwareCommand {
 					History::MEDIUM, false, 20
 				);
 				if ($position->getRuler()) {
-					$rm->abdicate($position->getRealm(), $char, $char->getSuccessor());					
+					$rm->abdicate($position->getRealm(), $char, $char->getSuccessor());
 				}
 			}
 
@@ -57,15 +58,27 @@ class PaymentCommand extends ContainerAwareCommand {
 					History::HIGH, false, 20
 				);
 			}
-			if ($char->getLiege()) {
-				$history->logEvent(
-					$char->getLiege(),
-					'event.character.inactive.vassal',
-					array('%link-character%'=>$char->getId()),
-					History::MEDIUM, false, 20
-				);
+			if ($liege = $char->findLiege()) {
+				if ($liege instanceof ArrayCollection) {
+					foreach ($liege as $one) {
+						$history->logEvent(
+							$one,
+							'event.character.inactive.vassal',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, false, 20
+						);
+					}
+				} else {
+					$history->logEvent(
+						$liege,
+						'event.character.inactive.vassal',
+						array('%link-character%'=>$char->getId()),
+						History::MEDIUM, false, 20
+					);
+				}
+
 			}
-			foreach ($char->getVassals() as $vassal) {
+			foreach ($char->findVassals() as $vassal) {
 				$history->logEvent(
 					$vassal,
 					'event.character.inactive.liege',
@@ -96,8 +109,9 @@ class PaymentCommand extends ContainerAwareCommand {
 
 
 		$pm = $this->getContainer()->get('payment_manager');
-		list($free, $active, $credits, $expired, $storage, $banned) = $pm->paymentCycle();
+		list($free, $patron, $active, $credits, $expired, $storage, $banned) = $pm->paymentCycle();
 		$output->writeln("$free free accounts");
+		$output->writeln("$patron patron accounts");
 		$output->writeln("$storage accounts moved into storage");
 		$output->writeln("$credits credits collected from $active users");
 		$output->writeln("$expired accounts with insufficient credits");

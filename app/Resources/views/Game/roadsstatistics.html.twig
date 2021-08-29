@@ -1,0 +1,47 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.pie.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>Roads Statistics</h2>
+<div id="graph" style="width: 40em; height: 40em"></div>
+
+{% endblock %}
+
+{% block jquery %}
+var options = {
+	series: {
+		pie: {
+				innerRadius: 0.25,
+				show: true,
+				radius: 1,
+				startAngle: 0,
+				label: {
+					show: true,
+					radius: 3/4,
+					formatter: labelFormatter,
+				}
+			}
+	 },
+	 legend: {
+		  show: false
+	 }
+};
+
+var data = [
+	{% for row in data %}
+		{{ row|json_encode|raw }}{% if not loop.last %}, {% endif %}
+	{% endfor %}
+];
+
+var plot = $.plot($("#graph"), data, options );
+
+function labelFormatter(label, series) {
+	return "<div style='text-align:center; padding:0.25em 0.5em; color:white; background-color:rgba(0,0,0,0.5); border-radius: 0.25em'>" + label + "</div>";
+}
+
+{% endblock %}

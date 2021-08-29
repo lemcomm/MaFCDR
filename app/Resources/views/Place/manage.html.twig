@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'place.manage.name'|trans({},"places")|title }}</h2>
+	<p>{{ 'place.manage.intro'|trans({},"places")|raw }}</p>
+	<form class="wide" action="{{ path('maf_place_manage', {'id':place.id}) }}" method="post"
+		{{ form_widget(form) }}
+		<button name="submit">{{ 'buttons.submit'|trans({},"places") }}</button>
+	</form>
+{% endblock %}

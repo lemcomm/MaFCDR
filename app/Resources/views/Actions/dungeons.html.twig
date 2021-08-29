@@ -1,0 +1,31 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "nearby"|trans({},"dungeons")|title }}</h2>
+	<p>{{ "enter.intro"|trans({},"dungeons")|raw }}</p>
+
+	{% for dungeon in dungeons %}
+		<h3>{{ ('area.'~dungeon.dungeon.area)|trans({},"dungeons")|title }}</h3>
+		<p>{{ ('areaintro.'~dungeon.dungeon.area)|trans({},"dungeons")|raw }}</p>
+		{% if dungeon.dungeon.party.members is not empty %}
+			<p>
+				{{ "enter.others"|trans({},"dungeons") }}
+				<ul>
+					{% for other in dungeon.dungeon.party.members %}
+						<li>{{ link(other.character) }}</li>
+					{% endfor %}
+				</ul>
+			</p>
+		{% else %}
+			<p>{{ "enter.noothers"|trans({},"dungeons") }}</p>
+		{% endif %}
+		{# FIXME: only show if we can actually enter (i.e. exploration has not yet started - if it has, also different text above) #}
+		<a href="{{ path('bm2_dungeon_dungeon_enter', {'dungeon':dungeon.dungeon.id}) }}"><button>{{ 'enter.commit'|trans({}, "dungeons") }}</button></a>
+	{% endfor %}
+
+	<hr />
+	<h2>{{ "cards.title"|trans({},"dungeons")|title }}</h2>
+	<p>{{ "cards.review"|trans({},"dungeons")|raw }}</p>
+	<a href="{{ path('dungeons_cards') }}">{{ "cards.link"|trans({},"dungeons") }}</a>
+
+{% endblock %}

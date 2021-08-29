@@ -1,0 +1,50 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "events.title"|trans|title }}</h2>
+<div class="rssfeed">
+	<a href="{{ path('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}) }}">
+		<img src="{{ asset('bundles/bm2site/images/rss-icon.svg') }}" alt="RSS" />
+		{{ "rss.feed"|trans({},"communication") }}
+	</a>
+</div>
+<table id="events"><thead>
+	<tr>
+		<th>{{ 'events.log'|trans }}</th>
+		<th>{{ 'events.type'|trans }}</th>
+{#
+		<th>{{ 'events.from'|trans }}</th>
+		<th>{{ 'events.until'|trans }}</th>
+#}
+		<th>{{ 'events.events'|trans }}</th>
+		<th>{{ 'events.new'|trans }}</th>
+		<th></th>
+	</tr>
+</thead><tbody>
+{% for id,log in logs %}
+	<tr{% if log.new == 0 %} class="disabled"{% endif %}>
+		<td>{{ log.name }}</td>
+		<td>{{ log.type }}</td>
+{#
+		<td align="right">{% if meta.accessfrom %}{{ meta.accessfrom|gametime('short') }}{% endif %}</td>
+		<td align="right">{% if meta.accessuntil %}{{ meta.accessuntil|gametime('short') }}{% endif %}</td>
+#}
+		<td align="right">{{ log.events }}</td>
+		<td align="right">{% if log.new > 0 %}{{ log.new }}{% endif %}</td>
+		<td><a href="{{ path("bm2_eventlog", {'id':id}) }}">{{ 'events.read'|trans }}</a></td>
+	</tr>
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
+
+{% block jquery %}
+	$("#events").tablesorter({
+		sortList: [[1,0]],
+	});
+{% endblock %}

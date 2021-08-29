@@ -28,14 +28,16 @@ Within these phases, all actions are resolved simultaneously.
 ### Ranged Phase ###
 As the armies approach each other, archers and other ranged troops are first to open fire. They will get one volley off before melee is joined, and thus cause casualties that have no chance to ever see melee. Losses suffered to archer fire will also impact morale of the fighting troops, and if the archer fire is especially deadly, might even cause some troops to flee combat before ever entering it properly.
 
+In the final stage of some sieges (those that involve a castle of some sort) this phase will be skipped entirely.
 
 ### Melee Phase ###
 As the armies clash, melee troops engage. Soldiers attack each other, and weapons, experience, armor and other equipment (such as shields) determine how many hits are scored and how deadly they are. While complex calculations go on in the background and combat is actually simulated at the level of individual soldiers, all you need to know are the results, which are summed up in the battle report.
 
+In a field battle, the first round of the melee phase will also include a lancer charge, if there are any lancers on the field.
+
 Archers continue to fire in the melee phase, but with reduced effect as they need to aim more carefully and change targets more often in order to not hit friendly troops.
 
-Again, casulties will affect morale, and there is a good chance that the battle will be decided by one side breaking and fleeing rather than one side being completely obliterated.
-
+Again, casualties will affect morale, and there is a good chance that the battle will be decided by one side breaking and fleeing rather than one side being completely obliterated.
 
 ### Hunting Phase ###
 Once one side breaks and runs, the final phase of battle occurs - hunting them down. Troops will pursue retreating enemies to slaughter them, which in turn leads to those fleeing discarding weapons, shields, etc. in order to run faster. Casualties in the hunting phase can be quite considerable, though for game-balance reasons we do not go to the extremes of some real-world battles (the famous battle of Marathon, for example, caused 203 deaths on the greek side, and an estimated 6,400 on the persian side, most of whom were slaughtered during the retreat).
@@ -75,4 +77,3 @@ After-Battle Actions
 If anyone involved in battle had travel set, he will move a short distance (about 25% of daily travel) immediately after the battle. This represents retreat from the battlefield, orderly or not, and is also intended to prevent players from keeping their enemies stationary by enaging them in multiple small battles.
 
 Anyone in a battle will also need to regroup afterwards, during which time he cannot join or initiate new battles. The time needed to regroup depends on the number of soldiers under his command and will in most cases amount to somewhere between 30 minutes and 2 hours (real time).
-

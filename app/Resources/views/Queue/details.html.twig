@@ -1,0 +1,113 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ ("queue."~action.type)|trans({}, "actions")|title }}</h2>
+
+<div id="actiondetails"><dl>
+{% if action.complete %}
+	<dt>{{ "queue.start"|trans({}, "actions") }}</dt>
+	<dd>{{ action.started.format("r") }}</dd>
+	<dt>{{ "queue.end"|trans({}, "actions") }}</dt>
+	<dd>{{ action.complete.format("r") }}</dd>
+	<dt>{{ "queue.progress"|trans({}, "actions") }}</dt>
+	<dd class="progress_column progress_small">
+		{% if action.complete %}
+			{% set progress = ( (now.timestamp - action.started.timestamp) * 100 / (action.complete.timestamp - action.started.timestamp) ) // 1 %}
+			{% if progress > 100 %}
+				<div class="progressbar" value="100"><span class="progress_value_dummy">{{ "queue.finishing"|trans({}, "actions") }}</span></div></td>
+			{% else %}
+				<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ progress }} %</span></div></td>
+			{% endif %}
+		{% endif %}
+	</dd>
+{% endif %}
+<dt>{{ "queue.block"|trans({}, "actions") }}</dt>
+<dd>{% if action.blocktravel %}{{ 'yes'|trans }}{% else %}{{ 'no'|trans }}{% endif %}</dd>
+{% if action.targetrealm %}
+	<dt>{{ "realm"|transchoice(1) }}</dt>
+	<dd>{{ link(action.targetrealm) }}</dd>
+{% endif %}
+{% if action.targetsettlement %}
+	<dt>{{ "settlement.name"|trans }}</dt>
+	<dd>{{ link(action.targetsettlement) }}</dd>
+{% endif %}
+{% if action.targetcharacter %}
+	<dt>{{ "queue.target.character"|trans({}, "actions") }}</dt>
+	<dd>{{ link(action.targetcharacter) }}</dd>
+{% endif %}
+{% if action.targetbattlegroup %}
+	{% set group = action.targetbattlegroup %}
+	{% if group.battle %}
+		<dt>{{ "queue.target.battle"|trans({}, "actions") }}</dt>
+		<dd>{{ link(action.targetbattlegroup.battle) }}</dd>
+	{% endif %}
+	{% if group.siege %}
+		{% if group.siege.settlement %}
+			<dt>{{ "queue.target.siege.settlement"|trans({}, "actions") }}</dt>
+			<dd>{{ link(group.siege.settlement) }}</dd>
+		{% endif %}
+		{% if group.siege.place %}
+			<dt>{{ "queue.target.siege.place"|trans({}, "actions") }}</dt>
+			<dd>{{ link(group.siege.place) }}</dd>
+		{% endif %}
+	{% endif %}
+{% endif %}
+{% if action.targetlisting %}
+	<dt>{{ "queue.target.list"|trans({}, "actions") }}</dt>
+	<dd>{{ ("military.block.mode."~action.stringvalue)|trans({}, "actions") }}: <a href="{{ path('bm2_lists') }}">{{ action.targetlisting.name }}</a></dd>
+{% endif %}
+
+{% if action.supportedaction %}
+	<dt>{{ "queue.support"|trans({}, "actions") }}</dt>
+	<dd>{{ link(action.supportedaction) }}</dd>
+{% endif %}
+{% if action.opposedaction %}
+	<dt>{{ "queue.oppose"|trans({}, "actions") }}</dt>
+	<dd>{{ link(action.opposedaction) }}</dd>
+{% endif %}
+
+{% if action.supportingactions is not empty %}
+	<dt>{{ "queue.supported"|trans({}, "actions") }}</dt>
+	<dd><ul class="shortlist">
+		{% for support in action.supportingactions %}
+			<li>{{ link(support.character) }}</li>
+		{% endfor %}
+	</ul></dd>
+{% endif %}
+{% if action.opposingactions is not empty %}
+	<dt>{{ "queue.opposed"|trans({}, "actions") }}</dt>
+	<dd><ul class="shortlist">
+		{% for opposing in action.opposingactions %}
+			<li>{{ link(opposing.character) }}</li>
+		{% endfor %}
+	</ul></dd>
+{% endif %}
+
+</dl>
+
+
+{% if action.cancancel %}
+	<button type="button" id="cancelaction">{{ ("queue.cancel")|trans({}, "actions") }}</button>
+{% endif %}
+
+</div>
+
+
+
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+
+$("#cancelaction").click(function(){
+
+	$.post('{{ path("bm2_site_queue_update") }}', {'id':{{ action.id }}, 'option':'cancel'}, function(data) {
+		$("#actiondetails").html('{{ "queue.cancelled"|trans({}, "actions") }}');
+	});
+});
+
+{% endblock %}

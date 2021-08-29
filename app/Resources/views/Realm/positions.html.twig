@@ -1,0 +1,72 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+{% if positions is empty %}
+<h2>{{ 'realm.positions.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+	{{ 'realm.positions.empty'|trans({},"politics") }}
+{% else %}
+<h2>{{ 'realm.positions.active.title'|trans({},"politics")|title }}</h2>
+	{{ 'realm.positions.active.description'|trans({},"politics") }}<br />
+	<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':0}) }}">{{ 'realm.positions.new'|trans({},"politics") }}</a>
+	<dl class="long">
+		{% for position in positions %}
+			{% if not position.retired %}
+			<dt>
+				{% if position.ruler %}
+					{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
+				{% else %}
+					{{ position.name }}
+				{% endif %}
+			</dt>
+			<dd>
+				{{ position.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+				<hr />
+				{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+				<ul class="shortlist" style="display:inline">
+					{% for holder in position.holders %}
+						<li>{{ link(holder) }}</li>
+					{% else %}
+						<li>{{ 'nobody'|trans }}</li>
+					{% endfor %}
+				</ul><br />
+				{# TODO: make this a list or something #}
+				<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.manage'|trans({},"politics") }}</a>
+				-
+				<a href="{{ path('bm2_site_realm_officials', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.appoint'|trans({},"politics") }}</a>
+			</dd>
+			{% endif %}
+		{% endfor %}
+<h2>{{ 'realm.positions.retired.title'|trans({},"politics")|title }}</h2>
+	{{ 'realm.positions.retired.description'|trans({},"politics") }}<br />
+	<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':0}) }}">{{ 'realm.positions.new'|trans({},"politics") }}</a>
+		{% for position in positions %}
+			{% if position.retired %}
+			<dt>
+				{{ position.name }}
+			</dt>
+			<dd>
+				{{ position.description }}
+				<hr />
+				{{ 'realm.positions.holder'|transchoice(position.holders.count, {},"politics") }}:
+				<ul class="shortlist" style="display:inline">
+					{% for holder in position.holders %}
+						<li>{{ link(holder) }}</li>
+					{% else %}
+						<li>{{ 'nobody'|trans }}</li>
+					{% endfor %}
+				</ul><br />
+				{# TODO: make this a list or something #}
+				<a href="{{ path('bm2_site_realm_position', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.manage'|trans({},"politics") }}</a>
+				-
+				<a href="{{ path('bm2_site_realm_officials', {'realm':realm.id, 'position':position.id}) }}">{{ 'realm.positions.appoint'|trans({},"politics") }}</a>
+			</dd>
+			{% endif %}
+		{% endfor %}
+	</dl>
+{% endif %}
+
+<br />
+
+
+{% endblock %}

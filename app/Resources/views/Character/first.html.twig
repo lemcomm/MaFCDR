@@ -1,0 +1,20 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'first.title'|trans|title }}</h2>
+	{% if place.spawnDescription %}
+		<p>{{ place.spawnDescription.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
+	{% else %}
+		<p>{{ "first.intro.nodesc"|trans|raw }}</p>
+	{% endif %}
+	<hr>
+	{% if realm %}
+		{{ "first.intro.realm"|trans({"%realm%":realm.name})}}
+		{% if not realm.superior %}
+			{{ "first.intro.sovrealm"|trans({"%conv%":path("maf_conv_read", {"conv":conv.id})})|raw }}
+		{% else %}
+			{{ "first.intro.subrealm"|trans({"%conv%":path("maf_conv_read", {"conv":conv.id}), "%conv2%":path("maf_conv_read", {"conv":supConv.id})})|raw }}
+		{% endif %}
+	{% endif %}
+	<p>{{ "first.intro.final"|trans({"%manual%":path('bm2_manual'), "%discord%":"https://discord.gg/7YpAhEh"})|raw }}
+{% endblock %}

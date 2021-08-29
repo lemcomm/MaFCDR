@@ -1,0 +1,16 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "location.giveship.name"|trans({},"actions")|title }}</h2>
+	{% if success is defined %}
+		<p>
+			{{ "location.giveship.success"|trans({"%newowner%":link(newowner)},"actions")|raw }}
+		</p>
+	{% else %}
+		<p>
+			{{ "location.giveship.intro"|trans({},"actions")|raw}}
+		</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ paper.name }}</h2>
+
+	<h3>{{ "news.members"|trans({},"communication") }}</h3>
+	<table class="newseditors">
+		<thead>
+			<tr>
+				<th>{{ "character.name"|trans }}</th>
+				<th>{{ "news.owner"|trans({},"communication") }}</th>
+				<th>{{ "news.editor"|trans({},"communication") }}</th>
+				<th>{{ "news.author"|trans({},"communication") }}</th>
+				<th>{{ "news.publisher"|trans({},"communication") }}</th>
+				{% if editor.owner %}
+					<th>{{ "news.change"|trans({},"communication") }}</th>
+				{% endif %}
+			</tr>
+		</thead>
+		<tbody>
+			{% for member in paper.editors %}
+			<tr id="editor_{{ member.character.id }}">
+				<td>{{ link(member.character) }}</td>
+				<td align="center" class="is_owner">{% if member.owner %}*{% endif %}</td>
+				<td align="center" class="is_editor">{% if member.editor %}*{% endif %}</td>
+				<td align="center" class="is_author">{% if member.author %}*{% endif %}</td>
+				<td align="center" class="is_publisher">{% if member.publisher %}*{% endif %}</td>
+				{% if editor.owner %}
+					<td><button class="action_change" data-id="{{ member.character.id }}" data-name="{{ member.character.name }}" data-owner="{{ member.owner }}" data-editor="{{ member.editor }}" data-author="{{ member.author }}" data-publisher="{{ member.publisher }}">{{ "news.change"|trans({},"communication") }}</button></td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{% if editor.owner %}
+		<button id="add_member">{{ "news.addmember"|trans({},"communication") }}</button>
+		<div id="add_dialog" title="{{ "news.addmember"|trans({},"communication") }}"></div>
+
+		<div id="change_dialog">
+			<form id="changer" class="wide" action="{{ path('bm2_site_news_editorchange') }}" method="post">
+				<input type="hidden" name="paper" value="{{ paper.id }}"/>
+				<input type="hidden" id="changer_character" name="character" value=""/>
+				{{ form_widget(form) }}
+				<div id="change_del">{{ "news.delmember"|trans({},"communication") }}</div>
+				<button>{{ "news.save"|trans({},"communication") }}</button>
+			</form>
+		</div>
+	{% endif %}
+
+	<h3>{{ "news.edition"|transchoice(10, {},"communication")|title }}</h3>
+	<table>
+		<thead><tr>
+		</tr></thead>
+		<tbody>
+		{% for edition in paper.editions %}
+		<tr>
+			<td>
+			<a href="{{ path('bm2_site_news_edition', {'edition':edition.id}) }}">
+			{% if edition.collection %}
+				{{ "news.collection"|trans({},"communication")|title }}
+			{% else %}
+				{{ "news.number"|trans({"%number%":edition.number},"communication")|title }}
+			{% endif %}
+			</a>
+			</td>
+			{% if edition.collection %}
+				<td colspan="3"></td>
+			{% else %}
+				{% if edition.published %}
+					<td>{{ gametime(edition.publishedcycle, 'long') }}</td>
+					<td>{{ edition.published|date }}</td>
+					<td align="right">{{ "news.readers"|transchoice(edition.readers.count,{"%count%":edition.readers.count},"communication") }}</td>
+				{% else %}
+					<td colspan="3">({{ "news.create.unpublished"|trans({},"communication") }})</td>
+				{% endif %}
+			{% endif %}
+		</li>
+		{% endfor %}
+		</tbody>
+	</table>
+
+	{% if editor.editor %}
+	<p>
+		<a href="{{ path('bm2_site_news_createedition', {'paper':paper.id}) }}">create new edition</a>
+	</p>
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+$("#change_dialog").dialog({
+	autoOpen: false,
+	width: "40%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+$(".action_change").click(function(){
+	var id = $(this).data("id");
+	$("#changer_character").val(id);
+	$("#change_dialog").dialog("option", "title", $(this).data("name"));
+	$("#newseditor_owner").prop("checked", $(this).data("owner"));
+	$("#newseditor_editor").prop("checked", $(this).data("editor"));
+	$("#newseditor_author").prop("checked", $(this).data("author"));
+	$("#newseditor_publisher").prop("checked", $(this).data("publisher"));
+	$("#change_dialog").dialog("open");
+});
+
+var tooltips = $("#change_dialog [title]").tooltip({
+	position: {
+		my: "left+20 center",
+		at: "right center",
+		collision: "fit"
+	}
+});
+
+
+// variable to hold request
+var request;
+// bind to the submit event of our form
+$("#changer").submit(function(event){
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+	// setup some local variables
+	var $form = $(this);
+	// let's select and cache all the fields
+	var $inputs = $form.find("input, select, button, textarea");
+	// serialize the data in the form
+	var serializedData = $form.serialize();
+
+	// let's disable the inputs for the duration of the ajax request
+	$inputs.prop("disabled", true);
+
+	// fire off the request to /form.php
+	request = $.ajax({
+		url: $("#changer").attr("action"),
+		type: "post",
+		data: serializedData
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		// log a message to the console
+		console.log("Hooray, it worked!");
+		var id = $("#changer_character").val();
+		var row = $("#editor_"+id);
+
+		$(".action_change", row).data("owner", $("#newseditor_owner").prop("checked"));
+		if ($("#newseditor_owner").prop("checked")) {
+			$("td.is_owner", row).html("*");
+		} else {
+			$("td.is_owner", row).html("");
+		}
+
+		$(".action_change", row).data("editor", $("#newseditor_editor").prop("checked"));
+		if ($("#newseditor_editor").prop("checked")) {
+			$("td.is_editor", row).html("*");
+		} else {
+			$("td.is_editor", row).html("");
+		}
+
+		$(".action_change", row).data("author", $("#newseditor_author").prop("checked"));
+		if ($("#newseditor_author").prop("checked")) {
+			$("td.is_author", row).html("*");
+		} else {
+			$("td.is_author", row).html("");
+		}
+
+		$(".action_change", row).data("publisher", $("#newseditor_publisher").prop("checked"));
+		if ($("#newseditor_publisher").prop("checked")) {
+			$("td.is_publisher", row).html("*");
+		} else {
+			$("td.is_publisher", row).html("");
+		}
+
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		// log the error to the console
+		console.error(
+			"The following error occured: "+
+			textStatus, errorThrown
+		);
+	});
+
+	// callback handler that will be called regardless
+	// if the request failed or succeeded
+	request.always(function () {
+		// reenable the inputs
+		$inputs.prop("disabled", false);
+		$("#change_dialog").dialog("close");
+	});
+
+	// prevent default posting of form
+	event.preventDefault();
+});
+
+
+$("#add_dialog").dialog({
+	autoOpen: false,
+	width: "40%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+
+var is_loaded=false;
+$("#add_member").click(function(){
+	$("#add_dialog").dialog("open");
+	if (!is_loaded) {
+		is_loaded = true;
+		$("#add_dialog").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');
+		$('#add_dialog').load('{{ path("bm2_site_news_editoraddform", {"paperId":paper.id}) }}');
+	}
+});
+{% endblock %}

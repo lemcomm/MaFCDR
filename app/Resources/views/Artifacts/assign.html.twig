@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+<h3>Assign Artifact</h3>
+{{ link(artifact) }}
+{% if givento is defined %}
+	The artifact has been given to {{ link(givento) }}.
+{% else %}
+	{{ form(form) }}
+{% endif %}
+{% endblock %}

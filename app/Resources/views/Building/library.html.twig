@@ -1,0 +1,54 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "building.library.name"|trans({},"actions")|title }}</h2>
+<p>{{ "building.library.intro"|trans({"%settlement%":link(settlement)},"actions")|raw }}</p>
+
+<h3>{{ "building.library.maps.name"|trans({},"actions")|title }}</h3>
+<p>
+	<div class="mapthumb">
+	<a href="{{ path('bm2_site_building_map', {'map': 'allrealms.png'}) }}">
+		<img src="{{ path('bm2_site_building_map', {'map': 'allrealms-thumb.png'}) }}" />
+		{{ "building.library.maps.allrealms"|trans({},"actions") }}
+	</a>
+	</div>
+	<div class="mapthumb">
+	<a href="{{ path('bm2_site_building_map', {'map': '2ndrealms.png'}) }}">
+		<img src="{{ path('bm2_site_building_map', {'map': '2ndrealms-thumb.png'}) }}" />
+		{{ "building.library.maps.2ndrealms"|trans({},"actions") }}
+	</a>
+	</div>
+	<div class="mapthumb">
+	<a href="{{ path('bm2_site_building_map', {'map': 'majorrealms.png'}) }}">
+		<img src="{{ path('bm2_site_building_map', {'map': 'majorrealms-thumb.png'}) }}" />
+		{{ "building.library.maps.majorrealms"|trans({},"actions") }}
+	</a>
+	</div>
+</p>
+
+<br class="clear"/>
+
+{# add link/short intro to create publications - if you can (must check if you need to be owner) #}
+
+<h3>{{ "building.library.top.name"|trans({},"actions")|title }}</h3>
+<p>{{ "building.library.top.realms"|trans({},"actions") }}</p>
+<ol>
+	{% for realm in top_realms %}
+		<li>{{ link(realm["stat"].realm) }}</li>
+	{% endfor %}
+</ol>
+
+
+<p>{{ "building.library.top.settlements"|trans({},"actions") }}</p>
+<ol>
+	{% for settlement in top_settlements %}
+		<li>{{ link(settlement) }}</li>
+	{% endfor %}
+</ol>
+
+{% endblock %}

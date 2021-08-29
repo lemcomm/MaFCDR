@@ -1,0 +1,56 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "elections.name"|trans({}, "politics")|title }}</h2>
+<p>{{ "elections.intro"|trans({"%realm%":link(realm)}, "politics")|raw }}</p>
+
+
+<h3>{{ "elections.current"|trans({}, "politics")|title }}</h3>
+<table class="electionslist">
+	<thead>
+		<tr>
+			<th>{{ "elections.title"|trans({}, "politics") }}</th>
+			<th>{{ "elections.complete"|trans({}, "politics") }}</th>
+			<th>{{ "elections.votes"|trans({}, "politics") }}</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for election in realm.elections %}
+			<tr>
+				<td>{{ election.name }}</td>
+				{% if election.closed %}
+					<td class="closed">
+				{% else %}
+					<td>
+				{% endif %}
+					{{ election.complete|date }}
+				</td>
+				<td align="right">{{ election.votes.count }}</td>
+				<td>
+					<a href="{{ path('bm2_site_realm_vote', {'id':election.id}) }}">
+						{% if election.closed %}
+							{{ 'votes.link2'|trans({},"politics") }}
+						{% else %}
+							{{ 'votes.link'|trans({},"politics") }}
+						{% endif %}
+					</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<br />
+<hr />
+<br />
+
+<h3>{{ "elections.new"|trans({}, "politics")|title }}</h3>
+{% if nopriest %}
+	<p>{{ "elections.nopriest"|trans({}, "politics") }}</p>
+{% else %}
+	<a href="{{ path('bm2_site_realm_election', {'realm':realm.id, 'election':0}) }}">{{ 'elections.new'|trans({},"politics") }}</a>
+{% endif %}
+
+
+{% endblock %}

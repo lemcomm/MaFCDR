@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'house.manage.disown.name2'|trans({"%name%":name},"politics") }}</h2>
+	<p>{{ 'house.manage.disown.intro'|trans({"%name%":name},"politics")|raw }}</p>
+
+	{{ form_start(form) }}
+	{{ form_errors(form) }}
+	{{ form_widget(form.member) }}
+	{{ form_end(form) }}
+
+{% endblock %}

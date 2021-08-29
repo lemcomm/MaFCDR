@@ -1,0 +1,70 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "military.battles.join.name"|trans({},"actions")|title }}</h2>
+{% if success == false %}
+	<p>{{ "military.battles.join.intro"|trans({},"actions")|raw }}</p>
+
+	<form action="{{ path('bm2_site_war_battlejoin') }}" method="post">
+		{{ form_widget(form._token) }}
+
+		{% for data in battles %}
+			{% set battle = data.battle %}
+			<h2>{{ 'battle.upcoming'|trans|title }}</h2>
+			<div class="progress_column progress_small">
+				{% set progress = ( (now.timestamp - battle.started.timestamp) * 100 / (battle.complete.timestamp - battle.started.timestamp) ) // 1 %}
+				{% if progress > 100 %}
+					<div class="progressbar" value="100"><span class="progress_value_dummy">{{ "queue.fighting"|trans({}, "actions") }}</span></div></td>
+				{% else %}
+					<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ battle.complete.format("r") }}</span></div></td>
+				{% endif %}
+			</div>
+			<table class="battlereport battlejoin">
+				<tr><th colspan="{{ battle.groups|length }}"><h3>{{ 'battle.participants'|trans|title }}</h3></th></tr>
+				<tr>
+				{% for group in battle.groups %}
+					<td><ul class="shortlist">
+					{% for participant in group.characters %}
+						<li>{{ link(participant) }}</li>
+					{% endfor %}
+					</ul></td>
+				{% endfor %}
+				</tr>
+
+				<tr><th colspan="{{ battle.groups|length }}"><h3>{{ 'battle.initial'|trans|title }}</h3></th></tr>
+				<tr>
+				{% for group in battle.groups %}
+					<td valign="top"><ul>
+					{% for type,amount in group.troopssummary %}
+						<li>{{ amount }} {{ ('soldier.'~type)|transchoice(amount) }}</li>
+					{% endfor %}
+					</ul></td>
+				{% endfor %}
+				</tr>
+
+				<tr>
+				{% for group in battle.groups %}
+					<th>
+						<input id="group_{{group.id}}" value="{{group.id}}" type="radio" name="{{ form.group.vars.full_name }}">
+						<label for="group_{{group.id}}">{{ "military.battles.join.join"|trans({},"actions") }}</label>
+					</th>
+				{% endfor %}
+				</tr>
+
+			</table>
+		{% endfor %}
+		<br /><br />
+		<button type="submit">{{ "military.battles.join.submit"|trans({},"actions") }}</button>
+	</form>
+{% else %}
+	<p>{{ "military.battles.join.success"|trans({"%battle%":link(success)},"actions")|raw }}</p>
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+{% endblock %}

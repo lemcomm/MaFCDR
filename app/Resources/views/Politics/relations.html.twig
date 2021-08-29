@@ -1,0 +1,74 @@
+{% extends "layout.html.twig" %}
+
+{% macro show_partnership(character, partnership) %}
+	{% if partnership.active %}
+		{{ 'relation.text'|trans({"%type%":("relation."~partnership.type)|trans({},"politics"), "%partner%":link(partnership.otherpartner(character))},"politics")|raw }}
+	{% elseif partnership.enddate %}
+		{# past relationship, only stored for historical purposes #}
+	{% else %}
+		{% if partnership.initiator == character %}
+			{{ 'relation.proposed2'|trans({"%type%":("relation.choice."~partnership.type)|trans({},"politics"), "%partner%":link(partnership.otherpartner(character))},"politics")|raw }}
+		{% else %}
+			{{ 'relation.proposed'|trans({"%type%":("relation.choice."~partnership.type)|trans({},"politics"), "%partner%":link(partnership.otherpartner(character))},"politics")|raw }}
+		{% endif %}
+	{% endif %}
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block content %}
+{% include "element/buttonlist.html.twig" with {"list":dispatcher.relationsActions, "domain":'politics', "who":'self'} %}
+
+<div class="act">
+	<h2>{{ 'character.family'|trans|title }}</h2>
+	<div class="act_actions">
+		<a href="{{ path("bm2_site_politics_partners") }}">{{ 'partners.name'|trans({},"politics")|title }}</a>
+	</div>
+		{% if character.partnerships|length == 0 %}
+			{{ 'partners.none'|trans({},"politics") }}
+		{% elseif character.partnerships|length == 1 %}
+			{{ macros.show_partnership(character,character.partnerships.first) }}
+		{% else %}
+			{{ 'partners.several'|trans({},"politics")}}
+			<ul>
+			{% for partnership in character.partnerships %}
+				<li>{{ macros.show_partnership(character,partnership) }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+</div>
+
+<div class="act">
+	<h2>{{ 'inheritance'|trans|title }}</h2>
+	<div class="act_actions">
+		<a href="{{ path("bm2_site_politics_successor") }}">{{ 'successor.name'|trans({},"politics")|title }}</a>
+	</div>
+		<h3>{{ 'successor.name'|trans({},"politics")|title }}</h3>
+		{% if character.successor %}
+			{{ link(character.successor) }}
+		{% else %}
+			{{ 'nobody'|trans }}
+		{% endif %}
+
+		<h3>{{ 'successor.you'|trans({},"politics")|title }}</h3>
+		<ul>
+		{% for to in character.successorTo %}
+			<li>{{ link(to) }}</li>
+		{% else %}
+			<li>{{ 'nobody'|trans }}</li>
+		{% endfor %}
+		</ul>
+</div>
+
+<hr />
+
+<div class="act">
+	<h2>{{ 'lists.name'|trans({},"politics")|title }}</h2>
+	<div class="act_actions">
+		<a href="{{ path("bm2_lists") }}">{{ 'lists.name'|trans({},"politics")|title }}</a>
+	</div>
+		{{ 'lists.description'|trans({},"politics")|raw }}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'realm.new.name'|trans({},"politics")|title }}</h2>
+	<p>{{ 'realm.new.intro'|trans({},"politics")|raw }}</p>
+	<form class="wide" action="{{ path('bm2_site_realm_new') }}" method="post">
+		{{ form_widget(form) }}
+		<button name="submit">{{ 'realm.new.submit'|trans({},"politics") }}</button>
+	</form>
+
+
+{% endblock %}

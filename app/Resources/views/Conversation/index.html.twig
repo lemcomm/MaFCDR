@@ -1,0 +1,93 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% macro conversationrow(conv, char) %}
+<tr data-id="{{ conv.id }}">
+	{% set msgs = conv.findMessages(char) %}
+	<td><a href="{{ path('maf_conv_read', {'conv':conv.id}) }}">{{ conv.topic }}</a></td>
+	<td align="right">{{ msgs.count }}</td>
+	<td align="right">{{ conv.findUnread(char) }}</td>
+	<td align="right">{{ conv.findActivePermissions.count }}</td>
+	<td align="right">
+		{% set msg = msgs.first %}
+		{% if msg %}
+			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
+		{% endif %}
+	</td>
+	<td align="right">
+		{% set msg = msgs.last %}
+		{% if msg %}
+			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
+		{% endif %}
+	</td>
+	<td>
+		<a href="{{path('maf_conv_print', {"conv":conv.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a> | <a href="{{path('maf_conv_remove', {"conv":conv.id, "var":1}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
+	</td>
+</tr>
+
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'index.title'|trans({}, "conversations")|title }}</h2>
+
+{% if warning %}
+	<div class="warning leftmain">{{ 'index.toomany'|trans({}, "conversations") }}</div>
+	<br />
+{% endif %}
+
+<div id="ajax_errors"></div>
+{% set group = null %}
+{% set first = true %}
+{% for conv in conversations %}
+	{% if conv.realm != group or first %}
+		{% set first = false %}
+		{% if group == null %}
+			</tbody></table>
+		{% endif %}
+		<table class="cmsg_table topmargin">
+			<thead>
+				<tr>
+					<td colspan="7" class="cmsg_header">
+						{% if conv.house %}
+							{{ "index.ref"|trans({"%ref%":link(conv.house)}, "conversations")|raw }}
+							<a href="{{ path("maf_conv_house_new", {"house":conv.house.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+						{% elseif conv.realm %}
+							{{ "index.ref"|trans({"%ref%":link(conv.realm)}, "conversations")|raw }}
+							<a href="{{ path("maf_conv_realm_new", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+						{% else %}
+							{{ 'index.ref2'|trans({}, "conversations") }}
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th>{{ 'index.topic'|trans({}, "conversations") }}</th>
+					<th>{{ 'index.messages'|trans({}, "conversations") }}</th>
+					<th>{{ 'index.unread'|trans({}, "conversations") }}</th>
+					<th>{{ 'index.participants'|trans({}, "conversations") }}</th>
+					<th>{{ 'index.first'|trans({}, "conversations") }}</th>
+					<th>{{ 'index.last'|trans({}, "conversations") }}</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+		{% set group = conv.realm %}
+	{% endif %}
+	{{ macros.conversationrow(conv, char) }}
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
+
+{% block jquery %}
+$(".cmsg_table").tablesorter();
+$(".cmsg_table").bind("sortStart",function() {
+	$(".icon-forward").remove();
+});
+
+{% endblock %}

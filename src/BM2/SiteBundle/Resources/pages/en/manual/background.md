@@ -3,9 +3,9 @@ There is quite a lot that goes into creating a game like Might & Fealty, and thi
 
 Basics
 ------
-The world of Might & Fealty is losely based on the european middle ages, somewhere in the 15th century, between the inventions of full plate armor suits  and the emergence of gunpowder rifles. It is, however, a low-fantasy world, where gunpowder and other technology has never been developed (China, for example, had matchlock firearms before Europe had knightly plate armor).
+The world of Might & Fealty is losely based on the european middle ages, somewhere in the 15th century, between the inventions of full plate armor suits  and the emergence of gunpowder rifles. It is, however, a fantasy world, where gunpowder and other technology has never been developed (China, for example, had matchlock firearms before Europe had knightly plate armor).
 
-By "low-fantasy", we mean a world that does have fantasy elements, including magic, but where these elements fade into the background. They are used mostly to explain elements that are necessary for gameplay, but violate a strong simulation - like instant delivery of messages, for example.
+By "fantasy", we mean a world that does have fantasy elements, including magic, but where these elements fade into the background. They are used mostly to explain elements that are necessary for gameplay, but violate a strong simulation - like instant delivery of messages, for example.
 
 
 

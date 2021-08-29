@@ -1,0 +1,82 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+<h2>Statistics</h2>
+<ul>
+	<li class="plot" data-id="users">{{ current.activeusers }} active users, {{ current.payingusers }} paying, {{ current.everpaidusers }} ever paid anything</li>
+	<li class="plot" data-id="characters">{{ current.characters }} characters created</li>
+	<li class="plot" data-id="realms">{{ current.realms }} active realms</li>
+	<li class="plot" data-id="major_realms">{{ current.majorrealms }} active sovereign realms</li>
+	<li class="plot" data-id="buildings">{{ current.buildings }} buildings constructed</li>
+	<li class="plot" data-id="buildings">{{ current.constructions }} buildings currently under construction</li>
+	<li class="plot" data-id="buildings">{{ current.abandoned }} buildings abandoned</li>
+	<li class="plot" data-id="features">{{ current.features }} features built</li>
+	<li class="plot" data-id="roads">{{ current.roads }} roads built</li>
+	<li class="plot" data-id="trades">{{ current.trades }} active trade deals</li>
+	<li class="plot" data-id="battles">{{ current.battles }} active battles</li>
+	<li class="plot" data-id="soldiers">{{ current.soldiers + current.militia + current.recruits }} soldiers recruited ({{ current.soldiers }} soldiers, {{ current.militia}} militia, {{ current.recruits }} in training, {{ current.offers }} offered to knights)</li>
+	<li class="plot" data-id="entourage">{{ current.entourage }} entourage recruited</li>
+	<li class="plot" data-id="peasants">{{ current.peasants }} peasants, {{ current.thralls }} thralls</li>
+	<li class="plot" data-id="peasants">{{ total }} total population</li>
+</ul>
+
+<div id="graph" style="width: 100%; height: 32em"></div>
+
+{% endblock %}
+
+{% block jquery %}
+var options = {
+	legend: {
+			position: "nw"
+	},
+	yaxes: [ { position: "left" }, { position: "right" }]
+};
+$(".plot").click(function(){
+	var id = $(this).data("id");
+
+	switch (id) {
+		case "users":
+			$.plot($("#graph"), [ {{global.users|json_encode|raw}}, {{global.active_users|json_encode|raw}}, {{global.paying_users|json_encode|raw}}, {{global.ever_paid_users|json_encode|raw}} ], options );
+			break;
+		case "characters":
+			$.plot($("#graph"), [ {{global.characters|json_encode|raw}}, {{global.living_characters|json_encode|raw}}, {{global.active_characters|json_encode|raw}}, {{global.deceased_characters|json_encode|raw}} ], options );
+			break;
+		case "realms":
+			$.plot($("#graph"), [ {{global.realms|json_encode|raw}} ], options );
+			break;
+		case "major_realms":
+			$.plot($("#graph"), [ {{global.major_realms|json_encode|raw}} ], options );
+			break;
+		case "trades":
+			$.plot($("#graph"), [ {{global.trades|json_encode|raw}} ], options );
+			break;
+		case "battles":
+			$.plot($("#graph"), [ {{global.battles|json_encode|raw}}, {{global.battles_avg|json_encode|raw}}, {{global.battles_avg2|json_encode|raw}} ], options );
+			break;
+		case "buildings":
+			$.plot($("#graph"), [ {{global.buildings|json_encode|raw}}, {{global.constructions|json_encode|raw}}, {{global.abandoned|json_encode|raw}} ], options );
+			break;
+		case "features":
+			$.plot($("#graph"), [ {{global.features|json_encode|raw}} ], options );
+			break;
+		case "roads":
+			$.plot($("#graph"), [ {{global.roads|json_encode|raw}} ], options );
+			break;
+		case "soldiers":
+			$.plot($("#graph"), [ {{global.soldiers|json_encode|raw}}, {{global.militia|json_encode|raw}}, {{global.recruits|json_encode|raw}}, {{global.offers|json_encode|raw}} ], options );
+			break;
+		case "entourage":
+			$.plot($("#graph"), [ {{global.entourage|json_encode|raw}} ], options );
+			break;
+		case "peasants":
+			$.plot($("#graph"), [ {{global.peasants|json_encode|raw}}, {{global.thralls|json_encode|raw}}, {{global.thralls2|json_encode|raw}}, {{global.population|json_encode|raw}} ], options );
+			break;
+	}
+});
+{% endblock %}

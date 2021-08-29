@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "location.giveartifact.name"|trans({},"actions")|title }}</h2>
+	{% if success is defined %}
+		{{ "artifact.give.success"|trans({"%artifact%":link(artifact), "%character%":link(target)})|raw }}
+	{% else %}
+		<p>{{ "artifact.give.intro"|trans }}</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

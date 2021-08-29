@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "successor.name"|trans({},"politics")|title }}</h2>
+{% if success is defined %}
+	{{ 'successor.success'|trans({'%successor%': link(character.successor)},"politics")|raw }}
+{% elseif fail is defined %}
+	{{ fail|trans({},"politics") }}
+{% else %}
+	<p>{{ "successor.intro"|trans({},"politics")|raw }}</p>
+	{% if character.successor %}
+		<p>{{ "successor.hasone"|trans({"%successor%":link(character.successor)},"politics")|raw }}</p>
+	{% endif %}
+
+	<h3>{{ "successor.set"|trans({},"politics")|title }}</h3>
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}

@@ -6,9 +6,11 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Monolog\Logger;
 
+use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\Geography;
+use BM2\SiteBundle\Service\CharacterManager;
 
 use BM2\DungeonBundle\Entity\Dungeon;
 use BM2\DungeonBundle\Entity\Dungeoneer;
@@ -93,7 +95,7 @@ class DungeonMaster {
 
 	public function cleanupDungeoneer(Character $character) {
 		$dungeoneer = $character->getDungeoneer();
-		if (!$dungeoneer) return false; 
+		if (!$dungeoneer) return false;
 
 		$this->exitDungeon($dungeoneer, 0, 0);
 		foreach ($dungeoneer->getCards() as $card) {
@@ -105,7 +107,7 @@ class DungeonMaster {
 
 	public function retireDungeoneer(Character $character) {
 		$dungeoneer = $character->getDungeoneer();
-		if (!$dungeoneer) return false; 
+		if (!$dungeoneer) return false;
 
 		$this->exitDungeon($dungeoneer, 0, 0);
 		return true;
@@ -147,7 +149,7 @@ class DungeonMaster {
 			if ($other->getCharacter()->getUser() == $dungeoneer->getCharacter()->getUser()) {
 				return 'samechar';
 			}
-		} 
+		}
 
 		$dungeoneer->setWounds(max(1, ceil($this->starting_wounds * $dungeoneer->getCharacter()->healthValue())));
 
@@ -286,7 +288,7 @@ class DungeonMaster {
 				case 4:	$wait = 4; break;
 				case 5:	$wait = 2; break;
 				default:	$wait = 1;
-			} 
+			}
 			switch ($missing) {
 				case 0:	break;
 				case 1:	$wait += 2; break;
@@ -304,7 +306,7 @@ class DungeonMaster {
 			}
 		}
 		return array($party, $missing, $wait);
-	} 
+	}
 /* Wait times here are in hours (Tom explained this). $missing is the number of people who've not selected cards to play yet. $party is the number of people in the party.
 In short before a dungeon starts you get a bit longer, but when it's running you get a while but not as long. --Andrew */
 
@@ -476,53 +478,53 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 			if ($dungeoneer->getCurrentAction()) {
 				switch ($dungeoneer->getCurrentAction()->getType()->getName()) {
 					case 'basic.fight':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target);
 						}
 						$dungeoneer->setTargetMonster(null); // remove target monster so it doesn't notice we attacked it
 						break;
 					case 'fight.stealth':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
 							$this->DungeoneerAttack($dungeoneer, $target);
 						}
 						break;
 					case 'fight.double':
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
-							$this->DungeoneerAttack($dungeoneer, $target); 
+							$this->DungeoneerAttack($dungeoneer, $target);
 						}
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
-							$this->DungeoneerAttack($dungeoneer, $target); 
+							$this->DungeoneerAttack($dungeoneer, $target);
 						}
 						break;
 					case 'fight.strong':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 2); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 2);
 						}
 						break;
 					case 'fight.hit':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.5); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.5);
 						}
 						break;
 					case 'fight.weak':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 1, 0.75); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 1, 0.75);
 						}
 						break;
 					case 'fight.sweep':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.0, 0.5); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.0, 0.5);
 						}
 						break;
 					case 'fight.kill':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 3, 1.2); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 3, 1.2);
 						}
 						break;
 					case 'fight.tripple':
 						for ($i=0;$i<3;$i++) {
 							if ($target = $this->findMonsterTarget($dungeoneer)) {
-								$this->DungeoneerAttack($dungeoneer, $target, 1, 0.75); 
+								$this->DungeoneerAttack($dungeoneer, $target, 1, 0.75);
 							}
 						}
 						break;
@@ -530,14 +532,14 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
 							for ($i=0;$i<3;$i++) {
 								if ($target->getAmount() > 0) {
-									$this->DungeoneerAttack($dungeoneer, $target); 
+									$this->DungeoneerAttack($dungeoneer, $target);
 								}
 							}
 						}
 						break;
 					case 'fight.sure':
-						if ($target = $this->findMonsterTarget($dungeoneer)) {	
-							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.5, 0.5); 
+						if ($target = $this->findMonsterTarget($dungeoneer)) {
+							$this->DungeoneerAttack($dungeoneer, $target, 1, 1.5, 0.5);
 						}
 						break;
 					case 'fight.bomb1':
@@ -563,7 +565,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 					case 'fight.slime':
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
 							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
-							$this->DungeoneerAttack($dungeoneer, $target, 6); 
+							$this->DungeoneerAttack($dungeoneer, $target, 6);
 							} else {
 							$this->DungeoneerAttack($dungeoneer, $target, 0.5);
 							}
@@ -618,7 +620,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 		if (!$dungeoneer->getTargetMonster()) {
 			$this->logger->error("apparently there are no (unstealthed) monsters on this level");
 			$this->addEvent($dungeoneer->getParty(), 'play.attack.notarget', array('d'=>$dungeoneer->getId()));
-		}		
+		}
 		return $dungeoneer->getTargetMonster();
 	}
 
@@ -637,6 +639,9 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 				$this->addEvent($dungeoneer->getParty(), 'play.attack.kill', $event_data);
 				$target->setAmount(max(0,$target->getAmount()-1));
 				$wounds-=$target->getType()->getWounds();
+				if ($target->getType()->getName()=='dragon') {
+					$this->addAchievement($dungeoneer->getCharacter(), 'dragons', 1);
+				}
 			}
 			if ($wounds>0) {
 				$this->logger->info("wounded");
@@ -960,7 +965,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 			$this->RemoveFromParty($member, $party);
 		}
 
-		$this->em->remove($party);		
+		$this->em->remove($party);
 	}
 
 	private function RemoveFromParty(Dungeoneer $member, DungeonParty $party) {
@@ -1026,6 +1031,22 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 			}
 		} else {
 			$this->logger->warning("no current level?");
+		}
+	}
+
+	# Yes, this is dupliocated from CharacterManager, but CharacterManager depends on DungeonMaster, so we can't call ChaacterManager from here.
+	public function addAchievement(Character $character, $key, $value=1) {
+		if ($value==0) return; // this way we can call this method without checking and it'll not update if not necessary
+		$value = round($value);
+		if ($a = $this->getAchievement($character, $key)) {
+			$a->setValue($a->getValue() + $value);
+		} else {
+			$a = new Achievement;
+			$a->setType($key);
+			$a->setValue($value);
+			$a->setCharacter($character);
+			$this->em->persist($a);
+			$character->addAchievement($a);
 		}
 	}
 

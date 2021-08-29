@@ -2,7 +2,9 @@
 
 namespace BM2\SiteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
@@ -38,10 +40,12 @@ class CharacterSelectType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$characters = $this->characters;
 
-		$builder->add('target', 'entity', array(
+		$builder->add('target', EntityType::class, array(
 			'placeholder' => $this->empty,
 			'label' => $this->label,
-			'class'=>'BM2SiteBundle:Character', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($characters) {
+			'class'=>'BM2SiteBundle:Character',
+			'choice_label'=>'name',
+			'query_builder'=>function(EntityRepository $er) use ($characters) {
 				$qb = $er->createQueryBuilder('c');
 				$qb->where('c IN (:characters)');
 				$qb->setParameter('characters', $characters);
@@ -49,7 +53,7 @@ class CharacterSelectType extends AbstractType {
 			},
 		));
 
-		$builder->add('submit', 'submit', array('label'=>$this->submit));
+		$builder->add('submit', SubmitType::class, array('label'=>$this->submit));
 	}
 
 

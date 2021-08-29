@@ -1,0 +1,8 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'unit.return.name'|trans({"%name%":unit.settings.name},"actions")|title }}</h2>
+<p>{{ 'unit.return.intro'|trans({"%name%":unit.settings.name},"actions")|raw }}</p>
+	{{ form(form) }}
+
+{% endblock %}

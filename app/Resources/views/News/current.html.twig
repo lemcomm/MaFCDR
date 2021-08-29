@@ -1,0 +1,55 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "news.title"|transchoice(10, {},"communication")|title }}</h2>
+
+	{% include "element/newslist.html.twig" with {"title":"news.local"|trans({},"communication"), "list":local_list} only %}
+
+	<h3>{{ "news.reader"|trans({},"communication") }}</h3>
+	<ul>
+		{% for reader in reader_list %}
+			<li>
+				<a href="{{ path('bm2_site_news_read', {'edition':reader.edition.id}) }}"><b>{{ reader.edition.paper.name }}</b>, {{ "news.number"|trans({"%number%":reader.edition.number},"communication") }}, {{ reader.edition.published|date }}</a>
+				{% if reader.updated %}
+					updated since you last read it
+				{% endif %}
+				{% if not reader.read %}
+					not yet read
+				{% endif %}
+			</li>
+		{% else %}
+			<em>{{ 'none'|trans }}</em>
+		{% endfor %}
+	</ul>
+
+	<h3>{{ "news.member"|trans({},"communication") }}</h3>
+	{% if editor_list is not empty %}
+	<table class="newseditors">
+		<thead>
+			<tr>
+				<th>{{ "news.title"|transchoice(1, {},"communication") }}</th>
+				<th>{{ "news.owner"|trans({},"communication") }}</th>
+				<th>{{ "news.editor"|trans({},"communication") }}</th>
+				<th>{{ "news.author"|trans({},"communication") }}</th>
+				<th>{{ "news.publisher"|trans({},"communication") }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for editor in editor_list %}
+			<tr>
+				<td><a href="{{ path('bm2_site_news_editor', {'paper':editor.paper.id}) }}">{{ editor.paper.name }}</a></td>
+				<td align="center">{% if editor.owner %}*{% endif %}</td>
+				<td align="center">{% if editor.editor %}*{% endif %}</td>
+				<td align="center">{% if editor.author %}*{% endif %}</td>
+				<td align="center">{% if editor.publisher %}*{% endif %}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+
+	{% if can_create %}
+	<a href="{{ path('bm2_site_news_create') }}">create new paper</a>
+	{% endif %}
+
+{% endblock %}

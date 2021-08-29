@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EventLog;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Form\EntourageAssignType;
@@ -20,11 +21,13 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class EventsController extends Controller {
 
 	/**
-		* @Route("/", name="bm2_events")
-		* @Template("BM2SiteBundle:Events:events.html.twig")
-		*/
+	* @Route("/", name="bm2_events")
+	*/
 	public function eventsAction() {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT l FROM BM2SiteBundle:EventLog l JOIN l.metadatas m WHERE m.reader = :me GROUP BY l');
@@ -72,16 +75,20 @@ class EventsController extends Controller {
 			}
 		}
 
-		return array('logs'=>$logs);
+		return $this->render('Events/events.html.twig', [
+			'logs'=>$logs
+		]);
 	}
 
 
 	/**
-		* @Route("/log/{id}", name="bm2_eventlog", requirements={"id"="\d+"})
-		* @Template
-		*/
+	* @Route("/log/{id}", name="bm2_eventlog", requirements={"id"="\d+"})
+	*/
 	public function eventlogAction($id, Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$log = $em->getRepository('BM2SiteBundle:EventLog')->find($id);
@@ -126,7 +133,7 @@ class EventsController extends Controller {
 					$act->setCanCancel(true);
 					$func = 'setTarget'.ucfirst($log->getType());
 					$act->$func($log->getSubject());
-					$result = $this->get('action_resolution')->queue($act);
+					$result = $this->get('action_manager')->queue($act);
 					$research = $act;
 				}
 				foreach ($data['entourage'] as $npc) {
@@ -142,20 +149,23 @@ class EventsController extends Controller {
 			$formView = null;
 		}
 
-		return array(
+		return $this->render('Events/eventlog.html.twig', [
 			'log'=>$log,
 			'metas'=>$metas,
 			'scholars'=>$myscholars->count(),
 			'research'=>$research,
 			'form'=>$formView
-		);
+		]);
 	}
 
 	/**
-		* @Route("/allread/{log}")
-		*/
+	* @Route("/allread/{log}")
+	*/
 	public function allreadAction(EventLog $log) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT m FROM BM2SiteBundle:EventMetadata m JOIN m.reader r WHERE m.log = :log AND r.user = :me');
 		$query->setParameters(array('log'=>$log, 'me'=>$character->getUser()));
@@ -169,10 +179,13 @@ class EventsController extends Controller {
 	}
 
 	/**
-		* @Route("/fullread/{which}")
-		*/
+	* @Route("/fullread/{which}")
+	*/
 	public function fullreadAction($which) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		switch ($which) {
@@ -203,23 +216,24 @@ class EventsController extends Controller {
 	}
 
 	/**
-		* @Route("/soldierlog/{soldier}")
-		* @Template
-		*/
+	* @Route("/soldierlog/{soldier}")
+	*/
 	public function soldierlogAction(Soldier $soldier) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$access = false;
-		if ($soldier->getCharacter() == $character) {
-			$access = true;
-		} elseif ($soldier->getBase() && $soldier->getBase()->getOwner() == $character) {
-			$access = true;
+		$unit = $soldier->getUnit();
+		$base = $unit->getSettlement();
+		$perm = $this->get('permission_manager')->checkSettlementPermission($base, $character, 'units');
+		if ($unit->getCharacter() === $character || $perm || $unit->getMarshal() === $character) {
+			return $this->render('Events/soldierlog.html.twig', [
+				'soldier'=>$soldier
+			]);
+		} else {
+			throw new AccessDeniedHttpException('error.noaccess.log');
 		}
-
-		if (!$access) {
-			throw new AccessDeniedHttpException('error.noaccess.log');			
-		}
-
-		return array('soldier'=>$soldier);
 	}
 }

@@ -1,0 +1,27 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'house.nearby.name2'|trans({},"politics") }}</h2>
+	<p>{{ 'house.nearby.intro'|trans({},"politics")|raw }}</p>
+
+	{% for house in houses %}
+		<div class="subcontent" style="color:#460702">
+		<h3>{{ house.name }}</h3>
+		{{ 'house.view.head'|trans({}, "politics")|raw }}: {% if house.head %}{{ link(house.head) }}{% else %}<i>{{ 'house.nohead'|trans({}, "politics") }}</i>{% endif %}
+		{% if house.description %}
+			{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+		{% else %}
+			{{ 'house.nodesc'|trans({}, "politics")|raw }}
+		{% endif %}
+		{% if not myHouse %}
+			<a href="{{path('maf_house_join', {"house":house.id}) }}"><button id="join">{{ 'house.join.button'|trans({},"politics") }}</button></a>
+		{% elseif house.head and house != myHouse %}
+			{% set check = dispatcher.houseManageCadetTest(null, house) %}
+			{% if check.url is defined %}
+				<a href="{{path('maf_house_cadetship', {"house":house.id}) }}"><button id="cadetship">{{ 'house.cadet.name'|trans({}, "politics")|raw }}</button></a>
+			{% endif %}
+		{% endif %}
+		</div>
+	{% endfor %}
+
+{% endblock %}

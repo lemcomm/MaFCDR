@@ -13,56 +13,102 @@ names:
 type:
  label:      Place Type
  empty:      (Select One)
- 
+
 new:
  name:       Formalize a New Place
- intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.
+ intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.<br /><br />Please be advised, both capitals and embassies require you to be in a realm.
+ success:    Successfully created %name%
 
 description:
  generic:    Description
- short:      Short, Externally Visible Description
- full:       Longer, Internally Visible Description
- 
+ short:      Short Description
+ full:       Longer, More Detailed Description
+
 place:
  owner:      Owner
  name:       Name
+ insidenow:  You are currently within this Place of Interest.
  manage:
+  button:    Manage Place
   name:      Place Details
   intro:     While there's not much here right now, you can presently change the name and descriptions of your Place. In time, we plan to expand this menu greatly.
+  success:   Place details updated successfully.
  permissions:
   name:      Place Permissions
   intro:     From this screen you can manage the many aspects of this Place, from changing individual permissions (which are further detailed in the manual) to allowing those who know about this location to spawn here (TODO: soon ;) ).
   manage:    Manage Your Permissions
  history:    History
+ actionable:
+  name:      View Local Places of Interest
+  intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Eventually these will be expanded to allow realms to do customized introductions for new players with separate arrival descriptions, as well as exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
+  list:      Local Places
+ enter:      Visit Place
+ exit:       Exit Place
+ newplayer:
+  name: Review Place Spawn Description
+  name2: Update the Spawn Description of %name%
+  description: Modify the new player description of the place.
+  longdesc: This page will let you modify the new player description of the place, which is displayed as part of the new character spawn selection process.
+  intro: Here you can alter the  information that is displayed to players creating a new character, after they opt to spawn in to the game. This description is specific to this location, so should be used to guide new players in the first actions. It is understood that this will also, likely, include propaganda about your realm, but that is your choice.
+  button:    Change Intro Message
+ spawn:
+  activate:    Enable Spawning
+  deactivate:  Disable Spawning
+ transfer:
+  name:         Transfer Place
+  description:  Transfer ownership of this Place.
+  intro: >
+    Any place of interest under your ownership can be transferred to another First One in the vicinity, all you need to do is say the word.
+  to:           New Owner
+  success:      You have transferred control of the Place to %name%.
 
 by:
+ ambassador: As a Manager of Diplomacy...
  lord:    As the Lord...
  castle:  From the Castle...
  none:    As a First One...
  magic:   As a Mage...
  ruler:   As the Ruler...
+ building: From local buildings...
+ dynasty head: As Head of Household...
 
 arena:    Arena
 capital:  Capital
 castle:   Castle
 cave:     Cave
+embassy:  Embassy
+home:     Home
 inn:      Inn
 library:  Library
 monument: Monument
 plaza:    Plaza
 portal:   Portal
 tavern:   Tavern
+track:    Track
 
- 
+realm:
+ label:   Realm
+ empty:   (none)
+
+hosting:
+ label: Hosted by Realm
+
+owning:
+ label: Used by Realm
+
+ambassador:
+ label: Appointed Ambassador
+ empty: (none)
 
 help:
  new:
   name:       The short name of this place. It should be memorable, but also to the point.
   formalname: The formal name of this place. Perhaps something ostentatious?
+  realm:      Which realm shall this Place of Interest belong to? This is particularly important for Embassies and Palaces, but it applies to all.
   type:       Select the type of place this is. You can only choose this once, so choose carefully.
   shortdesc:  This is the short description of this place, viewable by those outside of it.
-  longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it. Make it good!
- 
+  longdesc:   And this is the longer, stored in-perpetuity description of this place, visible only to those who can enter it and also used to lure new characters to spawn here. Make it good!
+
 unknown:
  title:      Unknown Place
  place:      It seems this isn't a place that you know anything about.

@@ -1,0 +1,50 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'events.logtitle'|trans({'%subject%':link(log.subject)})|raw }}</h2>
+{% if log.realm or log.settlement %}
+	<button id="allread">{{ 'events.allread'|trans }}</button>
+{% elseif log.character and log.character == character and character.alive == false %}
+	<a href="{{ path("bm2_site_character_background") }}">{{ "meta.background.descdeath"|trans({},"actions") }}</a>
+	<br />
+{% endif %}
+<br />
+<div id="select_type">
+	<input type="radio" id="filter_all" name="radio" checked="checked" /><label for="filter_all">{{ 'events.filter.all'|trans }}</label>
+	<input type="radio" id="filter_medium" name="radio" /><label for="filter_medium">{{ 'events.filter.medium'|trans }}</label>
+	<input type="radio" id="filter_high" name="radio" /><label for="filter_high">{{ 'events.filter.high'|trans }}</label>
+	<input type="radio" id="filter_ultra" name="radio" /><label for="filter_ultra">{{ 'events.filter.ultra'|trans }}</label>
+</div>
+
+{% include "Events/eventdata.html.twig" with { "log":log, "metas":metas, "research":true} %}
+
+{% endblock %}
+
+{% block javascript %}
+$("#select_type").buttonset();
+
+$("#filter_all").change(function(){
+	$(".eventlog").children().show();
+});
+$("#filter_medium").change(function(){
+	$(".prio_0").hide();
+	$(".prio_10").show();
+	$(".prio_20").show();
+});
+$("#filter_high").change(function(){
+	$(".prio_0").hide();
+	$(".prio_10").hide();
+	$(".prio_20").show();
+});
+$("#filter_ultra").change(function(){
+	$(".prio_0").hide();
+	$(".prio_10").hide();
+	$(".prio_20").hide();
+});
+
+$("#allread").click(function(){
+	$.post("{{ path('bm2_site_events_allread', {"log":log.id}) }}", function() {
+		$("#allread").replaceWith('<div class="success">{{ "events.alldone"|trans }}</div>');
+	});
+});
+{% endblock %}

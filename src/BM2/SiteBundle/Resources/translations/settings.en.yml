@@ -6,7 +6,7 @@
 areyousure: Confirm Your Decision
 button:
  submit:  Submit
- 
+
 character:
  title:              Character Settings
  description:        Using this menu you can choose to enable or disable different character level settings aimed at making your gameplay more enjoyable. One example of this is the ability to automatically set new realm messages as read for your character.
@@ -14,24 +14,40 @@ character:
   readrealms:        Automatically mark realm messages as read?
  non_hetero_options: Show homosexual partnership options?
 
+loadout:
+ title:      Character Loadout
+ description: >
+   From here, until we fully detail the soldier gear system (and similarly, the character gear system), you can specifically select the loadout for your character to be used in battle.<br \><br \>
+   It should be noted, that the equipment you use in battle your character will gain familiarity and skill with, which can then affect your performance in future battles and duels, or in the future proper tournaments.
+ armor:     Armor
+ weapon:    Weapon
+ equipment: Equipment
+ mount:     Mount
+ success:   Character loadout successfully updated!
+ none:      (select)
+
 unit:
  title:     Unit Settings
  description: >
-  This page lets you manage the individual tactics and strategy for each unit under your command, as well as change their unit names and supply sources (as applicable).
+  This page lets you manage the individual tactics and strategy for each unit under your command, as well as change their unit names and supply sources (as applicable).<br \><br \>
   All of this is presently not implemented, but will be fully tied into the rest of the game in short order, starting with supply sources, as things are completed. Full information can be found on the manual's "Units" page.
  yourown:   Settings for your personal force
  name:      Unit Name?
- supplier:  Where are they supplied from?
+ supplier:
+  name:     Where are they supplied from?
+  empty:    (Select a Source)
  strategy:
   name:     Battle Strategy?
   advance:  Charge enemy
   hold:     Hold position
   distance: Avoid enemies
+  empty:    (Select a Strategy)
  tactic:
   name:     Engagement Tactic?
   melee:    Melee only
   ranged:   Ranged only
   mixed:    Use best
+  empty:    (Select a Tactic)
  usefort:   Respect fortifications?
  line:
   name:     On which line shall they deploy?
@@ -42,12 +58,25 @@ unit:
   5:        5th Row
   6:        6th Row
   7:        7th Row (Very back)
+  empty:    (Select a Line)
  siege:
   name:     How should siege teams act outside of sieges?
   engage:   Join in combat
   stayback: Reserve only
   avoid:    Avoid combat
+ siege_orders:
+  name:       Orders during sieges?
+  empty:      (Select an Order)
+  assault:    Join Assault
+  hold:       Hold Back
+  equipment:  Man Equipment
  success:   Settings for the %name% have been updated!
+ renamable:
+  name:     Can this unit be renamed?
+ retreat:
+  name:     Withdraw/Retreat Percentage
+ reinforcements: Accept reinfocements?
+
 
 update:
  success:  Settings updated successfully!

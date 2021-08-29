@@ -1,0 +1,70 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "military.settlement.loot.name"|trans({},"actions")|title }}</h2>
+
+{# FIXME: translation strings #}
+{% if result is defined %}
+	<ul>
+	{% if result.thralls is defined %}
+		<li>You have taken {{ result.thralls }} peasants as thralls and sent them to {{ link(target) }}.</li>
+	{% endif %}
+	{% if result.supply is defined %}
+		<li>
+			You have stolen the following supplies:
+			<ul>
+				{% for name,amount in result.supply if amount > 0 %}
+					<li>{{ amount }} {{ ('item.'~name)|trans }}</li>{# FIXME: this should have plural forms #}
+				{% endfor %}
+			</ul>
+		</li>
+	{% endif %}
+	{% if result.resources is defined %}
+		<li>
+			You have stolen the following resources and sent them to {{ link(target) }}:
+			<ul>
+				{% for name,amount in result.resources if amount > 0 %}
+					<li>{{ amount }} {{ name|trans }}</li>
+				{% endfor %}
+			</ul>
+		</li>
+	{% endif %}
+	{% if result.gold is defined %}
+		<li>You have stolen {{ result.gold }} gold from this settlement.</li>
+	{% endif %}
+	{% if result.burn is defined %}
+		<li>Your troops burn and damage the following:
+			<ul>
+				{% for name,amount in result.burn if amount > 0 %}
+					<li>{{ name|trans }}</li>
+				{% endfor %}
+			</ul>
+		</li>
+	{% endif %}
+	</ul>
+{% else %}
+	<p>{{ "military.settlement.loot.intro"|trans({},"actions")|raw }}</p>
+	{% if settlement.owner == character %}
+		<p>{{ "military.settlement.loot.owner"|trans({},"actions")|raw }}</p>
+	{% endif %}
+	{% if not character.insidesettlement %}
+		<p>{{ "military.settlement.loot.outside"|trans({},"actions") }}</p>
+	{% endif %}
+	<p>{{ "military.settlement.loot.time"|trans({},"actions")|raw }}</p>
+
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% include "element/autocomplete.js.twig" %}
+settlementselect($("#loot_target"));
+
+$("#loot_method input[type=checkbox]").change(function(){
+	var count = $("#loot_method input[type=checkbox]:checked").length;
+	var time = count*count + count;
+	if (time < 4) { time = 4; }
+	$("#time").html(time);
+});
+{% endblock %}

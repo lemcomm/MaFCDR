@@ -1,0 +1,17 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'list.title'|trans({},"heraldry")|title }}</h2>
+<ul class="heraldrylist">
+{% for crest in crests %}
+	<li>
+		<h4>{{ crest.name }}</h4>
+		<img src="{{ path("bm2_site_heraldry_crest", {"id":crest.id}) }}"/>
+	</li>
+{% endfor %}
+</ul>
+
+<br class="clear"/>
+
+
+{% endblock %}

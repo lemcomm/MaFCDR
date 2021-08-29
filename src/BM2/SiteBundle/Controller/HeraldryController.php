@@ -19,16 +19,17 @@ class HeraldryController extends Controller {
 
 	/**
 	  * @Route("/", name="bm2_heraldry")
-	  * @Template
 	  */
 	public function indexAction() {
 		$user = $this->getUser();
-		return array('crests'=>$user->getCrests());
+
+		return $this->render('Heraldry/index.html.twig', [
+			'crests'=>$user->getCrests()
+		]);
 	}
 
 	/**
 	  * @Route("/create")
-	  * @Template
 	  */
 	public function createAction(Request $request) {
 		$user = $this->getUser();
@@ -60,10 +61,11 @@ class HeraldryController extends Controller {
 				return $this->redirectToRoute('bm2_heraldry');
 			}
 		}
-		return array(
+
+		return $this->render('Heraldry/create.html.twig', [
 			'crestfee' => $crestfee,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
@@ -94,7 +96,7 @@ class HeraldryController extends Controller {
 	public function crestAction($id) {
 		$em = $this->getDoctrine()->getManager();
 		$crest = $em->getRepository('BM2SiteBundle:Heraldry')->find($id);
-		
+
 		$data=array(
 			'<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
 			'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">',
@@ -153,7 +155,7 @@ class HeraldryController extends Controller {
 			$pattern = $xml->importNode($path, true);
 			$pattern->setAttribute("fill", $banner->getPatternColour());
 			$pattern->setAttribute("clip-path", 'url(#boundary)');
-			$child = $svg->appendChild($pattern);			
+			$child = $svg->appendChild($pattern);
 		}
 
 		if ($banner->getCharge() && $banner->getChargeColour()) {
@@ -174,11 +176,11 @@ class HeraldryController extends Controller {
 					if ($banner->getChargeColour()=="rgb(0,0,0)") {
 						$charge->setAttribute("fill", "rgb(60,60,60)");
 					} else {
-						$charge->setAttribute("fill", "black");						
+						$charge->setAttribute("fill", "black");
 					}
 				}
-				$child = $svg->appendChild($charge);			
-			}	
+				$child = $svg->appendChild($charge);
+			}
 		}
 
 		if ($banner->getShading()) {

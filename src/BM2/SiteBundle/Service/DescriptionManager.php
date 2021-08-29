@@ -9,6 +9,7 @@ use BM2\SiteBundle\Entity\Item;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\SpawnDescription;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
@@ -17,20 +18,20 @@ class DescriptionManager {
 	protected $em;
 	protected $appstate;
 	protected $history;
-	
+
 	public function __construct(EntityManager $em, AppState $appstate, History $history) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
 	}
-	
+
 	#TODO: Move this getClassName method, and similar methods, into a single HelperService file.
 	private function getClassName($entity) {
 		$classname = get_class($entity);
 		if ($pos = strrpos($classname, '\\')) return substr($classname, $pos + 1);
 		return $pos;
 	}
-	
+
 	public function newDescription($entity, $text, Character $character=null, $new=false) {
 		/* First, check to see if there's already one. */
 		$olddesc = NULL;
@@ -160,38 +161,56 @@ class DescriptionManager {
 		}
 		return $desc;
 	}
-	
-	public function findDescription($entity) {
-		/* Originally, this was written to find you the current description, in an earlier version of this file and how the databse would work.
-		Now though, you just do $thing->getDescription() to get it, as a given $thing will have two associations to descriptions, 
-		one that is the active, and one that goes to all.
-		This could be extended though, to add $criteria to let you find one within so many days or something. */
-		if ($entity->getDescription()) {
-			return $entity->getDescription();
+
+	public function newSpawnDescription($entity, $text, Character $character=null, $new=false) {
+		/* First, check to see if there's already one. */
+		$olddesc = NULL;
+		if ($entity->getSpawnDescription()) {
+			$olddesc = $entity->getSpawnDescription();
 		}
+		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
+		if ($olddesc) {
+			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
+			switch($this->getClassName($entity)) {
+				case 'House':
+					$olddesc->setActiveHouse(null);
+					break;
+				case 'Place':
+					$olddesc->setActivePlace(null);
+					break;
+				case 'Realm':
+					$desc->setActiveRealm(null);
+					break;
+			}
+			$this->em->flush();
+		}
+
+		$desc = new SpawnDescription();
+		$this->em->persist($desc);
+		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
 		switch($this->getClassName($entity)) {
-			case 'Artifact':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.artifact = :entity order by d.ts desc");
-				break;
-			case 'Item':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.item = :entity order by d.ts desc");
+			case 'House':
+				$desc->setActiveHouse($entity);
+				$desc->setHouse($entity);
 				break;
 			case 'Place':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.place = :entity order by d.ts desc");
+				$desc->setActivePlace($entity);
+				$desc->setPlace($entity);
 				break;
-			case 'Settlement':
-				$query = $this->em->createQuery("select d from BM2SiteBundle:Description d where d.settlement = :entity order by d.ts desc");
-				break;
-			default:
+			case 'Realm':
+				$desc->setActiveRealm($entity);
+				$desc->setRealm($entity);
 				break;
 		}
-		$query->setParameter('entity', $entity);
-		$query->setMaxResults(1);
-		$desc = $query->getOneOrNullResult();
-		if (!$desc) {
-			return null;
-		} else {
-			return $desc;
+		$entity->setSpawnDescription($desc);
+		if ($olddesc) {
+			$desc->setPrevious($olddesc);
 		}
+		$desc->setText($text);
+		$desc->setUpdater($character);
+		$desc->setTs(new \DateTime("now"));
+		$desc->setCycle($this->appstate->getCycle());
+		$this->em->flush($desc);
+		return $desc;
 	}
 }

@@ -16,11 +16,15 @@ class TradeType extends AbstractType {
 	private $character;
 	private $settlement;
 	private $sources;
+	private $dests;
+	private $allowed;
 
-	public function __construct(Character $character, Settlement $settlement, $sources) {
+	public function __construct(Character $character, Settlement $settlement, $sources, $dests, $allowed) {
 		$this->character = $character;
 		$this->settlement = $settlement;
 		$this->sources = $sources;
+		$this->dests = $dests;
+		$this->allowed = $allowed;
 	}
 
 	public function getName() {
@@ -36,6 +40,9 @@ class TradeType extends AbstractType {
 
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
+		$character = $this->character;
+		$sources = $this->sources;
+		$dests = $this->dests;
 		$builder->add('name', 'text', array(
 			'label'=>'tradename',
 			'required'=>false,
@@ -55,18 +62,14 @@ class TradeType extends AbstractType {
 			'choice_label'=>'name'
 		));
 
-		// you can always send FROM any of your estates
-		// FIXME: to get trade permissions working, this and the code in ActionsController:tradeAction need to be refactored to include permissions
-		//			 also, maybe this should use $sources instead of the owner comparison?
-		$character = $this->character;
 		$builder->add('source', 'entity', array(
 			'label' => 'source',
-			'placeholder' => ($character->getEstates()->count()>1?'form.choose':false),
-			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($character) {
+			'placeholder' => ($character->getOwnedSettlements()->count()>1?'form.choose':false),
+			'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($sources) {
 				$qb = $er->createQueryBuilder('s');
-				$qb->where('s.owner = :me');
+				$qb->where('s.id in (:sources)');
 				$qb->orderBy('s.name');
-				$qb->setParameter('me', $character);
+				$qb->setParameter('sources', $sources);
 				return $qb;
 			},
 		));
@@ -75,17 +78,16 @@ class TradeType extends AbstractType {
 		// however, there's one additional validation that either source or target must be your current location
 
 		// TODO: you should also be able to send to the estates of other characters who are nearby
-		
-		if ($this->settlement->getOwner() == $this->character) {
-			$sources = $this->sources;
+
+		if ($this->allowed) {
 			$builder->add('destination', 'entity', array(
 				'label' => 'destination',
-				'placeholder' => (count($sources)>1?'form.choose':false),
-				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($sources) {
+				'placeholder' => (count($dests)>1?'form.choose':false),
+				'class'=>'BM2SiteBundle:Settlement', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($dests) {
 					$qb = $er->createQueryBuilder('s');
-					$qb->where('s.id in (:sources)');
+					$qb->where('s.id in (:dests)');
 					$qb->orderBy('s.name');
-					$qb->setParameter('sources', $sources);
+					$qb->setParameter('dests', $dests);
 					return $qb;
 				},
 			));

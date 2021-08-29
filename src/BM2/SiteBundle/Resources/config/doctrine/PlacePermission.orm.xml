@@ -10,6 +10,7 @@
 
 		<many-to-one field="permission" target-entity="Permission"/>
 		<many-to-one field="place" target-entity="Place" inversed-by="permissions"/>
+		<many-to-one field="occupied_place" target-entity="Place" inversed-by="occupation_permissions"/>
 		<many-to-one field="listing" target-entity="Listing"/>
 	</entity>
 </doctrine-mapping>

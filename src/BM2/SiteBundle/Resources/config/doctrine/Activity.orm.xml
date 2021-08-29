@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Activity">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+                <many-to-one field="type" target-entity="ActivityType"/>
+		<many-to-one field="subtype" target-entity="ActivitySubType"/>
+                <field name="name" type="string"/>
+		<field name="created" type="datetime"/>
+		<field name="start" type="datetime"/>
+		<field name="finish" type="datetime"/>
+
+                <one-to-many field="participants" target-entity="ActivityParticipant" mapped-by="activity"/>
+                <many-to-one field="settlement" target-entity="Settlement" inversed-by="activities"/>
+                <many-to-one field="place" target-entity="Place" inversed-by="activities"/>
+                <one-to-many field="bouts" target-entity="ActivityBout" mapped-by="activity"/>
+
+                <many-to-one field="organizer" target-entity="Character" inversed-by="organized_activities"/>
+
+	</entity>
+</doctrine-mapping>

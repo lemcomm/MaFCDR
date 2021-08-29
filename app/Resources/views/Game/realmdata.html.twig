@@ -1,0 +1,54 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+<h2>Statistics for {{ link(realm) }}</h2>
+<ul>
+	<li class="plot" data-id="settlements">settlements</li>
+	<li class="plot" data-id="population">population</li>
+	<li class="plot" data-id="soldiers">soldiers</li>
+	<li class="plot" data-id="area">area</li>
+	<li class="plot" data-id="characters">characters</li>
+	<li class="plot" data-id="players">players</li>
+</ul>
+
+<div id="graph" style="width: 100%; height: 32em"></div>
+
+{% endblock %}
+
+{% block jquery %}
+var options = {
+	legend: {
+			position: "nw"
+	},
+};
+$(".plot").click(function(){
+	var id = $(this).data("id");
+
+	switch (id) {
+		case "settlements":
+			$.plot($("#graph"), [ {{data.settlements|json_encode|raw}} ], options );
+			break;
+		case "population":
+			$.plot($("#graph"), [ {{data.population|json_encode|raw}} ], options );
+			break;
+		case "soldiers":
+			$.plot($("#graph"), [ {{data.soldiers|json_encode|raw}}, {{data.militia|json_encode|raw}} ], options );
+			break;
+		case "area":
+			$.plot($("#graph"), [ {{data.area|json_encode|raw}} ], options );
+			break;
+		case "characters":
+			$.plot($("#graph"), [ {{data.characters|json_encode|raw}} ], options );
+			break;
+		case "players":
+			$.plot($("#graph"), [ {{data.players|json_encode|raw}} ], options );
+			break;
+	}
+});
+{% endblock %}

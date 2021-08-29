@@ -1,0 +1,34 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+<table>
+	<thead>
+		<tr>
+			<th></th>
+			{% for realm in realms %}
+				<th>{{ link(realm) }}</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+	{% for realm in realms %}
+	<tr>
+		<th>{{ link(realm) }}</th>
+		{% for target in realms %}
+			<td>
+			{% if target == realm %}
+				.
+			{% elseif data[realm.id][target.id] is defined %}
+				{{ data[realm.id][target.id] }}
+			{% else %}
+				-
+			{% endif %}
+			</td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

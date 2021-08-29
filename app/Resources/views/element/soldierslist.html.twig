@@ -1,0 +1,290 @@
+<div id="soldierslist">
+{{ form_errors(form) }}
+<form id="soldiersform" action="{{ submitpath }}" method="post">
+{{ form_widget(form._token) }}
+<table id="soldiers">
+	<thead><tr>
+		<th></th>
+		<th>{{ 'soldier.name'|trans }}</th>
+		<th data-sorter="false"></th>
+		<th>{{ 'experience'|trans }}</th>
+		<th data-sorter="false"></th>
+		<th>{{ 'weapon'|trans }}</th>
+		<th>{{ 'armour'|trans }}</th>
+		<th>{{ 'equipment'|trans }}</th>
+		<th>{{ 'mount'|trans }}</th>
+		<th>{{ 'home'|trans }}</th>
+		<th>{{ 'events.log'|trans }}</th>
+	</tr></thead>
+	<tbody>
+	{% for soldier in form.npcs %}
+		{% set id = soldier.vars.name %}
+		{% set man = soldiers[id] %}
+		{% if man.trainingRequired <= 0 %}
+			<tr has_changed="false">
+				<td><input type="checkbox" class="check_soldier" data-id="{{ man.id }}"/></td>
+				<td{% if not man.alive %} class="disabled"{% endif %}>{{ man.name }}</td>
+				<td>
+					{% if not man.alive %}
+						<img class="tt" src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
+					{% else %}
+						{% if man.wounded %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" />
+							{% if man.wounded > 10 %}
+								<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
+							{% endif %}
+							{% if man.wounded > 25 %}
+								<img class="tt" src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" style="margin-left:-12px"/>
+							{% endif %}
+						{% endif %}
+						{% if man.routed %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/runner4.svg') }}" alt="{{ 'routed'|trans }}" title="{{ 'routed'|trans }}" height="16px" />
+						{% endif %}
+						{% if man.hungry > 90 %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery_red.svg') }}" alt="{{ 'veryhungry'|trans }}" title="{{ 'veryhungry'|trans }}" height="16px" />
+						{% elseif man.hungry > 50 %}
+							<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery.svg') }}" alt="{{ 'hungry'|trans }}" title="{{ 'hungry'|trans }}" height="16px" />
+						{% endif %}
+					{% endif %}
+				</td>
+				<td align="right">{{ man.experience }}</td>
+				{% if not man.locked %}
+					<td>
+						{% if soldier.action is defined %}
+							{{ form_widget(soldier.action) }}
+						{% endif %}
+					</td>
+					{% if man.weapon %}
+						<td>{{ link(man.weapon) }}</td>
+					{% elseif man.trainedweapon %}
+						<td class="disabled">{{ ('item.'~man.trainedweapon.name)|trans }}</td>
+					{% else %}
+						<td>{{ 'item.improvised'|trans }}</td>
+					{% endif %}
+
+					{% if man.armour %}
+						<td>{{ link(man.armour) }}</td>
+					{% elseif man.trainedarmour %}
+						<td class="disabled">{{ ('item.'~man.trainedarmour.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
+
+					{% if man.equipment %}
+						<td>{{ link(man.equipment) }}</td>
+					{% elseif man.trainedequipment %}
+						<td class="disabled">{{ ('item.'~man.trainedequipment.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
+
+					{% if man.mount %}
+						<td>{{ link(man.mount) }}</td>
+					{% elseif man.trainedmount %}
+						<td class="disabled">{{ ('item.'~man.trainedmount.name)|trans }}</td>
+					{% else %}
+						<td></td>
+					{% endif %}
+				{% else %}
+					<td colspan="5" class="disabled">{{ 'islocked'|trans }}</td>
+				{% endif %}
+				<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
+				<td>
+					<a href="{{ path('bm2_site_events_soldierlog', {'soldier':man.id}) }}">log</a>
+				</td>
+			</tr>
+		{% endif %}
+	{% endfor %}
+	</tbody>
+</table>
+
+<hr />
+
+<div class="actionsbar">
+	<button type="button" id="toggle_all">{{ 'soldier.toggleall'|trans }}</button>
+	{{ 'soldier.allin4'|trans }}
+	<select id="group_option">
+		<option value="nothing">{{ 'recruit.manage.nothing'|trans({},"actions") }}</option>
+		<option value="disband">{{ 'recruit.manage.disband'|trans({},"actions") }}</option>
+		<option value="assignto">{{ 'recruit.manage.reassign'|trans({},"actions") }}</option>
+		<option value="retrain">{{ 'recruit.manage.retrain'|trans({},"actions") }}</option>
+		<option value="resupply">{{ 'recruit.manage.resupply'|trans({},"actions") }}</option>
+	</select>
+	<button type="button" id="group_apply">{{ 'recruit.manage.apply'|trans({},"actions") }}</button>
+
+	<br />
+
+	<button type="button" id="bury_all">{{ 'soldier.buryall'|trans }}</button>
+	<button type="button" id="resupply_all">{{ 'soldier.resupplyall'|trans }}</button>
+
+	<br /><br />
+
+</div>
+
+{% if form.assignto is defined %}
+<div id="assigntarget" class="hidden subselect">
+	{{ form_label(form.assignto) }}
+	{{ form_widget(form.assignto) }}
+</div>
+{% endif %}
+
+{% if form.weapon is defined %}
+<div id="retrain" class="hidden subselect">
+	{{ 'recruit.manage.retraininfo'|trans({},"actions")|raw }}<br />
+	{{ form_label(form.weapon) }}
+	{{ form_widget(form.weapon) }}
+	{{ form_label(form.armour) }}
+	{{ form_widget(form.armour) }}
+	{{ form_label(form.equipment) }}
+	{{ form_widget(form.equipment) }}
+	{{ form_label(form.mount) }}
+	{{ form_widget(form.mount) }}
+</div>
+{% endif %}
+
+<button id="do_submit">{{ 'recruit.manage.submit'|trans({},"actions") }}</button>
+</form>
+
+<div class="footnote">
+	{% if settlement is defined and settlement is not null %}
+		{{ 'settlement.resupply'|trans }}:
+		<dl class="wide">
+			{% set last = null %}
+			{% for data in resupply %}
+				{% set item = data.item %}
+				{% set type = item.provider %}
+				{% set supply = data.resupply %}
+				{% if type != last %}
+					{% if last != null %}
+						</ul></dd>
+					{% endif %}
+					<dt>{{ link(type) }}</dt>
+					<dd><ul class="shortlist">
+					{% set last = type %}
+				{% endif %}
+				<li>{{ link(item) }} ({{ (supply//item.resupplycost) }})</li>
+			{% endfor %}
+			{% if last != null %}
+				</ul></dd>
+			{% endif %}
+		</dl>
+
+		<br /><br />
+		{{ 'settlement.retrain'|trans }}:
+		<dl class="wide">
+			{% set last = null %}
+			{% for data in training %}
+				{% set item = data.item %}
+				{% set type = item.trainer %}
+				{% set supply = data.resupply %}
+				{% if type != last %}
+					{% if last != null %}
+						</ul></dd>
+					{% endif %}
+					<dt>{{ link(type) }}</dt>
+					<dd><ul class="shortlist">
+					{% set last = type %}
+				{% endif %}
+				<li>{{ link(item) }}</li>
+			{% endfor %}
+			{% if last != null %}
+				</ul></dd>
+			{% endif %}
+		</dl>
+	{% else %}
+		{{ 'character.resupply'|trans }}:
+		<dl class="wide">
+			{% set last = null %}
+			{% for data in resupply %}
+				{% set item = data.item %}
+				{% set supply = data.resupply %}
+				<dt>{{ link(item) }}</dt>
+				<dd>{{ (supply//item.resupplycost) }}</dd>
+			{% endfor %}
+		</dl>
+	{% endif %}
+</div>
+
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+
+	$("#soldiers").tablesorter({
+		sortList: [[0,0]],
+	});
+
+	if ($("#soldierslist select[id$=_action] option[value='disband']").length == 0) {
+		$("#group_option option[value='disband']").remove();
+	}
+	if ($("#soldierslist select[id$=_action] option[value='assignto']").length == 0) {
+		$("#group_option option[value='assignto']").remove();
+	}
+	if ($("#soldierslist select[id$=_action] option[value='retrain']").length == 0) {
+		$("#group_option option[value='retrain']").remove();
+	}
+	if ($("#soldierslist select[id$=_action] option[value='resupply']").length == 0) {
+		$("#group_option option[value='resupply']").remove();
+	}
+
+	$("#toggle_all").click(function(){
+		$("#soldierslist input.check_soldier").each(function(){
+			$(this).prop("checked", !$(this).prop("checked"));
+		});
+	});
+
+	if ($("#soldierslist select[id$=_action] option[value='bury']").length>0) {
+		$("#bury_all").click(function(){
+			var bury = $("#soldierslist select[id$=_action] option[value='bury']");
+			bury.parent().val("bury");
+			bury.closest("tr").attr("has_changed", "true");
+		});
+	} else {
+		$("#bury_all").remove();
+	}
+	if ($("#soldierslist select[id$=_action] option[value='resupply']").length>0) {
+		$("#resupply_all").click(function(){
+			var resupply = $("#soldierslist select[id$=_action] option[value='resupply']")
+			resupply.parent().val("resupply");
+			resupply.closest("tr").attr("has_changed", "true");
+		});
+	} else {
+		$("#resupply_all").remove();
+	}
+
+	function UpdateSoldierRow(actionselect) {
+		actionselect.closest("tr").attr("has_changed", "true");
+		if (actionselect.val() == "assignto") {
+			$("#assigntarget").show();
+		} else if (actionselect.val() == "retrain") {
+			$("#retrain").show();
+		}
+
+	}
+
+	$("#soldiers").delegate("select.action", "change", function(){
+		UpdateSoldierRow($(this));
+	});
+
+	$("#soldierslist select.group").change(function(){
+		$(this).closest("tr").attr("has_changed", "true");
+	});
+
+
+	$("#group_apply").click(function(){
+		var action = $("#group_option").val();
+
+		$("#soldierslist input.check_soldier:checked").each(function(){
+			$(this).closest("tr").find("[id$=_action]").val(action);
+			UpdateSoldierRow($(this).closest("tr").find("[id$=_action]"));
+		});
+	});
+
+	$("#do_submit").click(function(event){
+		event.preventDefault();
+		$(".actionsbar").replaceWith("loading...");
+		$("#do_submit").hide();
+		$("#soldiers tr[has_changed='false']").remove();
+		$("#soldiersform").submit();
+	});
+});
+</script>
+</div>

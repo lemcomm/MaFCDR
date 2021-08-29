@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'house.manage.applicants.name2'|trans({"%name%":name},"politics") }}</h2>
+	<p>{{ 'house.manage.applicants.intro'|trans({"%name%":name},"politics")|raw }}</p>
+
+	<h3> {{ 'house.manage.applicants.list'|trans({},"politics")|title }}</h2>
+	{% for joinrequest in joinrequests %}
+		<hr>
+		{{ 'house.manage.applicant.preamble'|trans({"%link-character%":link(joinrequest.fromCharacter), "%date%":joinrequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+		<div class="subcontent inline_announcements" style="color:#460702">
+		<h4>{{ joinrequest.subject|title }}</h4>
+		{{ joinrequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+		<a href="{{path('bm2_gamerequest_approve', {"id":joinrequest.id, "route":app.request.get('_route')}) }}"><button id="approve">{{ 'house.manage.applicant.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":joinrequest.id}) }}"><button id="deny">{{ 'house.manage.applicant.deny'|trans({},"politics") }}</button></a>
+		</div>
+	{% else %}
+		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
+		<a href="{{path('bm2_politics') }}"><button id="return">{{ 'house.manage.return'|trans({},"politics") }}</button></a>
+	{% endfor %}
+
+{% endblock %}

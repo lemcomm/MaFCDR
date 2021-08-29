@@ -6,7 +6,7 @@ APP="/var/www/maf/app/console"
 DAY=`date +%a%H`
 DATE=`date +%y%m%d%H`
 
-pg_dump -Fc -C maf | gzip > $BACKUPDIR/maf-$DAY.sql.gz
+pg_dump -C maf | gzip > $BACKUPDIR/maf-$DAY.sql.gz
 
 # So, this isn't nested in a user directory anymore, so let's find out if this is actually still needed.
 # this permission system is so fucked up that just to be sure I have to run this every time or I get exceptions

@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "escape.name"|trans({},"actions")|title }}</h2>
+	{% if queued is defined %}
+		<p>{{ "escape.queued"|trans({"%hours%":hours},"actions") }}</p>
+	{% else %}
+		<p>{{ "escape.intro"|trans({'%captor%':link(character.prisonerof)},"actions")|raw }}</p>
+		<p>
+			{% if captor_active %}
+				{{ "escape.low"|trans({},"actions") }}
+			{% else %}
+				{{ "escape.high"|trans({},"actions") }}
+			{% endif %}
+		</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

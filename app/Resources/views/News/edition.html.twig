@@ -1,0 +1,185 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/jquery.gridster.min.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/jquery.gridster.css') }}" />
+	<script src="{{ asset('bundles/bm2site/js/showdown.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<h2><a href="{{ url("bm2_site_news_editor", {"paper":paper.id}) }}">{{ paper.name }}</a></h2>
+	{% if edition.collection %}
+		<h3>{{ "news.collection"|trans({},"communication")|title }}</h3>
+	{% else %}
+		<h3>{{ "news.number"|trans({"%number%":edition.number},"communication")|title }}</h3>
+		<div id="published">
+		{% if edition.published %}
+			({{ gametime(edition.publishedcycle, 'long') }} - {{ edition.published|date }})
+		{% else %}
+			{{ "news.create.unpublished"|trans({},"communication") }}
+			{% if editor.editor %}
+				- <button id="publish">{{ "news.publish.do"|trans({},"communication") }}</button>
+			{% endif %}
+		{% endif %}
+		</div>
+	{% endif %}
+
+	<div class="gridster newspaper preview">
+	<ul>
+	{% for article in edition.articles %}
+		<li data-article="{{ article.id }}" data-row="{{ article.row }}" data-col="{{ article.col }}" data-sizex="{{ article.sizex }}" data-sizey="{{ article.sizey}}">
+			<div class="editbox">
+				<select class="size" data-article="{{ article.id }}">
+					{% for x in 1..4 %}
+						{% for y in 1..4 %}
+							<option data-x="{{x}}" data-y="{{y}}"{% if x == article.sizex and y == article.sizey %} selected="selected"{% endif %}>{{x}}x{{y}}</option>
+						{% endfor %}
+					{% endfor %}
+				</select>
+				<button class="edit" data-article="{{ article.id }}">{{ "news.layout.edit"|trans({},"communication") }}</button>
+				{% if edition.collection %}
+					<form method="post" action="{{ url('bm2_site_news_delarticle', {"article":article.id}) }}">
+						<button type="submit">{{ "news.layout.delete"|trans({},"communication") }}</button>
+					</form>
+					<form method="post" action="{{ url('bm2_site_news_restorearticle', {"article":article.id}) }}">
+						<select class="putback" name="edition">
+							{% for ed in edition.paper.editions %}
+								{% if not ed.collection and not ed.published %}
+									<option value="0">{{ 'news.rest'|trans({}, "communication") }}</option>
+									<option value="{{ ed.id }}">{{ 'news.restore'|trans({"%num%":ed.number}, "communication") }}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</form>
+				{% else %}
+					<form method="post" action="{{ url('bm2_site_news_storearticle', {"article":article.id}) }}">
+						<button type="submit">{{ "news.layout.delete"|trans({},"communication") }}</button>
+					</form>
+				{% endif %}
+			</div>
+			<h2 id="title_{{ article.id }}">{{ article.title }}</h2>
+			<div class="article">{{ article.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</div>
+			<div class="hidden" id="content_{{ article.id }}">{{ article.content }}</div>
+		</li>
+	{% endfor %}
+	</ul>
+	</div>
+	<button id="update">{{ "news.layout.update"|trans({},"communication") }}</button><span id="update_status" style="margin-left: 5em"></span>
+
+	{% if editor.author %}
+		<hr />
+		<h3>{{ "news.article.new"|trans({},"communication")|trans }}</h3>
+		{% include "element/editorfield.html.twig" with { "form":form, "url":url('bm2_site_news_newarticle'), "extended":true} %}
+	{% endif %}
+
+{# TODO: update layout when submitting a new article! #}
+
+{% endblock %}
+
+{% block jquery %}
+var gridster = $(".gridster ul").gridster({
+	widget_margins: [20, 20],
+	widget_base_dimensions: [200, 200],
+	max_cols: 4,
+	max_size_x: 4,
+	serialize_params: function($w, wgd) { return { article: $w.data("article"), col: wgd.col, row: wgd.row, x: wgd.size_x, y: wgd.size_y } }
+}).data("gridster");
+
+$("select.size").change(function(){
+	var opt = $("option:selected", $(this));
+	var article = $(this).data("article");
+	var x = opt.data("x");
+	var y = opt.data("y");
+	var box = $(".newspaper li[data-article="+article+"]");
+	gridster.resize_widget(box, x, y);
+});
+
+
+// variable to hold request
+var request;
+// bind to the submit event of our form
+$("#update").click(function(){
+	$("#update_status").removeClass().addClass("status_working").html("{{ "news.layout.updating"|trans({},"communication") }}");
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+
+	// fire off the request
+	request = $.ajax({
+		url: "{{ path('bm2_site_news_layout') }}",
+		type: "post",
+		data: { edition: {{ edition.id }}, layout: JSON.stringify(gridster.serialize()) },
+		dataType: "json"
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		$("#update_status").removeClass().addClass("status_success").html("{{ "news.layout.done"|trans({},"communication") }}").delay(5000).fadeOut();
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		$("#update_status").removeClass().addClass("status_error").html(textStatus);
+	});
+});
+
+$("#publish").click(function(){
+	$("#published").removeClass().addClass("status_working").html("{{ "news.publish.updating"|trans({},"communication") }}");
+	// abort any pending request
+	if (request) {
+		request.abort();
+	}
+
+	// fire off the request
+	request = $.ajax({
+		url: "{{ path('bm2_site_news_publish', {"edition":edition.id}) }}",
+		type: "post",
+	});
+
+	// callback handler that will be called on success
+	request.done(function (response, textStatus, jqXHR){
+		$("#published").removeClass().addClass("status_success").html("{{ "news.publish.done"|trans({},"communication") }}");
+	});
+
+	// callback handler that will be called on failure
+	request.fail(function (jqXHR, textStatus, errorThrown){
+		$("#published").removeClass().addClass("status_error").html(textStatus);
+	});
+});
+
+$(".edit").click(function(){
+	var id = $(this).data('article');
+	$("#newsarticle_title").val($("#title_"+id).html());
+	$("#newsarticle_content").html($("#content_"+id).html()).change();
+	$("#newsarticle_submit").html("{{ "news.article.edit"|trans({},"communication") }}");
+	var url = "{{ url('bm2_site_news_editarticle', {"article":"000"}) }}";
+	url = url.replace("000", id);
+	$("#newsarticle").closest("form").attr("action", url);
+});
+
+$(".putback").change(function(){
+	var id = $("option:selected", this).val();
+	if (id>0) {
+		$(this).closest("form").submit();
+	}
+});
+
+
+var converter = new Showdown.converter();
+$("#newsarticle_content").on("change keyup input", function() {
+	var markdown = $("#newsarticle_content").val();
+	$("#preview").html(converter.makeHtml(markdown));
+});
+
+$("#syntax").dialog({
+	autoOpen: false,
+	width: "50%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+$("#syntaxhelp").click(function(){
+	$("#syntax").dialog("open");
+});
+
+{% endblock %}

@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Building;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\Road;
 use BM2\SiteBundle\Form\BuildingconstructionType;
@@ -29,10 +30,12 @@ class ConstructionController extends Controller {
 
    /**
      * @Route("/roads")
-     * @Template
      */
 	public function roadsAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyRoadsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		// FIXME: This was a hack for alpha, where we didn't pre-populate the geofeatures - probably I can remove it?
@@ -128,8 +131,8 @@ class ConstructionController extends Controller {
 							$x += $ydiff * rand(-25, 25)/100;
 							$y += $xdiff * rand(-25, 25)/100;
 							$points[] = new Point($x, $y);
-							if ($geom!='') { 
-								$geom.=', '; 
+							if ($geom!='') {
+								$geom.=', ';
 							}
 							$geom.=$x." ".$y;
 						}
@@ -163,8 +166,7 @@ class ConstructionController extends Controller {
 			}
 
 		}
-
-		return array(
+		return $this->render('Construction/roads.html.twig', [
 			'settlement'=>$settlement,
 			'roadsdata'=>$roadsdata,
 			'regionpoly'=>$this->get('geography')->findRegionPolygon($settlement),
@@ -172,16 +174,18 @@ class ConstructionController extends Controller {
 			'featureworkers'=>$settlement->getFeatureWorkersPercent(),
 			'otherworkers'=>1.0-$settlement->getAvailableWorkforcePercent()+$settlement->getRoadWorkersPercent(),
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
    /**
      * @Route("/features")
-     * @Template
      */
 	public function featuresAction(Request $request) {
 		// TODO: add a way top remove / demolish features
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyFeaturesTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		list($features, $active, $building, $workhours) = $this->featureData($settlement);
 		$form = $this->createForm(new FeatureconstructionType($features, $settlement->getGeoData()->getRiver(), $settlement->getGeoData()->getCoast()));
@@ -201,7 +205,7 @@ class ConstructionController extends Controller {
 				}
 				if ($settlement->getAvailableWorkforcePercent() + $settlement->getFeatureWorkersPercent() - $totalworkers < 0.0) {
 					$form->addError(new FormError("economy.toomany"));
-				} else {					
+				} else {
 					foreach ($existing as $id=>$value) {
 						$feature = $em->getRepository('BM2SiteBundle:GeoFeature')->find($id);
 						if ($feature->getActive()) {
@@ -257,7 +261,7 @@ class ConstructionController extends Controller {
 									} else {
 										// TODO: maybe snap it, like we do with rivers above?
 										$form->addError(new FormError("feature.outside"));
-									}								
+									}
 							}
 						}
 					}
@@ -279,8 +283,7 @@ class ConstructionController extends Controller {
 			list($features, $active, $building, $workhours) = $this->featureData($settlement);
 			$form = $this->createForm(new FeatureconstructionType($features, $settlement->getGeoData()->getRiver(), $settlement->getGeoData()->getCoast()));
 		}
-
-		return array(
+		return $this->render('Construction/features.html.twig', [
 			'settlement'=>$settlement,
 			'regionpoly'=>$this->get('geography')->findRegionPolygon($settlement),
 			'features'=>$features,
@@ -291,7 +294,7 @@ class ConstructionController extends Controller {
 			'buildingworkers'=>$settlement->getBuildingWorkersPercent(),
 			'otherworkers'=>1.0-$settlement->getAvailableWorkforcePercent()+$settlement->getFeatureWorkersPercent(),
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 
@@ -352,10 +355,12 @@ class ConstructionController extends Controller {
 
    /**
      * @Route("/buildings")
-     * @Template
      */
 	public function buildingsAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$available=array();
@@ -413,20 +418,19 @@ class ConstructionController extends Controller {
 				}
 
 				$em->flush();
-				return $this->redirect($request->getUri());					
+				return $this->redirect($request->getUri());
 			}
 		}
-
-		return array(
+		return $this->render('Construction/buildings.html.twig', [
 			'settlement'=>$settlement,
-			'buildings'=>$settlement->getBuildings(), 
+			'buildings'=>$settlement->getBuildings(),
 			'available'=>$available,
 			'unavailable'=>$unavailable,
 			'roadworkers'=>$settlement->getRoadWorkersPercent(),
 			'featureworkers'=>$settlement->getFeatureWorkersPercent(),
 			'otherworkers'=>1.0-$settlement->getAvailableWorkforcePercent()+$settlement->getBuildingWorkersPercent(),
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 	private function checkBuildability($settlement, $type) {
@@ -487,6 +491,9 @@ class ConstructionController extends Controller {
 	  */
 	public function abandonbuildingAction(Building $building, Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$building->abandon();
 		$this->getDoctrine()->getManager()->flush();
@@ -497,10 +504,12 @@ class ConstructionController extends Controller {
 	/**
 	  * @Route("/focus")
 	  * @Method({"POST"})
-	 * @Template("BM2SiteBundle:element:buildingrow.html.twig")
 	  */
 	public function focusAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('economyBuildingsTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$request->request->has("building") || !$request->request->has("focus")) {
 			throw new \Exception("invalid request");
@@ -516,7 +525,7 @@ class ConstructionController extends Controller {
 			throw $this->createNotFoundException("building $id not found");
 		}
 		if ($building->getSettlement() != $settlement) {
-			throw new \Exception("invalid building");			
+			throw new \Exception("invalid building");
 		}
 
 		$building->setFocus($focus);
@@ -524,13 +533,15 @@ class ConstructionController extends Controller {
 		$response = array(
 			"focus" => $focus,
 			"base" => round($building->getCurrentSpeed()*100),
-			"final" => round($building->getCurrentSpeed()*100*pow(1.5, $focus)), 
+			"final" => round($building->getCurrentSpeed()*100*pow(1.5, $focus)),
 			"workers" => $building->getEmployees()
 		);
 
 		$em->flush();
 
-		return array('build'=>$building);
+		return $this->render('element/buildingrow.html.twig', [
+			'build'=>$building
+		]);
 	}
 
 }

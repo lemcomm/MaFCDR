@@ -1,0 +1,65 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	{% if house.crest %}
+		<div class="heraldry">
+			<img src="{{ path("bm2_site_heraldry_crest", {"id":house.crest.id}) }}"/>
+		</div>
+	{% endif %}
+	<div class="queue">
+		<h3>{{ 'house.history.name'|trans({},"politics")|title }}</h3>
+		<dl>
+		{% for event in house.log.events if event.public %}
+			<dt>{{ event.cycle|gametime('short') }}</dt>
+			<dd>{{ event|eventtranslate }}</dd>
+		{% endfor %}
+		</dl>
+	</div>
+	<h2>{{ house.name }}</h2>
+	<dl>
+		{% if house.founder is same as(house.head) %}
+			<dt>{{ 'house.view.founder'|trans({},"politics") }}</dt>
+			<dd>{{ link(house.founder) }}</dd>
+		{% else %}
+			<dt>{{ 'house.view.founder'|trans({},"politics") }}</dt>
+			<dd>{{ link(house.founder) }}</dd>
+			<dt>{{ 'house.view.head'|trans({},"politics") }}</dt>
+		{% if house.head %}<dd>{{ link(house.head) }}</dd>{% else %}<dd><i>{{ 'house.view.hoead'|trans({}, "politics") }}</i></dd>{% endif %}
+		{% endif %}
+		{% if house.motto %}
+			<dt>{{ 'house.view.motto'|trans({},"politics") }}</dt>
+			<dd>{{ house.motto }} </dd>
+		{% endif %}
+		<dt>{{ 'house.view.home'|trans({},"politics") }}</dt>
+		{% if house.home %}
+			{% if house.home.settlement %}
+				<dd> {{ link(house.home) }}, {{ link(house.home.settlement) }}</dd>
+			{% else %}
+				<dd> {{ link(house.home) }}</dd>
+			{% endif %}
+		{% else %}
+			<dd>{{ link(house.insideSettlement) }}</dt>
+		{% endif %}
+		{% if house.superior %}
+			<dt>{{ 'house.view.superior'|trans({}, "politics") }}</dt>
+			<dd>{{ link(house.superior) }}</dd>
+		{% endif %}
+		{% if house.cadets is not empty %}
+			<dt>{{ 'house.view.cadets'|trans({}, "politics") }}</dt>
+			<dd>{% for cadet in house.cadets %}{{ link(cadet) }}, {% endfor %}</dd>
+		{% endif %}
+
+	</dl>
+	{% if details and house.private is not null %}
+		<h3>{{ 'house.background.private.name'|trans({},"politics")|title }}</h3>
+		{{ house.private|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% endif %}
+	{% if house.description is not null and house.description.text is not null %}
+		<h3>{{ 'house.background.description.name'|trans({},"politics")|title }}</h3>
+		{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% endif %}
+	{% if head and house.secret is not null %}
+		<h3>{{ 'house.background.secret.name'|trans({},"politics")|title }}</h3>
+		{{ house.secret|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% endif %}
+{% endblock %}

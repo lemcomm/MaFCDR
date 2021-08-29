@@ -1,0 +1,50 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'account.settings.title'|trans }}</h2>
+{{ form(form) }}
+
+<div id="auto_login" class="hidden">
+	<hr />
+
+	<h3>{{ 'account.autologin.title'|trans|title }}</h3>
+	<p>{{ 'account.autologin.intro'|trans|raw }}</p>
+
+	<button id="enable">{{ 'account.autologin.enable'|trans|raw }}</button>
+	<button id="disable">{{ 'account.autologin.disable'|trans|raw }}</button>
+
+	{# TODO: strings here, and a function to reset (generate a new) secret (in case it was leaked, etc.) #}
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+function supports_html5_storage() {
+  try {
+    return 'localStorage' in window && window['localStorage'] !== null;
+  } catch (e) {
+    return false;
+  }
+}
+{% endblock %}
+
+{% block jquery %}
+if (supports_html5_storage()) {
+	$("#auto_login").show();
+}
+
+$("#enable").click(function(){
+	$.post("{{ path('bm2_secret', {'id':user.id}) }}", function(secret) {
+		localStorage['maf.userid'] = {{ user.id }};
+		localStorage['maf.secret'] = secret;
+	});
+});
+
+$("#disable").click(function(){
+{# creating a new one first to invalidate the old one #}
+	$.post("{{ path('bm2_secret', {'id':user.id}) }}", function(secret) {
+		localStorage.removeItem("maf.userid");
+		localStorage.removeItem("maf.secret");
+	});
+});
+{% endblock %}

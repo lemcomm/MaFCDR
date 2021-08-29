@@ -30,7 +30,6 @@ class GameController extends Controller {
 
 	/**
 	  * @Route("/")
-	  * @Template("BM2SiteBundle:Game:status.html.twig")
 	  */
 	public function indexAction($time_spent=0) {
 		$game = $this->get('game_runner');
@@ -56,16 +55,15 @@ class GameController extends Controller {
 			$status[]=array('name'=>$name, 'total'=>$total, 'done'=>$done, 'percent'=>$percent);
 		}
 
-		return array(
+		return $this->render('Game/status.html.twig', [
 			'cycle' => $cycle,
 			'status' => $status,
 			'time_spent' => $time_spent
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/users")
-	  * @Template
 	  */
 	public function usersAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -87,13 +85,14 @@ class GameController extends Controller {
 			}
 		}
 
-		return array('users'=>$users);
+		return $this->render('Game/users.html.twig', [
+			'users'=>$users
+		]);
 	}
 
 
    /**
      * @Route("/statistics/{start}", requirements={"start"="\d+"}, defaults={"start"=-1})
-     * @Template
      */
 	public function statisticsAction($start) {
 		if ($start == -1) { $start = $this->start_cycle; }
@@ -177,12 +176,13 @@ class GameController extends Controller {
 			$global["population"]["data"][] = array($cycle, $total);
 		}
 
-		return array('current'=>$current, 'global'=>$global, 'total'=>$total);
+		return $this->render('Game/statistics.html.twig', [
+			'current'=>$current, 'global'=>$global, 'total'=>$total
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/compare/{what}")
-	  * @Template
 	  */
 	public function comparedataAction($what) {
 		$em = $this->getDoctrine()->getManager();
@@ -216,27 +216,29 @@ class GameController extends Controller {
 			$value = false;
 			switch ($what) {
 				case 'area':		$value = $row->getArea(); break;
-				case 'estates':	$value = $row->getEstates(); break;
+				case 'settlements':	$value = $row->getSettlements(); break;
 				case 'players':	$value = $row->getPlayers(); break;
 				case 'soldiers':	$value = $row->getSoldiers(); break;
 			}
 			if ($value !== false) {
-				$data[$id]["data"][] = array($cycle, $value);	
+				$data[$id]["data"][] = array($cycle, $value);
 			}
 		}
-		return array('data'=>$data, 'what'=>$what);
+
+		return $this->render('Game/comparedata.html.twig', [
+			'data'=>$data, 'what'=>$what
+		]);
 	}
 
 
 	/**
 	  * @Route("/statistics/realm/{realm}", requirements={"realm"="\d+"})
-	  * @Template
 	  */
 	public function realmdataAction(Realm $realm) {
 		$em = $this->getDoctrine()->getManager();
 
 		$data = array(
-			"estates"		=> array("label" => "estates", "data" => array()),
+			"settlements"		=> array("label" => "settlements", "data" => array()),
 			"population"	=> array("label" => "population", "data" => array()),
 			"soldiers"		=> array("label" => "soldiers", "data" => array()),
 			"militia"		=> array("label" => "militia", "data" => array()),
@@ -249,7 +251,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $row) {
 			$cycle = $row->getCycle();
 
-			$data["estates"]["data"][] 	= array($cycle, $row->getEstates());
+			$data["settlements"]["data"][] 	= array($cycle, $row->getSettlements());
 			$data["population"]["data"][] = array($cycle, $row->getPopulation());
 			$data["soldiers"]["data"][] 	= array($cycle, $row->getSoldiers());
 			$data["militia"]["data"][] 	= array($cycle, $row->getMilitia());
@@ -257,12 +259,14 @@ class GameController extends Controller {
 			$data["characters"]["data"][] = array($cycle, $row->getCharacters());
 			$data["players"]["data"][] 	= array($cycle, $row->getPlayers());
 		}
-		return array('realm'=>$realm, 'data'=>$data);
+
+		return $this->render('Game/realmdata.html.twig', [
+			'realm'=>$realm, 'data'=>$data
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/settlement/{settlement}", requirements={"settlement"="\d+"})
-	  * @Template
 	  */
 	public function settlementdataAction(Settlement $settlement) {
 		$em = $this->getDoctrine()->getManager();
@@ -286,12 +290,14 @@ class GameController extends Controller {
 			$data["militia"]["data"][] 	= array($cycle, $row->getMilitia());
 			$data["war_fatigue"]["data"][] 	= array($cycle, $row->getWarFatigue());
 		}
-		return array('settlement'=>$settlement, 'data'=>$data);
+
+		return $this->render('Game/settlementdata.html.twig', [
+			'settlement'=>$settlement, 'data'=>$data
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/realms")
-	  * @Template
 	  */
 	public function realmstatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -302,7 +308,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $result) {
 			$data = array(
 				'realm' =>		$result->getRealm(),
-				'estates' =>	$result->getEstates(),
+				'settlements' =>	$result->getSettlements(),
 				'population'=>	$result->getPopulation(),
 				'soldiers'=>	$result->getSoldiers(),
 				'militia'=>		$result->getMilitia(),
@@ -312,12 +318,14 @@ class GameController extends Controller {
 			);
 			$realms->add($data);
 		}
-		return array('realms'=>$realms);
+
+		return $this->render('Game/realmstatistics.html.twig', [
+			'realms'=>$realms
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/battles")
-	  * @Template
 	  */
 	public function battlestatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -355,12 +363,14 @@ class GameController extends Controller {
 				$data[$type]["data"][] = array($i, $count);
 			}
 		}
-		return array('data'=>$data, 'battles'=>$battles);
+
+		return $this->render('Game/battlestatistics.html.twig', [
+			'data'=>$data, 'battles'=>$battles
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/troops")
-	  * @Template
 	  */
 	public function troopsstatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -393,7 +403,10 @@ class GameController extends Controller {
 			$type = $this->getSoldierType($row);
 			$data[$type]["data"]+=$row['number'];
 		}
-		return array('data'=>$data);
+
+		return $this->render('Game/troopstatistics.html.twig', [
+			'data'=>$data
+		]);
 	}
 
 	private function getSoldierType($row) {
@@ -440,12 +453,14 @@ class GameController extends Controller {
 			$amount = $row['amount'];
 			$data[$level] = array("label" => $level, "data" => $amount);
 		}
-		return array('data'=>$data);
+
+		return $this->render('Game/roadstatistics.html.twig', [
+			'data'=>$data
+		]);
 	}
 
 	/**
 	  * @Route("/statistics/resources")
-	  * @Template
 	  */
 	public function resourcesdataAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -468,42 +483,44 @@ class GameController extends Controller {
 			$data[$row->getResource()->getName()]["demand"]["data"][] = array($cycle, $row->getDemand());
 			$data[$row->getResource()->getName()]["trade"]["data"][] = array($cycle, $row->getTrade());
 		}
-		return array('resources'=>$resources, 'data'=>$data);
+
+		return $this->render('Game/resourcesdata.html.twig', [
+			'resources'=>$resources, 'data'=>$data
+		]);
 	}
 
 
     /**
      * @Route("/settlements")
-     * @Template
      */
 	public function settlementsAction() {
 		$em = $this->getDoctrine()->getManager();
 
 		$settlements = $em->getRepository('BM2SiteBundle:Settlement')->findAll();
 		$rt = $em->getRepository('BM2SiteBundle:ResourceType')->findAll();
-		return array(
+
+		return $this->render('Game/settlements.html.twig', [
 			'settlements' => $settlements,
 			'resourcetypes' => $rt,
 			'economy' => $this->get('economy')
-		);
+		]);
 	}
-   
+
    /**
      * @Route("/heraldry")
-     * @Template
      */
 	public function heraldryAction() {
 		$em = $this->getDoctrine()->getManager();
 
 		$crests = $em->getRepository('BM2SiteBundle:Heraldry')->findAll();
-		return array(
+
+		return $this->render('Game/heraldry.html.twig', [
 			'crests' => $crests,
-		);
+		]);
 	}
-   
+
 	/**
      * @Route("/techtree")
-     * @Template
      */
 	public function techtreeAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -517,41 +534,39 @@ class GameController extends Controller {
 		$query = $em->createQuery('SELECT b from BM2SiteBundle:BuildingType b');
 		$buildings = $query->getResult();
 
-
-	
-
-   	$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin 
-		   1 => array("pipe", "w"),  // stdout
-		   2 => array("pipe", "w") // stderr
+		$descriptorspec = array(
+			0 => array("pipe", "r"),  // stdin
+			1 => array("pipe", "w"),  // stdout
+			2 => array("pipe", "w") // stderr
 		);
 
-   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
+		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
-   	if (is_resource($process)) {
-   		$dot = $this->renderView('BM2SiteBundle:Game:techtree.dot.twig', array(
-				'equipment' => $equipment,
-				'entourage' => $entourage,
-				'buildings' => $buildings
-			));
-			echo $dot; exit; // FIXME: the svg generation fails and I don't know why
+		if (is_resource($process)) {
+		$dot = $this->renderView('Game/techtree.dot.twig', array(
+			'equipment' => $equipment,
+			'entourage' => $entourage,
+			'buildings' => $buildings
+		));
+		echo $dot; exit; // FIXME: the svg generation fails and I don't know why
 
-   		fwrite($pipes[0], $dot);
-   		fclose($pipes[0]);
+		fwrite($pipes[0], $dot);
+		fclose($pipes[0]);
 
-   		$svg = stream_get_contents($pipes[1]);
-   		fclose($pipes[1]);
+		$svg = stream_get_contents($pipes[1]);
+		fclose($pipes[1]);
 
-   		$return_value = proc_close($process);
-   	}
+		$return_value = proc_close($process);
+		}
 
-		return array('svg' => $svg);
+		return $this->render('Game/techtree.html.twig', [
+			'svg' => $svg
+		]);
 	}
 
 
 	/**
 	  * @Route("/diplomacy")
-	  * @Template
 	  */
 	public function diplomacyAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -565,21 +580,23 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $row) {
 			$data[$row->getSourceRealm()->getId()][$row->getTargetRealm()->getId()] = $row->getStatus();
 		}
-		return array('realms'=>$realms, 'data'=>$data);
+
+		return $this->render('Game/diplomacy.html.twig', [
+			'realms'=>$realms, 'data'=>$data
+		]);
 	}
 
 
 	/**
 	  * @Route("/buildings")
-	  * @Template
 	  */
 	public function buildingsAction() {
 		$em = $this->getDoctrine()->getManager();
 
-		return array(
-			'buildings'	=>	$em->getRepository('BM2SiteBundle:BuildingType')->findAll(),
+		return $this->render('Game/buildings.html.twig', [
+			'buildings'	=> $em->getRepository('BM2SiteBundle:BuildingType')->findAll(),
 			'resources'	=> $em->getRepository('BM2SiteBundle:ResourceType')->findAll()
-		);
+		]);
 	}
 
 
@@ -588,9 +605,8 @@ class GameController extends Controller {
    /**
      * @Route("/generate/{scale}", defaults={"seed"=-1})
      * @Route("/generate/{scale}/{seed}")
-     * @Template("BM2SiteBundle:Game:generate.html.twig")
 	  * @codeCoverageIgnore
-     */  
+     */
 	public function newgenerateAction($seed, $scale) {
 		if ($seed==-1) $seed=rand(0, time());
 		$Perlin = new Perlin($seed);
@@ -601,7 +617,7 @@ class GameController extends Controller {
 		$height = round(imagesy($image)/$scale);
 
 		$points=array();
-		for ($x=0; $x < $width; $x++) { 
+		for ($x=0; $x < $width; $x++) {
 			for ($y=0; $y < $height; $y++) {
 				$xa = $x*$scale + $jitter * $Perlin->random2D($x,$y) + $scale/2;
 				$ya = $y*$scale + $jitter * $Perlin->random2D($x*1.5,$y*1.5) + $scale/2;
@@ -615,7 +631,9 @@ class GameController extends Controller {
 			}
 		}
 
-		return array('seed'=>$seed, 'width_old'=>$width, 'width'=>$width*$scale,  'height_old'=>$height, 'height'=>$height*$scale, 'points'=>$points);
+		return $this->render('Game/generate.html.twig', [
+			'seed'=>$seed, 'width_old'=>$width, 'width'=>$width*$scale,  'height_old'=>$height, 'height'=>$height*$scale, 'points'=>$points
+		]);
 	}
 
 
@@ -624,9 +642,8 @@ class GameController extends Controller {
      * @Route("/make/{seed}", defaults={"width"=20, "height"=20})
      * @Route("/make/{width}/{height}", defaults={"seed"=-1})
      * @Route("/make/{width}/{height}/{seed}")
-     * @Template
 	  * @codeCoverageIgnore
-     */  
+     */
 	public function generateAction($seed, $width, $height) {
 		if ($seed==-1) $seed=rand(0, time());
 		$Perlin = new Perlin($seed);
@@ -637,7 +654,7 @@ class GameController extends Controller {
 		$size = ($width+$height)*$scale;
 
 		$points=array();
-		for ($x=0; $x < $width; $x++) { 
+		for ($x=0; $x < $width; $x++) {
 			for ($y=0; $y < $height; $y++) {
 				$xa = $x*$scale + $jitter * $Perlin->random2D($x,$y) + $scale/2;
 				$ya = $y*$scale + $jitter * $Perlin->random2D($x*1.5,$y*1.5) + $scale/2;
@@ -651,13 +668,15 @@ class GameController extends Controller {
 			}
 		}
 
-		return array('seed'=>$seed, 'width_old'=>$width, 'width'=>$width*$scale,  'height_old'=>$height, 'height'=>$height*$scale, 'points'=>$points);
+		return $this->render('Game/generate.html.twig', [
+			'seed'=>$seed, 'width_old'=>$width, 'width'=>$width*$scale,  'height_old'=>$height, 'height'=>$height*$scale, 'points'=>$points
+		]);
 	}
 
    /**
      * @Route("/heightmap/{width}/{height}/{seed}")
 	  * @codeCoverageIgnore
-     */  
+     */
 	public function heightmapAction($seed, $width, $height) {
 //		return new Response(); // disable to save time
 		$factor = 2;
@@ -700,10 +719,10 @@ class GameController extends Controller {
 
 	private function heightmap($Perlin, $border, $size, $x, $y) {
 		// the occasional inversion of $x and $y is not a bug - it makes the noise look much better
-		$alt = 0.6*$Perlin->noise($x, $y, 0, $size/4) 
-			+ 0.6*$Perlin->noise($y, $x, 0, $size/8) 
-			+ max(0,0.4*$Perlin->noise($x, $y, 0, $size/12)) 
-			- abs(0.3*$Perlin->noise($x, $y, 0, $size/16)) 
+		$alt = 0.6*$Perlin->noise($x, $y, 0, $size/4)
+			+ 0.6*$Perlin->noise($y, $x, 0, $size/8)
+			+ max(0,0.4*$Perlin->noise($x, $y, 0, $size/12))
+			- abs(0.3*$Perlin->noise($x, $y, 0, $size/16))
 			+ abs(0.2*$Perlin->noise($x, $y, 0, $size/24));
 		if ($alt>0.4) $alt+=abs(0.2*$Perlin->noise($y, $x, 0, $size/10));
 		if ($alt>0.65) $alt+=abs(0.2*$Perlin->noise($y, $x, 0, $size/18));
@@ -784,12 +803,11 @@ class GameController extends Controller {
 		return round(10000*$number)/10000;
 	}
 
-   /**
-     * @Route("/jitter", defaults={"seed"=-1})
-     * @Route("/jitter/{seed}")
-     * @Template
-	  * @codeCoverageIgnore
-     */
+	/**
+	 * @Route("/jitter", defaults={"seed"=-1})
+	 * @Route("/jitter/{seed}")
+	 * @codeCoverageIgnore
+	 */
 	/* FIXME: this should be re-written as a console command */
 	public function jitterAction($seed) {
 		if ($seed==-1) $seed=rand(0, time());
@@ -818,7 +836,7 @@ class GameController extends Controller {
 
 			if (isset($row[0]['length'])) {
 				$length = $row[0]['length'];
-			} else { 
+			} else {
 				$data = array_pop($row);
 				$length=$data["length"];
 			}
@@ -850,7 +868,7 @@ class GameController extends Controller {
 		}
 		$em->flush();
 
-		return array();
+		return $this->render('Game/jitter.html.twig');
 	}
 
 

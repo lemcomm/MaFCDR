@@ -1,0 +1,48 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "recruit.entourage.name"|trans({},"actions")|title }}</h2>
+<p>{{ "recruit.entourage.intro"|trans({"%settlement%":settlement.name,"%type%":settlement.getType|trans},"actions")|raw }}</p>
+{% if result is defined %}
+	{% if result.success %}
+
+	{% else %}
+		<p>{{ result.message|trans({},"actions") }}</p>
+	{% endif %}
+{% else %}
+	{% if settlement.recruitlimit <= 0 %}
+		<p>{{ "recruit.entourage.atlimit"|trans({},"actions") }}</p>
+	{% else %}
+		<p>{{ "recruit.entourage.limit"|trans({"%max%":settlement.recruitlimit},"actions") }}</p>
+		{{ form_errors(form) }}
+		<form action="{{ path('bm2_site_actions_entourage') }}" method="post">
+		{{ form_widget(form._token) }}
+		<table>
+			<thead><tr>
+				<th></th>
+				<th>{{ "npc.type"|trans|title }}</th>
+				<th>{{ "recruit.entourage.provided"|trans({}, "actions") }}</th>
+				<th>{{ "recruit.entourage.available"|trans({}, "actions") }}</th>
+			</tr></thead>
+			<tbody>
+			{% for servant in entourage %}
+				<tr>
+					{% set available = settlement.buildingbytype(servant.type.provider).resupply // servant.type.training %}
+					<td>
+						{% if available > 0 %}
+							{{ form_widget(form.recruits[servant.type.id]) }}
+						{% endif %}
+					</td>
+					<td>{{ link(servant.type) }}</td>
+					<td>{{ link(servant.type.provider) }}</td>
+					<td align="right">{{ available }}</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		<br />
+		<button name="submit">{{ 'recruit.entourage.submit'|trans({},"actions") }}</button>
+		</form>
+	{% endif %}
+{% endif %}
+{% endblock %}

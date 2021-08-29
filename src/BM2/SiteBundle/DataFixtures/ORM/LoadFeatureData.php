@@ -17,7 +17,8 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 		'tower'         => array('hidden'=>false,	'work'=>9000,	'icon'=>'rpg_map/watch_tower.svg',      'icon_uc'=>'rpg_map/watch_tower_outline.svg'),
 		'borderpost'    => array('hidden'=>false,	'work'=>100,	'icon'=>'rpg_map/sign_post.svg',        'icon_uc'=>'rpg_map/sign_post_outline.svg'),
 		'signpost'      => array('hidden'=>false,	'work'=>60,	'icon'=>'rpg_map/sign_crossroad.svg',   'icon_uc'=>'rpg_map/sign_crossroad_outline.svg'),
-		'docks'         => array('hidden'=>false,	'work'=>10000,	'icon'=>'rpg_map/docks.svg',            'icon_uc'=>'rpg_map/docks_outline.svg')
+		'docks'         => array('hidden'=>false,	'work'=>10000,	'icon'=>'rpg_map/docks.svg',            'icon_uc'=>'rpg_map/docks_outline.svg'),
+		'place'		=> array('hidden'=>true,	'work'=>0,	'icon'=>null,				'icon_uc'=>null)
 	);
 
 	/**
@@ -32,7 +33,7 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 	 */
 	public function load(ObjectManager $manager) {
 		foreach ($this->features as $name=>$data) {
-			$type = $manager->getRepository('BM2SiteBundle:SettlementType')->findOneByName($name)
+			$type = $manager->getRepository('BM2SiteBundle:FeatureType')->findOneByName($name);
 			if (!$type) {
 				$type = new FeatureType();
 				$manager->persist($type);
@@ -42,7 +43,7 @@ class LoadFeatureData extends AbstractFixture implements OrderedFixtureInterface
 			$type->setBuildHours($data['work']);
 			$type->setIcon($data['icon'])->setIconUnderConstruction($data['icon_uc']);
 			$manager->persist($type);
-			$this->addReference('featuretype: '.strtolower($name), $type);            
+			$this->addReference('featuretype: '.strtolower($name), $type);
 		}
 		$manager->flush();
 	}

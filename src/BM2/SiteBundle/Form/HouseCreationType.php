@@ -10,8 +10,9 @@ class HouseCreationType extends AbstractType {
 
 	private $house;
 	
-	public function __construct($name = NULL, $desc = NULL, $priv = NULL, $secret = NULL) {
+	public function __construct($name = NULL, $motto = NULL, $desc = NULL, $priv = NULL, $secret = NULL) {
 		$this->name = $name;
+		$this->motto = $motto;
 		$this->desc = $desc;
 		$this->priv = $priv;
 		$this->secret = $secret;
@@ -26,6 +27,7 @@ class HouseCreationType extends AbstractType {
 	
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$name = $this->name;
+		$motto = $this->motto;
 		$desc = $this->desc;
 		$priv = $this->priv;
 		$secret = $this->secret;
@@ -34,6 +36,12 @@ class HouseCreationType extends AbstractType {
 			'required'=>true,
 			'data'=>$name,
 			'attr' => array('size'=>30, 'maxlength'=>80)
+		));
+		$builder->add('motto', 'text', array(
+			'label'=>'house.create.motto',
+			'required'=>false,
+			'data'=>$motto,
+			'attr' => array('size'=>30, 'maxlength'=>200)
 		));
 		$builder->add('description', 'textarea', array(
 			'label'=>'house.create.description',

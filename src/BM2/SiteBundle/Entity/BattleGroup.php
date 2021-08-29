@@ -1,9 +1,8 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 
 
 class BattleGroup {
@@ -11,32 +10,24 @@ class BattleGroup {
 	protected $soldiers=null;
 	protected $enemy;
 
-	/*
-	 * @codeCoverageIgnore
-	 */  
-	public function __toString() {
-		\Doctrine\Common\Util\Debug::dump($this, 3);
-
-		$r = "battlegroup ".$this->id." of battle ".$this->battle->getId()." characters: ";
-		foreach ($this->getCharacters() as $char) {
-			$r.=", ".$char->getId();
-		}
-
-		return $r;
-	}
-
 	public function setupSoldiers() {
 		$this->soldiers = new ArrayCollection;
 		foreach ($this->getCharacters() as $char) {
-			foreach ($char->getActiveSoldiers() as $soldier) {
-				$this->soldiers->add($soldier);
+			foreach ($char->getUnits() as $unit) {
+				foreach ($unit->getActiveSoldiers() as $soldier) {
+					$this->soldiers->add($soldier);
+				}
 			}
 		}
 
-		if ($this->battle->getSettlement() && $this->isDefender()) {
-			foreach ($this->battle->getSettlement()->getActiveMilitia() as $soldier) {
-				if ($soldier->isActive()) {
-					$this->soldiers->add($soldier);
+		if ($this->battle->getSettlement() && $this->isDefender() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() == $this->battle->getSettlement()) {
+			foreach ($this->battle->getSettlement()->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					foreach ($unit->getActiveSoldiers() as $soldier) {
+						if ($soldier->isActive()) {
+							$this->soldiers->add($soldier);
+						}
+					}
 				}
 			}
 		}
@@ -79,6 +70,14 @@ class BattleGroup {
 		);
 	}
 
+	public function getActiveMeleeSoldiers() {
+		return $this->getActiveSoldiers()->filter(
+			function($entry) {
+				return (!$entry->isRanged());
+			}
+		);
+	}
+
 	public function getFightingSoldiers() {
 		return $this->getSoldiers()->filter(
 			function($entry) {
@@ -111,14 +110,39 @@ class BattleGroup {
 		return !$this->attacker;
 	}
 
-	public function getEnemy() {
-		foreach ($this->battle->getGroups() as $group) {
-			if ($group != $this) return $group;
+	public function getEnemies() {
+		$enemies = array();
+		if ($this->battle) {
+			if ($this->getReinforcing()) {
+				$primary = $this->getReinforcing();
+			} else {
+				$primary = $this;
+			}
+			$enemies = new ArrayCollection;
+			foreach ($this->battle->getGroups() as $group) {
+				if ($group == $primary || $group->getReinforcing() == $primary) {
+					# Do nothing, those are allies!
+				} else {
+					$enemies->add($group);
+				}
+			}
+		} else if ($this->siege) {
+			# Sieges are a lot easier, as they're always 2 sided.
+			if ($this->siege->getAttackers()->contains($this)) {
+				$enemies = $this->siege->getDefenders();
+			} else {
+				$enemies = $this->siege->getAttackers();
+			}
 		}
-		throw new \Exception('battle group '.$this->id.' has no enemy');
+		if (!empty($enemies)) {
+			return $enemies;
+		} else {
+			throw new \Exception('battle group '.$this->id.' has no enemies');
+		}
 	}
 
 	public function getLocalId() {
 		return intval($this->isDefender());
 	}
+	
 }

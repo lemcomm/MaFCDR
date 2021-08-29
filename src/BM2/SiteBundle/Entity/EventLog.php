@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -9,6 +9,7 @@ class EventLog {
 		if ($this->settlement) return 'settlement';
 		if ($this->realm) return 'realm';
 		if ($this->character) return 'character';
+		if ($this->place) return 'place';
 		if ($this->house) return 'house';
 		if ($this->quest) return 'quest';
 		if ($this->artifact) return 'artifact';
@@ -19,16 +20,18 @@ class EventLog {
 		if ($this->settlement) return $this->settlement;
 		if ($this->realm) return $this->realm;
 		if ($this->character) return $this->character;
+		if ($this->place) return $this->place;
 		if ($this->house) return $this->house;
 		if ($this->quest) return $this->quest;
 		if ($this->artifact) return $this->artifact;
-		return false;		
+		return false;
 	}
 
 	public function getName() {
 		if ($this->settlement) return $this->settlement->getName();
 		if ($this->realm) return $this->realm->getName();
 		if ($this->character) return $this->character->getName();
+		if ($this->place) return $this->place->getName();
 		if ($this->house) return $this->house->getName();
 		if ($this->quest) return $this->quest->getSummary();
 		if ($this->artifact) return $this->artifact->getName();

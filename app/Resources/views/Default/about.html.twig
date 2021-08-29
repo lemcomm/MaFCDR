@@ -1,0 +1,63 @@
+{% set biglogo = true %}
+{% extends "layout.html.twig" %}
+
+{% block jqueryuitheme %}
+	{% if app.request.isSecure %}
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% else %}
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'about.title'|trans|title }}</h2>
+
+<div id="tabs">
+<ul>
+<li><a href="#tabs-1">{{ 'about.intro'|trans|title }}</a></li>
+<li><a href="#tabs-2">{{ 'about.concept'|trans|title }}</a></li>
+<li><a href="#tabs-3">{{ 'about.gameplay'|trans|title }}</a></li>
+<li><a href="#tabs-4">{{ 'about.tech'|trans|title }}</a></li>
+<li><a href="#tabs-5">{{ 'about.cost'|trans|title }}</a></li>
+</ul>
+<div id="tabs-1">
+	<img class="sketch" src="{{ asset('bundles/bm2site/images/promo2.jpg') }}" />
+	{{ intro|markdown }}
+</div>
+<div id="tabs-2">
+	<img class="sketch" src="{{ asset('bundles/bm2site/images/promo1.jpg') }}" />
+	{{ concept|markdown }}
+</div>
+<div id="tabs-3">
+	<img class="sketch" src="{{ asset('bundles/bm2site/images/promo3.jpg') }}" />
+	{{ gameplay|markdown }}
+</div>
+<div id="tabs-4">
+	<img class="sketch" src="{{ asset('bundles/bm2site/images/promo4.jpg') }}" />
+	{{ tech|markdown }}
+</div>
+<div id="tabs-5">
+	<p>{{ 'account.sub.description2'|trans({"%url%":concepturl})|raw }}</p>
+	<div id="leveldetails_wrapper">
+	{% for i,level in levels if level.selectable %}
+	<div class="leveldetails">
+		<h3>{{ ('account.level.'~i)|trans }}</h3>
+		<dl>
+			<dt>{{ 'account.level.limit'|trans}}</dt>
+			<dd>{{ level.characters }}</dd>
+			<dt>{{ 'account.level.cpm'|trans}}</dt>
+			<dd>{{ level.fee }}</dd>
+		</dl>
+	</div>
+	{% endfor %}
+	</div>
+	<p>{{ 'account.sub.description3'|trans|raw }}</p>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block jquery %}
+$("#tabs").tabs();
+{% endblock %}

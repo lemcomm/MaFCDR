@@ -1,0 +1,31 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+<h2>{{ 'diplomacy.subrealm.name'|trans({},"politics")|title }}</h2>
+<div style="float:right;margin-top:-4em">
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+	<div id="map" style="min-width:30em;min-height:30em;margin-left:2em"></div>
+</div>
+<div id="sd_anchor" style="margin-right:1em;height:30em;float:right"></div>
+<div id="sd" class="hidden" title="dummy"></div>
+<p>{{ 'diplomacy.subrealm.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+
+{{ form(form) }}
+
+{% endblock %}
+
+{% block jquery %}
+	{% include "element/mapstrings.js.twig" %}
+	mapinit('map', false, false, true);
+	{% if realmpoly %}
+		{# TODO: also use the realm colour as fillcolour #}
+		addoutline('{{ realmpoly }}', '#cc2030');
+	{% endif %}
+{% endblock %}

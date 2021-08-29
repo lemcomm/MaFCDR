@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\MapMarker;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Service\Geography;
@@ -27,11 +28,10 @@ class MapController extends Controller {
 
    /**
      * @Route("/", name="bm2_map")
-     * @Template("BM2SiteBundle:Map:map-openlayers.html.twig")
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			if ($character->getTravel()) {
 				$travel = $this->get('geography')->jsonTravelSegments($character);
 				$details = $this->get('geography')->travelDetails($character);
@@ -41,15 +41,18 @@ class MapController extends Controller {
 				$details = null;
 				$roads = null;
 			}
-			return array(
+
+			return $this->render('Map/map-openlayers.html.twig', [
 				'actdistance'		=>	$this->get('geography')->calculateInteractionDistance($character),
 				'spotdistance'		=>	$this->get('geography')->calculateSpottingDistance($character),
 				'travel'				=> $travel,
 				'traveldetails'	=> $details,
 				'travelroads'		=> $roads,
-			);
+			]);
 		} else {
-			return array();
+
+			return $this->render('Map/map-openlayers.html.twig', [
+			]);
 		}
 	}
 
@@ -58,6 +61,9 @@ class MapController extends Controller {
 	  */
 	public function markerAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$my_realms = $character->findRealms();
 		if (!$my_realms) {
@@ -91,7 +97,7 @@ class MapController extends Controller {
 			if (count($my_markers) >= 10) { $limit = true; }
 		}
 
-		return $this->render('BM2SiteBundle:Map:marker.html.twig', array('mymarkers'=>$my_markers, 'limit'=>$limit, 'form'=>$form->createView()));
+		return $this->render('Map/marker.html.twig', array('mymarkers'=>$my_markers, 'limit'=>$limit, 'form'=>$form->createView()));
 	}
 
 	/**
@@ -99,6 +105,9 @@ class MapController extends Controller {
 	  */
 	public function removemarkerAction(MapMarker $marker) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($marker->getOwner() == $character) {
 			$em = $this->getDoctrine()->getManager();
@@ -248,7 +257,7 @@ class MapController extends Controller {
 					$targets[$id]['current'] = true;
 				}
 				if (! in_array($row['location'], $targets[$id]['line']->getPoints())) {
-					$targets[$id]['line']->addPoint($row['location']);					
+					$targets[$id]['line']->addPoint($row['location']);
 				}
 			}
 
@@ -299,7 +308,7 @@ class MapController extends Controller {
 				$qb->setParameter('towers', $towers)
 					->setParameter('towerspot', $this->get('appstate')->getGlobal('spot.towerdistance', 2500));
 			} else {
-				$qb->where('ST_Distance(c.location, me.location) < :spotting');				
+				$qb->where('ST_Distance(c.location, me.location) < :spotting');
 			}
 			$qb->andWhere('me = :me')
 				->andWhere('c != :me')
@@ -389,13 +398,8 @@ class MapController extends Controller {
 	private function dataSettlements($mode, $lowleft, $upright) {
 		$features = array();
 		$em = $this->getDoctrine()->getManager();
-		if ($mode=='start') {
-			$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c WHERE s.owner IS NOT NULL AND s.allow_spawn=true AND ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true');
-			$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
-		} else {
-			$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, g.center');
-			$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
-		}
+		$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, g.center');
+		$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
 		foreach ($query->getResult() as $r) {
 			$def = 0;
 			if (isset($r['defenses'])) {
@@ -554,25 +558,27 @@ class MapController extends Controller {
 				);
 				$em->clear();
 			}
-			
+
 			// mix in places
-			foreach ($this->get('geography')->findPlacesInSpotRange($character) as $place) {
-				$features[] = array(
-					'type' => 'Place',
-//					'id' => 'dungeon_'.$d['id'],
-					'properties' => array(
-						'type' => $place->getType()->getName(),
-						'name' => $place->getName(),
-						'active' => true,
-						),
-					'geometry' => json_decode($place->getLocation())
-				);
+			$results = $this->get('geography')->findPlacesInSpotRange($character);
+			if ($results != null) {
+				foreach ($results as $p) {
+					if ($p->getLocation()) {
+						$features[] = array(
+							'type' => 'Place',
+							'properties' => array(
+								'type' => $p->getType()->getName(),
+								'name' => $p->getName(),
+								'active' => true,
+								),
+							'geometry' => json_decode($p->getLocation())
+						);
+					}
+				}
 			}
 		}
-
 		return $features;
 	}
-
 
 	private function dataRealms($mode) {
 		$features = array();
@@ -586,7 +592,7 @@ class MapController extends Controller {
 				$query = $em->createQuery('SELECT r FROM BM2SiteBundle:Realm r JOIN r.superior s WHERE s.superior IS NULL');
 				$realms = $query->getResult();
 				break;
-			case '1': case '2': case '3': case '4': case '5': case '6': case '7': 
+			case '1': case '2': case '3': case '4': case '5': case '6': case '7':
 				$realms = $em->getRepository('BM2SiteBundle:Realm')->findByType($mode);
 				break;
 			default:
@@ -596,7 +602,7 @@ class MapController extends Controller {
 			$data = $this->get('geography')->findRealmDataPolygons($realm);
 			foreach ($data as $row) {
 				$geo = json_decode($row['poly']);
-				$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+				$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 				$features[] = array(
 							'type' => 'Feature',
 //							'id' => $id++,
@@ -604,7 +610,7 @@ class MapController extends Controller {
 								'name' => $realm->getName(),
 								'colour_hex' => $realm->getColourHex(),
 								'colour_rgb' => $realm->getColourRgb(),
-								'estates' => $estates
+								'settlements' => $settlements
 								),
 							'geometry' => $geo
 						);
@@ -618,7 +624,7 @@ class MapController extends Controller {
 				$data = $this->get('geography')->findRealmDataPolygons($realm);
 				foreach ($data as $row) {
 					$geo = json_decode($row['poly']);
-					$estates = $row['area'] / 64072607; // this is a hack - area divided by average area
+					$settlements = $row['area'] / 64072607; // this is a hack - area divided by average area
 					$features[] = array(
 								'type' => 'Feature',
 //								'id' => $id++,
@@ -626,7 +632,7 @@ class MapController extends Controller {
 									'name' => $realm->getName(),
 									'colour_hex' => $realm->getColourHex(),
 									'colour_rgb' => $realm->getColourRgb(),
-									'estates' => $estates
+									'settlements' => $settlements
 									),
 								'geometry' => $geo
 							);
@@ -638,7 +644,7 @@ class MapController extends Controller {
 	}
 
     // FIXME: this is not used anymore ?
-	private function realmdataArray($realm, $estates, $with_subs) {
+	private function realmdataArray($realm, $settlements, $with_subs) {
 		$data = json_decode($this->get('geography')->findRealmDataPolygons($realm));
 		var_dump($data);
 
@@ -650,7 +656,7 @@ class MapController extends Controller {
 				'name' => $realm->getName(),
 				'colour_hex' => $realm->getColourHex(),
 				'colour_rgb' => $realm->getColourRgb(),
-				'estates' => $estates
+				'settlements' => $settlements
 				),
 			'geometry' => json_decode($this->get('geography')->findRealmPolygon($realm, 'json', $with_subs))
 		);
@@ -689,29 +695,30 @@ class MapController extends Controller {
 
 	/**
      * @Route("/details/settlement/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsSettlementAction($id) {
 		$em = $this->getDoctrine()->getManager();
 		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
 
-		return array('settlement'=>$settlement);
+		return $this->render('Map/detailsSettlement.html.twig', [
+			'settlement'=>$settlement
+		]);
 	}
 
 	/**
      * @Route("/details/offerslist/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsOfferslistAction(Settlement $id) {
 		$em = $this->getDoctrine()->getManager();
 		$offers = $em->getRepository('BM2SiteBundle:KnightOffer')->findBySettlement($id);
 
-		return array('offers'=>$offers);
+		return $this->render('Map/detailsOfferslist.html.twig', [
+			'offers'=>$offers
+		]);
 	}
 
 	/**
      * @Route("/details/character/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsCharacterAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -727,16 +734,15 @@ class MapController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Map/detailsCharacter.html.twig', [
 			'char'=>$char,
 			'realms'=>$realms,
 			'ultimates'=>$ultimates
-		);
+		]);
 	}
 
    /**
      * @Route("/details/marker/{id}", requirements={"id"="\d+"})
-     * @Template
      */
 	public function detailsMarkerAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -744,7 +750,9 @@ class MapController extends Controller {
 
 		// TODO: check if we are allowed to see this marker
 
-		return array('marker'=>$marker);
+		return $this->render('Map/detailsMarker.html.twig', [
+			'marker'=>$marker
+		]);
 	}
 
 }

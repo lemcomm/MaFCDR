@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\ORM\EntityManager;
@@ -31,15 +32,26 @@ class Interactions {
 		if ($character->getInsideSettlement() == $settlement) {
 			return true; // we are already inside
 		}
+		if ($settlement->getOccupier()) {
+			$occupied = true;
+		} else {
+			$occupied = false;
+		}
 
+		#TODO: The entire if below this line might be redundant now that dispatcher also has all this logic.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit', $occupied)) {
 				return false;
 			}
 
 			// if we are currently engaged in battle, we can't enter
 			if ($character->isInBattle()) {
+				return false;
+			}
+
+			// if there is a siege going on and they've encircled the place, we can't enter
+			if ($settlement->getSiege() && $settlement->getSiege()->getEncircled()) {
 				return false;
 			}
 		}
@@ -71,19 +83,25 @@ class Interactions {
 		$character->setTravel(null)->setProgress(null)->setSpeed(null);
 
 		// open history log
-		if ($settlement->getOwner() != $character) {
+		if ($settlement->getOwner() != $character || $settlement->getSteward() != $character) {
 			$this->history->visitLog($settlement, $character);
 		}
 
 		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
 		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
-		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
-			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered2':'event.settlement.entered2',
-				array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
-				History::LOW, true, 10
-			);
+		if ($character->getUnits()) {
+			$count = 0;
+			foreach ($character->getUnits() as $unit) {
+				$count += $unit->getLivingSoldiers()->count();
+			}
+			if ($count > 5) {
+				$this->history->logEvent(
+					$settlement,
+					$force?'event.settlement.forceentered2':'event.settlement.entered2',
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$count),
+					History::LOW, true, 10
+				);
+			}
 		} else {
 			$this->history->logEvent(
 				$settlement,
@@ -94,12 +112,12 @@ class Interactions {
 		}
 
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsideSettlement($settlement);
 			$prisoner->setLocation($loc);
 			$settlement->addCharactersPresent($prisoner);
-			if ($settlement->getOwner() != $prisoner) {
+			if ($settlement->getOwner() != $prisoner || $settlement->getSteward() != $prisoner) {
 				$this->history->visitLog($settlement, $prisoner);
 			}
 		}
@@ -125,13 +143,26 @@ class Interactions {
 			return false;
 		}
 
+		if ($settlement->getSiege() && $settlement->getSiege()->getEncircled()) {
+			// the large army outside the gate (and the gatekeepers protecting you) laugh at your attempts to leave.
+			return false;
+		}
+
 		// don't ask me why, but the below two lines work in this order and FAIL if reversed. Yeah. Fuck Doctrine.
 		// $settlement->removeCharactersPresent($character); => Symfony 2.7 turns this into a DELETE - WTF ???
 		$character->setInsideSettlement(null);
 
 		// close history log
-		if ($settlement->getOwner() != $character) {
+		if ($settlement->getOwner() != $character || $settlement->getSteward() != $character) {
 			$this->history->closeLog($settlement, $character);
+		}
+
+		if ($character->getInsidePlace() && $character->getInsidePlace()->getSettlement()) {
+			# If you leave a settlement while in a place in the settlement, you leave the place as well. How logical. :P
+			$leftPlace = $this->characterLeavePlace($character);
+			if (!$leftPlace) {
+				return false; # We appear to be trapped in the Place!
+			}
 		}
 
 		$this->history->logEvent(
@@ -141,11 +172,11 @@ class Interactions {
 			History::LOW, true, 10
 		);
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsideSettlement(null);
 			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???
-			if ($settlement->getOwner() != $prisoner) {
+			if ($settlement->getOwner() != $prisoner || $settlement->getSteward() != $prisoner) {
 				$this->history->closeLog($settlement, $prisoner);
 			}
 		}
@@ -228,20 +259,19 @@ class Interactions {
 
 		return $details;
 	}
-	
+
 	public function characterEnterPlace(Character $character, Place $place, $force = false) {
 		if ($character->getInsidePlace() == $place) {
 			return true; // we are already inside
 		}
-		
-		if (!$this->pm->checkSettlementPermission($place, $character, 'visit')) {
+
+		if (!$this->pm->checkPlacePermission($place, $character, 'visit')) {
 				return false;
 		}
 
-		/* Leaving this here for when we make Places defensible.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
+			if ($place->isFortified() && !$this->pm->checkPlacePermission($place, $character, 'visit')) {
 				return false;
 			}
 
@@ -250,14 +280,18 @@ class Interactions {
 				return false;
 			}
 		}
-		*/
 
-		// TODO: check if settlement in action range
+		if ($place->getSettlement() != $character->getInsideSettlement()) {
+			// Not in the settlement the place is in.
+			return false;
+		}
+
+		// TODO: check if place in action range
 		$character->setInsidePlace($place);
 		$place->addCharactersPresent($character);
 
 		// If the Place is in a Settlement, set us in it, otherwise, set us to the place's location.
-		if ($place->getSettlement()) {
+		if ($settlement = $place->getSettlement()) {
 			$center_radius = $this->geo->calculateActionDistance($settlement) / 2;
 			$passable = false;
 			$loc = $character->getLocation();
@@ -287,27 +321,33 @@ class Interactions {
 			$this->history->visitLog($place, $character);
 		}
 
-		/* Leaving this here for when we make places defensible.
 		// TODO: we could make the counter depend on the "importance" of the person, i.e. if he's a ruler, owns land, etc.
 		// TODO: ugly hard-coded limit - do we want to change it, make it flexible, or just leave it?
-		if ($character->getSoldiers() && ($soldiers = $character->getLivingSoldiers()->count()) > 5) {
-			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered2':'event.settlement.entered2',
-				array('%link-character%'=>$character->getId(), '%soldiers%'=>$soldiers),
-				History::LOW, true, 10
-			);
+
+
+		if ($character->getUnits()) {
+			$count = 0;
+			foreach ($character->getUnits() as $unit) {
+				$count += $unit->getLivingSoldiers()->count();
+			}
+			if ($count > 5) {
+				$this->history->logEvent(
+					$place,
+					$force?'event.place.forceentered2':'event.place.entered2',
+					array('%link-character%'=>$character->getId(), '%soldiers%'=>$count),
+					History::LOW, true, 10
+				);
+			}
 		} else {
 			$this->history->logEvent(
-				$settlement,
-				$force?'event.settlement.forceentered':'event.settlement.entered',
+				$place,
+				$force?'event.place.forceentered':'event.place.entered',
 				array('%link-character%'=>$character->getId()),
 				History::LOW, true, 10
 			);
 		}
-		*/
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsidePlace($place);
 			$prisoner->setLocation($loc);
@@ -316,10 +356,10 @@ class Interactions {
 				$this->history->visitLog($place, $prisoner);
 			}
 		}
-		
+
 		// if you're a prisoner yourself, bring your captor with you
 		if ($captor = $character->getPrisonerOf()) {
-			$captor->setInsideSettlement($place);
+			$captor->setInsidePlace($place);
 			$captor->setLocation($loc);
 			$place->addCharactersPresent($captor);
 			if ($place->getOwner() != $captor) {
@@ -334,12 +374,10 @@ class Interactions {
 		$place = $character->getInsidePlace();
 		if (!$place) return false;
 
-		/* Leaving this for when Places are defensible.
-		if ($force && (!$settlement->isFortified() || $this->pm->checkSettlementPermission($settlement, $character, 'visit'))) {
+		if ($force && (!$place->isFortified() || $this->pm->checkPlacePermission($settlement, $character, 'visit'))) {
 			// people with visiting permission cannot be forced out
 			return false;
 		}
-		*/
 
 		// don't ask me why, but the below two lines work in this order and FAIL if reversed. Yeah. Fuck Doctrine.
 		// $settlement->removeCharactersPresent($character); => Symfony 2.7 turns this into a DELETE - WTF ???
@@ -357,7 +395,7 @@ class Interactions {
 			History::LOW, true, 10
 		);
 
-		// bring your prisoners with you 
+		// bring your prisoners with you
 		foreach ($character->getPrisoners() as $prisoner) {
 			$prisoner->setInsidePlace(null);
 			// $settlement->removeCharactersPresent($prisoner); => Symfony 2.7 turns this into a DELETE - WTF ???
@@ -368,5 +406,18 @@ class Interactions {
 		// if you're a prisoner yourself, your captor can stay, sorry, you don't get to define his location...
 
 		return true;
+	}
+
+	public function abandonSettlement(Character $character, Settlement $settlement, $keepRealm) {
+		if ($settlement->getOwner() == $character) {
+			if (!$keepRealm) {
+				$settlement->setRealm(null);
+			}
+			$settlement->setOwner(null);
+			$this->em->flush();
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

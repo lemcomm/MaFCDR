@@ -1,0 +1,166 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="meta">
+	{% include "element/linklist.html.twig" with {"list":dispatcher.metaActions, "domain":'actions'} only %}
+</div>
+{% if character.achievements is not empty %}
+	<div class="meta secondary">
+		<h2 class="clear">{{ 'achievements.title'|trans|title }}</h2>
+		<dl class="rightvalues">
+		{% for achievement in character.achievements %}
+			<dt>{{ ('achievements.type.'~achievement.type)|trans }}</dt>
+			<dd>{{ achievement.value }}</dd>
+		{% endfor %}
+		</dl>
+	</div>
+{% endif %}
+{% if character.crest %}
+<div class="heraldry">
+	<img src="{{ path("bm2_site_heraldry_crest", {"id":character.crest.id}) }}"/>
+</div>
+{% endif %}
+<h2>{{ 'character.status'|trans({'%name%':character.purename})|title }}</h2>
+{% if character.knownas %}
+	<h3 class="subtitle">{{ 'character.knownas'|trans({'%name%':character.knownas}) }}</h3>
+{% endif %}
+{% if character.prisoner %}
+<p class="inactive">
+	<img src="{{ asset('bundles/bm2site/images/nicubunu_chain.svg') }}" alt="{{ 'prisoner'|transchoice(1) }}" height="16px" align="bottom" />
+	{{ 'character.prisoner2'|trans({"%captor%":link(character.prisonerof)})|raw }}
+	<img src="{{ asset('bundles/bm2site/images/nicubunu_chain.svg') }}" alt="{{ 'prisoner'|transchoice(1) }}" height="16px" align="bottom" />
+</p>
+{% endif %}
+
+<div>
+	<ul class="simple">
+	<li>{{ ('character.health.'~character.healthstatus)|trans }}</li>
+	<li>{{ 'character.gold'|trans({"%gold%":character.gold}) }}</li>
+	{% for parent in character.parents %}
+		<li>
+		{% if parent.male %}
+			{{ 'character.father'|trans|title }}
+		{% else %}
+			{{ 'character.mother'|trans|title }}
+		{% endif %}:
+		<a href="{{ path('bm2_site_character_view', {'id':parent.id}) }}">{{ parent.name }}</a></li>
+	{% endfor %}
+	</ul>
+
+	{% if not character.npc %}
+		<h2>{{ 'politics.hierarchy'|trans|title }}</h2>
+		{% include "element/hierarchy.html.twig" with {"character":character, "who":'self'} only %}
+
+		<div id="myestates">
+		<h2>{{ 'estate'|transchoice(character.ownedSettlements|length)|title }}{% if character.ownedSettlements|length > 0%} <button id="expandestates">expand</button>{% endif %}</h2>
+		<ul>
+		{% for settlement in character.ownedSettlements %}
+			<li>
+				{{ link(settlement) }}
+				{% if settlement.realm %}
+					<small>({{link(settlement.realm)}})</small>
+				{% endif %}
+			</li>
+		{% else %}
+			<li>{{ 'none'|trans }}</li>
+		{% endfor %}
+		</ul>
+		</div>
+	{% endif %}
+
+	<h2>{{ 'location'|trans|capitalize }}</h2>
+	<ul class="simple">
+		{% if character.insidesettlement %}
+			<li>{{ 'inside'|trans({'%place%':link(character.insidesettlement)})|raw }}, {{ settlement.type|trans }}</li>
+		{% elseif settlement %}
+			<li>{{ 'near'|trans({'%place%':link(settlement)})|raw }}, {{ settlement.type|trans }}, {{ 'distance'|trans }} {{ nearest.distance|distance }}</li>
+		{% else %}
+			<li>{{ 'nothingnear'|trans }}</li>
+		{% endif %}
+		<li><small>{{ ('familiarity.'~familiarity)|trans }}</small></li>
+		<li>{{ 'coordinates'|trans|title }}: {{ character.location.x|number_format }} - {{ character.location.y|number_format }}</li>
+		<li>{{ 'spotdistance'|trans|title }}: {{ spot|distance }}</li>
+		<li>{{ 'actdistance'|trans|title }}: {{ act|distance }}</li>
+		{# used to show travel speed, but it's now integrated into the update function so not easily available anymore - do we want it back? #}
+		{% if character.travellocked %}
+			<li>{{ 'travellocked'|trans }}</li>
+		{% endif %}
+	</ul>
+
+	{% if others %}
+		<div id="nearbyothers">
+			<h3>{{ 'nearbyothers'|trans|title }} <button id="expandscouting">expand</button></h3>
+			<ul>
+			{% for other in others %}
+				<li>{{ link(other.character) }} ({{ other.distance|distance(true) }}{% if other.character.insidesettlement %}, {{ 'inside'|trans({'%place%':link(other.character.insidesettlement)})|raw }}{% endif %})</li>
+			{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
+
+	{% if character.prisoners is not empty %}
+		<h2>{{ 'prisoner'|transchoice(character.prisoners.count)|capitalize }}</h2>
+		<ul class="shortlist">
+			{% for prisoner in character.prisoners %}
+				<li>{{ link(prisoner) }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+
+	{% if units is not empty %}
+		<h2>{{ 'npc.units'|transchoice(units.count)|capitalize }}</h2>
+		<ul>
+		{% for unit in units %}
+			{% if unit.settlement %}
+				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
+			{% else %}
+				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':'-','%amount%':unit.soldiers.count})|raw}}</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+	{% endif %}
+
+	{% if entourage is not empty %}
+		<h2>{{ 'npc.entourage'|transchoice(10)|capitalize }}</h2>
+		<ul>
+		{% for type,number in entourage %}
+			<li>{{number}} {{ ("npc."~type)|transchoice(number) }}</li>
+		{% endfor %}
+		{% if dead_entourage > 0 %}
+			<li>{{ dead_entourage }} {{ "dead"|trans }}</li>
+		{% endif %}
+		</ul>
+		<a href="{{ path('bm2_site_character_entourage') }}">{{ 'viewdetails'|trans|title }}</a>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block jquery %}
+$("#expandscouting").click(function(){
+	$("#expandscouting").parent().after('<img src="{{ asset('bundles/bm2site/images/loader.png') }}"/>');
+	$("#expandscouting").remove();
+	$.get("{{ path('bm2_scouting') }}", function(data) {
+		$("#nearbyothers").replaceWith(data);
+		$("#scouting").tablesorter({
+			sortList: [[0,0]],
+		});
+	});
+
+});
+$("#expandestates").click(function(){
+	$("#expandestates").parent().after('<img src="{{ asset('bundles/bm2site/images/loader.png') }}"/>');
+	$("#expandestates").remove();
+	$.get("{{ path('bm2_estates') }}", function(data) {
+		$("#myestates").replaceWith(data);
+		$("#estates").tablesorter({
+			sortList: [[0,0]],
+		});
+	});
+
+});
+{% endblock %}

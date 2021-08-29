@@ -1,0 +1,34 @@
+{% set biglogo = true %}
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<img class="sketch" src="{{ asset('bundles/bm2site/images/title1.jpg') }}" />
+
+<h1>Create History</h1>
+<div style="font-size:1.2em">
+	<p>
+		In this entirely player-driven, persistent world, sandbox game.
+	</p>
+	<p>
+		Play for free as long as you want, or support ongoing development with a paid account.<br />
+		<small>(our trial accounts are not time-limited, and you can even change back to a free account at any time)</small>
+	</p>
+
+	{% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+	{% else %}
+	<p style="text-align:center;margin-top:3em">
+		<a style="
+		background-color: #0d0;
+		padding: 0.5em 1em;
+		border: 3px solid #0a0;
+		border-radius: 0.5em;"
+		href="{{ path('fos_user_registration_register') }}">
+			{{ 'menu.register'|trans }}
+		</a>
+	</p>
+	{% endif %}
+</div>
+
+<br class="clear" />
+
+{% endblock %}

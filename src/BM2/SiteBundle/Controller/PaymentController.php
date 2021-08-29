@@ -2,9 +2,13 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Patreon;
+use BM2\SiteBundle\Entity\Patron;
 use BM2\SiteBundle\Form\CultureType;
 use BM2\SiteBundle\Form\GiftType;
 use BM2\SiteBundle\Form\SubscriptionType;
+use Patreon\API as PAPI;
+use Patreon\OAuth as POA;
 use PayPal;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -23,26 +27,38 @@ class PaymentController extends Controller {
 
 	private $giftchoices = array(100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000, 2500);
 
+	private function fetchPatreon($creator = null) {
+		$em = $this->getDoctrine()->getManager();
+		if (!$creator) {
+			$query = $em->createQuery("SELECT p FROM BM2SiteBundle:Patreon p WHERE p.id > 0");
+			$result = $query->getResult();
+		} else {
+			$query = $em->createQuery("SELECT p FROM BM2SiteBundle:Patreon p WHERE p.creator = :name");
+			$query->setParameters(["name"=>$creator]);
+			$result = $query->getSingleResult();
+		}
+		return $result;
+	}
+
 	// FIXME: the secrets, etc. should probably not be in here, but in a safe place
 	// PayPal
 /*
 	private $paypal_config = array (
-			'mode' => 'sandbox' , 
+			'mode' => 'sandbox' ,
 			'acct1.UserName' => 'jb-us-seller_api1.paypal.com',
-			'acct1.Password' => 'WX4WTU3S8MY44S7F', 
+			'acct1.Password' => 'WX4WTU3S8MY44S7F',
 			'acct1.Signature' => 'AFcWxV21C7fd0v3bYYYRCpSSRl31A7yDhhsPUU2XhtMoZXsWHFxu-RWy'
 	);
 */
 	private $paypal_config = array (
 			'mode' => 'live',
 			'acct1.UserName' => 'payment_api1.mightandfealty.com',
-			'acct1.Password' => 'YWJ22BG45Z63LBU4', 
+			'acct1.Password' => 'YWJ22BG45Z63LBU4',
 			'acct1.Signature' => 'AuoUscunfGMRfST-cga6SnFHZjaMAhHW.dmiLV7HVrlT0SvatET9DLng'
 	);
 
 	/**
      * @Route("/", name="bm2_payment")
-     * @Template("BM2SiteBundle:Payment:payment.html.twig")
      */
 	public function paymentAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -52,7 +68,7 @@ class PaymentController extends Controller {
 
 		$form = $this->createFormBuilder()
 			->add('hash', 'text', array(
-				'required' => true, 
+				'required' => true,
 				'label' => 'account.code.label',
 			))
 			->add('submit', 'submit', array('label'=>'account.code.submit'))
@@ -73,12 +89,11 @@ class PaymentController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Payment/payment.html.twig', [
 			'form' => $form->createView(),
 			'redeemed' => $redeemed
-		);
+		]);
 	}
-
 
 	/**
 	  * @Route("/paypal/{amount}", name="bm2_paypal", requirements={"amount"="\d+"})
@@ -199,7 +214,7 @@ class PaymentController extends Controller {
 
 		$orderTotal = new PayPal\CoreComponentTypes\BasicAmountType();
 		$orderTotal->currencyID = 'EUR';
-		$orderTotal->value = $itemAmount * $itemQuantity; 
+		$orderTotal->value = $itemAmount * $itemQuantity;
 
 		$paymentDetails->OrderTotal = $orderTotal;
 		$paymentDetails->PaymentAction = 'Sale';
@@ -210,7 +225,6 @@ class PaymentController extends Controller {
 
 	/**
 	  * @Route("/testpayment")
-	  * @Template
 	  */
 	public function testpaymentAction(Request $request) {
 		$env = $this->get('kernel')->getEnvironment();
@@ -232,7 +246,6 @@ class PaymentController extends Controller {
 
    /**
      * @Route("/credits")
-     * @Template
      */
 	public function creditsAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -240,16 +253,14 @@ class PaymentController extends Controller {
 		}
 		$user = $this->getUser();
 
-		return array(
-			'myfee' =>			$this->get('payment_manager')->calculateUserFee($user),
-			'levels' =>			$this->get('payment_manager')->getPaymentLevels(),
-			'concepturl' =>	$this->generateUrl('bm2_site_default_paymentconcept')
-		);
+		return $this->render('Payment/credits.html.twig', [
+			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
+			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept')
+		]);
 	}
 
    /**
      * @Route("/subscription")
-     * @Template
      */
 	public function subscriptionAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -257,6 +268,13 @@ class PaymentController extends Controller {
 		}
 		$user = $this->getUser();
 		$levels = $this->get('payment_manager')->getPaymentLevels();
+
+		$sublevel = [];
+		foreach ($user->getPatronizing() as $patron) {
+			if ($patron->getCreator()->getCreator() == 'andrew' && $patron->getStatus() == 'active_patron') {
+				$sublevel['andrew'] = $patron->getCurrentAmount();
+			}
+		}
 
 		$form = $this->createForm(new SubscriptionType($levels, $user->getAccountLevel()));
 		$form->handleRequest($request);
@@ -273,18 +291,88 @@ class PaymentController extends Controller {
 			}
 		}
 
-		return array(
-			'myfee' =>			$this->get('payment_manager')->calculateUserFee($user),
-			'refund' => 		$this->get('payment_manager')->calculateRefund($user),
-			'levels' =>			$levels,
-			'concepturl' =>	$this->generateUrl('bm2_site_default_paymentconcept'),
-			'form'=>				$form->createView()
-		);
+		return $this->render('Payment/subscription.html.twig', [
+			'myfee' => $this->get('payment_manager')->calculateUserFee($user),
+			'refund' => $this->get('payment_manager')->calculateRefund($user),
+			'levels' => $levels,
+			'sublevel' => $sublevel,
+			'concepturl' => $this->generateUrl('bm2_site_default_paymentconcept'),
+			'creators' => $this->fetchPatreon(),
+			'form'=> $form->createView()
+		]);
+	}
+
+   /**
+     * @Route("/patreon/update", name="maf_patreon_update")
+     */
+	public function patreonUpdateAction(Request $request) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$patreons = $user->getPatronizing();
+		$pm = $this->get('payment_manager');
+
+		$now = new \DateTime('now');
+		$amount = 0;
+
+		foreach ($patreons as $patron) {
+			if ($patron->getExpires() < $now) {
+				$pm->refreshPatreonTokens($patron);
+			}
+			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
+			# NOTE: Expand this later for other creators if we have any.
+			if ($patron->getCreator()->getCreator()=='andrew') {
+				$amount += $entitlement;
+			}
+		}
+		if ($amount > 0) {
+			$amount = $amount/100;
+		}
+		$em->flush();
+		$this->addFlash('notice', $this->get('translator')->trans('account.patronizing', ['%entitlement%'=>$amount]));
+		return $this->redirectToRoute('bm2_account');
+	}
+
+   /**
+     * @Route("/patreon/{creator}", name="maf_patreon", requirements={"creator"="[A-Za-z]+"})
+     */
+	public function patreonAction(Request $request, $creator) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+
+		$code = $request->query->get('code');
+		$creator = $this->fetchPatreon($creator);
+		if (isset($code) && !empty($code)) {
+			$pm = $this->get('payment_manager');
+			$auth = new POA($creator->getClientId(), $creator->getClientSecret());
+			$tokens = $auth->get_tokens($code, $creator->getReturnUri());
+			$patron = $em->getRepository('BM2SiteBundle:Patron')->findOneBy(["user"=>$user, "creator"=>$creator]);
+			if (!$patron) {
+				$patron = new Patron();
+				$em->persist($patron);
+				$patron->setUser($user);
+				$patron->setCreator($creator);
+			}
+			$patron->setAccessToken($tokens['access_token']);
+			$patron->setRefreshToken($tokens['refresh_token']);
+			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
+			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('account.patronizing', ['%entitlement%'=>$entitlement/100]));
+			return $this->redirectToRoute('bm2_account');
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('account.patronfailure'));
+			return $this->redirectToRoute('bm2_site_payment_subscription');
+		}
 	}
 
    /**
      * @Route("/culture")
-     * @Template
      */
 	public function cultureAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -317,21 +405,22 @@ class PaymentController extends Controller {
 					$this->getUser()->getCultures()->add($buy);
 				}
 				$em->flush();
-				return array(
+
+				return $this->render('Payment/culture.html.twig', [
 					'bought'=>$buying,
 					'namescount'=>$namescount
-				);
+				]);
 			}
 		}
-		return array(
+
+		return $this->render('Payment/culture.html.twig', [
 			'cultures'=>$allcultures,
 			'namescount'=>$namescount,
 			'form'=>$form->createView()
-		);
+		]);
 	}
    /**
      * @Route("/gift")
-     * @Template
      */
 	public function giftAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -349,41 +438,41 @@ class PaymentController extends Controller {
 			$target = $em->getRepository('BM2SiteBundle:User')->findOneByEmail($data['email']);
 			if (!$target) {
 				sleep(1); // to make brute-forcing e-mail addresses a bit slower
-				return array('error'=>'notarget');				
+				return array('error'=>'notarget');
 			}
 			if ($target == $user) {
 				return array('error'=>'self');
 			}
 
-			$spent = $this->get('payment_manager')->spend($user, "gift", $value);
-			if ($spent) {
-				$code = $this->get('payment_manager')->createCode($value, 0, $data['email'], $user);
+			$code = $this->get('payment_manager')->createCode($value, 0, $data['email'], $user);
+			$this->get('payment_manager')->spend($user, "gift", $value);
 
-				$em->flush();
+			$em->flush();
 
-				$text = $this->get('translator')->trans('account.gift.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
-				$message = \Swift_Message::newInstance()
-					->setSubject($this->get('translator')->trans('account.gift.mail.subject', array()))
-					->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
-					->setTo($data['email'])
-					->setCc($user->getEmail())
-					->setBody($text, 'text/html')
-					->setMaxLineLength(1000)
-				;
-				$numSent = $this->get('mailer')->send($message);
-				$this->get('logger')->info("sent gift: ($numSent) from ".$user->getId()." to ".$data['email']." for $value credits");
+			$text = $this->get('translator')->trans('account.gift.mail.body', array("%credits%"=>$value, "%code%"=>$code->getCode(), "%message%"=>strip_tags($data['message'])));
+			$message = \Swift_Message::newInstance()
+				->setSubject($this->get('translator')->trans('account.gift.mail.subject', array()))
+				->setFrom(array('mafserver@lemuriacommunity.org' => $this->get('translator')->trans('mail.sender', array(), "communication")))
+				->setTo($data['email'])
+				->setCc($user->getEmail())
+				->setBody($text, 'text/html')
+				->setMaxLineLength(1000)
+			;
+			$numSent = $this->get('mailer')->send($message);
+			$this->get('logger')->info("sent gift: ($numSent) from ".$user->getId()." to ".$data['email']." for $value credits");
 
-				return array('success'=>true, 'credits'=>$value);
-			} else {
-				return array('error'=>'insufficient');
-			}
+			return $this->render('Payment/gift.html.twig', [
+				'success'=>true, 'credits'=>$value
+			]);
+
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Payment/gift.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
    /**
      * @Route("/invite")
-     * @Template
      */
 	public function inviteAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -415,10 +504,14 @@ class PaymentController extends Controller {
 			$numSent = $this->get('mailer')->send($message);
 			$this->get('logger')->info("sent friend invite: ($numSent) from ".$user->getId()." to ".$data['email']." for $value credits");
 
-			return array('success'=>true, 'credits'=>$value);
+			return $this->render('Payment/invite.html.twig', [
+				'success'=>true, 'credits'=>$value
+			]);
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Payment/invite.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 }

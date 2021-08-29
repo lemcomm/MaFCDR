@@ -1,0 +1,78 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "partners.name"|trans({},"politics")|title }}</h2>
+<p>{{ "partners.intro"|trans({},"politics")|raw }}</p>
+
+	{% if character.partnerships is not empty %}
+	<h3>{{ "partners.old.name"|trans({},"politics")|title }}</h3>
+	<p>{{ "partners.old.intro"|trans({},"politics")|raw }}</p>
+	<form action="{{ path('bm2_site_politics_partners', {'type':'old'}) }}" method="post">
+	{{ form_errors(form_old) }}
+	{{ form_widget(form_old._token) }}
+	<table><tbody>
+		{% for partnership in character.partnerships %}
+			{% if partnership.enddate is null %}
+			<tr>
+				<td>
+					{% if not partnership.active %}
+						{% if partnership.initiator == character %}
+							{{ 'relation.proposedyou'|trans({},"politics") }}
+						{% else %}
+							{{ 'relation.proposedto'|trans({},"politics") }}
+						{% endif %}
+					{% endif %}
+				</td>
+				<td>
+					{% if partnership.public %}
+						{{ 'relation.public'|trans({},"politics") }}
+					{% else %}
+						{{ 'relation.secret'|trans({},"politics") }}
+					{% endif %}
+				</td>
+				<td>{{ ("relation.choice."~partnership.type)|trans({},"politics") }}</td>
+				<td>{{ 'relation.with'|trans({},"politics") }}</td>
+				<td>{{ link(partnership.otherpartner(character)) }}</td>
+				<td>{% if partnership.partnermayusecrest %}{{ 'relation.heraldry'|trans({},"politics") }}{% else %}{{ 'relation.noheraldry'|trans({},"politics") }}{% endif %}</td>
+				<td>{% if partnership.withsex %}{{ 'relation.sex'|trans({},"politics") }}{% else %}{{ 'relation.nosex'|trans({},"politics") }}{% endif %}</td>
+				<td>{{ form_widget(form_old.partnership[partnership.id]) }}</td>
+			</tr>
+			{% endif %}
+		{% endfor %}
+	</tbody></table>
+		{{ form_widget(form_old) }}
+	<button type="submit">{{ "relation.choice.submitchange"|trans({},"politics") }}</button>
+	</form>
+	{% endif %}
+
+	<h3>{{ "partners.new.name"|trans({},"politics")|title }}</h3>
+	{% if newavailable %}
+		<p>{{ "partners.new.intro"|trans({},"politics")|raw }}</p>
+		<form class="compact" action="{{ path('bm2_site_politics_partners', {'type':'new'}) }}" method="post">
+			{{ form_widget(form_new) }}
+		<button type="submit">{{ "relation.choice.submitnew"|trans({},"politics") }}</button>
+		</form>
+	{% else %}
+		<p>{{ "partners.new.none"|trans({},"politics")|raw }}</p>
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+$("#partnership_type").change(function(){
+	var type = $("#partnership_type").val();
+	switch (type) {
+		case 'engagement':
+			$("#partnership_sex").prop('checked', false);
+			break;
+		case 'marriage':
+			$("#partnership_public").prop('checked', true);
+			$("#partnership_sex").prop('checked', true);
+			break;
+		case 'liason':
+			$("#partnership_public").prop('checked', false);
+			$("#partnership_sex").prop('checked', true);
+			break;
+	}
+});
+{% endblock %}

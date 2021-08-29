@@ -14,16 +14,35 @@ status:
   position:     %position% of %realm%.
   househead:    You are head of the %house%
   housememb:    You are part of the %house%
+  realmvassal:  You are a knight of the realm of %liege%.
+  landvassal:   You are a knight of the settlement of %liege% in the realm of %realm%.
+  landvassal2:  You are a knight of the independent settlement of %liege%.
+  positionvassal: You are a knight of the position of %liege% in the realm of %realm%.
+  liegeplace:   You are a knight of the place of %liege% in the realm of %realm%.
+  liegeplace2:  You are a knight of the independent place of %liege%.
+  liegeposition: You are a knight of the %liege% of %realm%.
  other:
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
   independent:	%He% is an independent lord.
   vassal:			  %He% is a vassal of %liege%.
+  realmvassal: %He% is a vassal of %liege%.
+  landvassal:  %He% is a vassal of the land of %liege% in %realm%.
+  landvassal2: %He% is a vassal of the land of %liege% which is independent.
+  placevassal: %He% is a vassal of the place of %liege% in %realm%.
+  placevassal2: %He% is a vassal of the place of %liege% which is independent.
+  positionvassal: %He% is a vassal of the position of %liege% in %realm%.
   realm:        %He% is a member of %realm%
   ultimate:     %He% is an independent leader, but has not formed a realm yet.
   liege:        Liege of:
   househead:    %He% is head of the %house%
   housememb:    %He% is part of the %house%
+  realmvassal:  %He% is a knight of the realm of %liege%.
+  landvassal:   %He% is a knight of the settlement of %liege% in %realm%.
+  landvassal2:  %He% is a knight of the independent settlement of %liege%.
+  liegeplace:   %He% is a knight of the place of %liege% in the realm of %realm%.
+  liegeplace2:  %He% is a knight of the independent place of %liege%.
+  liegeposition: %He% is a knight of the %liege% of %realm%.
  realm:
   independent:  %name% is an independent realm.
   ultimate:     %name% is a sovereign realm.
@@ -110,16 +129,16 @@ votes:
  updated:       Your votes have been updated.
 
 oath:
- view:          
+ view:
   name:         Oath Tree
   description:  See your oaths in a graphical view.
   longdesc:     View the tree of oaths that you belong to. (might take a short while to generate for large trees)
- name:          Oath of Fealty
+ name:          Offer a New Oath of Fealty
  intro: >
-   Fealty is what defines the hierarchy and political system. What exactly an oath contains - vassalage, military service, 
-   shares of estate income, protection, honour and politics - is negotiable between liege and vassal.<br />
-   Here you can swear an oath of fealty to a nearby character, which turns you into his or her vassal. This will also make
-   your estate a part of his/her realm.
+   Fealty is what defines the hierarchy and political system. What exactly an oath contains - vassalage, military service,
+   shares of estate income, protection, honour and politics - is negotiable between liege and vassal.<br /><br />
+   Here you can offer an oath of fealty to any position of authority, be it the lord of a settlement, the owner of a place of interest, a realm position holder, or even to a realm ruler directly, if the people holding that position are present. If you're inside a Settlement or a Place of Interest, and those are a viable choice, they will always be present.<br /><br />
+   Who you hold an oath of fealty to defines your primary realm affiliation. Since your oath is to a position, not necessarily the person holding it, this should prevent confusing realm loyalties to some degree.
  hasvassals: >
    All your vassals will also become a part of the realm you join, as their oath to you binds them to your decisions. Of course,
    if you act against their will, they might leave you afterwards.
@@ -133,9 +152,11 @@ oath:
  nobody:    There are no eligible new lords within your action range.
  newliege:	New liege
  choose:		-- Choose liege --
+ offerto:   Offer your services to...
+ message:   Message to include...
  norealm:   Independent
  swearto:   Swear oath to...
- submit:		Swear oath
+ submit:		 Offer oath
  fail:
   vassal:	You cannot swear an oath to your own vassals (or their vassals).
  success:	Swearing an oath of fealty, you are now a vassal of %newliege%.
@@ -143,9 +164,25 @@ oath:
  reason:
   liege:   Already is your current liege
   vassal:  Is your vassal or a vassal of one of your vassals
+ position:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
+ place:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
+ settlement:
+  approved:     You have accepted the oath of vassalage from %name%
+  rejected:     You have rejected the oath of vassalage from %name%
+ offer:
+  preamble:     "%link-character% has offered an oath of fealty to you, in your position as the lord of %link-settlement%, on %date% and has provided the following message:"
+  preamble2:     "%link-character% has offered an oath of fealty to you, in your position as the ruler of %link-realm%, on %date% and has provided the following message:"
+  preamble3:     "%link-character% has offered an oath of fealty to you, in your position as the owner of %link-place%, on %date% and has provided the following message:"
+  preamble4:     "%link-character% has offered an oath of fealty to you, in your position as the holder of %link-realmposition%, on %date% and has provided the following message:"
+  approve:      Accept their fealty
+  deny:         Reject their fealty
 
 vassals:
- view:          
+ view:
   name:         Vassals
   description:  Review and manage your vassals
   longdesc:     View details on your vassals and manage them, including disowning them.
@@ -155,7 +192,7 @@ vassals:
   desc: >
     If %name% has been disloyal to you, broken the oaths of fealty or otherwise justified this serious action,
     you can dissolve the fealty relationship below.<br />
-    This is a serious action and will be marked in your vassal's history. You should also use the opportunity 
+    This is a serious action and will be marked in your vassal's history. You should also use the opportunity
     to visit their character page - %name% and leave a reputation comment.
   submit:       Disown
   success: >
@@ -180,7 +217,7 @@ successor:
  intro: >
    Death being a part of life, it is important for every noble to assign a successor to his or her titles and holdings.<br />
    You can select any character nearby enough to exchange documents, or anyone of your characters (as they are assumed to be
-   from the same family or dynasty) irrespective of distance. Note that your estates, titles, etc. will leave your control 
+   from the same family or dynasty) irrespective of distance. Note that your estates, titles, etc. will leave your control
    if they are inherited by a character that does not belong to you.
  set:       Assign a new successor
  choose:    -- Choose successor --
@@ -276,7 +313,7 @@ realm:
   name:         Dismantle Realm
   description:  Tear down this realm.
   longdesc:     As the ruler of %formalname%, it's within your authority to order it's complete and utter dismantling, if you so wish.
-  intro: > 
+  intro: >
     Using your authority as ruler of this realm, you can forcibly dismantle this realm and remove it from existence.<br />
     If you're not absolutely certain that you wish to do this, you shouldn't even be looking at this. That's how serious this action is.<br />
     It's also worth noting that you are only dismantling this realm, not it's subordinates, who will automatically gain independence.
@@ -368,6 +405,26 @@ realm:
    5: Princess
    6: Queen
    7: Empress
+ newplayer:
+  name: Review Arrival Description
+  name2: Update the Arrival Description of %name%
+  description: Modify the new player description of the realm.
+  longdesc: This page will let you modify the new player description of the realm, which is displayed as part of the new character spawn selection process.
+  intro: Here you can alter the realm information that is displayed to players creating a new character or considering to join your realm at an Arrival location. This will display across all arrival locations for the realm of %name%, and should be used to describe the realm, not the locations you can spawn at. It is understood that this will also, likely, include propaganda about your realm, but that is your choice. <br /><br />It should be noted that this will only display in locations directly spawning into your realm, not your subrealms. They have their own, if you allow that.
+ spawns:
+  name: Manage Arrival Locations
+  description: Determine which arrival locations are active for your realm.
+  longdesc: This page lets you manage which of the Places in the Realm, that have been configured as such, can be used as arrival places for the realm.
+  intro: In a realm, there are any number of formalized Places of Interest, many of which can be utilized as a place of arrival for your realm, that will allow foreign and newly introduced First Ones to join your realm. Ideally, you'll want to centralize to only a few places to allow first ones to arrive in your realm, in order to ensure they get the best new player experience you can offer.
+  owner:
+   name: Owned By
+   empty: No Current Owner
+  status:
+   active: Currently allowing new arrivals
+   inactive: Turning all arrivals away to other locations
+  toggle:
+   active: Allow new arrivals to join the realm here
+   inactive: Forbid new arrivals from joining here
 
 position:
  name:          Title:
@@ -406,7 +463,7 @@ position:
   keeponslumber: Check this box to make this a position that is kept when a character slumbers. If left unchecked, position will be lost if a character slumbers.
   minholders:   Select the number of minimum holders this position should have.
   welcomer:     Select this to allow lords of the realm to include holders of this position on new player conversations--it is highly recommended that every realm have AT LEAST one position flagged as such!
-  
+
  appoint:
   intro: >
     You can appoint and discharge officials from this position at any time for any reason. They will, of course, be informed about your decision immediately
@@ -487,6 +544,13 @@ diplomacy:
    type:        Does not have a higher designation than your realm.
    current:     Is your current superior realm.
   done:         You have successfully submitted to the superior power of %target% and made your %realm% a part of it.
+  sent:         Your request has been sent to %target%.
+  approve:      Approve
+  approved:     %name% is now a subrealm of %name2%.
+  deny:         Deny
+  denied:       You have rejected the request of %name% to become a subrealm of %name2%.
+  preamble:     'You have received a request from %link-character%, a ruler of %link-realm%, to join their realm under %link-realm-2%, on %date%, as follows:'
+
 
  restore:
   name:         Restore %name%
@@ -496,14 +560,14 @@ diplomacy:
     As the ruler of %super%, you can use your authority to bring %name% back into existence, making yourself its ruler in the process.
     All you need to do is confirm that this is an action you want to take by clicking the button below.
   submit:       Revive Realm
-  success:      You have successfully restored the subrealm.  
+  success:      You have successfully restored the subrealm.
 
  subrealm:
   name:         Create Subrealm
   description:  Turn parts of your realm into a smaller sub-realm.
   intro: >
     As the ruler of %name%, you can create sub-realms within your realm by splitting your estates up between your main realm and the new vassal realm.<br />
-    Simply select the estates that you want to be part of the new sub-realm below, then give it a name, a designation and pick one of the lords of the 
+    Simply select the estates that you want to be part of the new sub-realm below, then give it a name, a designation and pick one of the lords of the
     new realm as its ruler.<br />
     Your new sub-realm must have at least one estate and at least one estate must remain with your main realm.
   estates:      Estates joining the new realm
@@ -584,7 +648,7 @@ lists:
    These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others, but not all.<br />
  intro: >
    Defining lists of realms and people you consider allies, friends, enemies, etc. makes it easier to make targeted actions.<br />
-   These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others, 
+   These lists are used for actions, settlement permissions and every other place where you want some activity to apply to some others,
    but not all.<br />
    You can define <i>realms</i> or <i>First Ones</i> as list members, in both cases with or without subservients (i.e. sub-realms or vassals).<br />
    Permissions will be evaluated in order (top-down) until the first match, so you can allow something to an
@@ -638,6 +702,7 @@ perm:
  laws:      Change Laws
  wars:      Manage Wars
  describe:  Update Description
+ units:     Manage Units
  realmdescribe: Update Description
  placeinside: Construct Place Inside
  placeoutside: Construct Place Outside
@@ -646,13 +711,10 @@ perm:
   visit: >
     Allow others to enter the settlement, a precondition for most other actions as well as interactions with First Ones inside.
   resupply: >
-    Allows others to resupply their soldiers at your settlement, up to a number of items per day that you can 
+    Allows others to resupply their soldiers at your settlement, up to a number of items per day that you can
     limit with the <em>amount</em> value. This amount is shared by everyone on the list.
   mobilize: >
-    Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of 
-    soldiers that can be mobilized per day is limited by the <em>amount</em> value, which is shared by everyone on the list.<br />
-    To prevent depletion of your defenses, you can also set a <em>reserve</em> value declaring that the reserve number of soldiers
-    always has to remain in the settlement.
+    Currently not in use.
   construct: >
     Allows others to initiate and manage construction projects in your settlement.<br />
     To prevent excessive building, you can define a <em>reserve</em> value, which is the percentage of peasants that must remain
@@ -660,7 +722,9 @@ perm:
   recruit: >
     Allows others to train new soldiers in your settlement.<br />
     To prevent excessive recruitment, you can set the <em>amount</em> value, which limits the number of new soldiers sent into
-    training per day. This value is shared by everyone on the list. 
+    training per day. This value is shared by everyone on the list.
+  units: >
+    Allows others to manage the units and recruitment in your settlement. This includes appointing marshals, training soldiers, disbanding soldiers, assign units to others, and disbanding entire units.
   trade: >
     Allows others to initiate trades from your settlement towards others, i.e. outbound trade.<br />
     Be very careful with this option as it cannot be limited, and someone trading all your food away can very quickly bring ruin
@@ -693,10 +757,10 @@ perm:
   placevisit: >
     Allow others to enter the Place, precondition for most other actions as well as interactions with nobles inside.
   placeresupply: >
-    Allows others to resupply their soldiers at your Place, up to a number of items per day that you can 
+    Allows others to resupply their soldiers at your Place, up to a number of items per day that you can
     limit with the <em>amount</em> value. This amount is shared by everyone on the list.
   placemobilize: >
-    Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of 
+    Allows others to mobilize troops from your militia, i.e. recruit them as their own soldiers. The number of
     soldiers that can be mobilized per day is limited by the <em>amount</em> value, which is shared by everyone on the list.<br />
     To prevent depletion of your defenses, you can also set a <em>reserve</em> value declaring that the reserve number of soldiers
     always has to remain in the settlement.
@@ -735,12 +799,12 @@ law:
    inherit:   inherit
    liege:     liege
    ruler:     ruler
-  desc: 
+  desc:
    banner:    one vote per First One
    spears:    one vote per warrior commanded
    swords:    one vote per vassal
    land:      one vote per estate
-   heads:     one vote per peasant ruled 
+   heads:     one vote per peasant ruled
    inherit:   inherited by successor
    liege:     fall to the lord
    ruler:     fall to the ruler
@@ -757,11 +821,12 @@ claim:
  cancelled:   You have withdrawn your claim.
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
- 
+
 house:
  history:
   name:         House History
  nodesc:        For reasons beyond your ability to know, this house does not have a description.
+ nohead:        Vacant
  new:
   name:         Formalize Your House
   description:  Any First One can declare themselves head of their House
@@ -778,8 +843,9 @@ house:
    Alternatively, should your character die and another character inherit the house that has a crest, it will be set to theirs.<br />
    It is worth note however, that any of your future descendants will, if the other parent either has no house, or is part of the
    same house, also join your house automatically.<br />
-   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't a legal 
-   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.
+   Lastly, be sure to set your successor after forming the house. If you don't set a successor, and your regular heir isn't a legal
+   successor (see the manual on Houses) the House will automatically pass to it's eldest active member.<br /><br />
+   <em>NOTE: Houses are not for guilds, associations, religions, cults, societies, or anything guild or religion like. Those will come in a future update.</em>
  background:
   name:
    name:        Name of the House
@@ -798,8 +864,41 @@ house:
    name:        Secret Memo
    desc:        It may surprise you, but you can also leave yourself a message here as well. Although, you could also use to to pass words to your successor, whomever that may end up being.
  create:
+  motto:        House Motto
   submit:       Create Your House!
- join:  
+ cadet:
+  name:    Offer Cadetship
+  intro: >
+    As the head of %house2%, it is within your capabilities to unilaterally declare your house subservient to %house1%.
+    That said, once you do this, the only way it can be undone is by the permission of the house you will be subservient to.<br /><br />
+    If you wish to go through with this, you can send a request offering your subordination with the form below.
+  subject:
+   name:   Request Subject
+   desc:   A short, and to the point summary
+  text:
+   name:   Message Contents
+   desc:   While you could leave this blank, adding some words explaining exactly why you are offering the subservience of your entire House is advised.
+  sure:
+   name:   Certain?
+   desc:   Once you do this, the only way you can undo it is if the other house agrees.
+ uncadet:
+  name:         Request End of Cadetship
+  description:  Ask your superior house for your house's freedom.
+  longdesc:     It is always possible to request an end to the cadetship of your house, but your superior house has no obligation to agree.
+  intro: >
+    As the head of %house-2%, it is within your capabilities to request freedom for your House from %house-1%.
+    That said, the do not have to accept your request. If they do not, and if you find this particularly problematic, perhaps it might be best to arrange for a change of leadership.<br /><br />
+    If you wish to go through with this, you can send a request asking for your freedom with the form below.
+  subject:
+   name:   Request Subject
+   desc:   A short, and to the point summary
+  text:
+   name:   Message Contents
+   desc:   While you could leave this blank, adding some words explaining exactly why you are requesting the freedom of your entire House is advised.
+  sure:
+   name:   Certain?
+   desc:   Once a request is sent, it cannot be unsent.
+ join:
   name:         Ask to Join this House
   intro: >
    As you do not yet have a house, you can always request to join one. If you find this one to your liking, why not join$
@@ -829,16 +928,36 @@ house:
    description: Find a location that better suits your House?
    longdesc:    If your house's previous location didn't quite suit your likings, you can always move it to another settlement.
    intro: >
-    As the Head of the %name% it is well within your powers to relocate the House to a place more of your choosing.
-    You can do this whenever you so desire, so long as you are in a region in which you have the rights to do so--moving 
-    isn't so simple as forming one, and it's not seen as such an inalienable right of First Ones to do.
+    As the Head of the <b>%name%</b> it is well within your powers to relocate the House to a place more of your choosing.
+    You can do this whenever you so desire, so long as you are in a Home in which you own--moving
+    isn't so simple as forming a House, and it's not seen an inalienable right of First Ones to do.<br /><br />
     If you're sure about moving to the settlement you're currently in, simple check the box below, and click 'submit'.
+  revive:
+   name:        Revive the House
+   name2:       Revive the %name%
+   description: Revive your house and assume control of it.
+   longdesc:    For whatever reason, your house appears to have fallen into disrepair. You could opt to fix that, if you'd like.
+   intro: >
+     As a member of the defunct house of <b>%name%</b> it is within your abilities to re-establish the House under your control, regardless of what others may think about this.<br /><br />
+     Please be aware though, that this puts you, specifically, in charge. If you want someone else to run the House, have them use this action instead.
   applicant:
    preamble:    You've received a request to join the House from %link-character%, on %date%, as follows:
    approve:     Approve
-   approved:    The applcation from %link-character% has been approved.
+   approved:    The applcation from %character% has been approved.
    deny:        Deny
-   denied:      The applcation from %link-character% has been denied.
+   denied:      The applcation from %character% has been denied.
+  cadet:
+   preamble:    You've received an offer of cadetship from %link-character% of %link-house%, on %date%, as follows:
+   approve:     Approve
+   approved:    The cadetship from %character% of %house% has been approved.
+   deny:        Deny
+   denied:      The cadetship from %character% of %house% has been denied.
+  uncadet:
+   preamble:    You've received an request for disassociation from %link-character% of the cadet %link-house%, on %date%, as follows:
+   approve:     Approve
+   approved:    The disassociation request from %character% of %house% has been approved.
+   deny:        Deny
+   denied:      The disassociation request from %character% of %house% has been denied.
   applicants:
    name:        Manage Applicants
    name2:       Manage Applicants to the %name%
@@ -869,7 +988,7 @@ house:
     leaves the Dynasty for some reason, the nominated Successor will no longer be a legal inheritor (usually). It is highly recommended
     that you read the manual on [houses].
  members:
-  submit:       Submit  
+  submit:       Submit
  updated:
   background:   You have successfully updated the background of this House.
   created:      You have successfully created a noble house.
@@ -880,12 +999,16 @@ house:
   name:         View Your House
   description:  It is always your prerogative to view your own house's details.
   longdesc: >
-   As a First One, the public details of any house are always available to you. 
+   As a First One, the public details of any house are always available to you.
    This naturally includes the public (and private) details of your own house.
   head:         Head
+  nohead:       no one
   founder:      Founder
+  cadets:       Cadets
+  superior:     Superior
   home:         Home
   members:      Members
+  motto:        Motto
   notable:      Notable Members
   internal:     Internal Information
   secret:       Secret Information
@@ -895,3 +1018,20 @@ house:
    Houses, courtesy of the First Ones that comprise them, are hard to miss things. If they're there, you'll know.
    It's a First One thing. As a First One yourself though, you can view any of the local ones, and even petition to join one if you
    are not already part of another.
+ newplayer:
+  name:         Setup Intro Message
+  name2:        Update the Arrival Description of %name%
+  description:  Alter the message new character receive
+  longdesc:     As the head of your house, you directly control the introduction those who arrive here receive
+  intro:        Here you can alter the house information that is displayed to players creating a new character or considering to join %name% at an Arrival location. It is understood that this will, likely, include propaganda about your realm, but that is your choice.
+ cadet:
+  name:        Offer Subordination
+  description: Offer to merge your house into another house as a cadet house.
+  longdesc: >
+    As the head of a house you can decide that perhaps your house would be better off as part of another, potentially more powerful house.
+    It should be noted, that you won't be able to undo this on your own, though you will retain control over your own house otherwise.
+  subject: Offer Subject
+  text:    Offer Text
+ spawntoggle:
+  name:    Toggle Spawning
+  description: Allow players to spawn into your House.

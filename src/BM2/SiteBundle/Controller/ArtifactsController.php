@@ -20,17 +20,17 @@ class ArtifactsController extends Controller {
 
 	/**
 	  * @Route("/owned")
-	  * @Template
 	  */
 	public function ownedAction() {
 		$user = $this->getUser();
 
-		return array('artifacts'=>$user->getArtifacts());
+		return $this->render('Artifacts/owned.html.twig', [
+			'artifacts'=>$user->getArtifacts(),
+		]);
 	}
 
 	/**
 	  * @Route("/create")
-	  * @Template
 	  */
 	public function createAction(Request $request) {
 		$user = $this->getUser();
@@ -56,7 +56,7 @@ class ArtifactsController extends Controller {
 				if (strlen($name) < 6) {
 					$form->addError(new FormError("Your name should be at least 6 characters long."));
 					return array('form'=>$form->createView());
-				}				
+				}
 
 				$em = $this->getDoctrine()->getManager();
 
@@ -85,23 +85,28 @@ class ArtifactsController extends Controller {
 				$em->flush();
 				return $this->redirectToRoute('bm2_site_artifacts_details', array('id'=>$artifact->getId()));
 			}
-			return array('form'=>$form->createView());
+
+			return $this->render('Artifacts/create.html.twig', [
+				'form'=>$form->createView(),
+			]);
 		} else {
-			return array('limit_reached' => false);
+			return $this->render('Artifacts/create.html.twig', [
+				'limit_reached' => false,
+			]);
 		}
 	}
 
 	/**
 	  * @Route("/details/{id}", requirements={"id"="\d+"})")
-	  * @Template
 	  */
 	public function detailsAction(Artifact $id) {
-		return array('artifact'=>$id);
+		return $this->render('Artifacts/details.html.twig', [
+			'artifact'=>$id,
+		]);
 	}
 
 	/**
 	  * @Route("/assign/{id}", requirements={"id"="\d+"})")
-	  * @Template
 	  */
 	public function assignAction(Artifact $id, Request $request) {
 		$user = $this->getUser();
@@ -134,16 +139,17 @@ class ArtifactsController extends Controller {
 			);
 
 			$this->getDoctrine()->getManager()->flush();
-
-			return array('artifact'=>$artifact, 'givento'=>$data['target']);
+			return $this->render('Artifacts/assign.html.twig', [
+				'artifact'=>$artifact, 'givento'=>$data['target']
+			]);
 		}
-
-		return array('artifact'=>$artifact, 'form'=>$form->createView());
+		return $this->render('Artifacts/assign.html.twig', [
+			'artifact'=>$artifact, 'form'=>$form->createView()
+		]);
 	}
 
 	/**
 	  * @Route("/spawn/{id}", requirements={"id"="\d+"})")
-	  * @Template
 	  */
 	public function spawnAction(Artifact $id, Request $request) {
 		$user = $this->getUser();
@@ -187,14 +193,14 @@ class ArtifactsController extends Controller {
 			);
 
 		}
-
-		return array('artifact'=>$artifact, 'form'=>$form->createView());
+		return $this->render('Artifacts/spawn.html.twig', [
+			'artifact'=>$artifact, 'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/give")
-	  * @Template
 	  */
 	public function giveAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('locationGiveArtifactTest');
@@ -223,10 +229,13 @@ class ArtifactsController extends Controller {
 				History::MEDIUM, true, 20
 			);
 			$em->flush();
-			return array('success'=>true, 'artifact'=>$artifact, 'target'=>$target);
+			return $this->render('Artifacts/give.html.twig', [
+				'success'=>true, 'artifact'=>$artifact, 'target'=>$target
+			]);
 		}
-
-		return array('form'=>$form->createView());
+		return $this->render('Artifacts/give.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 }

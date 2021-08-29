@@ -1,0 +1,27 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "building.temple.name"|trans({},"actions")|title }}</h2>
+<p>{{ "building.temple.intro"|trans({"%settlement%":link(settlement)},"actions")|raw }}</p>
+
+<div id="graph" style="width: 100%; height: 32em"></div>
+
+<br class="clear"/>
+
+{% endblock %}
+
+{% block jquery %}
+var options = {
+	legend: {
+			position: "nw"
+	},
+};
+
+$.plot($("#graph"), [ {{data.population|json_encode|raw}}, {{data.thralls|json_encode|raw}} ], options );
+
+{% endblock %}

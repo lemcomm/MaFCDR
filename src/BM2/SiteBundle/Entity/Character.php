@@ -1,9 +1,11 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
+use BM2\SiteBundle\Entity\Place;
 
 class Character {
 
@@ -28,6 +30,10 @@ class Character {
 		} else {
 			return '<i>'.$this->known_as.'</i>';
 		}
+	}
+
+	public function getListName() {
+		return $this->getName().' (ID: '.$this->id.')';
 	}
 
 	public function DaysInGame() {
@@ -146,6 +152,7 @@ class Character {
 	public function isActive($include_wounded=false, $include_slumbering=false) {
 		if (!$this->location) return false;
 		if (!$this->alive) return false;
+		if ($this->retired) return false;
 		if ($this->slumbering && !$include_slumbering) return false;
 		// we can take a few wounds before we go inactive
 		if ($this->healthValue() < 0.9 && !$include_wounded) return false;
@@ -177,8 +184,8 @@ class Character {
 
 	public function getVisualSize() {
 		$size = 5; // the default visual size for nobles, we're not added as a pseudo-soldier like we are in battle groups
-		foreach ($this->soldiers as $soldier) {
-			$size += $soldier->getVisualSize();
+		foreach ($this->units as $unit) {
+			$size += $unit->getVisualSize();
 		}
 		return $size;
 	}
@@ -212,30 +219,6 @@ class Character {
 		return $this->getEntourageOfType($type, true);
 	}
 
-	public function getActiveSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isActive());
-			}
-		);
-	}
-
-	public function getLivingSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return ($entry->isAlive());
-			}
-		);
-	}
-
-	public function getDeadSoldiers() {
-		return $this->getSoldiers()->filter(
-			function($entry) {
-				return (!$entry->isAlive());
-			}
-		);
-	}
-
 	public function getLivingEntourage() {
 		return $this->getEntourage()->filter(
 			function($entry) {
@@ -261,32 +244,10 @@ class Character {
 		if ($active_only) {
 			$npcs = $this->getLivingEntourage();
 		} else {
-			$npcs = $this->getEntourage();		
+			$npcs = $this->getEntourage();
 		}
 		foreach ($npcs as $npc) {
 			$type = $npc->getType()->getName();
-			if (isset($data[$type])) {
-				$data[$type]++;
-			} else {
-				$data[$type] = 1;
-			}
-		}
-		return $data;
-	}
-
-
-	public function getActiveSoldiersByType() {
-		return $this->getSoldiersByType(true);
-	}
-	public function getSoldiersByType($active_only=false) {
-		$data = array();
-		if ($active_only) {
-			$soldiers = $this->getActiveSoldiers();
-		} else {
-			$soldiers = $this->getSoldiers();
-		}
-		foreach ($soldiers as $soldier) {
-			$type = $soldier->getType();
 			if (isset($data[$type])) {
 				$data[$type]++;
 			} else {
@@ -321,7 +282,7 @@ class Character {
 			while ($liege->getLiege()) {
 				$liege=$liege->getLiege();
 			}
-			$this->ultimate=$liege;			
+			$this->ultimate=$liege;
 		}
 		return $this->ultimate;
 	}
@@ -340,14 +301,37 @@ class Character {
 				$realms->add($position->getRealm());
 			}
 		}
-		foreach ($this->getEstates() as $estate) {
+		foreach ($this->getOwnedSettlements() as $estate) {
 			if ($realm = $estate->getRealm()) {
 				if (!$realms->contains($realm)) {
 					$realms->add($realm);
 				}
 			}
 		}
-		if ($check_lord && $this->getLiege()) {
+		foreach ($this->getOwnedPlaces() as $place) {
+			if ($realm = $place->getRealm()) {
+				if (!$realms->contains($realm)) {
+					$realms->add($realm);
+				}
+			}
+		}
+
+		if ($check_lord && $this->findAllegiance()) {
+			$alg = $this->findAllegiance();
+			if (!$alg instanceof Realm) {
+				if ($alg->getRealm() != NULL) {
+					if (!$realms->contains($alg->getRealm())) {
+						$realms->add($alg->getRealm());
+					}
+				}
+			} else {
+				if ($alg != NULL) {
+					if (!$realms->contains($alg)) {
+						$realms->add($alg);
+					}
+				}
+			}
+		} elseif ($check_lord && $this->getLiege()) {
 			foreach ($this->getLiege()->findRealms(false) as $lordrealm) {
 				if (!$realms->contains($lordrealm)) {
 					$realms->add($lordrealm);
@@ -363,7 +347,7 @@ class Character {
 			}
 		}
 		$this->my_realms = $realms;
-		
+
 		return $realms;
 	}
 
@@ -384,7 +368,6 @@ class Character {
 		return $houses;
 	}
 
-
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
 			if ($log->hasNewEvents()) {
@@ -403,19 +386,23 @@ class Character {
 	}
 
 	public function hasNewMessages() {
-		if ($this->getMsgUser()) {
-			return $this->getMsgUser()->hasNewMessages();
-		} else {
-			return false;
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getUnread() > 0;});
+		if ($permissions->count() > 0) {
+			return true;
 		}
+		return false;
 	}
 
 	public function countNewMessages() {
-		if ($this->getMsgUser()) {
-			return $this->getMsgUser()->countNewMessages();
-		} else {
-			return 0;
+		$permissions = $this->getConvPermissions()->filter(function($entry) {return $entry->getUnread() > 0;});
+		$total = 0;
+		if ($permissions->count() > 0) {
+			foreach ($permissions as $perm) {
+				$total += $perm->getUnread();
+			}
+			return $total;
 		}
+		return $total;
 	}
 
 	public function findActions($key) {
@@ -424,14 +411,135 @@ class Character {
 				if (is_array($key)) {
 					return in_array($entry->getType(), $key);
 				} else {
-					return ($entry->getType()==$key);					
+					return ($entry->getType()==$key);
 				}
 			}
-		);		
+		);
 	}
 
 	public function hasAction($key) {
 		return ($this->findActions($key)->count()>0);
 	}
 
+	public function findForeignAffairsRealms() {
+		$realms = new ArrayCollection();
+		foreach ($this->getPositions() as $pos) {
+			if ($pos->getRuler()) {
+				$realms->add($pos->getRealm()->getId());
+			}
+			if ($pos->getType() && $pos->getType()->getName() == 'foreign affairs') {
+				$realms->add($pos->getRealm()->getId());
+			}
+		}
+		if ($realms->isEmpty()) {
+			return null;
+		} else {
+			return $realms;
+		}
+	}
+
+	public function hasNoSoldiers() {
+		$noSoldiers = true;
+		if (!$this->getUnits()->isEmpty()) {
+			foreach ($this->getUnits() as $unit) {
+				if ($unit->getActiveSoldiers()->count() > 0) {
+					$noSoldiers = false;
+					break;
+				}
+			}
+		}
+		return $noSoldiers;
+	}
+
+	public function findAllegiance() {
+		if ($this->realm) {
+			return $this->getRealm();
+		}
+		if ($this->liege_land) {
+			return $this->getLiegeLand();
+		}
+		if ($this->liege_place) {
+			return $this->getLiegePlace();
+		}
+		if ($this->liege_position) {
+			return $this->getLiegePosition();
+		}
+		if ($this->liege) {
+			return $this->getLiege();
+		}
+		return null;
+	}
+
+	public function findVassals() {
+		$vassals = new ArrayCollection();
+		foreach ($this->getPositions() as $key) {
+			if ($key->getRuler()) {
+				foreach ($key->getRealm()->getVassals() as $val) {
+					$vassals->add($val);
+				}
+			}
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		foreach ($this->getOwnedPlaces() as $key) {
+			if ($key->getType()->getName() != 'embassy') {
+				foreach ($key->getVassals() as $val) {
+					$vassals->add($val);
+				}
+			}
+		}
+		foreach ($this->getOwnedSettlements() as $key) {
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		foreach ($this->getAmbassadorships() as $key) {
+			foreach ($key->getVassals() as $val) {
+				$vassals->add($val);
+			}
+		}
+		return $vassals;
+	}
+
+	public function findPrimaryRealm() {
+		if ($this->realm) {
+			return $this->getRealm();
+		}
+		if ($this->liege_land) {
+			return $this->getLiegeLand()->getRealm();
+		}
+		if ($this->liege_place) {
+			return $this->getLiegePlace()->getRealm();
+		}
+		if ($this->liege_position) {
+			return $this->getLiegePosition()->getRealm();
+		}
+		return null;
+	}
+
+	public function findLiege() {
+		$alleg = $this->findAllegiance();
+		if ($alleg instanceof Character) {
+			return $alleg;
+		}
+		if ($alleg instanceof Realm) {
+			return $alleg->findRulers();
+		}
+		if ($alleg instanceof Settlement) {
+			return $alleg->getOwner();
+		}
+		if ($alleg instanceof Place) {
+			if ($alleg->getType()->getName() != 'embassy') {
+				return $alleg->getOwner();
+			} else {
+				return $alleg->getAmbassador();
+			}
+		}
+		if ($alleg instanceof RealmPosition) {
+			return $alleg->getHolders();
+		}
+		return null;
+	}
+	
 }

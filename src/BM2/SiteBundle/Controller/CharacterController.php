@@ -6,14 +6,18 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterRating;
 use BM2\SiteBundle\Entity\CharacterRatingVote;
+use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\Spawn;
+use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
 use BM2\SiteBundle\Form\CharacterBackgroundType;
+use BM2\SiteBundle\Form\CharacterLoadoutType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
 use BM2\SiteBundle\Form\CharacterRatingType;
 use BM2\SiteBundle\Form\CharacterSettingsType;
 use BM2\SiteBundle\Form\EntourageManageType;
-use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\UnitSettingsType;
 
@@ -58,10 +62,12 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/", name="bm2_character")
-     * @Template("BM2SiteBundle:Character:character.html.twig")
      */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($location=$character->getLocation()) {
 			$geo = $this->get('geography');
@@ -69,10 +75,9 @@ class CharacterController extends Controller {
 			$settlement=array_shift($nearest);
 			$location = $settlement->getGeoData();
 		} else {
-			return $this->redirectToRoute('bm2_site_character_start');
+			return $this->redirectToRoute('maf_character_start');
 		}
-
-		return array(
+		return $this->render('Character/character.html.twig', [
 			'location' => $location,
 			'familiarity' => $geo->findRegionFamiliarityLevel($character, $location),
 			'spot' => $geo->calculateSpottingDistance($character),
@@ -82,77 +87,55 @@ class CharacterController extends Controller {
 			'others' => $this->get('geography')->findCharactersInSpotRange($character),
 			'spottings' => $this->getSpottings($character),
 			'entourage' => $character->getActiveEntourageByType(),
-			'soldiers' => $character->getActiveSoldiersByType(),
+			'units' => $character->getUnits(),
 			'dead_entourage' => $character->getDeadEntourage()->count(),
-			'dead_soldiers' => $character->getDeadSoldiers()->count(),
-		);
+		]);
 
 	}
 
 	/**
 	  * @Route("/summary", name="bm2_recent")
-	  * @Template
 	  */
 	public function summaryAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$character->getLocation()) {
-			return $this->redirectToRoute('bm2_site_character_start');
+			return $this->redirectToRoute('maf_character_start');
 		}
 
-		// FIXME: this auto-gathers all our soldiers. we want that automatic, but not immediate (hidden action at turn?)
-		$hungry = 0; $starving = 0; $wounded = 0; $lost = 0; $dead = 0; $alive = 0; $distance = 0;
-		foreach ($character->getSoldiers() as $soldier) {
-			$soldier->setRouted(false);
-			if ($soldier->isAlive()) {
-				$distance += sqrt($soldier->getDistanceHome()/1000);
-				$alive++;
-				if ($soldier->getHungry()>50) {
-					$hungry++;
-					if ($soldier->getHungry()>90) {
-						$starving++;
-					}
-				}
-				if ($soldier->getWounded()>10) {
-					$wounded++;
-				}
-				if (!$soldier->getHasWeapon() || !$soldier->getHasArmour() || !$soldier->getHasEquipment()) {
-					$lost++;
-				}
-			} else {
-				$dead++;
+		$em = $this->getDoctrine()->getManager();
+
+		# TODO: This should really be somewhere else, like at the end of battles.
+		foreach ($character->getUnits() as $unit) {
+			foreach ($unit->getSoldiers() as $soldier) {
+				$soldier->setRouted(false);
 			}
 		}
-		if ($alive > 0) {
-			$hungry = ($hungry*100) / $alive;
-			$starving = ($starving*100) / $alive;
-			$wounded = ($wounded*100) / $alive;
-			$lost = ($lost*100) / $alive;
-			$distance = $distance / $alive;
-		}
-		$this->getDoctrine()->getManager()->flush();
-
-		$msguser = $this->get('message_manager')->getCurrentUser();
-
-		return array(
+		$em->flush();
+		return $this->render('Character/summary.html.twig', [
 			'events' => $this->get('character_manager')->findEvents($character),
-			'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
+			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
 			'others' => $this->get('geography')->findCharactersInSpotRange($character),
 			'spottings' => $this->getSpottings($character),
 			'battles' => $this->get('geography')->findBattlesNearMe($character, Geography::DISTANCE_BATTLE),
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
 			'actrange' => $this->get('geography')->calculateInteractionDistance($character),
-			'soldiers' => array('hungry'=>$hungry, 'starving'=>$starving, 'wounded'=>$wounded, 'lost'=>$lost, 'alive'=>$alive, 'dead'=>$dead, 'distance'=>$distance)
-		);
+			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character)
+		]);
 	}
 
 	/**
 	  * @Route("/scouting", name="bm2_scouting")
-	  * @Template
 	  */
 	public function scoutingAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// FIXME: this needs to be reworked !
 		$spotted = array();
@@ -169,6 +152,10 @@ class CharacterController extends Controller {
 					$ultimates->add($ult);
 				}
 			}
+			$soldiers = 0;
+			Foreach ($char->getUnits() as $unit) {
+				$soldiers += $unit->getActiveSoldiers()->count();
+			}
 
 			$spotted[] = array(
 				'char' => $char,
@@ -176,28 +163,30 @@ class CharacterController extends Controller {
 				'realms' => $realms,
 				'ultimates' => $ultimates,
 				'entourage' => $char->getLivingEntourage()->count(),
-				'soldiers' => $char->getLivingSoldiers()->count(),
+				'soldiers' => $soldiers,
 			);
 		}
 
-		return array(
-			'spotted' => $spotted
-		);
+		return $this->render('Character/scouting.html.twig', [
+			'spotted'=>$spotted
+		]);
 	}
 
 	/**
 	  * @Route("/estates", name="bm2_estates")
-	  * @Template
 	  */
 	public function estatesAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
-		$estates = array();
-		foreach ($character->getEstates() as $estate) {
+		$settlements = array();
+		foreach ($character->getOwnedSettlements() as $settlement) {
 			// FIXME: better: some trend analysis
 			$query = $em->createQuery('SELECT s.population as pop FROM BM2SiteBundle:StatisticSettlement s WHERE s.settlement = :here ORDER BY s.cycle DESC');
-			$query->setParameter('here', $estate);
+			$query->setParameter('here', $settlement);
 			$query->setMaxResults(3);
 			$data = $query->getArrayResult();
 			if (isset($data[2])) {
@@ -205,66 +194,61 @@ class CharacterController extends Controller {
 			} else {
 				$popchange = 0;
 			}
-			if ($estate->getRealm()) {
-				$r = $estate->getRealm();
-				$u = $estate->getRealm()->findUltimate();
+			if ($settlement->getRealm()) {
+				$r = $settlement->getRealm();
+				$u = $settlement->getRealm()->findUltimate();
 				$realm = array('id'=>$r->getId(), 'name'=>$r->getName());
 				$ultimate = array('id'=>$u->getId(), 'name'=>$u->getName());
 			} else {
 				$realm = null; $ultimate = null;
 			}
 			$build = array();
-			foreach ($estate->getBuildings()->filter(
+			foreach ($settlement->getBuildings()->filter(
 				function($entry) {
 					return ($entry->getActive()==false && $entry->getWorkers()>0);
 				}) as $building) {
 				$build[] = array('id'=>$building->getType()->getId(), 'name'=>$building->getType()->getName());
 			}
+			$militia = 0;
+			$recruits = 0;
+			foreach ($settlement->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					$militia += $unit->getActiveSoldiers()->count();
+					$recruits += $unit->getRecruits()->count();
+				}
+			}
 
-			$estates[] = array(
-				'id' => $estate->getId(),
-				'name' => $estate->getName(),
-				'pop' => $estate->getFullPopulation(),
-				'peasants' => $estate->getPopulation(),
-				'thralls' => $estate->getThralls(),
-				'size' => $estate->getSize(),
+			$settlements[] = array(
+				'id' => $settlement->getId(),
+				'name' => $settlement->getName(),
+				'pop' => $settlement->getFullPopulation(),
+				'peasants' => $settlement->getPopulation(),
+				'thralls' => $settlement->getThralls(),
+				'size' => $settlement->getSize(),
 				'popchange' => $popchange,
-				'militia' => $estate->getActiveMilitia()->count(),
-				'recruits' => $estate->getRecruits()->count(),
+				'militia' => $militia,
+				'recruits' => $recruits,
 				'realm' => $realm,
 				'ultimate' => $ultimate,
 				'build' => $build,
 			);
 		}
 
-		$poly = $this->get('geography')->findRegionsPolygon($character->getEstates());
-		return array('estates'=>$estates, 'poly'=>$poly);
+		$poly = $this->get('geography')->findRegionsPolygon($character->getOwnedSettlements());
+		return $this->render('Character/estates.html.twig', [
+	   		'settlements'=>$settlements,
+			'poly'=>$poly
+		]);
 	}
 
-   /**
-     * @Route("/first", name="bm2_first")
-     * @Template
-     */
-   public function firstAction() {
-   	$character = $this->get('appstate')->getCharacter(true, true, true);
-
-   	if (!$character->getLocation()) {
-   		return $this->redirectToRoute('bm2_site_character_start');
-   	}
-
-   	$msguser = $this->get('message_manager')->getCurrentUser();
-
-   	return array(
-   		'unread' => $this->get('message_manager')->getUnreadMessages($msguser),
-   	);
-   }
-
-   /**
-     * @Route("/start")
-     * @Template
-     */
-   public function startAction(Request $request) {
+	/**
+	  * @Route("/start", name="maf_character_start")
+	  */
+	public function startAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
@@ -276,202 +260,260 @@ class CharacterController extends Controller {
 		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
 		$this->get('character_manager')->checkReturnability($character);
 
-		$form_offer = $this->createForm(new CharacterPlacementType('offer', $character));
-		$form_existing = $this->createForm(new CharacterPlacementType('family', $character));
-		$form_map = $this->createFormBuilder()->add('settlement_id', 'hidden')->getForm();
-		if ($request->isMethod('POST')) {
-			$startlocation = false;
-			$historydone=false;
-			$em = $this->getDoctrine()->getManager();
-
-			$form_offer->bind($request);
-			if ($form_offer->isValid()) {
-				// sign up with a lord by taking his offer
-				$data = $form_offer->getData();
-				if (!$data['offer']) {
-					throw $this->createNotFoundException('error.notfound.offer');				
-				}
-
-				$startlocation = $data['offer']->getSettlement();
-				$liege = $startlocation->getOwner();
-				$welcomingcommittee = false;
-				if ($data['offer']->getWelcomers()) {
-					$welcomingcommittee = true;
-				}
-				if (!$liege) {
-					// invalid offer, should never happen, but catch it anyways
-					throw $this->createNotFoundException('error.notfound.newliege');
-				}
-				if ($data['offer']->getGiveSettlement()) {
-					$act = new Action;
-					$act->setType('settlement.grant')->setStringValue('keep_claim')->setCharacter($liege);
-					$act->setTargetSettlement($startlocation)->setTargetCharacter($character);
-					$act->setBlockTravel(false);
-					$complete = new \DateTime("now");
-					$complete->add(new \DateInterval("PT15M"));
-					$act->setComplete($complete);
-					$this->get('action_resolution')->queue($act);
-
-					// pseudo-action to prevent that he moves away in this time
-					$act->setType('settlement.receive')->setCharacter($character);
-					$act->setTargetSettlement($startlocation);
-					$act->setBlockTravel(true);
-					$complete = new \DateTime("now");
-					$complete->add(new \DateInterval("PT15M"));
-					$act->setComplete($complete);
-					$this->get('action_resolution')->queue($act);
-
-					$this->get('history')->logEvent(
-						$character,
-						'politics.oath.taken2',
-						array('%link-character%'=>$liege->getId(), '%link-settlement%'=>$startlocation->getId()),
-						History::HIGH, true
-					);
-				} else {
-					foreach ($data['offer']->getSoldiers() as $soldier) {
-						$this->get('military')->assign($soldier, $character);
-					}
-					$this->get('history')->logEvent(
-						$character,
-						'politics.oath.taken',
-						array('%link-character%'=>$liege->getId(), '%link-settlement%'=>$startlocation->getId()),
-						History::HIGH, true
-					);
-				}
-				$character->setLiege($liege);
-				$historydone=true;
-
-				// TODO: propagate downwards through all vassals, their vassals, etc.
-
-				// message to new liege - set to high so it triggers a notification
-				$this->get('history')->logEvent(
-					$liege,
-					'politics.oath.offer2',
-					array('%link-character%'=>$character->getId(), '%link-settlement%'=>$startlocation->getId()),
-					History::HIGH
-				);
-				$welcomers = $data['offer']->getWelcomers();
-				$em->remove($data['offer']);
-				echo $welcomers;
-
-				$em->flush(); // because some DQL below needs it, probably
-
-				// join realm conversations
-				$msg_user = $this->get('message_manager')->getMsgUser($character);
-
-				$my_realms = $character->findRealms();
-				if ($my_realms) {
-					$query = $em->createQuery("SELECT c FROM MsgBundle:Conversation c JOIN c.app_reference r WHERE r IN (:realms)");
-					$query->setParameter('realms', $my_realms->toArray());
-					foreach ($query->getResult() as $conversation) {
-						$this->get('message_manager')->updateMembers($conversation);
-					}
-				}
-
-				// TODO: announce to lowest-level realm - that's easy to get because it's the realm of our settlement. :-)
-				// also TODO: allow "join-as-vassal" for the other join options, with the same announcement to realm and liege,
-				//					so basically a lot of this would then shift to the more general and out of this branch
-
-				// create a conversation with my new liege
-				// TODO: this should be configurable
-				$topic = 'Welcome from '.$liege->getName().' to '.$character->getName();
-				if (!$welcomingcommittee) {
-					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and I will let you know what you can do to earn your stay.';
-				} else {
-					$content = 'Welcome to my service, [c:'.$character->getId().']. I am [c:'.$liege->getId().'] and your liege now, since you accepted my knight offer. Please introduce yourself by replying to this message and either myself, or one of the Welcomers of [r:'.$startlocation->getRealm()->getId().'], will let you know what you can do to earn your stay.';
-				}
-				if (!$welcomingcommittee) {
-					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, array($this->get('message_manager')->getMsgUser($liege)), $topic, $content);
-				} else {
-					$recipients = array();
-					$recipients[] = $this->get('message_manager')->getMsgUser($liege);
-					foreach($welcomers->getHolders() as $welcomechar) {
-						if ($welcomechar != $liege) {
-							$recipients[] = $this->get('message_manager')->getMsgUser($welcomechar);
-						}
-					}
-					list($meta, $message) = $this->get('message_manager')->newConversation($msg_user, $recipients, $topic, $content);
-				}
-				$this->get('message_manager')->setAllUnread($msg_user);
-
-			}
-
-			$form_existing->bind($request);
-			if ($form_existing->isValid()) {
-				// place at estate of family member
-				$data = $form_existing->getData();
-				$startlocation = $data['estate'];
-			}
-
-			$form_map->bind($request);
-			if ($form_map->isValid()) {
-				$data = $form_map->getData();
-				$id = $data['settlement_id'];
-
-				$startlocation = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-				if (!$startlocation->getOwner() || $startlocation->getAllowSpawn()==false) {
-					$startlocation = false;
-				}
-			}
-
-			if ($startlocation) {
-				if ($character->getRetired()) {
-					# No idea why but we lose the $retiree we declared above...
-					$retiree = true;
-					$character->setRetired(false);
-				}
-				$character->setLocation($startlocation->getGeoData()->getCenter());
-				$character->setInsideSettlement($startlocation);
-				if (!$historydone) {
-					$this->get('history')->logEvent(
-						$character,
-						'event.character.start',
-						array('%link-settlement%'=>$startlocation->getId()),
-						History::HIGH,	true
-					);
-				}
-				$this->get('history')->logEvent(
-					$startlocation,
-					'event.settlement.charstart',
-					array('%link-character%'=>$character->getId()),
-					History::MEDIUM, true, 15
-				);
-				$this->get('history')->visitLog($startlocation, $character);
-				$em->flush();
-
-				if (!$retiree) {
-					return $this->redirectToRoute('bm2_first');
-				} else {
-					$this->addFlash('notice', $this->get('translator')->trans('character.start.returnsuccess', array(), 'messages'));
-					return $this->redirectToRoute('bm2_recent');
+		$em = $this->getDoctrine()->getManager();
+		switch(rand(0,7)) {
+			case 0:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.id DESC');
+				break;
+			case 1:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.id ASC');
+				break;
+			case 2:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.name DESC');
+				break;
+			case 3:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.name ASC');
+				break;
+			case 4:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.formal_name DESC');
+				break;
+			case 5:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.formal_name ASC');
+				break;
+			case 6:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.superior DESC');
+				break;
+			case 7:
+				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.superior ASC');
+				break;
+		}
+		$result = $query->getResult();
+		$realms = new ArrayCollection();
+		$houses = new ArrayCollection();
+		$myHouse = null;
+		foreach ($result as $spawn) {
+			if (!$realms->contains($spawn->getRealm())) {
+				if ($spawn->getRealm()->getSpawnDescription() && $spawn->getPlace()->getDescription() && $spawn->getPlace()->getSpawnDescription()) {
+					$realms->add($spawn->getRealm());
 				}
 			}
 		}
-		return array(
-			'form_offer'=>$form_offer->createView(),
-			'form_existing'=>$form_existing->createView(),
-			'form_map'=>$form_map->createView(),
-			'retiree'=>$retiree
-		);
+		if ($character->getHouse() && $character->getHouse()->getHome()) {
+			$myHouse = $character->getHouse();
+		} else {
+			switch(rand(0,5)) {
+				case 0:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.id DESC');
+					break;
+				case 1:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.id ASC');
+					break;
+				case 2:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.name DESC');
+					break;
+				case 3:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.name ASC');
+					break;
+				case 4:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.superior DESC');
+					break;
+				case 5:
+					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.superior ASC');
+					break;
+			}
+			$result = $query->getResult();
+			foreach ($result as $spawn) {
+				if (!$houses->contains($spawn->getHouse())) {
+					if ($spawn->getHouse()->getSpawnDescription() && $spawn->getPlace()->getDescription() && $spawn->getPlace()->getSpawnDescription()) {
+						$houses->add($spawn->getHouse());
+					}
+				}
+			}
+		}
+
+		return $this->render('Character/start.html.twig', [
+			'realms'=>$realms, 'houses'=>$houses, 'myhouse'=>$myHouse, 'retiree'=>$retiree
+		]);
+
+	}
+
+	/**
+	  * @Route("/spawn/r{realm}", requirements={"realm"="\d+"}, name="maf_spawn_realm")
+  	  * @Route("/spawn/h{house}", requirements={"house"="\d+"}, name="maf_spawn_house")
+  	  * @Route("/spawn/myhouse", name="maf_spawn_myhouse")
+	  */
+	  public function spawnAction(Realm $realm = null, House $house = null) {
+  		$character = $this->get('appstate')->getCharacter(true, false, true);
+  		if (! $character instanceof Character) {
+  			return $this->redirectToRoute($character);
+  		}
+  		if ($character->getLocation()) {
+  			return $this->redirectToRoute('bm2_character');
+  		}
+
+		$spawns = new ArrayCollection();
+		$myHouse = null;
+		if ($realm) {
+			foreach ($realm->getSpawns() as $spawn) {
+				if ($spawn->getPlace()->getSpawnDescription() && $spawn->getPlace()->getDescription()) {
+					$spawns->add($spawn);
+				}
+			}
+		}
+		if ($house && $house->getHome() && $house->getHome()->getSpawnDescription() && $house->getHome()->getDescription()) {
+			$spawns->add($house->getSpawn());
+		}
+		if (!$house && !$realm) {
+			$myHouse = $character->getHouse();
+		}
+
+		return $this->render('Character/spawn.html.twig', [
+			'realm'=>$realm, 'house'=>$house, 'spawns'=>$spawns, 'myHouse'=>$myHouse
+		]);
+	}
+
+	/**
+	  * @Route("/spawnin/home", name="maf_spawn_home")
+	  * @Route("/spawnin/s{spawn}", requirements={"spawn"="\d+"}, name="maf_spawn_in")
+	  */
+	public function firstAction(Spawn $spawn = null) {
+		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$convMan = $this->get('conversation_manager');
+		$em = $this->getDoctrine()->getManager();
+
+		$house = null;
+		$realm = null;
+		$conv = null;
+		$supConv = null;
+		if (!$character->getLocation()) {
+			if ($spawn) {
+				$place = $spawn->getPlace();
+				if ($spawn->getRealm()) {
+					$realm = $spawn->getRealm();
+					$character->setRealm($realm);
+					$this->get('history')->logEvent(
+						$realm,
+						'event.realm.arrival',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, true, 15
+					);
+					if ($realm->getSuperior()) {
+						$this->get('history')->logEvent(
+							$realm->findUltimate(),
+							'event.subrealm.arrival',
+							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
+							History::MEDIUM, true, 15
+						);
+					}
+				} else {
+					$house = $spawn->getHouse();
+					$character->setHouse($house);
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.arrival',
+						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+						History::MEDIUM, true, 15
+					);
+				}
+			} else {
+				$house = $character->getHouse();
+				$place = $house->getPlace();
+			}
+			# new character spawn in.
+			if ($place->getLocation()) {
+				$character->setLocation($place->getLocation());
+				$settlement = null;
+			} else {
+				$settlement = $place->getSettlement();
+				$character->setLocation($settlement->getGeoMarker()->getLocation());
+				$character->setInsideSettlement($settlement);
+			}
+			if ($character->getRetired()) {
+				$character->setRetired(false);
+			}
+			$character->setInsidePlace($place);
+			list($conv, $supConv) = $convMan->sendNewCharacterMsg($realm, $house, $place, $character);
+			# $conv should always be a Conversation, while supConv will be if realm is not Ultimate--otherwise null.
+			# Both instances of Converstion.
+
+			$this->get('history')->logEvent(
+				$character,
+				'event.character.start2',
+				array('%link-place%'=>$place->getId()),
+				History::HIGH,	true
+			);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.start',
+				array('%link-character%'=>$character->getId()),
+				History::MEDIUM, true, 15
+			);
+			$this->get('history')->visitLog($place, $character);
+			if ($settlement) {
+				$this->get('history')->logEvent(
+					$settlement,
+					'event.place.charstart',
+					array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+					History::MEDIUM, true, 15
+				);
+				$this->get('history')->visitLog($settlement, $character);
+			}
+			$em->flush();
+		} else {
+			$place = $spawn->getPlace();
+			$realm = $character->findPrimaryRealm();
+			if ($realm) {
+				if ($realm->getSuperior()) {
+					$supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm->getSuperior(), 'system'=>'announcements']);
+				} else {
+					$supConv = null;
+				}
+				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
+			} elseif ($character->getHouse()) {
+				$house = $character->getHouse();
+				$conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['house'=>$house, 'system'=>'announcements']);
+				$supConv = null;
+			}
+		}
+
+		return $this->render('Character/first.html.twig', [
+			'unread' => $this->get('conversation_manager')->getUnreadConvPermissions($character),
+			'house' => $house,
+			'realm' => $realm,
+			'place' => $place,
+			'conv' => $conv,
+			'supConv' => $supConv
+		]);
 	}
 
 
 	/**
 	  * @Route("/view/{id}", requirements={"id"="\d+"}, name="bm2_site_character_view")
-	  * @Template
 	  */
 	public function viewAction(Character $id) {
 		$char = $id;
-		$character = $this->get('appstate')->getCharacter(false, true, true);
+		$character = $this->get('appstate')->getCharacter(FALSE, TRUE, TRUE);
 		$banned = false;
-		if ($character) {
+		if ($character instanceof Character) {
 			$details = $this->get('interactions')->characterViewDetails($character, $char);
 		} else {
 			$details = array('spot' => false, 'spy' => false);
 		}
 		if ($details['spot']) {
 			$entourage = $char->getActiveEntourageByType();
-			$soldiers = $char->getActiveSoldiersByType();
+			$soldiers = [];
+			foreach ($char->getUnits() as $unit) {
+				foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
+					if (array_key_exists($key, $soldiers)) {
+						$soldiers[$key] += $type;
+					} else {
+						$soldiers[$key] = $type;
+					}
+				}
+			}
 		} else {
 			$entourage = null;
 			$soldiers = null;
@@ -482,26 +524,25 @@ class CharacterController extends Controller {
 			}
 		}
 		$relationship = false;
-		if ($character && $character->getPartnerships() && $char->getPartnerships()) {
+		if ($character instanceof Character && $character->getPartnerships() && $char->getPartnerships()) {
 			foreach ($character->getPartnerships() as $partnership) {
 				if (!$partnership->getEndDate() && $partnership->getOtherPartner($character) == $char) {
 					$relationship = true;
 				}
 			}
 		}
-		return array(
+		return $this->render('Character/view.html.twig', [
 			'char'		=> $char,
 			'details'	=> $details,
 			'relationship'	=> $relationship,
 			'entourage'	=> $entourage,
 			'soldiers'	=> $soldiers,
 			'banned'	=> $banned,
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/reputation/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function reputationAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -523,14 +564,14 @@ class CharacterController extends Controller {
 			$my_rating->setCharacter($char);
 		}
 		$form = $this->createForm(new CharacterRatingType, $my_rating);
-		return array(
+		return $this->render('Character/reputation.html.twig', [
 			'char'		=> $char,
 			'ratings'	=> $data,
 			'respect'	=> $respect,
 			'honor'		=> $honor,
 			'trust'		=> $trust,
 			'form'		=> $form->createView()
-		);
+		]);
 	}
 
 	/**
@@ -601,7 +642,6 @@ class CharacterController extends Controller {
 
 	/**
 	  * @Route("/family/{id}", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Account:familytree.html.twig")
 	  */
 	public function familyAction($id) {
 		$em = $this->getDoctrine()->getManager();
@@ -619,7 +659,7 @@ class CharacterController extends Controller {
 		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 		if (is_resource($process)) {
-			$dot = $this->renderView('BM2SiteBundle:Account:familytree.dot.twig', array('characters'=>$characters));
+			$dot = $this->renderView('Account/familytree.dot.twig', array('characters'=>$characters));
 
 			fwrite($pipes[0], $dot);
 			fclose($pipes[0]);
@@ -630,7 +670,9 @@ class CharacterController extends Controller {
 			$return_value = proc_close($process);
 		}
 
-		return array('svg' => $svg);
+		return $this->render('Account/familytree.html.twig', [
+			'svg' => $svg
+		]);
 	}
 
 	private function addRelatives($characters, Character $char) {
@@ -662,10 +704,12 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/background")
-     * @Template
      */
 	public function backgroundAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		if ($request->query->get('starting')) {
@@ -691,7 +735,7 @@ class CharacterController extends Controller {
 					if ($character->getLocation()) {
 						return $this->redirectToRoute('bm2_play', array('id'=>$character->getId()));
 					} else {
-						return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId()));
+						return $this->redirectToRoute('maf_character_start');
 					}
 				} else {
 					return $this->redirectToRoute('bm2_characters');
@@ -701,18 +745,20 @@ class CharacterController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Character/background.html.twig', [
 			'form' => $form->createView(),
 			'starting' => $starting
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/rename")
-	  * @Template
 	  */
 	public function renameAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createFormBuilder()
 			->add('name', 'text', array(
@@ -772,18 +818,27 @@ class CharacterController extends Controller {
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
 
-			return array('result'=>array('success'=>true), 'newname'=>$newname);
+			return $this->render('Character/rename.html.twig', [
+				'result'=>array('success'=>true),
+				'newname'=>$newname
+			]);
+
+			return array();
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Character/rename.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
-	
+
    /**
      * @Route("/settings")
-     * @Template
      */
 	public function settingsAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		$form = $this->createForm(new CharacterSettingsType(), $character);
@@ -791,24 +846,60 @@ class CharacterController extends Controller {
 
 		if ($form->isValid()) {
 			$data = $form->getData();
-#			$character->setAutoReadRealms($data->getAutoReadRealms());
 			$em->flush();
-			
+
 
 			$this->addFlash('notice', $this->get('translator')->trans('update.success', array(), 'settings'));
 
 			return $this->redirectToRoute('bm2_recent');
 		}
-			
-		return array('form'=>$form->createView());
+
+
+		return $this->render('Character/settings.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
-	
+
+   /**
+     * @Route("/loadout", name="maf_character_loadout")
+     */
+	public function loadoutAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$em = $this->getDoctrine()->getManager();
+		$opt['wpns'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
+		$opt['arms'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'armour']);
+		$opt['othr'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'equipment']);
+		$opt['mnts'] = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'mount']);
+
+		$form = $this->createForm(new CharacterLoadoutType($opt), $character);
+		$form->handleRequest($request);
+
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$em->flush();
+
+
+			$this->addFlash('notice', $this->get('translator')->trans('loadout.success', array(), 'settings'));
+
+			return $this->redirectToRoute('bm2_recent');
+		}
+
+		return $this->render('Character/loadout.html.twig', [
+			'form'=>$form->createView(),
+		]);
+	}
+
    /**
      * @Route("/kill")
-     * @Template
      */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->isPrisoner()) {
 			throw new AccessDeniedHttpException('unavailable.prisoner');
 		}
@@ -829,6 +920,7 @@ class CharacterController extends Controller {
 			$fail = false;
 			$id = $character->getId();
 			$data = $form->getData();
+			$mm = $this->get('military_manager');
 			$em = $this->getDoctrine()->getManager();
 			if ($data['sure'] != true) {
 				$fail = true;
@@ -837,16 +929,8 @@ class CharacterController extends Controller {
 				// TODO: if killed while prisoner of someone, some consequences? we might simply have that one count as the killer here (for killers rights)
 				// TODO: we should somehow store that it was a suicide, to catch various exploits
 				$reclaimed = array();
-				foreach ($character->getSoldiers() as $soldier) {
-					if ($liege = $soldier->getLiege()) {
-						if (!isset($reclaimed[$liege->getId()])) {
-							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
-						}
-						$reclaimed[$liege->getId()]['number']++;
-						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-						$soldier->setCharacter($liege);
-						$soldier->setLiege(null)->setAssignedSince(null);
-					}
+				foreach ($character->getUnits() as $unit) {
+					$mm->returnUnitHome($unit, 'suicide', $character->getLocation());
 				}
 				$em->flush();
 				if ($data['death']) {
@@ -868,18 +952,23 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.kill.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_characters');
 			}
 		}
-		return array('form'=>$form->createView());
+
+		return $this->render('Character/kill.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
-	
+
    /**
      * @Route("/retire")
-     * @Template
      */
 	public function retireAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($character->isPrisoner()) {
 			throw new AccessDeniedHttpException('unvailable.prisoner');
 		}
@@ -905,17 +994,8 @@ class CharacterController extends Controller {
 				$fail = true;
 			}
 			if (!$fail) {
-				$reclaimed = array();
-				foreach ($character->getSoldiers() as $soldier) {
-					if ($liege = $soldier->getLiege()) {
-						if (!isset($reclaimed[$liege->getId()])) {
-							$reclaimed[$liege->getId()] = array('liege'=>$liege, 'number'=>0);
-						}
-						$reclaimed[$liege->getId()]['number']++;
-						// FIXME: this does not, in fact, work AT ALL - the message is sent, but soldiers are not re-assigned!
-						$soldier->setCharacter($liege);
-						$soldier->setLiege(null)->setAssignedSince(null);
-					}
+				foreach ($character->getUnits() as $unit) {
+					$mm->returnUnitHome($unit, 'retired', $character->getLocation());
 				}
 				$em->flush();
 				if ($data['retirement']) {
@@ -937,18 +1017,23 @@ class CharacterController extends Controller {
 				}
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
-				return $this->redirectToRoute('bm2_site_character_view', array('id'=>$id));
+				return $this->redirectToRoute('bm2_characters');
 			}
 		}
-		return array('form'=>$form->createView());
+
+		return $this->render('Character/retire.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
 	/**
 	  * @Route("/surrender")
-	  * @Template
 	  */
 	public function surrenderAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalSurrenderTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new InteractionType('surrender', $this->get('geography')->calculateInteractionDistance($character), $character));
 		$form->handleRequest($request);
@@ -974,16 +1059,21 @@ class CharacterController extends Controller {
 			return array('success'=>true, 'target'=>$data['target']);
 		}
 
-		return array('form'=>$form->createView(), 'gold'=>$character->getGold());
+		return $this->render('Character/surrender.html.twig', [
+			'form'=>$form->createView(),
+			'gold'=>$character->getGold()
+		]);
 	}
 
 
 	/**
 	  * @Route("/escape")
-	  * @Template
 	  */
 	public function escapeAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalEscapeTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($character->getPrisonerOf()->getSlumbering() == false && $character->getPrisonerOf()->isAlive() == true) {
 			$captor_active = true;
@@ -1005,32 +1095,37 @@ class CharacterController extends Controller {
 			$complete->add(new \DateInterval("PT".$hours."H"));
 			$act->setComplete($complete);
 			$act->setBlockTravel(false);
-			$result = $this->get('action_resolution')->queue($act);
+			$result = $this->get('action_manager')->queue($act);
 
-			return array('queued'=>true, 'hours'=>$hours);
+			return $this->render('Character/surrender.html.twig', [
+				'queued'=>true,
+				'hours'=>$hours
+			]);
 		}
 
-		return array(
+		return $this->render('Character/surrender.html.twig', [
 			'captor_active' => $captor_active,
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/crest")
-	  * @Template
 	  */
 	public function heraldryAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('metaHeraldryTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$available = array();
-		
+
 		# Get all crests for the current user.
 		foreach ($character->getUser()->getCrests() as $crest) {
 			$available[] = $crest->getId();
 		}
-		
+
                 # Check for parents having different crests.
                 foreach ($character->getParents() as $parent) {
                         if ($parent->getCrest()) {
@@ -1056,7 +1151,9 @@ class CharacterController extends Controller {
                 }
 
 		if (empty($available)) {
-			return array('nocrests'=>true);
+			return $this->render('Character/heraldry.html.twig', [
+				'nocrests'=>true
+			]);
 		}
 		$form = $this->createFormBuilder()
 			->add('crest', 'entity', array(
@@ -1076,16 +1173,21 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_character');
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('Character/heraldry.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 
 	/**
 	  * @Route("/entourage")
-	  * @Template
 	  */
 	public function entourageAction(Request $request) {
+		# TODO: We call AppState and Dispatcher? Can't we combine this into a single call and return it as a list somehow? -- Andrew 20181210
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$others = $this->get('dispatcher')->getActionableCharacters();
 		$em = $this->getDoctrine()->getManager();
 
@@ -1095,7 +1197,7 @@ class CharacterController extends Controller {
 			$data = $form->getData();
 
 			$settlement = $this->get('dispatcher')->getActionableSettlement();
-			$this->get('military')->manage($character->getEntourage(), $data, $settlement, $character);
+			$this->get('military_manager')->manageEntourage($character->getEntourage(), $data, $settlement, $character);
 
 			$em->flush();
 			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our entourage count
@@ -1126,128 +1228,13 @@ class CharacterController extends Controller {
 			$food_days = 0;
 		}
 
-		return array(
+		return $this->render('Character/entourage.html.twig', [
 			'entourage' => $character->getEntourage(),
 			'form' => $form->createView(),
 			'food_days' => $food_days,
 			'can_resupply' => $character->getInsideSettlement()?$this->get('permission_manager')->checkSettlementPermission($character->getInsideSettlement(), $character, 'resupply'):false,
 			'resupply' => $resupply
-		);
-	}
-
-
-	/**
-	  * @Route("/groupby/{by}")
-	  */
-	public function groupsoldiersAction($by) {
-		$character = $this->get('appstate')->getCharacter();
-
-		if ($by=="type") {
-			$this->get('military')->groupByType($character->getSoldiers());
-		} else {
-			$this->get('military')->groupByEquipment($character->getSoldiers());
-		}
-		$this->getDoctrine()->getManager()->flush();
-
-		$this->addFlash('notice', $this->get('translator')->trans('recruit.manage.grouped', array(), 'actions'));
-
-		return $this->redirectToRoute('bm2_site_character_soldiers');
-	}
-
-	/**
-	  * @Route("/soldiers")
-	  * @Template
-	  */
-	public function soldiersAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
-		$settlement = $this->get('dispatcher')->getActionableSettlement();
-		if ($character->getPrisonerOf()) {
-			$others = array($character->getPrisonerOf());
-		} else {
-			$others = $this->get('dispatcher')->getActionableCharacters(true);
-		}
-
-		$em = $this->getDoctrine()->getManager();
-
-		$resupply=array();
-		$training=array();
-		if ($settlement) {
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
-				$resupply = $this->get('military')->findAvailableEquipment($settlement, false);
-			}
-			if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
-				$training = $this->get('military')->findAvailableEquipment($settlement, true);
-			}
-		} else {
-			foreach ($character->getEntourage() as $entourage) {
-				if ($entourage->getEquipment()) {
-					$item = $entourage->getEquipment()->getId();
-					if (!isset($resupply[$item])) {
-						$resupply[$item] = array('item'=>$entourage->getEquipment(), 'resupply'=>0);
-					}
-					$resupply[$item]['resupply'] += $entourage->getSupply();
-				}
-			}
-		}
-		$form = $this->createForm(new SoldiersManageType($em, $character->getSoldiers(), $resupply, $training, $others, $settlement));
-
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-
-			list($success, $fail) = $this->get('military')->manage($character->getSoldiers(), $data, $settlement, $character);
-			// TODO: notice with result
-
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
-			return $this->redirect($request->getUri());
-		}
-
-		return array(
-			'soldiers' => $character->getSoldiers(),
-			'resupply' => $resupply,
-			'settlement' => $settlement,
-			'training' => $training,
-			'form' => $form->createView(),
-			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100)
-		);
-	}
-	
-   /**
-     * @Route("/unitsettings")
-     * @Template
-     */
-	public function unitSettingsAction(Request $request) {
-		# Get the current character, setup Doctrine EntityManager.
-		$character = $this->get('appstate')->getCharacter();
-		$em = $this->getDoctrine()->getManager();
-
-		# Check if unit settings info exists. If not, create.
-		if (!$character->getUnitSettings()) {
-			# TODO: newUnitSettings expects either a Unit, which doesn't exist yet (hence the TODO) or a character.
-			$settings = $this->get('military')->newUnitSettings(null, $character);
-		} else {
-			$settings = $character->getUnitSettings();
-		}
-		if (!$settings) {
-			throw new \Exception("Anata wa naniwoshita!?"); # Seriously, what did you do to get this!? Stop trying to break my game.
-		}
-
-		#NOTE: Originally, I was planning to have one page to manage all unit settings, but trying to get Symfony to understand what I'm asking doesn't appear to be feasible.
-		# It probably has something to do with dynamic form loading, kind of how the permissions forms work, but that's way beyond my skill level.
-
-		$form = $this->createForm(new UnitSettingsType($character, true), $settings);
-
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			# I love passing entities. It means I don't have to actually code what happens when this is all committed. :) --Andrew
-			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('unit.success', array('%name%'=>$data->getName()), 'settings'));
-		}
-			
-		return array('form'=>$form->createView());
+		]);
 	}
 
    /**
@@ -1256,12 +1243,15 @@ class CharacterController extends Controller {
 	public function setTravelAction(Request $request) {
 		if ($request->isMethod('POST') && $request->request->has("route")) {
 			$character = $this->get('appstate')->getCharacter();
+			if (! $character instanceof Character) {
+				return $this->redirectToRoute($character);
+			}
 			if ($character->isPrisoner()) {
 				// prisoners cannot travel on their own
 				return new Response(json_encode(array('turns'=>0, 'prisoner'=>true)));
 			}
 			if ($character->getUser()->getRestricted()) {
-				return new Response(json_encode(array('turns'=>0, 'restricted'=>true)));				
+				return new Response(json_encode(array('turns'=>0, 'restricted'=>true)));
 			}
 			$em = $this->getDoctrine()->getManager();
 			$points = $request->request->get('route');
@@ -1375,6 +1365,9 @@ class CharacterController extends Controller {
 	  */
 	public function clearTravelAction() {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$character->setTravel(null)->setProgress(null)->setSpeed(null)->setTravelEnter(false)->setTravelDisembark(false);
 		$this->getDoctrine()->getManager()->flush();
 		return new Response();
@@ -1383,10 +1376,12 @@ class CharacterController extends Controller {
 
    /**
      * @Route("/battlereport/{id}", name="bm2_battlereport", requirements={"id"="\d+"})
-     * @Template
      */
 	public function viewBattleReportAction($id) {
 		$character = $this->get('appstate')->getCharacter(true,true,true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$report = $em->getRepository('BM2SiteBundle:BattleReport')->find($id);
@@ -1394,12 +1389,17 @@ class CharacterController extends Controller {
 			throw $this->createNotFoundException('error.notfound.battlereport');
 		}
 
-   	if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
+		if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
 			$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
 			$query->setParameters(array('br'=>$report, 'me'=>$character));
 			$check = $query->getOneOrNullResult();
 			if (!$check) {
-				throw $this->createNotFoundException('error.noaccess.battlereport');
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleReportCharacter p JOIN p.group_report g WHERE p.character = :me AND g.battle_report = :br');
+				$query->setParameters(array('br'=>$report, 'me'=>$character));
+				$check = $query->getOneOrNullResult();
+				if (!$check) {
+					throw $this->createNotFoundException('error.noaccess.battlereport');
+				}
 			}
 		}
 
@@ -1409,51 +1409,50 @@ class CharacterController extends Controller {
 			$location = array('key'=>'battle.location.nowhere');
 		}
 
+
 		// get entity references
-		$start = array();
-		foreach ($report->getStart() as $i=>$group) {
-			$start[$i]=array();
-			foreach ($group as $id=>$amount) {
-				$start[$i][] = array('type'=>$id, 'amount'=>$amount);
+		if ($report->getStart()) {
+			$start = array();
+			foreach ($report->getStart() as $i=>$group) {
+				$start[$i]=array();
+				foreach ($group as $id=>$amount) {
+					$start[$i][] = array('type'=>$id, 'amount'=>$amount);
+				}
 			}
-		}
 
-		$survivors = array();
-		$nobles = array();
-		$finish = $report->getFinish();
-		$survivors_data = $finish['survivors'];
-		$nobles_data = $finish['nobles'];
-		foreach ($survivors_data as $i=>$group) {
-			$survivors[$i]=array();
-			foreach ($group as $id=>$amount) {
-				$survivors[$i][] = array('type'=>$id, 'amount'=>$amount);
+			$survivors = array();
+			$nobles = array();
+			$finish = $report->getFinish();
+			$survivors_data = $finish['survivors'];
+			$nobles_data = $finish['nobles'];
+			foreach ($survivors_data as $i=>$group) {
+				$survivors[$i]=array();
+				foreach ($group as $id=>$amount) {
+					$survivors[$i][] = array('type'=>$id, 'amount'=>$amount);
+				}
 			}
-		}
-		foreach ($nobles_data as $i=>$group) {
-			$nobles[$i]=array();
-			foreach ($group as $id=>$fate) {
-				$char = $em->getRepository('BM2SiteBundle:Character')->find($id);
-				$nobles[$i][] = array('character'=>$char, 'fate'=>$fate);
+			foreach ($nobles_data as $i=>$group) {
+				$nobles[$i]=array();
+				foreach ($group as $id=>$fate) {
+					$char = $em->getRepository('BM2SiteBundle:Character')->find($id);
+					$nobles[$i][] = array('character'=>$char, 'fate'=>$fate);
+				}
 			}
+
+			return $this->render('Character/viewBattleReport.html.twig', [
+				'version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location
+			]);
+		} else {
+			$count = $report->getGroups()->count(); # These return in a specific order, low to high, ID ascending.
+			foreach ($report->getGroups() as $group) {
+				$totalRounds = $group->getCombatStages()->count();
+				break;
+			}
+
+			return $this->render('Character/viewBattleReport.html.twig', [
+				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds
+			]);
 		}
-
-		return array('start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location);
-	}
-
-	/**
-	  * @Route("/mercenaries/{id}", name="bm2_mercenaries", requirements={"id"="\d+"})
-	  * @Template
-	  */
-	public function mercenariesAction($id) {
-		$character = $this->get('appstate')->getCharacter(true);
-
-		$em = $this->getDoctrine()->getManager();
-		$mercs = $em->getRepository('BM2SiteBundle:Mercenaries')->find($id);
-		if (!$mercs) {
-			throw $this->createNotFoundException('error.notfound.mercenaries');
-		}
-
-		return array('mercs'=>$mercs, 'hiredbyme'=>$mercs->getHiredBy()==$character);
 	}
 
 }

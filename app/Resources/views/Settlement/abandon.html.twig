@@ -1,0 +1,7 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'control.abandon.name'|trans({"%settlement%":settlement.name},"actions")|title }}</h2>
+	<p>{{ 'control.abandon.help'|trans({"%settlement%":settlement.name},"actions")|raw }}</p>
+	{{ form(form) }}
+{% endblock %}

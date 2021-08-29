@@ -1,0 +1,12 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% form_theme form with 'Form/form_characterlist.html.twig' %}
+
+{% block content %}
+<h2>{{ 'add.title'|trans({"%name%":conv.topic}, "conversations")|title }}</h2>
+
+{{ 'add.description'|trans({}, "conversations")|raw }}
+
+{{ form(form) }}
+
+{% endblock %}

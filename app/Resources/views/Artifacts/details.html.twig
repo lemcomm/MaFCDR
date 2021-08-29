@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+<h3>{{ artifact.name }}</h3>
+{% if artifact.description is not null and artifact.description.text is not null %}
+	<p>{{ artifact.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}</p>
+{% else %}
+	<p>{{ artifact.oldDescription|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}</p>
+{% endif %}
+{% if artifact.creator == app.user and artifact.owner is null %}
+	<a href="{{ path('bm2_site_artifacts_assign', {'id':artifact.id}) }}">give to character</a>
+	---
+	<a href="{{ path('bm2_site_artifacts_spawn', {'id':artifact.id}) }}">drop into world</a>
+{% endif %}
+
+
+<h3>{{ link(artifact.log)|title|raw }}</h3>
+{% include "Events/eventdata.html.twig" with { "log":artifact.log, "metas":false, "research":false} %}
+
+{% endblock %}

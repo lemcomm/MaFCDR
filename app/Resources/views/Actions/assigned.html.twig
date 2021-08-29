@@ -1,0 +1,79 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ "recruit.assigned.name"|trans({},"actions")|title }}</h2>
+
+{% if return is defined %}
+	{% if return > 0 %}
+		<p>{{ "recruit.assigned.success"|trans({'%return%':return, '%group%':group, '%lost%':lost},"actions")|raw }}</p>
+	{% else %}
+		<p>{{ "recruit.assigned.fail"|trans({'%lost%':lost},"actions")|raw }}</p>
+	{% endif %}
+{% else %}
+	<p>{{ "recruit.assigned.intro"|trans({},"actions")|raw }}</p>
+
+	<form action="{{ path('bm2_site_actions_assigned') }}" method="post">
+	{{ form_errors(form) }}
+	{{ form_widget(form._token) }}
+	<table id="assigned"><thead>
+		<tr>
+			<th data-sorter="false"></th>
+			<th>{{ 'soldier.name'|trans }}</th>
+			<th>{{ 'soldier.type'|trans }}</th>
+			<th>{{ 'home'|trans }}</th>
+			<th>{{ 'soldier.assigned_to'|trans }}</th>
+			<th>{{ 'soldier.assigned_since'|trans }}</th>
+			<th>{{ 'soldier.reclaim'|trans }}</th>
+		</tr></thead>
+		<tbody>
+		{% for soldier in form.soldiers %}
+			{% set id = soldier.vars.value %}
+			{% set man = assigned[id] %}
+			<tr>
+				{# FIXME: can't recall if in battle #}
+				<td>{{ form_widget(soldier) }}</td>
+				<td>{{ man.name }}</td>
+				<td>{{ man.type }}</td>
+				<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
+				<td>{% if man.character %}{{ link(man.character) }}{% else %}{{ link(man.base) }}{% endif %}</td>
+				<td align="right">
+					{% if man.assignedsince <= 0 %}
+						{{ "today"|trans }}
+					{% else %}
+						{% set days = appstate.global('cycle') - man.assignedsince %}
+						{{ days }} {{ "day"|transchoice(days) }}
+					{% endif %}
+				</td>
+				<td align="right">
+					{% if man.assignedsince <= 0 %}
+						{% set chance = 100 %}
+					{% else %}
+						{% if days <= 25 %}
+							{% set chance = 100 - (days*2) - (days/1.25) %}
+						{% elseif days >= 50 %}
+							{% set chance = 0 %}
+						{% else %}
+							{% set chance = 100 - (days*2) - ((50-days)/1.25) %}
+						{% endif %}
+					{% endif %}
+					{{ chance|number_format }} %
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody></table>
+		<br />
+		<button type="submit" name="submit">{{ "recruit.assigned.submit"|trans({},"actions") }}</button>
+	</form>
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+$("#assigned").tablesorter({
+	sortList: [[4,0]]
+});
+{% endblock %}

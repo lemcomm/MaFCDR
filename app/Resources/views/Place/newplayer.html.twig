@@ -1,0 +1,11 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'place.newplayer.name2'|trans({"%name%":place.name},"places")|title }}</h2>
+	<p>{{ 'place.newplayer.intro'|trans({"%name%":place.name},"places")|raw }}</p>
+
+	<form id="realmdata" class="wide" action="{{ path('maf_place_newplayer', {'place':place.id}) }}" method="post" {{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button name="submit">{{ 'buttons.submit'|trans({},"places") }}</button>
+	</form>
+{% endblock %}

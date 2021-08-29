@@ -1,0 +1,40 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "building.tavern.name"|trans({},"actions")|title }}</h2>
+<p>{{ "building.tavern.intro"|trans({"%settlement%":link(settlement)},"actions")|raw }}</p>
+
+<ul>
+{% for settlement in nearby_settlements %}
+	{% if settlement.owner and settlement.owner.slumbering == true %}
+		<li>{{ "building.tavern.slumber"|trans({"%settlement%":link(settlement)},"actions")|raw }}</li>
+	{% endif %}
+{% endfor %}
+</ul>
+
+
+{% if nearby_people is not empty %}
+<p>{{ "building.tavern.nobles"|trans({},"actions")|raw }}</p>
+<ul>
+{% for noble in nearby_people %}
+	<li>{{ link(noble) }}, <ul class="shortlist">
+	{% for position in noble.positions %}
+		<li>
+			{% if position.ruler %}
+				{% if noble.male %}
+					{% set posname = 'realm.title.male.'~position.realm.type %}
+				{% else %}
+					{% set posname = 'realm.title.female.'~position.realm.type %}
+				{% endif %}
+				{{ ("status.self.position")|trans({"%position%":posname|trans({},"politics")|title, "%realm%":link(position.realm)},"politics")|raw }}
+			{% else %}
+				{{ ("status.self.position")|trans({"%position%":link(position), "%realm%":link(position.realm)},"politics")|raw }}
+			{% endif %}
+		</li>
+	{% endfor %}
+	</ul>{{ "building.tavern.in"|trans({"%settlement%":link(noble.insidesettlement)},"actions")|raw }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

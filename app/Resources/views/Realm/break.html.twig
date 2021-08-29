@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+{% if success is defined %}
+		<p>{{ 'diplomacy.break.done'|trans({'%realm%':link(realm), '%type%':('realm.type.'~realm.type)|trans({},"politics")}, "politics")|raw }}</p>
+{% else %}
+	<h2>{{ 'diplomacy.break.name'|trans({},"politics")|title }}</h2>
+	<p>{{ 'diplomacy.break.intro'|trans({'%realm%':link(realm), '%parent%':link(realm.superior), '%type%':('realm.type.'~realm.type)|trans({},"politics")},"politics")|raw }}</p>
+
+	<form class="wide" method="post">
+		<button type="submit">{{ "diplomacy.break.submit"|trans({},"politics") }}</button>
+	</form>
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+{% block content %}
+{% set spawns = realm.spawns %}
+{% if spawns is empty %}
+<h2>{{ 'realm.spawns.name'|trans({},"politics")|title }}</h2>
+	{{ 'realm.spawns.empty' }}
+{% else %}
+<h2>{{ 'realm.spawns.name'|trans({},"politics")|title }}</h2>
+	{{ 'realm.spawns.description'|trans({},"politics") }}<br />
+	{% for spawn in spawns %}
+                <hr>
+                <h3><a href="{{path('maf_place', {'id':spawn.place.id}) }}">{{ spawn.place.name }}</a></h3>
+                <b>{{ 'realm.spawns.owner.name'|trans({},"politics") }}: {% if spawn.place.owner %}<a href="{{path('bm2_site_character_view', {'id':spawn.place.owner.id}) }}"></b>{{ spawn.place.owner.name }}</a>{% else %}</b><i>{{ 'realm.spawns.owner.empty'|trans({},"politics") }}</i>{% endif %}<br />
+                {% if spawn.place.description %}{{ spawn.place.description.text}}<br />{% endif %}<br />
+                {% if spawn.active %}
+                        {{ 'realm.spawns.status.active'|trans({},"politics") }} - <a href="{{path('maf_realm_spawn_toggle', {"realm":realm.id, "spawn":spawn.place.id}) }}"><button id="toggle">{{ 'realm.spawns.toggle.inactive'|trans({},"politics") }}</button></a>
+                {% else %}
+                        {{ 'realm.spawns.status.inactive'|trans({},"politics") }} - <a href="{{path('maf_realm_spawn_toggle', {"realm":realm.id, "spawn":spawn.place.id}) }}"><button id="toggle">{{ 'realm.spawns.toggle.active'|trans({},"politics") }}</button></a>
+                {% endif %}
+        {% endfor %}
+{% endif %}
+
+<br />
+
+
+{% endblock %}

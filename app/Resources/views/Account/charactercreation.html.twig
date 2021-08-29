@@ -1,0 +1,148 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'newcharacter.title'|trans }}</h2>
+	<img id="charimg" src="{{ asset('bundles/bm2site/images/char_m.png') }}" />
+	<p>{{ 'newcharacter.intro'|trans({"%firstoneurl%":path('bm2_fiction', {'page':'creation'})})|raw }}</p>
+	<p>{{ 'newcharacter.accountlimit'|trans({"%active%":characters_active, "%limit%":characters_allowed}) }}</p>
+
+	{% if limit <= 0 %}
+		<div class="warning">{{ 'newcharacter.limited'|trans }}</div>
+	{% elseif limit < 6 %}
+		<p>{{ 'newcharacter.limit'|transchoice(limit, {"%limit%":limit}) }}</p>
+	{% endif %}
+	{% if spawnlimit %}
+		<div class="error">{{ 'newcharacter.spawnlimit'|trans|raw }}</div>
+	{% else %}
+		{{ form(form) }}
+	{% endif %}
+{% endblock %}
+
+{% block jquery %}
+{# FIXME: on mobile/touch devices this makes 2 clicks necessary :-( #}
+var tooltips = $("[title]").tooltip({
+	position: {
+		my: "left+20 center",
+		at: "right center",
+		collision: "fit"
+	}
+});
+
+
+var chars = {{ characters|json_encode|raw }};
+
+$('#charactercreation_father option,#charactercreation_mother option').each(function(){
+	var id = $(this).val();
+	if (id > 0) {
+		var char = findChar(id);
+		if (!char) $(this).attr('disabled','disabled');
+	}
+});
+
+updatePartners();
+
+$('#charactercreation_gender').change(function(){
+	updatePartners();
+	updateImage();
+});
+$('#charactercreation_father').change(function(){updateOptions('father','mother')});
+$('#charactercreation_mother').change(function(){updateOptions('mother','father')});
+$('#charactercreation_dead').change(function(){updateImage()});
+
+
+function findChar(id) {
+	id = parseInt(id);
+	for (i in chars) {
+		if (chars[i].id == id) {
+			return chars[i];
+		}
+	};
+	return false;
+}
+
+function updateOptions(me, target) {
+	var id = $("#charactercreation_"+me+" option:selected").val();
+	if (id > 0) {
+		var char = findChar(id);
+		var selected = $("#charactercreation_"+target+" option:selected").val();
+		var updateselection = false;
+		$("#charactercreation_"+target+" option").each(function(){
+			var pid = $(this).val();
+			if (pid) {
+				var found=false;
+				for (i in char.partners) {
+					if (pid == char.partners[i].id) {
+						found=true;
+						break;
+					}
+				}
+				if (found) {
+					$(this).removeAttr('disabled');
+				} else {
+					$(this).attr('disabled','disabled');
+					if (pid==selected) {
+						$(this).removeAttr('selected');
+						updateselection = true;
+					}
+				}
+			} else {
+				if (char.mine) {
+					$(this).removeAttr('disabled');
+				} else {
+					$(this).attr('disabled','disabled');
+					if (pid==selected) {
+						$(this).removeAttr('selected');
+						updateselection = true;
+					}
+				}
+			}
+		});
+		if (updateselection) {
+			$("#charactercreation_"+target+" option:not([disabled])").first().attr("selected", "selected");
+		}
+	} else {
+		$("#charactercreation_"+target+" option").removeAttr('disabled');
+	}
+}
+
+function updatePartners() {
+	var gender = $("#charactercreation_gender option:selected").val();
+	var selected = $("#charactercreation_partner option:selected").val();
+	$("#charactercreation_partner option").each(function(){
+		var id = $(this).val();
+		if (id > 0) {
+			var char = findChar(id);
+			if (char.gender != gender) {
+				$(this).removeAttr('disabled');
+			} else {
+				$(this).attr('disabled','disabled');
+				if (id==selected) {
+					$(this).removeAttr('selected');
+					$("#charactercreation_partner option:not([disabled])").first().attr("selected", "selected");
+				}
+			}
+		}
+	});
+}
+
+function updateImage() {
+	var gender = $("#charactercreation_gender option:selected").val();
+	var dead = $("#charactercreation_dead").prop('checked');
+
+	if (gender == "m") {
+		if (dead) {
+			$("#charimg").attr("src", "{{ asset('bundles/bm2site/images/char_dead_m.png') }}");
+		} else {
+			$("#charimg").attr("src", "{{ asset('bundles/bm2site/images/char_m.png') }}");
+		}
+	} else {
+		if (dead) {
+			$("#charimg").attr("src", "{{ asset('bundles/bm2site/images/char_dead_f.png') }}");
+		} else {
+			$("#charimg").attr("src", "{{ asset('bundles/bm2site/images/char_f.png') }}");
+		}
+
+	}
+}
+
+{% endblock %}

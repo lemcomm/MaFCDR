@@ -10,27 +10,32 @@
 		<field name="routed" type="boolean"/>
 		<field name="assigned_since" type="integer" nullable="true"/>
 
-		<many-to-one field="mercenary" target-entity="Mercenaries" inversed-by="soldiers"/>
 		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="armour" target-entity="EquipmentType"/>
 		<many-to-one field="equipment" target-entity="EquipmentType"/>
+		<many-to-one field="mount" target-entity="EquipmentType"/>
 		<field name="has_weapon" type="boolean"/>
 		<field name="has_armour" type="boolean"/>
 		<field name="has_equipment" type="boolean"/>
+		<field name="has_mount" type="boolean" nullable="true"/>
 		<many-to-one field="old_weapon" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_armour" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
 		<many-to-one field="old_equipment" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
-		<many-to-one field="character" target-entity="Character" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
-		<many-to-one field="base" target-entity="Settlement" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
-		<many-to-one field="place" target-entity="Place" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
-		<many-to-one field="offered_as" target-entity="KnightOffer" inversed-by="soldiers" fetch="EXTRA_LAZY"/>
+		<many-to-one field="old_mount" target-entity="EquipmentType" fetch="EXTRA_LAZY"/>
+		<many-to-one field="character" target-entity="Character" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
+		<many-to-one field="base" target-entity="Settlement" inversed-by="soldiers_old" fetch="EXTRA_LAZY"/>
 		<many-to-one field="liege" target-entity="Character" inversed-by="soldiers_given" fetch="EXTRA_LAZY"/>
+
+		<many-to-one field="unit" target-entity="Unit" inversed-by="soldiers"/>
+		<field name="travel_days" type="smallint" nullable="true"/>
+		<field name="destination" type="string" nullable="true"/>
 
 		<one-to-many field="events" target-entity="SoldierLog" mapped-by="soldier" on-delete="CASCADE" fetch="EXTRA_LAZY">
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
 
 		<many-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_soldiers"/>
+		<many-to-one field="manning_equipment" target-entity="SiegeEquipment" inversed-by="manned_by"/>
 
 		<lifecycle-callbacks>
 			<lifecycle-callback type="preRemove" method="onPreRemove" />

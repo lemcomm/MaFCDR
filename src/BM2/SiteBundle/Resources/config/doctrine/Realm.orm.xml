@@ -17,10 +17,15 @@
 		<field name="old_description" type="text" nullable="true"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="realm"/>
 		<one-to-one field="description" target-entity="Description" mapped-by="active_realm"/>
+		<one-to-many field="spawns" target-entity="Spawn" mapped-by="realm"/>
+		<one-to-many field="spawn_descriptions" target-entity="SpawnDescription" mapped-by="realm"/>
+		<one-to-one field="spawn_description" target-entity="SpawnDescription" mapped-by="active_realm"/>
 
 		<many-to-one field="superior" target-entity="Realm" inversed-by="inferiors"/>
 		<one-to-many field="inferiors" target-entity="Realm" mapped-by="superior"/>
-		<one-to-many field="estates" target-entity="Settlement" mapped-by="realm"/>
+		<one-to-many field="settlements" target-entity="Settlement" mapped-by="realm"/>
+		<one-to-many field="occupied_settlements" target-entity="Settlement" mapped-by="occupier"/>
+		<one-to-many field="occupied_places" target-entity="Place" mapped-by="occupier"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="realm" fetch="EXTRA_LAZY"/>
 
@@ -32,12 +37,21 @@
 		<one-to-many field="my_relations" target-entity="RealmRelation" mapped-by="source_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="foreign_relations" target-entity="RealmRelation" mapped-by="target_realm" fetch="EXTRA_LAZY"/>
 		<one-to-many field="wars" target-entity="War" mapped-by="realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="sieges" target-entity="Siege" mapped-by="realm" fetch="EXTRA_LAZY"/>
 
-		<one-to-many field="conversations" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
+		<one-to-many field="conversations_old" target-entity="Calitarus\MessagingBundle\Entity\Conversation" mapped-by="app_reference"/>
+		<one-to-many field="conversations" target-entity="BM2\SiteBundle\Entity\Conversation" mapped-by="realm"/>
 
-		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_realm"/>
-		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm"/>
-		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm"/>
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_realm" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="places" target-entity="Place" mapped-by="realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="embassies_abroad" target-entity="Place" mapped-by="owning_realm" fetch="EXTRA_LAZY"/>
+		<one-to-many field="hosted_embassies" target-entity="Place" mapped-by="hosting_realm" fetch="EXTRA_LAZY"/>
+		<many-to-one field="capital_place" target-entity="Place" inversed-by="capital_of"/>
+
+		<one-to-many field="vassals" target-entity="Character" mapped-by="realm"/>
 
 	</entity>
 </doctrine-mapping>

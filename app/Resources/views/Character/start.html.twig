@@ -1,0 +1,46 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+{# overwrite because this is the one page where it's ok to have a character without a location #}
+{% set character = appstate.getCharacter(true,false,true) %}
+	<h2>{{ 'character.start.title'|trans|title }}</h2>
+	<p>{{ 'character.start.intro'|trans({"%name%":character.name})|raw }}</p>
+
+	{% if myhouse %}
+		<hr>
+		<h3>{{ 'character.start.myhouse'|trans|raw }}</h3>
+		<p>{{ 'character.start.myhouseintro'|trans|raw }}</p>
+
+	{% endif %}
+	{% if not realms.isEmpty %}
+		<hr>
+		<h3>{{ 'character.start.realm'|trans|raw }}</h3>
+		<p>{{ 'character.start.realmintro'|trans|raw }}</p>
+		{% for realm in realms %}
+			<hr>
+			<h3><u>{{ realm.formalName }}</u></h3>
+			<p>{{ 'character.start.nobles'|trans|raw }}: {{ realm.findActiveMembers.count }}<br />
+			{{ 'character.start.regions'|trans|raw }}: {{ realm.findTerritory.count }}<br /></p>
+			<p>{{ realm.spawnDescription.text}}<br /><br />
+			<a href="{{ path('maf_spawn_realm', {"realm":realm.id}) }}">{{ 'character.start.join.realm'|trans({"%name%":realm.name})|raw }}</a></p>
+		{% endfor %}
+	{% endif %}
+	{% if not houses.isEmpty %}
+		<hr>
+		<h3>{{ 'character.start.house'|trans|raw }}</h3>
+		<p>{{ 'character.start.houseintro'|trans|raw }}</p>
+		{% for house in houses %}
+			<hr>
+			<h3><u>{{ house.name }}</u></h3>
+			<p>{{ 'character.start.nobles'|trans|raw }}: {{ house.findAllActive.count }}<br />
+			<p>{{ house.spawnDescription.text}}<br /><br />
+			<a href="{{ path('maf_spawn_house', {"house":house.id}) }}">{{ 'character.start.join.house'|trans({"%name%":house.name})|raw }}</a></p>
+		{% endfor %}
+	{% endif %}
+{% endblock %}

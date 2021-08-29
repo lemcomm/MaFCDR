@@ -69,6 +69,12 @@ class LinksExtension extends \Twig_Extension {
 				case 'noble':
 					$type = 'Character';
 					break;
+				case 'p':
+				case 'poi':
+				case 'place':
+				case 'placeofinterest':
+					$type = 'Place';
+					break;
 				case 'vote':
 					$type = 'Election';
 					break;
@@ -85,7 +91,6 @@ class LinksExtension extends \Twig_Extension {
 				case 'war':
 					$type = 'War';
 					break;
-				case 'n':
 				case 'news':
 				case 'newspaper':
 				case 'newsedition':
@@ -108,18 +113,26 @@ class LinksExtension extends \Twig_Extension {
 				case 'family':
 					$type = 'House';
 					break;
+				case 'u':
+				case 'unit':
+					$type = 'Unit';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
 			$entity = $this->em->getRepository('BM2SiteBundle:'.$type)->find($id);
 			if ($entity) {
-				if ($type != 'NewsEdition') {
+				if ($type != 'NewsEdition' && $type != 'Unit') {
 					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
-				} else {
+				} elseif ($type == 'Unit') {
+					$url = $this->generator->generate($this->getLink($type), array('unit' => $id));
+				}  else {
 					$url = $this->generator->generate($this->getLink($type), array('edition' => $id));
 				}
-				if ($type != 'NewsEdition') {
+				if ($type != 'NewsEdition' && $type != 'Unit') {
 					$name = $entity->getName();
+				} elseif ($type == 'Unit') {
+					$name = $entity->getSettings()->getName();
 				} else {
 					$name = $entity->getPaper()->getName();
 				}
@@ -172,7 +185,9 @@ class LinksExtension extends \Twig_Extension {
 			case 'artifact':	return 'bm2_site_artifacts_details';
 			case 'war':		return 'bm2_site_war_view';
 			case 'newsedition':	return 'bm2_site_news_read';
-			case 'house':		return 'bm2_house';
+			case 'house':		return 'maf_house';
+			case 'place':		return 'maf_place';
+			case 'unit':		return 'maf_units_info';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
@@ -181,7 +196,7 @@ class LinksExtension extends \Twig_Extension {
 	public function ObjectLink($entity, $raw=false, $absolute=false, $number=1) {
 		if (!is_object($entity)) {
 			$this->logger->error("link() called without object - $entity"); // fuck, it's impossible to get a backtrace! - out of memory
-			$this->logger->error("dump: ".\Doctrine\Common\Util\Debug::dump($entity, 1, true, false));			
+			$this->logger->error("dump: ".\Doctrine\Common\Util\Debug::dump($entity, 1, true, false));
 			$this->logger->error("request: ".$this->request_stack->getCurrentRequest()->getRequestUri());
 			return "[invalid object]";
 		}
@@ -255,10 +270,17 @@ class LinksExtension extends \Twig_Extension {
 		return $this->linkhelper($this->getLink($classname), $id, $name, $linktype, $raw, $absolute);
 	}
 
-	public function IdNameLink($type, $id, $name, $raw=false, $absolute=false) {
+	public function IdNameLink($type, $id, $name = null, $raw=false, $absolute=false) {
 		$linktype = null;
 		switch (strtolower($type)) {
-			case 'character':			$linktype = 'character'; break;
+			case 'character':
+				$linktype = 'character';
+				if (!$name) {
+					$name = $this->em->getRepository('BM2SiteBundle:Character')->find($id)->getName();
+					# Yes, this exists solely for battle reports. *sigh*
+					# For the record, if you fail to declare $name, linkhelper, below, will fail out. :)
+				}
+				break;
 			case 'geofeature':
 			case 'feature':         $linktype = 'feature'; $name = $this->featurename($name); break;
 			case 'building':
@@ -307,7 +329,11 @@ class LinksExtension extends \Twig_Extension {
 		// FIXME: above still not working, so trying with all absolute paths now
 		$type = UrlGeneratorInterface::ABSOLUTE_URL;
 
-		$url = $this->generator->generate($path, array('id' => $id), $type);
+		if ($class != 'Unit') {
+			$url = $this->generator->generate($path, array('id' => $id), $type);
+		} else {
+			$url = $this->generator->generate($path, array('unit' => $id), $type);
+		}
 		if ($raw) return $url;
 		$link = '<a ';
 		if ($class) { $link .= 'class="link_'.$class.'" '; }

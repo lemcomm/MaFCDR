@@ -1,0 +1,58 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'diplomacy.relations.title'|trans({'%realm%':realm.name},"politics")|title }}</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th>{{ 'diplomacy.relations.they'|trans({},"politics") }}</th>
+			<th>{{ 'diplomacy.relations.ourstatus'|trans({},"politics") }}</th>
+			<th>{{ 'diplomacy.relations.theirstatus'|trans({},"politics") }}</th>
+			{% if canedit %}<th></th>{% endif %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for relation in relations %}
+		<tr>
+			<td>{{ link(relation.link) }}</td>
+			<td>
+				{% if relation.we is defined %}
+					<a href="{{ path('bm2_site_realm_viewrelations', {'realm':realm.id, 'target':relation.they.id}) }}">
+						{{ ('diplomacy.status.'~relation.we.status)|trans({}, 'politics') }}
+					</a>
+				{% endif %}
+			</td>
+			<td>
+				{% if relation.they is defined %}
+					<a href="{{ path('bm2_site_realm_viewrelations', {'realm':relation.they.id, 'target':realm.id}) }}">
+						{{ ('diplomacy.status.'~relation.they.status)|trans({}, 'politics') }}
+					</a>
+				{% endif %}
+			</td>
+			{% if canedit %}
+				<td>
+				{% if relation.we is defined %}
+					<a href="{{ path('bm2_site_realm_editrelation', {'realm':realm.id, 'relation':relation.we.id}) }}">{{ 'diplomacy.relations.edit'|trans({},"politics") }}</a>
+					-
+					<a href="{{ path('bm2_site_realm_deleterelation', {'realm':realm.id, 'relation':relation.we.id}) }}">{{ 'diplomacy.relations.delete'|trans({},"politics") }}</a>
+				{% else %}
+					<a href="{{ path('bm2_site_realm_editrelation', {'realm':realm.id, 'relation':0, 'target':relation.link.id}) }}">{{ 'diplomacy.relations.edit'|trans({},"politics") }}</a>
+				{% endif %}
+				</td>
+			{% endif %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% if canedit %}
+	<hr />
+
+	<h2>{{ 'diplomacy.relations.new.title'|trans({},"politics")|title }}</h2>
+	<p>{{ 'diplomacy.relations.new.intro'|trans({},"politics")|raw }}</p>
+
+	<a href="{{ path('bm2_site_realm_editrelation', {'realm':realm.id, 'relation':0}) }}">{{ 'diplomacy.relations.new.link'|trans({},"politics") }}</a>
+{% endif %}
+
+{% endblock %}

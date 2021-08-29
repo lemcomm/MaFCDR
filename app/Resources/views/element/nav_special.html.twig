@@ -1,0 +1,104 @@
+<ul>
+	<li><a href="{{ path('bm2_map') }}">{{ 'menu.travel'|trans }}</a></li>
+	<li>
+		<a href="{{ path('bm2_character') }}">{{ 'menu.status'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<h3>Your Status</h3>
+					<ul>
+						<li><a href="{{ path('bm2_character') }}">{{ 'menu.status'|trans }}</a></li>
+						<li><a href="{{ path('bm2_recent') }}">{{ 'menu.recent'|trans }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>Your Party</h3>
+					<ul>
+						{% if character.soldiers is not empty %}
+							<li><a href="{{ path('bm2_site_character_soldiers') }}">{{ 'npc.soldier'|transchoice(10) }}</a></li>
+						{% endif %}
+						{% if character.entourage is not empty %}
+							<li><a href="{{ path('bm2_site_character_entourage') }}">{{ 'np.entourage2'|transchoice(10) }}</a></li>
+						{% endif %}
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+
+	<li>
+		<a href="{{ path('bm2_events') }}"{% if character.hasnewevents %} class="new"{% endif %}>{{ 'menu.events'|trans }}</a>
+	</li>
+
+	<li>
+		<a href="#"{% if character.hasnewmessages %} class="new"{% endif %}>{{ 'menu.messages'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations")|title }}</a></li>
+				<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+				<hr>
+				<li class="part">
+					<h3>{{ 'menu.messages2'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_conv_recent', {"window":3}) }}">{{ 'recent.unread'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":6}) }}">{{ 'recent.12h'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":5}) }}">{{ 'recent.24h'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":4}) }}">{{ 'recent.3d'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":3}) }}">{{ 'recent.1w'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":2}) }}">{{ 'recent.2w'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":1}) }}">{{ 'recent.1m'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":7}) }}">{{ 'recent.2m'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_recent', {"window":8}) }}">{{ 'recent.3m'|trans({}, "conversations") }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>{{ 'menu.messages3'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_conv_unread') }}">{{ 'unread.short'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs') }}">{{ 'index.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_convs_orgs') }}">{{ 'orgs.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.title'|trans({}, "conversations") }}</a></li>
+					</ul>
+				</li>
+				<li class="part">
+					<h3>{{ 'menu.messages4'|trans|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a></li>
+						<li><a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<a href="#">{{ 'menu.politics'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<ul>
+						<li><a href="{{ path('bm2_site_quests_myquests') }}">{{ 'menu.quests'|trans }}</a></li>
+						<li><a href="{{ path('bm2_politics') }}">{{ 'menu.politics'|trans }}</a></li>
+						<li><a href="{{ path('bm2_relations') }}">{{ 'menu.relations'|trans }}</a></li>
+						<li><a href="{{ path("bm2_lists") }}">{{ 'lists.name'|trans({},"politics") }}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li>
+		<a href="{{ path('bm2_dungeon_dungeon_index') }}">{{ 'menu.dungeon'|trans }}</a>
+		<div class="sub">
+			<ul class="row">
+				<li class="part">
+					<ul>
+						<li><a href="{{ path('bm2_dungeon_dungeon_index') }}">{{ 'dungeon.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('bm2_dungeon_dungeon_events') }}">{{ 'dungeon.events.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('bm2_dungeon_dungeon_chat') }}">{{ 'dungeon.chat.title'|trans({}, "dungeons") }}</a></li>
+						<li><a href="{{ path('dungeons_cards') }}">{{ 'cards.title'|trans({}, "dungeons") }}</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</li>
+
+</ul>

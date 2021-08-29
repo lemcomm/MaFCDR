@@ -1,0 +1,78 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+{% if success is defined %}
+		<p>{{ 'diplomacy.join.done'|trans({'%realm%':link(realm), '%target%':link(target)}, "politics")|raw }}</p>
+{% else %}
+	{% if realm.superior %}
+		<h2>{{ 'diplomacy.change.name'|trans({},"politics")|title }}</h2>
+		<p>{{ 'diplomacy.change.intro'|trans({'%realm%':link(realm), '%parent%':link(realm.superior)},"politics")|raw }}</p>
+	{% else %}
+		<h2>{{ 'diplomacy.join.name'|trans({},"politics")|title }}</h2>
+		<p>{{ 'diplomacy.join.description'|trans({},"politics")|raw }}</p>
+	{% endif %}
+
+	{% if form is defined %}
+	{{ form_errors(form) }}
+	<form id="realmjoinform" class="wide" action="{{ path('bm2_site_realm_join', {'realm':realm.id}) }}" method="post">
+		{{ form_widget(form._token) }}
+		<table>
+			<thead><tr>
+				<th></th>
+				<th>{{ 'realm.name'|trans({}, "politics") }}</th>
+				<th>{{ 'realm.formalname'|trans({}, "politics") }}</th>
+				<th>{{ 'realm.designation'|trans({}, "politics") }}</th>
+				<th>{{ 'realm.ruler'|transchoice(10, {}, "politics") }}</th>
+				<th>{{ 'diplomacy.join.via'|trans({}, "politics") }}</th>
+			</tr></thead>
+			<tbody>
+			{% for choice in choices %}
+				<tr>
+					<td><button class="makechoice" value="{{ choice.realm.id }}">{{ 'diplomacy.join.submit'|trans({},"politics") }}</button></td>
+					<td>{{ link(choice.realm) }}</td>
+					<td>{{ choice.realm.formalname }}</td>
+					<td>{{ ('realm.type.'~choice.realm.type)|trans({},"politics") }}</td>
+					<td><ul class="shortlist">
+						{% for ruler in choice.realm.findrulers %}
+							<li>{{ link(ruler) }}</li>
+						{% else %}
+							<li>-</li>
+						{% endfor %}
+					</ul></td>
+					<td><ul class="shortlist">{% for via in choice.via %}<li>{{ link(via) }}</li>{% endfor %}</ul></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	<div id="nojschoice">
+		{{ form_widget(form.target) }}
+		{{ form_widget(form.submit) }}
+	</div>
+	{{ form_widget(form.message) }}
+	</form>
+	{% else %}
+		<div class="warning">{{ 'diplomacy.join.noothers'|trans({},"politics") }}</div>
+	{% endif %}
+
+	{% if unavailable is not empty %}
+	<hr class="spacer" />
+	<div class="disabled">
+	<p>{{ 'diplomacy.join.unavailable'|trans({},"politics") }}</p>
+	<dl>
+		{% for unavail in unavailable %}
+			<dt>{{ link(unavail.realm) }}</dt>
+			<dd>{{ ('diplomacy.join.unavail.'~unavail.reason)|trans({}, "politics") }}</dd>
+		{% endfor %}
+	</dl>
+	</div>
+	{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+$("#nojschoice").hide();
+$(".makechoice").click(function() {
+	var choice = $(this).val().toString();
+	$("#realm_target").val(choice);
+});
+{% endblock %}

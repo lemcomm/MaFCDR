@@ -54,7 +54,6 @@ class AccountController extends Controller {
 
    /**
      * @Route("/", name="bm2_account")
-     * @Template("BM2SiteBundle:Account:account.html.twig")
      */
 	public function indexAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -68,23 +67,22 @@ class AccountController extends Controller {
 
 		list($announcements, $notices) = $this->notifications();
 
-		return array(
+		return $this->render('Account/account.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices
-		);
+		]);
 	}
 
 
    /**
      * @Route("/data")
-     * @Template
      */
-   public function dataAction(Request $request) {
+	public function dataAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
-   	$form = $this->createForm(new UserDataType(), $user);
+			$form = $this->createForm(new UserDataType(), $user);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -93,32 +91,32 @@ class AccountController extends Controller {
 			return $this->redirectToRoute('bm2_account');
 		}
 
-   	return array(
-   		'user' => $user,
-   		'form' => $form->createView()
-   	);
-   }
+		return $this->render('Account/data.html.twig', [
+	   		'user' => $user,
+	   		'form' => $form->createView()
+		]);
+	}
 
    /**
      * @Route("/characters", name="bm2_characters")
-     * @Template
      */
 	public function charactersAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 		$this->getDoctrine()->getManager()->flush();
 
-		$characters = array(); 
+		$characters = array();
 		$npcs = array();
 
 		$now = new \DateTime("now");
 		$a_week_ago = $now->sub(new \DateInterval("P7D"));
-				
+
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
 			$annexing = false;
@@ -130,7 +128,10 @@ class AccountController extends Controller {
 			$renaming = false;
 			$reclaiming = false;
 			$unretirable = false;
-			if ($character->getLocation()) {
+			$preBattle = false;
+			$siege = false;
+			$alive = $character->getAlive();
+			if ($alive && $character->getLocation()) {
 				$nearest = $this->get('geography')->findNearestSettlement($character);
 				$settlement=array_shift($nearest);
 				$at_settlement = ($nearest['distance'] < $this->get('geography')->calculateActionDistance($settlement));
@@ -141,15 +142,20 @@ class AccountController extends Controller {
 			}
 			if ($character->getList()<100) {
 				$unread = $character->countNewMessages();
-				$events = $character->countNewEvents();				
+				$events = $character->countNewEvents();
 			} else {
 				// dead characters don't have events or messages...
 				$unread = 0;
 				$events = 0;
 			}
-			
+			if ($character->getBattling() && $character->getBattleGroups()->isEmpty() == TRUE) {
+				# NOTE: Because sometimes, battling isn't reset after a battle. May be related to entity locking.
+				$character->setBattling(false);
+				$em->flush();
+			}
+
 			// This adds in functionality for detecting character actions on this page. --Andrew
-			if ($character->getActions()) {
+			if ($alive && $character->getActions()) {
 				foreach ($character->getActions() as $actions) {
 					switch($actions->getType()) {
 						case 'settlement.take':
@@ -179,10 +185,20 @@ class AccountController extends Controller {
 					}
 				}
 			}
-			if (!is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
+			if ($alive && !is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days > 7) {
 				$unretirable = true;
 			} else {
 				$unretirable = false;
+			}
+			if ($alive && !$character->getBattleGroups()->isEmpty()) {
+				foreach ($character->getBattleGroups() as $group) {
+					if ($group->getBattle()) {
+						$preBattle = true;
+					}
+					if ($group->getSiege()) {
+						$siege = true;
+					}
+				}
 			}
 
 			$data = array(
@@ -190,6 +206,7 @@ class AccountController extends Controller {
 				'name' => $character->getName(),
 				'list' => $character->getList(),
 				'alive' => $character->getAlive(),
+				'battling' => $character->getBattling(),
 				'retired' => $character->getRetired(),
 				'unretirable' => $unretirable,
 				'npc' => $character->isNPC(),
@@ -200,7 +217,8 @@ class AccountController extends Controller {
 				'at_settlement' => $at_settlement,
 				'at_sea' => $character->getTravelAtSea()?true:false,
 				'travel' => $character->getTravel()?true:false,
-				'inbattle' => $character->getBattleGroups()->isEmpty()?false:true,
+				'prebattle' => $preBattle,
+				'sieging' => $siege,
 				'annexing' => $annexing,
 				'supporting' => $supporting,
 				'opposing' => $opposing,
@@ -210,6 +228,7 @@ class AccountController extends Controller {
 				'renaming' => $renaming,
 				'reclaiming' => $reclaiming,
 				'unread' => $unread,
+				'requests' => count($this->get('game_request_manager')->findAllManageableRequests($character)),
 				'events' => $events
 			);
 
@@ -239,9 +258,6 @@ class AccountController extends Controller {
 			$free_npcs = array();
 		}
 
-		$query = $this->getDoctrine()->getManager()->createQuery('SELECT count(o.id) FROM BM2SiteBundle:KnightOffer o');
-		$offers = $query->getSingleScalarResult();
-
 		// check when our next payment is due and if we have enough to pay it
 		$now = new \DateTime("now");
 		$daysleft = (int)$now->diff($user->getPaidUntil())->format("%r%a");
@@ -254,10 +270,24 @@ class AccountController extends Controller {
 
 		$list_form = $this->createForm(new ListSelectType);
 
-		return array(
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+
+		if ($user->getIp() != $ip) {
+			$user->setIp($ip);
+			$em->flush();
+		}
+
+		return $this->render('Account/characters.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices,
-			'offers' => $offers,
 			'locked' => ($user->getAccountLevel()==0),
 			'list_form' => $list_form->createView(),
 			'characters' => $characters,
@@ -267,7 +297,7 @@ class AccountController extends Controller {
 			'user' => $user,
 			'daysleft' => $daysleft,
 			'enough_credits' => $enough_credits
-		);
+		]);
 	}
 
 	private function character_sort($a, $b) {
@@ -280,7 +310,6 @@ class AccountController extends Controller {
 
 	/**
 	  * @Route("/overview")
-	  * @Template("BM2SiteBundle:Account:overview.html.twig")
 	  */
 	public function overviewAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -289,12 +318,12 @@ class AccountController extends Controller {
 		$user = $this->getUser();
 
 		$characters = array();
-		$estates = new ArrayCollection;
+		$settlements = new ArrayCollection;
 		$claims = new ArrayCollection;
 		foreach ($user->getLivingCharacters() as $character) {
 
-			foreach ($character->getEstates() as $estate) {
-				$estates->add($estate);
+			foreach ($character->getOwnedSettlements() as $settlement) {
+				$settlements->add($settlement);
 			}
 			foreach ($character->getSettlementClaims() as $claim) {
 				$claims->add($claim->getSettlement());
@@ -308,17 +337,16 @@ class AccountController extends Controller {
 
 		}
 
-		return array(
+		return $this->render('Account/overview.html.twig', [
 			'characters' => $characters,
-			'estates' => $this->get('geography')->findRegionsPolygon($estates),
+			'settlements' => $this->get('geography')->findRegionsPolygon($settlements),
 			'claims' => $this->get('geography')->findRegionsPolygon($claims)
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/newchar", name="bm2_newchar")
-	  * @Template("BM2SiteBundle:Account:charactercreation.html.twig")
 	  */
 	public function newcharAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -341,7 +369,7 @@ class AccountController extends Controller {
 		if ($unspawned->count() >= 2) {
 			$spawnlimit = true;
 		} else {
-			$spawnlimit = false;			
+			$spawnlimit = false;
 		}
 
 		if ($request->isMethod('POST') && $request->request->has("charactercreation")) {
@@ -349,7 +377,7 @@ class AccountController extends Controller {
 			if ($form->isValid()) {
 				$data = $form->getData();
 				if ($user->getNewCharsLimit() <= 0) { $data['dead']=true; } // validation doesn't catch this because the field is disabled
-				
+
 				$em = $this->getDoctrine()->getManager();
 				$works = true;
 
@@ -363,6 +391,10 @@ class AccountController extends Controller {
 				));
 				if ($query->getResult()) {
 					$form->addError(new FormError("character.burst"));
+					$works = false;
+				}
+				if (preg_match('/[01234567890\!\@\#\$\%\^\&\*\(\)_\+\-\=\[\]\{\}\:\;\<\>\.\?\/\\\|\~\"]/', $data['name'])) {
+					$form->addError(new FormError("character.illegaltext"));
 					$works = false;
 				}
 
@@ -394,7 +426,7 @@ class AccountController extends Controller {
 						}
 						if (!$havesex) {
 							$form->addError(new FormError("character.nosex"));
-							$works = false;							
+							$works = false;
 						}
 					}
 				} else if ($data['father']) {
@@ -439,14 +471,14 @@ class AccountController extends Controller {
 			$mychars[$char->getId()] = array('id'=>$char->getId(), 'name'=>$char->getName(), 'mine'=>true, 'gender'=>($char->getMale()?'m':'f'), 'partners'=>$mypartners);
 		}
 
-		return array(
+		return $this->render('Account/charactercreation.html.twig', [
 			'characters' => $mychars,
 			'limit' => $user->getNewCharsLimit(),
 			'spawnlimit' => $spawnlimit,
 			'characters_active' => $characters_active,
 			'characters_allowed' => $characters_allowed,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	private function findSexPartners($char) {
@@ -461,7 +493,7 @@ class AccountController extends Controller {
 	}
 
 	private function checkCharacterLimit(User $user) {
-		$levels = $this->get('payment_manager')->getPaymentLevels();
+		$levels = $this->get('payment_manager')->getPaymentLevels($user);
 		$level = $levels[$user->getAccountLevel()];
 		$characters_allowed = $level['characters'];
 		$characters_active = $user->getActiveCharacters()->count();
@@ -479,7 +511,6 @@ class AccountController extends Controller {
 
 	/**
 	  * @Route("/settings")
-	  * @Template
 	  */
 	public function settingsAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
@@ -502,10 +533,11 @@ class AccountController extends Controller {
 				return $this->redirectToRoute('bm2_account');
 			}
 		}
-		return array(
+
+		return $this->render('Account/settings.html.twig', [
 			'form' => $form->createView(),
 			'user' => $user
-		);
+		]);
 	}
 
 	/**
@@ -589,6 +621,9 @@ class AccountController extends Controller {
 		if (!$character) {
 			throw $this->createAccessDeniedException('error.notfound.character');
 		}
+		if ($character->getBattling()) {
+			throw $this->createAccessDeniedException('error.noaccess.battling');
+		}
 		if ($character->getUser() != $user) {
 			throw $this->createAccessDeniedException('error.noaccess.character');
 		}
@@ -615,7 +650,7 @@ class AccountController extends Controller {
 					if ($character->getDungeoneer() && $character->getDungeoneer()->isInDungeon()) {
 						return $this->redirectToRoute('bm2_dungeon_dungeon_index');
 					}
-				} 
+				}
 				return $this->redirectToRoute('bm2_recent');
 				break;
 			case 'placenew':
@@ -625,7 +660,7 @@ class AccountController extends Controller {
 					$character->setSystem(NULL);
 				}
 				$em->flush();
-				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'new'));
+				return $this->redirectToRoute('maf_character_start', array('logic'=>'new'));
 				break;
 			case 'viewhist':
 				if ($character->getList() < 100 ) {
@@ -635,9 +670,18 @@ class AccountController extends Controller {
 				$em->flush();
 				return $this->redirectToRoute('bm2_eventlog', array('id'=>$character->getLog()->getId()));
 				break;
+			case 'newbackground':
+				$character->setLastAccess(new \DateTime("now"));
+				$character->setSlumbering(false);
+				if ($character->getSystem() == 'procd_inactive') {
+					$character->setSystem(NULL);
+				}
+				$em->flush();
+				return $this->redirectToRoute('bm2_site_character_background', ['id'=>$character->getId(), 'starting'=>'1']);
+
 			case 'edithist':
-				$em->flush(); 
-				/* I don't have words for how stupid I think this is. 
+				$em->flush();
+				/* I don't have words for how stupid I think this is.
 				Apparently, if you don't flush after setting session data, the game has no idea which character you're trying to edit the background of.
 				Which is super odd to me, because session data doesn't involve the database... --Andrew, 20180213 */
 				return $this->redirectToRoute('bm2_site_character_background');
@@ -650,8 +694,8 @@ class AccountController extends Controller {
 					$character->setSystem(NULL);
 				}
 				$em->flush();
-				return $this->redirectToRoute('bm2_site_character_start', array('id'=>$character->getId(), 'logic'=>'retired'));
-				break;				
+				return $this->redirectToRoute('maf_character_start', array('logic'=>'retired'));
+				break;
 			default:
 				throw new AccessDeniedHttpException('error.notfound.playlogic');
 				return $this->redirectToRoute('bm2_characters');
@@ -660,46 +704,11 @@ class AccountController extends Controller {
 	}
 
 	/**
-	  * @Route("/choosebandit", name="bm2_choose_bandit")
-	  * @Template("BM2SiteBundle:Account:characters.html.twig")
-	  */
-	public function choosebanditAction(Request $request) {
-		$user = $this->getUser();
-
-		// check max NPCs
-		$npc_count = 0;
-		foreach ($user->getCharacters() as $character) {
-			if ($character->isNPC()) {
-				$npc_count++;
-				// for now, we allow at most 1 npc per player
-				throw new AccessDeniedHttpException('npc.maxreached');
-			}
-		}
-
-		$npcs_form = $this->createForm(new NpcSelectType($this->get('npc_manager')->getAvailableNPCs()));
-		$npcs_form->handleRequest($request);
-		if ($npcs_form->isValid()) {
-			$data = $npcs_form->getData();
-			if (!isset($data['npc'])) {
-				throw new \Exception("please select a bandit");
-			}
-			$character = $data['npc'];
-			$character->setUser($user);
-			$this->get('npc_manager')->spawnNPC($character);
-			$this->getDoctrine()->getManager()->flush();			
-			return $this->playAction($character->getId());
-		} else {
-			return $this->charactersAction();
-		}
-	}
-
-	/**
 	  * @Route("/familytree")
-	  * @Template
 	  */
 	public function familytreeAction() {
 		$descriptorspec = array(
-			0 => array("pipe", "r"),  // stdin 
+			0 => array("pipe", "r"),  // stdin
 			1 => array("pipe", "w"),  // stdout
 			2 => array("pipe", "w") // stderr
 		);
@@ -707,7 +716,7 @@ class AccountController extends Controller {
 		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 		if (is_resource($process)) {
-			$dot = $this->renderView('BM2SiteBundle:Account:familytree.dot.twig', array('characters'=>$this->getUser()->getNonNPCCharacters()));
+			$dot = $this->renderView('Account/familytree.dot.twig', array('characters'=>$this->getUser()->getNonNPCCharacters()));
 
 			fwrite($pipes[0], $dot);
 			fclose($pipes[0]);
@@ -718,13 +727,14 @@ class AccountController extends Controller {
 			$return_value = proc_close($process);
 		}
 
-		return array('svg' => $svg);
+		return $this->render('Account/familytree.html.twig', [
+			'svg' => $svg
+		]);
 	}
 
 
 	/**
 	  * @Route("/familytree.json", defaults={"_format"="json"})
-	  * @Template("BM2SiteBundle:Account:familytree.json.twig")
 	  */
 	public function familytreedataAction() {
 		$user = $this->getUser();
@@ -747,9 +757,12 @@ class AccountController extends Controller {
 			}
 		}
 
-		return array(
-			'tree' => array('nodes'=>$nodes, 'links'=>$links)
-		);
+		return $this->render('Account/familytreedata.json.twig', [
+			'tree' => [
+				'nodes'=>$nodes,
+				'links'=>$links
+			]
+		]);
 	}
 
 	private function node_find($id, $data) {

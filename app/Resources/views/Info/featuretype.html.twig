@@ -1,0 +1,19 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+	{% if featuretype.icon %}
+		<div class="artviewer withbg">
+			<img class="clipart" src="{{ asset('bundles/bm2site/images/'~featuretype.iconUnderConstruction) }}" />
+			<br />{{ 'underconstruction'|trans }}
+		</div>
+		<div class="artviewer withbg">
+			<img class="clipart" src="{{ asset('bundles/bm2site/images/'~featuretype.icon) }}" />
+			<br />{{ 'finished'|trans }}
+		</div>
+	{% endif %}
+	<h2>{{ ('feature.'~featuretype.name)|trans({}, "economy") }}</h2>
+	<p>{{ ('description.'~featuretype.name)|trans({}, "economy")|raw }}</p>
+	<hr />
+	<p>{{ 'economy.features.effortlong'|trans({'%hours%':featuretype.buildhours}, "actions") }}</p>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "layout.html.twig" %}
+
+
+{% block content %}
+<h2>{{ "queue.title"|trans({}, "actions")|title }}</h2>
+
+<table>
+	<thead><tr>
+		<th>{{ "queue.prio"|trans({}, "actions") }}</th>
+		<th>{{ "queue.action"|trans({}, "actions") }}</th>
+		<th>{{ "queue.progress"|trans({}, "actions") }}</th>
+		<th>{{ "queue.end"|trans({}, "actions") }}</th>
+		<th>{{ "queue.block"|trans({}, "actions") }}</th>
+	</tr></thead>
+	<tbody>
+	{% for action in character.actions %}
+		{% if action.hidden == false %}
+{# TODO: split into actions and reactions #}
+			<tr>
+				<td align="right" class="priority">{{ action.priority }}</td>
+				<td>{{ link(action) }}</td>
+				<td class="progress_column">
+					{% set progress = -1 %}
+					{% if action.complete %}
+						{% set progress = ( (now.timestamp - action.started.timestamp) * 100 / (action.complete.timestamp - action.started.timestamp) ) // 1 %}
+					{% elseif action.targetbattlegroup and action.targetbattlegroup.battle %}
+						{% set progress = ( (now.timestamp - action.targetbattlegroup.battle.started.timestamp) * 100 / (action.targetbattlegroup.battle.complete.timestamp - action.targetbattlegroup.battle.started.timestamp) ) // 1 %}
+					{% endif %}
+					{% if progress != -1 %}
+						{% if progress > 100 %}
+							<div class="progressbar" value="100"><span class="progress_value_dummy">{{ "queue.finishing"|trans({}, "actions") }}</span></div></td>
+						{% else %}
+							<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ progress }} %</span></div></td>
+						{% endif %}
+					{% endif %}
+				</td>
+				<td align="right">
+					{% if action.complete %}
+						{{ action.complete.format("r") }}
+					{% elseif action.targetbattlegroup and action.targetbattlegroup.battle %}
+						{{ action.targetbattlegroup.battle.complete.format("r") }}
+					{% endif %}
+				</td>
+				<td align="center">
+					{% if action.blocktravel %}
+						{{ "yes"|trans }}
+					{% else %}
+						{{ "no"|trans }}
+					{% endif %}
+				</td>
+				<td><button type="button" class="action" data-id="{{ action.id }}" data-action="up">{{ ("queue.up")|trans({}, "actions") }}</button></td>
+				<td><button type="button" class="action" data-id="{{ action.id }}" data-action="down">{{ ("queue.down")|trans({}, "actions") }}</button></td>
+				<td>
+				{% if action.cancancel %}
+					<button type="button" class="action" data-id="{{ action.id }}" data-action="cancel">{{ ("queue.cancel")|trans({}, "actions") }}</button>
+				{% endif %}
+				</td>
+			</tr>
+		{% endif %}
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+
+$(".action").click(function(){
+	var id = $(this).attr("data-id");
+	var action = $(this).attr("data-action");
+	var row = $(this).closest('tr');
+	var prio = $(".priority", row);
+	var prio_value = prio.html();
+
+	$.post('{{ path("bm2_site_queue_update") }}', {'id':id, 'option':action}, function(data) {
+		if (action == "up") {
+			var other = row.prev();
+			other.before(row);
+			var op = $(".priority", other);
+			var op_value = op.html();
+			prio.html(op_value);
+			op.html(prio_value);
+		} else if (action == "down") {
+			var other = row.next();
+			other.after(row);
+			var op = $(".priority", other);
+			var op_value = op.html();
+			prio.html(op_value);
+			op.html(prio_value);
+		} else if (action == "cancel") {
+			row.remove();
+		}
+	});
+});
+
+{% endblock %}

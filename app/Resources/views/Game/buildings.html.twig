@@ -1,0 +1,61 @@
+{% extends "layout.html.twig" %}
+
+
+{% block content %}
+<h2>Buildings</h2>
+<table>
+	<thead>
+		<tr>
+			<th colspan=2></th>
+			<th colspan=3>Population</th>
+			<th></th>
+			{% for r in resources %}
+				<th colspan=4>{{ r.name }}</th>
+			{% endfor %}
+		</tr>
+		<tr>
+			<th>Type</th>
+			<th>Build Hours</th>
+			<th>min</th>
+			<th>auto</th>
+			<th>per</th>
+			<th>Defense</th>
+			{% for r in resources %}
+				<th>build</th>
+				<th>operate</th>
+				<th colspan=2>provides</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for b in buildings %}
+		<tr>
+			<td>{{ link(b) }}</td>
+			<td align="right">{{ b.buildhours }}</td>
+			<td align="right">{{ b.minpopulation }}</td>
+			<td align="right">{{ b.autopopulation }}</td>
+			<td align="right">{{ b.perpeople }}</td>
+			<td align="right">{% if b.defenses != 0 %}{{ b.defenses }}{% endif %}</td>
+			{% for r in resources %}
+				{% set found = false %}
+				{% for res in b.resources %}
+					{% if res.resourcetype.name == r.name %}
+						{% set found = true %}
+						{% set title = "where building_type_id="~ b.id ~" and resource_type_id="~r.id %}
+						<td align="right" title="{{ title }}">{{ res.requiresconstruction }}</td>
+						<td align="right" title="{{ title }}">{{ res.requiresoperation }}</td>
+						<td align="right" title="{{ title }}">{{ res.providesoperation }}</td>
+						<td align="right" title="{{ title }}">{{ res.providesoperationbonus }}</td>
+					{% endif %}
+				{% endfor %}
+				{% if found == false %}
+					<td colspan=4></td>
+				{% endif %}
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+{% endblock %}

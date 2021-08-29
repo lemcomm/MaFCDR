@@ -1,0 +1,41 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "meta.heraldry.name"|trans({},"actions")|title }}</h2>
+<p>{{ "meta.heraldry.intro"|trans({'%url%':path('bm2_heraldry')},"actions")|raw }}</p>
+{% if nocrests is defined %}
+	{{ "meta.heraldry.nocrests"|trans({},"actions") }}
+{% else %}
+<form id="crestselect" class="wide" action="{{ path('bm2_site_character_heraldry') }}" method="post">
+	{{ form_widget(form._token) }}
+	<ul class="heraldrylist">
+		<li class="selectable" data-id="0">
+			<h4>{{ "meta.heraldry.remove"|trans({},"actions") }}</h4>
+			<img src="{{ asset('bundles/bm2site/heraldry-svg/empty.svg') }}"/>
+		</li>
+		{% for crest in form.crest.vars.choices %}
+			<li class="selectable" data-id="{{ crest.data.id }}">
+				<h4>{{ crest.data.name }}</h4>
+				<img src="{{ path("bm2_site_heraldry_crest", {"id":crest.data.id}) }}"/>
+			</li>
+		{% endfor %}
+	</ul>
+	<br class="clear"/>
+	<div style="display:none">
+		{{ form_row(form.crest) }}
+{#
+		<button type="submit" name="submit">{{ "meta.heraldry.submit"|trans({},"actions") }}</button>
+#}
+	</div>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+$("li.selectable").click(function(){
+	var id = $(this).data('id');
+	var opt = $("#form_crest option[value='"+id+"']");
+	opt.prop("selected", true);
+	$("#crestselect").submit();
+});
+{% endblock %}

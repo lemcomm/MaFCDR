@@ -1,0 +1,8 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'unread.title'|trans({}, "conversations")|title }}</h2>
+
+{% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
+
+{% endblock %}

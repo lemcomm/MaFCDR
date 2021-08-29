@@ -1,0 +1,48 @@
+<div id="sd_content">
+	<h2 id="sd_name">{{ char.name }} {% if char.male %}♂{% else %}♀{% endif %}</h2>
+	<div id="sd_id" class="hidden">{{ char.id }}</div>
+	<dl>
+		{% for parent in char.parents %}
+			<dt>
+			{% if parent.male %}
+				{{ 'character.father'|trans|title }}
+			{% else %}
+				{{ 'character.mother'|trans|title }}
+			{% endif %}
+			</dt>
+			<dd>{{ link(parent) }}</dd>
+		{% endfor %}
+		<dt>{{ 'character.child'|transchoice(char.children|length)|title }}</dt>
+		<dd><ul class="simple">
+			{% for child in char.children %}
+				<li>{{ link(child) }}</li>
+			{% else %}
+				<li>{{ 'none'|trans }}</li>
+			{% endfor %}
+		</ul></dd>
+		<hr />
+		<dt>{{ 'character.details.realm'|trans }}</dt>
+		<dd><ul class="simple">
+			{% for realm in realms %}
+				<li>{{ link(realm) }}</li>
+			{% endfor %}
+		</ul></dd>
+		<dt>{{ 'character.details.ultimate'|trans }}</dt>
+		<dd><ul class="simple">
+			{% for realm in ultimates %}
+				<li>{{ link(realm) }}</li>
+			{% endfor %}
+		</ul></dd>
+		<br />
+		<dt>{{ 'estate'|transchoice(char.ownedSettlements|length)|title }}</dt>
+		<dd><ul class="simple">
+			{% for settlement in char.ownedSettlements %}
+				<li>{{ link(settlement) }}</li>
+			{% else %}
+				<li>{{ 'none'|trans }}</li>
+			{% endfor %}
+		</ul></dd>
+	</dl>
+	<div class="clear" />
+	<div id="sd_details" class="sd_button"><a href="{{ path("bm2_site_character_view", {'id':char.id}) }}">{{ 'details'|trans|title }}</a></div>
+</div>

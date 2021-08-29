@@ -33,9 +33,13 @@ class War {
 				$score+=$scores['else'];
 			}
 		}
-		return round($score*100 / count($this->getTargets())*3);
+		$targets = count($this->getTargets());
+		if ($targets > 0) {
+			return round($score*100 / count($this->getTargets())*3);
+		} else {
+			return 0;
+		}
 	}
-
 
 	public function getAttackers($include_self=true) {
 		if (!$this->attackers) {

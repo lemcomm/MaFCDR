@@ -9,16 +9,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Doctrine\ORM\EntityRepository;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
+use BM2\SiteBundle\Entity\Unit;
+use BM2\SiteBundle\Entity\EquipmentType;
 
 class SoldiersRecruitType extends AbstractType {
 
 	private $available_equipment;
+	private $units;
 
-	public function __construct($available_equipment) {
+	public function __construct($available_equipment, $units) {
 		$this->available_equipment = array();
 		foreach ($available_equipment as $a) {
 			$this->available_equipment[] = $a['item']->getId();
 		}
+		$this->units = $units;
 	}
 
 	public function getName() {
@@ -30,29 +39,40 @@ class SoldiersRecruitType extends AbstractType {
 			'intention'	=> 'recruit_23469',
 			'attr'		=> array('class'=>'wide'),
 			'validation_constraint' => new Assert\Collection(array(
-            'number' => new Assert\Range(array('min'=>1)),
-            'weapon' => null,
-            'armour' => null,
-            'equipment' => null
-        ))
+				'number' => new Assert\Range(array('min'=>1)),
+				'weapon' => null,
+				'armour' => null,
+				'equipment' => null,
+				'mount' => null
+		        ))
 		));
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$available = $this->available_equipment;
+		$units = $this->units;
 
-		$builder->add('number', 'integer', array(
+		$builder->add('unit', EntityType::class, array(
+			'label' => 'recruit.troops.unit',
+			'required' => true,
+			'class' => Unit::class,
+			'choice_label' => 'settings.name',
+			'choices' => $units,
+			'translation_domain'=>'actions'
+		));
+
+		$builder->add('number', IntegerType::class, array(
 			'attr' => array('size'=>3)
 		));
 
-		$fields = array('weapon', 'armour', 'equipment');
+		$fields = array('weapon', 'armour', 'equipment', 'mount');
 		foreach ($fields as $field) {
-			$builder->add($field, 'entity', array(
+			$builder->add($field, EntityType::class, array(
 				'label'=>$field,
-				'class'=>'BM2SiteBundle:EquipmentType',
 				'placeholder'=>$field=='weapon'?'item.choose':'item.none',
 				'required'=>$field=='weapon'?true:false,
 				'choice_label'=>'nameTrans',
+				'class'=>EquipmentType::class,
 				'choice_translation_domain' => true,
 				'query_builder'=>function(EntityRepository $er) use ($available, $field) {
 					return $er->createQueryBuilder('e')->where('e in (:available)')->andWhere('e.type = :type')->orderBy('e.name')
@@ -60,7 +80,10 @@ class SoldiersRecruitType extends AbstractType {
 			}));
 		}
 
-		$builder->add('submit', 'submit', array('label'=>'recruit.troops.submit', 'translation_domain'=>'actions'));
+		$builder->add('submit', SubmitType::class, array(
+			'label'=>'recruit.troops.submit',
+			'translation_domain'=>'actions'
+		));
 	}
 
 

@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "military.disengage.name"|trans({},"actions")|title }}</h2>
+	{% if results is defined %}
+		<ul class="simple">
+		{% for result in results %}
+			{# TODO: we need more details here so we get feedback which battle it refers to #}
+			{% if result.success %}
+				{{ "military.disengage.success"|trans({},"actions")|raw }}
+			{% else %}
+				{{ result.message|trans }}
+			{% endif %}
+		{% endfor %}
+		</ul>
+	{% else %}
+		<p>{{ "military.disengage.intro"|trans({"%time%":takes|realtime},"actions")|raw }}</p>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}

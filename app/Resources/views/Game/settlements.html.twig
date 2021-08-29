@@ -1,0 +1,32 @@
+{% extends "layout.html.twig" %}
+
+
+{% block content %}
+<h2>Settlements</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Population</th>
+			{% for resource in resourcetypes %}
+				<th colspan="3">{{ resource.name }}</th>
+			{% endfor %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for settlement in settlements %}
+			<tr>
+				<td>{{ link(settlement) }}</td>
+				<td align="right">{{ settlement.population }}</td>
+				{% for resource in resourcetypes %}
+					<td align="right">{{ economy.resourceproduction(settlement, resource) }}</td>
+					<td align="right">{{ economy.tradebalance(settlement, resource) }}</td>
+					<td align="right">{{ economy.resourcedemand(settlement, resource) }}</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

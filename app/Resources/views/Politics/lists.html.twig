@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "lists.name"|trans({},"politics")|title }}</h2>
+<p>{{ "lists.description"|trans({},"politics")|raw }}</p>
+
+<ul>
+{% for listing in listings %}
+	<li>
+		<a href="{{ path('bm2_site_politics_list', {'id':listing.id}) }}">{{ listing.name }}</a>
+		<small>
+			({{ "lists.creator"|trans({"%character%":link(listing.creator)},"politics")|raw }})</li>
+		</small>
+{% endfor %}
+</ul>
+
+<a href="{{ path('bm2_site_politics_list', {'id':0}) }}">{{ 'lists.new'|trans({},"politics") }}</a>
+
+{% endblock %}

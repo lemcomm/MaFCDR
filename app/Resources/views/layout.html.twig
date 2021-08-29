@@ -1,0 +1,335 @@
+{% set character = appstate.getCharacter(false, true, true) %}
+{% if simple is not defined %}{% set simple = false %}{% endif %}
+{% if app.request.host == "sfw.mightandfealty.com" or app.request.host == "office.mightandfealty.com" or app.request.host == "biz.mightandfealty.com" %}
+	{% set theme_name = "Office Style" %}
+	{% set theme = "office" %}
+	{% set jquery_ui_theme = "overcast" %}
+{% else %}
+	{% set theme_name = "Medieval Style" %}
+	{% set theme = "default" %}
+	{% set jquery_ui_theme = "swanky-purse" %}
+{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>{% block title %}{% if 'mightandfealty.com' in app.request.host %}Might &amp; Fealty{% elseif 'iungard' in app.request.host %}Might &amp; Fealty{% elseif 'valengard' in app.request.host %}Valengard Test Server{% else %}M&amp;F Dev Build{% endif %}{% endblock %}</title>
+	<link rel="icon" sizes="16x16" href="/favicon.ico" />
+	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
+	<link rel="icon" type="image/png" sizes="129x129" href="/apple-touch-icon.png">
+	<link rel="apple-touch-icon" type="image/png" sizes="129x129" href="/apple-touch-icon.png">
+	<link rel="apple-touch-icon" type="image/png" sizes="144x144" href="/apple-touch-icon-144.png">
+	<link rel="apple-touch-icon" type="image/png" sizes="114x114" href="/apple-touch-icon-114.png">
+	<link rel="apple-touch-icon" type="image/png" sizes="72x72" href="/apple-touch-icon-72.png">
+	<link rel="apple-touch-icon" type="image/png" sizes="57x57" href="/apple-touch-icon-57.png">
+	<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
+{#  non-mobile: #}
+	{% block includes %}
+		<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/'~theme~'.css') }}" title="{{ theme_name }}"/>
+		{% block jqueryuitheme %}
+			<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/{{ jquery_ui_theme }}/jquery-ui.css" />
+		{% endblock %}
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
+{#
+		<script src="{{ asset('bundles/bm2site/js/jquery-1.11.0.js') }}"></script>
+		<script src="{{ asset('bundles/bm2site/js/jquery-ui.js') }}"></script>
+#}
+		<script src="{{ asset('bundles/bm2site/js/jquery.hoverintent.js') }}"></script>
+	{% endblock %}
+{#  mobile:
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+#}
+	{% if character %}
+		<link rel="alternate" type="application/rss+xml" title="New Events" href="http:{{ url('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}, true) }}">
+	{% endif %}
+</head>
+<body>
+{% if biglogo is defined %}
+	<h1 id="title">
+		<a href="{{ path('bm2_homepage') }}">
+			<img src="{{ asset('bundles/bm2site/images/logo-transparent.png') }}" alt="Might &amp; Fealty" />
+		</a>
+	</h1>
+{% else %}
+	<div id="logo">
+		<a href="{{ path('bm2_homepage') }}">
+			<img src="{{ asset('bundles/bm2site/images/logo-transparent-small.png') }}" alt="Might &amp; Fealty" />
+		</a>
+	</div>
+{% endif %}
+
+{% set l_german = 'de' %}
+{% set l_english = 'gb' %}
+{% set l_french = 'fr' %}
+{% for language in app.request.languages %}
+	{% if (language == 'en_US' and l_english=='gb') %}{% set l_english='us' %}{% endif %}
+	{% if (language == 'en_AU' and l_english=='gb') %}{% set l_english='au' %}{% endif %}
+	{% if (language == 'en_BZ' and l_english=='gb') %}{% set l_english='bz' %}{% endif %}
+	{% if (language == 'en_IE' and l_english=='gb') %}{% set l_english='ie' %}{% endif %}
+	{% if (language == 'en_JM' and l_english=='gb') %}{% set l_english='jm' %}{% endif %}
+	{% if (language == 'en_NZ' and l_english=='gb') %}{% set l_english='nz' %}{% endif %}
+	{% if (language == 'en_PH' and l_english=='gb') %}{% set l_english='ph' %}{% endif %}
+	{% if (language == 'en_ZA' and l_english=='gb') %}{% set l_english='za' %}{% endif %}
+	{% if (language == 'en_TT' and l_english=='gb') %}{% set l_english='tt' %}{% endif %}
+
+	{% if (language == 'de_AT' and l_german=='de') %}{% set l_german='at' %}{% endif %}
+	{% if (language == 'de_LI' and l_german=='de') %}{% set l_german='li' %}{% endif %}
+
+	{% if (language == 'fr_MC' and l_french=='fr') %}{% set l_french='mc' %}{% endif %}
+
+	{# what about multi-language countries like Canada and Switzerland? split flags? #}
+{% endfor %}
+	{% set params = app.request.get('_route_params') %}
+	{% if params is null %}
+		{% set params = {} %}
+	{% endif %}
+	{% set route = app.request.get('_route') %}
+	{% if route is null %}
+		{% set route = 'bm2_homepage' %}
+	{% endif %}
+	{% if supported_languages is not defined %}{% set supported_languages = {
+		'en': { 'flag': l_english, 'name': 'english' },
+		'de': { 'flag': l_german, 'name': 'deutsch' },
+		'es': { 'flag': 'es', 'name': 'español' },
+		'fr': { 'flag': l_french, 'name': 'français' },
+		'it': { 'flag': 'it', 'name': 'italiano' },
+	} %}{% endif %}
+<ul class="lang-menu">
+	{% for code,lang in supported_languages %}
+		<li><a href="{{ path(route, params|merge({'_locale': code})) }}"><img src="{{ asset('bundles/bm2site/images/flags/'~lang.flag~'.png') }}" alt="{{ code }}" title="{{ lang.name }}" /></a></li>
+	{% endfor %}
+</ul>
+
+<div id="symfony-wrapper" data-role="page">
+	{% if not simple %}
+	<div id="symfony-header" data-role="header">
+		<ul class="navbar">
+			{% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+				<li><a href="{{ path('fos_user_profile_show') }}">{{ 'menu.profile'|trans }}</a></li>
+				<li><a href="{{ path('bm2_characters') }}">{{ 'menu.characters'|trans }}</a></li>
+			{% else %}
+				<li><a href="{{ path('fos_user_registration_register') }}">{{ 'menu.register'|trans }}</a></li>
+			{% endif %}
+
+			<li>
+			{% if app.user and is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+				<a href="{{ path('fos_user_security_logout') }}">{{ 'layout.logout'|trans({}, 'FOSUserBundle') }}</a>
+			{% else %}
+				<a href="{{ path('fos_user_security_login') }}" class="link_login">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+			{% endif %}
+			</li>
+			{% if character and not simple %}
+				<li><a href="{{ path('bm2_manual') }}/intro">{{ 'menu.manual'|trans }}</a></li>
+			{% endif %}
+		</ul>
+	</div>
+	{% if character %}
+	<div id="identity">
+		{% trans with {'%name%': link(character)} %}menu.playing{% endtrans %}
+		<br />
+		{% if character.travelatsea %}
+			{# nothing #}
+		{% elseif character.insidesettlement %}
+			{% trans with {'%place%':link(character.insidesettlement)} %}inside{% endtrans %}
+		{% elseif character.location and app.session.get('nearest_settlement') %}
+			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
+			{% trans with {'%place%':link(app.session.get('nearest_settlement'))} %}near{% endtrans %}
+		{% endif %}
+	</div>
+	{% endif %}
+	<div style="clear: both"></div>
+	{% endif %}
+
+	<div id="symfony-navigation" data-role="navbar" {% if simple %}class="simple"{% endif %}>
+		{% if character and not simple %}
+			{% if character.location %}
+				{% if character.special %}
+					{% include "element/nav_special.html.twig" %}
+				{% else %}
+					{% include "element/nav_main.html.twig" %}
+				{% endif %}
+			{% else %}
+				{% include "element/nav_start.html.twig" %}
+			{% endif %}
+		{% else %}
+			{% include "element/nav_guest.html.twig" %}
+		{% endif %}
+	</div>
+
+	{#
+	{% if character and app.session.get('soldiers') is defined %}
+	<div class="symfony-shortcuts" data-role="navbar">
+		<ul>
+			{% if app.session.get('soldiers') > 0 %}
+				<li><a href="{{ path('bm2_site_character_soldiers') }}"><span class="value">{{ app.session.get('soldiers') }}</span>{{ 'npc.soldier'|transchoice(app.session.get('soldiers')) }}</a></li>
+			{% endif %}
+			{% if app.session.get('entourage') > 0 %}
+				<li><a href="{{ path('bm2_site_character_entourage') }}"><span class="value">{{ app.session.get('entourage') }}</span>{{ 'npc.entourage2'|transchoice(app.session.get('entourage')) }}</a></li>
+			{% endif %}
+			{% if app.session.get('settlements') is not empty %}
+				<li class="drawer">
+					<a href="{{ path('bm2_estates') }}"><span class="value">{{ app.session.get('settlements')|length }}</span>{{ 'estate'|transchoice(app.session.get('settlements')|length) }}</a>
+					<ul>
+						{% for id,name in app.session.get('settlements') %}
+						<li>{{ settlement_link(id, name) }}</li>
+						{% endfor %}
+					</ul>
+				</li>
+			{% endif %}
+			{% if app.session.get('realms') is not empty %}
+				<li class="drawer">
+					<a href="{{ path('bm2_politics') }}"><span class="value">{{ app.session.get('realms')|length }}</span>{{ 'realm'|transchoice(app.session.get('realms')|length) }}</a>
+					<ul>
+						{% for id,name in app.session.get('realms') %}
+						<li>{{ realm_link(id, name) }}</li>
+						{% endfor %}
+					</ul>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+	{% endif %}
+	#}
+
+	<div style="clear: both"></div>
+
+	<div class="symfony-content" data-role="content">
+		{% for flashMessage in app.session.flashbag.get('error') %}
+		<div class="flash-message" data-role="header" data-theme="e">
+			{{ flashMessage|trans|raw }}
+		</div>
+		{% endfor %}
+		{% for flashMessage in app.session.flashbag.get('warning') %}
+		<div class="flash-message" data-role="header" data-theme="e">
+			{{ flashMessage|trans|raw }}
+		</div>
+		{% endfor %}
+		{% for flashMessage in app.session.flashbag.get('notice') %}
+		<div class="flash-message" data-role="header" data-theme="e">
+			{{ flashMessage|trans|raw }}
+		</div>
+		{% endfor %}
+		{% block content %}
+		{% endblock %}
+	</div>
+
+	<div id="viewer" class="hidden"></div>
+
+	<div id="symfony-footer" data-role="footer">
+		{% if not simple %}
+		<div>
+			{{ gametime(false, 'current') }}<br />
+			{{ untilturn() }}<br />
+			server time: {{ "now"|date("H:i") }}
+		</div>
+		<hr />
+		{% endif %}
+		{% if app.environment != 'prod' %}
+			<div>environment: {{ app.environment }}</div>
+		{% endif %}
+		<div>&copy;2013-2021 by Tom Vogt</div>
+		<div><a href="{{ path('bm2_terms') }}">{{ 'menu.terms'|trans }}</a></div>
+		<div><a href="{{ path('bm2_credits') }}">{{ 'menu.credits'|trans }}</a></div>
+		<div><a href="{{ path('bm2_contact') }}">{{ 'menu.contact'|trans }}</a></div>
+		<div><a href="https://discord.gg/7YpAhEh">{{ 'menu.discord'|trans }}</a></div>
+{# TODO: social sharing buttons (from http://www.heise.de/extras/socialshareprivacy/) etc. #}
+		<div><a href="https://www.patreon.com/andrewdoesprogramming">{{ 'menu.patreon.andrew'|trans }}</a></div>
+		<div><a href="https://pbbg.com">{{ 'menu.pbbg'|trans }}</a></div>
+	</div>
+</div>
+<script language="javascript" type="text/javascript">
+{% block javascript %}
+{% endblock %}
+$(document).ready(function() {
+$(".tt").tooltip({
+	"position": { my: "left bottom", at: "center top" }
+});
+$(".tt_bot").tooltip({
+	"position": { my: "center top", at: "center bottom" }
+});
+$(".tt_botleft").tooltip({
+	"position": { my: "left top", at: "left bottom" }
+});
+$("#viewer").dialog({
+	autoOpen: false,
+	width: "60%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+var ajaxlink = function(event){
+	event.preventDefault();
+	if ($("#viewer").dialog("isOpen")) {
+		$("#viewer").html('<center><img src="{{ asset('bundles/bm2site/images/loader.png') }}"/></center>');
+	};
+	var url = $(this).attr("href");
+	$.get(url, function(data){
+		$("#viewer").html(data);
+		if (! $("#viewer").dialog("isOpen")) {
+			$("#viewer").dialog("open");
+		}
+		$("#viewer a[class^=link_]").click(ajaxlink);
+	});
+};
+$("a[class^=link_]").on('click', ajaxlink);
+
+function megaHoverOver(){
+	$(this).find(".sub").stop().fadeTo('fast', 1).show();
+}
+
+function megaHoverOut(){
+	$(this).find(".sub").stop().fadeTo('fast', 0, function() {
+		$(this).hide();
+	});
+}
+
+var nav_config = {
+	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)
+	interval: 100, // number = milliseconds for onMouseOver polling interval
+	over: megaHoverOver, // function = onMouseOver callback (REQUIRED)
+	timeout: 300, // number = milliseconds delay before onMouseOut
+	out: megaHoverOut // function = onMouseOut callback (REQUIRED)
+};
+
+$("#symfony-navigation ul li .sub").css({'opacity':'0'});
+$("#symfony-navigation ul li").hoverIntent(nav_config);
+
+var short_config = {
+	sensitivity: 2, // number = sensitivity threshold (must be 1 or higher)
+	interval: 100, // number = milliseconds for onMouseOver polling interval
+	over: shortcutHoverOver, // function = onMouseOver callback (REQUIRED)
+	timeout: 300, // number = milliseconds delay before onMouseOut
+	out: shortcutHoverOut // function = onMouseOut callback (REQUIRED)
+};
+
+$("li.drawer").hoverIntent(short_config)
+
+function shortcutHoverOver(){
+	$(this).find("ul").stop().show("slide", {direction: 'right'});
+}
+
+function shortcutHoverOut(){
+	$(this).find("ul").stop().hide("slide", {direction: 'right'});
+}
+
+{% if not simple %}
+	var pos = $('#symfony-navigation').offset().top;
+	var nav = $('#symfony-navigation');
+
+	$(window).scroll(function () {
+		if ($(this).scrollTop() > pos) {
+			nav.addClass("fixed");
+		} else {
+			nav.removeClass("fixed");
+		}
+	});
+{% endif %}
+
+{% block jquery %}
+{% endblock %}
+});
+
+</script>
+</body>
+</html>

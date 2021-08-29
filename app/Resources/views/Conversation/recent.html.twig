@@ -1,0 +1,29 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+        <h2>{{ 'conversation.recent'|trans({}, "conversations")|title }}</h2>
+
+        <div class="cmsg_conversation">
+        {% for message in messages %}
+                {% include "Conversation/one_message.html.twig" with {"message":message, "recent":true, "period":period, "archive":false} only %}
+        {% endfor %}
+        </div>
+
+{% endblock %}
+
+{% block jquery %}
+
+$("#oldmessages").hide();
+var old_visible = false;
+$("#hidetoggle").click(function(){
+	if (old_visible) {
+		$("#hidetoggle").html("{{ 'conversation.old.show'|trans({},"conversations") }}");
+		$("#oldmessages").hide("blind", 1200);
+		old_visible = false;
+	} else {
+		$("#hidetoggle").html("{{ 'conversation.old.hide'|trans({},"conversations") }}");
+		$("#oldmessages").show("blind", 1200);
+		old_visible = true;
+	}
+});
+{% endblock %}

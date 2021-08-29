@@ -1,0 +1,69 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "diplomacy.prisoners.name"|trans({},"politics")|title }}</h2>
+<p>{{ "diplomacy.prisoners.intro"|trans({},"politics")|raw }}</p>
+
+{% for result in results %}
+<div class="flash-message" data-role="header" data-theme="e">
+	{% if result.action == 'free' %}
+		{{ 'diplomacy.prisoners.done.free'|trans({"%prisoner%":link(result.prisoner)}, "politics")|raw }}
+	{% elseif result.action == 'execute' %}
+		{{ 'diplomacy.prisoners.done.execute'|trans({"%prisoner%":link(result.prisoner)}, "politics")|raw }}
+	{% elseif result.action == 'assign' %}
+		{{ 'diplomacy.prisoners.done.assign'|trans({"%prisoner%":link(result.prisoner), "%target%":link(result.target)}, "politics")|raw }}
+	{% endif %}
+</div>
+{% endfor %}
+
+{{ form_errors(form) }}
+<form action="" method="post" {{ form_start(form) }}
+{{ form_widget(form._token) }}
+
+<table>
+	<thead><tr>
+		<th></th>
+		<th></th>
+	</tr></thead>
+	<tbody>
+	{% for prisoner in form.prisoners %}
+		{% set id = prisoner.vars.name %}
+		{% set char = character.prisoners[id] %}
+		<tr>
+			<td>{{ link(char) }}</td>
+			<td>{{ form_widget(prisoner.action) }}</td>
+			<td class="hidden">{{ form_widget(prisoner.method) }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% if form.assignto is defined %}
+<div id="assigntarget" class="hidden subselect">
+	{{ form_label(form.assignto) }}
+	{{ form_widget(form.assignto) }}
+</div>
+{% endif %}
+
+<button>{{ 'recruit.manage.submit'|trans({},"actions") }}</button>
+</form>
+
+{% endblock %}
+
+
+{% block jquery %}
+$("select.action").change(function(){
+	if ($(this).val() == "assign") {
+		$("#assigntarget").show();
+	}
+	var method = $(this).closest("tr").find("select.method");
+
+	if ($(this).val() == "execute") {
+		method.parent().show();
+		method.attr('required', 'required');
+	} else {
+		method.parent().hide();
+		method.removeAttr('required');
+	}
+});
+{% endblock %}

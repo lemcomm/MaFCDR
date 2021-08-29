@@ -1,0 +1,44 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>Realm Statistics</h2>
+<table id="stats">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Players</th>
+			<th>Characters</th>
+			<th>Settlements</th>
+			<th>Population</th>
+			<th>Soldiers</th>
+			<th>Militia</th>
+			<th data-sorter="false">Area</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for data in realms %}
+		<tr>
+			<td><a href="{{ path('bm2_site_game_realmdata', {'realm':data.realm.id} ) }}">{{ data.realm.name }}</td>
+			<td align="right">{{ data.players }}</td>
+			<td align="right">{{ data.nobles }}</td>
+			<td align="right">{{ data.settlements }}</td>
+			<td align="right">{{ data.population }}</td>
+			<td align="right">{{ data.soldiers }}</td>
+			<td align="right">{{ data.militia }}</td>
+			<td align="right">{{ data.area|number_format }} km<sup>2</sup></td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
+
+{% block jquery %}
+$("#stats").tablesorter({
+	sortList: [[0,0]]
+});
+{% endblock %}

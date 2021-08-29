@@ -4,6 +4,7 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
+		<field name="ip" type="string" nullable="true"/>
 		<field name="display_name" type="string"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
@@ -41,6 +42,7 @@
 				</inverse-join-columns>
 			</join-table>
 		</many-to-many>
+		<one-to-many field="patronizing" target-entity="Patron" mapped-by="user"/>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />

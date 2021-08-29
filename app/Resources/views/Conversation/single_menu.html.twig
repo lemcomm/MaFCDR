@@ -1,0 +1,11 @@
+<p align="right">
+<a href="{{path('maf_conv_print', {"conv":conversation.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
+        {% if not conversation.realm and not conversation.house %}
+                {% if active %}
+                         | <a href="{{path('maf_conv_leave', {"conv":conversation.id}) }}"><button class="convo_leave cmsg_button" title="{{ 'conversation.leave.help'|trans({}, "conversations") }}">{{ 'conversation.leave.label'|trans({}, "conversations") }}</button></a>
+                {% endif %}
+                {% if not conversation.localFor %}
+                         | <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
+                {% endif %}
+        {% endif %}
+</p>

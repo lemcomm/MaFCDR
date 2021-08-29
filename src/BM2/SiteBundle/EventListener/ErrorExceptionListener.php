@@ -38,7 +38,7 @@ class ErrorExceptionListener {
 				$data = array();
 			}
 			$params = array('domain'=>$domain, 'status_code'=>$exception->getStatusCode(), 'status_text'=>$text, 'status_data'=>$data);
-			$event->setResponse(new Response($this->templating->render('BM2SiteBundle:Exception:error.html.twig', $params)));
+			$event->setResponse(new Response($this->templating->render('Exception\error.html.twig', $params)));
 		}
 	}
 

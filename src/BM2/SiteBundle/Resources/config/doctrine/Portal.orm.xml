@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Portal">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+                <many-to-one field="maintainer" target-entity="Character" inversed-by="portals"/>
+                <many-to-one field="origin" target-entity="Place" inversed-by="outbound_portals"/>
+                <many-to-one field="destination" target-entity="Place" inversed-by="inbound_portals"/>
+                <many-to-one field="origin_access" target-entity="Listing"/>
+                <many-to-one field="dest_access" target-entity="Listing"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_portal"/>
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="portal"/>
+                <one-to-many field="recently_used_by" target-entity="Character" mapped-by="used_portal"/>
+
+	</entity>
+</doctrine-mapping>

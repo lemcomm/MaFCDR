@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<h2>{{ 'account.overview.title'|trans|title }}</h2>
+	<p>{{ 'account.overview.intro'|trans|raw }}</p>
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+
+	<div id="map" style="min-width:60em;min-height:40em;"></div>
+{% endblock %}
+
+{% block jquery %}
+	{% include "element/mapstrings.js.twig" %}
+	mapinit('map', false, false, false);
+
+	var style = new OpenLayers.Style({
+		externalGraphic: imgpath+'marker-black.png',
+		fillOpacity: 1.0,
+		graphicWith: 32,
+		graphicHeight: 32,
+		graphicXOffset: -4,
+		graphicYOffset: -30,
+	});
+
+	loclayer = new OpenLayers.Layer.Vector("{{ 'map.chars'|trans }}", {
+		renderers: ["SVG2", "SVG", "VML", "Canvas"],
+		styleMap: new OpenLayers.StyleMap(style)
+	});
+
+	var pt = null;
+	{% for char in characters %}
+		{% if char.location and char.location.x and char.location.y %}
+			pt = new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point({{ char.location.x }}, {{ char.location.y }}));
+			loclayer.addFeatures([pt]);
+		{% endif %}
+	{% endfor %}
+	loclayer.setVisibility(true);
+	map.addLayer(loclayer);
+	map.setLayerIndex(loclayer, 10);
+
+	addoutline('{{ claims }}', '#eeaa20', 1, '#eeaa20', 0.25);
+	addoutline('{{ settlements }}', '#cccc20', 3, '#cccc20', 0.5);
+
+{% endblock %}

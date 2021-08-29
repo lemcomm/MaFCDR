@@ -76,6 +76,9 @@ queue:
   character:    Character
   battle:       Battle
   list:         List
+  siege:
+   place:       Place of Interest
+   settlement:  Settlement
  support:       Supporting
  oppose:        Opposing
  supported:     Supported by
@@ -105,6 +108,7 @@ queue:
   block:        Block area
   hire:         Hire mercenaries
   reclaim:      Reclaim soldiers
+  siege:        Conduct siege
  task:
   research:     Research journal
  dungeon:
@@ -201,7 +205,7 @@ building:
     In the inn, you can hear rumours from abroad, especially about what other lords offer for prospective knights. And if
     you are looking for sell-swords, soldiers of fortune, men-at-arms - in a word: Mercenaries, the inn is where you will
     most likely find them.<br />
-    They are usually easy to spot as they are looking for employers the same way you are looking for them. Their services, 
+    They are usually easy to spot as they are looking for employers the same way you are looking for them. Their services,
     however, are less easy. They will follow you as long as you pay them well. You can also not retrain, assign or set them
     as militia. And you can only disband them all at once.
  library:
@@ -273,7 +277,7 @@ control:
     is very likely a much better idea.
   limit:      With a free account, you can control at most three estates with each character. Keep that in mind and select carefully, or support the game with a subscription.
   long: >
-    You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead, 
+    You noticed that it will take a very long time to take control here? If you know what you are doing, go ahead,
     we won't stop you, but probably you should bring more troops, reduce the militia by attacking first or gain the support
     of allies who will aid you.
   owned:        This settlement is currently controlled by %owner%.
@@ -328,6 +332,13 @@ control:
   keepclaim2:   If you keep a claim to the estate, you grant it "in fief", but you continue to consider it your property. The claim will allow you to take it back easily.
   success:      You have now given control over this settlement to %newowner%.
   queued:       You will soon be meeting with %newowner% and arrange the details of the transfer, as well as informing the settlement leaders.
+ steward:
+  name:         Appoint Steward
+  description:  Delegate most of your responsibilies.
+  intro: >
+    Any settlement you control fully can have an appointed steward to manage it in your stead. This individual has the vast majority of your same abilities over the lands they're appointed to, but cannot grant control or appoint their replacement.
+  to:           Appoint
+  success:      You have now appointed %name% as your new Steward.
  rename:
   name:         Rename settlement
   description:  Change the name of this settlement.
@@ -370,6 +381,7 @@ control:
   specific:     Specific permissions
   spawn:        Allow new characters to spawn here?
   thralls:      Allow slavery (thralls) ?
+  feedsoldiers: Allow knights to pull food for their soldiers?
   submit:       Set new permissions
   success:      Your new permissions have been saved.
  quests:
@@ -391,10 +403,20 @@ control:
     You can give a short summary, a long description and a description of the reward. You should include all important information,
     including whether the quest reward will be given only to the first to complete it, or to multiple people, and on which conditions,
     such as evidence of conclusion, or time limits.
+ abandon:
+  name:         Abandon Settlement
+  description:  Reliquish control of this settlement.
+  help: >
+    As the rightful owner of %settlement%, you can always decide that you simply don't want to be the lord any longer.<br/>
+    You can also decide if you simply wish to be rid of the region, or for you AND your realm to be rid of the region.
+  keep:         Keep in realm?
+  sure:         Are you sure?
+  success:      Settlement has been abandoned.
+  submit:       Dispatch the order!
  description:
   settlement:
    name:        Update Description
-   description: Change this settlement's description. 
+   description: Change this settlement's description.
    help: >
     From here you can change the description of this settlement, which will display publicly whenever someone views the settlement details.
     This will be displayed regardless of whether they are in spotting distance or interaction range, and can be viewed by anyone, even people
@@ -408,6 +430,37 @@ control:
     last description(s), you won't know what the previous descriptions were.
   full:         Edit Text
   success:      Description has been updated successfully!
+ occupy:
+  realm:        In the name of what Realm?
+  submit:       Begin Occupation
+ occupationstart:
+  name:         Occupy Settlement
+  description:  Declare an occupation of this settlement?
+  intro: >
+    Now that you're inside %settlement% you're in a good position to delcare an occupation.<br /><br />
+    By declaring an occupation, you will be effectively be making yourself psuedo-owner, and the regular owner will have his own privileges revoked.
+ occupationend:
+  name:         End Occupation
+  description:  Declare an end to the occupation?
+  intro: >
+    As the occupant of %settlement% you are well within your capabilities to declare an end to the occupation of this settlement.
+ changeoccupant:
+  name:         Change Occupant
+  description:  Someone else can manage this
+  intro: >
+    As the occupant of %settlement% you can always pass off this responsibiity to someone else.
+ changeoccupier:
+  name:         Change Occupying Realm
+  description:  Replace the flag of the occupation
+  intro: >
+    As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement.
+ spawn:
+  success:
+   start:       You have enabled spawning at %name%, further action may be required by the realm rulers or house head, as appropriate.
+   stop:        You have disabled all spawning at %name%. No further characters may appear here.
+  manage:
+   start:       You have enabled spawning at %name%.
+   stop:        You have disabled spawning at %name%.
 
 military:
  name:          Military actions
@@ -457,7 +510,6 @@ military:
    submit:      Set up defenses
    queued: >
      Your soldiers are now preparing for an attack, and are ready to defend.
-
   attack:
    name:        Attack settlement
    description: Assault this settlement in order to kill or drive away its defenders.
@@ -493,6 +545,9 @@ military:
     wealth:     Steal wealth
     burn:       Burn down buildings
    submit:      Begin looting
+  food:
+   supplied:    You have authorized %character% to pull from %settlement%'s food stores.
+   rejected:    You have denied the request of %character% to pull food from %settlement%'s stores.
  battles:
   initiate:
    name:        Initiate battle
@@ -552,9 +607,9 @@ military:
     Obviously, this is most useful either at chokepoints such as bridges, passes, etc. or when working with others so you can cover a large area.<br />
     You cannot move while blocking. Your army will camp in the area and send patrols around. This allows you to automatically
     engage your targets at twice your normal interaction range.<br />
-    Target selection uses the <a href="%listsurl%">lists system</a> in order to allow you to create sophisticated orders.
+    Target selection uses the <a href=%listsurl%>lists system</a> in order to allow you to create sophisticated orders.
     Slumbering First Ones, however, will never be engaged. You can attack them normally, but for block area they will be ignored.<br />
-    Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself 
+    Note that this action will make you engage <i>any target on the list, irrespective of army size</i>. You could well find yourself
     in battle with a vastly superior enemy if you are not careful.<br />
     Blocking area can be cancelled at any time from your actions queue.
   mode:
@@ -563,24 +618,113 @@ military:
    attack:        Attack these, allow all others
   target:         Target
   submit:         Tssue block orders
-  success: >
-    Your men will now set up camp and patrol the area.
+  success:        Your men will now set up camp and patrol the area.
  damage:
   name:           Damage feature
   description:    Try to destroy a bridge or other feature.
   longdesc:       Use your soldiers to tear down or damage a bridge, watchtower or sign to disrupt enemy operations.
   intro: >
-    You can use your soldiers to tear apart features such as bridges, watchtowers or signs.<br />
+    "You can use your soldiers to tear apart features such as bridges, watchtowers or signs.<br />
     Typically, you do this to your enemy to disrupt them, but sometimes you may want to get rid of features in your own lands.<br />
     This action takes 4 hours, except for signs where it takes only 1 hour.<br />
     <br />
-    The following feature(s) is/are within range:
+    The following feature(s) is/are within range:"
   target:         Choose which feature to damage or destroy.
   inactive:       (inactive)
   submit:         Proceed with destruction
   success:        You have destroyed the %featuretype%.
   success2:       You have damaged the %featuretype%, making it inoperative.
   success3:       You have damaged the %featuretype%, by about %damage% % of the effort required to build it.
+ siege:
+  name:         Siege Actions
+  actions:      All Available Actions
+  no_action:    (Select an Action)
+  start:
+   name:        Declare a Siege
+   description: Order a siege of this settlement.
+  leadership:
+   name:        Change Siege Leader
+   description: Hand off control of the siege to another.
+  assume:
+   name:        Take Siege Leadership
+   description: By the rights of your position, assume leadership.
+  build:
+   name:        Build Siege Equipment
+   description: Or rather, order your soldiers to do so.
+  assault:
+   name:        Order an Assault/Sortie
+   description: Lead the combined forces of your side into conflict.
+  disband:
+   name:        Disband Siege
+   description: For whatever reason, end the siege.
+  leave:
+   name:        Leave the Siege Forces
+   description: Though you may not neccessarily be able to leave altogether...
+  attack:
+   name:        Lead an Attack
+   description: Though others may not follow you...
+  joinattack:
+   name:        Join a Pending Attack
+   description: Order your men to join you in joining the pending attack.
+  confirm:
+   leadership:  Who shall take command?
+   assume:      Confirm Assumption
+   build:       Lorem Ipsum Filler Cause this isn't active yet.
+   assault:     Confirm Assault
+   sortie:      Cofnirm Sortie
+   disband:     Really End the Siege
+   leave:       Confirm Departure
+   attack:      Cofnrim Individual Attackers
+   joinattacK:  They Shall Have Allies
+  submit:       Dispatch Orders!
+  side:
+   attackers:   Attackers
+   defenders:   Defenders
+   none:        (none)
+  menu:
+   name:        Siege Settlement
+   description: Declare a siege of this settlement, in order to force an entry.
+   inactive: >
+     Order your soldiers to begin a siege of <b>%settlement%</b>.<br />
+     Depending on the number of soldiers you have, you might be able to fully encircle the settlement, and block entry and exit.<br /><br />
+     Of course, it should go without saying that the settlement owner, and the defenders guarding it, will not like this, and this will constitute an act of war.<br />
+     After declaring a siege, you'll then be able to assault the settlement properly, construct siege equipment, or either pass control of the siege to another or, simply, disband the siege if you so wish.
+   active: >
+     From here you can manage your, and possibly other's, actions in regards to the siege of <b>%settlement%</b>.<br /><br />
+     If you are the siege commander on either side, you will be able to order assaults or sorties of your collective force against that of your enemy, or if you so desire pass control of the forces to another.<br />
+     Alternatively, if you are not a commander, you could just call a sortie or assault of your own, though this would be inherently risky.<br /><br />
+     <i><b>Coming Soon</b>: You also have the ability to order the construction of siege equipment from here, which will be used as soon as completed or during any assault, if appropriate (refer to the manual for more information).</i>
+     Lastly, if you tire of this siege altogether, you could decide to leave it.
+   confirm:    Declare a Siege?
+   places:     Delacre a Siege of ...
+  actions:
+   leave:
+    name:
+    description:
+    confirm:            Leave the Siege?
+   disband:
+    name:
+    description:
+    confirm:            Cancel the Siege?
+   assault:
+    name:
+    description:
+    confirm:            Call an Assault?
+   leadership:
+    name:
+    description:
+    form:               Who Shall Command?
+   assume:
+    name:
+    description:
+    confirm:            Take Leadership?
+   join:
+    name:               Join the Ongoing Siege
+    description: >
+      While it is dependent on which side of the walls you are on, you are welcome to join the ongoing siege of %settlement%.<br /><<br />
+      <i><b>Coming Soon</b>: You will later be able to join a third or fourth side that will allow you to assist the defenders from outside and attackers from inside.</i>
+    form:               Side to Join?
+
 
 economy:
  name:          Settlement economy actions
@@ -733,6 +877,10 @@ recruit:
     Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might
     want to wait for current training to finish.<br />
     Details of the current recruit training is available on the <a href="%url%">%page%</a> page.
+  current2: >
+    You are current training %number% new soldiers out of %optimal% training slots.<br />
+    Training times increase as more soldiers are trained at the same time. Unless you want to set up a queue, you might
+    want to wait for current training to finish.<br />
   time2:        You can train about %amount% soldiers at once before training speeds slow down.
   submit:       Recruit
   cancel:       Cancel
@@ -743,6 +891,8 @@ recruit:
   returns:      will return to militia
   disbands:     will return to workforce
   supply:       Due to a lack of equipment, only %only% of %planned% planned recruits could be added.
+  unit:         Unit
+  nounit:       (Select a Unit)
  warning:
   over25percent:  You are recruiting a considerable share of your population into military service. These peasants will no longer be available for construction, farming or production. Make sure you can handle the consequences.
   over50percent:  You are recruiting more than half of your population into military service. Unless you have taken specific steps to prevent it, this will likely result in the economic destruction of this settlement. Make sure you know what you are doing.
@@ -761,11 +911,12 @@ recruit:
   limited:      Due to your current ongoing actions (such as battle or looting), your management options are limited.
   choose:       -- Action --
   nothing:      (No action)
-  apply:        Apply to group
+  apply:        Apply to Selected
   disband:      Disband
   assign:       Assign...
   assignto:     Assign selected soldiers to:
   assignto2:    Assign selected entourage to:
+  reassign:     Reassign
   bury:         Bury
   bury2:        Leave corpse
   makesoldier:  Mobilize
@@ -849,7 +1000,7 @@ meta:
   appearance:
    name:      Appearance
    desc: >
-    Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant - 
+    Is what others see when they meet your character. Body, clothing, demeanor, but also favorite horse or constantly present servant -
     whatever those who encounter the character will recognize and remember.<br />
     <em>This field is publicly visible on your character page.</em>
   personality:
@@ -888,13 +1039,13 @@ meta:
     a plausible, actual name.<br />
     All name changes are recorded in your character's public history.<br />
     <br />
-    You can also add a religious or political name or monicker that the character uses themselves or is being called 
-    by others. If you want your character to be known by something besides their name, this is the place to put it. 
+    You can also add a religious or political name or monicker that the character uses themselves or is being called
+    by others. If you want your character to be known by something besides their name, this is the place to put it.
     Alexander "The Great" as well as "Brother Gregory" are examples from the real world.<br />
     The "known as" can be more free-form than the character name, but should still pass a common sense "would someone really be called like that in a medieval world?"
     test. In other words: No silliness, no modern or Internet speak, something that passes the giggle test when you
     imagine composing a letter starting with "My esteemed (...)".<br />
-    If set, this name will be shown instead of the character name everywhere, but in <i>italics</i>. 
+    If set, this name will be shown instead of the character name everywhere, but in <i>italics</i>.
     The character details page will show both.<br />
   newname:      New Name
   knownas:      Add a "known as"
@@ -924,6 +1075,9 @@ meta:
  settings:
   name:         Settings
   description:  Change character settings
+ loadout:
+  name:         Loadout
+  description:  Change character loadout
  respawn:
   name:         Respawn
   description:  Return character to pool
@@ -962,13 +1116,65 @@ surrender:
  success:       You have surrendered yourself and are now a prisoner of %character%.
 
 personal:
+ name:          Personal Actions
  party:
   name:         Dungeon Party
   description:  Check the status of your dungeon exploration group.
  dungeoncards:
   name:         Dungeon Actions
   description:  Review your available dungeon actions.
-
+ requests:
+  name:        Manage Requests
+  description: Handle any actional requests to you or your holdings.
+  intro: >
+    From here you can manage any of the requests that are pending to you, your lands, your house, or your realms, if applicable, to include canceling already agreed to requests, if you so desire.
+    Please be advised that requests are sorted primarily by whether or not it's already accepted, and then by the date it was received, so you may find a request for food for your soldiers right next to a request to join your house.
+  accepted: Conversely, you can also cancel some requests that you've previously accepted.
+  cancelable:  Previously Accepted Requests
+  list:        Pending Requests
+  empty:       For better or worse, it doesn't look like you have any request to review.
+  summary:
+   title:      Pending Requests
+   none:       You don't currently have any pending requests.
+   pending:    There are currently pending:
+   some:       %i% request|%i% requests
+ request:
+  premable:    You've received a request from %link-character%, on %date%, as follows:
+  created:     Request received at %date%.
+  approve:     Approve
+  approved:    The request from %link-character% has been approved.
+  deny:        Deny
+  denied:      The request from %link-character% has been denied.
+  cancel:      Revoke
+  cancelled:   The request from %linke-character% has been revoked.
+  soldierfood: %link-character% has requested that they be allowed to use the food stores of %link-settlement% to feed their mobilized forces, and has provided the following message explaining their request.
+  expires:     This request allows this until %date%.
+  noexpire:    This request is good forever, or until circumstances change (see the manual).
+ soldierfood:
+  name:        Request Food for Your Unit
+  description: Formalize a request for provisions.
+  intro: >
+    While you may not require food, the soldiers you command, unfortunately, do. Here you can formalize requests to others in order for them to handle feeding your soldiers for you.
+  subject:
+   name:    Request Subject
+   desc:    A formal subject for this food request.
+  text:
+   name:    Request Text
+   desc:    Perhaps you want to keep it short or maybe you're feeling particularly fanciful? This is probably where you should explain the how and/or why of your request.
+  source:
+   name:    Food Source
+   desc:    This will list, automatically, the owned settlements of your liege, the realm capital, and the settlement you're currently in. This determines where your request is sent.
+  limit:
+   name:    Request upper limit
+   desc:    An upper limit to the amount of food this request allows.
+  expiration:
+   name:    Request Expiration Date
+   desc:    This isn't required, and the individual sending food can cancel it early if they decide to, but this lest you have a request time out automatically.
+   year:    (year)
+   month:   (month)
+   day:     (day)
+   hour:    (hour)
+   minute:  (minute)
 
 mercenaries:
  title:     Available Mercenary Groups
@@ -1008,4 +1214,116 @@ quests:
  details:   Details
  current:   Current Quests
  past:      Past Quests
- 
+
+request:
+ generic:
+  subject:     Subject
+  text:        Message
+  expires:     Expiration Date & Time
+  submit:      Send Request
+  help:
+   subject:    A title for your request, similar to those used in regular messages.
+   text:       Here you can put a message to go along with your request. The same formating that is useable in other text boxes in the game can be used here. For more details on that, please see the manual.
+   expires:    This will determine how long this request will be considered valid. Only valid requests will confer their benefits, like granting access or allowing food usage.
+  year:        (year)
+  month:       (month)
+  day:         (day)
+  hour:        (hour)
+  minute:      (min)
+ soldierfood:
+  estate:      Supplying Settlement
+  estatehelp:  The estate from which food will be drawn, up to the limit set in this request. This list is generated from all settlements of all realms you are part of.
+  limit:       Maximum Amount
+  sent:        Your request to receive food from %settlement% has been sent.
+  limithelp:   The upper limit of how much food your soldiers will be able to draw from. This can be left blank for an infinite amount (assuming the settlement can spare the food).
+
+place:
+ actionable:
+  name:   Visit A Place of Interest
+ new:
+  name:   Create Place of Interest
+  description:   Formalize a place of interest at your current location
+  longdesc:       With the permission of the regional lord, you can formalize a new place of interest that others can visit. The creation is instant, but future upgrades will take time and resources.
+ enter:
+  name:   Enter Place
+  success: You have successfully entered %name%.
+  failure: You find yourself unable to %name%. Either you don't have permission or some other factor, like a siege, is preventing entry.
+ exit:
+  name:   Exit Place
+  description: Sometimes, it is better to be outside.
+  success: You find yourself outside %name%.
+  failure: You find that you are unable to leave. Perhaps it is besieged?
+ list:
+  name:   View Local Places
+  description:   Perhaps one of them will be interesting?
+  longdesc:      Places of interest can exist either inside or outside settlements, and can be created by anyone with permission of the local lord.
+
+unit:
+ list:
+  name:     Manage Units
+  description: Oversee the units under your authority.
+  intro:    From here you can manage those Units you command, marshall, or own, as appropriate.
+  list:     Your Units
+  rebase:   Rebase this Unit
+  review:   Review Soldiers
+  soldiers: Comprised of
+  count:    %soldiers% Soldiers
+  manage:   Manage Unit Settings
+  youcommand: Under your direct command.
+  commander: Under comamnd of %name%.
+  nocommander: Not currently under anyone's command.
+  supplied: Supplied by
+  nosupplier: <i>no one</i>
+  source:  %settlement%
+  nosource: Nowhere
+  base:     Based out of
+  based:    %settlement%
+  nobase:   <i>Your Camp</i>
+  marshal:  Can be marshalled by %character%.
+  nomarshal: Marshalling of this unit is reserved by the settlement's owner.
+  assign:   Assign a Leader
+  appoint:  Appoint a Marshal
+  disband:  Disband Unit
+  return:   Send Unit Home
+  recall:   Recall Unit
+  revoke:   Remove Marshal
+  traveling: Unit is currently traveling back to base and will arrive in %days% days.
+ assigned:
+ assign:
+  name:     Assign a Leader to %name%
+  intro:    From here you can select any of the nearby characters to take control of %name%, letting them lead them to other locations and/or lead them into battle.
+  empty:    (Select a Character)
+  select:   "Assign this unit to:"
+  submit:   Assign Unit
+  success:  Unit has been assigned!
+  fail:     Unit assignment failed!
+ appoint:
+  name:     Appoint a Marshal for %name%
+  intro:    This menu allows you to appoint a marshal for this unit, granting them the ability to assignt his unit to others, recall it from abroad, or even disband it. Recruitment will require they have permissions to do that with the settlement's own permissions list.
+  empty:    (Select a Character)
+  select:   "Available Characters:"
+  submit:   Appoint Marshal
+  success:  Marshal appointed successfully!
+ revoke:
+  success:  Marshal removed successfully!
+ new:
+  name:     Create A Unit
+  description: Organize a new unit under your authority.
+ rebase:
+  name:     Rebase %name%
+  intro:    A unit's base determined the settlement that owns it. Changing it will grant full authority of %name% to whomever the lord of the new base is.
+  settlement: "New Base:"
+  success:  Unit has been rebased!
+  fail:     Rebasing has failed.
+  none:     (Select a Settlement)
+ recall:
+  name:     Recall %name%
+  intro:    Decide it is time to call a Unit back? Simply confirm your choice below and the message will be sent, recalling %name% from whatever distant land they may be in.
+ return:
+  name:     Return %name%
+  intro:    Sometimes, you just don't need as many soldiers. From here you can send %name% back home.
+ disband:
+  name:     Disband %name%
+  intro:    From here you can choose to completely disband a unit, sending all the soldiers on home and reliquishing %name% to the annals of history.
+  success:  Unit has been disbanded.
+  fail:     Unit disbandment has failed.

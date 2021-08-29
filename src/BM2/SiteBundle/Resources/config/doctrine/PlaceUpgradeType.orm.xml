@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\PlaceUpgradeType" table="types.placeupgradetype">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+                <many-to-one field="place_type" target-entity="PlaceType" inversed-by="subtypes"/>
+                <field name="requires" type="string" nullable="true"/>
+	</entity>
+</doctrine-mapping>

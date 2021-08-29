@@ -1,0 +1,49 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "location.quests.name"|trans({},"actions")|title }}</h2>
+	<p>{{ "location.quests.intro"|trans({},"actions")|raw }}</p>
+
+	{% if quests is empty %}
+		<p>{{ "location.quests.noquests"|trans({},"actions")|raw }}</p>
+	{% else %}
+		<h3>{{ "quests.current"|trans({},"actions")|title }}</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>{{ "quests.summary"|trans({},"actions") }}</th>
+					<th>{{ "quests.questers"|trans({},"actions") }}</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for quest in quests if quest.completed == false %}
+					<tr>
+						<td>{{ quest.summary }}</td>
+						<td><ul class="shortlist">{% for quester in quest.questers %}<li>{{ link(quester.character) }}</li>{% endfor %}</ul></td>
+						<td><a href="{{ path('bm2_site_quests_details', {'id':quest.id}) }}">{{ "quests.details"|trans({},"actions") }}</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<h3>{{ "quests.past"|trans({},"actions")|title }}</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>{{ "quests.summary"|trans({},"actions") }}</th>
+					<th>{{ "quests.questers2"|trans({},"actions") }}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for quest in quests if quest.completed == true %}
+					<tr>
+						<td>{{ quest.summary }}</td>
+						<td><ul class="shortlist">{% for quester in quest.questers %}<li>{{ link(quester.character) }}</li>{% endfor %}</ul></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+	{% endif %}
+{% endblock %}

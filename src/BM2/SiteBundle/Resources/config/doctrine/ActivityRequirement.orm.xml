@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityRequirement" table="types.activityrequirements">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="type" target-entity="ActivityType" inversed-by="requires"/>
+		<many-to-one field="building" target-entity="BuildingType"/>
+		<many-to-one field="place" target-entity="PlaceType"/>
+	</entity>
+</doctrine-mapping>

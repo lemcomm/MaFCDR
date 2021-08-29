@@ -3,8 +3,9 @@ security:
         FOS\UserBundle\Model\UserInterface: sha512
 
     role_hierarchy:
-        ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_TESTER:      ROLE USER
+        ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER]
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_TESTER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
         fos_userbundle:
@@ -21,22 +22,23 @@ security:
             switch_user: { role: ROLE_ADMIN }
             form_login:
                 provider:               fos_userbundle
-                login_path:             fos_user_security_login
+                login_path:             fos_user_security_detect
                 check_path:             fos_user_security_check
-                csrf_provider:          security.csrf.token_manager
+                csrf_token_generator:   security.csrf.token_manager
                 remember_me:            true
                 default_target_path:    bm2_account
             remember_me:
-                key:            "%secret%"
+                secret:            "%secret%"
                 lifetime:       7776000 # 90 days in seconds
                 path:           /
                 domain:         ~ # Defaults to the current domain from $_SERVER
-            logout:     
+            logout:
                 path:           fos_user_security_logout
                 target:         bm2_homepage
 
     access_control:
         - { path: ^/(../)?admin, roles: ROLE_ADMIN }
+        - { path: ^/(../)?gamerequest, roles: ROLE_USER } # Without this, users will be locked out of the gamerequest path by the line below. --Andrew
         - { path: ^/(../)?game, roles: ROLE_ADMIN }
         - { path: ^/(../)?account, roles: ROLE_USER }
         - { path: ^/(../)?heraldry, roles: ROLE_USER }
@@ -44,12 +46,22 @@ security:
         - { path: ^/(../)?payment/paypal_success$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment/paypal_cancel$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?payment, roles: ROLE_USER }
+        - { path: ^/(../)?publications, roles: ROLE_USER }
         - { path: ^/(../)?character, roles: ROLE_USER }
         - { path: ^/(../)?actions, roles: ROLE_USER }
         - { path: ^/(../)?artifacts, roles: ROLE_USER }
         - { path: ^/(../)?messages, roles: ROLE_USER }
+        - { path: ^/(../)?realm/[0-9]+/viewrelations, roles: ROLE_USER }
+        - { path: ^/(../)?realm/[0-9]+/view, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(../)?realm, roles: ROLE_USER }
+        - { path: ^/(../)?place/[0-9]+, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(../)?place/[0-9]+/, roles: ROLE_USER }
+        - { path: ^/(../)?house/[0-9]+, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(../)?house/[0-9]+/, roles: ROLE_USER }
         - { path: ^/(../)?settlement, roles: ROLE_USER }
+        - { path: ^/(../)?conv, roles: ROLE_USER }
         - { path: ^/(../)?translator, roles: ROLE_USER }
+        - { path: ^/(../)?unit, roles: ROLE_USER }
         - { path: ^/(../)?login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?resetting$, roles: IS_AUTHENTICATED_ANONYMOUSLY }

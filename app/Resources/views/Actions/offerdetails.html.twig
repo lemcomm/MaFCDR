@@ -1,0 +1,26 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+<h4>{{ "recruit.offers.details"|trans({},"actions")|title }}</h4>
+<dl class="wide">
+	<dt>{{ "recruit.offers.location"|trans({},"actions")|title }}</dt>
+	<dd>{{ link(offer.settlement) }}</dd>
+{% if offer.settlement.realm %}
+	<dt>{{ "recruit.offers.realm"|trans({},"actions")|title }}</dt>
+	<dd>{{ link(offer.settlement.realm) }}</dd>
+{% endif %}
+	<dt>{{ "recruit.offers.text"|trans({},"actions")|title }}</dt>
+	<dd>{{ offer.description }}</dd>
+	{% if offer.givesettlement %}
+		<dt>{{ "recruit.offers.contains2"|trans({},"actions")|title }}</dt>
+		<dd>{{ "recruit.offers.withsettlement"|trans({},"actions") }}</dd>
+	{% else %}
+		<dt>{{ "recruit.offers.contains"|trans({},"actions")|title }}</dt>
+		<dd><ul>
+		{% for soldier in offer.soldiers %}
+			<li>{{ soldier.name }} ({{ soldier.type }}, {% if soldier.weapon %}{{ link(soldier.weapon) }}{% else %}{{ "item.improvised"|trans }}{% endif %}{% if soldier.armour %}, {{ link(soldier.armour)}}{%endif %}{% if soldier.equipment %}, {{ link(soldier.equipment) }}{% endif %})</li>
+		{% endfor %}
+		</ul></dd>
+	{% endif %}
+</dl>
+{% endblock %}

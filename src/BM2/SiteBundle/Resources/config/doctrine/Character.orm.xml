@@ -4,8 +4,8 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="version" type="integer" version="true"/>
 		<field name="name" type="string"/>
+		<field name="battling" type="boolean" nullable="true"/>
 		<field name="known_as" type="string" nullable="true"/>
 		<field name="system" type="string" nullable="true"/>
 		<field name="male" type="boolean"/>
@@ -15,7 +15,7 @@
 		<field name="generation" type="smallint"/>
 		<field name="genome" type="string" length="2">
 			<options>
-				<option name="fixed">true</option> 
+				<option name="fixed">true</option>
 			</options>
 		</field>
 		<field name="magic" type="integer" nullable="true"/>
@@ -41,7 +41,11 @@
 
 		<field name="auto_read_realms" type="boolean" nullable="true"/>
 		<field name="non_hetero_options" type="boolean" nullable="true"/>
-		
+		<many-to-one field="weapon" target-entity="EquipmentType"/>
+		<many-to-one field="armour" target-entity="EquipmentType"/>
+		<many-to-one field="equipment" target-entity="EquipmentType"/>
+		<many-to-one field="mount" target-entity="EquipmentType"/>
+
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
 
@@ -83,8 +87,10 @@
 		<many-to-many field="partnerships" target-entity="Partnership" mapped-by="partners"/>
 		<many-to-one field="crest" target-entity="Heraldry"/>
 
-		<one-to-many field="estates" target-entity="Settlement" mapped-by="owner"/>
+		<one-to-many field="owned_settlements" target-entity="Settlement" mapped-by="owner"/>
+		<one-to-many field="stewarding_settlements" target-entity="Settlement" mapped-by="steward"/>
 		<one-to-many field="settlement_claims" target-entity="SettlementClaim" mapped-by="character" fetch="EXTRA_LAZY"/>
+		<one-to-many field="occupied_settlements" target-entity="Settlement" mapped-by="occupant"/>
 
 		<many-to-one field="liege" target-entity="Character" inversed-by="vassals"/>
 		<one-to-many field="vassals" target-entity="Character" mapped-by="liege"/>
@@ -98,13 +104,17 @@
 
 		<one-to-many field="entourage" target-entity="Entourage" mapped-by="character" index-by="id"/>
 		<one-to-many field="entourage_given" target-entity="Entourage" mapped-by="liege" index-by="id"/>
-		<one-to-many field="soldiers" target-entity="Soldier" mapped-by="character" index-by="id"/>
+		<one-to-many field="soldiers_old" target-entity="Soldier" mapped-by="character" index-by="id"/>
 		<one-to-many field="soldiers_given" target-entity="Soldier" mapped-by="liege" index-by="id"/>
 
 		<one-to-one field="dungeoneer" target-entity="BM2\DungeonBundle\Entity\Dungeoneer" mapped-by="character" fetch="EXTRA_LAZY"/>
-		
+
 		<one-to-many field="owned_places" target-entity="Place" mapped-by="owner"/>
+		<one-to-many field="created_places" target-entity="Place" mapped-by="creator"/>
+		<one-to-many field="occupied_places" target-entity="Place" mapped-by="occupant"/>
+		<one-to-many field="ambassadorships" target-entity="Place" mapped-by="ambassador"/>
 		<one-to-many field="updated_descriptions" target-entity="Description" mapped-by="updater"/>
+		<one-to-many field="updated_spawn_descriptions" target-entity="SpawnDescription" mapped-by="updater"/>
 
 		<many-to-one field="house" target-entity="House" inversed-by="members"/>
 		<one-to-many field="founded_houses" target-entity="House" mapped-by="founder"/>
@@ -115,6 +125,33 @@
 		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_character"/>
 		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_character"/>
 
-		<one-to-one field="unit_settings" target-entity="UnitSettings" mapped-by="character"/>
+		<one-to-many field="units" target-entity="Unit" mapped-by="character"/>
+		<one-to-many field="marshalling_units" target-entity="Unit" mapped-by="marshal"/>
+		<one-to-many field="leading_battlegroup" target-entity="BattleGroup" mapped-by="leader"/>
+
+		<one-to-one field="active_report" target-entity="BattleReportCharacter"/>
+
+		<one-to-many field="siege_equipment" target-entity="SiegeEquipment" mapped-by="owner"/>
+
+		<one-to-many field="portals" target-entity="Portal" mapped-by="maintainer"/>
+		<many-to-one field="used_portal" target-entity="Portal" inversed-by="recently_used_by"/>
+
+		<one-to-many field="conv_permissions" target-entity="ConversationPermission" mapped-by="character" fetch="EXTRA_LAZY"/>
+		<one-to-one field="local_conversation" target-entity="Conversation" mapped-by="local_for" fetch="EXTRA_LAZY"/>
+		<one-to-many field="messages" target-entity="Message" mapped-by="sender" fetch="EXTRA_LAZY"/>
+		<one-to-many field="tagged_messages" target-entity="MessageTag" mapped-by="character" fetch="EXTRA_LAZY"/>
+
+		<many-to-one field="realm" target-entity="Realm" inversed-by="vassals"/>
+		<many-to-one field="liege_land" target-entity="Settlement" inversed-by="vassals"/>
+		<many-to-one field="liege_place" target-entity="Place" inversed-by="vassals"/>
+		<many-to-one field="liege_position" target-entity="RealmPosition" inversed-by="vassals"/>
+		<field name="oath_current" type="boolean" nullable="true"/>
+
+		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
+		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
+
+                <one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
+		<one-to-many field="styles" target-entity="CharacterStyle" mapped-by="character"/>
+		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
 	</entity>
 </doctrine-mapping>

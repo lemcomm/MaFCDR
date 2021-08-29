@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "elections.name"|trans({}, "politics")|title }}</h2>
+<p>{{ "elections.intro2"|trans({"%realm%":link(realm)}, "politics")|raw }}</p>
+{% if nopriest is defined %}
+	<p>{{ "elections.nopriest"|trans({}, "politics") }}</p>
+{% else %}
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "meta.background.name"|trans({},"actions")|title }}</h2>
+	<p>{{ "meta.background.intro"|trans({"%name%":character.name},"actions")|raw }}</p>
+	{% if starting %}
+		{% if character.alive %}
+			<p>
+				{{ "meta.background.traits"|trans({},"actions") }}
+				<dl class="traits">
+					{% for trait in character.genome|split('',1) %}
+						<dt>{{ ('trait.name.'~trait)|trans }}</dt>
+						<dd>{% if character.male %}{{ ('trait.description.male.'~trait)|trans }}{% else %}{{ ('trait.description.female.'~trait)|trans }}{% endif %}</dd>
+					{% endfor %}
+				</dl>
+			</p>
+
+			{% set url = path('maf_character_start',{"id":character.id, "logic":'new'}) %}
+			<p>{{ "meta.background.skip"|trans({"%url%":url},"actions")|raw }}</p>
+		{% else %}
+			{% set url = path('bm2_characters') %}
+		{% endif %}
+	{% endif %}
+
+	<div class="fullwidth texts">
+		{{ form_start(form) }}
+		{{ form_errors(form) }}
+		<dl>
+			<dt>
+				<h3>{{ "meta.background.appearance.name"|trans({}, "actions") }}</h3>
+				{{ "meta.background.appearance.desc"|trans({}, "actions")|raw }}
+			</dt>
+			<dd>{{ form_widget(form.appearance) }}</dd>
+			<dt>
+				<h3>{{ "meta.background.personality.name"|trans({}, "actions") }}</h3>
+				{{ "meta.background.personality.desc"|trans({}, "actions")|raw }}
+			</dt>
+			<dd>{{ form_widget(form.personality) }}</dd>
+			<dt>
+				<h3>{{ "meta.background.secrets.name"|trans({}, "actions") }}</h3>
+				{{ "meta.background.secrets.desc"|trans({}, "actions")|raw }}
+			</dt>
+			<dd>{{ form_widget(form.secrets) }}</dd>
+			{% if form.death is defined %}
+				<dt>
+					<h3>{{ "meta.background.death.name"|trans({}, "actions") }}</h3>
+					{{ "meta.background.death.desc"|trans({}, "actions")|raw }}
+				</dt>
+				<dd>{{ form_widget(form.death) }}</dd>
+			{% endif %}
+		</dl>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}

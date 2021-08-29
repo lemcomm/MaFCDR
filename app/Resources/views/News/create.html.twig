@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "news.create.title"|trans({},"communication")|title }}</h2>
+	<p>{{ "news.create.intro"|trans({},"communication")|raw }}</p>
+
+	<form class="wide" action="{{ path('bm2_site_news_create') }}" method="post">
+		{{ form_widget(form) }}
+		<button type="submit" name="submit">{{ "news.create.submit"|trans({},"communication") }}</button>
+	</form>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ ('npc.'~entouragetype.name)|transchoice(1)|title }}</h2>
+	{{ ('description.'~entouragetype.name)|trans|raw }}
+
+	<h3>{{ 'req'|trans({},"economy") }}</h3>
+	{% if entouragetype.icon %}
+		<div class="artviewer">
+			<img class="clipart" src="{{ asset('bundles/bm2site/images/'~entouragetype.icon) }}" />
+		</div>
+	{% endif %}
+	{% if entouragetype.provider %}
+		{{ link(entouragetype.provider) }}
+	{% endif %}
+
+
+{% endblock %}

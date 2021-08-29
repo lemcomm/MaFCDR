@@ -6,7 +6,9 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Listing;
 use BM2\SiteBundle\Entity\Partnership;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Form\CharacterSelectType;
 use BM2\SiteBundle\Form\ListingType;
@@ -17,6 +19,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -31,73 +36,89 @@ class PoliticsController extends Controller {
 
    /**
      * @Route("/", name="bm2_politics")
-     * @Template("BM2SiteBundle:Politics:politics.html.twig")
      */
 	public function indexAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array();
+		return $this->render('Politics/politics.html.twig');
 	}
 
    /**
      * @Route("/realms", name="bm2_politics_realms")
-     * @Template("BM2SiteBundle:Politics:realms.html.twig")
      */
 	public function realmsAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array();
+		return $this->render('Politics/realms.html.twig');
 	}
 
    /**
      * @Route("/relations", name="bm2_relations")
-     * @Template("BM2SiteBundle:Politics:relations.html.twig")
      */
 	public function relationsAction() {
-		$this->get('dispatcher')->gateway();
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array();
+		return $this->render('Politics/relations.html.twig');
 	}
 
    /**
      * @Route("/hierarchy")
-     * @Template
      */
 	public function hierarchyAction() {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$this->addToHierarchy($character);
 
-   	$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin 
-		   1 => array("pipe", "w"),  // stdout
-		   2 => array("pipe", "w") // stderr
-		);
+	   	$descriptorspec = array(
+			   0 => array("pipe", "r"),  // stdin
+			   1 => array("pipe", "w"),  // stdout
+			   2 => array("pipe", "w") // stderr
+			);
 
-   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
+	   	$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
-   	if (is_resource($process)) {
-   		$dot = $this->renderView('BM2SiteBundle:Politics:hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
+	   	if (is_resource($process)) {
+	   		$dot = $this->renderView('Politics/hierarchy.dot.twig', array('hierarchy'=>$this->hierarchy, 'me'=>$character));
 
-   		fwrite($pipes[0], $dot);
-   		fclose($pipes[0]);
+	   		fwrite($pipes[0], $dot);
+	   		fclose($pipes[0]);
 
-   		$svg = stream_get_contents($pipes[1]);
-   		fclose($pipes[1]);
+	   		$svg = stream_get_contents($pipes[1]);
+	   		fclose($pipes[1]);
 
-   		$return_value = proc_close($process);
-   	}
+	   		$return_value = proc_close($process);
+	   	}
 
-		return array('svg'=>$svg);
+		return $this->render('Politics/hierarchy.html.twig', [
+			'svg'=>$svg
+		]);
 	}
 
 	private function addToHierarchy(Character $character) {
 		if (!isset($this->hierarchy[$character->getId()])) {
 			$this->hierarchy[$character->getId()] = $character;
-			if ($character->getLiege()) {
-				$this->addToHierarchy($character->getLiege());
+			if ($liege = $character->findLiege()) {
+				if (!($liege instanceof Character)) {
+					foreach ($liege as $one) {
+						$this->addToHierarchy($one);
+					}
+				} else {
+					$this->addToHierarchy($liege);
+				}
 			}
-			foreach ($character->getVassals() as $vassal) {
+			foreach ($character->findVassals() as $vassal) {
 				$this->addToHierarchy($vassal);
 			}
 		}
@@ -105,22 +126,28 @@ class PoliticsController extends Controller {
 
 	/**
 	  * @Route("/vassals")
-	  * @Template
 	  */
 	public function vassalsAction() {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array('vassals'=>$character->getVassals());
+		return $this->render('Politics/vassals.html.twig', [
+			'vassals'=>$character->findVassals()
+		]);
 	}
 
 	/**
 	  * @Route("/disown/{vassal}")
-	  * @Template
 	  */
 	public function disownAction(Request $request, Character $vassal) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		if ($vassal->getLiege() != $character) {
+		if (!$character->findVassals()->contains($vassal)) {
 			throw new AccessDeniedHttpException("error.noaccess.vassal");
 		}
 
@@ -132,116 +159,157 @@ class PoliticsController extends Controller {
 			$this->get('politics')->disown($vassal);
 			$em = $this->getDoctrine()->getManager();
 			$em->flush();
-			return array('vassal'=>$vassal, 'success'=>true);
+			return $this->render('Politics/disown.html.twig', [
+				'vassal'=>$vassal,
+				'success'=>true
+			]);
 		}
 
-		return array('vassal'=>$vassal, 'form'=>$form->createView());
+		return $this->render('Politics/disown.html.twig', [
+			'vassal'=>$vassal,
+			'form'=>$form->createView()
+		]);
 	}
 
-   /**
-     * @Route("/oath")
-     * @Template
-     */
-	public function oathAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('hierarchyOathTest');
-
+	/**
+	  * @Route("/offeroath", name="maf_politics_oath_offer")
+	  */
+	public function offerOathAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('hierarchyOfferOathTest');
+		if (!$character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$others = $this->get('dispatcher')->getActionableCharacters();
-		$availableLords = array();
-		$unavailableLords = array();
+		$options = [];
+		if ($character->getInsideSettlement()) {
+			$options[] = $character->getInsideSettlement();
+		}
+		if ($character->getInsidePlace()) {
+			$options[] = $character->getInsidePlace();
+		}
 		foreach ($others as $other) {
-			// filter out my current liege and those below me
-			if ($other['character'] == $character->getLiege()) {
-				$unavailableLords[] = array('char'=>$other['character'], 'reason'=>'liege');
-			} elseif ($this->get('politics')->isSuperior($other['character'], $character)) {
-				$unavailableLords[] = array('char'=>$other['character'], 'reason'=>'vassal');
-			} else {
-				$availableLords[] = $other['character'];
-			}			
-		}
-
-		if (!empty($availableLords)) {
-			$available = array();
-			foreach ($availableLords as $lord) {
-				$realms = new ArrayCollection;
-				foreach ($lord->findRulerships() as $realm) {
-					if (!$realms->contains($realm)) {
-						$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
-						$realms->add($realm);
+			$otherchar = $other['character'];
+			if ($otherchar->getOwnedSettlements()){
+				foreach ($otherchar->getOwnedSettlements() as $settlement) {
+					if (!in_array($settlement, $options)) {
+						$options[] = $settlement;
 					}
 				}
-				foreach ($lord->getEstates() as $estate) {
-					if ($realm = $estate->getRealm()) {
-						if (!$realms->contains($realm)) {
-							$available[$lord->getId().'-'.$realm->getId()] = $lord->getName().' ('.$realm->getName().')';
-							$realms->add($realm);
-						}
+			}
+			if ($otherchar->getPositions()) {
+				foreach ($otherchar->getPositions() as $pos) {
+					if ($pos->getVassals() && !in_array($pos, $options)) {
+						$options[] = $pos;
+					}
+				}
+			}
+			if ($otherchar->getOwnedPlaces()) {
+				foreach ($otherchar->getOwnedPlaces() as $place) {
+					if ($place->getType()->getVassals()) {
+						$options[] = $place;
+					}
+				}
+			}
+		}
+		$form = $this->createFormBuilder()
+			->add('liege', ChoiceType::class, [
+			'label'=>'oath.offerto',
+			'required'=>true,
+			'empty_value'=>'oath.choose',
+			'translation_domain'=>'politics',
+			'choices'=>$options,
+			'choices_as_values'=>true,
+			'choice_label' => function ($choice, $key, $value) {
+				if ($choice instanceof Settlement) {
+					if ($choice->getRealm()) {
+						return $choice->getName().' ('.$choice->getRealm()->getName().')';
 					} else {
-						$available[$lord->getId().'-0'] = $lord->getName().' ('.$this->get('translator')->trans('oath.norealm', array(), 'politics').')';
+						return $choice->getName();
 					}
 				}
-			}
-			$form = $this->createFormBuilder()
-				->add('liege', 'choice', array(
-				'label'=>'oath.swearto',
-				'required'=>true,
-				'empty_value'=>'oath.choose',
-				'translation_domain'=>'politics',
-				'choices'=>$available
-			))->getForm();
-
-			$form->handleRequest($request);
-			if ($form->isValid()) {
-				$data = $form->getData();
-				list($liege_id, $realm_id) = explode('-', $data['liege']);
-
-				$liege = $em->getRepository('BM2SiteBundle:Character')->find($liege_id);
-				if ($realm_id>0) {
-					$realm = $em->getRepository('BM2SiteBundle:Realm')->find($realm_id);
-				} else {
-					$realm = null;
+				if ($choice instanceof RealmPosition) {
+					if ($choice->getName() == 'ruler') {
+						return 'Ruler of '.$choice->getRealm()->getName();
+					}
+					return $choice->getName().' ('.$choice->getRealm()->getName().')';
 				}
+				if ($choice instanceof Place) {
+					if ($choice->getRealm()) {
+						if ($choice->getHouse()) {
+							return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' of '.$choice->getHouse()->getName().' in '.$choice->getRealm()->getName();
+						} else {
+							return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' in '.$choice->getRealm()->getName();
+						}
+					} elseif ($choice->getHouse()) {
+						return $choice->getName().' - '.ucfirst($choice->getType()->getName()).' of '.$choice->getHouse()->getName();
+					} else {
+						return $choice->getName().' - '.ucfirst($choice->getType()->getName());
+					}
+				}
+			},
+			'group_by' => function($choice, $key, $value) {
+				if ($choice instanceof Settlement) {
+					return 'Settlements';
+				}
+				if ($choice instanceof RealmPosition) {
+					if ($choice->getRuler()) {
+						return 'Rulers';
+					}
+					return 'Other Positions';
+				}
+				if ($choice instanceof Place) {
+					return 'Places';
+				}
+			},
+		])->add('message', TextareaType::class, [
+			'label' => 'oath.message',
+			'translation_domain'=>'politics',
+			'required' => true
+		])->add('submit', SubmitType::class, [
+			'label'=>'oath.submit',
+			'translation_domain'=>'politics',
+		])->getForm();
 
-				$this->get('politics')->oath($character, $liege, $realm);
-
-				$em->flush();
-				return array('success'=>true);
-			}
-
-			return array(
-				'form'=>$form->createView(),
-				'unavailable'=>$unavailableLords
-			);			
-		} else {
-			return array(
-				'nobody'=>true,
-				'unavailable'=>$unavailableLords
-			);
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			$this->get('game_request_manager')->newOathOffer($character, $data['message'], $data['liege']);
+			$this->addFlash('success', $this->get('translator')->trans('oath.offered', array(), 'politics'));
+			return $this->redirectToRoute('bm2_relations');
 		}
+
+		return $this->render('Politics/offerOath.html.twig', [
+			'form' => $form->createView(),
+		]);
 	}
 
    /**
      * @Route("/breakoath")
-     * @Template
      */
 	public function breakoathAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('hierarchyIndependenceTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		if ($request->isMethod('POST')) {
 			$this->get('politics')->breakoath($character);
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-			return array('success'=>true);
+			$em = $this->getDoctrine()->getManager()->flush();
+			$this->addFlash('success', $this->get('translator')->trans('oath.broken', array(), 'politics'));
+			return $this->redirectToRoute('bm2_relations');
 		}
 
-		return array();
+		return $this->render('Politics/breakoath.html.twig');
 	}
 
    /**
      * @Route("/successor")
-     * @Template
      */
 	public function successorAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('InheritanceSuccessorTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$em = $this->getDoctrine()->getManager();
 		$others = $this->get('dispatcher')->getActionableCharacters();
@@ -252,13 +320,13 @@ class PoliticsController extends Controller {
 			}
 		}
 		foreach ($character->getUser()->getCharacters() as $mychar) {
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
 		foreach ($character->getPartnerships() as $partnership) {
 			$mychar = $partnership->getOtherPartner($character);
-			if (!$mychar->isNPC() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
+			if (!$mychar->isNPC() && !$mychar->getRetired() && $mychar != $character && $mychar->isAlive() && $mychar != $character->getSuccessor()) {
 				$availableLords[] = $mychar;
 			}
 		}
@@ -306,21 +374,27 @@ class PoliticsController extends Controller {
 			);
 
 			$em->flush();
-			return array('success'=>true);
+
+			#TODO: Convert this to a redirect and flash.
+			return $this->render('Politics/successor.html.twig', [
+				'success'=>true
+			]);
 		}
 
-		return array(
+		return $this->render('Politics/successor.html.twig', [
 			'form'=>$form->createView()
-		);
+		]);
 	}
 
 
    /**
      * @Route("/partners/{type}", defaults={"type":null})
-     * @Template
      */
 	public function partnersAction(Request $request, $type=null) {
 		$character = $this->get('dispatcher')->gateway('partnershipsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$newavailable = false;
 		$form_old_view=null; $form_new_view=null;
@@ -349,7 +423,7 @@ class PoliticsController extends Controller {
 					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners)) {
 						$choices[$char->getId()] = $char->getName();
 					}
-				} else {					
+				} else {
 					if (!$char->isNPC() && $char->isActive(true) && !in_array($char, $existingpartners) && $char->getMale() != $character->getMale()) {
 						$choices[$char->getId()] = $char->getName();
 					}
@@ -394,7 +468,7 @@ class PoliticsController extends Controller {
 									if ($relation->getType()=="marriage") {
 										$priority = History::HIGH;
 									} else {
-										$priority = History::MEDIUM;										
+										$priority = History::MEDIUM;
 									}
 									foreach ($relation->getPartners() as $partner) {
 										$other = $relation->getOtherPartner($partner);
@@ -465,31 +539,36 @@ class PoliticsController extends Controller {
 			}
 		}
 
-		return array(
+		return $this->render('Politics/partners.html.twig', [
 			'newavailable' => $newavailable,
 			'form_old'=>$form_old_view,
 			'form_new'=>$form_new_view
-		);
+		]);
 	}
 
 
-   /**
-     * @Route("/lists", name="bm2_lists")
-     * @Template
-     */
+	/**
+	  * @Route("/lists", name="bm2_lists")
+	  */
 	public function listsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway();
-		return array(
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Politics/lists.html.twig', [
 			'listings' => $character->getUser()->getListings(),
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/list/{id}", requirements={"id"="\d+"})
-	  * @Template
 	  */
 	public function listAction($id, Request $request) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
 		$using = false;
 
@@ -512,7 +591,7 @@ class PoliticsController extends Controller {
 				$using = $em->getRepository('BM2SiteBundle:SettlementPermission')->findByListing($listing);
 				if ($using && !empty($using)) {
 					$can_delete = false;
-					$locked_reasons[] = "used";			
+					$locked_reasons[] = "used";
 				}
 			}
 			$is_new = false;
@@ -555,7 +634,7 @@ class PoliticsController extends Controller {
 					}
 					$seen->add($parent);
 					$current = $parent;
-				}					
+				}
 			}
 			// FIXME: this works on character names, WHICH ARE NOT UNIQUE!
 			foreach ($listing->getMembers() as $member) {
@@ -570,7 +649,7 @@ class PoliticsController extends Controller {
 				}
 			}
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('lists.updated', array(), 'politics'));
+			$this->addFlash('success', $this->get('translator')->trans('lists.updated', array(), 'politics'));
 			return $this->redirectToRoute('bm2_site_politics_list', array('id'=>$listing->getId()));
 		}
 
@@ -591,7 +670,7 @@ class PoliticsController extends Controller {
 				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('lists.delete.done', array("%name%"=>$name), 'politics'));
 				return $this->redirectToRoute('bm2_lists');
-			}			
+			}
 		}
 
 		$used_by = array();
@@ -601,8 +680,7 @@ class PoliticsController extends Controller {
 			}
 		}
 
-
-		return array(
+		return $this->render('Politics/list.html.twig', [
 			'listing' => $listing,
 			'used_by' => $used_by,
 			'can_delete' => $can_delete,
@@ -610,16 +688,18 @@ class PoliticsController extends Controller {
 			'is_new' => $is_new,
 			'form' => $form->createView(),
 			'form_delete' => $can_delete?$form_delete->createView():null
-		);
+		]);
 	}
 
 
 	/**
 	  * @Route("/prisoners")
-	  * @Template
 	  */
 	public function prisonersAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalPrisonersTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$results = array();
 		$others = $this->get('dispatcher')->getActionableCharacters();
@@ -672,7 +752,7 @@ class PoliticsController extends Controller {
 							$complete->add(new \DateInterval("PT2H"));
 							$act->setComplete($complete);
 							$act->setBlockTravel(false);
-							$this->get('action_resolution')->queue($act);
+							$this->get('action_manager')->queue($act);
 
 							$this->get('history')->logEvent(
 								$prisoner,
@@ -692,36 +772,42 @@ class PoliticsController extends Controller {
 				}
 			}
 			$this->getDoctrine()->getManager()->flush();
-			if ($change_others) { 
+			if ($change_others) {
 				$others = $this->get('dispatcher')->getActionableCharacters();
 			}
 			$form = $this->createForm(new PrisonersManageType($prisoners, $others));
 		}
 
-		return array(
+		return $this->render('Politics/prisoners.html.twig', [
 			'form' => $form->createView(),
 			'results' => $results
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/claims")
-	  * @Template
 	  */
 	public function claimsAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('personalClaimsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
-		return array('claims'=>$character->getSettlementClaims());
+		return $this->render('Politics/claims.html.twig', [
+			'claims'=>$character->getSettlementClaims()
+		]);
 	}
 
 
 
 	/**
 	  * @Route("/claimadd/{settlement}")
-	  * @Template
 	  */
 	public function claimaddAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
@@ -753,10 +839,12 @@ class PoliticsController extends Controller {
 
 	/**
 	  * @Route("/claimcancel/{settlement}")
-	  * @Template
 	  */
 	public function claimcancelAction(Settlement $settlement) {
 		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');

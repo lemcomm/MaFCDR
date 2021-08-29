@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Entity;
 
 class Building {
 
+	private $defMin = 0.30;
 
 	public function startConstruction($workers) {
 		$this->setActive(false);
@@ -15,7 +16,7 @@ class Building {
 	public function getEmployees() {
 		// only active buildings use employees
 		if ($this->isActive()) {
-			$employees = 
+			$employees =
 				$this->getSettlement()->getFullPopulation() / $this->getType()->getPerPeople()
 				+
 				pow($this->getSettlement()->getFullPopulation() * 500 / $this->getType()->getPerPeople(), 0.25);
@@ -42,6 +43,20 @@ class Building {
 		}
 		$this->setWorkers(0);
 		return $this;
+	}
+
+	public function getDefenseScore() {
+		if ($this->getType()->getDefenses() <= 0) {
+			return 0;
+		} else  {
+			$worth = $this->getType()->getBuildHours();
+			if ($this->getActive()) {
+				$completed = 1;
+			} else {
+				$completed = abs($this->getCondition() / $worth);
+			}
+			return $this->getType()->getDefenses()*$completed;
+		}
 	}
 
 }

@@ -15,7 +15,7 @@ There are seven types of realms, in order:
 
 These can contain any number of smaller types, so a kingdom could have one ore more principalities, duchies, marches, counties or baronies, but not the other way around - a march cannot contain a kingdom, nor other marches, but it can contain counties or baronies. Realms that are not part of any higher realm are called *sovereign realms* and are shown on the map.
 
-Realms that are part of another realm count towards that realm with all their nobles and lands, but at the same time also keep their own identity. So for [messages], for example, members of a county that is part of a kingdom will have access to the realm communication of both the county and the kingdom, while, say, other nobles who are members of a march that is also part of the same kingdom get their march realm communication, but no access to the county.
+Realms that are part of another realm count towards that realm with all their First Ones and lands, but at the same time also keep their own identity. So for [messages], for example, members of a county that is part of a kingdom will have access to the realm communication of both the county and the kingdom, while, say, other First Ones who are members of a march that is also part of the same kingdom get their march realm communication, but no access to the county.
 
 You are free to set up any hierarchy you want within your realm. You can have it as flat or with as many levels as you want, it is entirely up to players to define the internal politics and structure of realms.
 
@@ -38,3 +38,4 @@ Related Topics
 * [fealty]
 * [diplomacy]
 * [permissions]
+* [allegiance]

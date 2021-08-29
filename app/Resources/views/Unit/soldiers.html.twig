@@ -1,0 +1,121 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+	<script src="{{ asset('bundles/bm2site/tablesorter/parsers/parser-input-select.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	{% set settlement = unit.settlement %}
+	<h2>{{ 'npc.soldiers'|trans({'%name%': unit.settings.name}) }}</h2>
+	<p>{{ 'recruit.manage.intro'|trans({},"actions") }}</p>
+	{% if character.isinbattle or character.islooting %}
+		<p>{{ 'recruit.manage.limited'|trans({},"actions") }}</p>
+	{% endif %}
+
+	{% include "element/soldierslist.html.twig" with {
+		"settlement":settlement,
+		"submitpath":path('maf_unit_soldiers', {"unit":unit.id}),
+		"listpath":path('maf_unit_soldiers', {"unit":unit.id})
+	} %}
+
+
+	{% if settlement and recruits is not empty %}
+		<h2>{{ 'settlement.recruits'|trans({"%name%":unit.settlement.name})|title }}</h2>
+		<a id="recruits"></a>
+		<div id="oncancel" class="hidden" style="margin-bottom:1em">
+			{{ 'recruit.troops.canceldone'|trans({},"actions") }}<br />
+			<i>{{ 'recruit.troops.aftercancel'|trans({},"actions") }}</i>
+		</div>
+		<p>{{ "recruit.troops.cancelinfo"|trans({},"actions") }}</p>
+		<p>{{ "recruit.troops.recruitlink"|trans({"%url%":path("maf_recruit") },"actions")|raw }}</p>
+		<table>
+			<thead>
+				<th>{{ "soldier.name"|trans|title }}</th>
+				<th>{{ 'weapon'|trans }}</th>
+				<th>{{ 'armour'|trans }}</th>
+				<th>{{ 'equipment'|trans }}</th>
+				<th>{{ 'mount'|trans }}</th>
+				<th>{{ "soldier.train"|trans|title }}</th>
+				<th>{{ "soldier.complete"|trans|title }}</th>
+			</thead>
+			<tbody>
+			{% if settlement.singleTrainingPoints < settlement.trainingPoints/recruits|length %}
+				{% set tp = settlement.singleTrainingPoints %}
+			{% else %}
+				{% set tp = settlement.trainingPoints/recruits|length %}
+			{% endif %}
+			{% for soldier in recruits %}
+				{% set time = (soldier.trainingRequired-soldier.training)/tp %}
+				{% set progress = soldier.training*100/soldier.trainingRequired %}
+				<tr id="recruit_{{ soldier.id }}">
+					<td>{{ soldier.name }}</td>
+					{% if soldier.weapon %}
+						{% if soldier.oldweapon != soldier.weapon %}
+							<td>{{ link(soldier.weapon) }}</td>
+						{% else %}
+							<td class="disabled">{{ link(soldier.weapon) }}</td>
+						{% endif %}
+					{% else %}
+						<td>{{ 'item.improvised'|trans }}</td>
+					{% endif %}
+					{% if soldier.armour %}
+						{% if soldier.oldarmour != soldier.armour %}
+							<td>{{ link(soldier.armour) }}</td>
+						{% else %}
+							<td class="disabled">{{ link(soldier.armour) }}</td>
+						{% endif %}
+					{% else %}
+						<td></td>
+					{% endif %}
+					{% if soldier.equipment %}
+						{% if soldier.oldequipment != soldier.equipment %}
+							<td>{{ link(soldier.equipment) }}</td>
+						{% else %}
+							<td class="disabled">{{ link(soldier.equipment) }}</td>
+						{% endif %}
+					{% else %}
+						<td></td>
+					{% endif %}
+					{% if soldier.mount %}
+						{% if soldier.oldmount != soldier.mount %}
+							<td>{{ link(soldier.mount) }}</td>
+						{% else %}
+							<td class="disabled">{{ link(soldier.mount) }}</td>
+						{% endif %}
+					{% else %}
+						<td></td>
+					{% endif %}
+					<td class="progress_column"><div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ soldier.training|number_format }} / {{ soldier.trainingRequired }}</span></div></td>
+					<td align="right">{% if time < 1 %}{{ 'today'|trans }}{% else %}{{ time|number_format }} {{ "day"|transchoice(time|number_format) }}{% endif %}</td>
+					<td>
+						<a href="{{ path('maf_recruit_cancel', {"unit":unit.id, "recruit":soldier.id}) }}"><button class="canceltraining" value="{{ soldier.id }}">{{ 'recruit.troops.cancel'|trans({},"actions") }}</button></a>
+						{% if soldier.oldweapon or soldier.oldarmour or soldier.oldequipment or soldier.oldmount %}
+							{{ 'recruit.troops.returns'|trans({},"actions") }}
+						{% else %}
+							{{ 'recruit.troops.disbands'|trans({},"actions") }}
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+	{% if recruits is not empty %}
+		function DeleteRow() {
+			var td = event.target.parentNode;
+			var tr = td.parentNode;
+			tr.parentNode.removeChild(tr);
+		}
+		$(".progressbar").each(function(){
+			var percent = parseInt($(this).attr("value"));
+		 	$(this).progressbar({value: percent });
+		});
+		$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+	{% endif %}
+{% endblock %}

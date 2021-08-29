@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "rogue.name"|trans({},"politics")|title }}</h2>
+	<p>{{ "rogue.intro"|trans({},"politics")|raw }}</p>
+
+	<h3>{{ "oath.current"|trans({},"politics")|title }}</h3>
+	{% include "element/hierarchy.html.twig" with {"character":character, "who":'self'} only %}
+
+	<h3>{{ "rogue.name"|trans({},"politics")|title }}</h3>
+	<form class="wide" action="{{ path('bm2_site_politics_breakoath') }}" method="post">
+		<button type="submit">{{ "rogue.submit"|trans({},"politics") }}</button>
+	</form>
+{% endblock %}

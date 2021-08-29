@@ -1,0 +1,59 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ ('building.'~buildingtype.name)|trans({}, "economy") }}</h2>
+	{% if buildingtype.icon %}
+		<div class="artviewer">
+			<img class="clipart" src="{{ asset('bundles/bm2site/images/'~buildingtype.icon) }}" />
+		</div>
+	{% endif %}
+
+	{{ ('description.'~buildingtype.name)|trans({}, "economy")|raw }}
+
+	<h3>{{ 'req'|trans({},"economy") }}</h3>
+	<ul>
+	{% for requires in buildingtype.requires %}
+		<li>{{ link(requires) }}</li>
+	{% endfor %}
+		<li>{{ buildingtype.buildhours }} {{ 'economy.workhours'|trans({}, "actions") }}</li>
+	{% for resource in buildingtype.resources if resource.requiresconstruction > 0 %}
+		<li>{{ resource.requiresconstruction }} {{ resource.resourcetype.name|trans }}</li>
+	{% endfor %}
+		<li>{{ 'minpop'|trans({"%pop%":buildingtype.minPopulation}, "economy") }}</li>
+		<li>{{ 'optpop'|trans({"%pop%":buildingtype.minPopulation*2}, "economy") }}</li>
+	{% if buildingtype.specialconditions %}
+		<li>{{ ('condition.'~buildingtype.name)|trans({}, "economy") }}</li>
+	{% endif %}
+	</ul>
+
+	<h3>{{ 'reqfor'|trans({},"economy") }}</h3>
+	<ul>
+	{% for enables in buildingtype.enables %}
+		<li>{{ link(enables) }}</li>
+	{% endfor %}
+	</ul>
+
+	<h3>{{ 'provides'|trans({},"economy") }}</h3>
+	<ul>
+	{% if buildingtype.defenses > 0 %}
+		<li>{{ 'defbonus'|trans({},"economy") }}</li>
+	{% endif %}
+	{% for provides in buildingtype.providesEntourage %}
+		<li>{{ link(provides) }}</li>
+	{% endfor %}
+	{% for provides in buildingtype.providesEquipment %}
+		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes",
+		which is roughly the dumbest thing it could possibly do in that situation, but hey, brains were out apparently. #}
+		<li>{{ link(provides) }}</li>
+	{% endfor %}
+	{% for provides in buildingtype.providesTraining %}
+		{# FIXME: I'd really like to have a plural here, but we also use this in form fiels, and symfony is a piece of crap with translations in form, and among other things there's no way to tell it to use transchoice, so it'll output "axe|axes",
+		which is roughly the dumbest thing it could possibly do in that situation, but hey, brains were out apparently. #}
+		<li>{{ 'trainingfor'|trans({'%item%':link(provides)}, "economy")|raw }}</li>
+	{% endfor %}
+	{% for resource in buildingtype.resources if (resource.providesoperation > 0) or (resource.providesoperationbonus > 0) %}
+		<li>{{ resource.resourcetype.name|trans }} {{ 'bonus'|trans({}, "economy") }}</li>
+	{% endfor %}
+	</ul>
+
+{% endblock %}

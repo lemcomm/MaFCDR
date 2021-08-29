@@ -1,0 +1,21 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'house.join.name'|trans({},"politics")|title }}</h2>
+<p>{{ 'house.join.intro'|trans({},"politics")|raw }}</p>
+
+<div class="fullwidth texts">
+{{ form_start(form) }}
+{{ form_errors(form) }}
+	<h4>{{ "house.join.subject.name"|trans({}, "politics") }}</h4>
+	{{ "house.join.subject.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.subject) }}
+
+	<h4>{{ "house.join.text.name"|trans({}, "politics") }}</h4>
+	{{ "house.join.text.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.text) }}
+
+	<h4>{{ "house.join.sure.name"|trans({}, "politics") }}</h4>
+	{{ "house.join.sure.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.sure) }}
+<br /><br />{{ form_end(form) }}
+</div>
+
+{% endblock %}

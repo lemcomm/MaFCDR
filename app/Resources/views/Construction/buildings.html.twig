@@ -1,0 +1,238 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<h2>{{ "economy.build.name"|trans({},"actions")|title }}</h2>
+	<p>{{ "economy.build.intro"|trans({"%settlement%":settlement.name,"%type%":settlement.getType|trans},"actions")|raw }}</p>
+
+	{% if result is defined %}
+		{% if result.success %}
+
+		{% else %}
+			<p>{{ result.message|trans({},"actions") }}</p>
+		{% endif %}
+	{% else %}
+		{{ form_errors(form) }}
+		<div id="over20" class="warning hidden">{{ 'economy.build.warning.over20percent'|trans({}, "actions") }}</div>
+		<div id="over50" class="warning hidden">{{ 'economy.build.warning.over50percent'|trans({}, "actions") }}</div>
+		<div id="over100" class="error hidden">{{ 'economy.build.error.over100percent'|trans({}, "actions") }}</div>
+		{% if buildings is empty %}
+			<form action="{{ path('bm2_site_construction_buildings') }}" method="post">
+			{{ form_widget(form._token) }}
+		{% else %}
+			<h3>{{ 'economy.build.existing'|trans({}, "actions")|title }}</h3>
+			<table id="buildingslist">
+				<thead><tr>
+					<th>{{ "building"|transchoice(1)|title }}</th>
+					<th colspan="2">{{ "economy.build.speed"|trans({}, "actions") }}</th>
+					<th data-sorter="false">{{ "economy.build.focus"|trans({}, "actions") }}</th>
+					<th>{{ "economy.build.employees"|trans({}, "actions") }}</th>
+					<th>{{ "economy.build.production"|trans({}, "actions") }}</th>
+					<th data-sorter="false"></th>
+				</tr></thead>
+				<tbody>
+				{% for build in buildings if build.active == true %}
+					{% include "element/buildingrow.html.twig" with { "build": build } only %}
+				{% endfor %}
+				</tbody>
+			</table>
+
+			<form action="{{ path('bm2_site_construction_buildings') }}" method="post">
+			{{ form_widget(form._token) }}
+			<h3>{{ 'economy.build.underconstruction'|trans({},"actions")|title }}</h3>
+			<table id="buildingslist2">
+				<thead><tr style="margin-top: 1em">
+					<th>{{ "building"|transchoice(1)|title }}</th>
+					<th>{{ "economy.build.status"|trans({}, "actions") }}</th>
+					<th>{{ "economy.build.progress"|trans({}, "actions") }}</th>
+					<th colspan="2">{{ "economy.build.workers"|trans({}, "actions") }}</th>
+					<th>{{ "economy.build.completion"|trans({}, "actions") }}</th>
+				</tr></thead>
+				<tbody>
+				{% for build in buildings if build.active == false %}
+					<tr>
+						<td>{{ link(build.type) }}</td>
+						<td>
+							{% if build.workers > 0 %}
+								{{ 'economy.build.building'|trans({},"actions") }}
+							{% else %}
+								{{ 'economy.build.abandoned'|trans({},"actions") }}
+							{% endif %}
+						</td>
+
+						<td class="progress_column">
+							{% if build.condition < 0 %}
+							{% set progress = ((build.condition+build.type.buildhours)*100/build.type.buildhours) // 1 %}
+							<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ progress }} %</span></div></td>
+							{% endif %}
+						</td>
+						{% if build.type.minpopulation * 0.5 <= settlement.fullpopulation %}
+							<td align="center">{{ form_widget(form.existing[build.id]) }}</td>
+							<td align="right" id="we_{{ build.id }}">{{ (build.workers*settlement.population)|number_format }} {{ 'build.workers'|trans }}</td>
+							{% if build.workers > 0 %}
+								{# FIXME: both the estimates and the actual calculation should have a low limit. Or maybe a max number of people who can work on something - no matter how many people you throw at it, you just can't complete most things in 1 day! #}
+								{% set complete = (-1*build.condition) / (10*((build.workers*settlement.population) ** 0.95)) %}
+								{% set worstcase = complete/build.currentspeed %}
+								<td align="right" id="done_{{ build.id }}">
+									{% if complete < 1 %}
+										{{ 'today'|trans }}
+									{% else %}
+										{% if worstcase > complete + 1 %}
+											{{ complete|number_format }}-{{ worstcase|number_format }} {{ 'day'|transchoice(worstcase|number_format) }}
+										{% else %}
+											{{ complete|number_format }} {{ 'day'|transchoice(complete|number_format) }}
+										{% endif %}
+									{% endif %}
+								</td>
+							{% else %}
+								<td align="right" id="done_{{ build.id }}">{{ "economy.build.never"|trans({}, "actions")}}</td>
+							{% endif %}
+						{% else %}
+							<td></td><td></td>
+							<td align="right" id="done_{{ build.id }}">{{ "economy.build.never"|trans({}, "actions")}}</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+				</tbody>
+			{% if roadworkers > 0 or featureworkers > 0 %}
+			<tfoot>
+				{% if roadworkers > 0 %}
+				<tr><td colspan="3">{{ "economy.roadworkers"|trans({"%url%":path('bm2_site_construction_roads')}, "actions")|raw }}</td>
+						<td align="center">{{ roadworkers*100 }} %</td>
+						<td align="right">{{ (roadworkers*settlement.population)|number_format }} {{ 'road.workers'|trans }}</td>
+				</tr>
+				{% endif %}
+				{% if featureworkers > 0 %}
+				<tr><td colspan="3">{{ "economy.featureworkers"|trans({"%url%":path('bm2_site_construction_features')}, "actions")|raw }}</td>
+						<td align="center">{{ featureworkers*100 }} %</td>
+						<td align="right">{{ (featureworkers*settlement.population)|number_format }} {{ 'build.workers'|trans }}</td>
+				</tr>
+				{% endif %}
+			</tfoot>
+			{% endif %}
+			</table>
+		{% endif %}
+
+		<h3>{{ 'economy.build.canbuild'|trans({}, "actions")|title }}</h3>
+		<p>{{ settlement.AvailableWorkforce }} {{ 'build.workers'|trans }} ({{ (settlement.AvailableWorkforcePercent*100)|number_format }} %)</p>
+		{% if available is not empty %}
+			<table id="constructions">
+				<thead><tr>
+					<th>{{ "building"|transchoice(1)|title }}</th>
+					<th colspan="2" data-sorter="false">{{ "economy.build.workers"|trans({}, "actions") }}</th>
+					<th>{{ "economy.build.effort"|trans({}, "actions") }}</th>
+				</tr></thead>
+				<tbody>
+				{% for build in available %}
+					<tr>
+						<td>{{ buildingtype_link(build.id, build.name) }}</a></td>
+						<td align="center">{{ form_widget(form.available[build.id]) }}</td>
+						<td align="right" id="wa_{{ build.id }}">0</td>
+						<td align="right">{{ build.buildhours }} {{ 'economy.workhours'|trans({}, "actions") }}</a></td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			{{ 'none'|trans }}
+		{% endif %}
+
+		<button>{{ 'economy.build.submit'|trans({},"actions") }}</button>
+		</form>
+
+		<br />
+		<hr />
+
+		<h3>{{ 'economy.build.cannotbuild'|trans({}, "actions")|title }}</h3>
+		{# TODO: per default, collapsed #}
+		<table id="unavailable" class="disabled">
+			<thead><tr>
+				<th>{{ "building"|transchoice(1)|title }}</th>
+				<th data-sorter="false"></th>
+			</tr></thead>
+			<tbody>
+			{% for build in unavailable %}
+				{% if build.reason != "already" %}
+					<tr>
+						<td>{{ buildingtype_link(build.id, build.name) }}</td>
+						<td>{{ ('economy.build.error.'~build.reason)|trans({"%content%": build.value|default("-")},"actions") }}</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+			</tbody>
+		</table>
+
+	{% endif %}
+{% endblock %}
+
+{% block jquery %}
+
+$("#buildingslist").tablesorter({ sortList: [[0,0]] });
+$("#buildingslist2").tablesorter({ sortList: [[0,0]] });
+$("#constructions").tablesorter({ sortList: [[0,0]] });
+$("#unavailable").tablesorter({ sortList: [[0,0]] });
+
+
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+
+$("input.assignment").change(function(){
+	var id = $(this).attr("id");
+	var value = parseFloat($(this).val()) || 0;
+	var param = id.split("_");
+	var target="dummy";
+	if (param[1]=="existing") {
+		target = "#we_"+param[2];
+		$("#done_"+param[2]).html("?");
+	} else if (param[1]=="available") {
+		target = "#wa_"+param[2];
+	}
+	$(target).html(Math.round({{settlement.population}}*value/100)+" {{ 'build.workers'|trans }}");
+
+
+	var total={{ otherworkers|number_format }};
+	$("input.assignment").each(function(){
+		var x = parseFloat($(this).val()) || 0;
+		total += x;
+	});
+
+	if (total>100) {
+ 		$("#over100").show();
+ 		$("#over50").hide();
+ 		$("#over20").hide();
+	} else if (total>50) {
+ 		$("#over100").hide();
+ 		$("#over50").show();
+ 		$("#over20").hide();
+	} else if (total>20) {
+ 		$("#over100").hide();
+ 		$("#over50").hide();
+ 		$("#over20").show();
+ 	} else {
+ 		$("#over100").hide();
+ 		$("#over50").hide();
+ 		$("#over20").hide();
+ 	}
+});
+
+$("#buildingslist").on("click", ".setfocus", function(){
+	var id = $(this).data("id");
+	var set = $(this).data("set");
+	var row = $(this).closest('tr');
+
+	$(this).closest('td').html('<img src="{{ asset('bundles/bm2site/images/activitysmall.gif') }}" />');
+
+	$.post("{{ path('bm2_site_construction_focus') }}", {"building":id, "focus":set}, function(data) {
+		row.replaceWith(data);
+		{# TODO: update available for construction workers count below - how do we get that data? #}
+	});
+
+});
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ war.summary }}</h2>
+<p>{{ war.description|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}</p>
+
+{% if war.timer <= 0 %}
+	<p>{{ 'war.over'}}</p>
+{% elseif war.timer <= 30 %}
+	<p>{{ 'war.ending2'}}</p>
+{% elseif war.timer <= 60 %}
+	<p>{{ 'war.ending1'}}</p>
+{% endif %}
+
+score: {{ war.score }}
+<br />
+<dl>
+<dt>Primary Attacker:</dt>
+<dd>{{ link(war.realm) }}</dd>
+{% if war.attackers(false) is not empty %}
+	<dt>Other Attackers:</dt>
+	<dd>
+		<ul class="shortlist">{% for realm in war.attackers(false) %}<li>{{ link(realm) }}</li>{% endfor %}</ul>
+	</dd>
+{% endif %}
+<dt>Defenders:</dt>
+<dd>
+	<ul class="shortlist">{% for realm in war.defenders %}<li>{{ link(realm) }}</li>{% endfor %}</ul>
+</dd>
+</dl>
+
+<table>
+	<tbody>
+		{% for target in war.targets %}
+			<tr>
+				<td>{{ link(target.settlement) }}</td>
+				<td>{% if target.settlement.owner %}{{ link(target.settlement.owner) }}{% endif %}</td>
+				<td>{% if target.settlement.realm %}{{ link(target.settlement.realm) }}{% endif %}</td>
+				<td>
+					{% if target.takencurrently %}
+						{% if war.timer <= 0 %}
+							conquered
+						{% else %}
+							occupied
+						{% endif %}
+					{% elseif target.takenever %}
+						contested
+					{% elseif target.attacked %}
+						defended
+					{% else %}
+						never attacked
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<h3>{{ link(war.log)|title|raw }}</h3>
+{% include "Events/eventdata.html.twig" with { "log":war.log, "metas":false, "research":false} %}
+
+{% endblock %}

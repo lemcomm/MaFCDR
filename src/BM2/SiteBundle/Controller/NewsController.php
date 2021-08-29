@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\NewsArticle;
 use BM2\SiteBundle\Entity\NewsEdition;
 use BM2\SiteBundle\Entity\NewsEditor;
@@ -27,25 +28,26 @@ class NewsController extends Controller {
 
 	/**
 		* @Route("/", name="bm2_news")
-		* @Template("BM2SiteBundle:News:current.html.twig")
 		*/
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter();
 
-		return array(
+		return $this->render('News/current.html.twig', [
 			"editor_list"=>$character->getNewspapersEditor(),
 			"reader_list"=>$character->getNewspapersReader(),
 			"local_list"=>$this->get('news_manager')->getLocalList($character),
 			"can_create"=>$this->get('news_manager')->canCreatePaper($character)
-		);
+		]);
 	}
 
 	/**
 	  * @Route("/read/{edition}", name="bm2_site_news_read", requirements={"edition"="\d+"})
-	  * @Template
 	  */
 	public function readAction(NewsEdition $edition, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$reader = $this->get('news_manager')->readEdition($edition, $character);
 		if (!$reader) {
@@ -63,20 +65,22 @@ class NewsController extends Controller {
 			$this->getDoctrine()->getManager()->flush();
 		}
 
-		return array(
+		return $this->render('News/read.html.twig', [
 			'paper'	=>	$edition->getPaper(),
 			'edition' => $edition,
 			'can_subscribe' => $can_subscribe
-		);
+		]);
 	}
 
 
 	 /**
 		 * @Route("/subscribe/{edition}", requirements={"edition"="\d+"})
-		 * @Template
 		 */
 	 public function subscribeAction(NewsEdition $edition) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		// FIXME: catch exception if $paper can not be found and throw this:
 		//			throw $this->createNotFoundException('error.notfound.paper');
@@ -102,10 +106,12 @@ class NewsController extends Controller {
 
 	/**
 		* @Route("/create")
-		* @Template
 		*/
 	public function createAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if (!$this->get('news_manager')->canCreatePaper($character)) {
 			throw new AccessDeniedHttpException('error.noaccess.library');
@@ -113,7 +119,7 @@ class NewsController extends Controller {
 
 		$form = $this->createFormBuilder()
 			->add('name', 'text', array(
-				'required'=>true, 
+				'required'=>true,
 				'label'=>'news.create.newname',
 				'translation_domain' => 'communication'
 				))
@@ -130,15 +136,19 @@ class NewsController extends Controller {
 				)));
 		}
 
-		return array('form'=>$form->createView());
+		return $this->render('News/create.html.twig', [
+			'form'=>$form->createView()
+		]);
 	}
 
 	 /**
 		 * @Route("/editor/{paper}", requirements={"paper"="\d+"})
-		 * @Template
 		 */
 	 public function editorAction(NewsPaper $paper, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($paper, $character);
 		if (!$editor) {
@@ -147,12 +157,11 @@ class NewsController extends Controller {
 
 		$form = $this->createForm(new NewsEditorType($paper));
 
-		return array(
+		return $this->render('News/editor.html.twig', [
 			'paper'	=>	$paper,
 			'editor'	=> $editor,
 			'form'	=> $form->createView()
-		);
-
+		]);
 	}
 
 	 /**
@@ -160,6 +169,9 @@ class NewsController extends Controller {
 		 */
 	 public function editorchangeAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST')) {
 			$paperId = $request->request->get('paper');
@@ -197,7 +209,7 @@ class NewsController extends Controller {
 					$target_editor->setOwner($data['owner']);
 					$target_editor->setEditor($data['editor']);
 					$target_editor->setAuthor($data['author']);
-					$target_editor->setPublisher($data['publisher']);					
+					$target_editor->setPublisher($data['publisher']);
 				}
 
 				// TODO: notify target
@@ -213,10 +225,12 @@ class NewsController extends Controller {
 
 	 /**
 		 * @Route("/editoraddform/{paperId}", requirements={"paperId"="\d+"})
-		 * @Template
 		 */
 	 public function editoraddformAction($paperId, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$distance = $this->get('geography')->calculateInteractionDistance($character);
 		$form = $this->createForm(new InteractionType(
 			'publication',
@@ -224,10 +238,11 @@ class NewsController extends Controller {
 			$character,
 			true
 		));
-		return array(
+
+		return $this->render('News/editoraddform.html.twig', [
 			'paperid'=>$paperId,
 			'form'=>$form->createView()
-		);
+		]);
 	 }
 
 
@@ -236,6 +251,9 @@ class NewsController extends Controller {
 		 */
 	 public function editoraddAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		if ($request->isMethod('POST')) {
 			$paperId = $request->request->get('paper');
@@ -285,6 +303,9 @@ class NewsController extends Controller {
 		 */
 	 public function createeditionAction(NewsPaper $paper, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($paper, $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -317,10 +338,12 @@ class NewsController extends Controller {
 
 	 /**
 		 * @Route("/edition/{edition}", requirements={"edition"="\d+"})
-		 * @Template
 		 */
 	 public function editionAction(NewsEdition $edition, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($edition->getPaper(), $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -331,12 +354,12 @@ class NewsController extends Controller {
 		$article->setEdition($edition);
 		$form = $this->createForm(new NewsArticleType, $article);
 
-		return array(
+		return $this->render('News/edition.html.twig', [
 			'paper'	=>	$edition->getPaper(),
 			'editor'	=> $editor,
 			'edition' => $edition,
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	 /**
@@ -345,6 +368,9 @@ class NewsController extends Controller {
 	  */
 	public function publishAction(NewsEdition $edition) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editor = $this->get('news_manager')->accessPaper($edition->getPaper(), $character);
 		if (!$editor || $editor->getEditor()===false) {
@@ -363,6 +389,9 @@ class NewsController extends Controller {
 	  */
 	 public function layoutAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$editionId = $request->request->get('edition');
 		$layout_data = json_decode($request->request->get('layout'));
@@ -403,10 +432,12 @@ class NewsController extends Controller {
 
 	/**
 	  * @Route("/newarticle")
-	  * @Template
 	  */
 	public function newarticleAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$article = new NewsArticle;
 		$form = $this->createForm(new NewsArticleType, $article);
@@ -435,10 +466,12 @@ class NewsController extends Controller {
 
 	/**
 	  * @Route("/editarticle/{article}")
-	  * @Template
 	  */
 	public function editarticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$form = $this->createForm(new NewsArticleType, $article);
 		$form->handleRequest($request);
@@ -466,10 +499,12 @@ class NewsController extends Controller {
 	/**
 	  * @Route("/storearticle/{article}")
 	  * @Method({"POST"})
-	  * @Template
 	  */
 	public function storearticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {
@@ -500,10 +535,12 @@ class NewsController extends Controller {
 	/**
 	  * @Route("/restorearticle/{article}")
 	  * @Method({"POST"})
-	  * @Template
 	  */
 	public function restorearticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {
@@ -539,10 +576,12 @@ class NewsController extends Controller {
 	/**
 	  * @Route("/delarticle/{article}")
 	  * @Method({"POST"})
-	  * @Template
 	  */
 	public function delarticleAction(NewsArticle $article, Request $request) {
 		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
 		$paper = $article->getEdition()->getPaper();
 		if (!$paper) {

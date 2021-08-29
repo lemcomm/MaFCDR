@@ -26,7 +26,7 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 		$em = $container->get('doctrine')->getManager();
 		$logger = $container->get('logger');
 		$battlerunner = $container->get('battle_runner');
-		$military = $container->get('military');
+		$warmanager = $container->get('war_manager');
 		$cycle = $container->get('appstate')->getCycle();
 		$opt_time = $input->getOption('time');
 		$arg_debug = $input->getArgument('debug level');
@@ -45,7 +45,7 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 			$query = $em->createQuery('SELECT b FROM BM2SiteBundle:Battle b WHERE b.complete < :now ORDER BY b.id ASC');
 			$query->setParameters(array('now'=>$now));
 			foreach ($query->getResult() as $battle) {
-				$military->recalculateBattleTimer($battle);
+				$warmanager->recalculateBattleTimer($battle);
 			}
 			$em->flush();
 
@@ -54,16 +54,6 @@ class ProcessBattlesCommand extends ContainerAwareCommand {
 			foreach ($query->getResult() as $battle) {
 				$battlerunner->enableLog($arg_debug);
 				$battlerunner->run($battle, $cycle);
-
-				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
-				// 0.05 is 5% of a day's journey, or about 25% of an hourly journey - or about 500m base speed, modified for character speed
-				foreach ($battle->getGroups() as $group) {
-					foreach ($group->getCharacters() as $char) {
-						if ($char->getTravel()) {
-							$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
-						}
-					}
-				}
 			}
 			if ($opt_time) {
 				$event = $stopwatch->lap('battles');

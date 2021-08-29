@@ -1,0 +1,28 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/jquery.minicolors.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/jquery.minicolors.css') }}" />
+{% endblock %}
+
+
+{% block content %}
+<h2>{{ 'realm.manage.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+<p>{{ 'realm.manage.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+
+<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_manage', {'realm':realm.id}) }}" method="post" {{ form_start(form) }}
+	{{ form_widget(form) }}
+</form>
+
+{% endblock %}
+
+{% block jquery %}
+$('#realmmanage_colour_hex').minicolors({
+	control: 'wheel'
+});
+$('#realmdata').submit(function(event){
+ 	var rgba = $('#realmmanage_colour_hex').minicolors('rgbString');
+	$('#realmmanage_colour_rgb').val(rgba);
+});
+{% endblock %}

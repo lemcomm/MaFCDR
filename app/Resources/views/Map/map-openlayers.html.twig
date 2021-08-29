@@ -1,0 +1,273 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/map/OpenLayers.js') }}"></script>
+	{% if app.environment != 'prod' %}
+		<script src="{{ asset('bundles/bm2site/map/map.js?env='~app.environment) }}"></script>
+	{% else %}
+		<script src="{{ asset('bundles/bm2site/map/map.js') }}"></script>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+	{% if character %}
+		<h2>{{ 'map.title.both'|trans|title }}</h2>
+		<p>{{ 'map.howto'|trans|raw }}</p>
+	{% else %}
+		<h2>{{ 'map.title.map'|trans|title }}</h2>
+	{% endif %}
+
+	&nbsp;<ul id="loadlist" class="shortlist" style="display:inline"></ul>
+
+	<div id="mapviewer">
+	<div id="searchbox"><input id="search" placeholder="{{ 'map.search'|trans }}" /><span id="searchrunning"</span></div>
+	<div id="sd_anchor" style="width:20em;float:right;margin-right:0;min-height:50em">
+		<div id="accordion">
+			<h1>{{ 'map.layers'|trans|title }}</h1>
+			<div id="switcher" class="olControlLayerSwitcher">
+			</div>
+			<h1>{{ 'map.legend'|trans|title }}</h1>
+			<div id="legend">
+				<ul style="line-height:40px">
+					<li style="list-style-image:url({{ asset('bundles/bm2site/images/marker-small-green.png') }})"/>{{ 'map.you'|trans }}</li>
+					<li style="list-style-image:url({{ asset('bundles/bm2site/images/marker-small-blue.png') }})"/>{{ 'map.yourchars'|trans }}</li>
+					<li style="list-style-image:url({{ asset('bundles/bm2site/images/marker-small-red.png') }})"/>{{ 'map.others'|trans }}</li>
+					<li style="list-style-image:url({{ asset('bundles/bm2site/images/marker-small-black.png') }})"/>{{ 'map.past'|trans }}</li>
+					<li style="color:#c00000"/>{{ 'map.ownedplace'|trans }}</li>
+					<li style="color:#0000c0"/>{{ 'map.indyplace'|trans }}</li>
+					<li style="list-style-type:circle; color:#c0a000"/>{{ 'map.spot'|trans }}</li>
+					<li style="list-style-type:circle; color:#00a0f0"/>{{ 'map.act'|trans }}</li>
+				</ul>
+				<p>{{ 'map.clickselect'|trans }}</p>
+			</div>
+			{% if character %}
+			<h1 id="travelpicker">{{ 'map.travel'|trans|title }}</h1>
+			<div>
+				{% if character.isprisoner %}
+					{{ 'map.error.prisoner'|trans }}
+				{% elseif character.user.restricted %}
+					{{ 'map.error.restricted'|trans }}
+				{% else %}
+					{% if character.travellocked %}
+					<div>
+						{{ 'map.locked'|trans }}
+					</div>
+					{% endif %}
+					<div id="result">
+						<p>{{ 'map.draw'|trans|raw }}</p>
+					</div>
+					<div id="route">
+						<ul class="simple">
+							<li>
+								<button onClick="submitRoute('{{ path('bm2_site_character_settravel') }}')">{{ 'map.submit'|trans }}</button>
+							</li>
+							<li>
+								<button id="#rmlast" onClick="remove_last_point('{{ path('bm2_site_character_settravel') }}')">{{ 'map.rmlast'|trans }}</button>
+							</li>
+							<li>
+								<button onClick="myClearRoute('{{ path('bm2_site_character_cleartravel') }}')">{{ 'map.clear'|trans }}</button>
+							</li>
+							{# FIXME: this should only be visible if the destination is (near) a settlement #}
+							<li>
+								<label for="enterdest">{{ 'map.enter'|trans }}</label><input id="enterdest" type="checkbox" checked="checked" name="enter" />
+							</li>
+						</ul>
+					</div>
+					<hr />
+					<div>
+						{{ 'map.info.length'|trans }}: <span id="routelength">0</span> {{ 'metre_abr'|trans }}
+					</div>
+				{% endif %}
+			</div>
+			{% endif %}
+			{% if traveldetails is defined %}
+				<h1>{{ 'map.traveldetails'|trans|title }}</h1>
+				<div>
+					{# TODO: update this as well #}
+					<ul class="simple">
+					{% for places in traveldetails %}
+						<li>{{ link(places.place) }} <small>({{ ('biome.'~places.biome)|trans }}, {{ places.length|distance(true) }})</small></li>
+					{% endfor %}
+					</ul>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div style="margin-right:22em">
+		<div id="map" style="min-width:40em;min-height:50em;"></div>
+	</div>
+	<div id="sd" class="hidden" title="dummy"></div>
+
+	</div>
+
+{% endblock %}
+
+{% block javascript %}
+function myClearRoute(path) {
+	clearRoute(path);
+	$("#result").html("{{ 'map.cleared'|trans|e('js') }}");
+}
+
+function mode_click() {
+	if (typeof hoverSelectChars !== 'undefined') {
+		hoverSelectChars.deactivate();
+		hoverSelectPlace.deactivate();
+		clickSelectChars.activate();
+		clickSelectPlace.activate();
+		drawRoute.deactivate();
+	}
+}
+
+function mode_hover() {
+	if (typeof hoverSelectChars !== 'undefined') {
+		clickSelectChars.deactivate();
+		clickSelectPlace.deactivate();
+		hoverSelectChars.activate();
+		hoverSelectPlace.activate();
+		drawRoute.activate();
+	}
+}
+
+function updateRoute(data) {
+	if (data.leftworld) {
+		$("#result").html("{{ 'map.error.world'|trans|e('js') }}");
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		}
+	} else if (data.prisoner) {
+		$("#result").html("{{ 'map.error.prisoner'|trans|e('js') }}");
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		}
+	} else if (data.restricted) {
+		$("#result").html("{{ 'map.error.restricted'|trans|e('js') }}");
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		}
+	} else if (data.disembark) {
+		var html = "{{ 'map.disembark'|trans|e('js') }}";
+		html = html.replace("%duration%", Math.round(data.turns*10)/10);
+		html = html.replace("%real%", Math.round(data.turns*10)/10/4);
+		$("#result").html(html);
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		} else {
+			adderrorlayer();
+		}
+		errorlayer.addFeatures(geojson_format.read(data.invalid));
+	} else if (data.turns>0) {
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		}
+		var html = "{{ 'map.newroute'|trans|e('js') }}";
+		html = html.replace("%duration%", Math.round(data.turns*10)/10);
+		if (Math.round(data.turns*10)/10*6/24 < 1) {
+			html = html.replace("%hours%", Math.ceil(Math.round(data.turns*10)/10*6));
+			html = html.replace("%days%", 0);
+		} else {
+			html = html.replace("%hours%", Math.ceil(Math.round(data.turns*10)/10*6)%24);
+			html = html.replace("%days%", Math.floor(Math.round(data.turns*10)/10*6/24));
+		}
+		if (data.bridges.length>0) {
+			html = html+"<br /><h4>{{ 'map.crossings.title'|trans|title|e('js') }}</h4><ul>";
+			for (var i in data.bridges) {
+				var bridge = "{{ 'map.crossings.river'|trans|e('js') }}";
+				bridge = bridge.replace("%river%", data.bridges[i].river);
+				bridge = bridge.replace("%bridge%", data.bridges[i].bridgename);
+				bridge = bridge.replace("%nearby%", data.bridges[i].bridgelocation);
+				html = html + "<li>"+bridge+"</li>";
+			}
+			html = html+"</ul>";
+		}
+		$("#result").html(html);
+		if (data.roads) {
+			if (usedroadslayer) {
+				usedroadslayer.removeAllFeatures();
+			} else {
+				addusedroadslayer();
+			}
+			usedroadslayer.addFeatures(geojson_format.read(data.roads));
+		} else {
+			if (usedroadslayer) {
+				usedroadslayer.removeAllFeatures();
+			}
+		}
+	} else {
+		$("#result").html("{{ 'map.error.impassable'|trans|e('js') }}");
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		} else {
+			adderrorlayer();
+		}
+		errorlayer.addFeatures(geojson_format.read(data.invalid));
+	}
+}
+{% endblock %}
+
+{% block jquery %}
+$("#accordion").accordion({
+	heightStyle: "fill",
+	activate: function(event, ui) {
+		if (ui.newHeader[0].id == "travelpicker") {
+			mode_hover();
+		} else {
+			mode_click();
+		}
+	}
+});
+{% include "element/mapstrings.js.twig" %}
+mapinit('map');
+{% if character and character.location %}
+	addcharacters();
+	{% if character.travel %}
+		set_char_location({{ character.location.x }}, {{ character.location.y }}, false, {{ actdistance}}, {{ spotdistance }});
+		set_char_path({{ travel.completed|raw }}, {{ travel.future|raw }}, {{ character.progress }});
+		addusedroadslayer();
+		usedroadslayer.addFeatures(geojson_format.read({{ travelroads|raw }}));
+	{% else %}
+		set_char_location({{ character.location.x }}, {{ character.location.y }}, true, {{ actdistance}}, {{ spotdistance }});
+	{% endif %}
+	zoomto({{ character.location.x }}, {{ character.location.y }}, 6);
+{% endif %}
+
+var settlement_cache = {};
+
+{# FIXME: shouldn't this use the existing autocomplete.js we use elsewhere ? #}
+$("#search").autocomplete({
+	minLength: 2,
+	source: function( request, response ) {
+		var term = request.term;
+		if ( term in settlement_cache ) {
+			response( settlement_cache[ term ] );
+			return;
+		}
+		$("#searchrunning").html("{{ 'map.searching'|trans }}");
+		$.getJSON("{{ path('bm2_site_data_settlements') }}", request, function( data, status, xhr ) {
+			settlement_cache[ term ] = data;
+			response( data );
+			$("#searchrunning").html("");
+		});
+	},
+	select: function(event, ui) {
+		//Pan to location and Zoom to zoom level 3.
+		var lonlat = new OpenLayers.LonLat(ui.item.x, ui.item.y);
+		console.log(lonlat);
+		map.moveTo(lonlat, 6);
+		return false;
+	}
+})
+.data("ui-autocomplete")._renderItem = function(ul, item) {
+	if (item.label) {
+		label = item.label;
+	} else {
+		label = '{{ "settlement.unowned"|trans }}';
+	}
+	return $("<li>")
+		.append("<a>"+item.value+" <small style='float:right'>("+label+")</small></a>")
+		.appendTo(ul);
+};
+
+
+{% endblock %}

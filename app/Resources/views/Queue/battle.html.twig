@@ -1,0 +1,64 @@
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'battle.upcoming'|trans|title }}</h2>
+<p>
+	{{ location.key|trans({'%location%':link(location.entity)})|raw }}
+</p>
+
+<dl>
+{# TODO: translations #}
+<dt>started</dt>
+<dd>{{ battle.started.format("r") }}</dd>
+<dt>est. complete</dt>
+<dd>{{ battle.complete.format("r") }}</dd>
+<dt>progress</dt>
+<dd class="progress_column progress_small">
+	{% set progress = ( (now.timestamp - battle.started.timestamp) * 100 / (battle.complete.timestamp - battle.started.timestamp) ) // 1 %}
+	{% if progress > 100 %}
+		<div class="progressbar" value="100"><span class="progress_value_dummy">{{ "queue.finishing"|trans({}, "actions") }}</span></div></td>
+	{% else %}
+		<div class="progressbar" value="{{progress}}"><span class="progress_value_dummy">{{ progress }} %</span></div></td>
+	{% endif %}
+</dd>
+{% if battle.war %}
+	<dt>part of war</dt>
+	<dd>{{ link(battle.war) }}</dd>
+{% endif %}
+</dl>
+
+{# TODO: this info should only available after some time, to prevent "scouting attacks". say, after half the time between initiation and completion has passed? #}
+
+<table class="battlereport">
+	<tr><th colspan="2"><h3>{{ 'battle.participants'|trans|title }}</h3></th></tr>
+	<tr>
+	{% for group in battle.groups %}
+		<td><ul class="shortlist">
+		{% for participant in group.characters %}
+			<li>{{ link(participant) }}</li>
+		{% endfor %}
+		</ul></td>
+	{% endfor %}
+	</tr>
+
+	<tr><th colspan="2"><h3>{{ 'battle.initial'|trans|title }}</h3></th></tr>
+	<tr>
+	{% for group in battle.groups %}
+		<td valign="top"><ul>
+		{% for type,amount in group.troopssummary %}
+			<li>{{ amount }} {{ ('soldier.'~type)|transchoice(amount) }}</li>
+		{% endfor %}
+		</ul></td>
+	{% endfor %}
+	</tr>
+
+</table>
+{% endblock %}
+
+{% block jquery %}
+$(".progressbar").each(function(){
+	var percent = parseInt($(this).attr("value"));
+ 	$(this).progressbar({value: percent });
+});
+$(".progress_value_dummy").addClass("progress_value").removeClass("progress_value_dummy");
+{% endblock %}

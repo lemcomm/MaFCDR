@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "vassals.disown.title"|trans({},"politics")|title }}</h2>
+
+{% if success is defined %}
+	<p>{{ "vassals.disown.success"|trans({"%name%":link(vassal)},"politics")|raw }}</p>
+{% else %}
+	<p>{{ "vassals.disown.desc"|trans({"%name%":link(vassal)},"politics")|raw }}</p>
+
+	{{ form(form) }}
+{% endif %}
+
+{% endblock %}

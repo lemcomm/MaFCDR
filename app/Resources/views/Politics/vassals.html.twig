@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "vassals.view.name"|trans({},"politics")|title }}</h2>
+
+<table>
+	<thead></thead>
+	<tbody>
+	{% for vassal in vassals  %}
+		<tr>
+			<td>{{ link(vassal) }}</td>
+			<td><a href="{{ path("bm2_site_politics_disown", {"vassal":vassal.id}) }}"><button>{{ "vassals.disown.link"|trans({},"politics") }}</button></a></td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+
+{% endblock %}

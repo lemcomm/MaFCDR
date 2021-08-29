@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Message">
+		<id name="id" type="bigint">
+			<generator strategy="AUTO"/>
+		</id>
+		<field name="topic" type="string" nullable="true"/>
+                <field name="type" type="string" nullable="true"/>
+                <field name="sent" type="datetime"/>
+		<field name="cycle" type="integer" nullable="true"/>
+                <field name="system_content" type="text" nullable="true"/>
+                <many-to-one field="conversation" target-entity="Conversation" inversed-by="messages" fetch="EAGER"/>
+                <many-to-one field="sender" target-entity="Character" inversed-by="messages"/>
+                <one-to-many field="replies" target-entity="Message" mapped-by="reply_to" on-delete="CASCADE">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+                <many-to-one field="reply_to" target-entity="Message" inversed-by="replies"/>
+                <one-to-many field="tags" target-entity="MessageTag" mapped-by="message" on-delete="CASCADE">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+                <field name="content" type="text" nullable="true"/>
+		<field name="recipient_count" type="integer" nullable="true"/>
+		<one-to-many field="recipients" target-entity="MessageRecipient" mapped-by="message" on-delete="CASCADE" fetch="EAGER">
+			<cascade><cascade-remove /></cascade>
+		</one-to-many>
+                <field name="target" type="string" nullable="true"/>
+		<field name="read" type="boolean" nullable="true"/>
+	</entity>
+</doctrine-mapping>

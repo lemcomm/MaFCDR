@@ -74,11 +74,6 @@ class RealmPositionType extends AbstractType {
 				'attr' => array('title'=>'position.help.retired'),
 			));
 		}
-		$builder->add('welcomer', 'checkbox', array(
-			'label'=>'position.welcomer',
-			'required' => false,
-			'attr' => array('title'=>'position.help.welcomer'),
-		));
 		$builder->add('minholders', 'integer', array(
 			'label'=>'position.minholders',
 			'scale'=>0,
@@ -153,5 +148,5 @@ class RealmPositionType extends AbstractType {
 	public function getName() {
 		return 'realmposition';
 	}
-			
+
 }

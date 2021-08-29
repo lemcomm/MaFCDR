@@ -1,0 +1,25 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "meta.kill.name"|trans({},"actions")|title }}</h2>
+	{# The following code is no longer needed, as this page redirects with a flash message.
+		{% if result is defined %}
+			<p>
+			{% if result.success %}
+				{{ "meta.kill.success"|trans({},"actions")|raw }}
+			{% else %}
+				{{ result.message|trans({},"actions") }}
+			{% endif %}
+			</p>
+		{% else %}
+	#}
+	<p>{{ "meta.kill.intro"|trans({'%he%':character.gender('he')|trans},"actions")|raw }}</p>
+	<form class="wide" action="{{ path('bm2_site_character_kill') }}" method="post">
+		{{ form_widget(form) }}
+		<button type="submit" name="submit">{{ "meta.kill.submit"|trans({},"actions") }}</button>
+	</form>
+	{# {% endif %} #}
+
+
+
+{% endblock %}

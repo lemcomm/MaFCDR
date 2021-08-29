@@ -1,0 +1,37 @@
+{% if list.name is defined %}
+	<div class="act">
+		<h2>{{ list.name|trans({},domain)|title }}</h2>
+		{% if list.intro is defined %}
+			<p>{{ list.intro|trans({},domain)|raw }}</p>
+		{% endif %}
+	</div>
+{% endif %}
+{% for element in list.elements %}
+	{% if element.transkeys is defined %}
+	{% set transkeys = element.transkeys %}
+	{% else %}
+	{% set transkeys = [] %}
+	{% endif %}
+	{% if element.title is defined %}
+		<div class="act_title">
+			<h3>{{ element.title|trans(transkeys,domain)|title }}</h3>
+		</div>
+	{% endif %}
+	{% if element.url is defined %}
+		<div class="act">
+		<div class="act_actions">
+			<a href="{% if element.parameters is defined %}
+				{{ path(element.url, element.parameters) }}
+			{% else %}
+				{{ path(element.url) }}
+			{% endif %}">{{ element.name|trans(transkeys,domain)|title }}</a>
+		</div>
+		{% if element.include is defined %}
+			<p>{% include "element/"~element.include~".html.twig" %}</p>
+		{% endif %}
+		{% if element.description is defined %}
+			<p>{{ element.description|trans(transkeys,domain)|raw }}</p>
+		{% endif %}
+		</div>
+	{% endif %}
+{% endfor %}

@@ -2,10 +2,13 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Form\SettlementAbandonType;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
-use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,7 +26,6 @@ class SettlementController extends Controller {
 
 	/**
 	  * @Route("/{id}", name="bm2_settlement", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:Settlement:settlement.html.twig")
 	  */
 	public function indexAction(Settlement $id) {
 		$em = $this->getDoctrine()->getManager();
@@ -31,10 +33,11 @@ class SettlementController extends Controller {
 
 		// check if we should be able to see details
 		$character = $this->get('appstate')->getCharacter(false);
-		if ($character) {
+		if ($character instanceof Character) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
+			$character = NULL; //Override Appstate's return so we don't need to tinker with the rest of this function.
 		}
 		$details = $this->get('interactions')->characterViewDetails($character, $settlement);
 		if (isset($details['startme'])) {
@@ -42,17 +45,31 @@ class SettlementController extends Controller {
 			$form_map = $this->createFormBuilder()->add('settlement_id', 'hidden', array(
 				'constraints' => array() // TODO: constrained to available settlements
 			))->getForm();
-			$details['startme'] = $form_map->createView();			
+			$details['startme'] = $form_map->createView();
 		}
 
 		// FIXME: shouldn't this use geodata?
-		$query = $em->createQuery('SELECT s.id, s.name, ST_Distance(y.center, x.center) AS distance, ST_Azimuth(y.center, x.center) AS direction 
+		$query = $em->createQuery('SELECT s.id, s.name, ST_Distance(y.center, x.center) AS distance, ST_Azimuth(y.center, x.center) AS direction
 			FROM BM2SiteBundle:Settlement s JOIN s.geo_data x, BM2SiteBundle:GeoData y WHERE y=:here AND ST_Touches(x.poly, y.poly)=true');
 		$query->setParameter('here', $settlement);
 		$neighbours = $query->getArrayResult();
 
-		if ($details['spy'] || $settlement->getOwner() == $character) {
-			$militia = $settlement->getActiveMilitiaByType();
+		$militia = [];
+		$recruits = 0;
+		if ($details['spy'] || ($settlement->getOwner() == $character || $settlement->getSteward() == $character)) {
+			foreach ($settlement->getUnits() as $unit) {
+				if ($unit->isLocal()) {
+					foreach ($unit->getActiveSoldiersByType() as $key=>$type) {
+						if (array_key_exists($key, $militia)) {
+							$militia[$key] += $type;
+						} else {
+							$militia[$key] = $type;
+						}
+					}
+				}
+				$recruits += $unit->getRecruits()->count();
+				#$militia = $settlement->getActiveMilitiaByType();
+			}
 		} else {
 			$militia = null;
 		}
@@ -86,7 +103,7 @@ class SettlementController extends Controller {
 				$storage = 0;
 			}
 
-			if ($details['spot'] && ($details['prospector'] || $settlement->getOwner() == $character)) {
+			if ($details['spot'] && ($details['prospector'] || $settlement->getOwner() == $character || $settlement->getSteward() == $character)) {
 				// TODO: we should fuzz corruption a bit to prevent people spotting same users by comparing corruption
 				$full_demand = $this->get('economy')->ResourceDemand($settlement, $resource, true);
 				$demand = 0;
@@ -120,10 +137,10 @@ class SettlementController extends Controller {
 				} else {
 					$FoodSupply = 1.0;
 				}
-			} 
+			}
 		}
 
-		return array(
+		return $this->render('Settlement/settlement.html.twig', [
 			'settlement' => $settlement,
 			'familiarity' => $character?$this->get('geography')->findRegionFamiliarityLevel($character, $settlement->getGeoData()):false,
 			'details' => $details,
@@ -136,131 +153,34 @@ class SettlementController extends Controller {
 			'regionpoly'=> $this->get('geography')->findRegionPolygon($settlement),
 			'neighbours' => $neighbours,
 			'militia' => $militia,
-			'recruits' => $settlement->getRecruits()->count(),
+			'recruits' => $recruits,
 			'security' => round(($this->get('economy')->EconomicSecurity($settlement)-1.0)*16),
 			'heralds' => $heralds
-		);
+		]);
 	}
-
-
-	/**
-	  * @Route("/{id}/soldiers/{start}", requirements={"id"="\d+", "start"="\d+"}, defaults={"start"=0})
-	  * @Template
-	  */
-	public function soldiersAction($id, $start, Request $request) {
-		$em = $this->getDoctrine()->getManager();
-
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		if ($settlement->getId() != $id) {
-			throw new AccessDeniedHttpException('error.noaccess.settlement');
-		}
-		if ($character->getPrisonerOf()) {
-			$others = array($character->getPrisonerOf());
-		} else {
-			$others = $this->get('dispatcher')->getActionableCharacters(true);
-		}
-
-		$resupply = $this->get('military')->findAvailableEquipment($settlement, false);
-		$training = $this->get('military')->findAvailableEquipment($settlement, true);
-
-		// this duplicates functionality from the Soldier Entity (e.g. determine who is militia and who recruit),
-		// but I think we need it for memory reasons, since loading all and then slicing is a ton less efficient
-		$query = $em->createQuery("SELECT count(s) FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required <= 0")			
-			->setParameter('here', $settlement);
-		$total_soldiers = $query->getSingleScalarResult();
-		$query = $em->createQuery("SELECT s FROM BM2SiteBundle:Soldier s WHERE s.base = :here AND s.training_required <= 0 ORDER BY s.name ASC")
-			->setParameter('here', $settlement)
-			->setFirstResult($start)
-			->setMaxResults($this->slice_size);
-		$militia_slice = array();
-		foreach ($query->getResult() as $soldier) {
-			$militia_slice[$soldier->getId()] = $soldier;
-		}
-
-
-		$form = $this->createForm(new SoldiersManageType($em, $militia_slice, $resupply, $training, $others, $settlement));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-
-			$this->get('military')->manage($militia_slice, $data, $settlement, $character);
-			$em->flush();
-			$this->get('appstate')->setSessionData($character); // update, because maybe we changed our soldiers count
-			return $this->redirect($request->getUri());
-		}
-
-		return array(
-			'settlement' => $settlement,
-			'soldiers' => $militia_slice,
-			'recruits' => $settlement->getRecruits(),
-			'resupply' => $resupply,
-			'training' => $training,
-			'total_soldiers' => $total_soldiers,
-			'start' => $start,
-			'slice' => $this->slice_size,
-			'form' => $form->createView(),
-			'limit' => $this->get('appstate')->getGlobal('pagerlimit', 100)
-		);
-	}
-
-
-	/**
-	* @Route("/canceltraining")
-	*/
-	public function cancelTrainingAction(Request $request) {
-		if ($request->isMethod('POST') && $request->request->has("settlement") && $request->request->has("recruit")) {
-			list($character, $settlement) = $this->get('dispatcher')->gateway('personalMilitiaTest', true);
-
-			$em = $this->getDoctrine()->getManager();
-			$recruit = $em->getRepository('BM2SiteBundle:Soldier')->find($request->request->get('recruit'));
-			if (!$recruit || !$recruit->isRecruit() || $recruit->getBase()!=$settlement) {
-				throw $this->createNotFoundException('error.notfound.recruit');
-			}
-
-			// return his equipment to the stockpile:
-			$this->get('military')->returnItem($settlement, $recruit->getWeapon());
-			$this->get('military')->returnItem($settlement, $recruit->getArmour());
-			$this->get('military')->returnItem($settlement, $recruit->getEquipment());
-
-			if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
-				// old soldier - return to militia with his old stuff
-				$recruit->setWeapon($recruit->getOldWeapon());
-				$recruit->setArmour($recruit->getOldArmour());
-				$recruit->setEquipment($recruit->getOldEquipment());
-				$recruit->setTraining(0)->setTrainingRequired(0);
-				$this->get('history')->addToSoldierLog($recruit, 'traincancel');
-			} else {
-				// fresh recruit - return to workforce
-				$settlement->setPopulation($settlement->getPopulation()+1);
-				$em->remove($recruit);
-			}
-			$em->flush();
-		}
-		return new Response();
-	}
-
 
 	/**
 	  * @Route("/{id}/permissions", requirements={"id"="\d+"})
-	  * @Template
 	  */
-	public function permissionsAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
+	public function permissionsAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlPermissionsTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
-		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
+		$settlement = $id;
+		if ($settlement->getOwner() == $character || $settlement->getSteward() == $character) {
+			$lord = true;
+			$original_permissions = clone $settlement->getPermissions();
+			$page = 'Settlement/permissions.html.twig';
+		} else {
+			$lord = false;
+			$original_permissions = clone $settlement->getOccupationPermissions();
+			$page = 'Settlement/occupationPermissions.html.twig';
 		}
 
-		$original_permissions = clone $settlement->getPermissions();
 
-		$form = $this->createForm(new SettlementPermissionsSetType($character, $this->getDoctrine()->getManager()), $settlement);
+		$form = $this->createForm(new SettlementPermissionsSetType($character, $this->getDoctrine()->getManager(), $lord), $settlement);
 
 		// FIXME: right now, nothing happens if we disallow thralls while having some
 		//			 something should happen - set them free? most should vanish, but some stay as peasants?
@@ -270,15 +190,32 @@ class SettlementController extends Controller {
 		if ($form->isValid()) {
 			$data = $form->getData();
 
-			foreach ($settlement->getPermissions() as $permission) {
-				$permission->setValueRemaining($permission->getValue());
-				if (!$permission->getId()) {
-					$em->persist($permission);
+			# TODO: This can be combined with the code in PlaceController as part of a service function.
+			if ($lord) {
+				foreach ($settlement->getPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
 				}
-			}
-			foreach ($original_permissions as $orig) {
-				if (!$settlement->getPermissions()->contains($orig)) {
-					$em->remove($orig);
+				foreach ($original_permissions as $orig) {
+					if (!$settlement->getPermissions()->contains($orig)) {
+						$em->remove($orig);
+					} else {
+						$em->persist($orig);
+					}
+				}
+			} else {
+				foreach ($settlement->getOccupationPermissions() as $permission) {
+					$permission->setValueRemaining($permission->getValue());
+					if (!$permission->getId()) {
+						$em->persist($permission);
+					}
+				}
+				foreach ($original_permissions as $orig) {
+					if (!$settlement->getOccupationPermissions()->contains($orig)) {
+						$em->remove($orig);
+					}
 				}
 			}
 			$em->flush();
@@ -286,44 +223,38 @@ class SettlementController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return array(
+		return $this->render($page, [
 			'settlement' => $settlement,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('settlement'),
-			'form' => $form->createView()
-		);
+			'form' => $form->createView(),
+			'lord' => $lord
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/quests", requirements={"id"="\d+"})
-	  * @Template
 	  */
-	public function questsAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
+	public function questsAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlQuestsTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
-		}
-		return array('settlement'=>$settlement, 'quests'=>$settlement->getQuests());
+
+		return $this->render('Settlement/quests.html.twig', [
+			'quests'=>$id->getQuests(),
+			'settlement' => $id
+		]);
 	}
 
 	/**
 	  * @Route("/{id}/description", requirements={"id"="\d+"})
-	  * @Template
 	  */
-	public function descriptionAction($id, Request $request) {
-		$character = $this->get('dispatcher')->gateway();
-		$em = $this->getDoctrine()->getManager();
-		$settlement = $em->getRepository('BM2SiteBundle:Settlement')->find($id);
-		if (!$settlement) {
-			throw $this->createNotFoundException('error.notfound.settlement');
+	public function descriptionAction(Settlement $settlement, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlSettlementDescriptionTest', false, true, false, $settlement);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		if ($settlement->getOwner() !== $character) {
-			throw $this->createNotFoundException('error.noaccess.settlement');
-		}
+
 		$desc = $settlement->getDescription();
 		if ($desc) {
 			$text = $desc->getText();
@@ -339,8 +270,38 @@ class SettlementController extends Controller {
 			}
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+			return $this->redirectToRoute('bm2_settlement', ['id'=>$settlement->getId()]);
 		}
-		return array('settlement'=>$settlement, 'form'=>$form->createView());
+		return $this->render('Settlement/description.html.twig', [
+                        'form' => $form->createView(),
+			'settlement' => $settlement
+                ]);
+	}
+
+	/**
+	  * @Route("/{id}/abandon", requirements={"id"="\d+"})
+	  */
+	public function abandonAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlAbandonTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->CreateForm(new SettlementAbandonType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$result = $this->get('interactions')->abandonSettlement($character, $id, $data['keep']);
+			if ($result) {
+				$this->addFlash('notice', $this->get('translator')->trans('control.abandon.success', [], 'actions'));
+				return $this->redirectToRoute('bm2_settlement', ['id'=>$id->getId()]);
+			}
+			# If the form doesn't validate, they don't get here. Thus, no else case.
+		}
+		return $this->render('Settlement/abandon.html.twig', [
+                        'form' => $form->createView(),
+			'settlement' => $id
+                ]);
 	}
 
 }

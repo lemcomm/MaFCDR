@@ -14,10 +14,12 @@ class SettlementPermissionsSetType extends AbstractType {
 
 	private $me;
 	private $em;
+	private $lord;
 
-	public function __construct(Character $me, EntityManager $em) {
+	public function __construct(Character $me, EntityManager $em, $lord) {
 		$this->me = $me;
 		$this->em = $em;
+		$this->lord = $lord;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -29,22 +31,32 @@ class SettlementPermissionsSetType extends AbstractType {
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$builder->add('allow_spawn', 'checkbox', array(
-			'label' => "control.permissions.spawn",
-			'required' => false,
-		));
+		$lord = $this->lord;
+		if ($lord) {
+			$builder->add('allow_thralls', 'checkbox', array(
+				'label' => "control.permissions.thralls",
+				'required' => false,
+			));
 
-		$builder->add('allow_thralls', 'checkbox', array(
-			'label' => "control.permissions.thralls",
-			'required' => false,
-		));
+			$builder->add('feed_soldiers', 'checkbox', array(
+				'label' => "control.permissions.feedsoldiers",
+				'required' => false,
+			));
 
-		$builder->add('permissions', 'collection', array(
-			'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em),
-			'allow_add'	=> true,
-			'allow_delete' => true,
-			'cascade_validation' => true
-		));
+			$builder->add('permissions', 'collection', array(
+				'type'		=> new SettlementPermissionsType($builder->getData(), $this->me, $this->em),
+				'allow_add'	=> true,
+				'allow_delete' => true,
+				'cascade_validation' => true
+			));
+		} else {
+			$builder->add('occupation_permissions', 'collection', array(
+				'type'		=> new SettlementOccupationPermissionsType($builder->getData(), $this->me, $this->em),
+				'allow_add'	=> true,
+				'allow_delete' => true,
+				'cascade_validation' => true
+			));
+		}
 	}
 
 	public function getName() {

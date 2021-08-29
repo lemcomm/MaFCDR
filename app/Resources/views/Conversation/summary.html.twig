@@ -1,0 +1,66 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'summary.title'|trans({}, "conversations")|title }}</h2>
+
+<div id="actionlist" class="boxlist">
+	<ul>
+		{% if private > 0 %}
+			<li>
+				<a href="{{ path('maf_convs') }}">{{ 'index.private'|trans({}, "conversations") }}</a>
+				{{ 'summary.private'|trans({"%conversations%":private, "%active%":privateActive}, "conversations") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'index.private'|trans({}, "conversations") }}</span>
+				{{ 'summary.noprivate'|trans({}, "conversations") }}
+			</li>
+		{% endif %}
+		{% if org > 0 %}
+			<li>
+				<a href="{{ path('maf_convs_orgs') }}">{{ 'index.org'|trans({}, "conversations") }}</a>
+				{{ 'summary.org'|trans({"%conversations%":org, "%active%":orgActive}, "conversations") }}
+			</li>
+		{% else %}
+			<li class="disabled">
+				<span class="nolink">{{ 'index.org'|trans({}, "conversations") }}</span>
+				{{ 'summary.noorg'|trans({}, "conversations") }}
+			</li>
+		{% endif %}
+		{#
+			{% if flagged > 0 %}
+				<li>
+					<a href="{{ path('maf_conv_flagged') }}">{{ 'flagged.title'|trans({}, "conversations") }}</a>
+					{{ 'summary.flagged'|trans({"%messages%":flagged}, "conversations") }}
+				</li>
+			{% else %}
+				<li class="disabled">
+					<span class="nolink">{{ 'flagged.title'|trans({}, "conversations") }}</span>
+					{{ 'summary.noflagged'|trans({}, "conversations") }}
+				</li>
+			{% endif %}
+		#}
+		<li>
+			<a href="{{ path('maf_conv_new') }}">{{ 'conversation.new.label'|trans({}, "conversations") }}</a>
+			{{ 'conversation.new.desc'|trans({}, "conversations") }}
+		</li>
+		<li>
+			<a href="{{ path('maf_conv_local') }}">{{ 'local.title'|trans({}, "conversations") }}</a>
+			{{ 'local.desc'|trans({}, "conversations") }}
+		</li>
+		<li>
+			<a href="{{ path('maf_conv_local_new') }}">{{ 'local.new.title'|trans({}, "conversations") }}</a>
+			{{ 'local.new.desc'|trans({}, "conversations") }}
+		</li>
+	</ul>
+</div>
+<br class="clear"/>
+
+<h2>{{ 'unread.title'|trans({}, "conversations")|title }}</h2>
+{% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
+
+{% if not local_news.isempty %}
+	{% include "element/newslist.html.twig" with {"title":"news.local2"|trans({},"communication")|title, "list":local_news} only %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% form_theme form with 'Form/form_characterlist.html.twig' %}
+
+{% block content %}
+{% if position.ruler %}
+	<h2>
+		{{ ('realm.title.male.'~realm.type)|trans({},"politics")|title }} / {{ ('realm.title.female.'~realm.type)|trans({},"politics")|title }}
+		({{ link(realm) }})</h2>
+	</h2>
+	<p>{{ 'position.appoint.intro2'|trans({},"politics")|raw }}</p>
+{% else %}
+	<h2>{{ link(position) }} ({{ link(realm) }})</h2>
+	<p>{{ 'position.appoint.intro'|trans({},"politics")|raw }}</p>
+{% endif %}
+
+{{ form(form) }}
+
+{% endblock %}

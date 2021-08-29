@@ -1,0 +1,31 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'events.soldierlog.title'|trans({'link-soldier-name':soldier.name}, "messages")|title|raw }}</h2>
+
+<table id="soldierlog"><thead>
+	<tr>
+		<th>{{ 'events.time'|trans }}</th>
+		<th>{{ 'events.entry'|trans }}</th>
+	</tr>
+</thead><tbody>
+{% for event in soldier.events %}
+	<tr>
+		<td>{{ event.cycle|gametime('short') }}</td>
+		<td>{{ event|logtranslate }}</td>
+	</tr>
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
+
+{% block jquery %}
+	$("#soldierlog").tablesorter({
+		sortList: [[0,1],[1,0]],
+	});
+{% endblock %}

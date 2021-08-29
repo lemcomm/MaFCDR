@@ -1,0 +1,46 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/js/flot/jquery.flot.min.js') }}"></script>
+{% endblock %}
+
+
+{% block content %}
+<h2>Resources Statistics</h2>
+<ul>
+	{% for resource in resources %}
+	<li class="plot" data-id="{{resource.name}}">{{ resource.name }}</li>
+	{% endfor %}
+</ul>
+
+<div id="graph" style="width: 100%; height: 32em"></div>
+
+{% endblock %}
+
+{% block jquery %}
+var options = {
+	legend: {
+			position: "nw"
+	},
+	yaxes: [ { position: "left", label: "supply/demand" }, { position: "right", label: "trade" }]
+};
+
+$(".plot").click(function(){
+	var id = $(this).data("id");
+	console.log(id)
+
+	switch (id) {
+	{% for resource in resources %}
+		case "{{ resource.name }}":
+			$.plot($("#graph"), [
+				{{data[resource.name].supply|json_encode|raw}},
+				{{data[resource.name].demand|json_encode|raw}},
+				{{data[resource.name].trade|json_encode|raw}} ],
+			options);
+		break;
+	{% endfor %}
+	}
+});
+
+{% endblock %}

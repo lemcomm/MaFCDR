@@ -1,0 +1,137 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "votes.name"|trans({"%name%":election.name}, "politics")|title }}</h2>
+{% if not election.closed %}
+	<p>{{ "votes.intro"|trans({"%realm%":link(election.realm), "%complete%":election.complete|date, "%type%":('elections.method.'~election.method)|trans({},"politics")}, "politics")|raw }}</p>
+	{% if election.position %}
+		<p>{{ "votes.forposition"|trans({"%position%":link(election.position)}, "politics")|raw }}</p>
+	{% endif %}
+{% else %}
+	{% if election.winner %}
+		<p>{{ "votes.intro2"|trans({"%realm%":link(election.realm), "%type%":('elections.method.'~election.method)|trans({},"politics"), "%winner%":link(election.winner)}, "politics")|raw }}</p>
+		{% if election.position %}
+			<p>{{ "votes.forposition2"|trans({"%position%":link(election.position)}, "politics")|raw }}</p>
+		{% endif %}
+	{% else %}
+		<p>{{ "votes.intro3"|trans({"%realm%":link(election.realm)}, "politics")|raw }}</p>
+	{% endif %}
+{% endif %}
+<p>{{ election.description }}</p>
+
+<h3>{{ "votes.list"|trans({}, "politics")|title }}</h3>
+<p>{{ "votes.howto"|trans({}, "politics") }}</p>
+{% if not election.closed %}
+	<form method="post">
+	{{ form_errors(form_votes) }}
+	{{ form_widget(form_votes._token) }}
+{% endif %}
+{# FIXME: on mobile devices, the hover-show-button thing won't work :-( #}
+<table class="hidebuttons votes">
+	<thead>
+		<tr>
+			<th>{{ "votes.candidate"|trans({}, "politics") }}</th>
+			<th>{{ "votes.pro"|trans({}, "politics") }}</th>
+			<th>{{ "votes.contra"|trans({}, "politics") }}</th>
+			<th>{{ "votes.sum"|trans({}, "politics") }}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for vote in votes %}
+			{% set sum = 0 %}
+			{% set myvote = "0" %}
+			<tr>
+				<td>
+					{{ link(vote.candidate) }}
+					{% if not election.closed %}
+						<input class="votebox" id="form_targets_{{ vote.candidate.id }}" name="form[targets][{{ vote.candidate.id }}]" value="neutral"/></td>
+					{% endif %}
+				<td>
+					{% if not election.closed %}
+						<button type="button" class="votehere" data-id="{{ vote.candidate.id }}" data-vote="pro">{{ "votes.add.procontra"|trans({}, "politics") }}</button>
+					{% endif %}
+					<ul>
+					{% for ballot in vote.pro %}
+						<li{% if ballot.voter == character %} class="self"{% endif %}>{{ link(ballot.voter) }}</li>
+						{% set sum = sum + ballot.votes %}
+					{% endfor %}
+					</ul>
+				</td>
+				<td>
+					{% if not election.closed %}
+						<button type="button" class="votehere" data-id="{{ vote.candidate.id }}" data-vote="contra">{{ "votes.add.procontra"|trans({}, "politics") }}</button>
+					{% endif %}
+					<ul>
+					{% for ballot in vote.contra %}
+						<li{% if ballot.voter == character %} class="self"{% endif %}>{{ link(ballot.voter) }}</li>
+						{% set sum = sum - ballot.votes %}
+					{% endfor %}
+					</ul>
+				</td>
+				<td class="right">
+					{% if not election.closed %}
+						<button type="button" class="votehere" data-id="{{ vote.candidate.id }}" data-vote="neutral">{{ "votes.remove"|trans({}, "politics") }}</button>
+					{% endif %}
+					<span class="sum">{{ sum }}</sum>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<br />
+{% if not election.closed %}
+	<button id="updatevotes">update</button>
+	</form>
+
+	<hr />
+	<br />
+
+	<h3>{{ "votes.add.name"|trans({}, "politics")|title }}</h3>
+	{{ form(form) }}
+{% endif %}
+{% endblock %}
+
+{% block jquery %}
+{% include "element/autocomplete.js.twig" %}
+{% if not election.closed %}
+$("table.votes li.self").each(function(){
+	var vote = $(this).closest('td').find('button').data('vote');
+	$(this).closest('tr').find('input.votebox').val(vote);
+});
+
+charselect($("#form_candidate"), characterchange);
+
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("form_candidate").selectionStart;
+	var textTxt = $("#form_candidate").val();
+	$("#form_candidate").val(insert);
+
+}
+function characterchange(id, name) {
+	search_insert(name+" ("+id+")");
+}
+
+
+$(".votehere").click(function(){
+	var id = $(this).data('id');
+	var vote = $(this).data('vote');
+	var myvote = $(this).closest('tr').find('.self').closest('td').find('button').data('vote');
+	var sum = parseInt($(this).closest('tr').find('.sum').html());
+	if (myvote=="contra") {
+		sum = sum + {{ my_weight }};
+	} else if (myvote=="pro") {
+		sum = sum - {{ my_weight }};
+	}
+	if (vote=="pro") {
+		sum = sum + {{ my_weight }};
+	} else if (vote=="contra") {
+		sum = sum - {{ my_weight }};
+	}
+	$(this).closest('tr').find('input.votebox').val(vote);
+	$(this).closest('tr').find(".self").remove();
+	$(this).closest('td').find('ul').prepend('<li class="self">{{ character.name }}</li>');
+	$(this).closest('tr').find('.sum').html(sum);
+});
+{% endif %}
+{% endblock %}

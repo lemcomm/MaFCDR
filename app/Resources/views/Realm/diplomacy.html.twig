@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'diplomacy.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+{% if realm.ultimate %}
+	{% if realm.inferiors is empty %}
+		<p>{{ 'status.realm.independent'|trans({"%name%":link(realm)}, "politics")|raw }}</p>
+	{% else %}
+		<p>{{ 'status.realm.ultimate'|trans({"%name%":link(realm)}, "politics")|raw }}</p>
+	{% endif %}
+{% else %}
+	{% if realm.superior.ultimate %}
+		<p>{{ 'status.realm.second'|trans({"%name%":link(realm), "%ultimate%":link(realm.superior)}, "politics")|raw }}</p>
+	{% else %}
+		<p>{{ 'status.realm.inferior'|trans({"%name%":link(realm), "%superior%":link(realm.superior), "%ultimate%":link(realm.findultimate)}, "politics")|raw }}</p>
+	{% endif %}
+{% endif %}
+
+{% if realm.superior or realm.inferiors is not empty %}
+	<p><a href="{{ path('bm2_site_realm_hierarchy', {'realm':realm.id}) }}">{{ 'viewdetails'|trans|title }}</a></p>
+{% endif %}
+
+{% include "element/buttonlist.html.twig" with {"list":dispatcher.diplomacyActions, "domain":'politics', "who":'self'} %}
+
+
+{% endblock %}

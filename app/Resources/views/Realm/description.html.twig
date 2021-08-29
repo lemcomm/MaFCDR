@@ -1,0 +1,11 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'realm.description.name'|trans({"%name%":realm.name},"politics")|title }}</h2>
+	<p>{{ 'realm.description.intro'|trans({"%name%":realm.name},"politics")|raw }}</p>
+
+	<form id="realmdata" class="wide" action="{{ path('bm2_site_realm_description', {'realm':realm.id}) }}" method="post" {{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button name="submit">{{ 'buttons.submit'|trans({},"places") }}</button>
+	</form>
+{% endblock %}

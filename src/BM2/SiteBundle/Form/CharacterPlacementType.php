@@ -53,7 +53,7 @@ class CharacterPlacementType extends AbstractType {
 
 	private function buildForm_Family(FormBuilderInterface $builder) {
 		$char = $this->character;
-		$builder->add('estate', 'entity', array(
+		$builder->add('settlement', 'entity', array(
 			'label'=>'character.start.estate',
 			'required'=>true,
 			'placeholder'=>'form.choose',

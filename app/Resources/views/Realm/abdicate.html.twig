@@ -1,0 +1,13 @@
+{% extends "layout.html.twig" %}
+
+{% form_theme form with 'Form/form_characterlist.html.twig' %}
+
+{% block content %}
+<h2>{{ 'realm.abdicate.name'|trans({},"politics")|title }}</h2>
+{% if success %}
+	<p>{{ 'realm.abdicate.done'|trans({"%name%":link(realm)},"politics")|raw }}</p>
+{% else %}
+	<p>{{ 'realm.abdicate.intro'|trans({"%name%":link(realm)},"politics")|raw }}</p>
+	{{ form(form) }}
+{% endif %}
+{% endblock %}

@@ -2,19 +2,22 @@
 
 namespace BM2\SiteBundle\Controller;
 
-use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
+use BM2\SiteBundle\Entity\House;
 
-use BM2\SiteBundle\Form\HouseCreationType;
-use BM2\SiteBundle\Form\HouseMembersType;
-use BM2\SiteBundle\Form\HouseJoinType;
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\HouseCadetType;
+use BM2\SiteBundle\Form\HouseUncadetType;
+use BM2\SiteBundle\Form\HouseCreationType;
+use BM2\SiteBundle\Form\HouseJoinType;
+use BM2\SiteBundle\Form\HouseMembersType;
 
+use BM2\SiteBundle\Service\DescriptionManager;
 use BM2\SiteBundle\Service\GameRequestManager;
 use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
-use BM2\SiteBundle\Service\DescriptionManager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
@@ -31,18 +34,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HouseController extends Controller {
 
-	private $house;
-
 	/**
-	  * @Route("/{id}", name="bm2_house", requirements={"id"="\d+"})
-	  * @Template("BM2SiteBundle:House:view.html.twig")
+	  * @Route("/{id}", name="maf_house", requirements={"id"="\d+"})
 	  */
-	
+
 	public function viewAction(House $house) {
 		$details = false;
 		$head = false;
 		$character = $this->get('appstate')->getCharacter(false, true, true);
-		if ($character) {
+		if ($character instanceof Character) {
 			if ($character->getHouse() == $house) {
 				$details = true;
 				if ($character->getHeadOfHouse() && $character->getHeadOfHouse() == $house) {
@@ -50,67 +50,47 @@ class HouseController extends Controller {
 				}
 			}
 		}
-		
-		return array(
+
+		return $this->render('House/view.html.twig', [
 			'house' => $house,
 			'details' => $details,
 			'head' => $head
-		);
+		]);
 	}
 
 	/**
-	  * @Route("/nearby", name="bm2_house_nearby")
-	  * @Template
+	  * @Route("/nearby", name="maf_house_nearby")
 	  */
-	
-	public function nearbyAction() {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$houses = [];
-		if ($character) {
-			if ($character->getInsideSettlement()) {
-				$houses = $character->getInsideSettlement()->getHousesPresent();
-			} else {
-				#TODO: Add code for houses as places here.
-			}
-		}
-		$already = false;
-		if ($character->getHouse()) {
-			$already = true;
-		}
-		
-		foreach ($houses as $house) {
-			$member = false;
-			$head = false;
-			if ($house->getMembers()->contains($character)) {
-				$member = true;
-				if ($house->getHead() == $character) {
-					$head = true;
-				}
-			}
-		}
 
-		return array(
+	public function nearbyAction() {
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$houses = [];
+		if ($character->getInsideSettlement()) {
+			$houses = $character->getInsideSettlement()->getHousesPresent();
+		} else {
+			#TODO: Add code for houses as places here.
+		}
+		$myHouse = $character->getHouse();
+
+		return $this->render('House/nearby.html.twig', [
 			'houses' => $houses,
-			'already' => $already
-		);
+			'myHouse' => $myHouse,
+			'char' => $char
+		]);
 	}
 
 	/**
-	  * @Route("/create", name="bm2_house_create")
-	  * @Template
-	  */	
-	
+	  * @Route("/create", name="maf_house_create")
+	  */
+
 	public function createAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
-		if ($character->getInsideSettlement()) {
-			$settlement = $character->getInsideSettlement();
-		} else {
-			throw $this->createNotFoundException('unvailable.notinside');
+		$character = $this->get('dispatcher')->gateway('houseCreateHouseTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		if ($character->getHouse()) {
-			throw $this->createNotFoundException('error.found.house');
-		}
-		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$crest = $character->getCrest();
 		$form = $this->createForm(new HouseCreationType());
@@ -123,26 +103,33 @@ class HouseController extends Controller {
 			if ($character->getCrest()); {
 				$crest = $character->getCrest();
 			}
-			$house = $this->get('house_manager')->create($data['name'], $data['description'], $data['private'], $data['secret'], null, $settlement, $crest, $character);
+			$settlement = $character->getInsideSettlement();
+			$place = $character->getInsidePlace();
+			if ($settlement = $character->getInsideSettlement()) {
+				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $place, $settlement, $crest, $character);
+			}
 			# No flush needed, HouseMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('House/create.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
-	
+
 	/**
-	  * @Route("/{house}/manage", name="bm2_house_manage", requirements={"house"="\d+"})
-	  * @Template
+	  * @Route("/{house}/manage", name="maf_house_manage", requirements={"house"="\d+"})
 	  */
-		
+
 	public function manageAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('dispatcher')->gateway('houseManageHouseTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
-		
+
 		$name = $house->getName();
+		$motto = $house->getMotto();
 		if ($house->getDescription()) {
 			$desc = $house->getDescription()->getText();
 		} else {
@@ -151,18 +138,25 @@ class HouseController extends Controller {
 		$priv = $house->getPrivate();
 		$secret = $house->getSecret();
 
-		$form = $this->createForm(new HouseCreationType($name, $desc, $priv, $secret));
+		$form = $this->createForm(new HouseCreationType($name, $motto, $desc, $priv, $secret));
 		$form->handleRequest($request);
-		# TODO: Rework this to use dispatcher.
-		if ($character != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$change = FALSE;
-			// FIXME: this causes the (valid markdown) like "> and &" to be converted - maybe strip-tags is better?;
-			// FIXME: need to apply this here - maybe data transformers or something?
-			// htmlspecialchars($data['subject'], ENT_NOQUOTES);
+			if ($data['name'] != $name) {
+				$change = TRUE;
+				$house->setName($data['name']);
+				$this->get('history')->logEvent(
+					$house,
+					'event.house.newname',
+					array('%name%'=>$data['name']),
+					History::ULTRA, true
+				);
+			}
+			if ($data['motto'] != $motto) {
+				$change = TRUE;
+				$house->setMotto($data['motto']);
+			}
 			if ((!$house->getDescription() AND $data['description'] != NULL) OR ($data['description'] != NULL AND ($house->getDescription() AND $desc != $data['description']))) {
 				$this->get('description_manager')->newDescription($house, $data['description'], $character);
 				$change = TRUE;
@@ -175,40 +169,31 @@ class HouseController extends Controller {
 				$change = TRUE;
 			}
 			if ($data['private'] != $priv) {
-				$house->setPrivate($data['secret']);
+				$house->setPrivate($data['private']);
 				$change = TRUE;
 			}
 			if ($change) {
 				$em->flush();
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.background', array(), 'messages'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('House/manage.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
-					  
+
 	/**
-	  * @Route("/{house}/join", name="bm2_house_join", requirements={"house"="\d+"})
-	  * @Template
+	  * @Route("/{house}/join", name="maf_house_join", requirements={"house"="\d+"})
 	  */
-	
-		/* TODO: Review all of this file below this line. The above should be good.
-		We'll want to be sure to work joinAction and approveAction into the GameRequest system.*/
-	
+
 	public function joinAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseJoinHouseTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		$hashouse = FALSE;
-		$character = $this->get('appstate')->getCharacter(true, true, true);
-		
-		# TODO: Rework this later to allow for Houses at Places.
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getInsideSettlement()) {
-			throw $this->createNotFoundException('unvailable.notinside');
-		}
-		if ($house->getInsideSettlement() != $character->getInsideSettlement()) {
-			throw $this->createNotFoundException('error.notfound.housenothere');
-		}
 		$form = $this->createForm(new HouseJoinType());
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -225,28 +210,24 @@ class HouseController extends Controller {
 				$this->addFlash('notice', $this->get('translator')->trans('house.member.joinfail', array(), 'messages'));
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('house.member.join', array(), 'actions'));
-			return $this->redirectToRoute('bm2_house', array('id'=>$house->getId()));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
-		return array(
+		return $this->render('House/join.html.twig', [
 			'form' => $form->createView()
-		);
+		]);
 	}
 
 	/**
-	  * @Route("/{house}/applicants", name="bm2_house_applicants", requirements={"house"="\d+"})
-	  * @Template
+	  * @Route("/{house}/applicants", name="maf_house_applicants", requirements={"house"="\d+"})
 	  */
-	
+
 	public function applicantsAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		# TODO: Make this a sub-route of the manage GameRequests route.
+		$character = $this->get('dispatcher')->gateway('houseManageApplicantsTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$joinrequests = $em->getRepository('BM2SiteBundle:GameRequest')->findBy(array('type' => 'house.join', 'to_house' => $house));
 
 		foreach ($joinrequests as $joinrequest) {
@@ -254,27 +235,22 @@ class HouseController extends Controller {
 			$subject = $joinrequest->getSubject();
 			$text = $joinrequest->getText();
 		}
-		return array(
+
+		return $this->render('House/applicants.html.twig', [
 			'name' => $house->getName(),
-			'joinrequests' => $joinrequests
-		);
+		]);
 	}
 
 	/**
-	  * @Route("/{house}/disown", name="bm2_house_disown", requirements={"house"="\d+"})
-	  * @Template
+	  * @Route("/{house}/disown", name="maf_house_disown", requirements={"house"="\d+"})
 	  */
-	
+
 	public function disownAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('dispatcher')->gateway('houseManageDisownTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$members = $house->findAllMembers();
 
 		$form = $this->createForm(new HouseMembersType($members));
@@ -305,28 +281,24 @@ class HouseController extends Controller {
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
-		
-		return array(
+
+		return $this->render('House/disown.html.twig', [
 			'name' => $house->getName(),
-			'form' => $form->createView(),
-		);
+			'form' => $form->createView()
+		]);
 	}
 
 	/**
-	  * @Route("/{house}/successor", name="bm2_house_successor", requirements={"house"="\d+"})
-	  * @Template
+	  * @Route("/{house}/successor", name="maf_house_successor", requirements={"house"="\d+"})
 	  */
-	
+
 	public function successorAction(House $house, Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
+		$character = $this->get('dispatcher')->gateway('houseManageSuccessorTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
 		$em = $this->getDoctrine()->getManager();
-		# TODO: Rework this to use dispatcher.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.noaccess.nohouse');
-		}
-		if ($character->getHouse()->getHead() != $house->getHead()) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		}
 		$members = $house->findAllMembers();
 
 		$form = $this->createForm(new HouseMembersType($members));
@@ -341,44 +313,26 @@ class HouseController extends Controller {
 				return $this->redirectToRoute('bm2_politics', array());
 			}
 		}
-		
-		return array(
+
+		return $this->render('House/successor.html.twig', [
 			'name' => $house->getName(),
-			'form' => $form->createView(),
-		);
+			'form' => $form->createView()
+		]);
 	}
 
 	/**
-	  * @Route("/relocate", name="bm2_house_relocate")
-	  * @Template
-	  */	
-	
+	  * @Route("/relocate", name="maf_house_relocate")
+	  */
+
 	public function relocateAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter(true, true, true);
-		$settlement = null;
-		$house = null;
-		#Character must be inside a settlement in order to relocate the house
-		if ($character->getInsideSettlement()) {
-			$settlement = $character->getInsideSettlement();
-			#Can only relocate a house if you own the target settlement
-			if ($settlement->getOwner() != $character) {
-				throw $this->createNotFOundException('unavailable.notyours2');
-			} else {
-				$settlement = $character->getInsideSettlement();
-			}
-		} else {
-			throw $this->createNotFoundException('unvailable.notinside');
+		$character = $this->get('dispatcher')->gateway('houseManageRelocateTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
 		}
-		#Impossible to relocate a house if you don't belong to one.
-		if (!$character->getHouse()) {
-			throw $this->createNotFoundException('error.found.house');
-		} 
-		#Only the Head of a house can relocate.
-		if ($character->getHouse()->getHead() != $character) {
-			throw $this->createNotFoundException('error.noaccess.nothead');
-		} else {
-			$house = $character->getHouse();
-		}
+
+		$settlement = $character->getInsideSettlement();
+		$place = $character->getInsidePlace();
+		$house = $character->getHouse();
 		# TODO: Rework this to use dispatcher.
 		$em = $this->getDoctrine()->getManager();
 		$form = $this->createForm(new AreYouSureType());
@@ -391,14 +345,27 @@ class HouseController extends Controller {
 			}
 			if (!$fail) {
 				#Update House location
-				$house->setInsideSettlement($settlement);
-				#Create relocation event in House's event log
-				$this->get('history')->logEvent(
-					$house,
-					'event.house.relocated.settlement',
-					array('%link-settlement%'=>$settlement->getId()),
-					History::HIGH, true
-				);
+				if (!$place) {
+					$house->setHome(null);
+					$house->setInsideSettlement($settlement);
+					#Create relocation event in House's event log
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.relocated.settlement',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$house->setHome($place);
+					$house->setInsideSettlement(null);
+					#Create relocation event in House's event log
+					$this->get('history')->logEvent(
+						$house,
+						'event.house.relocated.place',
+						array('%link-place%'=>$place->getId()),
+						History::HIGH, true
+					);
+				}
 				$em->flush();
 				#Add "success" flash message to the top of the redirected page for feedback.
 				$this->addFlash('notice', $this->get('translator')->trans('house.updated.relocated', array(), 'messages'));
@@ -407,9 +374,166 @@ class HouseController extends Controller {
 				/* You shouldn't ever reach this. The form requires input. */
 			}
 		}
-		return array(
+		return $this->render('House/relocate.html.twig', [
 			'name' => $house->getName(),
 			'form' => $form->createView()
-		);
+		]);
+	}
+
+
+	/**
+	  * @Route("/{house}/newplayer", requirements={"house"="\d+"}, name="maf_house_newplayer")
+	  */
+	public function newplayerAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseNewPlayerInfoTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$desc = $house->getSpawnDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+		$form = $this->createForm(new DescriptionNewType($text));
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($text != $data['text']) {
+				$desc = $this->get('description_manager')->newSpawnDescription($house, $data['text'], $character);
+			}
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('control.description.success', array(), 'actions'));
+			return $this->redirectToRoute('bm2_politics');
+		}
+		return $this->render('House/newplayer.html.twig', [
+			'house'=>$house, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{house}/spawntoggle", requirements={"house"="\d+"}, name="maf_house_spawn_toggle")
+	  */
+	public function houseSpawnToggleAction(House $house) {
+		$character = $this->get('dispatcher')->gateway('houseSpawnToggleTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		if ($place = $house->getHome()) {
+			if ($spawn = $place->getSpawn()) {
+				if($spawn->getActive()) {
+					$spawn->setActive(false);
+					$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.stop', ["%name%"=>$place->getName()], 'actions'));
+				} else {
+					$spawn->setActive(true);
+					$this->addFlash('notice', $this->get('translator')->trans('control.spawn.manage.start', ["%name%"=>$place->getName()], 'actions'));
+				}
+				$em->flush();
+			}
+		}
+		return $this->redirectToRoute('bm2_politics');
+	}
+
+	/**
+	  * @Route("/{house}/cadet", name="maf_house_cadetship", requirements={"house"="\d+"})
+	  */
+
+	public function cadetAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageCadetTest', null, null, null, $house);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$myHouse = $character->getHouse();
+		$form = $this->createForm(new HouseCadetType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$yes = $data['sure'];
+			if ($yes) {
+				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.cadet', null, null, null, $data['subject'], $data['text'], $character, $myHouse, $house);
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('house.cadet.fail', array(), 'messages'));
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('house.cadet.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
+		}
+		return $this->render('House/cadet.html.twig', [
+			'house'=>$house,
+			'myHouse'=>$myHouse,
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{house}/uncadet", name="maf_house_uncadet", requirements={"house"="\d+"})
+	  */
+
+	public function uncadetAction(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageUncadetTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new HouseUncadetType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$yes = $data['sure'];
+			if ($yes) {
+				$this->get('game_request_manager')->newRequestFromHouseToHouse('house.uncadet', null, null, null, $data['subject'], $data['text'], $character, $house, $house->getSuperior());
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.fail', array(), 'messages'));
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('house.uncadet.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
+		}
+		return $this->render('House/uncadet.html.twig', [
+			'house'=>$house,
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/revive", name="maf_house_revive")
+	  */
+
+	public function reviveAction(Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseManageReviveTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AreYouSureType());
+		$house = $character->getHouse();
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($data['sure'] == true) {
+				$house->setActive(true);
+				$house->setHead($character);
+				#Create revival event in House's event log
+				$this->get('history')->logEvent(
+					$house,
+					'event.house.revived',
+					array('%link-character%'=>$character->getId()),
+					History::HIGH, true
+				);
+				$em->flush();
+				#Add "success" flash message to the top of the redirected page for feedback.
+				$this->addFlash('notice', $this->get('translator')->trans('house.updated.revived', array(), 'messages'));
+				return $this->redirectToRoute('bm2_politics', array());
+			} else {
+				/* You shouldn't ever reach this. The form requires input. */
+			}
+		}
+		return $this->render('House/revive.html.twig', [
+			'name' => $house->getName(),
+			'form' => $form->createView()
+		]);
 	}
 }

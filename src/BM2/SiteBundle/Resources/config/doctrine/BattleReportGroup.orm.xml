@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\BattleReportGroup">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<field name="start" type="array"/>
+
+		<one-to-many field="combat_stages" target-entity="BattleReportStage" mapped-by="group_report">
+			<order-by>
+				<order-by-field name="round" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+		<field name="hunt" type="array"/>
+		<field name="finish" type="array"/>
+		<field name="fates" type="array" nullable="true"/>
+
+		<one-to-many field="characters" target-entity="BattleReportCharacter" mapped-by="group_report"/>
+		<many-to-one field="battle_report" target-entity="BattleReport" inversed-by="groups"/>
+		<one-to-many field="supported_by" target-entity="BattleReportGroup" mapped-by="supporting"/>
+		<many-to-one field="supporting" target-entity="BattleReportGroup" inversed-by="supported_by"/>
+
+	</entity>
+</doctrine-mapping>

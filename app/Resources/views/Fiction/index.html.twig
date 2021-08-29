@@ -1,0 +1,36 @@
+{% set biglogo = true %}
+{% extends "layout.html.twig" %}
+
+{% block jqueryuitheme %}
+	{% if app.request.isSecure %}
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% else %}
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/ui-darkness/jquery-ui.css" />
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'fiction.title'|trans|title }}</h2>
+<p>{{ 'fiction.header'|trans }}</p>
+
+{# FIXME load this from .md files using pagereader #}
+{# some jquery to activate the selected $page, if any #}
+<div id="tabs">
+	<ul>
+	<li><a href="#intro">{{ 'fiction.intro.title'|trans|title }}</a></li>
+	{% for page in allpages %}
+		<li><a href="{{ path('bm2_fiction_content', {'page':page}) }}">{{ ('fiction.page.'~page)|trans|title }}</a></li>
+	{% endfor %}
+	</ul>
+
+	<div id="intro">
+		{{ 'fiction.intro.text'|trans|raw }}
+	</div>
+</div>
+<br class="clear" />
+
+{% endblock %}
+
+{% block jquery %}
+$('#tabs').tabs().addClass('ui-tabs-vertical');
+{% endblock %}

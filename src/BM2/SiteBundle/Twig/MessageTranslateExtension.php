@@ -73,7 +73,7 @@ class MessageTranslateExtension extends \Twig_Extension {
 			foreach ($input as $in) {
 				$strings[] = $this->messageTranslateOne($in);
 			}
-			return implode("<br />", $strings);            
+			return implode("<br />", $strings);
 		} else {
 			return $this->messageTranslateOne($input);
 		}
@@ -123,6 +123,9 @@ class MessageTranslateExtension extends \Twig_Extension {
 						$mercenaries = $this->em->getRepository('BM2SiteBundle:Mercenaries')->find($value);
 						$data['%mercenaries'.$index.'%'] = $this->links->ObjectLink($mercenaries, false, $this->absolute);
 						break;
+					case 'place':
+						$place = $this->em->getRepository('BM2SiteBundle:Place')->find($value);
+						$data['%place'.$index.'%'] = $this->links->ObjectLink($place, false, $this->absolute);
 					case 'battle':
 						$battle = $this->em->getRepository('BM2SiteBundle:BattleReport')->find($value);
 						$data['%battle'.$index.'%'] = $this->links->ObjectLink($battle, false, $this->absolute);

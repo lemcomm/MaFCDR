@@ -4,7 +4,7 @@ Unlike other extra-realm politicies, Houses are regarded as particular worthy of
 
 Houses are also unique in that they have quite strict rules on inheritance, that ensure the leadership of the House never passes too far away from itself.
 
-A final point to note, before going into how inheritance works, is that Houses can support a Superior/Cadet relationship between themselves, with one House becoming subservient to another. This will be expanded in the future, which is detailed a the bottom of this page.
+A final point to note, before going into how inheritance works, is that Houses can support a Superior/Cadet relationship between themselves, with one House becoming subservient to another.
 
 Precedence of Inheritance
 -------------------------
@@ -38,7 +38,7 @@ At this time, inheritance by an heir is the only way for one house to end up a C
 
 Future Additions
 ----------------
-House are a relatively new feature in Might & Fealty, and are not yet considered compelte at this time. As such, the following features are officially planned:
+House are a relatively new feature in Might & Fealty, and are not yet considered complete at this time. As such, the following features are officially planned:
 
 * Ability to create Cadet Houses directly
 * Ability to merge Houses under a new Superior House

@@ -1,0 +1,47 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>My Quests</h2>
+
+	<h3>Quests I am On</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>{{ "quests.summary"|trans({},"actions") }}</th>
+				<th>{{ "quests.questers"|trans({},"actions") }}</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for my in my_quests if my.quest.completed == false %}
+				<tr>
+					<td>{{ my.quest.summary }}</td>
+					<td><ul class="shortlist">{% for quester in my.quest.questers %}<li>{{ link(quester.character) }}</li>{% endfor %}</ul></td>
+					<td><a href="{{ path('bm2_site_quests_details', {'id':my.quest.id}) }}">{{ "quests.details"|trans({},"actions") }}</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<h3>Quests That I made</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>{{ "quests.summary"|trans({},"actions") }}</th>
+				<th>{{ "quests.questers"|trans({},"actions") }}</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for quest in owned_quests if quest.completed == false %}
+				<tr>
+					<td>{{ quest.summary }}</td>
+					<td><ul class="shortlist">{% for quester in quest.questers %}<li>{{ link(quester.character) }}</li>{% endfor %}</ul></td>
+					<td><a href="{{ path('bm2_site_quests_details', {'id':quest.id}) }}">{{ "quests.details"|trans({},"actions") }}</a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "military.aid.name"|trans({},"actions")|title }}</h2>
+	{% if success %}
+		<p>{{ "military.aid.success"|trans({"%character%":target.name},"actions")|raw }}</p>
+	{% else %}
+		<p>{{ "military.aid.intro"|trans({},"actions")|raw }}</p>
+		{{ "military.aid.target"|trans({},"actions") }}: <input type="text" id="target_ac"/>
+		{{ form(form) }}
+	{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+$("#form_submit").prop("disabled", true);
+charselect($("#target_ac"), targetchange);
+
+{% include "element/autocomplete.js.twig" %}
+
+function targetchange(id, name) {
+	console.log(id+" / "+name);
+	$("#form_target").val(id);
+	$("#form_submit").prop("disabled", false);
+}
+
+{% endblock %}

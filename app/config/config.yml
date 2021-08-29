@@ -25,9 +25,8 @@ twig:
     exception_controller: BM2SiteBundle:Exception:exception
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    form:
-        resources:
-            - 'BM2SiteBundle:Form:form_theme.html.twig'
+    form_themes:
+         - 'Form/form_theme.html.twig'
 
 # Assetic Configuration
 assetic:

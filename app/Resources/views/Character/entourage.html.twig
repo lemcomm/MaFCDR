@@ -1,0 +1,129 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'npc.entourage'|transchoice(10)|capitalize }}</h2>
+<p>
+{# FIXME: translate #}
+{% if can_resupply %}
+	Your camp followers can acquire additional supplies here.
+{% else %}
+	Your camp followers will not acquire additional supplies here, because you do not have resupply permissions in this settlement.
+{% endif %}
+<br />
+{% if food_days > 0 %}
+	Your food supply will feed your army for {{ food_days }} days.<br />
+{% else %}
+	You have no food left, if your army cannot find enough food from the land, it will starve.<br />
+{% endif %}
+{% if resupply is not empty %}
+	Total equipment available for resuply:
+	<ul class="shortlist">
+	{% for have in resupply %}
+		<li>{{ have.amount }} {{ link(have.equipment) }}</li>
+	{% endfor %}
+	</ul>
+{% endif %}
+</p>
+
+{{ form_errors(form) }}
+<form action="" method="post">
+{{ form_widget(form._token) }}
+
+<table id="entourage">
+	<thead><tr>
+		<th>{{ 'npc.name'|trans }}</th>
+		<th data-sorter="false"></th>
+		<th>{{ 'npc.type'|trans }}</th>
+		{#<th>{{ 'experience'|trans }}</th>#}
+		<th data-sorter="false"></th>
+		<th colspan="2" data-sorter="false">{{ 'npc.supply'|trans }}</th>
+		<th>{{ 'home'|trans }}</th>
+	</tr></thead>
+	<tbody>
+
+	{% for npc in form.npcs %}
+		{% set id = npc.vars.name %}
+		{% set man = entourage[id] %}
+		<tr>
+			<td{% if not man.alive %} class="disabled"{% endif %}>{{ man.name }}</td>
+			<td>
+				{% if not man.alive %}
+					<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" title="{{ 'dead'|trans }}" height="16px" />
+				{% else %}
+					{% if man.wounded %}
+						<img src="{{ asset('bundles/bm2site/images/blood_clipart.svg') }}" alt="{{ 'wounded'|trans }}" title="{{ 'wounded'|trans }}" height="16px" />
+					{% endif %}
+					{% if man.hungry > 80 %}
+						<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery_red.svg') }}" alt="{{ 'veryhungry'|trans }}" title="{{ 'veryhungry'|trans }}" height="16px" />
+					{% elseif man.hungry > 40 %}
+						<img class="tt" src="{{ asset('bundles/bm2site/images/cutlery.svg') }}" alt="{{ 'hungry'|trans }}" title="{{ 'hungry'|trans }}" height="16px" />
+					{% endif %}
+				{% endif %}
+			</td>
+			<td>{{ ("npc."~man.type.name)|transchoice(1) }}</td>
+			{#<td align="right">{{ man.experience }}</td>#}
+			{% if not man.locked %}
+				<td>{{ form_widget(npc.action) }}</td>
+			{% else %}
+				<td class="disabled">{{ 'islocked'|trans }}</td>
+			{% endif %}
+			{% if man.type.name == "follower" and not man.locked %}
+				<td align="right">
+					{% if man.equipment %}
+						{{ man.supply // man.equipment.resupplycost }}
+					{% else %}
+						{{ man.supply }}
+					{% endif %}
+				</td>
+				<td>
+					{{ form_widget(npc.supply) }}
+				</td>
+			{% else %}
+				<td></td><td></td>
+			{% endif %}
+			<td>{% if man.home %}{{ link(man.home) }}{% endif %}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+<div class="actionsbar">
+	<button type="button" id="bury_all">{{ 'soldier.buryall'|trans }}</button>
+</div>
+
+{% if form.assignto is defined %}
+<div id="assigntarget" class="hidden subselect">
+	{{ form_label(form.assignto) }}
+	{{ form_widget(form.assignto) }}
+</div>
+{% endif %}
+
+<button>{{ 'recruit.manage.submit'|trans({},"actions") }}</button>
+</form>
+
+{% endblock %}
+
+
+{% block jquery %}
+$("select.action").change(function(){
+	if ($(this).val() == "assign2") {
+		$("#assigntarget").show();
+	}
+});
+if ($("[id$=_action] option[value='bury']").length>0) {
+	$("#bury_all").click(function(){
+		$("[id$=_action] option[value='bury']").parent().val("bury");
+	});
+} else {
+	$("#bury_all").remove();
+}
+
+$("#entourage").tablesorter({
+	sortList: [[0,0]]
+});
+{% endblock %}

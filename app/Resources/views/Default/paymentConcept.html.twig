@@ -1,0 +1,28 @@
+{% set biglogo = true %}
+{% extends app.request.isXmlHttpRequest ? "ajax.html.twig" : "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'paymentconcept'|trans|title }}</h2>
+
+{{ content|markdown }}
+
+<div class="clear"></div>
+
+{#
+<table>
+	<thead>
+		<tr><th>{{ 'account.level.name'|trans }}</th><th>{{ 'account.level.limit'|trans }}</th><th>{{ 'account.level.cpm'|trans }}</th></tr>
+	</thead>
+	<tbody>
+		{% for i,paylevel in paylevels if paylevel.selectable %}
+		<tr>
+			<th align="left">{{ ('account.level.'~i)|trans }}</th>
+			<td align="right">{{ paylevel.characters }}</td>
+			<td align="right">{{ paylevel.fee }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+#}
+
+{% endblock %}

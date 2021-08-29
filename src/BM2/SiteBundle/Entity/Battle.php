@@ -73,23 +73,12 @@ class Battle {
 		return null;
 	}
 
-	public function getDefenseBonus() {
-		if ($this->defense_bonus == -1) {
-			$this->defense_bonus = 0;
-			foreach ($this->getDefenseBuildings() as $building) {		
-				$this->defense_bonus += $building->getDefenses();
-			}
-		}
-
-		return $this->defense_bonus;
-	}
-
 	public function getDefenseBuildings() {
 		$def = new ArrayCollection();
 		if ($this->getSettlement()) {
-			foreach ($this->getSettlement()->getActiveBuildings() as $building) {
-				if ($building->getType()->getDefenses() != 0) {
-					$def->add($building->getType());
+			foreach ($this->getSettlement()->getBuildings() as $building) {
+				if ($building->getType()->getDefenses() > 0) {
+					$def->add($building);
 				}
 			}
 		}
@@ -105,7 +94,7 @@ class Battle {
 				}
 			}
 			if ($this->getSettlement()) {
-				$this->defenders += $this->getSettlement()->getActiveMilitia()->count();
+				$this->defenders += $this->getSettlement()->countDefenders();
 			}
 		}
 		return $this->defenders;
@@ -132,4 +121,7 @@ class Battle {
 		return $this->soldiers;
 	}
 
+	public function isSiege() {
+		return $this->is_siege;
+	}
 }

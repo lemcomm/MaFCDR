@@ -1,0 +1,99 @@
+{% spaceless %}
+
+{% set gender_he = character.gender("he")|trans|title %}
+
+{% macro realm_hierarchy(realm, gender_he) %}
+
+{#
+
+For reasons I literally do not understand, if this exists, it breaks pages. If it's commented out, the world keeps turning.
+More than likely, it's due to a change in the update from Twig 1.23 to Twig 2.0. So far, I've not seen anything indicating that this
+is still required, but we'll leave it in the code just in case. --Andrew
+
+{% spaceless %}
+
+{% endspaceless %}
+
+#}
+
+{% endmacro %}
+
+{% import _self as macros %}
+
+{% if character.realm %}
+	<p>{{ ("status."~who~".realmvassal")|trans({"%He%":gender_he, "%liege%":link(character.realm)},"politics")|raw }}</p>
+{% elseif character.liegeLand %}
+	{% if character.liegeLand.realm %}
+		<p>{{ ("status."~who~".landvassal")|trans({"%He%":gender_he, "%liege%":link(character.liegeLand), "%realm%":link(character.liegeLand.realm)},"politics")|raw }}</p>
+	{% else %}
+		<p>{{ ("status."~who~".landvassal2")|trans({"%He%":gender_he, "%liege%":link(character.liegeLand)},"politics")|raw }}</p>
+	{% endif %}
+{% elseif character.liegePlace %}
+	{% if character.liegePlace.realm %}
+		<p>{{ ("status."~who~".placevassal")|trans({"%He%":gender_he, "%liege%":link(character.liegePlace), "%realm%":link(character.liegePlace.realm)},"politics")|raw }}</p>
+	{% else %}
+		<p>{{ ("status."~who~".placevassal2")|trans({"%He%":gender_he, "%liege%":link(character.liegePlace)},"politics")|raw }}</p>
+	{% endif %}
+{% elseif character.liegePosition %}
+	<p>{{ ("status."~who~".positionvassal")|trans({"%He%":gender_he, "%liege%":link(character.liegePosition), "%realm%":link(character.liegePosition.realm)},"politics")|raw }}</p>
+{% elseif character.liege %}
+	<p>{{ ("status."~who~".vassal")|trans({"%He%":gender_he, "%liege%":link(character.liege)},"politics")|raw }}</p>
+{% elseif character.findVassals is empty %}
+	{% if character.ownedSettlements is empty %}
+		{% if character.positions is empty %}
+			<p>{{ ("status."~who~".landless")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% else %}
+			<p>{{ ("status."~who~".landless2")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% endif %}
+	{% else %}
+		{% if character.findrealms is empty %}
+			<p>{{ ("status."~who~".independent")|trans({"%He%":gender_he, },"politics") }}</p>
+		{% endif %}
+	{% endif %}
+{% else %}
+	{% if character.findrealms is empty %}
+		<p>{{ ("status."~who~".ultimate")|trans({"%He%":gender_he, },"politics") }}</p>
+	{% endif %}
+{% endif %}
+
+<ul>
+{% if character.house %}
+	<li>
+		{% if character.house.head == character %}
+			{{ ("status."~who~".househead")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
+		{% else %}
+			{{ ("status."~who~".housememb")|trans({"%He%":gender_he, "%house%":link(character.house)},"politics")|raw }}
+		{% endif %}
+	</li>
+{% endif %}
+{% for position in character.positions %}
+	<li>
+		{% if position.ruler %}
+			{% if character.male %}
+				{% set posname = 'realm.title.male.'~position.realm.type %}
+			{% else %}
+				{% set posname = 'realm.title.female.'~position.realm.type %}
+			{% endif %}
+			{{ ("status.self.position")|trans({"%position%":posname|trans({},"politics")|title, "%realm%":link(position.realm)},"politics")|raw }}
+		{% else %}
+			{{ ("status.self.position")|trans({"%position%":link(position), "%realm%":link(position.realm)},"politics")|raw }}
+		{% endif %}
+	</li>
+{% endfor %}
+
+{% for realm in character.findrealms %}
+	<li>
+	{{ ("status."~who~".realm")|trans({"%He%":gender_he, "%realm%":link(realm)},"politics")|raw }}
+	</li>
+{% endfor %}
+
+{% if character.findVassals is not empty %}
+	<li>{{ ("status."~who~".liege")|trans({},"politics") }}<ul class="shortlist">
+	{% for vassal in character.findVassals  %}
+		<li>{{ link(vassal) }}</li>
+	{% endfor %}
+	</ul></li>
+{% endif %}
+
+</ul>
+{% endspaceless %}

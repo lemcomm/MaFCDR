@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Siege">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="stage" type="integer"/>
+		<field name="max_stage" type="integer"/>
+		<field name="encircled" type="boolean"/>
+		<field name="encirclement" type="integer" nullable="true"/>
+
+		<one-to-one field="settlement" target-entity="Settlement" inversed-by="siege"/>
+		<one-to-one field="place" target-entity="Place" inversed-by="siege"/>
+		<one-to-many field="groups" target-entity="BattleGroup" mapped-by="siege"/>
+		<one-to-one field="attacker" target-entity="BattleGroup" inversed-by="attacking_in_siege"/>
+		<one-to-many field="battles" target-entity="Battle" mapped-by="siege"/>
+		<one-to-many field="related_battle_reports" target-entity="BattleReport" mapped-by="siege"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="sieges"/>
+		<many-to-one field="war" target-entity="War" inversed-by="sieges"/>
+
+	</entity>
+</doctrine-mapping>

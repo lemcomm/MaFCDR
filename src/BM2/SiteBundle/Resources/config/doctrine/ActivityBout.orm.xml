@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityBout">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+                <many-to-one field="type" target-entity="ActivitySubType"/>
+                <many-to-one field="activity" target-entity="Activity" inversed-by="bouts"/>
+                <one-to-many field="participants" target-entity="ActivityBoutParticipant" mapped-by="bout"/>
+		<one-to-many field="groups" target-entity="ActivityBoutGroup" mapped-by="bout"/>
+
+	</entity>
+</doctrine-mapping>

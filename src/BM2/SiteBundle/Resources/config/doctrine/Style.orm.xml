@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Style">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="formal_name" type="string"/>
+                <field name="neutrality" type="float"/>
+                <field name="distance" type="float"/>
+                <field name="initiative" type="float"/>
+
+                <many-to-one field="creator" target-entity="Character" inversed-by="created_styles"/>
+                <one-to-many field="users" target-entity="CharacterStyle" mapped-by="style"/>
+                <many-to-one field="item" target-entity="ItemType"/>
+                <one-to-many field="counters" target-entity="StyleCounter" mapped-by="style"/>
+                <many-to-one field="augments" target-entity="SkillType" mapped-by="style"/>
+
+	</entity>
+</doctrine-mapping>

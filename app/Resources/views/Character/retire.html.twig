@@ -1,0 +1,11 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "meta.retire.name"|trans({},"actions")|title }}</h2>
+	<p>{{ "meta.retire.intro"|trans({'%he%':character.gender('he')|trans},"actions")|raw }}</p>
+	<form class="wide" action="{{ path('bm2_site_character_retire') }}" method="post">
+		{{ form_widget(form) }}
+		<button type="submit" name="submit">{{ "meta.retire.submit"|trans({},"actions") }}</button>
+	</form>
+	
+{% endblock %}

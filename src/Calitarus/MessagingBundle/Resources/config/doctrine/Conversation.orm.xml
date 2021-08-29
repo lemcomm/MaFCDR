@@ -22,7 +22,7 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
 
-		<many-to-one field="app_reference" target-entity="BM2\SiteBundle\Entity\Realm" inversed-by="conversations"/>
+		<many-to-one field="app_reference" target-entity="BM2\SiteBundle\Entity\Realm" inversed-by="conversations_old" cascade="persist"/>
 
 	</entity>
 </doctrine-mapping>

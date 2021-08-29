@@ -50,9 +50,9 @@ class PermissionManager {
 	}
 
 
-	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false) {
+	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false, $occupied = false) {
 		// settlement owner always has all permissions without limits
-		if ($place->getOwner() == $character) {
+		if (($place->getOwner() == $character && $place->getOccupant() == false) OR $place->getOccupant() == $character) {
 			if ($return_details) {
 				return array(true, null, 'owner', null);
 			} else {
@@ -69,15 +69,27 @@ class PermissionManager {
 		}
 
 		// fetch everyone who is granted this permission
-		$allowed = $place->getPermissions()->filter(
-			function($entry) use ($permission) {
-				if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
-					return true;
-				} else {
-					return false;
+		if (!$occupied) {
+			$allowed = $place->getPermissions()->filter(
+				function($entry) use ($permission) {
+					if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
+						return true;
+					} else {
+						return false;
+					}
 				}
-			}
-		);
+			);
+		} else {
+			$allowed = $place->getOccupationPermissions()->filter(
+				function($entry) use ($permission) {
+					if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			);
+		}
 
 		// for all of them, now check if our character is in this listing
 		foreach ($allowed as $perm) {
@@ -101,10 +113,10 @@ class PermissionManager {
 			return false;
 		}
 	}
-	
-	public function checkSettlementPermission(Settlement $settlement, Character $character, $permission, $return_details=false) {
+
+	public function checkSettlementPermission(Settlement $settlement, Character $character, $permission, $return_details=false, $occupied = false) {
 		// settlement owner always has all permissions without limits
-		if ($settlement->getOwner() == $character) {
+		if ((($settlement->getOwner() == $character || $settlement->getSteward() == $character) && $settlement->getOccupant() == false) OR $settlement->getOccupant() == $character) {
 			if ($return_details) {
 				return array(true, null, 'owner', null);
 			} else {
@@ -121,15 +133,27 @@ class PermissionManager {
 		}
 
 		// fetch everyone who is granted this permission
-		$allowed = $settlement->getPermissions()->filter(
-			function($entry) use ($permission) {
-				if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
-					return true;
-				} else {
-					return false;
+		if (!$occupied) {
+			$allowed = $settlement->getPermissions()->filter(
+				function($entry) use ($permission) {
+					if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
+						return true;
+					} else {
+						return false;
+					}
 				}
-			}
-		);
+			);
+		} else {
+			$allowed = $settlement->getOccupationPermissions()->filter(
+				function($entry) use ($permission) {
+					if ($entry->getPermission()->getName() == $permission && $entry->getListing()) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			);
+		}
 
 		// for all of them, now check if our character is in this listing
 		foreach ($allowed as $perm) {

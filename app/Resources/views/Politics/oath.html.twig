@@ -1,0 +1,46 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "oath.name"|trans({},"politics")|title }}</h2>
+{% if success is defined %}
+	{{ 'oath.success'|trans({'%newliege%': link(character.liege)},"politics")|raw }}
+{% elseif fail is defined %}
+	{{ fail|trans({},"politics") }}
+{% else %}
+	<p>{{ "oath.intro"|trans({},"politics")|raw }}</p>
+	{% if character.vassals is not empty %}
+		<p>{{ "oath.hasvassals"|trans({},"politics")|raw }}</p>
+		{% if not character.liege %}
+			<p>{{ "oath.isruler"|trans({},"politics")|raw }}</p>
+		{% endif %}
+	{% endif %}
+	{% if character.liege %}
+		<p>{{ "oath.hasliege"|trans({"%liege%":link(character.liege)},"politics")|raw }}</p>
+	{% endif %}
+
+	<h3>{{ "oath.current"|trans({},"politics")|title }}</h3>
+	{% include "element/hierarchy.html.twig" with {"character":character, "who":'self'} only %}
+
+	<h3>{{ "oath.swear"|trans({},"politics")|title }}</h3>
+	<p>{{ "oath.swearintro"|trans({},"politics")|raw }}</p>
+	{% if nobody is defined %}
+		{{ "oath.nobody"|trans({},"politics") }}
+	{% else %}
+		<form class="wide" action="{{ path('bm2_site_politics_oath') }}" method="post" {{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button type="submit">{{ "oath.submit"|trans({},"politics") }}</button>
+		</form>
+	{% endif %}
+
+	{% if unavailable is not empty %}
+	<h3>{{ "oath.unavailable"|trans({},"politics")|title }}</h3>
+	<ul>
+		{% for data in unavailable %}
+			<li>{{ link(data.char) }}, {{ ('oath.reason.'~data.reason)|trans({},"politics") }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+
+{% endif %}
+
+{% endblock %}

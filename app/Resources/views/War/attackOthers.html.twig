@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% form_theme form with 'Form/form_characterlist.html.twig' %}
+
+{% block content %}
+<h2>{{ "military.battles.initiate.name"|trans({},"actions")|title }}</h2>
+{% if result == false %}
+	<p>{{ "military.battles.initiate.intro"|trans({},"actions")|raw }}</h2>
+	{{ form(form) }}
+{% else %}
+	<p>{{ "military.battles.initiate.success"|trans({"%time%":result.time|realtime},"actions")|raw }}</h2>
+{% endif %}
+
+{% endblock %}
