@@ -161,6 +161,9 @@ class Dispatcher {
 			$actions[] = array("name"=>"location.enter.name", "description"=>"unavailable.nosettlement");
 		}
 
+		if ($this->getLeaveablePlace()) {
+			$actions[] = $this->placeLeaveTest(true);
+		}
 		$actions[] = $this->placeListTest();
 		$actions[] = $this->placeCreateTest();
 
@@ -191,10 +194,6 @@ class Dispatcher {
 		$spy = $this->nearbySpyTest(true);
 		if (isset($spy['url'])) {
 			$actions[] = $spy;
-		}
-		$has = $this->locationVisitHousesTest();
-		if (isset($has['url'])) {
-			$actions[] = $has;
 		}
 		$has = $this->locationDungeonsTest();
 		if (isset($has['url'])) {
@@ -290,7 +289,7 @@ class Dispatcher {
 				$actions[] = $this->controlChangeOccupantTest(true);
 				$actions[] = $this->controlChangeOccupierTest(true);
 			}
-			$actions[] = $this->controlChangeRealmTest(true);
+			$actions[] = $this->controlChangeRealmTest(true, $settlement);
 			$actions[] = $this->controlSettlementDescriptionTest(null, $settlement);
 			$actions[] = $this->controlGrantTest(true);
 			$actions[] = $this->controlRenameTest(true);
@@ -2224,8 +2223,6 @@ class Dispatcher {
 	public function placeListTest() {
 		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
 			return $this->action("place.list", "maf_place_actionable");
-		} else if ($this->getLeaveablePlace()) {
-			return $this->placeLeaveTest(true);
 		} else {
 			return array("name"=>"place.actionable.name", "description"=>"unavailable.noplace");
 		}

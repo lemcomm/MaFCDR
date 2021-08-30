@@ -59,30 +59,6 @@ class HouseController extends Controller {
 	}
 
 	/**
-	  * @Route("/nearby", name="maf_house_nearby")
-	  */
-
-	public function nearbyAction() {
-		$character = $this->get('appstate')->getCharacter();
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		$houses = [];
-		if ($character->getInsideSettlement()) {
-			$houses = $character->getInsideSettlement()->getHousesPresent();
-		} else {
-			#TODO: Add code for houses as places here.
-		}
-		$myHouse = $character->getHouse();
-
-		return $this->render('House/nearby.html.twig', [
-			'houses' => $houses,
-			'myHouse' => $myHouse,
-			'char' => $char
-		]);
-	}
-
-	/**
 	  * @Route("/create", name="maf_house_create")
 	  */
 

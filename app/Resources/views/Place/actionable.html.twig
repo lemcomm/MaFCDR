@@ -8,6 +8,7 @@
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for place in places %}
 		{% set type = place.type %}
+		{% set house = place.house %}
 		{% if character.insidePlace == place %}
 			{% set inside = true %}
 		{% else %}
@@ -16,11 +17,22 @@
 		{% if place.visible or inside or (not place.visible and place.owner == character) %}
 			<hr>
 			<div class="subcontent inline_announcements" style="color:#460702">
-				<h4>{{ place.name|title }}</h4>
+				<h3>{{ place.name|title }}</h4>
 				{% if inside %}
 					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
 				{% endif %}
 				{{ place.description.text }}<br><br>
+				{% if house %}
+					<i>{{ 'place.hosthouse'|trans({}, "places")|raw }}</i>
+					<hr>
+					<h3>{{ house.name }}</h3>
+					{{ 'house.view.head'|trans({}, "politics")|raw }}: {% if house.head %}{{ link(house.head) }}{% else %}<i>{{ 'house.nohead'|trans({}, "politics") }}</i>{% endif %}
+					{% if house.description %}
+						{{ house.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+					{% else %}
+						{{ 'house.nodesc'|trans({}, "politics")|raw }}
+					{% endif %}
+				{% endif %}
 				{% if not inside %}
 					{% set check = dispatcher.placeEnterTest(true, place) %}
 					{% if check.url is defined %}
@@ -69,6 +81,16 @@
 					{% set check = dispatcher.houseManageRelocateTest() %}
 					{% if check.url is defined %}
 						<a href="{{path('maf_house_relocate') }}"><button id="siege">{{ 'house.manage.relocate.name'|trans({}, "politics")|raw }}</button></a>
+					{% endif %}
+				{% endif %}
+				{% if house %}
+					{% if house != myHouse and myHouse == null %}
+						<a href="{{path('maf_house_join', {"house":house.id}) }}"><button id="join">{{ 'house.join.button'|trans({},"politics") }}</button></a>
+					{% elseif house != myHouse and myHouse != null %}
+						{% set check = dispatcher.houseManageCadetTest(null, house) %}
+						{% if check.url is defined %}
+							<a href="{{path('maf_house_cadetship', {"house":house.id}) }}"><button id="cadetship">{{ 'house.cadet.name'|trans({}, "politics")|raw }}</button></a>
+						{% endif %}
 					{% endif %}
 				{% endif %}
 			</div>

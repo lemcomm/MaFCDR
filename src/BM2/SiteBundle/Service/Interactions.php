@@ -262,7 +262,12 @@ class Interactions {
 
 	public function characterEnterPlace(Character $character, Place $place, $force = false) {
 		if ($character->getInsidePlace() == $place) {
-			return true; // we are already inside
+			return false; // You are already here...
+		} elseif ($character->getInsidePlace()) {
+			$leave = $this->characterLeavePlace($character, $force);
+			if (!$leave) {
+				return false; // Can't leave here...
+			}
 		}
 
 		if (!$this->pm->checkPlacePermission($place, $character, 'visit')) {

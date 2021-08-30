@@ -61,6 +61,7 @@ place:
     Any place of interest under your ownership can be transferred to another First One in the vicinity, all you need to do is say the word.
   to:           New Owner
   success:      You have transferred control of the Place to %name%.
+ hosthouse:     Currently residing here...
 
 by:
  ambassador: As a Manager of Diplomacy...
