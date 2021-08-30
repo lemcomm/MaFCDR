@@ -123,18 +123,24 @@ map:
  searching:    Searching...
  settlements:  Settlements
  realms:       Sovereign realms
+ empires:      Empires
+ kingdoms:     Kingdoms
+ principalities: Principalities
+ duchies:      Duckies
+ marches:      Marches
+ counties:     Counties
+ baronies:     Baronies
  cultures:     Cultures
  towers:       Towers
  features:     Structures
  markers:      Markers
- placer:       placer
+ placer:       Placer
  roads:        Roads
  chars:        Characters
  route:        Route plot
  invalid:      Invalid route
- usedroads:    Road travel
- offers:       Knight offers
- poi:          POI
+ usedroads:    Used Roads
+ poi:          Points of Interest
  you:          Your location
  area:         Local area
  howto: >
