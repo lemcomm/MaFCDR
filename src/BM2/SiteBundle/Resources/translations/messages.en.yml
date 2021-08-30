@@ -1640,6 +1640,7 @@ unavailable:
  notrulerofthatrealm: You do not appear to be ruler of the realm you are making a capital for.
  placestooclose: You are too close to another settlement or place to create a new place here.
  notyourunit:   This isn't your unit to manage.
+ toocrowded:    This is too close to another place or settlement.
 marker:
  name:      Marker name
  type:      Marker type
