@@ -68,11 +68,18 @@ var my_y;
 
 if (typeof mapstrings == "undefined") {
 	var mapstrings = {
-		'map': "abstract map",
-		'graphmap': "graphical map",
+		'map': "Abstract Map",
+		'graphmap': "Graphical Map",
 		'settlements': "Settlements",
 		'realms': "Sovereign Realms",
-		'poi': "POI",
+		'empires': "Empires",
+		'kingdoms': "Kingdoms",
+		'principalities': "Principalities",
+		'duchies': "Duchies",
+		'marches': "Marches",
+		'counties': "Counties",
+		'baronies': "Baronies",
+		'poi': "Points of Interest",
 		'cultures': "Cultures",
 		'features': "Features",
 		'markers': "Markers",
@@ -413,12 +420,11 @@ function addrealms() {
 	map.setLayerIndex(layer, 100);
 
 
-/* TODO: translations strings for below */
-	var layer = new OpenLayers.Layer.Vector("empires", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.empires, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "empires"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.empires); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -431,11 +437,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 99);
 
-	var layer = new OpenLayers.Layer.Vector("kingdoms", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.kingdoms, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "kingdoms"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.kingdoms); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -448,11 +454,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 98);
 
-	var layer = new OpenLayers.Layer.Vector("principalities", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.principalities, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "principalities"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.principalities); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -465,11 +471,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 97);
 
-	var layer = new OpenLayers.Layer.Vector("duchies", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.duchies, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "duchies"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.duchies); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -482,11 +488,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 96);
 
-	var layer = new OpenLayers.Layer.Vector("marches", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.marches, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "marches"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.marches); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -499,11 +505,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 95);
 
-	var layer = new OpenLayers.Layer.Vector("counties", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.counties, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "counties"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.counties); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -516,11 +522,11 @@ function addrealms() {
 	map.addLayer(layer);
 	map.setLayerIndex(layer, 94);
 
-	var layer = new OpenLayers.Layer.Vector("baronies", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.baronies, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
-			'loadstart': function(event){ loader_on('realms', "baronies"); },
+			'loadstart': function(event){ loader_on('realms', mapstrings.baronies); },
 			'loadend': function(event){ loader_off('realms'); }
 		},
 		strategies: [new OpenLayers.Strategy.Fixed()],
@@ -614,7 +620,7 @@ function addsettlements(mode) {
 		fillOpacity: 0.8
 	}, {context: zoomSupport});
 
-	var layer = new OpenLayers.Layer.Vector("cultures", {
+	var layer = new OpenLayers.Layer.Vector(mapstrings.cultures, {
 		renderers: ["SVG2", "SVG", "VML", "Canvas"],
 		styleMap: new OpenLayers.StyleMap(style),
 		eventListeners: {
