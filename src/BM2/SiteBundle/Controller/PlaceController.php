@@ -97,6 +97,7 @@ class PlaceController extends Controller {
 
 		return $this->render('Place/actionable.html.twig', [
 			'places' => $places,
+			'myHouse' => $character->getHouse(),
 			'character' => $character
 		]);
 	}
