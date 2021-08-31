@@ -990,6 +990,7 @@ class CharacterController extends Controller {
 			$id = $character->getId();
 			$data = $form->getData();
 			$em = $this->getDoctrine()->getManager();
+			$mm = $this->get('military_manager');
 			if ($data['sure'] != true) {
 				$fail = true;
 			}
@@ -1007,15 +1008,6 @@ class CharacterController extends Controller {
 					$em->flush();
 				}
 				$this->get('character_manager')->retire($character);
-				foreach ($reclaimed as $rec) {
-					$this->get('history')->logEvent(
-						$rec['liege'],
-						'event.character.retirereclaim',
-						array('%link-character%'=>$character->getId(), '%amount%'=>$rec['number']),
-						History::MEDIUM
-					);
-				}
-				$em->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
 				return $this->redirectToRoute('bm2_characters');
 			}
