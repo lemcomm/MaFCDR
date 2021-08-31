@@ -33,6 +33,7 @@ Along with the search boxes in the message writer that lets you do lookups, the 
 
 * Artifacts - [a:#], [artifact:#]
 * Characters - [c:#], [character:#], [n:#], [noble:#]
+* Conversations - [conv:#], [conversation:#]
 * Elections - [vote:#]
 * Houses - [clan:#], [dynasty:#], [f:#], [family:#], [h:#], [house:#]
 * Newspapers - [news:#], [newspaper:#], [newsedition:#], [edition:#], [pub:#], [publication:#]
