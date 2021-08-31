@@ -117,22 +117,39 @@ class LinksExtension extends \Twig_Extension {
 				case 'unit':
 					$type = 'Unit';
 					break;
+				case 'conv':
+				case 'topic':
+				case 'conversation':
+					$type = 'Conversation';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
 			$entity = $this->em->getRepository('BM2SiteBundle:'.$type)->find($id);
 			if ($entity) {
-				if ($type != 'NewsEdition' && $type != 'Unit') {
-					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
-				} elseif ($type == 'Unit') {
+				if ($type == 'Unit') {
 					$url = $this->generator->generate($this->getLink($type), array('unit' => $id));
-				}  else {
+				} elseif ($type == 'NewsEdition') {
 					$url = $this->generator->generate($this->getLink($type), array('edition' => $id));
+				} elseif ($type == 'Conversation') {
+					if($entity->getLocalFor()) {
+						$url = $this->generator->generate('maf_conv_local');
+					} else {
+						$url = $this->generator->generate($this->getLink($type), array('conv' => $id));
+					}
+				} else {
+					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
 				}
-				if ($type != 'NewsEdition' && $type != 'Unit') {
+				if ($type != 'NewsEdition' && $type != 'Unit' && $type != 'Conversation') {
 					$name = $entity->getName();
 				} elseif ($type == 'Unit') {
 					$name = $entity->getSettings()->getName();
+				} elseif ($type == 'Conversation') {
+					if ($entity->getLocalFor()) {
+						$name = 'Local Conversation';
+					} else {
+						$name = $entity->getTopic();
+					}
 				} else {
 					$name = $entity->getPaper()->getName();
 				}
@@ -188,6 +205,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'house':		return 'maf_house';
 			case 'place':		return 'maf_place';
 			case 'unit':		return 'maf_units_info';
+			case 'conversation':	return 'maf_conv_read';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
