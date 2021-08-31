@@ -33,23 +33,18 @@ class PlaceController extends Controller {
 	  */
 	public function indexAction(Place $id) {
 		$character = $this->get('appstate')->getCharacter(false, true, true);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
+
 		$place = $id;
 		$em = $this->getDoctrine()->getManager();
 
-		if ($character != $place->getOwner()) {
+		if ($character && $character != $place->getOwner()) {
 			$heralds = $character->getAvailableEntourageOfType('Herald')->count();
 		} else {
 			$heralds = 0;
 		}
 
 		# Check if we should be able to view any details on this place. A lot of places won't return much! :)
-		if ($character instanceof Character) {
-			$details = $this->get('interactions')->characterViewDetails($character, $place);
-		}
-
+		$details = $this->get('interactions')->characterViewDetails($character, $place);
 
 		$militia = [];
 		if ($details['spy'] || $place->getOwner() == $character) {
@@ -68,7 +63,7 @@ class PlaceController extends Controller {
 			$militia = null;
 		}
 
-		if ($character->getInsidePlace() == $place) {
+		if ($character && $character->getInsidePlace() == $place) {
 			$inside = true;
 		} else {
 			$inside = false;
