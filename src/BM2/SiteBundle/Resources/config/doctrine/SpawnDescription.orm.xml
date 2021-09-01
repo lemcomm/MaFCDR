@@ -16,6 +16,8 @@
 		<one-to-one field="active_realm" target-entity="Realm" inversed-by="spawn_description"/>
 		<many-to-one field="house" target-entity="House" inversed-by="spawn_descriptions"/>
 		<one-to-one field="active_house" target-entity="House" inversed-by="spawn_description"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="spawn_descriptions"/>
+		<one-to-one field="active_association" target-entity="Association" inversed-by="spawn_description"/>
 
 		<one-to-one field="previous" target-entity="SpawnDescription" inversed-by="next"/>
 		<one-to-one field="next" target-entity="SpawnDescription" mapped-by="previous"/>
