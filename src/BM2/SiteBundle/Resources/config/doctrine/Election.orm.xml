@@ -16,6 +16,7 @@
 			<cascade><cascade-remove /></cascade>
 		</one-to-many>
 		<many-to-one field="realm" target-entity="Realm" inversed-by="elections"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="elections"/>
 		<many-to-one field="position" target-entity="RealmPosition" inversed-by="elections"/>
 		<field name="routine" type="boolean" nullable="true"/>
 
