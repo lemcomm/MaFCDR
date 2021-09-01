@@ -153,5 +153,7 @@
                 <one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
 		<one-to-many field="styles" target-entity="CharacterStyle" mapped-by="character"/>
 		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
+		<one-to-many field="founded_associations" target-entity="Association" mapped-by="founder"/>
+		<one-to-many field="association_memberships" target-entity="AssociationMember" mapped-by="character"/>
 	</entity>
 </doctrine-mapping>
