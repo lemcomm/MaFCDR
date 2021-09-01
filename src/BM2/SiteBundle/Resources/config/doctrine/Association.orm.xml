@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Association">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="name" type="string"/>
+		<field name="formal_name" type="string"/>
+		<field name="motto" type="string" nullable="true"/>
+		<field name="active" type="boolean" nullable="true"/>
+		<many-to-one field="type" target-entity="AssociationType"/>
+
+		<many-to-one field="superior" target-entity="Association" inversed-by="inferiors"/>
+		<one-to-many field="inferiors" target-entity="Association" mapped-by="superior"/>
+
+		<one-to-many field="laws" target-entity="AssociationLaw" mapped-by="association" fetch="EXTRA_LAZY"/>
+		<one-to-many field="elections" target-entity="Election" mapped-by="association"/>
+
+		<many-to-one field="founder" target-entity="Character" inversed-by="founded_associations"/>
+		<one-to-many field="ranks" target-entity="AssociationRank" mapped-by="association"/>
+		<one-to-many field="members" target-entity="AssociationMember" mapped-by="association"/>
+
+		<one-to-many field="my_relations" target-entity="RealmRelation" mapped-by="source_association" fetch="EXTRA_LAZY"/>
+		<one-to-many field="foreign_relations" target-entity="RealmRelation" mapped-by="target_association" fetch="EXTRA_LAZY"/>
+
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="association"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_association"/>
+		<one-to-many field="spawn_descriptions" target-entity="SpawnDescription" mapped-by="association"/>
+		<one-to-one field="spawn_description" target-entity="SpawnDescription" mapped-by="active_association"/>
+
+		<field name="private" type="text" nullable="true"/>
+		<field name="secret" type="text" nullable="true"/>
+		<field name="gold" type="integer"/>
+
+		<one-to-one field="log" target-entity="EventLog" inversed-by="association"/>
+
+		<one-to-many field="requests" target-entity="GameRequest" mapped-by="from_association"/>
+		<one-to-many field="related_requests" target-entity="GameRequest" mapped-by="to_association"/>
+		<one-to-many field="part_of_requests" target-entity="GameRequest" mapped-by="include_association"/>
+
+		<many-to-one field="headquarters" target-entity="Place" inversed-by="hq_of"/>
+		<one-to-many field="places" target-entity="Place" mapped-by="association"/>
+		<one-to-many field="spawns" target-entity="Spawn" mapped-by="association"/>
+		<one-to-many field="conversations" target-entity="Conversation" mapped-by="association"/>
+	</entity>
+</doctrine-mapping>
