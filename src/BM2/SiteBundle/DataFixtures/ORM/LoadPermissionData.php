@@ -25,14 +25,6 @@ class LoadPermissionData extends AbstractFixture implements OrderedFixtureInterf
 			'placeoutside'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.placeoutside', 'desc'=>'perm.desc.placeoutside'),
 			'units'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.units', 'desc'=>'perm.desc.units')
 		),
-		'realm' => array(
-			'expel'   	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.expel', 'desc'=>'perm.desc.expel'),
-			'describe'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.realmdescribe', 'desc'=>'perm.desc.realmdescribe'),
-			'diplomacy'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.diplomacy', 'desc'=>'perm.desc.diplomacy'),
-			'laws'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.laws', 'desc'=>'perm.desc.laws'),
-			'positions'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.positions', 'desc'=>'perm.desc.positions'),
-			'wars'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.wars', 'desc'=>'perm.desc.wars')
-		),
 		'place' => array(
 			'see'		=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.see', 'desc'=>'perm.desc.see'),
 			'manage'	=> array('use_value'=>false, 'reserve'=>false, 'translation'=>'perm.manage', 'desc'=>'perm.desc.manage'),
