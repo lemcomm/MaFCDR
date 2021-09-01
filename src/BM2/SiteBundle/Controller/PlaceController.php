@@ -110,7 +110,7 @@ class PlaceController extends Controller {
 		if ($this->get('interactions')->characterEnterPlace($character, $id)) {
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('place.enter.success', array('%name%' => $id->getName()), 'actions'));
-			return $this->redirectToRoute('maf_place_actionable', ['id' => $id->getId()]);
+			return $this->redirectToRoute('maf_place_actionable');
 		} else {
 			$this->addFlash('error', $this->get('translator')->trans('place.enter.failure', array(), 'actions'));
 			return $this->redirectToRoute('maf_place_actionable');
