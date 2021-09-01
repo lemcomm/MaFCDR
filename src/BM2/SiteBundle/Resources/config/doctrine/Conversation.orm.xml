@@ -26,5 +26,6 @@
 		</one-to-many>
                 <many-to-one field="realm" target-entity="Realm" inversed-by="conversations" fetch="EAGER"/>
                 <many-to-one field="house" target-entity="House" inversed-by="conversations" fetch="EAGER"/>
+                <many-to-one field="association" target-entity="Association" inversed-by="conversations" fetch="EAGER"/>
 	</entity>
 </doctrine-mapping>
