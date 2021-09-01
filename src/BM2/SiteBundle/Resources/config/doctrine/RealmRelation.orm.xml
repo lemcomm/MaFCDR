@@ -12,6 +12,8 @@
 
 		<many-to-one field="source_realm" target-entity="Realm" inversed-by="my_relations"/>
 		<many-to-one field="target_realm" target-entity="Realm" inversed-by="foreign_relations"/>
+		<many-to-one field="source_association" target-entity="Association" inversed-by="my_relations"/>
+		<many-to-one field="target_association" target-entity="Association" inversed-by="foreign_relations"/>
 
 	</entity>
 </doctrine-mapping>
