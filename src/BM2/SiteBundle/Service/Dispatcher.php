@@ -2221,7 +2221,7 @@ class Dispatcher {
 	/* ========== Place Actions ============== */
 
 	public function placeListTest() {
-		if ($this->getCharacter() && !$this->getCharacter()->getInsidePlace() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
+		if ($this->getCharacter() && $this->geography->findPlacesInActionRange($this->getCharacter())) {
 			return $this->action("place.list", "maf_place_actionable");
 		} else {
 			return array("name"=>"place.actionable.name", "description"=>"unavailable.noplace");

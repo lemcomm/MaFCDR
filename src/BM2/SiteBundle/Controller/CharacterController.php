@@ -930,7 +930,7 @@ class CharacterController extends Controller {
 				// TODO: we should somehow store that it was a suicide, to catch various exploits
 				$reclaimed = array();
 				foreach ($character->getUnits() as $unit) {
-					$mm->returnUnitHome($unit, 'suicide', $character->getLocation());
+					$mm->returnUnitHome($unit, 'suicide', $character);
 				}
 				$em->flush();
 				if ($data['death']) {
@@ -996,7 +996,7 @@ class CharacterController extends Controller {
 			}
 			if (!$fail) {
 				foreach ($character->getUnits() as $unit) {
-					$mm->returnUnitHome($unit, 'retired', $character->getLocation());
+					$mm->returnUnitHome($unit, 'retired', $character);
 				}
 				$em->flush();
 				if ($data['retirement']) {
