@@ -5,6 +5,7 @@
 		<field name="active" type="boolean"/>
 
                 <many-to-one field="realm" target-entity="Realm" inversed-by="spawns"/>
+                <many-to-one field="association" target-entity="Association" inversed-by="spawns"/>
                 <one-to-one field="place" target-entity="Place" inversed-by="spawn"/>
 		<one-to-one field="house" target-entity="House" inversed-by="spawn"/>
 

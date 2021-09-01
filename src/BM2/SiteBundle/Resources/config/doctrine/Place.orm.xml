@@ -73,6 +73,8 @@
 		<one-to-many field="vassals" target-entity="Character" mapped-by="liege_place"/>
 
 		<one-to-many field="activities" target-entity="Activity" mapped-by="place"/>
+		<one-to-many field="hq_of" target-entity="Association" mapped-by="headquarters"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="places"/>
 
 	</entity>
 </doctrine-mapping>

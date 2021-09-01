@@ -54,6 +54,8 @@ security:
         - { path: ^/(../)?realm/[0-9]+/viewrelations, roles: ROLE_USER }
         - { path: ^/(../)?realm/[0-9]+/view, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?realm, roles: ROLE_USER }
+        - { path: ^/(../)?assoc/[0-9]+/view, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(../)?assoc, roles: ROLE_USER }
         - { path: ^/(../)?place/[0-9]+, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(../)?place/[0-9]+/, roles: ROLE_USER }
         - { path: ^/(../)?house/[0-9]+, roles: IS_AUTHENTICATED_ANONYMOUSLY }
