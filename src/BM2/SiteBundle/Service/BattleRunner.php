@@ -28,6 +28,7 @@ class BattleRunner {
 	private $npc_manager;
 	private $interactions;
 	private $warman;
+	private $actman;
 
 	# The following variables are used all over this class, in multiple functions, sometimes as far as 4 or 5 functions deep.
 	private $battle;
@@ -51,7 +52,7 @@ class BattleRunner {
 	private $defenseBonus=0;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
@@ -60,6 +61,7 @@ class BattleRunner {
 		$this->npc_manager = $npc_manager;
 		$this->interactions = $interactions;
 		$this->war_manager = $war_manager;
+		$this->actman = $actman;
 	}
 
 	public function enableLog($level=9999) {
@@ -1280,7 +1282,7 @@ class BattleRunner {
 	private function MeleeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		if ($soldier->isNoble()) {
-			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkillType(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
 		}
@@ -1302,7 +1304,7 @@ class BattleRunner {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'melee');
 			if ($soldier->isNoble()) {
-				$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkillType(), $xpMod);
 			} else {
 				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
 			}
@@ -1320,7 +1322,7 @@ class BattleRunner {
 	private function ChargeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		if ($soldier->isNoble()) {
-			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkillType(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
 		}
@@ -1343,7 +1345,7 @@ class BattleRunner {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'charge', $antiCav);
 			if ($soldier->isNoble()) {
-				$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkillType(), $xpMod);
 			} else {
 				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
 			}
@@ -1361,7 +1363,7 @@ class BattleRunner {
 	private function RangedHit(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		if ($soldier->isNoble()) {
-			$soldier->getCharacter()->addSkill($soldier->getWeapon(), $xpMod);
+			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkillType(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
 		}
