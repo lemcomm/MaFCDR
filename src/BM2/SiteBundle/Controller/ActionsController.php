@@ -707,10 +707,6 @@ class ActionsController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$resources = $em->getRepository('BM2SiteBundle:ResourceType')->findAll();
 
-		$query = $em->createQuery('SELECT t FROM BM2SiteBundle:Trade t JOIN t.source s JOIN t.destination d WHERE (t.source=:here OR t.destination=:here) AND (s.owner=:me OR d.owner=:me)');
-		$query->setParameters(array('here'=>$settlement, 'me'=>$character));
-		$trades = $query->getResult();
-
 		/*
 		The lines below this comment exist to check if a given character is not the owner but has owner-level trade access to this settlement.
 		Because we'd have to build the owned settlements list for the foreach after these we just build it ourselves first, check if we have not-owner trade rights,
@@ -744,6 +740,16 @@ class ActionsController extends Controller {
 		} else {
 			$allowed = false;
 		}
+
+		# This is here so we can abuse the fact that we know if we have permissions or not already.
+		if ($allowed) {
+			$query = $em->createQuery('SELECT t FROM BM2SiteBundle:Trade t JOIN t.source s JOIN t.destination d WHERE (t.source=:here OR t.destination=:here)');
+			$query->setParameters(array('here'=>$settlement));
+		} else{
+			$query = $em->createQuery('SELECT t FROM BM2SiteBundle:Trade t JOIN t.source s JOIN t.destination d WHERE (t.source=:here OR t.destination=:here) AND (s.owner=:me OR d.owner=:me)');
+			$query->setParameters(array('here'=>$settlement, 'me'=>$character));
+		}
+		$trades = $query->getResult();
 
 		$trade = new Trade;
 
@@ -802,15 +808,21 @@ class ActionsController extends Controller {
 			if ($cancelform->isValid()) {
 				$data = $cancelform->getData();
 				$trade = $data['trade'];
-				$this->get('history')->logEvent(
-					$trade->getDestination(),
-					'event.settlement.tradestop',
-					array('%amount%'=>$trade->getAmount(), '%resource%'=>$trade->getResourceType()->getName(), '%link-settlement%'=>$trade->getSource()->getId()),
-					History::MEDIUM, false, 20
-				);
-				$em->remove($trade);
-				$em->flush();
-				return $this->redirect($request->getUri());
+				$source = $trade->getSource();
+				$dest = $trade->getDestination();
+				if (($allowed && ($source == $settlement || $dest == $settlement)) || (($dest->getOwner() == $character || $dest->getSteward() == $character) || ($source->getOwner() == $character || $dest->getSteward() == $character))) {
+					$this->get('history')->logEvent(
+						$trade->getDestination(),
+						'event.settlement.tradestop',
+						array('%amount%'=>$trade->getAmount(), '%resource%'=>$trade->getResourceType()->getName(), '%link-settlement%'=>$trade->getSource()->getId()),
+						History::MEDIUM, false, 20
+					);
+					$em->remove($trade);
+					$em->flush();
+					return $this->redirect($request->getUri());
+				} else {
+					$form->addError(new FormError("trade.notyourtrade"));
+				}
 			}
 		}
 
