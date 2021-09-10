@@ -175,7 +175,7 @@ class MilitaryManager {
 					break;
 				case 'retrain':
 					if ($canRecruit) {
-						$this->retrain($soldier, $settlement, $data['weapon'], $data['armour'], $data['equipment']);
+						$this->retrain($soldier, $settlement, $data['weapon'], $data['armour'], $data['equipment'], $data['mount']);
 					}
 					break;
 			}
@@ -228,7 +228,7 @@ class MilitaryManager {
 					case 'makemilitia':	if ($settlement) { $this->makeMilitia($npc, $settlement); } break;
 					case 'makesoldier':	if ($settlement) { $this->makeSoldier($npc, $character); } break;
 					case 'resupply':		if ($this->resupply($npc, $settlement)) { $success++; } else { $fail++; } break;
-					case 'retrain':		$this->retrain($npc, $settlement, $data['weapon'], $data['armour'], $data['equipment']);
+					case 'retrain':		$this->retrain($npc, $settlement, $data['weapon'], $data['armour'], $data['equipment'], $data['mount']);
 												break;
 				}
 			}
@@ -342,7 +342,7 @@ class MilitaryManager {
 		return true;
 	}
 
-	public function retrain(Soldier $soldier, Settlement $settlement, $weapon, $armour, $equipment) {
+	public function retrain(Soldier $soldier, Settlement $settlement, $weapon, $armour, $equipment, $mount) {
 		$train = 10;
 		$change = false;
 
@@ -363,6 +363,11 @@ class MilitaryManager {
 				$fail = true;
 			}
 		}
+		if ($mount && $mount != $soldier->getTrainedMount()) {
+			if (!$this->acquireItem($settlement, $mount, true, false)) {
+				$fail = true;
+			}
+		}
 		if ($fail) {
 			return false;
 		}
@@ -371,6 +376,7 @@ class MilitaryManager {
 		$soldier->setOldWeapon($soldier->getWeapon());
 		$soldier->setOldArmour($soldier->getArmour());
 		$soldier->setOldEquipment($soldier->getEquipment());
+		$soldier->setOldMount($soldier->getMount());
 
 		// now do it - we don't need to check for trainers in the acquireItem() statement anymore, because we did it above
 		if ($weapon && $weapon != $soldier->getTrainedWeapon()) {
@@ -394,6 +400,13 @@ class MilitaryManager {
 				$change = true;
 			}
 		}
+		if ($mount && $mount != $soldier->getTrainedMount()) {
+			if ($this->acquireItem($settlement, $mount)) {
+				$train += $mount->getTrainingRequired();
+				$soldier->setMount($mount)->setHasEquipment(true);
+				$change = true;
+			}
+		}
 
 		if ($change) {
 			// experienced troops train faster
@@ -405,11 +418,12 @@ class MilitaryManager {
 			$soldier->setBase($settlement)->setCharacter(null);
 
 			$this->history->addToSoldierLog(
-				$soldier, 'retrain',
+				$soldier, 'retrain2',
 				array('%link-settlement%'=>$settlement->getId(),
 					'%link-item-1%'=>$weapon?$weapon->getId():0,
 					'%link-item-2%'=>$armour?$armour->getId():0,
-					'%link-item-3%'=>$equipment?$equipment->getId():0
+					'%link-item-3%'=>$equipment?$equipment->getId():0,
+					'%link-item-4%'=>$mount?$mount->getId():0
 				)
 			);
 		}
