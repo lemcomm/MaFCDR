@@ -1,0 +1,28 @@
+# Might & Fealty
+# Text translation strings for associations, houses, and realms (non-event strings)
+# Author: Andrew Gwynn
+# Contact: mafteam@lemuriacommunity.org
+
+assoc:
+ form:
+  new:
+   name: Name
+   formalname: Formal Name
+   type: Type
+   public: Public
+   motto: Motto
+   founder: Founder Rank Name
+  description:
+   short: Short Description
+   full:  Full, Longer Description
+ help:
+  new:
+   name: A short, and easily referred to, name for the association.
+   formalname: The formal, and likely long, name for the association.
+   type: Separate from how it functions, this is what you style it as, and changes how the game refers to it.
+   public: Is the organization intended to be public knowledge? Should anyone be able to view basic details on it?
+   motto: Perhaps a battlecry for the order, or common chant of the faith? Something your association will be known to say or represent.
+   founder: This is the rank name for your character's rank within the association.
+  description:
+   short: The short description is used anywhere the game needs to be brief. Depending on how you structure this association, it may not show anywhere.
+   full: The full description is used primarily on the association details page, but depending on how you structure this association, it may not be visible even there.
