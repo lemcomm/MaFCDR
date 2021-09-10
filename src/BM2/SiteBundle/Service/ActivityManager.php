@@ -10,6 +10,8 @@ use BM2\SiteBundle\Entity\ActivityGroup;
 use BM2\SiteBundle\Entity\ActivityBoutGroup;
 use BM2\SiteBundle\Entity\ActivityBoutParticipant;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Skill;
+use BM2\SiteBundle\Entity\SkillType;
 
 use Doctrine\ORM\EntityManager;
 
@@ -163,6 +165,58 @@ class ActionManager {
 		} else {
 			return 'Bad $type matchup.';
 		}
+	}
+
+	/*
+	SKILL FUNCTIONS
+	*/
+
+	public function trainSkill(Character $char, SkillType $type, $pract = 0, $theory = 0) {
+		$training = false;
+		foreach ($char->getSkills() as $skill) {
+			if ($skill->getType() === $type) {
+				$training = $skill;
+				break;
+			}
+		}
+		if ($pract && $pract < 1) {
+			$pract = 1;
+		} elseif ($pract) {
+			$pract = round($pract);
+		}
+		if ($theory && $theory < 1) {
+			$theory = 1;
+		} elseif ($theory) {
+			$theory = round($theory);
+		}
+		if (!$training) {
+			$training = new Skill();
+			$this->em->persist($training);
+			$training->setCharacter($char);
+			$training->setType($type);
+			$training->setCategory($type->getCategory());
+			$training->setPractice($pract);
+			$training->setTheory($theory);
+			$training->setPracticeHigh($pract);
+			$training->setTheoryHigh($theory);
+		} else {
+			if ($pract) {
+				$newPract = $training->getPractice() + $pract;
+				$training->setPractice($newPract);
+				if ($newPract > $training->getPracticeHigh()) {
+					$training->setPracticeHigh($newPract);
+				}
+			}
+			if ($theory) {
+				$newTheory = $training->getPractice() + $theory;
+				$training->setPractice($newTheory);
+				if ($newTheory > $training->getTheoryHigh()) {
+					$training->setTheoryHigh($newTheory);
+				}
+			}
+		}
+		$training->setUpdate(new \DateTime('now'));
+		$this->em->flush();
 	}
 
 }

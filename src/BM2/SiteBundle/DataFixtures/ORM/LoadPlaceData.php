@@ -18,6 +18,7 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'capital'	=> array('requires' => 'ruler',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>true,	'pop' => 0),
 		'castle'	=> array('requires' => 'castle',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>true,	'pop' => 0),
 		'cave'		=> array('requires' => '',		'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
+		'collective'	=> array('requires' => '',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'embassy'	=> array('requires' => 'ambassador',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 2),
 		'fort'		=> array('requires' => 'fort',		'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'guild house'	=> array('requires' => 'guilds',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
@@ -32,7 +33,8 @@ class LoadPlaceData extends AbstractFixture implements OrderedFixtureInterface {
 		'temple'	=> array('requires' => 'temple',	'visible' => true,	'defensible'=>true,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'track'		=> array('requires' => 'track',		'visible' => true,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 0),
 		'tavern'	=> array('requires' => 'tavern',	'visible' => true,	'defensible'=>false,	'public'=>true,		'spawnable'=>false,	'pop' => 0),
-		'tournament'	=> array('requires' => 'lord',		'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 10)
+		'tournament'	=> array('requires' => 'lord',		'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 10),
+		'warehouse'	=> array('requires' => 'warehouse',	'visible' => false,	'defensible'=>false,	'public'=>false,	'spawnable'=>false,	'pop' => 0)
 	);
 
 	private $placesubtypes = array(

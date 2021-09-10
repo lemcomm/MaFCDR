@@ -1,0 +1,19 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	{% if public or visible %}
+		<div class="queue">
+			<h3>{{ 'house.history.name'|trans({},"politics")|title }}</h3>
+			<dl>
+			{% for event in assoc.log.events if event.public %}
+				<dt>{{ event.cycle|gametime('short') }}</dt>
+				<dd>{{ event|eventtranslate }}</dd>
+			{% endfor %}
+			</dl>
+		</div>
+		<h2>{{ assoc.formalName }}</h2>
+		{# Copy the realm and house pages, probably. #}
+	{% else %}
+		{{ 'view.hidden'|trans({}, "assoc") }}
+	{% endif %}
+{% endblock %}
