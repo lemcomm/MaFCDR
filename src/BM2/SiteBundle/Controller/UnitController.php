@@ -316,12 +316,16 @@ class UnitController extends Controller {
                 if ($recruit->getOldEquipment() && $recruit->getEquipment() != $recruit->getOldEquipment()) {
                         $this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
                 }
+                if ($recruit->getOldMount() && $recruit->getMount() != $recruit->getOldMount()) {
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getMount());
+                }
 
-                if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment()) {
+                if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment() || $recruit->getOldMount()) {
                 	// old soldier - return to militia with his old stuff
                 	$recruit->setWeapon($recruit->getOldWeapon());
                 	$recruit->setArmour($recruit->getOldArmour());
                 	$recruit->setEquipment($recruit->getOldEquipment());
+                	$recruit->setMount($recruit->getOldMount());
                 	$recruit->setTraining(0)->setTrainingRequired(0);
                 	$this->get('history')->addToSoldierLog($recruit, 'traincancel');
                 } else {
