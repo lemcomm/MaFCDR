@@ -633,9 +633,20 @@ class GameRequestController extends Controller {
 			}
 		}
 		if ($liege = $character->findLiege()) {
-			foreach ($liege->getOwnedSettlements() as $settlement) {
-				if ($settlement->getFeedSoldiers() && !$settlements->contains($settlement)) {
-					$settlements->add($settlement);
+			if ($liege instanceof ArrayCollection) {
+				$lieges = $liege;
+				foreach ($lieges as $liege) {
+					foreach ($liege->getOwnedSettlements() as $settlement) {
+						if ($settlement->getFeedSoldiers() && !$settlements->contains($settlement)) {
+							$settlements->add($settlement);
+						}
+					}
+				}
+			} else {
+				foreach ($liege->getOwnedSettlements() as $settlement) {
+					if ($settlement->getFeedSoldiers() && !$settlements->contains($settlement)) {
+						$settlements->add($settlement);
+					}
 				}
 			}
 		}
