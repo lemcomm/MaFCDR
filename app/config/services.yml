@@ -89,6 +89,9 @@ services:
     house_manager:
         class:      BM2\SiteBundle\Service\HouseManager
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
+    association_manager:
+        class:      BM2\SiteBundle\Service\AssociationManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager']
@@ -100,7 +103,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     game_runner:
