@@ -284,9 +284,11 @@ class PlaceController extends Controller {
 		if ($diplomacy) {
 			$rights[] = 'ambassador';
 		}
+		/* Disabling this until I can update ports to be more porty and tie into docks.
 		if ($settlement->getGeoData()->getCoast() && $settlement->hasBuildingNamed('Dockyard')) {
 			$rights[] = 'port';
 		}
+		*/
 
 		if ($character->getHouse() && $character->getHouse()->getHead() == $character) {
 			$rights[] = 'dynasty head';
