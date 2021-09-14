@@ -44,7 +44,7 @@
 					{% elseif not spawnfail and place.spawn.realm %}
 						{% if not place.spawn.active %}
 							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i><br><br>
-						{% elseif not place.house.spawnDescription %}
+						{% elseif not place.realm.spawnDescription %}
 							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i><br><br>
 						{% else %}
 							<i>{{ 'place.realmspawn'|trans({}, "palces")|raw }}</i><br><br>
