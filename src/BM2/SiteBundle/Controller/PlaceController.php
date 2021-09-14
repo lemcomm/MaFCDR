@@ -330,6 +330,7 @@ class PlaceController extends Controller {
 				$place->setCreator($character);
 				$place->setType($data['type']);
 				$place->setRealm($data['realm']);
+				$place->setDestroyed(false);
 				if ($character->getInsideSettlement()) {
 					$place->setSettlement($character->getInsideSettlement());
 					$place->setGeoData($character->getInsideSettlement()->getGeoData());
@@ -489,7 +490,7 @@ class PlaceController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$allplaces = $em->getRepository('BM2SiteBundle:Place')->findAll();
 		foreach ($allplaces as $other) {
-			if ($other == $me) continue;
+			if ($other == $me || $other->getDestroyed()) continue;
 			if (levenshtein($name, $other->getName()) < min(3, min(strlen($name), strlen($other->getName()))*0.75)) {
 				$form->addError(new FormError($this->get('translator')->trans("place.new.toosimilar.name"), null, array('%other%'=>$other->getName())));
 				$fail=true;
