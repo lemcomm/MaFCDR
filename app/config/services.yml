@@ -100,7 +100,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager']
     activity_manager:
         class:      BM2\SiteBundle\Service\ActivityManager
-        arguments:  ['@doctrine.orm.entity_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@geography']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager']
