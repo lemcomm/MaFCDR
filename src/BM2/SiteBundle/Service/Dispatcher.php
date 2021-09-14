@@ -2239,13 +2239,13 @@ class Dispatcher {
 		# If not inside a settlement, check that we've enough separation (500m)
 		$settlement = $character->getInsideSettlement();
 		if (!$settlement) {
+			if (!$this->geography->findMyRegion($character)) {
+				return array("name"=>"place.new.name", "description"=>"unavailable.notinregion");
+			}
 			if (!$this->geography->checkPlacePlacement($character)) {
 				return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
 			}
-		}
-		if ($settlement && $settlement->getOccupier()) {
-				$occupied = true;
-		} elseif ($this->geography->findMyRegion($character)->getSettlement() && $this->geography->findMyRegion($character)->getSettlement()->getOccupier()) {
+		} elseif ($settlement->getOccupier()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
