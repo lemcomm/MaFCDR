@@ -19,7 +19,7 @@ use Doctrine\ORM\EntityManager;
 As you might expect, ActivityManager handles Activities.
 */
 
-class ActionManager {
+class ActivityManager {
 
 	private $em;
 	private $geo;
