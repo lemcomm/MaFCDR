@@ -22,6 +22,36 @@
 					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
 				{% endif %}
 				{{ place.description.text }}<br><br>
+				{% set spawncheck = dispatcher.placeNewPlayerInfoTest(null, place) %}
+				{% if spawncheck.url is defined %}
+					{% set spawnfail = false %}
+
+					{% if not place.spawn %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nospawn'|trans({}, "places")|raw }}</i><br><br>
+					{% elseif not place.spawnDescription %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nodesc'|trans({}, "places")|raw }}</i><br><br>
+					{% endif %}
+					{% if not spawnfail and place.spawn.house %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.houseinactive'|trans({}, "places")|raw }}</i><br><br>
+						{% elseif not place.house.spawnDescription %}
+							<i>{{ 'place.spawnfail.nohousedesc'|trans({}, "places")|raw }}</i><br><br>
+						{% else %}
+							<i>{{ 'place.housespawn'|trans({}, "palces")|raw }}</i><br><br>
+						{% endif %}
+					{% elseif not spawnfail and place.spawn.realm %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i><br><br>
+						{% elseif not place.house.spawnDescription %}
+							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i><br><br>
+						{% else %}
+							<i>{{ 'place.realmspawn'|trans({}, "palces")|raw }}</i><br><br>
+						{% endif %}
+					{% endif %}
+				{% endif %}
+
 				{% if house %}
 					<i>{{ 'place.hosthouse'|trans({}, "places")|raw }}</i>
 					<hr>
@@ -55,8 +85,7 @@
 				{% if check.url is defined %}
 					<a href="{{path('maf_place_transfer', {"id":place.id}) }}"><button id="transfer">{{ 'place.transfer.name'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
-				{% set check = dispatcher.placeNewPlayerInfoTest(null, place) %}
-				{% if check.url is defined %}
+				{% if spawncheck.url is defined %}
 					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="spawn_description">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
 					<a href="{{path('maf_place_spawn_toggle', {"place":place.id}) }}"><button id="toggle_spawn">{% if place.spawn %}{{ 'place.spawn.deactivate'|trans({}, "places")|raw }}{% else %}{{ 'place.spawn.activate'|trans({}, "places")|raw }}{% endif %}</button></a>
 				{% endif %}

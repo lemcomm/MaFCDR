@@ -10,6 +10,7 @@
 		<field name="workers" type="integer" nullable="true"/>
 		<field name="active" type="boolean" nullable="true"/>
 		<field name="public" type="boolean" nullable="true"/>
+		<field name="destroyed" type="boolean" nullable="true"/>
 
 		<many-to-one field="type" target-entity="PlaceType"/>
 		<many-to-one field="sub_type" target-entity="PlaceSubType"/>
