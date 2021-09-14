@@ -62,6 +62,15 @@ place:
   to:           New Owner
   success:      You have transferred control of the Place to %name%.
  hosthouse:     Currently residing here...
+ spawnfail:
+  nospawn:      This Place can have arrivals but spawning has not been enabled.
+  nodesc:       This Place can have arrivals but no spawn description has been set.
+  houseinacitve: This Place can have arrivals but the house has not enabled it.
+  nohousedesc:  This Place can have arrivals but the house has no new player description.
+  realminactive: This Place can have arrivals but the realm has not enabled it.
+  norealmdesc:  This Place can have arrivals but the realm has no new player description.
+ realmspawn:    This Place appears to be correctly setup to support arrivals for %realm%.
+ housespawn:    This Place appears to be correctly setup to support arrivals for %house%.
 
 by:
  ambassador: As a Manager of Diplomacy...
