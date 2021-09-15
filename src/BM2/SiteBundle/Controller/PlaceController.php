@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\Spawn;
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
