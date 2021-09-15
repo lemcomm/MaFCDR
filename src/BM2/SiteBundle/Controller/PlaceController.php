@@ -354,9 +354,11 @@ class PlaceController extends Controller {
 				$place->setVisible($data['type']->getVisible());
 				if ($data['type'] != 'embassy' && $data['type'] != 'capital') {
 					$place->setActive(true);
-					$place->setOwner($character);
 				} else {
 					$place->setActive(false);
+				}
+				if ($data['type'] != 'capital') {
+					$place->setOwner($character);
 				}
 				$this->getDoctrine()->getManager()->flush(); # We can't create history for something that doesn't exist yet.
 				$this->get('history')->logEvent(
@@ -578,31 +580,6 @@ class PlaceController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/occupation/start", requirements={"id"="\d+"}, name="maf_place_occupation_start")
-	  */
-	public function occupationStartAction(Place $id, Request $request) {
-		$place = $id;
-		$character = $this->get('dispatcher')->gateway('placeOccupationStartTest', false, true, false, $place);
-		if (! $character instanceof Character) {
-			return $this->redirectToRoute($character);
-		}
-		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'occupy'));
-		$form->handleRequest($request);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			$targetrealm = $data['target'];
-
-			$result = $this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
-			$this->getDoctrine()->getManager()->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.start', [], 'communication'));
-			return $this->redirectToRoute('bm2_actions');
-		}
-		return $this->render('Place/occupationstart.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
-		]);
-	}
-
-	/**
 	  * @Route("/{id}/occupation/end", requirements={"id"="\d+"}, name="maf_place_occupation_end")
 	  */
 	public function occupationEndAction(Place $id, Request $request) {
@@ -615,13 +592,13 @@ class PlaceController extends Controller {
 		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $this->get('politics')->endOccupation($settlement, 'manual');
+                        $this->get('politics')->endOccupation($place, 'manual');
 			$this->getDoctrine()->getManager()->flush();
                         $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
                         return $this->redirectToRoute('bm2_actions');
                 }
 		return $this->render('Place/occupationend.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
+			'place'=>$place, 'form'=>$form->createView()
 		]);
 	}
 
@@ -683,6 +660,40 @@ class PlaceController extends Controller {
 		}
 		$em->flush();
 		return new RedirectResponse($this->generateUrl('maf_place_actionable').'#'.$place->getId());
+	}
+
+	/**
+	  * @Route("/{id}/destroy", requirements={"id"="\d+"}, name="maf_place_destroy")
+	  */
+	public function destroyAction(Place $id, Request $request) {
+		$place = $id;
+		if ($place->getType()->getName() == 'capital') {
+			$character = $this->get('dispatcher')->gateway('placeManageRulersTest', false, true, false, $place);
+		} else {
+			# No exception for embassies here.
+			$character = $this->get('dispatcher')->gateway('placeManageTest', false, true, false, $place);
+		}
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+                        $place->setDestroyed(true);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.destroyed',
+				array('%link-character%'=>$character->getId()),
+				History::HIGH, true
+			);
+
+			$this->getDoctrine()->getManager()->flush();
+                        return $this->redirectToRoute('maf_place_actionable');
+                }
+		return $this->render('Place/destroy.html.twig', [
+			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
 	}
 
 }
