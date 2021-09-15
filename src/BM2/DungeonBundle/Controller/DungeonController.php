@@ -105,7 +105,7 @@ class DungeonController extends Controller {
 					$act->setType('dungeon.explore')->setCharacter($dungeoneer->getCharacter());
 					$act->setBlockTravel(true);
 					$act->setCanCancel(false);
-					$result = $this->get('action_resolution')->queue($act);
+					$result = $this->get('action_manager')->queue($act);
 					$dungeoneer->getCharacter()->setSpecial(true); // turn on the special navigation menu
 					$this->getDoctrine()->getManager()->flush();
 					return $this->redirectToRoute('bm2_dungeon_dungeon_index');
@@ -291,7 +291,7 @@ class DungeonController extends Controller {
 					$choices[$monster->getId()] = $this->get('translator')->trans('target.monster', array("%amount%" => $monster->getAmount(), "%size%" =>  $size, "%type%" => $type), "dungeons");
 				}
 				if (!$valid) {
-					$choices = array(0=>$this->get('translator')->trans('target.invalid', array(), "dungeons"));					
+					$choices = array(0=>$this->get('translator')->trans('target.invalid', array(), "dungeons"));
 				}
 			} elseif ($level->getScoutLevel() > 0) {
 				foreach ($level->getMonsters() as $monster) {
