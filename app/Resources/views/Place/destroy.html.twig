@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "place.destroy.name"|trans({},"places")|title }}</h2>
+
+	<p>{{ "place.destroy.intro"|trans({},"places")|raw}}</p>
+
+	{{ form(form) }}
+
+{% endblock %}

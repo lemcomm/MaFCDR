@@ -71,14 +71,17 @@
 				{% else %}
 					<a href="{{path('maf_place_exit') }}"><button id="exit">{{ 'place.exit'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
+				{% set destroyable = false %}
 				{% if type.name == 'embassy' %}
-					{% set check = dispatcher.placeManageEmbassyTest(null, place) %}
+					{% set mngcheck = dispatcher.placeManageEmbassyTest(null, place) %}
 				{% elseif type.name == 'capital' %}
-					{% set check = dispatcher.placeManageRulersTest(null, place) %}
+					{% set mngcheck = dispatcher.placeManageRulersTest(null, place) %}
+					{% set destroyable = true %}
 				{% else %}
-					{% set check = dispatcher.placeManageTest(null, place) %}
+					{% set mngcheck = dispatcher.placeManageTest(null, place) %}
+					{% set destroyable = true %}
 				{% endif %}
-				{% if check.url is defined %}
+				{% if mngcheck.url is defined %}
 					<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 				{% set check = dispatcher.placeTransferTest(null, place) %}
@@ -120,6 +123,16 @@
 						{% if check.url is defined %}
 							<a href="{{path('maf_house_cadetship', {"house":house.id}) }}"><button id="cadetship">{{ 'house.cadet.name'|trans({}, "politics")|raw }}</button></a>
 						{% endif %}
+					{% endif %}
+				{% endif %}
+				{% if mngcheck.url is defined %}
+					{% if destroyable == false %}
+						{# We only get this if we're talking about embassies, which require the regular manage check vs the special checks. #}
+						{% set mngcheck = dispatcher.placeManageTest(null, place) %}
+					{% endif %}
+					{# We just redefined this, so we check again, just in case. #}
+					{% if mngcheck.url is defined %}
+						<a href="{{path('maf_place_destroy', {"id":place.id}) }}"><button id="manage">{{ 'place.destroy.name'|trans({}, "places")|raw }}</button></a>
 					{% endif %}
 				{% endif %}
 			</div>

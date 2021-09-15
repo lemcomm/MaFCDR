@@ -61,6 +61,11 @@ place:
     Any place of interest under your ownership can be transferred to another First One in the vicinity, all you need to do is say the word.
   to:           New Owner
   success:      You have transferred control of the Place to %name%.
+ destroy:
+  name:         Destroy Place
+  description:  Destroy this place.
+  intro: >
+    If you own a place, you can destroy a place. Once gone though, they can't be reamde or recovered, so be certain before you do this.
  hosthouse:     Currently residing here...
  spawnfail:
   nospawn:      This Place can have arrivals but spawning has not been enabled.
