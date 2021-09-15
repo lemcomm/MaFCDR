@@ -359,6 +359,7 @@ event:
  place:
   formalized:   Foramlized by %character% in the lands of %settlement%.
   attacked:     The place is being attacked by troops of %character%.
+  destroyed:    Place has been demolished by %character%.
   battle:       %battle% was fought.
   entered:      %character% has entered the place.
   entered2:     %character% has entered the place with %soldiers% soldiers.
