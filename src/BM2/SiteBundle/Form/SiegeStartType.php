@@ -36,7 +36,7 @@ class SiegeStartType extends AbstractType {
 
 		$builder->add('confirm', CheckboxType::class, array(
 			'required'=>false,
-			'label'=> 'military.siege.place.confirm'
+			'label'=> 'military.siege.menu.confirm'
 		));
 		$builder->add('war', EntityType::class, [
 			'required'=>false,
