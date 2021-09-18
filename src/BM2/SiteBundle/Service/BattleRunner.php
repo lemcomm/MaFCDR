@@ -170,7 +170,7 @@ class BattleRunner {
 							case 'stone towers': # 5 points
 							case 'stone castle': # 5 points
 								if ($myStage < 3) {
-									$this->report->addDefenseBuilding($building);
+									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
@@ -181,19 +181,19 @@ class BattleRunner {
 							case 'wood towers': # 5 points
 							case 'wood castle': # 5 points
 								if ($myStage < 2) {
-									$this->report->addDefenseBuilding($building);
+									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
 							case 'fortress': # 50 points
 								if ($myStage == 3) {
-									$this->report->addDefenseBuilding($building);
+									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
 							case 'citadel': # 70 points
 								if ($myStage == 4) {
-									$this->report->addDefenseBuilding($building);
+									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
@@ -201,7 +201,7 @@ class BattleRunner {
 								# Seats of power are all 5 pts each.
 								# Apothercary and alchemist are also 5.
 								# This grants up to 30 points.
-								$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
+								$this->report->addDefenseBuilding($building->getType()); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
 								$this->defenseBonus += $building->getDefenseScore();
 								break;
 						}
