@@ -77,5 +77,7 @@
 		<one-to-many field="hq_of" target-entity="Association" mapped-by="headquarters"/>
 		<many-to-one field="association" target-entity="Association" inversed-by="places"/>
 
+		<one-to-many field="battles" target-entity="Battle" mapped-by="place" fetch="EXTRA_LAZY"/>
+
 	</entity>
 </doctrine-mapping>
