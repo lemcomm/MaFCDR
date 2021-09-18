@@ -550,10 +550,18 @@ class WarController extends Controller {
 						case 'assault':
 							# We're either attackers assaulting or defenders sortieing! Battle type (assault vs sortie) is figured out by WarMan based on which group is passed as the attacker.
 							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'assault') {
-								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								if ($place) {
+									$result = $this->get('war_manager')->createBattle($character, null, $place, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								} else {
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getAttacker(), $siege->getDefender());
+								}
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							} else if ($siege->getDefender()->getLeader() == $character && $data['subaction'] == 'assault') {
-								$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getDefender(), $siege->getAttacker());
+								if ($place) {
+									$result = $this->get('war_manager')->createBattle($character, null, $place, null, $siege, $siege->getDefender(), $siege->getAttacker());
+								} else {
+									$result = $this->get('war_manager')->createBattle($character, $settlement, null, null, $siege, $siege->getDefender(), $siege->getAttacker());
+								}
 								return $this->redirectToRoute('bm2_battle', array('id'=>$result['battle']->getId()));
 							} else {
 								throw $this->createNotFoundException('error.notfound.leader');
