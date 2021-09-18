@@ -1396,7 +1396,11 @@ class CharacterController extends Controller {
 		}
 
 		if ($loc = $report->getLocationName()) {
-			$location = array('key' => $loc['key'], 'entity'=>$em->getRepository("BM2SiteBundle:Settlement")->find($loc['id']));
+			if ($report->getPlace()) {
+				$location = array('key' => $loc['key'], 'entity'=>$em->getRepository("BM2SiteBundle:Place")->find($loc['id']));
+			} else {
+				$location = array('key' => $loc['key'], 'entity'=>$em->getRepository("BM2SiteBundle:Settlement")->find($loc['id']));
+			}
 		} else {
 			$location = array('key'=>'battle.location.nowhere');
 		}

@@ -118,15 +118,24 @@ class BattleRunner {
 		$this->report->setUrban(FALSE);
 		$myStage = NULL;
 		$maxStage = NULL;
+		$place = $battle->getPlace();
 		switch ($battle->getType()) {
 			case 'siegesortie':
 				$this->report->setSortie(TRUE);
 				$myStage = $battle->getSiege()->getStage();
 				$maxStage = $battle->getSiege()->getMaxStage();
-				if ($myStage > 1) {
-					$location = array('key'=>'battle.location.sortie', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				if ($place) {
+					if ($myStage > 1) {
+						$location = array('key'=>'battle.location.sortie', 'id'=>$battle->getPlace()->getId(), 'name'=>$battle->getPlace()->getName());
+					} else {
+						$location = array('key'=>'battle.location.of', 'id'=>$battle->getPlace()->getId(), 'name'=>$battle->getPlace()->getName());
+					}
 				} else {
-					$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+					if ($myStage > 1) {
+						$location = array('key'=>'battle.location.sortie', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+					} else {
+						$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+					}
 				}
 				$this->siegeFinale = FALSE;
 				break;
@@ -134,62 +143,78 @@ class BattleRunner {
 				$this->report->setAssault(TRUE);
 				$myStage = $battle->getSiege()->getStage();
 				$maxStage = $battle->getSiege()->getMaxStage();
-				if ($myStage > 2 && $myStage == $maxStage) {
-					$location = array('key'=>'battle.location.castle', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
-					$this->siegeFinale = TRUE;
+				if ($place) {
+					if ($myStage > 2 && $myStage == $maxStage) {
+						$location = array('key'=>'battle.location.castle', 'id'=>$battle->getPlace()->getId(), 'name'=>$battle->getPlace()->getName());
+						$this->siegeFinale = TRUE;
+					} else {
+						$location = array('key'=>'battle.location.assault', 'id'=>$battle->getPlace()->getId(), 'name'=>$battle->getPlace()->getName());
+						$this->siegeFinale = FALSE;
+					}
 				} else {
-					$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
-					$this->siegeFinale = FALSE;
+					if ($myStage > 2 && $myStage == $maxStage) {
+						$location = array('key'=>'battle.location.castle', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+						$this->siegeFinale = TRUE;
+					} else {
+						$location = array('key'=>'battle.location.assault', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+						$this->siegeFinale = FALSE;
+					}
 				}
 				$assault = true;
-				# So, this looks a bit weird, but stone stuff counts during stages 1 and 2, while wood stuff and moats only count during stage 1. Stage 3 gives you the fortress, and stage 4 gives the citadel bonus.
-				# If you're wondering why this looks different from how we figure out the max stage, that's because the final stage works differently.
-				foreach ($battle->getDefenseBuildings() as $building) {
-					switch (strtolower($building->getName())) {
-						case 'stone wall': # 10 points
-						case 'stone towers': # 5 points
-						case 'stone castle': # 5 points
-							if ($myStage < 3) {
-								$this->report->addDefenseBuilding($building);
+				if (!$place) {
+					# So, this looks a bit weird, but stone stuff counts during stages 1 and 2, while wood stuff and moats only count during stage 1. Stage 3 gives you the fortress, and stage 4 gives the citadel bonus.
+					# If you're wondering why this looks different from how we figure out the max stage, that's because the final stage works differently.
+					foreach ($battle->getDefenseBuildings() as $building) {
+						switch (strtolower($building->getType()->getName())) {
+							case 'stone wall': # 10 points
+							case 'stone towers': # 5 points
+							case 'stone castle': # 5 points
+								if ($myStage < 3) {
+									$this->report->addDefenseBuilding($building);
+									$this->defenseBonus += $building->getDefenseScore();
+								}
+								break;
+							case 'palisade': # 10 points
+							case 'empty moat': # 5 points
+							case 'filled moat': # 5 points
+							case 'wood wall': # 10 points
+							case 'wood towers': # 5 points
+							case 'wood castle': # 5 points
+								if ($myStage < 2) {
+									$this->report->addDefenseBuilding($building);
+									$this->defenseBonus += $building->getDefenseScore();
+								}
+								break;
+							case 'fortress': # 50 points
+								if ($myStage == 3) {
+									$this->report->addDefenseBuilding($building);
+									$this->defenseBonus += $building->getDefenseScore();
+								}
+								break;
+							case 'citadel': # 70 points
+								if ($myStage == 4) {
+									$this->report->addDefenseBuilding($building);
+									$this->defenseBonus += $building->getDefenseScore();
+								}
+								break;
+							default:
+								# Seats of power are all 5 pts each.
+								# Apothercary and alchemist are also 5.
+								# This grants up to 30 points.
+								$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
 								$this->defenseBonus += $building->getDefenseScore();
-							}
-							break;
-						case 'palisade': # 10 points
-						case 'empty moat': # 5 points
-						case 'filled moat': # 5 points
-						case 'wood wall': # 10 points
-						case 'wood towers': # 5 points
-						case 'wood castle': # 5 points
-							if ($myStage < 2) {
-								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenseScore();
-							}
-							break;
-						case 'fortress': # 50 points
-							if ($myStage == 3) {
-								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenseScore();
-							}
-							break;
-						case 'citadel': # 70 points
-							if ($myStage == 4) {
-								$this->report->addDefenseBuilding($building);
-								$this->defenseBonus += $building->getDefenseScore();
-							}
-							break;
-						default:
-							# Seats of power are all 5 pts each.
-							# Apothercary and alchemist are also 5.
-							# This grants up to 30 points.
-							$this->report->addDefenseBuilding($building); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
-							$this->defenseBonus += $building->getDefenseScore();
-							break;
+								break;
+						}
 					}
 				}
 				break;
 			case 'urban':
 				$this->report->setUrban(TRUE);
-				$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				if ($place) {
+					$location = array('key'=>'battle.location.of', 'id'=>$battle->getPlace()->getId(), 'name'=>$battle->getPlace()->getName());
+				} else {
+					$location = array('key'=>'battle.location.of', 'id'=>$battle->getSettlement()->getId(), 'name'=>$battle->getSettlement()->getName());
+				}
 				$this->siegeFinale = FALSE;
 				break;
 			case 'field':

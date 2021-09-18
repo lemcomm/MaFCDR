@@ -684,11 +684,17 @@ military:
   menu:
    name:        Siege Settlement
    description: Declare a siege of this settlement, in order to force an entry.
-   inactive: >
-     Order your soldiers to begin a siege of <b>%settlement%</b>.<br />
-     Depending on the number of soldiers you have, you might be able to fully encircle the settlement, and block entry and exit.<br /><br />
-     Of course, it should go without saying that the settlement owner, and the defenders guarding it, will not like this, and this will constitute an act of war.<br />
-     After declaring a siege, you'll then be able to assault the settlement properly, construct siege equipment, or either pass control of the siege to another or, simply, disband the siege if you so wish.
+   inactive:
+    settlement: >
+      Order your soldiers to begin a siege of <b>%settlement%</b>.<br />
+      Depending on the number of soldiers you have, you might be able to fully encircle the settlement, and block entry and exit.<br /><br />
+      Of course, it should go without saying that the settlement owner, and the defenders guarding it, will not like this, and this will constitute an act of war.<br />
+      After declaring a siege, you'll then be able to assault the settlement properly, construct siege equipment, or either pass control of the siege to another or, simply, disband the siege if you so wish.
+    place: >
+      Order your soldiers to begin a siege of <b>%place%</b>.<br />
+      Given the small size, a place is easily barricaded, and there are no requirements for encirlcing it.<br /><br />
+      Of course, it should go without saying that the place owner, and the defenders guarding it, will not like this, and this will constitute an act of war.<br />
+      After declaring a siege, you'll then be able to assault the place properly, construct siege equipment, or either pass control of the siege to another or, simply, disband the siege if you so wish.
    active: >
      From here you can manage your, and possibly other's, actions in regards to the siege of <b>%settlement%</b>.<br /><br />
      If you are the siege commander on either side, you will be able to order assaults or sorties of your collective force against that of your enemy, or if you so desire pass control of the forces to another.<br />
@@ -696,6 +702,8 @@ military:
      <i><b>Coming Soon</b>: You also have the ability to order the construction of siege equipment from here, which will be used as soon as completed or during any assault, if appropriate (refer to the manual for more information).</i>
      Lastly, if you tire of this siege altogether, you could decide to leave it.
    confirm:    Declare a Siege?
+   war:        As part of the war of ...
+   realms:     In the name of the realm of ...
    places:     Delacre a Siege of ...
   actions:
    leave:
