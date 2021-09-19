@@ -825,10 +825,10 @@ class CharacterManager {
 	public function bequeathPlace(Place $place, Character $heir, Character $from, Character $via=null) {
 		$oldowner = $place->getOwner();
 		if ($oldowner) {
-			$oldowner->removeOwnedPlace($settlement);
+			$oldowner->removeOwnedPlace($place);
 		}
 		if ($heir) {
-			$heir->addOwnedPlace($settlement);
+			$heir->addOwnedPlace($place);
 		}
 		$place->setOwner($heir);
 		foreach ($place->getPermissions() as $perm) {
@@ -844,14 +844,14 @@ class CharacterManager {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inherit.place',
-				array('%link-place%'=>$settlement->getId(), '%link-character%'=>$from->getId()),
+				array('%link-place%'=>$place->getId(), '%link-character%'=>$from->getId()),
 				HISTORY::HIGH, true
 			);
 		} else {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inheritvia.place',
-				array('%link-place%'=>$settlement->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
+				array('%link-place%'=>$place->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
 				History::HIGH, true
 			);
 		}
