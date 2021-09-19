@@ -133,10 +133,10 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 		'war horse'         => array('type' => 'mount', 'ranged' =>  0, 'melee' =>  25, 'defense' =>  30, 'train' =>100, 'resupply' =>800,	'provider' => 'Royal Mews', 'trainer' => 'Wood Castle',		'icon' => 'items/warhorse2.png'),
 
 		'shield'            => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>   0, 'defense' =>  25, 'train' => 40, 'resupply' => 40,	'provider' => 'Carpenter', 'trainer' => 'Guardhouse',	'icon' => 'items/shield2.png'),
-		'javelin'           => array('type' => 'equipment', 'ranged' => 65, 'melee' =>  10, 'defense' =>   0, 'train' => 40, 'resupply' => 35,	'provider' => 'Weaponsmith', 'trainer' => 'Guardhouse',	'icon' => 'items/javelin2.png'),
+		'javelin'           => array('type' => 'equipment', 'ranged' => 65, 'melee' =>  10, 'defense' =>   0, 'train' => 40, 'resupply' => 35,	'provider' => 'Weaponsmith', 'trainer' => 'Guardhouse',	'icon' => 'items/javelin2.png', 'skill'=> 'javelin'),
 		'short sword'       => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>  10, 'defense' =>   5, 'train' => 40, 'resupply' => 50,	'provider' => 'Bladesmith', 'trainer' => 'Barracks',		'icon' => 'items/kurzschwert2.png'),
-		'lance'    	    => array('type' => 'equipment', 'ranged' =>  0, 'melee' => 100, 'defense' =>   0, 'train' => 50, 'resupply' => 50,	'provider' => 'Weaponsmith', 'trainer' => 'Royal Mews', 'icon' => null),
-		'pavise'    	    => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>   0, 'defense' =>  50, 'train' => 40, 'resupply' => 60,	'provider' => 'Carpenter', 'trainer' => 'Archery Range', 'icon' => null),
+		'lance'    	    => array('type' => 'equipment', 'ranged' =>  0, 'melee' => 100, 'defense' =>   0, 'train' => 50, 'resupply' => 50,	'provider' => 'Weaponsmith', 'trainer' => 'Royal Mews', 		'icon' => null, 'skill'=> 'lance'),
+		'pavise'    	    => array('type' => 'equipment', 'ranged' =>  0, 'melee' =>   0, 'defense' =>  50, 'train' => 40, 'resupply' => 60,	'provider' => 'Carpenter', 'trainer' => 'Archery Range', 		'icon' => null),
 	);
 
 	/**
@@ -180,6 +180,15 @@ class LoadEquipmentData extends AbstractFixture implements OrderedFixtureInterfa
 					$type->setTrainer($trainer);
 				} else {
 					echo "can't find ".$data['trainer']." needed by $name.\n";
+				}
+			}
+			if (isset($data['skill'])) {
+				$skill = $manager->getRepository('BM2SiteBundle:SkillType')->findOneByName($data['skill']);
+				#$trainer = $this->getReference('buildingtype: '.strtolower($data['trainer']));
+				if ($skill) {
+					$type->setSkill($skill);
+				} else {
+					echo "can't find ".$data['skill']." needed by $name.\n";
 				}
 			}
 			$this->addReference('equipmenttype: '.strtolower($name), $type);
