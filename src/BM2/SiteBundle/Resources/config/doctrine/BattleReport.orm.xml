@@ -21,6 +21,7 @@
 		<field name="debug" type="text"/>
 
 		<many-to-one field="settlement" target-entity="Settlement"/>
+		<many-to-one field="place" target-entity="Place"/>
 		<one-to-many field="participants" target-entity="BattleParticipant" mapped-by="battle_report"/>
 
 		<one-to-many field="groups" target-entity="BattleReportGroup" mapped-by="battle_report">
