@@ -228,6 +228,7 @@ class BattleRunner {
 		$this->report->setCycle($cycle);
 		$this->report->setLocation($battle->getLocation());
 		$this->report->setSettlement($battle->getSettlement());
+		$this->report->setPlace($battle->getPlace());
 		$this->report->setWar($battle->getWar());
 		$this->report->setLocationName($location);
 
@@ -1347,7 +1348,7 @@ class BattleRunner {
 	private function ChargeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		if ($soldier->isNoble()) {
-			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
+			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
 		}
@@ -1388,7 +1389,11 @@ class BattleRunner {
 	private function RangedHit(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
 		if ($soldier->isNoble()) {
-			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
+			if (in_array($soldier->getType(), ['armoured archer', 'archer'])) {
+				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
+			} else {
+				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
+			}
 		} else {
 			$soldier->gainExperience(1*$xpMod);
 		}

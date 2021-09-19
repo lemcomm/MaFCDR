@@ -171,7 +171,11 @@ class ActivityManager {
 	SKILL FUNCTIONS
 	*/
 
-	public function trainSkill(Character $char, SkillType $type, $pract = 0, $theory = 0) {
+	public function trainSkill(Character $char, SkillType $type=null, $pract = 0, $theory = 0) {
+		if (!$type) {
+			# Not all weapons have skills, this just catches those.
+			return false;
+		}
 		$training = false;
 		foreach ($char->getSkills() as $skill) {
 			if ($skill->getType() === $type) {
@@ -215,7 +219,7 @@ class ActivityManager {
 				}
 			}
 		}
-		$training->setUpdate(new \DateTime('now'));
+		$training->setUpdated(new \DateTime('now'));
 		$this->em->flush();
 	}
 
