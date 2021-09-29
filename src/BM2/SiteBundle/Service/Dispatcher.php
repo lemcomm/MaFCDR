@@ -2254,13 +2254,14 @@ class Dispatcher {
 			return array("name"=>"place.new.name", "description"=>"unavailable.occupied");
 		}
 		if (
-			($character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside'))
-			&& (!$character->getInsideSettlement() && !$this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))
+			($character->getInsideSettlement() && $this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside'))
+			|| (!$character->getInsideSettlement() && $this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))
 		) {
-			# It's a long line, but basically, are we inside a settlement with permission, or outside a settlement with permission. If neither, we don't get access :)
+			# It's a long line, but basically, but if we're in a settlement or in a region and have the respective permission, we're allowed. If not, denied.
+			return array("name"=>"place.new.name", "url"=>"maf_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
+		} else {
 			return array("name"=>"place.new.name", "description"=>"unavailable.nopermission");
 		}
-		return array("name"=>"place.new.name", "url"=>"maf_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 	}
 
 	public function placeManageTest($ignored, Place $place) {
