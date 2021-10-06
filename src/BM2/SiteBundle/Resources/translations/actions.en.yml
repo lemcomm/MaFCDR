@@ -637,7 +637,6 @@ military:
   success3:       You have damaged the %featuretype%, by about %damage% % of the effort required to build it.
  siege:
   name:         Siege Actions
-  actions:      All Available Actions
   no_action:    (Select an Action)
   start:
    name:        Declare a Siege
@@ -666,6 +665,9 @@ military:
   joinattack:
    name:        Join a Pending Attack
    description: Order your men to join you in joining the pending attack.
+  join:
+   name:        Join an Ongoing Siege
+   description: Order your men to join you in partaking in the ongoing siege.
   confirm:
    leadership:  Who shall take command?
    assume:      Confirm Assumption
@@ -682,8 +684,10 @@ military:
    defenders:   Defenders
    none:        (none)
   menu:
-   name:        Siege Settlement
-   description: Declare a siege of this settlement, in order to force an entry.
+   name:
+    settlement: Siege Settlement
+    place:      Siege Place of Interest
+   description: Declare a siege of this location, in order to force an entry.
    inactive:
     settlement: >
       Order your soldiers to begin a siege of <b>%settlement%</b>.<br />
@@ -706,30 +710,31 @@ military:
    realms:     In the name of the realm of ...
    places:     Delacre a Siege of ...
   actions:
+   all:                 All Available Actions
    leave:
-    name:
-    description:
+    name:               Leave the Siege
+    description:        If you believe there are better uses of your time, you can always opt to leave the siege and not participate in any upcoming battles.
     confirm:            Leave the Siege?
    disband:
-    name:
-    description:
+    name:               Disband the Siege
+    description:        As is the right of the assaulting force, you could always just opt to call the entire thing off.
     confirm:            Cancel the Siege?
    assault:
-    name:
-    description:
-    confirm:            Call an Assault?
+    name:               Begin an Attack.
+    description:        If you've finished gathering your forces and think it's time to take the offensive, why not call an attack on the enemy?
+    confirm:            Call an Attack?
    leadership:
-    name:
-    description:
+    name:               Change Leadership
+    description:        As commander of your force, you can always pass it off to another.
     form:               Who Shall Command?
    assume:
-    name:
-    description:
+    name:               Assume Leadership
+    description:        Sometimes, things get attacked when you're not actively on the defense. This lets you assume control.
     confirm:            Take Leadership?
    join:
     name:               Join the Ongoing Siege
     description: >
-      While it is dependent on which side of the walls you are on, you are welcome to join the ongoing siege of %settlement%.<br /><<br />
+      While it is dependent on which side of the walls you are on, you are welcome to join the ongoing siege of %settlement%.<br /><br />
       <i><b>Coming Soon</b>: You will later be able to join a third or fourth side that will allow you to assist the defenders from outside and attackers from inside.</i>
     form:               Side to Join?
 
