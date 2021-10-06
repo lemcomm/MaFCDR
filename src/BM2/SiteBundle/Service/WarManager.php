@@ -656,7 +656,9 @@ class WarManager {
 					} else {
 						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 					}
-					$focus->getBattles()->first()->setSiege(NULL); # Detach the siege from the battle. Only one battle per siege at the moment, so we can just grab the only one present.
+					if ($battle = $focus->getBattles()->first()) {
+						$battle->setSiege(NULL); # Detach the siege from the battle. Only one battle per siege at the moment, so we can just grab the only one present.
+					}
 				}
 				$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
