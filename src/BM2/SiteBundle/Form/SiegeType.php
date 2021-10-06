@@ -135,7 +135,7 @@ class SiegeType extends AbstractType {
 				'required'=>true,
 				'choices' => $actionslist,
 				'placeholder'=>'military.siege.no_action',
-				'label'=> 'military.siege.actions'
+				'label'=> 'military.siege.actions.all'
 			));
 		} else {
 			$builder->add('action', HiddenType::class, array(
@@ -250,7 +250,7 @@ class SiegeType extends AbstractType {
 					$builder->add('side', ChoiceType::class, array(
 						'required'=>true,
 						'choices' => $sides,
-						'placeholder'=>'military.siege.sides.none',
+						'placeholder'=>'military.siege.side.none',
 						'label'=> 'military.siege.actions.join.form'
 					));
 					break;
