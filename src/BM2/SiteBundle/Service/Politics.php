@@ -547,9 +547,9 @@ class Politics {
 			$event = 'settlement';
 			$warTargets = $target->getWarTargets();
 			if ($warTargets && !$occupantTakeOver) {
-				foreach ($warTargets as $target) {
-					if ($target->getTakenCurrently()) {
-						$target->setTakenCurrently(false);
+				foreach ($warTargets as $warTarget) {
+					if ($warTarget->getTakenCurrently()) {
+						$warTarget->setTakenCurrently(false);
 					}
 				}
 			}
