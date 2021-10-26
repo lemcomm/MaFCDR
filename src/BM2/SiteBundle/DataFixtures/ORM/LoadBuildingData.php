@@ -86,6 +86,9 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Quarry'		=> array('auto' =>      0, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter'), 'conditions'=>true),
 
 		'Hunters Lodge'		=> array('auto' =>	0, 'min' =>	50, 'work' =>	5000, 'ratio' =>  1200, 'builtin' => ['city', 'fort'], 'requires' => ['Bowyer'], 'conditions'=>true),
+
+		'List Field'		=> array('auto' =>      0, 'min' =>   2000, 'work' =>  15000, 'ratio' =>  2000, 'builtin' => ['city'], 'requires' => ['Carpenter','Training Ground','Stables']),
+		'Tournament Grounds'	=> array('auto' =>      0, 'min' =>   7500, 'work' => 500000, 'ratio' =>   500, 'builtin' => ['city'], 'requires' => ['Arena','Stables','Inn','List Field','Regional Seat'], 'conditions'=>true),
 	);
 
 	private $resources = array(
@@ -161,6 +164,9 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Quarry'		=> array('wood'=>array('construction'=>3000, 'operation'=>100), 'metal'=>array('construction'=>1000, 'operation'=>50, 'bonus'=>20), 'goods'=>array('construction'=>300, 'operation'=>2, 'bonus'=>1)),
 
 		'Hunters Lodge'         => array('wood'=>array('construction'=>1800, 'bonus'=>1), 'metal'=>array('construction'=>100), 'food'=>array('provides'=>5, 'bonus'=>5)),
+
+		'List Field'		=> array('wood'=>['construction'=>4500], 'metal'=>['construction'=>500], 'goods'=>['construction'=>500], 'money'=>['construction'=>200, 'provides'=>5, 'bonus'=>5]),
+		'Tournament Grounds'	=> array('wood' => ['construction'=>10000], 'metal'=>['construction'=>2000], 'goods'=>['construction'=>2000], 'money'=>['construction'=>2500, 'provides'=>5, 'bonus'=>20]),
 	);
 
 	/**
