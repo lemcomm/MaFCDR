@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Artifact;
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Item;
@@ -46,6 +47,10 @@ class DescriptionManager {
 					$olddesc->setActiveArtifact(NULL);
 					$this->em->flush();
 					break;
+				case 'Association':
+					$olddesc->setActiveAssociation(NULL);
+					$this->em->flush();
+					break;
 				case 'House':
 					$olddesc->setActiveHouse(NULL);
 					$this->em->flush();
@@ -76,6 +81,10 @@ class DescriptionManager {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
 				$desc->setArtifact($entity);
+				break;
+			case 'Association':
+				$desc->setActiveAssociation($entity);
+				$desc->setAssociation($entity);
 				break;
 			case 'House':
 				$desc->setActiveHouse($entity);
@@ -114,6 +123,14 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.artifact',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Association':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.assoc',
 						null,
 						History::LOW
 					);
