@@ -31,6 +31,7 @@ class Dispatcher {
 	private $geography;
 	private $milman;
 	private $interactions;
+	private $assocman;
 
 	// test results to store because they are expensive to calculate
 	private $actionableSettlement=false;
@@ -40,12 +41,13 @@ class Dispatcher {
 	private $actionableShip=false;
 	private $actionableHouses=false;
 
-	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions) {
+	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions, AssociationManager $assocman) {
 		$this->appstate = $appstate;
 		$this->permission_manager = $pm;
 		$this->geography = $geo;
 		$this->milman = $milman;
 		$this->interactions = $interactions;
+		$this->assocman = $assocman;
 	}
 
 	public function getCharacter() {
@@ -339,7 +341,8 @@ class Dispatcher {
 		$actions[] = $this->militaryLootSettlementTest(true);
 		if ($settlement = $this->getActionableSettlement()) {
 			$actions[] = $this->militaryDefendSettlementTest();
-			if (!$settlement->getSiege()) {
+			$siege = $settlement->getSiege();
+			if (!$siege) {
 				$actions[] = $this->militarySiegeSettlementTest();
 			} else {
 				$actions[] = $this->militarySiegeJoinSiegeTest();
@@ -1909,12 +1912,22 @@ class Dispatcher {
 	}
 	*/
 
-	public function militarySiegeJoinSiegeTest($check_duplicate=false, $siege) {
-		# Controls access to the ability to join an ongoing siege.
-		if (!$siege) {
-			# No siege.
-			return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
+	public function militarySiegeJoinSiegeTest($check_duplicate=false, $siege = null) {
+		# This is the one route for the siege menu that needs to be accessible outside of a siege. And this is the easiest way to do that.
+		if ($siege === null) {
+			$settlement = $this->getActionableSettlement();
+			$nosiege = false;
+			if (!$settlement) {
+				$nosiege = true;
+			} elseif (!$settlement->getSiege()) {
+				$nosiege = true;
+			}
+			if ($nosiege) {
+				# No siege.
+				return array("name"=>"military.siege.join.name", "description"=>"unavailable.nosiege");
+			}
 		}
+
 		if ($this->getCharacter()->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.prisoner");
@@ -2703,7 +2716,7 @@ class Dispatcher {
 				if($unit->getSettlement() != $character->getInsideSettlement()) {
 					return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
 				}
-				return array("name"=>"unit.recall.name", "description"=>"unavailable.notlord");
+				return array("name"=>"unit.recall.name", "description"=>"unavailable.notyours");
 			}
 		} elseif ($unit->getCharacter() != $character) {
 			return array("name"=>"unit.recall.name", "description"=>"unavailable.notyourunit");
@@ -2712,7 +2725,6 @@ class Dispatcher {
 		if ($unit->getTravelDays() > 0) {
 			return array("name"=>"unit.recall.name", "description"=>"unavailable.rebasing");
 		}
-		if ($unit->getTravelDays() == 0 && !$unit->getCharacter())
 		return $this->action("unit.recall.name", "maf_unit_recall");
 	}
 
@@ -3277,6 +3289,77 @@ class Dispatcher {
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
+		}
+	}
+
+	/* ========== Association Actions ========== */
+
+	public function assocCreateTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.new.name", "description"=>"unavailable.$check");
+		}
+		$character = $this->getCharacter();
+		if (!$character->getInsidePlace()) {
+			return array("name"=>"assoc.new.name", "description"=>"unavailable.outsideplace");
+		} else {
+			$place = $character->getInsidePlace();
+		}
+		if (!$place->getType()->getAssociations()) {
+			return array("name"=>"assoc.new.name", "description"=>"unavailable.noassociationsallowed");
+		}
+		if ($place->getOwner() !== $character) {
+			#TODO: Rework this for permissions when we add House permissions (if we do).
+			return array("name"=>"assoc.new.name", "description"=>"unavailable.notowner");
+		}
+		return array("name"=>"assoc.new.name", "url"=>"maf_assoc_create", "description"=>"assoc.new.description", "long"=>"assoc.new.longdesc");
+	}
+
+	public function assocCreateRankTest(Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($char);
+		if (!$member) {
+			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->canSubcreate()) {
+			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.nosubcreate");
+		} else {
+			return $this->action("assoc.create.rank", "maf_assoc_createrank", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocManageRankTest($opts) {
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		$assoc = $opts[0];
+		$rank = $opts[1];
+		if (!$assoc instanceof Association || !$rank instanceof AssociationRank) {
+			return array("name"=>"assoc.manage.rank.name", "description"=>"unavaible.badinput");
+		}
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($char);
+		if (!$member) {
+			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notinassoc");
+		}
+		$myRank = $member->getRank();
+		if (!$myRank->canSubcreate()) {
+			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.nosubcreate");
+		}
+		if ($myRank->findManageableSubordinates()->contains($rank)) {
+			return $this->action("assoc.manage.rank", "maf_assoc_managerank", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		} else {
+			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notmanageablerank");
 		}
 	}
 
