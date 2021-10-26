@@ -5,6 +5,8 @@
 
 assoc:
  form:
+  select: (select one)
+  submit: Submit
   new:
    name: Name
    formalname: Formal Name
@@ -12,17 +14,24 @@ assoc:
    public: Public
    motto: Motto
    founder: Founder Rank Name
+   created: Association has been succesfully created!
   description:
    short: Short Description
-   full:  Full, Longer Description
+   full:  Full Description
  help:
-  new:
-   name: A short, and easily referred to, name for the association.
-   formalname: The formal, and likely long, name for the association.
-   type: Separate from how it functions, this is what you style it as, and changes how the game refers to it.
-   public: Is the organization intended to be public knowledge? Should anyone be able to view basic details on it?
-   motto: Perhaps a battlecry for the order, or common chant of the faith? Something your association will be known to say or represent.
-   founder: This is the rank name for your character's rank within the association.
+  name: A short, and easily referred to, name for the association.
+  formalname: The formal, and likely long, name for the association.
+  type: Separate from how it functions, this is what you style it as, and changes how the game refers to it.
+  public: Is the organization intended to be public knowledge? Should anyone be able to view basic details on it?
+  motto: Perhaps a battlecry for the order, or common chant of the faith? Something your association will be known to say or represent.
+  founder: This is the rank name for your character's rank within the association.
   description:
    short: The short description is used anywhere the game needs to be brief. Depending on how you structure this association, it may not show anywhere.
    full: The full description is used primarily on the association details page, but depending on how you structure this association, it may not be visible even there.
+ route:
+  create:
+   header: Formalize a New Association
+   intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>It should be worth noting that one option here has fairly reaching impact. Unlike Houses and Realms which are, by design, public, Associations need not be. You can decide the moment you create it that you don't want this association to be Public, and that only members of it should know about it.</p><p>Finally, there is one last thing you should understand about Associations in M&F. Type is only what your association styles itself as, and has no formal functionality beyond that. You can be the Gold Star Merchant Company that believes in a pantheon or a Temple of Fire Lake that operates exclusively to sell mercenary contracts. How your Association works is entirely up to you to decide.</p>
+  view:
+   history:
+    name: History
