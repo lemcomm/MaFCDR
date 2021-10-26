@@ -234,6 +234,8 @@ event:
    position:    The %realmposition% has rejected your offer of vassalge.
   steward:      Has been appointed as the steward of %settlement%.
   recvdplace:   Has received ownership of %place%.
+  assoc:
+   founded:     Founded the association of %association%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -375,6 +377,8 @@ event:
   newowner:     Onwership has been transferred to %character%.
   inherited:    Was inherited by %character%.
   inherifail:   Fell to independence on the death of %character%, who left no heir.
+ assoc:
+  founded:      Formalized by %character%.
 
 report:
  building:
