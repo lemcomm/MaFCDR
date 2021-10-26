@@ -269,6 +269,8 @@ class PlaceController extends Controller {
 			if ($settlement->hasBuildingNamed('Tavern')) {
 				$rights[] = 'tavern';
 			}
+		} else {
+			$rights[] = 'outside';
 		}
 
 		$realm = $settlement->getRealm();
@@ -293,6 +295,18 @@ class PlaceController extends Controller {
 
 		if ($character->getHouse() && $character->getHouse()->getHead() == $character) {
 			$rights[] = 'dynasty head';
+		}
+
+		# Economy checks.
+		$econ = $this->get('economy');
+		if ($econ->checkSpecialConditions($settlement, 'mine')) {
+			$rights[] = 'metals';
+		}
+		if ($econ->checkSpecialConditions($settlement, 'quarry')) {
+			$rights[] = 'stone';
+		}
+		if ($econ->checkSpecialConditions($settlement, 'lumber yard')) {
+			$rights[] = 'forested';
 		}
 
 
