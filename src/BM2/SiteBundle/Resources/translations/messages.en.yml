@@ -1643,6 +1643,7 @@ unavailable:
  placestooclose: You are too close to another settlement or place to create a new place here.
  notyourunit:   This isn't your unit to manage.
  toocrowded:    This is too close to another place or settlement.
+ noassociationsallowed: This Place does not allow for the creation of Associations.
 marker:
  name:      Marker name
  type:      Marker type
