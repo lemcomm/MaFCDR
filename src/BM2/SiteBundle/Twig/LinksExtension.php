@@ -69,6 +69,19 @@ class LinksExtension extends \Twig_Extension {
 				case 'noble':
 					$type = 'Character';
 					break;
+				case 'assoc':
+				case 'association':
+				case 'guild':
+				case 'religion':
+				case 'corps':
+				case 'company':
+				case 'temple':
+				case 'order':
+				case 'faith':
+				case 'g':
+				case 'f':
+					$type = 'Association';
+					break;
 				case 'p':
 				case 'poi':
 				case 'place':
@@ -206,6 +219,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'place':		return 'maf_place';
 			case 'unit':		return 'maf_units_info';
 			case 'conversation':	return 'maf_conv_read';
+			case 'association':	return 'maf_assoc';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
