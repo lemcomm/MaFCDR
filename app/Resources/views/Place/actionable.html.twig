@@ -9,6 +9,7 @@
 	{% for place in places %}
 		{% set type = place.type %}
 		{% set house = place.house %}
+
 		{% if character.insidePlace == place %}
 			{% set inside = true %}
 		{% else %}
@@ -21,37 +22,7 @@
 				{% if inside %}
 					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
 				{% endif %}
-				{{ place.description.text }}<br><br>
-				{% set spawncheck = dispatcher.placeNewPlayerInfoTest(null, place) %}
-				{% if spawncheck.url is defined %}
-					{% set spawnfail = false %}
-
-					{% if not place.spawn %}
-						{% set spawnfail = true %}
-						<i>{{ 'place.spawnfail.nospawn'|trans({}, "places")|raw }}</i><br><br>
-					{% elseif not place.spawnDescription %}
-						{% set spawnfail = true %}
-						<i>{{ 'place.spawnfail.nodesc'|trans({}, "places")|raw }}</i><br><br>
-					{% endif %}
-					{% if not spawnfail and place.spawn.house %}
-						{% if not place.spawn.active %}
-							<i>{{ 'place.spawnfail.houseinactive'|trans({}, "places")|raw }}</i><br><br>
-						{% elseif not place.house.spawnDescription %}
-							<i>{{ 'place.spawnfail.nohousedesc'|trans({}, "places")|raw }}</i><br><br>
-						{% else %}
-							<i>{{ 'place.housespawn'|trans({"%house%":place.house.name}, "places")|raw }}</i><br><br>
-						{% endif %}
-					{% elseif not spawnfail and place.spawn.realm %}
-						{% if not place.spawn.active %}
-							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i><br><br>
-						{% elseif not place.realm.spawnDescription %}
-							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i><br><br>
-						{% else %}
-							<i>{{ 'place.realmspawn'|trans({"%realm%":place.realm.name}, "places")|raw }}</i><br><br>
-						{% endif %}
-					{% endif %}
-				{% endif %}
-
+				<p>{{ place.description and place.description.text }}</p>
 				{% if house %}
 					<i>{{ 'place.hosthouse'|trans({}, "places")|raw }}</i>
 					<hr>
@@ -62,7 +33,14 @@
 					{% else %}
 						{{ 'house.nodesc'|trans({}, "politics")|raw }}
 					{% endif %}
+					<hr>
 				{% endif %}
+				{% if not place.associations.isEmpty %}
+					{{ 'place.associations.list'|trans({}, "places")|raw }}: {% for assoc in place.associations %}{{ link(assoc.association) }}{% if not loop.last %}, {% endif %}{% endfor %}
+					<hr>
+				{% endif %}
+
+				{% set spawncheck = dispatcher.placeNewPlayerInfoTest(null, place) %}
 				{% if not inside %}
 					{% set check = dispatcher.placeEnterTest(true, place) %}
 					{% if check.url is defined %}
@@ -101,6 +79,10 @@
 					<a href="{{path('maf_war_siege_place', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
 				{% endif %}
 				{% if inside %}
+					{% set check = dispatcher.assocCreateTest() %}
+					{% if check.url is defined %}
+						<a href="{{path('maf_assoc_create') }}"><button id="assoc_create">{{ 'place.associations.create'|trans({}, "places")|raw }}</button></a>
+					{% endif %}
 					{% if place.getType.getDefensible() %}
 						{% if place.getOccupier() == character %}
 							<a href="{{path('maf_place_occupant', {"place":place.id}) }}"><button id="siege">{{ 'place.occupant.button'|trans({}, "places")|raw }}</button></a>
@@ -134,6 +116,35 @@
 					{% if mngcheck.url is defined %}
 						<a href="{{path('maf_place_destroy', {"id":place.id}) }}"><button id="manage">{{ 'place.destroy.name'|trans({}, "places")|raw }}</button></a>
 					{% endif %}
+				{% endif %}
+				{% if spawncheck.url is defined %}
+					{% set spawnfail = false %}
+					<p>
+					{% if not place.spawn %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nospawn'|trans({}, "places")|raw }}</i>
+					{% elseif not place.spawnDescription %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nodesc'|trans({}, "places")|raw }}</i>
+					{% endif %}
+					{% if not spawnfail and place.spawn.house %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.houseinactive'|trans({}, "places")|raw }}</i>
+						{% elseif not place.house.spawnDescription %}
+							<i>{{ 'place.spawnfail.nohousedesc'|trans({}, "places")|raw }}</i>
+						{% else %}
+							<i>{{ 'place.housespawn'|trans({"%house%":place.house.name}, "places")|raw }}</i>
+						{% endif %}
+					{% elseif not spawnfail and place.spawn.realm %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i>
+						{% elseif not place.realm.spawnDescription %}
+							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i>
+						{% else %}
+							<i>{{ 'place.realmspawn'|trans({"%realm%":place.realm.name}, "places")|raw }}</i>
+						{% endif %}
+					{% endif %}
+					</p>
 				{% endif %}
 			</div>
 		{% endif %}
