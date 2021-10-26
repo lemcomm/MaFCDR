@@ -62,7 +62,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @appstate, @logger]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions']
+        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
     twig.extension.dispatcher:
         class:      BM2\SiteBundle\Twig\DispatcherExtension
         arguments:  ['@dispatcher']
@@ -91,7 +91,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
     association_manager:
         class:      BM2\SiteBundle\Service\AssociationManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager']
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager']
