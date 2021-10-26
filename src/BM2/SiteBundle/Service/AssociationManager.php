@@ -2,8 +2,12 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationMember;
+use BM2\SiteBundle\Entity\AssociationPlace;
+use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Place;
 use Doctrine\ORM\EntityManager;
 
 
@@ -11,99 +15,155 @@ class AssociationManager {
 
 	protected $em;
 	protected $history;
+	protected $descman;
+	protected $convman;
 
-	public function __construct(EntityManager $em, History $history, DescriptionManager $descman) {
+	public function __construct(EntityManager $em, History $history, DescriptionManager $descman, ConversationManager $convman) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->descman = $descman;
+		$this->convman = $convman;
 	}
 
-	public function create($data, $place=null, $settlement=null, Character $founder) {
-		# TODO: Unpack $data from the form.
-		# _create(name, description, private description, secret description, superior house, place, settlement, crest, and founder)
-		$assoc = $this->_create($name, $motto, $description, $private_description, $secret_description, null, $place, $settlement, $founder);
+	public function create($data, Place $place, Character $founder, $superior = null) {
+		$assoc = $this->_create($data['name'], $data['formal_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $superior);
 
-		$this->history->openLog($house, $founder);
+		$this->history->openLog($assoc, $founder);
 		$this->history->logEvent(
-			$house,
-			'event.house.founded',
+			$assoc,
+			'event.assoc.founded',
 			array('%link-character%'=>$founder->getId()),
 			History::ULTRA, true
 		);
-		$this->history->logEvent(
-			$founder,
-			'event.character.house.founded',
-			array('%link-house%'=>$house->getId()),
-			History::ULTRA, true
-		);
+		if($data['public']) {
+			$this->history->logEvent(
+				$founder,
+				'event.character.assoc.founded',
+				array('%link-association%'=>$assoc->getId()),
+				History::HIGH, true
+			);
+		}
 		$this->em->flush();
-		return $house;
-	}
-
-	public function subcreate(Character $character, $name, $motto = null, $description = null, $place = null, $settlement = null, $founder, House $id) {
-		# Cadet houses won't be created with these so we set them to null in order to ensure they exist for passing to _create.
-		$private_description = null;
-		$secret_description = null;
-
-		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$assoc = $this->_create($name, $motto, $description, $private_description, $secret_description, $id, $settlement, $founder);
-
-		$this->history->openLog($house, $founder);
-		$this->history->logEvent(
-			$id,
-			'event.assoc.subfounded',
-			array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId(), '%link-assoc%'=>$assoc->getId()),
-			History::ULTRA, true
-		);
-		$this->history->logEvent(
-			$character,
-			'event.character.assoc.subcreated',
-			array('%link-house%'=>$house->getId(), '%link-character%'=>$founder->getId()),
-			History::HIGH, true
-		);
-		$this->history->logEvent(
-			$founder,
-			'event.character.assoc.subfounded',
-			array('%link-character%'=>$founder->getId(), '%link-assoc-1%'=>$id->getId(), '%link-assoc-2%'=>$assoc->getId()),
-			History::HIGH, true
-		);
-		$this->history->logEvent(
-			$assoc,
-			'event.house.subcreated',
-			array('%link-house-1%'=>$id->getId(), '%link-house-2%'=>$id->getId(), '%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId()),
-			History::ULTRA, true
-		);
 		return $assoc;
 	}
 
-	private function _create($name, $motto, $description = null, $private_description = null, $secret_description = null, $superior = null, $place = null, $settlement = null, Character $founder) {
+	private function _create($name, $formal, $type, $motto, $public, $short_desc, $full_desc, $founderRank, $place, Character $founder, $superior) {
 		$assoc = new Association;
 		$this->em->persist($assoc);
 		$assoc->setName($name);
+		$assoc->setFormalName($formal);
+		$assoc->setType($type);
 		$assoc->setMotto($motto);
-		$assoc->setPrivate($private_description);
-		$assoc->setSecret($secret_description);
+		$assoc->setPublic($public);
+		$assoc->setShortDescription($short_desc);
+
 		if ($superior) {
 			$assoc->setSuperior($superior);
 			$superior->addCadet($assoc);
 		}
-		if ($place) {
-			$assoc->setHome($place);
-		}
-		if ($settlement && !$place) {
-			$assoc->setInsideSettlement($settlement);
-		}
-		# TODO: Founder rank code!
+
 		$assoc->setFounder($founder);
-		$assoc->setHead($founder);
 		$assoc->setGold(0);
 		$assoc->setActive(true);
 		$this->em->flush();
-		if ($description) {
-			$this->descman->newDescription($assoc, $description, $founder, TRUE);
-		}
+		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, null, false, true, false);
+		$this->newLocation($assoc, $place, true, false);
+		$this->descman->newDescription($assoc, $full_desc, $founder, TRUE); #Descman includes a flush for the EM.
+		$this->updateMember($assoc, $rank, $founder, true);
 
-		return $house;
+		return $assoc;
+	}
+
+	public function newRank($assoc, AssociationRank $myRank = null, $name, $viewAll, $viewUp, $viewDown, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+		$rank = new AssociationRank;
+		$this->em->persist($rank);
+		$rank->setAssociation($assoc);
+		$this->updateRank($myRank, $rank, $name, $viewAll, $viewUp, $viewDown, $superior, $createSubs, $manager, $owner, $flush);
+		if ($flush) {
+			$this->em->flush();
+		}
+		return $rank;
+	}
+
+	public function updateRank(AssociationRank $myRank = null, $rank, $name, $viewAll, $viewUp, $viewDown, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+		$rank->setName($name);
+		if ($myRank) {
+			if ($myRank->getViewAll()) {
+				$rank->setViewAll($viewAll);
+				$rank->setViewUp($viewUp);
+			} else {
+				$rank->setViewAll(false);
+				if ($superior === $myRank) {
+					$rank->setViewUp($superior->getViewUp() + 1);
+				} else {
+					$diff = $myRank->findRankDifference($superior);
+					if ($diff > 0) {
+						$diff++;
+						if ($viewUp > $diff) {
+							$rank->setViewUp($diff);
+						} else {
+							$rank->setViewUp($viewUp);
+						}
+					} else {
+						return false; #Can't edit superiors or those not in your hierarchy.
+					}
+				}
+			}
+		} else {
+			$rank->setViewAll($viewAll);
+			$rank->setViewUp($viewUp);
+		}
+		$rank->setViewDown($viewDown);
+		$rank->setSubcreate($createSubs);
+		$rank->setManager($manager);
+		$rank->setOwner($owner);
+		$rank->setSuperior($superior);
+		if ($flush) {
+			$this->em->flush();
+		}
+		return $rank;
+	}
+
+	public function newLocation($assoc, $place, $hq=false, $flush=true) {
+		$loc = new AssociationPlace;
+		$this->em->persist($loc);
+		$loc->setAssociation($assoc);
+		$loc->setPlace($place);
+		if ($hq) {
+			$loc->setHeadquarters(true);
+		}
+		if ($flush) {
+			$this->em->flush();
+		}
+		return $loc;
+	}
+
+	public function updateMember($assoc, $rank, $char, $flush=true) {
+		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
+		if ($member && $old->getRank() === $rank) {
+			return 'no change';
+		}
+		$now = new \DateTime("now");
+		if ($member) {
+			$joinDate = $old->getJoinDate();
+		} else {
+			$member = new AssociationMember;
+			$this->em->persist($member);
+			$member->setJoinDate($now);
+			$member->setAssociation($assoc);
+			$member->setCharacter($char);
+		}
+		$member->setRankDate($now);
+		$member->setRank($rank);
+		if ($flush) {
+			$this->em->flush();
+		}
+		return $member;
+	}
+
+	public function findMember(Association $assoc, Character $char) {
+		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
+		return $member;
 	}
 
 }
