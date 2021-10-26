@@ -14,11 +14,14 @@ class LoadAssociationData extends AbstractFixture implements OrderedFixtureInter
 		'academy',
 		'association',
 		'brotherhood',
+		'company',
+		'corps',
 		'cult',
 		'guild',
 		'order',
 		'sect',
 		'society',
+		'temple',
 	);
 
 	/**
@@ -33,7 +36,7 @@ class LoadAssociationData extends AbstractFixture implements OrderedFixtureInter
 	 */
 	public function load(ObjectManager $manager) {
 		# Load association types.
-		foreach ($this->$assoctypes as $name) {
+		foreach ($this->assoctypes as $name) {
 			$type = $manager->getRepository('BM2SiteBundle:AssociationType')->findOneByName($name);
 			if (!$type) {
 				$type = new AssociationType();
