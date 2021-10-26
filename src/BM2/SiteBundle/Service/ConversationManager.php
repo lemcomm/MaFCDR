@@ -422,6 +422,8 @@ class ConversationManager {
                 if ($org) {
                         if ($org instanceof Realm) {
                                 $realm = $org;
+                        } elseif ($org instanceof Association) {
+                                $assoc = $org;
                         } elseif ($org instanceof House) {
                                 $house = $org;
                         }
@@ -458,6 +460,11 @@ class ConversationManager {
                         $conv->setRealm($realm);
                         if (!$recipients) {
                                 $recipients = $realm->findMembers();
+                        }
+                } elseif ($assoc) {
+                        $conv->setAssociation($assoc);
+                        if (!$recipients) {
+                                $recipients = $assoc->findMembers();
                         }
                 } elseif ($house) {
                         $conv->setHouse($house);
@@ -651,6 +658,7 @@ class ConversationManager {
         public function updateMembers(Conversation $conv, ArrayCollection $members=null) {
                 $realm = $conv->getRealm();
                 $house = $conv->getHouse();
+                $assoc = $conv->getAssociation();
                 $added = new ArrayCollection();
                 $removed = new ArrayCollection();
                 $now = new \DateTime("now");
@@ -659,6 +667,11 @@ class ConversationManager {
                         $entity = $realm;
                         if (!$members) {
                                 $members = $realm->findMembers();
+                        }
+                } elseif ($assoc) {
+                        $entity = $assoc;
+                        if (!$members) {
+                                $members = $assoc->findMembers();
                         }
                 } else {
                         $entity = $house;
