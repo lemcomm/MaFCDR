@@ -1143,7 +1143,7 @@ class GameRunner {
 		return true;
 	}
 
-	public function runConversationsCycle() {
+	public function runConversationsCleanup() {
 		# This has to be under runRealmsCycle so we don't update dead realms and so we don't have to force update members.
 		$last = $this->appstate->getGlobal('cycle.convs', 0);
 		$lastRealm = $this->appstate->getGlobal('cycle.convs.realm', 0);
@@ -1212,7 +1212,7 @@ class GameRunner {
 				break;
 			}
 			$house = $row[0];
-			$lastHouse = $realm->getId();
+			$lastHouse = $house->getId();
 			$this->logger->info("  -- Updating ".$house->getName()."...");
 			$total++;
 			$members = $house->findAllActive();
@@ -1232,6 +1232,48 @@ class GameRunner {
 		$this->logger->info("  Result: ".$total." houses, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
 		$this->em->flush();
 		$this->em->clear();
+
+		$this->logger->info("  Updating association conversation permissions...");
+		$query = $this->em->createQuery("SELECT a from BM2SiteBundle:Association a WHERE (a.active = TRUE OR a.active IS NULL) AND a.id > :last ORDER BY a.id ASC");
+		$query->setParameters(['last'=>$lastHouse]);
+		$houses = $query->getResult();
+		$added = 0;
+		$total = 0;
+		$removed = 0;
+		$convs = 0;
+		$iterableResult = $query->iterate();
+
+		$done = false;
+		$complete = false;
+		while (!$done) {
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				$complete=true;
+				break;
+			}
+			$house = $row[0];
+			$lastAssoc = $assoc->getId();
+			$this->logger->info("  -- Updating ".$assoc->getName()."...");
+			$total++;
+			$members = $assoc->findMembers();
+			foreach ($house->getConversations() as $conv) {
+				$rtn = $this->convman->updateMembers($conv, $members);
+				$convs++;
+				$removed += $rtn['removed']->count();
+				$added += $rtn['added']->count();
+			}
+		}
+
+		if ($complete) {
+			$this->appstate->setGlobal('cycle.convs.assoc', 'complete');
+		} else {
+			$this->appstate->setGlobal('cycle.convs.assoc', $lastAssoc);
+		}
+		$this->logger->info("  Result: ".$total." associations, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
+
 		$this->appstate->setGlobal('cycle.convs', 'complete');
 		return true;
 	}
