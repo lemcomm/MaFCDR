@@ -76,6 +76,10 @@ place:
   norealmdesc:  This Place can have arrivals but the realm has no new player description.
  realmspawn:    This Place appears to be correctly setup to support arrivals for %realm%.
  housespawn:    This Place appears to be correctly setup to support arrivals for %house%.
+ associations:
+  create:       Formalize an Association
+  none:         No associations are present here.
+  list:         Associations Located Here: 
 
 by:
  ambassador: As a Manager of Diplomacy...
