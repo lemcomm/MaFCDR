@@ -250,6 +250,7 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'tournament grounds':
 			case 'local seat': // only if lord is ruler of realm
 			case 'regional seat': // only if lord is ruler of realm
 			case 'royal seat': // only if lord is ruler of realm
