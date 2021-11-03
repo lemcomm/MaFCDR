@@ -812,8 +812,15 @@ class PoliticsController extends Controller {
 		if (!$settlement) {
 			throw $this->createNotFoundException('error.notfound.settlement');
 		}
+		$already = false;
+		foreach ($character->getSettlementClaims() as $claim) {
+			if ($claim->getSettlement() == $settlement) {
+				$already = true;
+				break;
+			}
+		}
 
-		if ($character->getSettlementClaims()->contains($settlement)) {
+		if ($already) {
 			$this->addFlash('error', $this->get('translator')->trans('claim.already', array(), 'politics'));
 		} else {
 			$heralds = $character->getAvailableEntourageOfType('Herald');
