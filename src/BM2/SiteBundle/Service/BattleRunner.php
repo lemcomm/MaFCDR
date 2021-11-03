@@ -318,7 +318,7 @@ class BattleRunner {
 		} else {
 			$this->log(15, "Siege battle detected, progressing siege...\n");
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
-			$this->war_manager->progressSiege($battle->getSiege(), $victor, $preparations, $this->report);
+			$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations, $this->report);
 		}
 		$this->em->flush();
 		$this->em->remove($battle);

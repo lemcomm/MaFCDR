@@ -50,6 +50,7 @@ class WarManager {
 		$type = 'field';
 
 		$battle = new Battle;
+		$this->em->persist($battle);
 		if ($siege) {
 			# Check for sieges first, because they'll always have settlements or places attached, but settlements and places won't always come with sieges.
 			if ($settlement) {
@@ -268,6 +269,7 @@ class WarManager {
 		// setup attacker (i.e. me)
 		if (!$attackers) {
 			$attackers = new BattleGroup;
+			$this->em->persist($attackers);
 		}
 		$attackers->setBattle($battle);
 		if (!$siege) {
@@ -280,6 +282,7 @@ class WarManager {
 		// setup defenders
 		if (!$defenders) {
 			$defenders = new BattleGroup;
+			$this->em->persist($defenders);
 		}
 		$defenders->setBattle($battle);
 		if (!$siege) {
@@ -299,9 +302,6 @@ class WarManager {
 		$complete->add(new \DateInterval('PT'.$time.'S'));
 		$battle->setInitialComplete($complete)->setComplete($complete);
 
-		$this->em->persist($battle);
-		$this->em->persist($attackers);
-		$this->em->persist($defenders);
 
 		// setup actions and lock travel
 		switch ($type) {
@@ -699,10 +699,9 @@ class WarManager {
 	#TODO
 	}
 
-	public function progressSiege(Siege $siege, BattleGroup $victor, $flag, BattleReport $report) {
+	public function progressSiege(Siege $siege, Battle $battle, BattleGroup $victor = null, $flag, BattleReport $report) {
 		$current = $siege->getStage();
 		$max = $siege->getMaxStage();
-		$battle = $victor->getBattle();
 		$assault = FALSE;
 		$sortie = FALSE;
 		$bypass = FALSE;
