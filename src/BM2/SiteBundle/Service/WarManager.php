@@ -699,10 +699,9 @@ class WarManager {
 	#TODO
 	}
 
-	public function progressSiege(Siege $siege, BattleGroup $victor, $flag, BattleReport $report) {
+	public function progressSiege(Siege $siege, Battle $battle, BattleGroup $victor = null, $flag, BattleReport $report) {
 		$current = $siege->getStage();
 		$max = $siege->getMaxStage();
-		$battle = $victor->getBattle();
 		$assault = FALSE;
 		$sortie = FALSE;
 		$bypass = FALSE;
