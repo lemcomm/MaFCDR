@@ -272,12 +272,15 @@ class BattleRunner {
 						array(),
 						History::MEDIUM, false, 20
 					);
+					$char->setActiveReport(null); #Unset active report.
+					$char->setBattling(false);
 				}
+				$group->setActiveReport(null);
 			}
 		}
 
 		# Remove actions related to this battle.
-		$this->log(15, "Removeing related actions...\n");
+		$this->log(15, "Removing related actions...\n");
 		foreach ($battle->getGroups() as $group) {
 			foreach ($group->getRelatedActions() as $act) {
 				$relevantActs = ['military.battle', 'siege.sortie', 'siege.assault'];
@@ -290,7 +293,6 @@ class BattleRunner {
 		// TODO: maybe here we could copy the soldier log to the character, so people get more detailed battle reports? could be with temporary events
 		$this->log(15, "Removing temporary character associations...\n");
 		foreach ($this->nobility as $noble) {
-			$noble->getCharacter()->setActiveReport(null);
 			$noble->getCharacter()->removeSoldiersOld($noble);
 		}
 
