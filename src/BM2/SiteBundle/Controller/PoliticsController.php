@@ -206,9 +206,15 @@ class PoliticsController extends Controller {
 			}
 			if ($otherchar->getOwnedPlaces()) {
 				foreach ($otherchar->getOwnedPlaces() as $place) {
-					if ($place->getType()->getVassals()) {
+					$type = $place->getType();
+					if ($type->getName() != 'embassy' && $type->getVassals()) {
 						$options[] = $place;
 					}
+				}
+			}
+			if ($otherchar->getAmbassadorships()) {
+				foreach ($otherchar->getAmbassadorships() as $place) {
+					$options[] = $place;
 				}
 			}
 		}
