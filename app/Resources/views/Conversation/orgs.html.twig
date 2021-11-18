@@ -1,29 +1,5 @@
 {% extends "Conversation/layout.html.twig" %}
 
-{% macro conversationrow(conv, char) %}
-<tr data-id="{{ conv.id }}">
-	{% set msgs = conv.findMessages(char) %}
-	<td><a href="{{ path('maf_conv_read', {'conv':conv.id}) }}">{{ conv.topic }}</a></td>
-	<td align="right">{{ msgs.count }}</td>
-	<td align="right">{{ conv.findUnread(char) }}</td>
-	<td align="right">{{ conv.findActivePermissions.count }}</td>
-	<td align="right">
-		{% set msg = msgs.first %}
-		{% if msg %}
-			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
-		{% endif %}
-	</td>
-	<td align="right">
-		{% set msg = msgs.last %}
-		{% if msg %}
-			{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
-		{% endif %}
-	</td>
-</tr>
-
-{% endmacro %}
-
-{% import _self as macros %}
 
 {% block includes %}
 	{{ parent() }}
@@ -36,8 +12,15 @@
 <div id="ajax_errors"></div>
 {% set group = null %}
 {% set first = true %}
-{% for conv in conversations %}
-	{% if conv.realm != group or first %}
+{% for conv in convs %}
+	{% if conv.realm %}
+		{% set grouping = conv.realm %}
+	{% elseif conv.house %}
+		{% set grouping = conv.house %}
+	{% elseif conv.association %}
+		{% set grouping = conv.association %}
+	{% endif %}
+	{% if grouping != group or first %}
 		{% set first = false %}
 		{% if group == null %}
 			</tbody></table>
@@ -48,10 +31,13 @@
 					<td colspan="7" class="cmsg_header">
 						{% if conv.house %}
 							{{ "index.ref"|trans({"%ref%":link(conv.house)}, "conversations")|raw }}
-							<a href="{{ path("maf_conv_house_new", {"house":conv.house.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+							<a href="{{ path("maf_conv_house_new", {"house":conv.house.id}) }}"><button class="cmsg_button">{{ 'conversation.new.title2'|trans({"%realm%":conv.house.name}, "conversations") }}</button></a>
 						{% elseif conv.realm %}
 							{{ "index.ref"|trans({"%ref%":link(conv.realm)}, "conversations")|raw }}
-							<a href="{{ path("maf_conv_realm_new", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.label'|trans({}, "conversations") }}</button></a>
+							<a href="{{ path("maf_conv_realm_new", {"realm":conv.realm.id}) }}"><button class="cmsg_button">{{ 'conversation.new.title2'|trans({"%realm%":conv.realm.name}, "conversations") }}</button></a>
+						{% elseif conv.association %}
+							{{ "index.ref"|trans({"%ref%":link(conv.association)}, "conversations")|raw }}
+							<a href="{{ path("maf_conv_assoc_new", {"assoc":conv.association.id}) }}"><button class="cmsg_button">{{ 'conversation.new.title2'|trans({"%realm%":conv.association.name}, "conversations") }}</button></a>
 						{% else %}
 							{{ 'index.ref2'|trans({}, "conversations") }}
 						{% endif %}
@@ -67,9 +53,27 @@
 				</tr>
 			</thead>
 			<tbody>
-		{% set group = conv.realm %}
+		{% set group = grouping %}
 	{% endif %}
-	{{ macros.conversationrow(conv, char) }}
+	<tr data-id="{{ conv.id }}">
+		{% set msgs = conv.findMessages(char) %}
+		<td><a href="{{ path('maf_conv_read', {'conv':conv.id}) }}">{{ conv.topic }}</a></td>
+		<td align="right">{{ msgs.count }}</td>
+		<td align="right">{{ conv.findUnread(char) }}</td>
+		<td align="right">{{ conv.findActivePermissions.count }}</td>
+		<td align="right">
+			{% set msg = msgs.first %}
+			{% if msg %}
+				{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
+			{% endif %}
+		</td>
+		<td align="right">
+			{% set msg = msgs.last %}
+			{% if msg %}
+				{{ 'index.msgshort'|trans({"%sender%":msg.sender?link(msg.sender):'-', "%day%":msg.cycle|gametime("short")}, "conversations")|raw }}
+			{% endif %}
+		</td>
+	</tr>
 {% endfor %}
 </tbody></table>
 
