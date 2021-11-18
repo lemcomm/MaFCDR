@@ -260,14 +260,41 @@ class PlaceController extends Controller {
 
 		# Check for inside settlement...
 		if ($character->getInsideSettlement()) {
-			if ($settlement->hasBuildingNamed('Library')) {
-				$rights[] = 'library';
-			}
-			if ($settlement->hasBuildingNamed('Inn')) {
-				$rights[] = 'inn';
-			}
-			if ($settlement->hasBuildingNamed('Tavern')) {
-				$rights[] = 'tavern';
+			foreach ($settlement->getBuildings() as $bldg) {
+				$name = $bldg->getType()->getName();
+				if ($name == 'Library') {
+					$rights[] = 'library';
+				}
+				if ($name == 'Inn') {
+					$rights[] = 'inn';
+				}
+				if ($name == 'Tavern') {
+					$rights[] = 'tavern';
+				}
+				if ($name == 'Arena') {
+					$rights[] = 'arena';
+				}
+				if ($name == 'Blacksmith') {
+					$rights[] = 'smith';
+				}
+				if ($name == 'List Field') {
+					$rights[] = 'list field';
+				}
+				if ($name == 'Racetrack') {
+					$rights[] = 'track';
+				}
+				if ($name == 'Temple') {
+					$rights[] = 'temple';
+				}
+				if ($name == 'Warehouse') {
+					$rights[] = 'warehouse';
+				}
+				if ($name == 'Tournament Grounds') {
+					$rights[] = 'tournament';
+				}
+				if ($name == 'Academy') {
+					$rights[] = 'academy';
+				}
 			}
 		} else {
 			$rights[] = 'outside';
@@ -279,9 +306,6 @@ class PlaceController extends Controller {
 				$rights[] = 'ruler';
 				break;
 			}
-		}
-		if ($settlement->hasBuildingNamed('Academy')) {
-			$rights[] = 'academy';
 		}
 		$diplomacy = $character->findForeignAffairsRealms(); #Returns realms or null.
 		if ($diplomacy) {
