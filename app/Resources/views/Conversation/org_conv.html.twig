@@ -1,0 +1,147 @@
+{% block content %}
+	<h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
+
+	{% if not archive %}
+		<p align="right">
+		<a href="{{path('maf_conv_print', {"conv":conversation.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
+		</p>
+	{% endif %}
+
+	{% set participants = conversation.findActivePermissions %}
+
+	<div class="cmsg_conversation">
+	{% if conversation.realm %}
+		<h3>{{ conversation.realm.name }}: {{ conversation.topic }}</h3>
+	{% elseif conversation.house %}
+		<h3>{{ conversation.house.name }}: {{ conversation.topic }}</h3>
+	{% else %}
+		<h3>{{ conversation.association.name }}: {{ conversation.topic }}</h3>
+	{% endif %}
+
+	{% if not archive %}
+		<div class="cmsg_general">
+			{% if active %}
+				<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> | 
+			{% else %}
+	                         <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a> |
+			{% endif %}
+			<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %} class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"{% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
+		</div>
+	{% endif %}
+
+	{% set in_hidden = false %}
+	{% for message in messages %}
+		{% if not archive %}
+			{% if in_hidden == false and message.sent < veryold %}
+				<button id="hidetoggle" class="cmsg_button">{{ 'conversation.old.show'|trans({},"conversations") }}</button>
+				<div id="oldmessages">
+				{% set in_hidden = true %}
+			{% elseif in_hidden == true and message.sent > veryold %}
+				</div>
+				{% set in_hidden = false %}
+			{% endif %}
+		{% endif %}
+		{% if archive %}
+			<hr>
+			<div class="cmsg_message">
+		{% else %}
+			<div class="cmsg_message{% if last is defined and last is not null and last.timestamp > message.sent.timestamp %} cmsg_old{% endif %}" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}">
+		{% endif %}
+			<div class="cmsg_message_wrapper_{{message.type}}">
+				<div class="cmsg_message_header_{{message.type}}">
+					{% if message.sender %}
+						{% set sender = link(message.sender) %}
+					{% else %}
+						{% set sender = "<i>The System</i>" %}
+					{% endif %}
+
+					<a id="{{message.id}}"></a>
+					{{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
+					--
+					{% if message.recipientCount %}
+						{% set recips = message.recipientCount %}
+					{% else %}
+						{% set recips = '???' %}
+					{% endif %}
+					{{ 'index.conversation3' |trans({"%i%":recips}, "conversations")|raw }}
+					{% if message.replyTo %}
+						 --
+						<a href="#{{message.replyTo.id}}">
+							{% if message.replyTo.sender %}
+								{{ 'index.reply' |trans({"%sender%":message.replyTo.sender.name, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+							{% else %}
+								{{ 'index.reply' |trans({"%sender%":'<i>The System</i>', "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+							{% endif %}
+						</a>
+					{% endif %}
+				</div>
+
+				<div class="cmsg_content_{{message.type}}">
+				{{ message.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
+				</div>
+
+				{% if message.type != 'system' %}
+					<div class="cmsg_message_meta_{{message.type}}">
+						{% if not archive %}
+							<ul class="cmsg_actions">
+								{% if last is defined and last is not null and last.timestamp < message.sent.timestamp %}
+									<li>{{ 'message.new'|trans({},"conversations") }}</li>
+								{% endif %}
+								<li><button class="reply cmsg_button">{{ 'button.reply'|trans({},"conversations") }}</button></li>
+							</ul>
+						{% endif %}
+						{% if message.replies and message.replies.count > 0 %}<br>
+							<br>{{ 'index.replies' |trans({}, "conversations")|raw }}
+							<ul>
+								{% for msg in message.replies %}
+									<a href="#{{msg.id}}">
+										{% if msg.sender %}
+											<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+										{% else %}
+											<li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+										{% endif %}
+									</a>
+								{% endfor %}
+							</ul>
+						{% endif %}
+						{# Flags currently removed.
+						<ul class="cmsg_flags">
+							<li><button class="cmsg_icon icon-star3{% if meta and meta.hasflagbyname("important") %} active{% endif %}" title="{{ 'flag.important'|trans({},"conversations") }}" data-msg="{{ message.id }}" data-flag="important"></button></li>
+							<li><button class="cmsg_icon icon-lightning{% if meta and meta.hasflagbyname("act") %} active{% endif %}" title="{{ 'flag.act'|trans({},"conversations") }}" data-msg="{{ message.id }}" data-flag="act"></button></li>
+							<li><button class="cmsg_icon icon-history{% if meta and meta.hasflagbyname("remind") %} active{% endif %}" title="{{ 'flag.remind'|trans({},"conversations") }}" data-msg="{{ message.id }}" data-flag="remind"></button></li>
+							<li><button class="cmsg_icon icon-drawer2{% if meta and meta.hasflagbyname("keep") %} active{% endif %}" title="{{ 'flag.keep'|trans({},"conversations") }}" data-msg="{{ message.id }}" data-flag="keep"></button></li>
+						</ul>
+						#}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+	{% if in_hidden == true %}
+		</div>
+	{% endif %}
+
+	{# FIXME: this only counts top-level messages, for some reason #}
+	{% if not archive and messages.count > 5 %}
+		<div class="cmsg_general">
+			{% if active %}
+				<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> |
+			{% else %}
+	                         <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a>
+			{% endif %}
+			<a href="{{ path('maf_conv_participants', {'conv':conversation.id}) }}"{% if participants.count <= 5 %} class="tt" title="{% for p in participants %}{{ p.character.name }}{% if loop.last == false %}, {% endif %}{% endfor %}"{% endif %}><button class="cmsg_button">{{ 'conversation.participants.label'|trans({"%count%":participants.count}, "conversations") }}</button></a>
+		</div>
+	{% endif %}
+</div>
+{% if not archive %}
+	<div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
+		{% include "Conversation/syntax.html.twig" %}
+		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyAction', { 'conv': conversation })) }}
+	</div>
+
+	<p align="right">
+	<a href="{{path('maf_conv_print', {"conv":conversation.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
+	</p>
+{% endif %}
+
+{% endblock %}
