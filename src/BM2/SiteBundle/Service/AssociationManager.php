@@ -44,6 +44,10 @@ class AssociationManager {
 			);
 		}
 		$this->em->flush();
+		$topic = $assoc->getName().' Announcements';
+		$this->convman->newConversation(null, null, $topic, null, null, $assoc, 'announcements');
+		$topic = $assoc->getName().' General Discussion';
+		$this->convman->newConversation(null, null, $topic, null, null, $assoc, 'general');
 		return $assoc;
 	}
 
