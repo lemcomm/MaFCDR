@@ -33,7 +33,8 @@ class ProcessConvsCommand extends ContainerAwareCommand {
 
 		$complete = $game->runConversationsCleanup();
 		if ($timing) {
-			$stopwatch->start($match[1]);
+			$stopwatch = new Stopwatch();
+			$stopwatch->start('conv_cleanup');
 		}
 		if ($complete) {
 			$logger->info("Conversation cleanup completed");
@@ -43,8 +44,8 @@ class ProcessConvsCommand extends ContainerAwareCommand {
 			$output->writeln("<error>Conversation cleanup errored!</error>");
 		}
 		if ($timing) {
-			$event = $stopwatch->stop($match[1]);
-			$logger->info($match[1].": ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
+			$event = $stopwatch->stop('conv_cleanup');
+			$logger->info("Conversation Cleanup: ".date("g:i:s").", ".($event->getDuration()/1000)." s, ".(round($event->getMemory()/1024)/1024)." MB");
 		}
 	}
 
