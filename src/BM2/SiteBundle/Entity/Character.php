@@ -12,6 +12,7 @@ class Character {
 	protected $ultimate=false;
 	protected $my_realms=null;
 	protected $my_houses=null;
+	protected $my_assocs=null;
 	protected $my_rulerships=false;
 	public $full_health = 100;
 
@@ -368,6 +369,16 @@ class Character {
 		return $houses;
 	}
 
+	public function findAssociations() {
+		if ($this->my_assocs!=null) return $this->my_assocs;
+		$assocs = new ArrayCollection;
+		foreach ($this->getAssociationMemberships() as $mbr) {
+			$assocs->add($mbr->getAssociation());
+		}
+		$this->my_assocs = $assocs;
+		return $assocs;
+	}
+
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
 			if ($log->hasNewEvents()) {
@@ -541,5 +552,6 @@ class Character {
 		}
 		return null;
 	}
+	
 	
 }
