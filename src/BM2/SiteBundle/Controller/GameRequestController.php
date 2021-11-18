@@ -53,8 +53,12 @@ class GameRequestController extends Controller {
 			case 'oath.offer':
 				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char)) {
 					$result = false;
-				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
-					$result = false;
+				} elseif ($id->getToPlace()) {
+					if ($id->getToPlace()->getType() != 'embassy' && $id->getToPlace()->getOwner() != $char) {
+						$result = false;
+					} elseif ($id->getToPlace()->getType() == 'embassy' && $id->getToPlace()->getAmbassador() != $char) {
+						$result = false;
+					}
 				} elseif ($id->getToPosition() && !$id->getToPosition()->getHolders()->contains($char)) {
 					$result = false;
 				} else {
