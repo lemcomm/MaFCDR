@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
 use BM2\SiteBundle\Service\AppState;
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\ConversationPermission;
@@ -38,13 +39,13 @@ class ConversationManager {
         }
 
         public function getOrgConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL) ORDER BY c.realm ASC, c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL) ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
 
         public function getPrivateConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL ORDER BY c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL AND c.association IS NULL ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
@@ -56,7 +57,7 @@ class ConversationManager {
         }
 
         public function getOrgConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL)');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
@@ -74,13 +75,13 @@ class ConversationManager {
         }
 
         public function getActiveOrgConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL)');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
 
         public function getActivePrivateConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND c.realm IS NULL AND c.house IS NULL');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND c.realm IS NULL AND c.house IS NULL AND c.association IS NULL');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
@@ -102,7 +103,7 @@ class ConversationManager {
         }
 
         public function getActivePrivatePermissions(Character $char) {
-                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.active = true and c.realm is null and c.house is null and p.character = :me');
+                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.active = true and c.realm is null and c.house is null AND c.association IS NULL and p.character = :me');
                 $query->setParameters(['me'=>$char]);
                 return new ArrayCollection($query->getResult());
         }
@@ -419,6 +420,7 @@ class ConversationManager {
                 }
                 $realm = null;
                 $house = null;
+                $assoc = null;
                 if ($org) {
                         if ($org instanceof Realm) {
                                 $realm = $org;
@@ -444,7 +446,7 @@ class ConversationManager {
                 $added = [];
                 $this->em->flush();
 
-                if (!$realm && !$house && !$local) {
+                if (!$realm && !$house && !$assoc && !$local) {
                         $creator = new ConversationPermission();
                         $this->em->persist($creator);
                         $creator->setOwner(true);
@@ -464,7 +466,7 @@ class ConversationManager {
                 } elseif ($assoc) {
                         $conv->setAssociation($assoc);
                         if (!$recipients) {
-                                $recipients = $assoc->findMembers();
+                                $recipients = $assoc->findAllMemberCharacters();
                         }
                 } elseif ($house) {
                         $conv->setHouse($house);
