@@ -1,0 +1,254 @@
+realmselect($("#realmsearch"), realmchange);
+settlementselect($("#settlementsearch"), settlementchange);
+charselect($("#charactersearch"), characterchange);
+placeselect($("#placesearch"), placechange);
+guildselect($("#guildsearch"), guildchange);
+houseselect($("#housesearch"), housechange);
+
+var character_cache = {};
+var realm_cache = {};
+var settlement_cache = {};
+var place_cache = {};
+var guild_cache = {};
+var house_cache = {};
+
+function charselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 3,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in character_cache ) {
+				response( character_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_characters') }}", request, function( data, status, xhr ) {
+				character_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+item.id+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function settlementselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in settlement_cache ) {
+				response( settlement_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_settlements') }}", request, function( data, status, xhr ) {
+				settlement_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				if (item.label) {
+					label = item.label;
+				} else {
+					label = '{{ "settlement.unowned"|trans }}';
+				}
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+label+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function realmselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in realm_cache ) {
+				response( realm_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_realms') }}", request, function( data, status, xhr ) {
+				realm_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+item.id+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function placeselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in place_cache ) {
+				response( place_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_places') }}", request, function( data, status, xhr ) {
+				place_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+item.id+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function guildselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in guild_cache ) {
+				response( guild_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_assocs') }}", request, function( data, status, xhr ) {
+				guild_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+item.id+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function houseselect(obj, callback) {
+	obj.autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in house_cache ) {
+				response( house_cache[ term ] );
+				return;
+			}
+			$.getJSON("{{ path('bm2_site_data_houses') }}", request, function( data, status, xhr ) {
+				house_cache[ term ] = data;
+				response( data );
+			});
+		},
+		select: function(event, ui) {
+			obj.val(ui.item.value);
+			obj.data('id', ui.item.id);
+			if (callback) {
+				callback(ui.item.id, ui.item.value);
+			}
+			return false;
+		}
+	});
+	if (obj.data()) {
+		var ac = obj.data("ui-autocomplete");
+		if (ac) {
+			ac._renderItem = function(ul, item) {
+				return $("<li>")
+					.append("<a>"+item.value+" <small style='float:right'>("+item.id+")</small></a>")
+					.appendTo(ul);
+			}
+		}
+	}
+}
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("message_reply_content").selectionStart;
+	var textAreaTxt = $("#message_reply_content").val();
+	$("#message_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+}
+
+function realmchange(id, name) {
+	search_insert("[r:"+id+"]");
+}
+function settlementchange(id, name) {
+	search_insert("[s:"+id+"]");
+}
+function characterchange(id, name) {
+	search_insert("[c:"+id+"]");
+}
+function placechange(id, name) {
+	search_insert("[p:"+id+"]");
+}
+function guildchange(id, name) {
+	search_insert("[g:"+id+"]");
+}
+function housechange(id, name) {
+	search_insert("[h:"+id+"]");
+}
