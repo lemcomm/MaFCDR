@@ -1143,14 +1143,67 @@ class GameRunner {
 		return true;
 	}
 
+	public function runAssociationsCycle() {
+		$last = $this->appstate->getGlobal('cycle.assocs', 0);
+		if ($last==='complete') return true;
+        	$last=(int)$last;
+		$this->logger->info("Associations Cycle...");
+
+		$this->logger->info("  Checking for missing Assoc conversations...");
+
+		$query = $this->em->createQuery('SELECT a FROM BM2SiteBundle:Association a WHERE a.active = true OR a.active IS NULL');
+
+		foreach ($query->getResult() as $assoc) {
+			$anno = false;
+			$gen = false;
+
+                	$criteria = Criteria::create()->where(Criteria::expr()->eq("system", "announcements"))->orWhere(Criteria::expr()->eq("system", "general"));
+			$convs = $assoc->getConversations()->matching($criteria);
+			if ($convs->count() > 0) {
+				foreach ($convs as $conv) {
+					if (!$anno && $conv->getSystem() == 'announcements') {
+						$anno = true;
+						continue;
+					}
+					if (!$gen && $conv->getSystem() == 'general') {
+						$gen = true;
+						continue;
+					}
+					if ($gen && $anno) {
+						break;
+					}
+				}
+			}
+			if (!$anno) {
+				$topic = $assoc->getName().' Announcements';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $assoc, 'announcements');
+				$this->logger->notice("  ".$assoc->getName()." announcements created");
+			}
+			if (!$gen) {
+				$topic = $assoc->getName().' General Discussion';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $assoc, 'general');
+				$this->logger->notice("  ".$assoc->getName()." general discussion created");
+			}
+		}
+
+		$this->appstate->setGlobal('cycle.assocs', 'complete');
+		$this->em->flush();
+		$this->em->clear();
+
+		return true;
+	}
+
 	public function runConversationsCleanup() {
-		# This has to be under runRealmsCycle so we don't update dead realms and so we don't have to force update members.
+		# This is run separately from the main turn command, and runs after it. It remains here because it is still primarily turn logic.
+		# Ideally, this does nothing. If it does something though, it just means we caught a character that should or shouldn't be part of a conversation and fixed it.
 		$last = $this->appstate->getGlobal('cycle.convs', 0);
 		$lastRealm = $this->appstate->getGlobal('cycle.convs.realm', 0);
 		$lastHouse = $this->appstate->getGlobal('cycle.convs.house', 0);
+		$lastAssoc = $this->appstate->getGlobal('cycle.convs.assoc', 0);
 		if ($last==='complete') return true;
 		$lastRealm=(int)$lastRealm;
 		$lastHouse=(int)$lastHouse;
+		$lastAssoc=(int)$lastAssoc;
 		$this->logger->info("Conversation Cycle...");
 		$this->logger->info("  Updating realm conversation permissions...");
 		$query = $this->em->createQuery("SELECT r from BM2SiteBundle:Realm r WHERE r.active = TRUE AND r.id > :last ORDER BY r.id ASC");
@@ -1235,7 +1288,7 @@ class GameRunner {
 
 		$this->logger->info("  Updating association conversation permissions...");
 		$query = $this->em->createQuery("SELECT a from BM2SiteBundle:Association a WHERE (a.active = TRUE OR a.active IS NULL) AND a.id > :last ORDER BY a.id ASC");
-		$query->setParameters(['last'=>$lastHouse]);
+		$query->setParameters(['last'=>$lastAssoc]);
 		$houses = $query->getResult();
 		$added = 0;
 		$total = 0;
