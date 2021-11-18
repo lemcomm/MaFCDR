@@ -1196,11 +1196,9 @@ class GameRunner {
 	public function runConversationsCleanup() {
 		# This is run separately from the main turn command, and runs after it. It remains here because it is still primarily turn logic.
 		# Ideally, this does nothing. If it does something though, it just means we caught a character that should or shouldn't be part of a conversation and fixed it.
-		$last = $this->appstate->getGlobal('cycle.convs', 0);
 		$lastRealm = $this->appstate->getGlobal('cycle.convs.realm', 0);
 		$lastHouse = $this->appstate->getGlobal('cycle.convs.house', 0);
 		$lastAssoc = $this->appstate->getGlobal('cycle.convs.assoc', 0);
-		if ($last==='complete') return true;
 		$lastRealm=(int)$lastRealm;
 		$lastHouse=(int)$lastHouse;
 		$lastAssoc=(int)$lastAssoc;
@@ -1289,7 +1287,7 @@ class GameRunner {
 		$this->logger->info("  Updating association conversation permissions...");
 		$query = $this->em->createQuery("SELECT a from BM2SiteBundle:Association a WHERE (a.active = TRUE OR a.active IS NULL) AND a.id > :last ORDER BY a.id ASC");
 		$query->setParameters(['last'=>$lastAssoc]);
-		$houses = $query->getResult();
+		$assocs = $query->getResult();
 		$added = 0;
 		$total = 0;
 		$removed = 0;
@@ -1305,12 +1303,12 @@ class GameRunner {
 				$complete=true;
 				break;
 			}
-			$house = $row[0];
+			$assoc = $row[0];
 			$lastAssoc = $assoc->getId();
 			$this->logger->info("  -- Updating ".$assoc->getName()."...");
 			$total++;
-			$members = $assoc->findMembers();
-			foreach ($house->getConversations() as $conv) {
+			$members = $assoc->findAllMemberCharacters();
+			foreach ($assoc->getConversations() as $conv) {
 				$rtn = $this->convman->updateMembers($conv, $members);
 				$convs++;
 				$removed += $rtn['removed']->count();
@@ -1327,7 +1325,9 @@ class GameRunner {
 		$this->em->flush();
 		$this->em->clear();
 
-		$this->appstate->setGlobal('cycle.convs', 'complete');
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Setting s SET s.value=0 WHERE s.name LIKE :cycle');
+		$query->setParameter('cycle', 'cycle.convs.'.'%');
+		$query->execute();
 		return true;
 	}
 
