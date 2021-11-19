@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Conversationpermission;
@@ -21,6 +22,7 @@ use BM2\SiteBundle\Form\AddParticipantType;
 use BM2\SiteBundle\Form\MessageReplyType;
 use BM2\SiteBundle\Form\NewConversationType;
 use BM2\SiteBundle\Form\NewLocalMessageType;
+use BM2\SiteBundle\Form\RecentMessageReplyType;
 
 /**
  * @Route("/conv")
@@ -62,8 +64,7 @@ class ConversationController extends Controller {
 		$convs = $this->get('conversation_manager')->getOrgConversations($char);
 
 		return $this->render('Conversation/orgs.html.twig', [
-			'orgs' => true,
-			'conversations' => $convs,
+			'convs' => $convs,
 			'char' => $char,
 		]);
 	}
@@ -132,8 +133,9 @@ class ConversationController extends Controller {
 	  * @Route("/new", name="maf_conv_new")
 	  * @Route("/new/r{realm}", name="maf_conv_realm_new")
 	  * @Route("/new/h{house}", name="maf_conv_house_new")
+	  * @Route("/new/a{assoc}", name="maf_conv_assoc_new")
 	  */
-	public function newConversationAction(Request $request, Realm $realm=null, House $house=null) {
+	public function newConversationAction(Request $request, Realm $realm=null, House $house=null, Association $assoc=null) {
                 $char = $this->get('dispatcher')->gateway('conversationNewTest');
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
@@ -145,13 +147,18 @@ class ConversationController extends Controller {
 		if ($house && $char->getHouse() != $house) {
 			$house = null;
 		}
+		if ($assoc && !$char->findAssociations()->contains($assoc)) {
+			$assoc = null;
+		}
 
-		if ($realm || $house) {
+		if ($realm || $house || $assoc) {
 			$contacts = null;
 			$distance = null;
 			$settlement = null;
 			if ($realm) {
 				$org = $realm;
+			} elseif ($assoc) {
+				$org = $assoc;
 			} else {
 				$org = $house;
 			}
@@ -213,7 +220,8 @@ class ConversationController extends Controller {
 		return $this->render('Conversation/newconversation.html.twig', [
 			'form' => $form->createView(),
 			'realm' => $realm,
-			'house' => $house
+			'house' => $house,
+			'assoc' => $assoc
 		]);
 	}
 
@@ -226,14 +234,7 @@ class ConversationController extends Controller {
                         return $this->redirectToRoute($char);
                 }
 
-		$org = false;
-		if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
-			$distance = $this->get('geography')->calculateInteractionDistance($char);
-		} else {
-			$distance = $this->get('geography')->calculateSpottingDistance($char);
-		}
-		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
-		$allNearby = $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
+		$allNearby = $this->allNearby($char);
 
 		$form = $this->createForm(new NewLocalMessageType($char->getInsideSettlement(), $char->getInsidePlace(), false));
 
@@ -248,7 +249,7 @@ class ConversationController extends Controller {
 			} else {
 				$target = $data['target'];
 			}
-			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], null, $data['target']);
+			$msg = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to'], $data['target']);
 
 			$url = $this->generateUrl('maf_conv_local', [], UrlGeneratorInterface::ABSOLUTE_URL).'#'.$msg->getId();
 			$this->addFlash('notice', $this->get('translator')->trans('conversation.created', ["%url%"=>$url], 'conversations'));
@@ -261,29 +262,57 @@ class ConversationController extends Controller {
 		]);
 	}
 
+	private function allNearby(Character $char) {
+		if ($char->getAvailableEntourageOfType("herald")->isEmpty()) {
+			$distance = $this->get('geography')->calculateInteractionDistance($char);
+		} else {
+			$distance = $this->get('geography')->calculateSpottingDistance($char);
+		}
+		# findCharactersNearMe(Character $character, $maxdistance, $only_outside_settlement=false, $exclude_prisoners=true, $match_battle=false, $exclude_slumbering=false, $only_oustide_place=false)
+		return $this->get('geography')->findCharactersNearMe($char, $distance, false, false);
+	}
+
 	/**
 	  * @Route("/recent/reply/{msg}/{window}", name="maf_conv_recent_reply", requirements={"msg"="\d+","window"="\d+"})
 	  */
-	public function replyRecentAction(Request $request, Message $msg, string $window='0') {
+	public function replyRecentAction(Request $request, Message $msg=null, string $window='0') {
+                $char = $this->get('dispatcher')->gateway('conversationRecentTest');
+                if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+                }
 
-		$form = $this->createForm(new MessageReplyType());
+		$form = $this->createForm(new RecentMessageReplyType($char->getInsideSettlement(), $char->getInsidePlace()));
 
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
+			$allNearby = $this->allNearby($char);
+			if ($data['target'] == 'local') {
+				$target = new ArrayCollection();
+				foreach ($allNearby as $each) {
+					$target->add($each['character']);
+				}
+			} else {
+				$target = $data['target'];
+			}
 
-			$conv = $data['conversation'];
 			$em = $this->getDoctrine()->getManager();
-			$conv = $em->getRepository(Conversation::class)->findOneById($conv);
-	                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
-	                if (! $char instanceof Character) {
-	                        return $this->redirectToRoute($char);
-	                }
+			if ($msg = $em->getRepository(Message::class)->findOneById($data['reply_to'])) {
+				$conv = $msg->getConversation();
+		                $char = $this->get('dispatcher')->gateway('conversationReplyTest', false, true, false, $conv); # Reuse is deliberate!
+		                if (! $char instanceof Character) {
+		                        return $this->redirectToRoute($char);
+		                }
 
-			#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
-			$message = $this->get('conversation_manager')->writeMessage($conv, $msg, $char, $data['content'], $data['type']);
+				if ($conv->findType() != 'local') {
+					#writeMessage(Conversation $conv, $replyTo = null, Character $char = null, $text, $type)
+					$message = $this->get('conversation_manager')->writeMessage($conv, $msg, $char, $data['content'], $data['type']);
+				} else {
+					$message = $this->get('conversation_manager')->writeLocalMessage($char, $target, $data['topic'], $data['type'], $data['content'], $data['reply_to'], $data['target']);
+				}
 
-			return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
+				return new RedirectResponse($this->generateUrl('maf_conv_recent', ['window' => $window]).'#'.$message->getId());
+			}
 		}
 
 		return $this->render('Conversation/reply.html.twig', [
@@ -309,7 +338,7 @@ class ConversationController extends Controller {
 			$conv = $this->get('conversation_manager')->newLocalConversation($char, $now);
 			$em->flush();
 		}
-		
+
 		$search = null;
 		switch ($window) {
 			case '0':
@@ -385,17 +414,28 @@ class ConversationController extends Controller {
 		$veryold = new \DateTime('now');
 		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
 
-		return $this->render('Conversation/conversation.html.twig', [
-			'conversation' => $conv,
-			'messages' => $messages,
-			'total' => $total,
-			'unread' => $unread,
-			'veryold' => $veryold,
-			'last' => $last,
-			'manager' => $lastPerm->getManager() ? true : $lastPerm->getOwner(),
-			'active'=> $lastPerm->getActive(),
-			'archive'=> false
-		]);
+		if ($conv->findType() == 'org') {
+			return $this->render('Conversation/layout_wrapper.html.twig', [
+				'type' => 'org',
+				'conversation' => $conv,
+				'messages' => $messages,
+				'veryold' => $veryold,
+				'last' => $last,
+				'active'=> $lastPerm->getActive(),
+				'archive'=> false
+			]);
+		} else {
+			return $this->render('Conversation/layout_wrapper.html.twig', [
+				'type' => 'private',
+				'conversation' => $conv,
+				'messages' => $messages,
+				'veryold' => $veryold,
+				'last' => $last,
+				'manager' => $lastPerm->getManager() ? true : $lastPerm->getOwner(),
+				'active'=> $lastPerm->getActive(),
+				'archive'=> false
+			]);
+		}
 	}
 
 	/**
@@ -427,8 +467,8 @@ class ConversationController extends Controller {
 		}
 
 		$veryold = $now->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
-
-		return $this->render('Conversation/conversation.html.twig', [
+		return $this->render('Conversation/layout_wrapper.html.twig', [
+			'type' => 'local',
 			'conversation' => $conv,
 			'messages' => $messages,
 			'total' => $total,
@@ -452,8 +492,6 @@ class ConversationController extends Controller {
 	                }
 			$messages = $conv->getMessages();
 			$local = true;
-			$perms = $conv->findCharPermissions($char);
-			$lastPerm = $perms->last();
 		} else {
 	                $char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
 	                if (! $char instanceof Character) {
@@ -461,6 +499,17 @@ class ConversationController extends Controller {
 	                }
 			$messages = $conv->findMessages($char);
 			$local = false;
+			$perms = $conv->findCharPermissions($char);
+			$lastPerm = $perms->last();
+		}
+
+		$org = null;
+		if ($conv->getRealm()) {
+			$org = $conv->getRealm();
+		} elseif ($conv->getAssociation()) {
+			$org = $conv->getAssociation();
+		} elseif ($conv->getHouse()) {
+			$org = $conv->getHouse();
 		}
 
 		$total = $messages->count();
@@ -472,22 +521,30 @@ class ConversationController extends Controller {
 
 		if ($local) {
 			return $this->render('Conversation/archive.html.twig', [
+				'type' => 'local',
 				'conversation' => $conv,
 				'messages' => $messages,
-				'total' => $total,
-				'unread' => 0,
+				'archive'=> true
+			]);
+		} elseif ($org) {
+			return $this->render('Conversation/archive.html.twig', [
+				'type' => 'org',
+				'conversation' => $conv,
+				'messages' => $messages,
 				'veryold' => $veryold,
-				'local'=> $local,
+				'last' => NULL,
+				'active'=> $lastPerm->getActive(),
+				'archive'=> true
 			]);
 		} else {
 			return $this->render('Conversation/archive.html.twig', [
+				'type' => 'private',
 				'conversation' => $conv,
 				'messages' => $messages,
-				'total' => $total,
-				'unread' => 0,
 				'veryold' => $veryold,
+				'active'=> $lastPerm->getActive(),
 				'last' => NULL,
-				'active'=> false,
+				'archive'=> true
 			]);
 		}
 	}
