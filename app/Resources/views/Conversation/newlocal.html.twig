@@ -14,27 +14,14 @@
 {% endblock %}
 
 {% block jquery %}
-realmselect($("#realmsearch"), realmchange);
-settlementselect($("#settlementsearch"), settlementchange);
-charselect($("#charactersearch"), characterchange);
 
-{% include "element/autocomplete.js.twig" %}
+{% include "element/msgautocomplete.js.twig" %}
 
 function search_insert(insert) {
-	var caretPos = document.getElementById("new_conversation_content").selectionStart;
-	var textAreaTxt = $("#new_conversation_content").val();
-	$("#new_conversation_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+	var caretPos = document.getElementById("new_local_message_content").selectionStart;
+	var textAreaTxt = $("#new_local_message_content").val();
+	$("#new_local_message_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
 
-}
-
-function realmchange(id, name) {
-	search_insert("[r:"+id+"]");
-}
-function settlementchange(id, name) {
-	search_insert("[s:"+id+"]");
-}
-function characterchange(id, name) {
-	search_insert("[c:"+id+"]");
 }
 
 {% endblock %}
