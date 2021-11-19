@@ -72,6 +72,15 @@ class Association {
                 }
                 return $all_infs;
         }
+
+	public function findLaw($search) {
+		foreach ($this->getLaws() as $law) {
+			if ($law->getType()->getName() == $search) {
+				return $law;
+			}
+		}
+		return false;
+	}
   
   
 }
