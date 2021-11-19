@@ -354,7 +354,7 @@ class ConversationManager {
                 return $conv;
         }
 
-        public function writeLocalMessage(Character $char, $target, $topic, $type, $text, $replyTo = null, $group) {
+        public function writeLocalMessage(Character $char, $target, $topic = null, $type, $text, $replyTo = null, $group) {
                 #TODO: Finish reworking this.
                 if ($target == 'place') {
                         $recipients = $char->getInsidePlace()->getCharactersPresent();
@@ -372,6 +372,9 @@ class ConversationManager {
                 $cycle = $this->appstate->getCycle();
                 if ($replyTo) {
                         $origTarget = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
+                        if (!$topic && $origTarget) {
+                                $topic = $origTarget->getTopic();
+                        }
                 } else {
                         $origTarget = FALSE;
                 }
@@ -393,9 +396,9 @@ class ConversationManager {
                         $msg->setSent($now);
                         $msg->setContent($text);
                         if ($origTarget) {
-                                $targetMsg = $this->em->getRepository('BM2SiteBundle:Message')->findOneBy(['sent'=>$origTarget->getSent(), 'sender'=>$origTarget->getSender(), 'content'=>$origTarget->getContent()]);
+                                $targetMsg = $this->em->getRepository('BM2SiteBundle:Message')->findOneBy(['conversation'=>$conv, 'sender'=>$origTarget->getSender(), 'content'=>$origTarget->getContent()]);
                                 if ($targetMsg) {
-                                        $msg->setReplyTo($target);
+                                        $msg->setReplyTo($targetMsg);
                                 }
                         }
                         $msg->setRecipientCount($count);
