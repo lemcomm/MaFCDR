@@ -111,25 +111,32 @@ class AssociationRank {
         }
 
         public function findRankDifference($rank) {
-                if ($this->getSubordinates()->contains($subRank) || $this->getSuperior() === $rank) {
-                        return 1;
-                }
-
                 $diff = 0;
-                # This takes advantage of the fact that superiors are returned in order. The first result of findAll is the immediate, the next is the one after, etc.
-                foreach ($rank->findAllSuperiors() as $sup) {
-                        $diff--;
-                        if ($sup === $rank) {
-                                return $diff;
+                $assoc = $this->getAssocaition();
+                if ($rank->getAssociation() === $assoc) {
+                        if ($rank === $this) {
+                                return 0;
+                        }
+                        $visLaw = $assoc->findLaw('rankVisibility');
+                        if ($visLaw == 'direct') {
+                                # This takes advantage of the fact that superiors are returned in order. The first result of findAll is the immediate, the next is the one after, etc.
+                                foreach ($rank->findAllSuperiors() as $sup) {
+                                        $diff++;
+                                        if ($sup === $rank) {
+                                                return $diff;
+                                        }
+                                }
+                                foreach ($rank->findAllSubordinates() as $sub) {
+                                        $diff--;
+                                        if ($sub === $rank) {
+                                                return $diff;
+                                        }
+                                }
+                        } elseif ($visLaw == 'crossCompare') {
+                                return $this->getLevel() - $rank->getLevel();
                         }
                 }
-                foreach ($rank->findAllSubordinates() as $sub) {
-                        $diff++;
-                        if ($sub === $rank) {
-                                return $diff;
-                        }
-                }
-                return $diff; #This should only happen if you compare between associations or chains of hierarchy.
+                return 'Outside Range'; #This should only happen if you compare between associations or chains of hierarchy.
         }
 	
 	
