@@ -1,7 +1,8 @@
 {% block content %}
-	<h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
 
 	{% if not archive %}
+		<h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
+		
 		<p align="right">
 		<a href="{{path('maf_conv_print', {"conv":conversation.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
 		</p>
@@ -21,7 +22,7 @@
 	{% if not archive %}
 		<div class="cmsg_general">
 			{% if active %}
-				<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> | 
+				<button class="topicreply cmsg_button" data-id="{{ conversation.id }}">{{ 'conversation.reply.label'|trans({}, "conversations")|title }}</button> |
 			{% else %}
 	                         <a href="{{path('maf_conv_remove', {"conv":conversation.id}) }}"><button class="convo_remove cmsg_button" title="{{ 'conversation.remove.help'|trans({}, "conversations") }}">{{ 'conversation.remove.label'|trans({}, "conversations") }}</button></a> |
 			{% endif %}
