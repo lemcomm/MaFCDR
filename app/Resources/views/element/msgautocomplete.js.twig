@@ -227,13 +227,6 @@ function houseselect(obj, callback) {
 	}
 }
 
-function search_insert(insert) {
-	var caretPos = document.getElementById("message_reply_content").selectionStart;
-	var textAreaTxt = $("#message_reply_content").val();
-	$("#message_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
-
-}
-
 function realmchange(id, name) {
 	search_insert("[r:"+id+"]");
 }
