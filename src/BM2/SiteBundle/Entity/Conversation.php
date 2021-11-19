@@ -113,5 +113,15 @@ class Conversation {
                 }
                 return $all;
         }
+
+        public function findType() {
+                if ($this->realm || $this->house || $this->association) {
+                        return 'org';
+                }
+                if ($this->local_for) {
+                        return 'local';
+                }
+                return 'private';
+        }
         
 }
