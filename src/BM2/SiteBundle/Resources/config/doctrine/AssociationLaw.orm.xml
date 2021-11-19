@@ -4,14 +4,17 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="name" type="string"/>
 		<field name="description" type="text"/>
 		<field name="mandatory" type="boolean"/>
-		<field name="value_boolean" type="boolean" nullable="true"/>
-		<field name="value_integer" type="integer" nullable="true"/>
-		<field name="value_string" type="string" nullable="true"/>
+		<field name="value" type="string"/>
+		<field name="enacted" type="datetime"/>
+		<field name="invalidated_on" type="datetime"/>
+		<many-to-one field="invalidated_by" target-entity="AssociationLaw" inversed-by="invalidates"/>
+		<one-to-many field="invalidates" target-entity="AssociationLaw" mapped-by="invalidated_by"/>
 
+		<many-to-one field="character" target-entity="Character" inversed-by="enacted_laws"/>
 		<many-to-one field="association" target-entity="Association" inversed-by="laws"/>
+		<many-to-one field="type" target-entity="LawType"/>
 
 	</entity>
 </doctrine-mapping>
