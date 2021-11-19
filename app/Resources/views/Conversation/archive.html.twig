@@ -5,11 +5,11 @@
 	<title>{% block title %}{% if 'mightandfealty.com' in app.request.host %}Might &amp; Fealty{% elseif 'iungard' in app.request.host %}Might &amp; Fealty{% elseif 'valengard' in app.request.host %}Valengard Test Server{% else %}M&amp;F Dev Build{% endif %}{% endblock %}</title>
 </head>
 {% block content %}
-{% if type == 'org' %}
-	{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
-{% elseif type == 'local' %}
-	{% include "Conversation/local_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "archive": archive} %}
-{% else %}
-	{% include "Conversation/priv_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
-{% endif %}
+	{% if type == 'org' %}
+		{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
+	{% elseif type == 'local' %}
+		{% include "Conversation/local_conv.html.twig" with {"messages": messages, "conversation": conversation, "archive": archive} %}
+	{% else %}
+		{% include "Conversation/priv_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
+	{% endif %}
 {% endblock %}
