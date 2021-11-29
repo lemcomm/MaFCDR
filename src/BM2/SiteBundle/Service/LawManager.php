@@ -20,9 +20,9 @@ class LawManager {
 		$this->em = $em;
 	}
 
-	public function updateLaw($org, $type, $setting, $description = null, Character $character, $flush=true) {
+	public function updateLaw($org, $type, $setting, $title, $description = null, Character $character, $allowed, $mandatory, $cascades, $sol, $flush=true) {
 		# All laws are kept eternal, new laws are made whenever a law is changed, the old is inactivated.
-		
+
 		$oldLaw = $assoc->findLaw($type);
 		if (!$oldLaw || ($oldLaw->getSetting() != $setting)) {
 			$law = new Law();
