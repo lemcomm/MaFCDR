@@ -5,7 +5,6 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\Realm;
-use BM2\SiteBundle\Entity\RealmLaw;
 use BM2\SiteBundle\Entity\RealmPosition;
 use Doctrine\ORM\EntityManager;
 
@@ -16,15 +15,14 @@ class RealmManager {
 	protected $history;
 	protected $politics;
 	protected $convman;
+	protected $lawman;
 
-	public $available_ruler_election = array('banner', 'spears', 'swords', 'land', 'heads');
-
-
-	public function __construct(EntityManager $em, History $history, Politics $politics, ConversationManager $convman) {
+	public function __construct(EntityManager $em, History $history, Politics $politics, ConversationManager $convman, LawManager $lawman) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->politics = $politics;
 		$this->convman = $convman;
+		$this->lawman = $lawman;
 	}
 
 	public function create($name, $formalname, $type, Character $founder) {
@@ -96,15 +94,6 @@ class RealmManager {
 		$realm->addPosition($position);
 
 		$this->makeRuler($realm, $ruler);
-
-		// default laws
-		$elect = new RealmLaw;
-		$elect->setRealm($realm);
-		$elect->setName('estates')->setDescription("");
-		$elect->setMandatory(true);
-		$elect->setValueString("inherit");
-		$this->em->persist($elect);
-		$realm->addLaw($elect);
 
 		return $realm;
 	}
