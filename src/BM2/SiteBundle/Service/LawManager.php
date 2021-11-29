@@ -40,8 +40,15 @@ class LawManager {
 			}
 			$law->setEnacted(new \DateTime("now"));
 			$law->setCharacter($character);
+			$law->setTitle($title);
+			$law->setAllowed($allowed);
+			$law->setMandatory($mandatory);
+			$law->setCascades($cascades);
+			$law->setSolCycles($sol);
 			if ($oldLaw) {
 				$changes = $this->lawSequenceUpdater($oldLaw, $law, $type, $setting);
+			} else {
+				$changes = null;
 			}
 			if ($flush) {
 				$this->em->flush();
