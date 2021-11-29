@@ -14,7 +14,7 @@
 		<many-to-one field="superior" target-entity="Association" inversed-by="inferiors"/>
 		<one-to-many field="inferiors" target-entity="Association" mapped-by="superior"/>
 
-		<one-to-many field="laws" target-entity="AssociationLaw" mapped-by="association" fetch="EXTRA_LAZY"/>
+		<one-to-many field="laws" target-entity="Law" mapped-by="association" fetch="EXTRA_LAZY"/>
 		<one-to-many field="elections" target-entity="Election" mapped-by="association"/>
 
 		<many-to-one field="founder" target-entity="Character" inversed-by="founded_associations"/>
