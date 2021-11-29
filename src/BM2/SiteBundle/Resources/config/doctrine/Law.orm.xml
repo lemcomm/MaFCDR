@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <doctrine-mapping>
-	<entity name="BM2\SiteBundle\Entity\AssociationLaw">
+	<entity name="BM2\SiteBundle\Entity\Law">
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
+		<field name="title" type="text"/>
 		<field name="description" type="text"/>
+		<field name="allow" type="boolean"/>
 		<field name="mandatory" type="boolean"/>
+		<field name="cascades" type="boolean"/>
 		<field name="value" type="string"/>
 		<field name="enacted" type="datetime"/>
 		<field name="invalidated_on" type="datetime"/>
-		<many-to-one field="invalidated_by" target-entity="AssociationLaw" inversed-by="invalidates"/>
-		<one-to-many field="invalidates" target-entity="AssociationLaw" mapped-by="invalidated_by"/>
+		<field name="sol_cycles" type="integer"/>
+		<many-to-one field="invalidated_by" target-entity="Law" inversed-by="invalidates"/>
+		<one-to-many field="invalidates" target-entity="Law" mapped-by="invalidated_by"/>
 
 		<many-to-one field="character" target-entity="Character" inversed-by="enacted_laws"/>
 		<many-to-one field="association" target-entity="Association" inversed-by="laws"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="laws"/>
 		<many-to-one field="type" target-entity="LawType"/>
 
 	</entity>
