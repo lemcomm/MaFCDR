@@ -17,12 +17,14 @@ class AssociationManager {
 	protected $history;
 	protected $descman;
 	protected $convman;
+	protected $lawman;
 
-	public function __construct(EntityManager $em, History $history, DescriptionManager $descman, ConversationManager $convman) {
+	public function __construct(EntityManager $em, History $history, DescriptionManager $descman, ConversationManager $convman, LawManager $lawman) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->descman = $descman;
 		$this->convman = $convman;
+		$this->lawman = $lawman;
 	}
 
 	public function create($data, Place $place, Character $founder, $superior = null) {
@@ -58,7 +60,6 @@ class AssociationManager {
 		$assoc->setFormalName($formal);
 		$assoc->setType($type);
 		$assoc->setMotto($motto);
-		$assoc->setPublic($public);
 		$assoc->setShortDescription($short_desc);
 
 		if ($superior) {
@@ -70,6 +71,12 @@ class AssociationManager {
 		$assoc->setGold(0);
 		$assoc->setActive(true);
 		$this->em->flush();
+		if ($public) {
+			$lawman->updateLaw($assoc, 'assocVisibility', 'true', null, $founder);
+		} else {
+			$lawman->updateLaw($assoc, 'assocVisibility', 'false', null, $founder);
+			$lawman->updateLaw($assoc, 'rankVisibility', 'direct', null, $founder);
+		}
 		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, null, false, true, false);
 		$this->newLocation($assoc, $place, true, false);
 		$this->descman->newDescription($assoc, $full_desc, $founder, TRUE); #Descman includes a flush for the EM.
