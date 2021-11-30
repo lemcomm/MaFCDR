@@ -4,15 +4,15 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="title" type="text"/>
-		<field name="description" type="text"/>
-		<field name="allow" type="boolean"/>
-		<field name="mandatory" type="boolean"/>
-		<field name="cascades" type="boolean"/>
-		<field name="value" type="string"/>
-		<field name="enacted" type="datetime"/>
-		<field name="invalidated_on" type="datetime"/>
-		<field name="sol_cycles" type="integer"/>
+		<field name="title" type="text" nullable="true"/>
+		<field name="description" type="text" nullable="true"/>
+		<field name="allow" type="boolean" nullable="true"/>
+		<field name="mandatory" type="boolean" nullable="true"/>
+		<field name="cascades" type="boolean" nullable="true"/>
+		<field name="value" type="string" nullable="true"/>
+		<field name="enacted" type="datetime" nullable="true"/>
+		<field name="invalidated_on" type="datetime" nullable="true"/>
+		<field name="sol_cycles" type="integer" nullable="true"/>
 		<many-to-one field="invalidated_by" target-entity="Law" inversed-by="invalidates"/>
 		<one-to-many field="invalidates" target-entity="Law" mapped-by="invalidated_by"/>
 
