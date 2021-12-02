@@ -72,6 +72,14 @@ class Unit {
 		);
 	}
 
+	public function getNotRecruits() {
+		return $this->getSoldiers()->filter(
+			function($entry) {
+				return (!$entry->isRecruit());
+			}
+		);
+	}
+
 	public function isLocal() {
 		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace() && !$this->getDefendingSettlement()) {
 			return true;
