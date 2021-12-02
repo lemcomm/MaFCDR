@@ -267,7 +267,7 @@ class UnitController extends Controller {
                         $canReassign = true;
                 }
 
-		$form = $this->createForm(new UnitSoldiersType($em, $unit->getActiveSoldiers(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character, $hasUnitsPerm));
+		$form = $this->createForm(new UnitSoldiersType($em, $unit->getNotRecruits(), $resupply, $training, $units, $settlement, $canReassign, $unit, $character, $hasUnitsPerm));
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
@@ -283,7 +283,7 @@ class UnitController extends Controller {
 		}
 
                 return $this->render('Unit/soldiers.html.twig', [
-			'soldiers' => $unit->getActiveSoldiers(),
+			'soldiers' => $unit->getNotRecruits(),
 			'recruits' => $unit->getRecruits(),
 			'resupply' => $resupply,
 			'training' => $training,
