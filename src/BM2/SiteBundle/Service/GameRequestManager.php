@@ -82,6 +82,13 @@ class GameRequestManager {
 	}
 
 	public function findAllManageableRequests(Character $char, $accepted = false) {
+		# TODO: When we have multiple ranks/roles within a single org that can manage different requests, we'll have to build that analysis into the SQL query we make here.
+
+		# Prepare string and param set.
+		$queryString = 'SELECT r FROM BM2SiteBundle:GameRequest r WHERE ';
+		$innerString = 'r.to_character = :char';
+		$params = ['char'=>$char];
+
 		# Build a list of all realms we are in, using their IDs.
 		$realms = $char->findRealms();
 		$realmIDs =  [];
@@ -92,41 +99,76 @@ class GameRequestManager {
 				}
 			}
 		}
+		if (!empty($realmIDs)) {
+			$innerString .= ' OR r.to_realm IN (:realms)';
+			$params['realms'] = $realmIDs;
+		}
+
 		# Build a list of all settlements we own, using their IDs.
 		$settlementIDs = [];
 		foreach ($char->getOwnedSettlements() as $settlement) {
 			$settlementIDs[] = $settlement->getId();
 		}
+		if (!empty($settlements)) {
+			$innerString .= ' OR r.to_settlement IN (:settlements)';
+			$params['settlements'] = $settlementIDs;
+		}
+
 		# Build a list of all places we own, using their IDs.
 		$placeIDs = [];
 		foreach ($char->getOwnedPlaces() as $place) {
 			$placeIDs[] = $place->getId();
 		}
+		if (!empty($placeIDs)) {
+			$innerString .= ' OR r.to_place IN (:places)';
+			$params['places'] = $placeIDs;
+		}
+
 		# Check if we're in a house, and if we are, check who the head of it is. If we are, grab the ID.
-		$houseID = null;
 		if ($char->getHouse() && $char->getHouse()->getHead() === $char) {
 			$houseID = $char->getHouse()->getId();
+			$innerString .= ' OR r.to_house = :house';
+			$params['house'] = $houseID;
 		}
+
 		# Build a list of all positions we hold, using their IDs.
 		$positionIDs = [];
 		foreach ($char->getPositions() as $pos) {
 			$positionIDs[] = $pos->getId();
 		}
-		# Now we build the query, or two of them.
-		# TODO: See if we need to actually differentiate these. I'm suspeting Doctrine is smart enough to know what to do here.
-		if ($houseID && !$accepted) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND (r.accepted = FALSE AND r.rejected = FALSE)');
-			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
-		} elseif (!$houseID && !$accepted) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND (r.accepted = FALSE AND r.rejected = FALSE)');
-			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
-		} elseif ($houseID && $accepted) {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_house = :house OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND r.accepted = TRUE');
-			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'house'=>$houseID, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
-		} else {
-			$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:GameRequest r WHERE (r.to_character = :char OR r.to_settlement IN (:settlements) OR r.to_realm IN (:realms) OR r.to_place IN (:places) OR r.to_position IN (:positions)) AND r.accepted = TRUE');
-			$query->setParameters(['char'=>$char, 'settlements'=>$settlementIDs, 'realms'=>$realmIDs, 'places'=>$placeIDs, 'positions'=>$positionIDs]);
+		if (!empty($positionIDs)) {
+			$innerString .= ' OR r.to_position IN (:positions)';
+			$params['positions'] = $positionIDs;
 		}
+
+		# Find all associations we can manage.
+		$assocIDs = [];
+		foreach ($char->getAssociationMemberships() as $mbr) {
+			$rank = $mbr->getRank();
+			if($rank->getOwner() || $rank->getManager()) {
+				$assocIDs[] = $mbr->getAssociation()->getId();
+			}
+		}
+		if (!empty($assocIDs)) {
+			$innerString .= ' OR r.to_association IN (:assocs)';
+			$params['assocs'] = $assocIDs;
+		}
+
+		# Condense the strings so far back into one chunk.
+		$queryString .= '('.$innerString.')';
+
+		# Add filter for not yet accepted and already accepted.
+		# Not accepted are those we haven't reponded to, while accepted is those we can cancel still.
+		if (!$accepted) {
+			$queryString .= ' AND r.accepted = FALSE AND r.rejected = FALSE';
+		} else {
+			$queryString .= ' AND r.accepted = TRUE';
+		}
+
+		# Build the query and parameters.
+		$query = $this->em->createQuery($queryString);
+		$query->setParameters($params);
+
 		try {
 			# We try/catch this because doctrine doesn't like to return null. By not like, I mean it won't return null on this type of query.
 			return $query->getResult();
