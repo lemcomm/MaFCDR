@@ -711,10 +711,10 @@ class WarManager {
 			$sortie = TRUE;
 		}
 		$attacker = $battle->getPrimaryAttacker();
-		if ($flag == 'haveAttacker') {
+		if ($flag === 'haveAttacker') {
 			$victor = $siege->getAttacker();
 			$bypass = TRUE; #Defenders failed to muster any defenders.
-		} else if ($flag == 'haveDefender') {
+		} else if ($flag === 'haveDefender') {
 			$victor = $siege->getDefender();
 			$bypass = TRUE; #Attackers failed to muster any attackers.
 		}
