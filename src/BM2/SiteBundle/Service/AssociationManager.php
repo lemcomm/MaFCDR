@@ -152,23 +152,23 @@ class AssociationManager {
 		return $loc;
 	}
 
-	public function updateMember($assoc, $rank, $char, $flush=true) {
+	public function updateMember($assoc, $rank=null, $char, $flush=true) {
 		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
-		if ($member && $old->getRank() === $rank) {
+		if ($member && $rank && $member->getRank() === $rank) {
 			return 'no change';
 		}
 		$now = new \DateTime("now");
-		if ($member) {
-			$joinDate = $old->getJoinDate();
-		} else {
+		if (!$member) {
 			$member = new AssociationMember;
 			$this->em->persist($member);
 			$member->setJoinDate($now);
 			$member->setAssociation($assoc);
 			$member->setCharacter($char);
 		}
-		$member->setRankDate($now);
-		$member->setRank($rank);
+		if ($rank) {
+			$member->setRankDate($now);
+			$member->setRank($rank);
+		}
 		if ($flush) {
 			$this->em->flush();
 		}
