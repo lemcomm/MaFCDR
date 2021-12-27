@@ -1553,6 +1553,7 @@ unavailable:
  nosettlement:  You are not near any settlement.
  notinside:     You are not inside a settlement.
  inside:        You are inside the settlement.
+ insideplace:   You cannot declare a siege on a place from inside another place.
  outside:       You are not currently inside a settlement.
  outsideplace:  You are not currently inside a place.
  outsideall:    You are not inside either a place or settlement.
