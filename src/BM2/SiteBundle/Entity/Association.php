@@ -73,6 +73,20 @@ class Association {
                 return $all_infs;
         }
 
+	public function findMember(Character $char, $all = false) {
+		if ($all) {
+			$all = $this->findAllMembers(true);
+		} else {
+			$all = $this->getMembers();
+		}
+		foreach ($all as $mbr) {
+			if ($mbr->getCharacter() === $char) {
+				return $mbr;
+			}
+		}
+		return false;
+	}
+
 	public function findLaw($search) {
 		foreach ($this->getLaws() as $law) {
 			if ($law->getType()->getName() == $search) {
