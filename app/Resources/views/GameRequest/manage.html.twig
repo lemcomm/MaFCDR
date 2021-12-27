@@ -69,6 +69,14 @@
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
 			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'diplomacy.join.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'diplomacy.join.deny'|trans({},"politics") }}</button></a>
 			</div>
+		{% elseif gamerequest.type == 'assoc.join' %}
+			<hr>
+			{{ 'assoc.requests.join.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%link-assoc%":link(gamerequest.toAssociation), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "orgs")|raw }}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'diplomacy.join.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'diplomacy.join.deny'|trans({},"politics") }}</button></a>
+			</div>
 		{% endif %}
 	{% else %}
 		{{ 'house.manage.applicants.empty'|trans({},"politics")|raw }}<br />
