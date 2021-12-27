@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Entity\House;
@@ -348,6 +349,43 @@ class GameRequestManager {
 		}
 		if ($toSettlement) {
 			$GR->setToSettlement($toSettlement);
+		}
+		$this->em->flush();
+	}
+
+	public function newRequestFromCharacterToAssociation($type, $expires, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar, Association $toAssoc, Character $includeChar = null, Place $includePlace = null) {
+		$GR = new GameRequest();
+		$this->em->persist($GR);
+		$GR->setType($type);
+		$GR->setCreated(new \DateTime("now"));
+		$GR->setAccepted(FALSE);
+		$GR->setRejected(FALSE);
+		if ($expires) {
+			$GR->setExpires($expires);
+		}
+		if ($numberValue) {
+			$GR->setNumberValue($numberValue);
+		}
+		if ($stringValue) {
+			$GR->setStringValue($stringValue);
+		}
+		if ($subject) {
+			$GR->setSubject($subject);
+		}
+		if ($text) {
+			$GR->setText($text);
+		}
+		if ($fromChar) {
+			$GR->setFromCharacter($fromChar);
+		}
+		if ($toAssoc) {
+			$GR->setToAssociation($toAssoc);
+		}
+		if ($includeChar) {
+			$GR->setIncludeCharacter($includeChar);
+		}
+		if ($includePlace) {
+			$GR->setIncludePlace($includePlace);
 		}
 		$this->em->flush();
 	}
