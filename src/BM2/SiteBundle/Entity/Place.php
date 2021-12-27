@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Entity;
 
+use BM2\SiteBundle\Entity\Association;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class Place {
@@ -43,5 +44,15 @@ class Place {
 		}
 		return $defenders;
 	}
+
+        public function containsAssociation(Association $assoc) {
+                foreach ($this->getAssociations() as $ap) {
+                        # Cycle through AssociationPlace intermediary objects.
+                        if ($ap->getAssociation() === $assoc) {
+                                return true;
+                        }
+                }
+                return false;
+        }
 
 }
