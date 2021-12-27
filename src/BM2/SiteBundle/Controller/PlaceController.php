@@ -15,6 +15,7 @@ use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
 use BM2\SiteBundle\Form\PlaceNewType;
 use BM2\SiteBundle\Service\History;
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -90,6 +91,14 @@ class PlaceController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 		$places = $this->get('geography')->findPlacesInActionRange($character);
+
+		$coll = new ArrayCollection($places);
+		$iterator = $coll->getIterator();
+		$iterator->uasort(function ($a, $b) {
+		    return ($a->getName() < $b->getName()) ? -1 : 1;
+		});
+		$places = new ArrayCollection(iterator_to_array($iterator));
+
 
 		return $this->render('Place/actionable.html.twig', [
 			'places' => $places,
@@ -492,7 +501,11 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$olddescription = $place->getDescription()->getText();
+		if ($olddescription = $place->getDescription()) {
+			$olddescription = $place->getDescription()->getText();
+		} else {
+			$olddescription = null;
+		}
 
 		$form = $this->createForm(new PlaceManageType($olddescription, $type, $place));
 		$form->handleRequest($request);
@@ -676,7 +689,7 @@ class PlaceController extends Controller {
 	  * @Route("/{place}/spawn", requirements={"place"="\d+"}, name="maf_place_spawn_toggle")
 	  */
 	public function placeSpawnToggleAction(Place $place) {
-		$character = $this->get('dispatcher')->gateway('placeNewPlayerInfoTest', false, true, false, $place);
+		$character = $this->get('dispatcher')->gateway('placeSpawnToggleTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
