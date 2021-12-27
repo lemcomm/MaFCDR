@@ -5,6 +5,7 @@
 
 assoc:
  form:
+  areyousure: Are You Sure?
   select: (select one)
   submit: Submit
   new:
@@ -18,6 +19,12 @@ assoc:
   description:
    short: Short Description
    full:  Full Description
+  join:
+   subject: Subject For Your Application
+   text: Message For Your Application
+
+
+
  help:
   name: A short, and easily referred to, name for the association.
   formalname: The formal, and likely long, name for the association.
@@ -35,3 +42,25 @@ assoc:
   view:
    history:
     name: History
+  join:
+   header: Join an Association
+   intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>Unlike other games, these entities tend to be very free form. Functionally, they all have access to the same options, a mercenary company can have a patron saint or a temple can run trade routes--this is up to the association to decide.</p>
+   subject:
+    name: Subject for your Application
+    desc: A title for your message asking to join.
+   text:
+    name: Message Body for your Application
+    desc: The message you want to send explaining why you would like to join this particular group.
+   success: Your request to join %name% has been submitted.
+
+ requests:
+  join:
+   preamble: You've received a request to join the Association of %link-assoc% from %link-character%, on %date%, as follows:
+   approve:     Approve
+   approved:    The applcation from %character% to join %assoc% has been approved.
+   deny:        Deny
+   denied:      The applcation from %character% to join %assoc% has been denied.
+  manage:
+   applicant:
+    approved:   The request from %character% to join %assoc% has been approved.
+    denied:     The request from %character% to join %assoc% has been denied.
