@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\AssocCreationType;
+use BM2\SiteBundle\Form\AssocJoinType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 
 use BM2\SiteBundle\Service\DescriptionManager;
@@ -31,7 +32,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AssociationController extends Controller {
 
 	private function gateway($test, $secondary = null) {
-		$char = $this->get('dispatcher')->gateway($test, $secondary);
+		$char = $this->get('dispatcher')->gateway($test, false, true, false, $secondary);
 		if (! $char instanceof Character) {
 			return $this->redirectToRoute($char);
 		}
@@ -52,7 +53,8 @@ class AssociationController extends Controller {
 			if ($member = $this->get('association_manager')->findMember($id, $char)) {
 				$details = true;
 				$public = true;
-				if ($member->getRank()->getOwner()) {
+				$rank = $member->getRank();
+				if ($rank && $rank->getOwner()) {
 					$owner = true;
 				}
 			}
@@ -95,7 +97,7 @@ class AssociationController extends Controller {
 	}
 
 	/**
-	  * @Route("{id}/createrank", name="maf_assoc_createrank", requirements={"id"="\d+"})
+	  * @Route("/{id}/createrank", name="maf_assoc_createrank", requirements={"id"="\d+"})
 	  */
 
 	public function createRankAction(Association $id, Request $request) {
@@ -121,7 +123,7 @@ class AssociationController extends Controller {
 	}
 
 	/**
-	  * @Route("{id}/managerank/{rank}", name="maf_assoc_managerank", requirements={"id"="\d+", "rank"="\d+"})
+	  * @Route("/{id}/managerank/{rank}", name="maf_assoc_managerank", requirements={"id"="\d+", "rank"="\d+"})
 	  */
 
 	public function manageRankAction(Association $id, AssociationRank $rank, Request $request) {
@@ -144,6 +146,32 @@ class AssociationController extends Controller {
 			return $this->redirectToRoute('maf_assoc_manage', array('id'=>$assoc->getId()));
 		}
 		return $this->render('Assoc/manageRank.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/join", name="maf_assoc_join", requirements={"id"="\d+"})
+	  */
+
+	public function joinAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocJoinTest', $assoc);
+
+		$form = $this->createForm(new AssocJoinType());
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($data['sure']) {
+				$this->get('game_request_manager')->newRequestFromCharacterToAssociation('assoc.join', null, null, null, $data['subject'], $data['text'], $char, $assoc);
+				$this->addFlash('notice', $this->get('translator')->trans('assoc.route.join.success', ['%name%'=>$assoc->getName()], 'orgs'));
+				return $this->redirectToRoute('maf_assoc', array('id'=>$assoc->getId()));
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('assoc.route.member.joinfail', array(), 'orgs'));
+				return $this->redirectToRoute('maf_assoc_join', ['id'=>$assoc->getId()]);
+			}
+		}
+		return $this->render('Assoc/join.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
