@@ -475,7 +475,7 @@ class ActionResolution {
 		$chance = 40;
 		// the larger my army, the less chance I have to evade (with 500 people, -50 %)
 		$soldiercount = 0;
-		foreach ($character->getUnits() as $unit) {
+		foreach ($char->getUnits() as $unit) {
 			$soldiercount += $unit->getSoldiers()->count();
 		}
 		$chance -= sqrt( ($soldiercount + $char->getEntourage()->count()) * 5);
@@ -486,6 +486,17 @@ class ActionResolution {
 
 		// avoid the abusive "catch with small army to engage, while large army moves in for the kill" abuse for extreme scenarios
 		$enemies = $action->getTargetBattlegroup()->getEnemy()->getActiveSoldiers()->count();
+		$eGrps = $action->getTargetBattlegroup()->getEnemies();
+		$enemies = 0;
+		$eChars = new ArrayCollection();
+		foreach ($eGrps as $eGrp) {
+			$enemies = $eGrp->getActiveSoldiers()->count();
+			foreach ($eGrp->getCharacters as $gChar) {
+				if (!$eChars->contains($gChar)) {
+					$eChars->add($gChar);
+				}
+			}
+		}
 		if ($enemies < 5) {
 			$chance += 30;
 		} elseif ($enemies < 10) {
@@ -508,7 +519,7 @@ class ActionResolution {
 
 		if (rand(0,100) < $chance) {
 			// add a short regroup timer to those who engaged me, to prevent immediate re-engages
-			foreach ($action->getTargetBattlegroup()->getEnemy()->getCharacters() as $enemy) {
+			foreach ($eChars as $enemy) {
 				$act = new Action;
 				$act->setType('military.regroup')->setCharacter($enemy);
 				$act->setBlockTravel(false);
