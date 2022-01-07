@@ -164,7 +164,7 @@ class MilitaryManager {
 					}
 					break;
 				case 'bury':
-					$this->bury($npc);
+					$this->bury($soldier);
 					break;
 				case 'resupply':
 					if ($canResupply && $this->resupply($soldier, $settlement)) {
