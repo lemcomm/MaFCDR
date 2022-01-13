@@ -1,0 +1,18 @@
+digraph hierarchy {
+bgcolor=transparent;
+node [color="#c0c0ccd0", fontcolor=white, style="bold, rounded, filled", shape=box, fillcolor="#20408060"];
+edge [color=white, fontcolor=white, arrowhead="vee"];
+
+{% for rank in hierarchy %}
+	{% if rank == me %}
+		{% set opacity = "a0" %}
+	{% else %}
+		{% set opacity = "60" %}
+	{% endif %}
+	{{ rank.id }} [label="{{ rank.name }}", tooltip="{{rank.description.text}}", fillcolor="#206080{{opacity}}"];
+	{% if rank.superior and rank.superior in hierarchy %}
+		{{ rank.superior.id }} -> {{ rank.id }};
+	{% endif %}
+{% endfor %}
+
+}
