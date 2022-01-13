@@ -31,6 +31,9 @@
 		<many-to-one field="association" target-entity="Association" inversed-by="descriptions"/>
 		<one-to-one field="active_association" target-entity="Association" inversed-by="description"/>
 
+		<many-to-one field="association_rank" target-entity="AssociationRank" inversed-by="descriptions"/>
+		<one-to-one field="active_association_rank" target-entity="AssociationRank" inversed-by="description"/>
+
 		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
 		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
 		<many-to-one field="updater" target-entity="Character" inversed-by="updated_descriptions"/>
