@@ -146,8 +146,10 @@ class GameRequestManager {
 		$assocIDs = [];
 		foreach ($char->getAssociationMemberships() as $mbr) {
 			$rank = $mbr->getRank();
-			if($rank->getOwner() || $rank->getManager()) {
-				$assocIDs[] = $mbr->getAssociation()->getId();
+			if ($rank) {
+				if($rank->getOwner() || $rank->getManager()) {
+					$assocIDs[] = $mbr->getAssociation()->getId();
+				}
 			}
 		}
 		if (!empty($assocIDs)) {
