@@ -583,6 +583,7 @@ class Dispatcher {
 
 		$actions[] = $this->hierarchyCreateRealmTest();
 		$actions[] = $this->houseCreateHouseTest();
+		$actions[] = $this->assocCreateTest();
 		$house = $this->house;
 		if ($house) {
 			$actions[] = array("title"=>$house->getName());
@@ -618,6 +619,7 @@ class Dispatcher {
 
 		$actions[] = $this->hierarchyCreateRealmTest();
 		$actions[] = $this->houseCreateHouseTest();
+		$actions[] = $this->assocCreateTest();
 		foreach ($this->getCharacter()->findRealms() as $realm) {
 			$this->setRealm($realm);
 			$actions[] = array("title"=>$realm->getFormalName());
@@ -637,6 +639,30 @@ class Dispatcher {
 				$actions[] = $this->hierarchyDiplomacyTest();
 				$actions[] = $this->hierarchyAbolishRealmTest();
 			}
+		}
+
+		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
+	}
+
+	public function politicsAssocsActions() {
+		$actions=array();
+		$actions[] = $this->personalRelationsTest();
+		$actions[] = $this->personalPrisonersTest();
+		$actions[] = $this->personalClaimsTest();
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			$actions[] = array("name"=>"politics.all", "description"=>"unavailable.$check");
+			return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
+		}
+
+		$actions[] = $this->hierarchyCreateRealmTest();
+		$actions[] = $this->houseCreateHouseTest();
+		$actions[] = $this->assocCreateTest();
+		foreach ($this->getCharacter()->findAssociations() as $assoc) {
+			$actions[] = array("title"=>$assoc->getFormalName());
+			$actions[] = array("name"=>"assoc.view.name", "url"=>"maf_assoc", "parameters"=>array("id"=>$assoc->getId()), "description"=>"assoc.view.description");
+			$actions[] = $this->assocViewRanksTest(null, $assoc);
+			$actions[] = $this->assocGraphRanksTest(null, $assoc);
+			$actions[] = $this->assocCreateRankTest(null, $assoc);
 		}
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
@@ -3416,7 +3442,7 @@ class Dispatcher {
 			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.$check");
 		}
 		$char = $this->getCharacter();
-		$member = $this->assocman->findMember($char);
+		$member = $this->assocman->findMember($assoc, $char);
 		if (!$member) {
 			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.notinassoc");
 		}
@@ -3444,7 +3470,7 @@ class Dispatcher {
 		if (!$place->containsAssociation($assoc)) {
 			return ["name"=>"assoc.join.name", "description"=>"unavailable.assocnothere"];
 		}
-		if ($assoc->findMember($character)) {
+		if ($assoc->findMember($assoc, $character)) {
 			return ["name"=>"assoc.join.name", "description"=>"unavailable.alreadyinassoc"];
 		}
 		return $this->action('assoc.join', 'maf_assoc_join', true,
@@ -3465,7 +3491,7 @@ class Dispatcher {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.$check");
 		}
 		$char = $this->getCharacter();
-		$member = $this->assocman->findMember($char);
+		$member = $this->assocman->findMember($assoc, $char);
 		if (!$member) {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notinassoc");
 		}
@@ -3481,6 +3507,37 @@ class Dispatcher {
 		} else {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notmanageablerank");
 		}
+	}
+
+	public function assocViewRanksTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.viewRanks.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$assoc->isPublic() && !$member) {
+			return array("name"=>"assoc.viewRanks.name", "description"=>"unavailable.notinassoc");
+		}
+		return $this->action("assoc.viewRanks", "maf_assoc_viewranks", false,
+			array('id'=>$assoc->getId()),
+			array("%name%"=>$assoc->getName())
+		);
+	}
+
+	public function assocGraphRanksTest($ignored, Association $assoc) {
+		# Should be the same as above assocViewRanksTest.
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.graphRanks.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$assoc->isPublic() && !$member) {
+			return array("name"=>"assoc.graphRanks.name", "description"=>"unavailable.notinassoc");
+		}
+		return $this->action("assoc.graphRanks", "maf_assoc_graphranks", false,
+			array('id'=>$assoc->getId()),
+			array("%name%"=>$assoc->getName())
+		);
 	}
 
 	/* ========== Meta Actions ========== */
