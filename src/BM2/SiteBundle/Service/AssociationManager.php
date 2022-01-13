@@ -76,11 +76,12 @@ class AssociationManager {
 		# Realm/Assocation , Law Name, 'Value', Law Title, Description (fluff), allowed/disallowed, mandatory/guideline, cascades to subs, statute of limitations cycles, db flush;
 		if ($public) {
 			$lawman->updateLaw($assoc, 'assocVisibility', 'true', null, null, $founder, null, true, null, null);
+			$lawman->updateLaw($assoc, 'rankVisibility', 'all', null, null, $founder, null, true, null, null);
 		} else {
 			$lawman->updateLaw($assoc, 'assocVisibility', 'false', null, null, $founder, null, true, null, null);
 			$lawman->updateLaw($assoc, 'rankVisibility', 'direct', null, null, $founder, null, true, null, null);
 		}
-		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, null, true, true, true, false);
+		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, true, null, true, true, true, false);
 		$this->newLocation($assoc, $place, true, false);
 		$this->descman->newDescription($assoc, $full_desc, $founder, TRUE); #Descman includes a flush for the EM.
 		$this->updateMember($assoc, $rank, $founder, true);
@@ -88,18 +89,18 @@ class AssociationManager {
 		return $assoc;
 	}
 
-	public function newRank($assoc, AssociationRank $myRank = null, $name, $viewAll, $viewUp, $viewDown, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+	public function newRank($assoc, AssociationRank $myRank = null, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
 		$rank = new AssociationRank;
 		$this->em->persist($rank);
 		$rank->setAssociation($assoc);
-		$this->updateRank($myRank, $rank, $name, $viewAll, $viewUp, $viewDown, $superior, $createSubs, $manager, $owner, $flush);
+		$this->updateRank($myRank, $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, $superior, $createSubs, $manager, $owner, $flush);
 		if ($flush) {
 			$this->em->flush();
 		}
 		return $rank;
 	}
 
-	public function updateRank(AssociationRank $myRank = null, $rank, $name, $viewAll, $viewUp, $viewDown, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+	public function updateRank(AssociationRank $myRank = null, $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
 		$rank->setName($name);
 		if ($myRank) {
 			if ($myRank->getViewAll()) {
@@ -128,6 +129,7 @@ class AssociationManager {
 			$rank->setViewUp($viewUp);
 		}
 		$rank->setViewDown($viewDown);
+		$rank->setViewSelf($viewSelf);
 		$rank->setSubcreate($createSubs);
 		$rank->setManager($manager);
 		$rank->setOwner($owner);
