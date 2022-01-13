@@ -822,6 +822,27 @@ claim:
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
 
+assoc:
+ view:
+  name:         View Details
+  description:  Bring up details on the Association
+ graphRanks:
+  name:   Rank Hierarchy Graph
+  description:  View known ranks hiearchically.
+ viewRanks:
+  name:   View Association Ranks
+  description:  Look through the ranks you know of.
+ new:
+  name:         Create an Association
+  description:  Create a new association at this place of interest.
+  longdesc:     First Ones can always organize themselves into yet more complex groups.
+ create:
+  rank:
+   name:        Add a New Rank
+   description: Add a new rank to the internal hierarchy
+   longdesc:    If you feel like there's a missing role within the strucutre of the association, you can always add one.
+
+
 house:
  history:
   name:         House History
