@@ -18,12 +18,19 @@ class AssociationRank {
                 return false;
         }
 
+        public function canManage() {
+                if ($this->owner || $this->manager) {
+                        return true;
+                }
+                return false;
+        }
+
         public function findAllKnownSubordinates() {
-                if ($this->owner || $this->viewAll) {
+                if ($this->owner || $this->view_all) {
                         return $this->findAllSubordinates();
                 }
-                if ($this->viewDown > 0) {
-                        return $this->findKnownSubordinates(1, $this->viewDown);
+                if ($this->view_down > 0) {
+                        return $this->findKnownSubordinates(1, $this->view_down);
                 }
                 return new ArrayCollection();
         }
@@ -59,9 +66,11 @@ class AssociationRank {
         }
 
         public function findManageableSubordinates() {
-                if ($this->owner || ($this->manage && $this->viewAll)) {
+                if ($this->owner) {
+                        return $this->association->getRanks();
+                } elseif ($this->manager && $this->view_all) {
                         return $this->findAllSubordinates();
-                } elseif ($this->manage) {
+                } elseif ($this->manager) {
                         return $this->findAllKnownSubordinates();
                 } else {
                         return new ArrayCollection;
@@ -69,13 +78,36 @@ class AssociationRank {
         }
 
         public function findAllKnownSuperiors() {
-                if ($this->viewAll) {
+                if ($this->view_all) {
                         return $this->findAllSuperiors();
                 }
-                if ($this->viewUp > 0) {
-                        return $this->findKnownSuperiors(1, $this->viewUp);
+                if ($this->view_up > 0) {
+                        return $this->findKnownSuperiors(1, $this->view_up);
                 }
                 return new ArrayCollection();
+        }
+
+        public function findAllKnownRanks() {
+                $all = new ArrayCollection();
+
+                if ($this->owner || $this->view_all) {
+                        $all = $this->association->getRanks();
+                } else {
+                        if ($this->view_up > 0) {
+                                foreach ($this->findAllKnownSuperiors(1, $this->view_up) as $sup) {
+                                        $all->add($sup);
+                                }
+                        }
+                        if ($this->view_self && !$all->contains($this)) {
+                                $all->add($this);
+                        }
+                        foreach ($this->findAllKnownSubordinates(1, $this->view_down) as $sub) {
+                                if (!$all->contains($sub)) {
+                                        $all->add($sub);
+                                }
+                        }
+                }
+                return $all;
         }
 
         public function findAllSuperiors() {
