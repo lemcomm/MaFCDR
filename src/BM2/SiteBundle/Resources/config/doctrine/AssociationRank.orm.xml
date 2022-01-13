@@ -9,6 +9,7 @@
 		<field name="view_all" type="boolean" nullable="true"/>
 		<field name="view_up" type="integer" nullable="true"/>
 		<field name="view_down" type="integer" nullable="true"/>
+		<field name="view_self" type="boolean" nullable="true"/>
 		<field name="owner" type="boolean" nullable="true"/>
 		<field name="manager" type="boolean" nullable="true"/>
 		<field name="subcreate" type="boolean" nullable="true"/>
@@ -18,5 +19,8 @@
 
 		<many-to-one field="association" target-entity="Association" inversed-by="ranks"/>
 		<one-to-many field="members" target-entity="AssociationMember" mapped-by="rank"/>
+
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="association_rank"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_association_rank" fetch="EAGER"/>
 	</entity>
 </doctrine-mapping>
