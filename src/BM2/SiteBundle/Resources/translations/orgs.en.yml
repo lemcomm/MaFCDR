@@ -42,6 +42,21 @@ assoc:
   view:
    history:
     name: History
+  graphRanks:
+   name:   Rank Hierarchy Graph
+  viewRanks:
+   name:   View Association Ranks
+   desc:   Look through the ranks you know of.
+   description:  Associations can be completely transparent or absolutely arcane, by design. Unless you run the association, this is only the ranks you've been allowed to see by whoever created the rank you hold, if you even hold one. Unlike realms, there's no retiring ranks, and no history of them.
+   empty:  If there's nothing here it is probably because you don't hold a rank of your own. You should reach out to whoever invited you or approved your joining to fix this.
+  rankInfo:
+   superior: "Answers to:"
+   holders:  Rank Holders
+  manageRank:
+   name:   Manage %name%
+  createRank:
+   name:   Create a New Rank
+   desc:   Add a new rank to this assocciation
   join:
    header: Join an Association
    intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>Unlike other games, these entities tend to be very free form. Functionally, they all have access to the same options, a mercenary company can have a patron saint or a temple can run trade routes--this is up to the association to decide.</p>
@@ -64,3 +79,6 @@ assoc:
    applicant:
     approved:   The request from %character% to join %assoc% has been approved.
     denied:     The request from %character% to join %assoc% has been denied.
+
+# Generic one off strings.
+nobody: Nobody
