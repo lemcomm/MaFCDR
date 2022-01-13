@@ -95,6 +95,38 @@ class Association {
 		}
 		return false;
 	}
+
+	public function findMutlipleLaws($haystack) {
+		$needles = [];
+		foreach ($this->getLaws() as $law) {
+			if (in_array($law->getType()->getName(), $haystack)) {
+				$needles[] = $law;
+			}
+		}
+		if (is_empty($needles)) {
+			return false;
+		} else {
+			return $needles;
+		}
+	}
+
+	public function isPublic() {
+		$law = $this->findLaw('assocVisibility');
+		if ($law->getValue() === 'true') {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function findPubliclyVisibleRanks() {
+		if ($this->isPublic() && $this->findLaw('rankVisibility')->getValue() === 'all') {
+			$all = $this->ranks;
+		} else {
+			$all = new ArrayCollection();
+		}
+		return $all;
+	}
   
   
 }
