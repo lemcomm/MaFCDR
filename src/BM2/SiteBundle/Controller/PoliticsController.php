@@ -71,6 +71,18 @@ class PoliticsController extends Controller {
 	}
 
    /**
+     * @Route("/assocs", name="maf_politics_assocs")
+     */
+	public function associationsAction() {
+		$character = $this->get('dispatcher')->gateway();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Politics/assocs.html.twig');
+	}
+
+   /**
      * @Route("/hierarchy")
      */
 	public function hierarchyAction() {
