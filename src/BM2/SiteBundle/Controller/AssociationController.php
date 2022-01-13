@@ -137,7 +137,7 @@ class AssociationController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/ranksgraph", name="maf_assoc_graphranks", requirements={"id"="\d+"})
+	  * @Route("/{id}/graphranks", name="maf_assoc_graphranks", requirements={"id"="\d+"})
 	  */
 
 	public function graphRanksAction(Association $id, Request $request) {
@@ -176,7 +176,7 @@ class AssociationController extends Controller {
    		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
 
 	   	if (is_resource($process)) {
-	   		$dot = $this->renderView('Assoc/ranksGraph.dot.twig', array('hierarchy'=>$allRanks, 'me'=>$me));
+	   		$dot = $this->renderView('Assoc/graphRanks.dot.twig', array('hierarchy'=>$allRanks, 'me'=>$me));
 
 	   		fwrite($pipes[0], $dot);
 	   		fclose($pipes[0]);
@@ -187,7 +187,7 @@ class AssociationController extends Controller {
 	   		$return_value = proc_close($process);
 	   	}
 
-		return $this->render('Assoc/ranksGraph.html.twig', [
+		return $this->render('Assoc/graphRanks.html.twig', [
 			'svg'=>$svg
 		]);
 	}
