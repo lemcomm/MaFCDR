@@ -1,0 +1,47 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+
+<h2>{{ 'assoc.route.viewRanks.name'|trans({"%name%":assoc.name})|title }}</h2>
+{% if ranks|length < 1 %}
+	{{ 'assoc.route.viewRanks.empty'|trans({}) }}
+{% else %}
+	{{ 'assoc.route.viewRanks.description'|trans({}) }}
+	{% if canManage %}
+		{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
+		<p><a href="{{ path('maf_assoc_createrank', {'id':assoc.id}) }}">{{ 'assoc.route.createRank.name'|trans({}) }}</a></p>
+	{% endif %}
+
+	<dl class="long">
+	{% for rank in ranks %}
+		<dt>
+			<a id="{{assoc.id}}"></a>
+			{{ rank.name }}
+		</dt>
+		<dd>
+			{% if rank.superior %}
+				{{ 'assoc.route.rankInfo.superior' |trans }} <a href="{{rank.superior.id}}">{{rank.superior.name}}</a>
+			{% endif %}
+			<p>{{ rank.description.text }}</p>
+
+			{% if member %}
+			{# If you're a member, these aren't public ranks, but ranks you can see. Which means you can see who holds them as well. #}
+				<hr />
+				{{ 'assoc.route.rankInfo.holders'|trans }}:
+				<ul class="shortlist" style="display:inline">
+					{% for members in rank.members %}
+						<li>{{ link(member.character) }}</li>
+					{% else %}
+						<li><i>{{ 'nobody' |trans }}</i></li>
+					{% endfor %}
+				</ul><br><br>
+				{% if rank in manageable %}
+					<a href="{{ path('maf_assoc_managerank', {'id':assoc.id, 'rank':rank.id}) }}">{{ 'assoc.route.manageRank.name'|trans({'%name%':rank.name}) }}</a>
+				{% endif %}
+			{% endif %}
+		</dd>
+	{% endfor %}
+	</dl>
+{% endif %}
+{% endblock %}
