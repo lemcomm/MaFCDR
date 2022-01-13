@@ -3,11 +3,13 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\AssocCreationType;
+use BM2\SiteBundle\Form\AssocCreateRankType;
 use BM2\SiteBundle\Form\AssocJoinType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 
@@ -33,7 +35,7 @@ class AssociationController extends Controller {
 
 	private function gateway($test, $secondary = null) {
 		$char = $this->get('dispatcher')->gateway($test, false, true, false, $secondary);
-		if (! $char instanceof Character) {
+		if (!($char instanceof Character)) {
 			return $this->redirectToRoute($char);
 		}
 		return $char;
@@ -97,14 +99,108 @@ class AssociationController extends Controller {
 	}
 
 	/**
+	  * @Route("/{id}/viewranks", name="maf_assoc_viewranks", requirements={"id"="\d+"})
+	  */
+
+	public function viewRanksAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocViewRanksTest', $assoc);
+
+		$em = $this->getDoctrine()->getManager();
+		$assocman = $this->get('association_manager');
+		$member = $assocman->findMember($assoc, $char);
+		$rank = false;
+		if ($member) {
+			$rank = $member->getRank();
+			$canManage = false;
+			if ($rank) {
+				$allRanks = $member->getRank()->findAllKnownRanks();
+				$mngRanks = $member->getRank()->findManageableSubordinates();
+				$canManage = $rank->canManage();
+				$rank = true; # Flip this back to boolean so we can resuse the below bit for those that don't hold ranks as well, without doing costly object comparisons.
+			} else {
+				$rank = false;
+			}
+		}
+		if (!$member || !$rank) {
+			$allRanks = $assoc->findPubliclyVisibleRanks();
+			$mngRanks = new ArrayCollection; # No rank, can't manage any. Return empty collection.
+		}
+
+		return $this->render('Assoc/viewRanks.html.twig', [
+			'assoc' => $assoc,
+			'member' => $member,
+			'ranks' => $allRanks,
+			'manageable' => $mngRanks,
+			'canManage' => $canManage
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/ranksgraph", name="maf_assoc_graphranks", requirements={"id"="\d+"})
+	  */
+
+	public function graphRanksAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocGraphRanksTest', $assoc); #Same test is deliberate.
+
+		$em = $this->getDoctrine()->getManager();
+		$assocman = $this->get('association_manager');
+		$member = $assocman->findMember($assoc, $char);
+		$rank = false;
+		$me = null;
+		if ($member) {
+			$rank = $member->getRank();
+			$canManage = false;
+			if ($rank) {
+				$allRanks = $member->getRank()->findAllKnownRanks();
+				$mngRanks = $member->getRank()->findManageableSubordinates();
+				$canManage = $rank->canManage();
+				$me = $rank;
+				$rank = true; # Flip this back to boolean so we can resuse the below bit for those that don't hold ranks as well, without doing costly object comparisons.
+			} else {
+				$rank = false;
+			}
+		}
+		if (!$member || !$rank) {
+			$allRanks = $assoc->findPubliclyVisibleRanks();
+			$mngRanks = new ArrayCollection; # No rank, can't manage any. Return empty collection.
+		}
+
+	   	$descriptorspec = array(
+			   0 => array("pipe", "r"),  // stdin
+			   1 => array("pipe", "w"),  // stdout
+			   2 => array("pipe", "w") // stderr
+			);
+
+   		$process = proc_open('dot -Tsvg', $descriptorspec, $pipes, '/tmp', array());
+
+	   	if (is_resource($process)) {
+	   		$dot = $this->renderView('Assoc/ranksGraph.dot.twig', array('hierarchy'=>$allRanks, 'me'=>$me));
+
+	   		fwrite($pipes[0], $dot);
+	   		fclose($pipes[0]);
+
+	   		$svg = stream_get_contents($pipes[1]);
+	   		fclose($pipes[1]);
+
+	   		$return_value = proc_close($process);
+	   	}
+
+		return $this->render('Assoc/ranksGraph.html.twig', [
+			'svg'=>$svg
+		]);
+	}
+
+	/**
 	  * @Route("/{id}/createrank", name="maf_assoc_createrank", requirements={"id"="\d+"})
 	  */
 
 	public function createRankAction(Association $id, Request $request) {
 		$assoc = $id;
-		$char = $this->gateway('assocManageRankTest', $assoc);
+		$char = $this->gateway('assocCreateRankTest', $assoc);
 		$assocman = $this->get('association_manager');
-		$member = $assocman->findMember($char);
+		$member = $assocman->findMember($assoc, $char);
 		$ranks = $member->getRank()->findAllKnownSubordinates();
 
 		$form = $this->createForm(new AssocCreateRankType($ranks));
@@ -112,7 +208,7 @@ class AssociationController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->createRank($assoc, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['superior'], $data['createSubs'], $data['manager']);
+			$assocman->createRank($assoc, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager']);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.created', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_manage', array('id'=>$assoc->getId()));
@@ -133,9 +229,9 @@ class AssociationController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$assocman = $this->get('association_manager');
 		$member = $assocman->findMember($char);
-		$ranks = $member->getRank()->findAllKnownSubordinates();
+		$subordinates = $member->getRank()->findAllKnownSubordinates();
 
-		$form = $this->createForm(new AssocManageRankType($ranks));
+		$form = $this->createForm(new AssocManageRankType($subordinates));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
