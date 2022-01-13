@@ -26,7 +26,7 @@
 
 		<field name="short_description" type="text" nullable="true"/>
 		<one-to-many field="descriptions" target-entity="Description" mapped-by="association"/>
-		<one-to-one field="description" target-entity="Description" mapped-by="active_association"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_association" fetch="EAGER"/>
 		<one-to-many field="spawn_descriptions" target-entity="SpawnDescription" mapped-by="association"/>
 		<one-to-one field="spawn_description" target-entity="SpawnDescription" mapped-by="active_association"/>
 
