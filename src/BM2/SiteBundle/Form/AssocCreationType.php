@@ -2,9 +2,16 @@
 
 namespace BM2\SiteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
 use BM2\SiteBundle\Entity\AssociationType;
 
@@ -25,7 +32,7 @@ class AssocCreationType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$types = $this->types;
-		$builder->add('name', 'text', array(
+		$builder->add('name', TextType::class, array(
 			'label'=>'assoc.form.new.name',
 			'required'=>true,
 			'attr' => array(
@@ -34,7 +41,7 @@ class AssocCreationType extends AbstractType {
 				'title'=>'assoc.help.name'
 			)
 		));
-		$builder->add('formal_name', 'text', array(
+		$builder->add('formal_name', TextType::class, array(
 			'label'=>'assoc.form.new.formalname',
 			'required'=>true,
 			'attr' => array(
@@ -43,7 +50,7 @@ class AssocCreationType extends AbstractType {
 				'title'=>'assoc.help.formalname'
 			)
 		));
-		$builder->add('type', 'entity', array(
+		$builder->add('type', EntityType::class, array(
 			'label'=>'assoc.form.new.type',
 			'required'=>true,
 			'placeholder' => 'assoc.form.select',
@@ -53,7 +60,7 @@ class AssocCreationType extends AbstractType {
 			'choice_label' => 'name',
 			'choices' => $types
 		));
-		$builder->add('motto', 'text', array(
+		$builder->add('motto', TextType::class, array(
 			'label'=>'assoc.form.new.motto',
 			'required'=>false,
 			'attr' => array(
@@ -61,7 +68,7 @@ class AssocCreationType extends AbstractType {
 				'maxlength'=>160,
 				'title'=>'assoc.help.motto')
 		));
-		$builder->add('founder', 'text', array(
+		$builder->add('founder', TextType::class, array(
 			'label'=>'assoc.form.new.founder',
 			'required'=>true,
 			'attr' => array(
@@ -70,22 +77,22 @@ class AssocCreationType extends AbstractType {
 				'title'=>'assoc.help.founder'
 			)
 		));
-		$builder->add('public', 'checkbox', array(
+		$builder->add('public', CheckboxType::class, array(
 			'label'=>'assoc.form.new.public',
 			'attr' => array('title'=>'assoc.help.public'),
 			'data' => true
 		));
-		$builder->add('short_description', 'textarea', array(
+		$builder->add('short_description', TextareaType::class, array(
 			'label'=>'assoc.form.description.short',
 			'attr' => array('title'=>'assoc.help.shortdesc'),
 			'required'=>true,
 		));
-		$builder->add('description', 'textarea', array(
+		$builder->add('description', TextareaType::class, array(
 			'label'=>'assoc.form.description.full',
 			'attr' => array('title'=>'assoc.help.longdesc'),
 			'required'=>true,
 		));
-		$builder->add('submit', 'submit', array('label'=>'assoc.form.submit'));
+		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
 
 	public function getName() {
