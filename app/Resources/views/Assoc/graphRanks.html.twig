@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+	<h2>{{ "assoc.route.graphRanks.name"|trans|title }}</h2>
+	<p><button id="zoom">{{ "zoom"|trans }}</button></p>
+
+	{{ svg|raw }}
+
+{% endblock %}
+
+{% block jquery %}
+var zoomed=false;
+var default_width = $("svg").attr('width');
+$("#zoom").click(function(){
+	if (zoomed) {
+		$("svg").attr('width', default_width);
+		$("#zoom").html("zoom to fit");
+	} else {
+		$("svg").removeAttr('height');
+		$("svg").removeAttr('width');
+		$("#zoom").html("zoom off");
+	}
+	zoomed = !zoomed;
+});
+{% endblock %}
