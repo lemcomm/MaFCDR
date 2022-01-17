@@ -203,7 +203,7 @@ class AssociationController extends Controller {
 		$member = $assocman->findMember($assoc, $char);
 		$ranks = $member->getRank()->findAllKnownSubordinates();
 
-		$form = $this->createForm(new AssocCreateRankType($ranks));
+		$form = $this->createForm(new AssocCreateRankType($ranks, false));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
@@ -228,10 +228,10 @@ class AssociationController extends Controller {
 
 		$em = $this->getDoctrine()->getManager();
 		$assocman = $this->get('association_manager');
-		$member = $assocman->findMember($char);
+		$member = $assocman->findMember($assoc, $char);
 		$subordinates = $member->getRank()->findAllKnownSubordinates();
 
-		$form = $this->createForm(new AssocManageRankType($subordinates));
+		$form = $this->createForm(new AssocCreateRankType($subordinates, $rank));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
