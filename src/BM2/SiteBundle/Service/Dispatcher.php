@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\House;
@@ -3484,7 +3485,7 @@ class Dispatcher {
 		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
 		$assoc = $opts[0];
 		$rank = $opts[1];
-		if (!$assoc instanceof Association || !$rank instanceof AssociationRank) {
+		if (!($assoc instanceof Association) || !($rank instanceof AssociationRank)) {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavaible.badinput");
 		}
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
