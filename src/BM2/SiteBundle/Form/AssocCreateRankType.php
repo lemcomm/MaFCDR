@@ -18,9 +18,11 @@ use BM2\SiteBundle\Entity\AssociationType;
 class AssocCreateRankType extends AbstractType {
 
 	private $ranks;
+	private $me;
 
-	public function __construct($ranks) {
+	public function __construct($ranks, $me) {
 		$this->ranks = $ranks;
+		$this->me = $me;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -32,6 +34,7 @@ class AssocCreateRankType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$ranks = $this->ranks;
+		$me = $this->me;
 		#TODO: ALL OF THIS.
 		$builder->add('name', TextType::class, array(
 			'label'=>'assoc.form.createRank.name',
@@ -39,21 +42,24 @@ class AssocCreateRankType extends AbstractType {
 			'attr' => array(
 				'size'=>20,
 				'maxlength'=>40,
-				'title'=>'assoc.help.newRank.name'
-			)
+				'title'=>'assoc.help.rankname'
+			),
+			'data' => $me ? $me->getName() : null
 		));
 		$builder->add('description', TextareaType::class, array(
 			'label'=>'assoc.form.description.full',
-			'attr' => array('title'=>'assoc.help.longdesc'),
-			'required'=>true,
+			'attr' => array('title'=>'assoc.help.rankdesc'),
+			'data' => $me ? $me->getDescription()->getText() : null
 		));
 		$builder->add('viewAll', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.viewAll',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.viewAll'),
-			'required' => true
+			'data' => $me ? $me->getViewAll() : null
 		));
 		$builder->add('viewUp', IntegerType::class, array(
 			'label'=>'assoc.form.createRank.viewUp',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.viewUp'),
 			'empty_data' => 1,
 			'constraints' => [
@@ -61,9 +67,11 @@ class AssocCreateRankType extends AbstractType {
 					'value' => -1,
 				]),
 			],
+			'data' => $me ? $me->getViewUp() : null
 		));
 		$builder->add('viewDown', IntegerType::class, array(
 			'label'=>'assoc.form.createRank.viewDown',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.viewDown'),
 			'empty_data' => 1,
 			'constraints' => [
@@ -71,31 +79,36 @@ class AssocCreateRankType extends AbstractType {
 					'value' => -1,
 				]),
 			],
+			'data' => $me ? $me->getViewDown() : null
 		));
 		$builder->add('viewSelf', CheckboxType::class, array(
-			'label'=>'assoc.form.createRank.public',
+			'label'=>'assoc.form.createRank.viewSelf',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.public'),
-			'required' => true
+			'data' => $me ? $me->getViewSelf() : null
 		));
 		$builder->add('superior', EntityType::class, array(
-			'label'=>'assoc.form.createRank.type',
+			'label'=>'assoc.form.createRank.superior',
 			'required'=>false,
 			'placeholder' => 'assoc.form.createRank.selectsuperior',
 			'attr' => array('title'=>'assoc.help.superior'),
 			'class' => 'BM2SiteBundle:AssociationRank',
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
-			'choices' => $ranks
+			'choices' => $ranks,
+			'data' => $me ? $me->getSuperior() : null
 		));
 		$builder->add('createSubs', CheckboxType::class, array(
-			'label'=>'assoc.form.createRank.public',
+			'label'=>'assoc.form.createRank.createSubs',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.createSubs'),
-			'required' => true
+			'data' => $me ? $me->getSubCreate() : null
 		));
 		$builder->add('manager', CheckboxType::class, array(
-			'label'=>'assoc.form.createRank.short',
+			'label'=>'assoc.form.createRank.manager',
+			'required'=>false,
 			'attr' => array('title'=>'assoc.help.manager'),
-			'required'=>true,
+			'data' => $me ? $me->getManager() : null
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
