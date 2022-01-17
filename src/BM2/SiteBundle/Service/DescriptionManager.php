@@ -51,6 +51,10 @@ class DescriptionManager {
 					$olddesc->setActiveAssociation(NULL);
 					$this->em->flush();
 					break;
+				case 'AssociationRank':
+					$olddesc->setActiveAssociationRank(NULL);
+					$this->em->flush();
+					break;
 				case 'House':
 					$olddesc->setActiveHouse(NULL);
 					$this->em->flush();
@@ -86,6 +90,10 @@ class DescriptionManager {
 				$desc->setActiveAssociation($entity);
 				$desc->setAssociation($entity);
 				break;
+			case 'AssociationRank':
+				$desc->setActiveAssociationRank($entity);
+				$desc->setAssociationRank($entity);
+				break;
 			case 'House':
 				$desc->setActiveHouse($entity);
 				$desc->setHouse($entity);
@@ -118,6 +126,7 @@ class DescriptionManager {
 		$this->em->flush($desc);
 		if (!$new) {
 			/* No need to tell the people that just made the thing that they updated the descriptions. */
+			/* Association Ranks deliberately ommitted. */
 			switch($this->getClassName($entity)) {
 				case 'Artifact':
 					$this->history->logEvent(
