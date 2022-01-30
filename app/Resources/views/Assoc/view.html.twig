@@ -12,7 +12,7 @@
 			</dl>
 		</div>
 		<h2>{{ assoc.formalName }}</h2>
-		<p>{{ assoc.description.text }}</p>
+		<p>{{ assoc.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
 		{# Copy the realm and house pages, probably. #}
 	{% else %}
 		{{ 'view.hidden'|trans({}, "assoc") }}
