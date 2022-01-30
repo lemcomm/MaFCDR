@@ -28,7 +28,7 @@ class AssociationManager {
 	}
 
 	public function create($data, Place $place, Character $founder, $superior = null) {
-		$assoc = $this->_create($data['name'], $data['formal_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $superior);
+		$assoc = $this->_create($data['name'], $data['formal_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $data['superior']);
 
 		$this->history->openLog($assoc, $founder);
 		$this->history->logEvent(
@@ -100,7 +100,7 @@ class AssociationManager {
 		return $rank;
 	}
 
-	public function updateRank(AssociationRank $myRank = null, $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+	public function updateRank(AssociationRank $myRank = null, AssociationRank $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $createAssocs, $owner = false, $flush=true) {
 		$rank->setName($name);
 		if ($myRank) {
 			if ($myRank->getViewAll()) {
@@ -124,16 +124,34 @@ class AssociationManager {
 					}
 				}
 			}
+			if ($myRank->getOwner()) {
+				$rank->setOwner($owner);
+				$rank->setManager($manager);
+			} else {
+				$rank->setOwner(false);
+				if ($myRank->getManager()) {
+					$rank->setManager($manager);
+				} else {
+					$rank->setManager(false);
+				}
+				if ($myRank->getCreateAssocs()) {
+					$rank->setCreateAssocs($createAssocs);
+				} else {
+					$rank->setCreateAssocs(false);
+				}
+			}
 		} else {
+			# No creator rank, must be a new association, assume all inputs correct.
 			$rank->setViewAll($viewAll);
 			$rank->setViewUp($viewUp);
+			$rank->setViewDown($viewDown);
+			$rank->setViewSelf($viewSelf);
+			$rank->setSubcreate($createSubs);
+			$rank->setCreateAssocs($createAssocs);
+			$rank->setManager($manager);
+			$rank->setOwner($owner);
+			$rank->setSuperior($superior);
 		}
-		$rank->setViewDown($viewDown);
-		$rank->setViewSelf($viewSelf);
-		$rank->setSubcreate($createSubs);
-		$rank->setManager($manager);
-		$rank->setOwner($owner);
-		$rank->setSuperior($superior);
 		if ($flush) {
 			$this->em->flush();
 		}
