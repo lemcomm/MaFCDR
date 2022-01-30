@@ -379,6 +379,18 @@ class Character {
 		return $assocs;
 	}
 
+	public function findSubcreateableAssociations() {
+		$assocs = new ArrayCollection;
+		foreach ($this->getAssociationMemberships() as $mbr) {
+			if ($rank = $mbr->getRank()) {
+				if ($rank->getOwner() || $mbr->getCreateAssocs()) {
+					$assocs->add($mbr->getAssociation());
+				}
+			}
+		}
+		return $assocs;
+	}
+
 	public function hasNewEvents() {
 		foreach ($this->getReadableLogs() as $log) {
 			if ($log->hasNewEvents()) {
