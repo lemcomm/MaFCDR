@@ -1,0 +1,29 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+
+<h2>{{ 'assoc.route.viewDeities.name'|trans({"%name%":assoc.name})|title }}</h2>
+{% if deities|length < 1 %}
+	{{ 'assoc.route.viewDeities.empty'|trans({}) }}
+{% else %}
+	{{ 'assoc.route.viewDeities.description'|trans({}) }}
+	{% if owner %}
+		{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
+		<p><a href="{{ path('maf_assoc_new_deity', {'id':assoc.id}) }}">{{ 'assoc.route.newDeity.name'|trans({}) }}</a></p>
+	{% endif %}
+
+	<dl class="long">
+	{% for each in deities %}
+		{% set deity = each.deity %}{# deities is an array of assocDeity relations, not of deity objeccts, and we need the actual deity object. #}
+		<dt>
+			<a id="{{deity.id}}"></a>
+			{{ deity.name }}
+		</dt>
+		<dd>
+			<p>{{deity.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
+		</dd>
+	{% endfor %}
+	</dl>
+{% endif %}
+{% endblock %}
