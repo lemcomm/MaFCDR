@@ -81,7 +81,7 @@ class AssociationController extends Controller {
 		$char = $this->gateway('assocCreateTest');
 
 		$em = $this->getDoctrine()->getManager();
-		$form = $this->createForm(new AssocCreationType($em->getRepository('BM2SiteBundle:AssociationType')->findAll()));
+		$form = $this->createForm(new AssocCreationType($em->getRepository('BM2SiteBundle:AssociationType')->findAll(), $char->findSubcreateableAssociations()));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
@@ -95,6 +95,82 @@ class AssociationController extends Controller {
 		}
 		return $this->render('Assoc/create.html.twig', [
 			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/deities", name="maf_assoc_deities")
+	  */
+
+	public function deitiesAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocDeitiesTest', $assoc);
+		$assocman = $this->get('association_manager');
+		$owner = false;
+		if ($member = $assocman->findMember($assoc, $char)) {
+			if ($rank = $member->getRank()) {
+				$owner = $rank->getOwner();
+			}
+		}
+
+		return $this->render('Assoc/viewDeities.html.twig', [
+			'deities' => $assoc->getDieties(),
+			'owner' => $owner
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/newdeity", name="maf_assoc_new_deity")
+	  */
+
+	public function newDeityAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocNewDeityTest', $assoc);
+
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AssocDeityType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+
+			$deity = $this->get('association_manager')->newDeity($data, $assoc, $char);
+			# No flush needed, AssocMan flushes.
+			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.created', [], 'orgs'));
+			return $this->redirectToRoute('maf_assoc', array('id'=>$assoc->getId()));
+		}
+		return $this->render('Assoc/newDeity.html.twig', [
+			'form' => $form->createView(),
+			'deities' => $assoc->getDieties(),
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/addDeity/{deity}", name="maf_assoc_deities")
+	  */
+
+	public function addDeityAction(Association $id, Deity $deity, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocAddDeityTest', $assoc);
+
+		$this->get('association_manager')->addDeity($assoc, $deity);
+
+		return $this->render('Assoc/deities.html.twig', [
+			'deities' => $assoc->getDieties(),
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/removeDeity/{deity}", name="maf_assoc_deities")
+	  */
+
+	public function removeDeityAction(Association $id, Deity $deity, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocAddDeityTest', $assoc);
+
+		$this->get('association_manager')->removeDeity($assoc, $deity);
+
+		return $this->render('Assoc/deities.html.twig', [
+			'deities' => $assoc->getDieties(),
 		]);
 	}
 
@@ -201,14 +277,15 @@ class AssociationController extends Controller {
 		$char = $this->gateway('assocCreateRankTest', $assoc);
 		$assocman = $this->get('association_manager');
 		$member = $assocman->findMember($assoc, $char);
-		$ranks = $member->getRank()->findAllKnownSubordinates();
+		$myRank = $member->getRank();
+		$ranks = $myRank->findAllKnownSubordinates();
 
 		$form = $this->createForm(new AssocCreateRankType($ranks, false));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->createRank($assoc, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager']);
+			$assocman->createRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.created', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_manage', array('id'=>$assoc->getId()));
@@ -229,14 +306,15 @@ class AssociationController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$assocman = $this->get('association_manager');
 		$member = $assocman->findMember($assoc, $char);
-		$subordinates = $member->getRank()->findAllKnownSubordinates();
+		$myRank = $member->getRank();
+		$subordinates = $myRank->findAllKnownSubordinates();
 
 		$form = $this->createForm(new AssocCreateRankType($subordinates, $rank));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->updateRank($rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['superior'], $data['createSubs'], $data['manager']);
+			$assocman->updateRank($rank, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.updated', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_manage', array('id'=>$assoc->getId()));
