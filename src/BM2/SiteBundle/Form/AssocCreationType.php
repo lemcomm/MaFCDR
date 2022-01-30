@@ -18,9 +18,11 @@ use BM2\SiteBundle\Entity\AssociationType;
 class AssocCreationType extends AbstractType {
 
 	private $types;
+	private $assocs;
 
-	public function __construct($types) {
+	public function __construct($types, $assocs) {
 		$this->types = $types;
+		$this->assocs = $assocs;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -32,6 +34,7 @@ class AssocCreationType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$types = $this->types;
+		$assocs = $this->assocs;
 		$builder->add('name', TextType::class, array(
 			'label'=>'assoc.form.new.name',
 			'required'=>true,
@@ -91,6 +94,16 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.description.full',
 			'attr' => array('title'=>'assoc.help.longdesc'),
 			'required'=>true,
+		));
+		$builder->add('superior', EntityType::class, array(
+			'label'=>'assoc.form.new.superior',
+			'required'=>false,
+			'placeholder' => 'assoc.form.superior',
+			'attr' => array('title'=>'assoc.help.type'),
+			'class' => 'BM2SiteBundle:Association',
+			'choice_translation_domain' => true,
+			'choice_label' => 'name',
+			'choices' => $types
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
