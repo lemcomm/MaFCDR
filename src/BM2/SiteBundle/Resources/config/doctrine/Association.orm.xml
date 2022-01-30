@@ -39,5 +39,8 @@
 		<one-to-many field="places" target-entity="AssociationPlace" mapped-by="association"/>
 		<one-to-many field="spawns" target-entity="Spawn" mapped-by="association"/>
 		<one-to-many field="conversations" target-entity="Conversation" mapped-by="association"/>
+
+		<one-to-many field="deities" target-entity="AssociationDeity" mapped-by="association"/>
+		<one-to-many field="recognized_deities" target-entity="Deity" mapped-by="main_recognizer"/>
 	</entity>
 </doctrine-mapping>
