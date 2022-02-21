@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\DeityAspect">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="deity" target-entity="Deity" inversed-by="aspects"/>
+		<many-to-one field="aspect" target-entity="AspectType"/>
+	</entity>
+</doctrine-mapping>
