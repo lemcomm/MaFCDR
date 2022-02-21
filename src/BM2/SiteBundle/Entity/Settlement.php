@@ -104,7 +104,7 @@ class Settlement {
 			if ($this->getOwner()->getSlumbering()) {
 				$mod = 0.5;
 			} else {
-				if ($opposers && $opposers->countains($owner)) {
+				if ($opposers && $opposers->contains($owner)) {
 					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
 				} else {
 					$mod = 10;

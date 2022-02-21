@@ -1309,7 +1309,7 @@ class BattleRunner {
 
 	private function MeleeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
-		if ($soldier->isNoble()) {
+		if ($soldier->isNoble() && $soldier->getWeapon()) {
 			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
@@ -1331,7 +1331,7 @@ class BattleRunner {
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'melee');
-			if ($soldier->isNoble()) {
+			if ($soldier->isNoble() && $soldier->getWeapon()) {
 				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
 			} else {
 				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
@@ -1349,7 +1349,7 @@ class BattleRunner {
 
 	private function ChargeAttack(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
-		if ($soldier->isNoble()) {
+		if ($soldier->isNoble() && $soldier->getWeapon()) {
 			$this->actman->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
 		} else {
 			$soldier->gainExperience(1*$xpMod);
@@ -1372,7 +1372,7 @@ class BattleRunner {
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
 			$result = $this->resolveDamage($soldier, $target, $attack, 'charge', $antiCav);
-			if ($soldier->isNoble()) {
+			if ($soldier->isNoble() && $soldier->getWeapon()) {
 				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
 			} else {
 				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
@@ -1390,7 +1390,7 @@ class BattleRunner {
 
 	private function RangedHit(Soldier $soldier, Soldier $target) {
 		$xpMod = $this->xpMod;
-		if ($soldier->isNoble()) {
+		if ($soldier->isNoble() && $soldier->getWeapon()) {
 			if (in_array($soldier->getType(), ['armoured archer', 'archer'])) {
 				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
 			} else {

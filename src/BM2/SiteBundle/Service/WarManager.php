@@ -836,6 +836,7 @@ class WarManager {
 
 		if ($completed) {
 			if ($victor == $attacker) {
+				$realm = $siege->getRealm();
 				if ($target instanceof Settlement) {
 					foreach ($victor->getCharacters() as $char) {
 							# Force move victorious attackers inside the settlement.
@@ -847,7 +848,7 @@ class WarManager {
 						$leader = $victor->getCharacters()->first(); #Get one at random.
 					}
 					if ($leader) {
-						$this->politics->changeSettlementOccupier($leader, $target, $siege->getRealm());
+						$this->politics->changeSettlementOccupier($leader, $target, $realm);
 					}
 					foreach ($target->getSuppliedUnits() as $unit) {
 						if ($unit->getCharacter() != $victor->getLeader() && $unit->getSettlement() != $target) {
@@ -858,15 +859,14 @@ class WarManager {
 						if ($unit->getCharacter() != $victor->getLeader() && $unit->getCharacter() !== NULL) {
 							$unit->setSettlement(NULL);
 							$unit->setMarshal(NULL);
-							if ($siege->getRealm()) {
+							if ($realm) {
 								$this->history->logEvent(
 									$unit,
 									'event.unit.basetaken',
-									array("%link-realm%"=>$siege->getRealm()->getId(), "%link-settlement%"=>$target->getId()),
+									array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
 									History::HIGH, true
 								);
-							}
-							if (!$siege->getRealm()) {
+							} else {
 								$this->history->logEvent(
 									$unit,
 									'event.unit.basetaken2',
@@ -878,7 +878,7 @@ class WarManager {
 					}
 					foreach ($target->getDefendingUnits() as $unit) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
-						if ($siege->getRealm()) {
+						if ($realm) {
 							$this->history->logEvent(
 								$unit,
 								'event.unit.defenselost',
@@ -898,11 +898,11 @@ class WarManager {
 						$leader = $victor->getCharacters()->first(); #Get one at random.
 					}
 					if ($leader) {
-						$this->politics->changePlaceOccupier($leader, $target, $siege->getRealm());
+						$this->politics->changePlaceOccupier($leader, $target, $realm);
 					}
 					foreach ($target->getUnits() as $unit) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
-						if ($siege->getRealm()) {
+						if ($realm) {
 							$this->history->logEvent(
 								$unit,
 								'event.unit.defenselost2',
