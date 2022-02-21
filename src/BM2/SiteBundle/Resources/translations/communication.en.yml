@@ -99,9 +99,14 @@ event:
   newplace:     %character% has formalized %place% as a location of interst.
   occupied:     %character% has delcared an occupation in the name of %realm%.
   occupied2:    %character% has taken over %realm%'s occupation.
+  occupied3:    %character% has delcared an occupation.
+  occupied4:    %character% has taken over the occupation.
   endoccupation:
    manual:      %character% has declared an end to the occupation by %realm%.
+   take:        The occupation lead by %character% has ended due to his replacing the administration with his own.
+   othertake:   The occupation lead by %character% has ended due to the takeover of the administration by another.
    warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
+   manual2:      %character% has declared an end to the occupation.
   besieged:     %character% has declared a siege of the Settlement.
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
@@ -234,6 +239,8 @@ event:
    position:    The %realmposition% has rejected your offer of vassalge.
   steward:      Has been appointed as the steward of %settlement%.
   recvdplace:   Has received ownership of %place%.
+  assoc:
+   founded:     Founded the association of %association%.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -375,6 +382,8 @@ event:
   newowner:     Onwership has been transferred to %character%.
   inherited:    Was inherited by %character%.
   inherifail:   Fell to independence on the death of %character%, who left no heir.
+ assoc:
+  founded:      Formalized by %character%.
 
 report:
  building:
