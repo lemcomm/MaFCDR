@@ -28,7 +28,7 @@ class AssociationManager {
 	}
 
 	public function create($data, Place $place, Character $founder, $superior = null) {
-		$assoc = $this->_create($data['name'], $data['formal_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $data['superior']);
+		$assoc = $this->_create($data['name'], $data['formal_name'], $data['faith_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $data['superior']);
 
 		$this->history->openLog($assoc, $founder);
 		$this->history->logEvent(
@@ -53,11 +53,12 @@ class AssociationManager {
 		return $assoc;
 	}
 
-	private function _create($name, $formal, $type, $motto, $public, $short_desc, $full_desc, $founderRank, $place, Character $founder, $superior) {
+	private function _create($name, $formal, $faith, $type, $motto, $public, $short_desc, $full_desc, $founderRank, $place, Character $founder, $superior) {
 		$assoc = new Association;
 		$this->em->persist($assoc);
 		$assoc->setName($name);
 		$assoc->setFormalName($formal);
+		$assoc->setFaithName($faith);
 		$assoc->setType($type);
 		$assoc->setMotto($motto);
 		$assoc->setShortDescription($short_desc);
@@ -198,6 +199,50 @@ class AssociationManager {
 	public function findMember(Association $assoc, Character $char) {
 		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
 		return $member;
+	}
+
+	public function newDeity(Association $assoc, Characteer $char, $data) {
+		$deity = new Deity();
+		$this->em->persist($deity);
+		$deity->setMainRecognizer($assoc);
+		$deity->setName($data['name']);
+		foreach ($data['aspects'] as $each) {
+			$aspect = new DeityApsect();
+			$this->em->persist($aspect);
+			$aspect->setType($each);
+			$aspect->setDeity($deity);
+		}
+		$this->descman->newDescription($deity, $data['description'], $char, TRUE); #Descman includes a flush for the EM.
+		$this->addDeity($assoc, $deity, $char, $data['words']);
+	}
+
+	public function addDeity(Assocaition $assoc, Deity $deity, Character $char, $words) {
+		$aDeity = new AssociationDeity();
+		$this->em->persist($aDeity);
+		$aDeity->setAssociation($assoc);
+		$aDeity->setDeity($deity);
+		$aDeity->setWords($words);
+		$aDeity->setWordsTimestamp(new \DateTime("now"));
+		$aDeity->setWordsFrom($char);
+		$this->em->flush();
+		$this->history->logEvent(
+			$assoc,
+			'event.assoc.deity.recognized',
+			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
+			History::HIGH, true
+		);
+	}
+
+	public function removeDeity(Association $assoc, Deity $deity, Character $char) {
+		$aDeity = $this->em->getRepository('BM2SiteBundle:AssociationDeity')->findOneBy(['association'=>$assoc, 'deity'=>$deity]);
+		$this->em->remove($aDeity);
+		$this->em->flush();
+		$this->history->logEvent(
+			$assoc,
+			'event.assoc.deity.removed',
+			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
+			History::HIGH, true
+		);
 	}
 
 }
