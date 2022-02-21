@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Artifact;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Item;
 use BM2\SiteBundle\Entity\Place;
@@ -55,6 +56,10 @@ class DescriptionManager {
 					$olddesc->setActiveAssociationRank(NULL);
 					$this->em->flush();
 					break;
+				case 'Deity':
+					$olddesc->setActiveDeity(NULL);
+					$this->em->flush();
+					break;
 				case 'House':
 					$olddesc->setActiveHouse(NULL);
 					$this->em->flush();
@@ -93,6 +98,10 @@ class DescriptionManager {
 			case 'AssociationRank':
 				$desc->setActiveAssociationRank($entity);
 				$desc->setAssociationRank($entity);
+				break;
+			case 'Deity':
+				$desc->setActiveDeity($entity);
+				$desc->setDeity($entity);
 				break;
 			case 'House':
 				$desc->setActiveHouse($entity);
@@ -140,6 +149,14 @@ class DescriptionManager {
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.assoc',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Deity':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.deity',
 						null,
 						History::LOW
 					);
