@@ -434,7 +434,7 @@ class Dispatcher {
 		if (!$settlement) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
-			if ($settlement->getOccupier()) {
+			if ($settlement->getOccupier() || $settlement->getOccupant()) {
 				$occupied = true;
 			} else {
 				$occupied = false;
@@ -505,7 +505,7 @@ class Dispatcher {
 			}
 		} else {
 			$actions['placeLeaveTest'] = $this->placeLeaveTest(true);
-			if ($type->getDefensible() && $place->getOccupier() === $char) {
+			if ($type->getDefensible() && $place->getOccupant() === $char) {
 				$actions['placeOccupationEndTest'] = $this->placeOccupationEndTest(true, $place);
 				$actions['placeChangeOccupantTest'] = $this->placeChangeOccupantTest(true, $place);
 				$actions['placeChangeOccupierTest'] = $this->placeChangeOccupierTest(true, $place);
@@ -785,7 +785,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isInBattle()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inbattle");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -1099,7 +1099,7 @@ class Dispatcher {
 		if (!$settlement) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.notsettlement");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.changerealm.name", "description"=>"unavailable.occupied");
 		}
 		if ($settlement->getOwner() != $this->getCharacter()) {
@@ -1129,7 +1129,7 @@ class Dispatcher {
 		if (!$settlement) {
 			return array("name"=>"control.changeoccupier.name", "description"=>"unavailable.notsettlement");
 		}
-		if (!$settlement->getOccupier()) {
+		if (!$settlement->getOccupier() && !$settlement->getOccupant()) {
 			return array("name"=>"control.changeoccupier.name", "description"=>"unavailable.notoccupied");
 		}
 		if ($settlement->getOccupant() != $this->getCharacter()) {
@@ -1153,7 +1153,7 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.grant.name", "description"=>"unavailable.occupied");
 		}
 		if ($settlement->getOwner() != $this->getCharacter()) {
@@ -1175,7 +1175,7 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.steward.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.steward.name", "description"=>"unavailable.occupied");
 		}
 		if ($settlement->getOwner() != $this->getCharacter()) {
@@ -1207,7 +1207,7 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.changeoccupant.name", "description"=>"unavailable.nosettlement");
 		}
-		if (!$settlement->getOccupier()) {
+		if (!$settlement->getOccupier() && !$settlement->getOccupant()) {
 			return array("name"=>"control.changeoccupant.name", "description"=>"unavailable.notoccupied");
 		}
 		if ($settlement->getOccupant() != $this->getCharacter()) {
@@ -1226,7 +1226,7 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.rename.name", "description"=>"unavailable.occupied");
 		}
 		$char = $this->getCharacter();
@@ -1245,7 +1245,7 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.occupied");
 		}
 		$char = $this->getCharacter();
@@ -1287,7 +1287,7 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.quests.name", "description"=>"unavailable.occupied");
 		}
 		$char = $this->getCharacter();
@@ -1538,7 +1538,7 @@ class Dispatcher {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupier() == $this->getCharacter()) {
+		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupant() == $this->getCharacter()) {
 			# No need to siege your own settlement.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
@@ -1583,7 +1583,7 @@ class Dispatcher {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if ($place->getOwner() == $this->getCharacter() || $place->getOccupier() == $this->getCharacter()) {
+		if ($place->getOwner() == $this->getCharacter() || $place->getOccupant() == $this->getCharacter()) {
 			# No need to siege your own settlement.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
@@ -2257,7 +2257,7 @@ class Dispatcher {
 		}
 
 		// TODO: need a merchant in your entourage for trade options? or just foreign trade?
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2277,7 +2277,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2294,7 +2294,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2311,7 +2311,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier()) {
+		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2350,7 +2350,7 @@ class Dispatcher {
 			if (!$this->geography->checkPlacePlacement($character)) {
 				return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
 			}
-		} elseif ($settlement->getOccupier()) {
+		} elseif ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2373,7 +2373,7 @@ class Dispatcher {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupier()) {
+		if ($place->getOccupier() || $place->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2537,7 +2537,7 @@ class Dispatcher {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupier()) {
+		if ($place->getOccupier() || $place->getOccupant()) {
 			$occupied = true;
 		} else {
 			$occupied = false;
@@ -2660,7 +2660,7 @@ class Dispatcher {
 		if (!$place) {
 			return array("name"=>"place.changeoccupier.name", "description"=>"unavailable.notsettlement");
 		}
-		if (!$place->getOccupier()) {
+		if (!$place->getOccupier() && !$place->getOccupant()) {
 			return array("name"=>"place.changeoccupier.name", "description"=>"unavailable.notoccupied");
 		}
 		if ($place->getOccupant() != $this->getCharacter()) {
@@ -2681,7 +2681,7 @@ class Dispatcher {
 		if (!$place = $this->getCharacter()->getInsidePlace()) {
 			return array("name"=>"place.changeoccupant.name", "description"=>"unavailable.nosettlement");
 		}
-		if (!$place->getOccupier()) {
+		if (!$place->getOccupier() && !$place->getOccupant()) {
 			return array("name"=>"place.changeoccupant.name", "description"=>"unavailable.notoccupied");
 		}
 		if ($place->getOccupant() != $this->getCharacter()) {
