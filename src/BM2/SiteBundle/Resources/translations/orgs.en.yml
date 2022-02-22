@@ -89,6 +89,21 @@ assoc:
     name: Message Body for your Application
     desc: The message you want to send explaining why you would like to join this particular group.
    success: Your request to join %name% has been submitted.
+  newDeity:
+   name:  Formalize a New Deity
+   header: Formalize a New Deity
+   intro: <p>Deities are known things in Might & Fealty, for all First Ones trace their lineage back to the moment they were created by one deity or another. Whether or not you follow a deity is up to you, but the existence of deities beyond this realm is fact. How you interpret that is up to you.</p><p>Warning: No real world or clearly from popular fiction religions. This is a game. Make up something new or interesting.</p>
+  viewDeities:
+   name:  Review the Association's Recognized Deities
+   header: Review the Association's Recognized Deities
+   description: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p>
+   empty: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps this association doesn't care for religion? Or maybe it just hasn't had time to figure things out.</p>
+  viewAllDeities:
+   name:  All Known Deities
+   header: Review the List of Known Deities
+   description: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p>
+   empty: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps the First Ones have not yet remembered from where they originate? Someone should read the lore.</p>
+
 
  requests:
   join:
@@ -102,5 +117,20 @@ assoc:
     approved:   The request from %character% to join %assoc% has been approved.
     denied:     The request from %character% to join %assoc% has been denied.
 
+deity:
+ form:
+  submit: Submit
+  new:
+   name: Name
+   aspects: Aspects
+   words:  Words of your Own
+  description:
+   short: Short Description
+   full:  Full Description
+ help:
+  name:  The name of the deity. Will be semi-public knowledge.
+  aspects: These describe what the deity is the deity of. If anything. Perhaps of everything?
+  desc:  A description of the deity, to describe them to all who might follow, outside this Association, or within.
+  words: Some words about the deity for your faithful, within the Association only.
 # Generic one off strings.
 nobody: Nobody
