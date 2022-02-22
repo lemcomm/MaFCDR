@@ -53,6 +53,24 @@ class AssocCreationType extends AbstractType {
 				'title'=>'assoc.help.formalname'
 			)
 		));
+		$builder->add('faith_name', TextType::class, array(
+			'label'=>'assoc.form.new.faithname',
+			'required'=>false,
+			'attr' => array(
+				'size'=>80,
+				'maxlength'=>255,
+				'title'=>'assoc.help.faithname'
+			)
+		));
+		$builder->add('follower_name', TextType::class, array(
+			'label'=>'assoc.form.new.followername',
+			'required'=>false,
+			'attr' => array(
+				'size'=>80,
+				'maxlength'=>255,
+				'title'=>'assoc.help.followername'
+			)
+		));
 		$builder->add('type', EntityType::class, array(
 			'label'=>'assoc.form.new.type',
 			'required'=>true,
