@@ -15,26 +15,23 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 
 use BM2\SiteBundle\Entity\AssociationType;
 
-class AssocCreationType extends AbstractType {
+class AssocDeityType extends AbstractType {
 
-	private $types;
-	private $assocs;
+	private $aspects;
 
-	public function __construct($types, $assocs) {
-		$this->types = $types;
-		$this->assocs = $assocs;
+	public function __construct($aspects) {
+		$this->aspects = $aspects;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
-			'intention'       	=> 'newassoc_1779',
+			'intention'       	=> 'newdeity_1779',
 			'translation_domain' => 'orgs'
 		));
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$types = $this->types;
-		$assocs = $this->assocs;
+		$aspects = $this->aspects;
 		$builder->add('name', TextType::class, array(
 			'label'=>'deity.form.new.name',
 			'required'=>true,
@@ -47,21 +44,20 @@ class AssocCreationType extends AbstractType {
 		$builder->add('aspects', EntityType::class, array(
 			'label'=>'deity.form.new.aspects',
 			'required'=>true,
-			'placeholder' => 'deity.form.select',
-			'attr' => array('title'=>'deity.help.type'),
+			'attr' => array('title'=>'deity.help.aspects'),
 			'class' => 'BM2SiteBundle:AspectType',
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
 			'multiple' => true,
 			'expanded' => false,
-			'choices' => $types
+			'choices' => $aspects
 		));
 		$builder->add('description', TextareaType::class, array(
 			'label'=>'deity.form.description.full',
 			'attr' => array('title'=>'deity.help.desc'),
 			'required'=>true,
 		));
-		$builder->add('words', TextType::class, array(
+		$builder->add('words', TextareaType::class, array(
 			'label'=>'deity.form.new.words',
 			'attr' => array('title'=>'deity.help.words'),
 			'required'=>false,
