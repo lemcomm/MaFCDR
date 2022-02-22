@@ -28,7 +28,7 @@ class AssociationManager {
 	}
 
 	public function create($data, Place $place, Character $founder, $superior = null) {
-		$assoc = $this->_create($data['name'], $data['formal_name'], $data['faith_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $data['superior']);
+		$assoc = $this->_create($data['name'], $data['formal_name'], $data['faith_name'], $data['follower_name'], $data['type'], $data['motto'], $data['public'], $data['short_description'], $data['description'], $data['founder'], $place, $founder, $data['superior']);
 
 		$this->history->openLog($assoc, $founder);
 		$this->history->logEvent(
@@ -53,12 +53,13 @@ class AssociationManager {
 		return $assoc;
 	}
 
-	private function _create($name, $formal, $faith, $type, $motto, $public, $short_desc, $full_desc, $founderRank, $place, Character $founder, $superior) {
+	private function _create($name, $formal, $faith, $follower, $type, $motto, $public, $short_desc, $full_desc, $founderRank, $place, Character $founder, $superior) {
 		$assoc = new Association;
 		$this->em->persist($assoc);
 		$assoc->setName($name);
 		$assoc->setFormalName($formal);
 		$assoc->setFaithName($faith);
+		$assoc->setFollowerName($follower);
 		$assoc->setType($type);
 		$assoc->setMotto($motto);
 		$assoc->setShortDescription($short_desc);
@@ -86,6 +87,40 @@ class AssociationManager {
 		$this->newLocation($assoc, $place, true, false);
 		$this->descman->newDescription($assoc, $full_desc, $founder, TRUE); #Descman includes a flush for the EM.
 		$this->updateMember($assoc, $rank, $founder, true);
+
+		return $assoc;
+	}
+
+	private function update($assoc, $data, $char) {
+		if ($assoc->getName() !== $data['name']) {
+			$assoc->setName($data['name']);
+		}
+		if ($assoc->getFormalName() !== $data['formal_name']) {
+			$assoc->setFormalName($data['formal_name']);
+		}
+		if ($assoc->getFaithName() !== $data['faith_name']) {
+			$assoc->setFaithName($data['faith_name']);
+		}
+		if ($assoc->getFollowerName() !== $data['follower_name']) {
+			$assoc->setFollowerName($data['follower_name']);
+		}
+		if ($assoc->getType() !== $data['type']) {
+			$assoc->setType($data['type']);
+		}
+		if ($assoc->getMotto() !== $data['motto']) {
+			$assoc->setMotto($data['motto']);
+		}
+		if ($assoc->getShortDescription() !== $data['short_description']) {
+			$assoc->setShortDescription($data['short_description']);
+		}
+
+		if ($assoc->getSuperior() !== $data['superior']) {
+			$assoc->getSuperior()->removeCadet($assoc);
+			$assoc->setSuperior($data['superior']);
+			$data['superior']->addCadet($assoc);
+		}
+
+		$this->descman->newDescription($assoc, $data['description'], $char); #Descman includes a flush for the EM.
 
 		return $assoc;
 	}
@@ -199,6 +234,11 @@ class AssociationManager {
 	public function findMember(Association $assoc, Character $char) {
 		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
 		return $member;
+	}
+
+	public function findDeity(Association $assoc, Deity $deity) {
+		$result = $this->em->getRepository('BM2SiteBundle:AssociationDeity')->findOneBy(["association"=>$assoc, "deity"=>$deity]);
+		return $result;
 	}
 
 	public function newDeity(Association $assoc, Characteer $char, $data) {
