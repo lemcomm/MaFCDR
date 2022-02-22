@@ -664,6 +664,10 @@ class Dispatcher {
 			$actions[] = $this->assocViewRanksTest(null, $assoc);
 			$actions[] = $this->assocGraphRanksTest(null, $assoc);
 			$actions[] = $this->assocCreateRankTest(null, $assoc);
+			$actions[] = $this->assocUpdateTest(null, $assoc);
+			$actions[] = $this->assocDeitiesAllTest(null, $assoc);
+			$actions[] = $this->assocDeitiesMinetest(null, $assoc);
+			$actions[] = $this->assocNewDeityTest(null, $assoc);
 		}
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
@@ -3438,6 +3442,26 @@ class Dispatcher {
 		return $this->action('assoc.new', 'maf_assoc_create', true);
 	}
 
+	public function assocUpdateTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.update.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.update.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.update.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.update", "maf_assoc_update", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
 	public function assocCreateRankTest($ignored, Association $assoc) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.$check");
@@ -3539,6 +3563,125 @@ class Dispatcher {
 			array('id'=>$assoc->getId()),
 			array("%name%"=>$assoc->getName())
 		);
+	}
+
+	public function assocDeitiesMineTest($ignored, Association $assoc) {
+		# Should be the same as above assocViewRanksTest.
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.viewMine.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$assoc->isPublic() && !$member) {
+			return array("name"=>"assoc.deities.viewMine.name", "description"=>"unavailable.notinassoc");
+		}
+		return $this->action("assoc.deities.viewMine", "maf_assoc_deities", false,
+			array('id'=>$assoc->getId()),
+			array("%name%"=>$assoc->getName())
+		);
+	}
+
+	public function assocDeitiesAllTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.viewAll.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.viewAll.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.viewAll.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.deities.viewAll", "maf_all_deities", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocNewDeityTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.new.name", "description"=>"unavailable.$check");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.new.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.new.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.deities.new", "maf_assoc_new_deity", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocAddDeityTest($ignored, $opts) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.$check");
+		}
+
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		$assoc = $opts[0];
+		$deity = $opts[1];
+		if (!($assoc instanceof Association) || !($deity instanceof Deity)) {
+			return array("name"=>"assoc.deities.add.name", "description"=>"unavaible.badinput");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.notinassoc");
+		}
+		if ($this->assocman->findDeity($assoc, $deity)) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deityalreadyofassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.deities.add", "maf_assoc_deities_add", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocRemoveDeityTest($ignored, $opts) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.$check");
+		}
+
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		$assoc = $opts[0];
+		$deity = $opts[1];
+		if (!($assoc instanceof Association) || !($deity instanceof Deity)) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavaible.badinput");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notinassoc");
+		}
+		if (!$this->assocman->findDeity($assoc, $deity)) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.deities.remove", "maf_assoc_deities_remove", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
 	}
 
 	/* ========== Meta Actions ========== */
