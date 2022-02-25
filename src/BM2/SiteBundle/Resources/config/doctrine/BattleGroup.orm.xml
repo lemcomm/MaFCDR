@@ -27,8 +27,8 @@
 		<many-to-one field="siege" target-entity="Siege" inversed-by="groups"/>
 		<many-to-one field="reinforcing" target-entity="BattleGroup" inversed-by="reinforced_by"/>
 		<one-to-many field="reinforced_by" target-entity="BattleGroup" mapped-by="reinforcing"/>
-		<one-to-one field="attacking_in_battles" target-entity="Battle" mapped-by="primary_attacker"/>
-		<one-to-one field="defending_in_battles" target-entity="Battle" mapped-by="primary_defender"/>
+		<one-to-many field="attacking_in_battles" target-entity="Battle" mapped-by="primary_attacker"/>
+		<one-to-many field="defending_in_battles" target-entity="Battle" mapped-by="primary_defender"/>
 		<one-to-one field="attacking_in_siege" target-entity="Siege" mapped-by="attacker"/>
 		<field name="engaged" type="boolean" nullable="true"/>
 

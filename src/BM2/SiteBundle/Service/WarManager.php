@@ -764,13 +764,15 @@ class WarManager {
 						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
-					foreach ($victor->getCharacters() as $char) {
-						$this->history->logEvent(
-							$char,
-							'battle.failed',
-							array(),
-							History::MEDIUM, false, 20
-						);
+					if ($victor) {
+						foreach ($victor->getCharacters() as $char) {
+							$this->history->logEvent(
+								$char,
+								'battle.failed',
+								array(),
+								History::MEDIUM, false, 20
+							);
+						}
 					}
 				}
 
@@ -816,13 +818,15 @@ class WarManager {
 						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
-					foreach ($victor->getCharacters() as $char) {
-						$this->history->logEvent(
-							$char,
-							'battle.failed',
-							array(),
-							History::MEDIUM, false, 20
-						);
+					if ($victor) {
+						foreach ($victor->getCharacters() as $char) {
+							$this->history->logEvent(
+								$char,
+								'battle.failed',
+								array(),
+								History::MEDIUM, false, 20
+							);
+						}
 					}
 				}
 			}
