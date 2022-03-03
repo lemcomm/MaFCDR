@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -118,11 +118,12 @@ class User extends BaseUser {
 			$count += $character->getCreatedPlaces()->count();
 		}
 		if ($this->account_level >= 20) {
-			$mod = 1;
+			$mod = 2;
 		} else {
-			$mod = 0;
+			$mod = 1;
 		}
-		return $months - $count + $mod;
+		return ($months * $mod) - $count;
 	}
+
 	
 }
