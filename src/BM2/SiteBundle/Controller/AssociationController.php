@@ -104,12 +104,12 @@ class AssociationController extends Controller {
 	  * @Route("/{id}/update", name="maf_assoc_update")
 	  */
 
-	public function updateAction(Request $request) {
+	public function updateAction(Association $id, Request $request) {
 		$assoc = $id;
 		$char = $this->gateway('assocUpdateTest', $assoc);
 
 		$em = $this->getDoctrine()->getManager();
-		$form = $this->createForm(new AssocCreationType($em->getRepository('BM2SiteBundle:AssociationType')->findAll(), $char->findSubcreateableAssociations(), $assoc));
+		$form = $this->createForm(new AssocUpdateType($em->getRepository('BM2SiteBundle:AssociationType')->findAll(), $char->findSubcreateableAssociations(), $assoc));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$assoc = $this->get('association_manager')->update($assoc, $form->getData(), $char);
@@ -117,7 +117,7 @@ class AssociationController extends Controller {
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.updated.success', [], 'orgs'));
 			return $this->redirectToRoute('maf_politics_assocs');
 		}
-		return $this->render('Assoc/create.html.twig', [
+		return $this->render('Assoc/update.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
@@ -172,7 +172,7 @@ class AssociationController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$deity = $this->get('association_manager')->newDeity($data, $assoc, $char);
+			$deity = $this->get('association_manager')->newDeity($assoc, $char, $data);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.created', [], 'orgs'));
 			return $this->redirectToRoute('maf_assoc_deities', array('id'=>$assoc->getId()));
@@ -207,6 +207,20 @@ class AssociationController extends Controller {
 		$this->get('association_manager')->removeDeity($assoc, $deity, $char);
 
 		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.removed', ['%link-deity%'=>$deity], 'orgs'));
+		return $this->redirectToRoute('maf_assoc_deities', ['id'=>$assoc->getId()]);
+	}
+
+	/**
+	  * @Route("/{id}/adopteDeity/{deity}", name="maf_assoc_deities_adopt", requirements={"id"="\d+"})
+	  */
+
+	public function adoptDeityAction(Association $id, Deity $deity, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocAdoptDeityTest', [$assoc, $deity]);
+
+		$this->get('association_manager')->adoptDeity($assoc, $deity, $char);
+
+		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.adopted', ['%link-deity%'=>$deity], 'orgs'));
 		return $this->redirectToRoute('maf_assoc_deities', ['id'=>$assoc->getId()]);
 	}
 
