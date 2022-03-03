@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
+use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Place;
