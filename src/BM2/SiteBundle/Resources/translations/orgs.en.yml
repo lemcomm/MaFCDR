@@ -32,6 +32,9 @@ assoc:
    selectsuperior: (no one)
    createSubs: Rank can create subordinate ranks.
    manager: Rank can manage Association applicants and memberships.
+  faith:
+   name: Faith to Follow
+   empty: (none)
 
  help:
   name: A short, and easily referred to, name for the association.
@@ -59,6 +62,11 @@ assoc:
   createRank:
    header: Create a New Rank within the Association
    intro: <p>Ranks are a simple thing that help you manage the structure of the organization. Some of these options are overruled by association laws (like Rank Visibility and viewability) while others always take effect. If you're unsure what an option does, additional help is available for each.</p>
+  faith:
+   name: Declare Your Faith
+   intro: You can always decide that you simply which to, at least nominally, follow one faith or another that you're part of. Any Association that you are a member of that has named what their faith and followers is called is eligible to pick from. All regions you own will follow your choice here.
+   success: You've successfully changed your official religion to that of %faith%.
+   success2: You've successfully changed your official religion to that of not having one.
   manageRank:
    header: Update an Existing Rank
   view:
@@ -98,12 +106,12 @@ assoc:
    header: Review the Association's Recognized Deities
    description: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p>
    empty: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps this association doesn't care for religion? Or maybe it just hasn't had time to figure things out.</p>
+   words: Additionally, the association has some words of their own to offer...
   viewAllDeities:
    name:  All Known Deities
    header: Review the List of Known Deities
    description: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p>
    empty: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps the First Ones have not yet remembered from where they originate? Someone should read the lore.</p>
-
 
  requests:
   join:
