@@ -846,4 +846,13 @@ class ConversationManager {
                 }
                 return $perm;
         }
+
+        public function updateSystemConversations($orgType = 'realm', $org) {
+                $sysConvs = ['announcements'=>'Announcements', 'general'=>'General Discussions'];
+                foreach ($sysConvs as $sys=>$name) {
+                        $conv = $this->em->getRepository('BM2SiteBundle:Conversation')->findOneBy([$orgType=>$org, 'system'=>$sys]);
+                        $conv->setName($org->getName().' '.$name);
+                }
+                $this->em->flush();
+        }
 }
