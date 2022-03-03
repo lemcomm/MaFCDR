@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Artifact;
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\Description;
@@ -40,10 +41,11 @@ class DescriptionManager {
 		if ($entity->getDescription()) {
 			$olddesc = $entity->getDescription();
 		}
+		$eClass = $this->getClassName($entity);
 		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
 		if ($olddesc) {
 			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-			switch($this->getClassName($entity)) {
+			switch($eClass) {
 				case 'Artifact':
 					$olddesc->setActiveArtifact(NULL);
 					$this->em->flush();
@@ -86,7 +88,7 @@ class DescriptionManager {
 		$desc = new Description();
 		$this->em->persist($desc);
 		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-		switch($this->getClassName($entity)) {
+		switch($eClass) {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
 				$desc->setArtifact($entity);
@@ -132,11 +134,11 @@ class DescriptionManager {
 		$desc->setUpdater($character);
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
-		$this->em->flush($desc);
+		$this->em->flush();
 		if (!$new) {
 			/* No need to tell the people that just made the thing that they updated the descriptions. */
 			/* Association Ranks deliberately ommitted. */
-			switch($this->getClassName($entity)) {
+			switch($eClass) {
 				case 'Artifact':
 					$this->history->logEvent(
 						$entity,
@@ -211,10 +213,11 @@ class DescriptionManager {
 		if ($entity->getSpawnDescription()) {
 			$olddesc = $entity->getSpawnDescription();
 		}
+		$eClass = $this->getClassName($entity);
 		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
 		if ($olddesc) {
 			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-			switch($this->getClassName($entity)) {
+			switch($eClass) {
 				case 'House':
 					$olddesc->setActiveHouse(null);
 					break;
@@ -231,7 +234,7 @@ class DescriptionManager {
 		$desc = new SpawnDescription();
 		$this->em->persist($desc);
 		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-		switch($this->getClassName($entity)) {
+		switch($eClass) {
 			case 'House':
 				$desc->setActiveHouse($entity);
 				$desc->setHouse($entity);
