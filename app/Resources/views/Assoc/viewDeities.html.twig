@@ -7,13 +7,11 @@
 {% if deities|length < 1 %}
 	{{ 'assoc.route.viewDeities.empty'|trans({})|raw }}
 	{% if owner %}
-		{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
 		<p><a href="{{ path('maf_assoc_new_deity', {'id':assoc.id}) }}">{{ 'assoc.route.newDeity.name'|trans({}) }}</a></p>
 	{% endif %}
 {% else %}
 	{{ 'assoc.route.viewDeities.description'|trans({})|raw }}
 	{% if owner %}
-		{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
 		<p><a href="{{ path('maf_assoc_new_deity', {'id':assoc.id}) }}">{{ 'assoc.route.newDeity.name'|trans({}) }}</a></p>
 	{% endif %}
 
@@ -26,6 +24,14 @@
 		</dt>
 		<dd>
 			<p>{{deity.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
+			{% if owner and not deity.mainRecognizer %}
+				{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
+				<p><a href="{{ path('maf_assoc_deities_adopt', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.adoptDeity.name'|trans({}) }}</a></p>
+			{% endif %}
+			{% set check = dispatcher.assocRemoveDeityTest(null, [assoc, deity]) %}
+			{% if check.url is defined %}
+				<p><a href="{{ path('maf_assoc_deities_remove', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.removeDeity.name'|trans({}) }}</a></p>
+			{% endif %}
 			<p><i>{{ 'assoc.route.viewDeities.words'|trans({}) }}</i></p>
 			<p>{{each.words|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
 		</dd>
