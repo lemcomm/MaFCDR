@@ -482,6 +482,89 @@ class Politics {
 		$this->updateWarTargets($settlement, $oldrealm, $newrealm);
 	}
 
+	public function changePlaceRealm(Place $place, Realm $newrealm=null, $reason=false) {
+		$oldrealm = $place->getRealm();
+
+		if ($newrealm) {
+			$newrealm->addPlace($place);
+		}
+		if ($oldrealm) {
+			$oldrealm->removePlace($place);
+		}
+		$place->setRealm($newrealm);
+
+		// history events
+		switch ($reason) {
+			case 'change':	// settlement owner has decided to change
+				if ($newrealm) {
+					$this->history->logEvent(
+						$settlement,
+						'event.place.changed',
+						array('%link-realm%'=>$newrealm->getId()),
+						History::MEDIUM
+					);
+				}
+				if ($oldrealm && $newrealm) {
+					// TODO: different text when the new realm is related to the old realm (subrealm, parent realm, etc.)
+					$this->history->logEvent(
+						$oldrealm,
+						'event.realm.lostplace2',
+						array('%link-place%'=>$place->getId(), '%link-realm%'=>$newrealm->getId()),
+						History::MEDIUM
+					);
+					$this->history->logEvent(
+						$newrealm,
+						'event.realm.gainedplace2',
+						array('%link-place%'=>$place->getId(), '%link-realm%'=>$oldrealm->getId()),
+						History::MEDIUM
+					);
+				} else if ($oldrealm) {
+					$this->history->logEvent(
+						$oldrealm,
+						'event.realm.lostplace',
+						array('%link-place%'=>$place->getId()),
+						History::MEDIUM
+					);
+				} else {
+					$this->history->logEvent(
+						$newrealm,
+						'event.realm.gainedplace',
+						array('%link-place%'=>$place->getId()),
+						History::MEDIUM
+					);
+				}
+				break;
+			case 'fail': // my realm has failed
+				if ($newrealm) {
+					$this->history->logEvent(
+						$settlement,
+						'event.place.realmfail2',
+						array("%link-realm-1%"=>$newrealm->getId(), "%link-realm-2%"=>$oldrealm->getId()),
+						History::HIGH, true
+					);
+					// TODO: message for new realm
+				} else {
+					$this->history->logEvent(
+						$settlement,
+						'event.place.realmfail',
+						array("%link-realm%"=>$oldrealm->getId()),
+						History::HIGH, true
+					);
+				}
+				break;
+			case 'grant': // granted without realm
+				$this->history->logEvent(
+					$oldrealm,
+					'event.place.lost',
+					array('%link-settlement%'=>$settlement->getId()),
+					History::MEDIUM
+				);
+				break;
+			default:
+				// error, this should never happen
+		} /* end switch */
+	}
+
 	public function changeSettlementOccupier(Character $char, Settlement $settlement, Realm $realm = null) {
 		$new = false;
 		$old = null;
