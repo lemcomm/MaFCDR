@@ -119,7 +119,7 @@ class AssocUpdateType extends AbstractType {
 			'class' => 'BM2SiteBundle:Association',
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
-			'choices' => $types,
+			'choices' => $assocs,
 			'data'=>$me->getSuperior()
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
