@@ -3,10 +3,13 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationDeity;
 use BM2\SiteBundle\Entity\AssociationMember;
 use BM2\SiteBundle\Entity\AssociationPlace;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Deity;
+use BM2\SiteBundle\Entity\DeityAspect;
 use BM2\SiteBundle\Entity\Place;
 use Doctrine\ORM\EntityManager;
 
@@ -91,7 +94,7 @@ class AssociationManager {
 		return $assoc;
 	}
 
-	private function update($assoc, $data, $char) {
+	public function update($assoc, $data, $char) {
 		if ($assoc->getName() !== $data['name']) {
 			$assoc->setName($data['name']);
 		}
@@ -119,8 +122,10 @@ class AssociationManager {
 			$assoc->setSuperior($data['superior']);
 			$data['superior']->addCadet($assoc);
 		}
+		if ($assoc->getDescription()->getText() != $data['description']) {
+			$this->descman->newDescription($assoc, $data['description'], $char); #Descman includes a flush for the EM.
+		}
 
-		$this->descman->newDescription($assoc, $data['description'], $char); #Descman includes a flush for the EM.
 
 		return $assoc;
 	}
@@ -241,22 +246,33 @@ class AssociationManager {
 		return $result;
 	}
 
-	public function newDeity(Association $assoc, Characteer $char, $data) {
+	public function newDeity(Association $assoc, Character $char, $data) {
 		$deity = new Deity();
 		$this->em->persist($deity);
 		$deity->setMainRecognizer($assoc);
 		$deity->setName($data['name']);
 		foreach ($data['aspects'] as $each) {
-			$aspect = new DeityApsect();
+			$aspect = new DeityAspect();
 			$this->em->persist($aspect);
-			$aspect->setType($each);
+			$aspect->setAspect($each);
 			$aspect->setDeity($deity);
 		}
 		$this->descman->newDescription($deity, $data['description'], $char, TRUE); #Descman includes a flush for the EM.
 		$this->addDeity($assoc, $deity, $char, $data['words']);
 	}
 
-	public function addDeity(Assocaition $assoc, Deity $deity, Character $char, $words) {
+	public function adoptDeity(Association $assoc, Deity $deity, Character $char) {
+		$deity->setMainRecognizer($assoc);
+		$this->em->flush();
+		$this->history->logEvent(
+			$assoc,
+			'event.assoc.deity.adopted',
+			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
+			History::HIGH, true
+		);
+	}
+
+	public function addDeity(Association $assoc, Deity $deity, Character $char, $words) {
 		$aDeity = new AssociationDeity();
 		$this->em->persist($aDeity);
 		$aDeity->setAssociation($assoc);
