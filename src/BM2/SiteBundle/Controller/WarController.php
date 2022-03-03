@@ -721,9 +721,9 @@ class WarController extends Controller {
 			if ($ratio > 0.25) { $ratio = 0.25; }
 			if (!$inside) {
 				if ($settlement->isFortified()) {
-					$ratio *= 0.25;
-				} else {
 					$ratio *= 0.1;
+				} else {
+					$ratio *= 0.25;
 				}
 			}
 
