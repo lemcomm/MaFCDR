@@ -1,0 +1,23 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'assoc.route.create.header'|trans({},"orgs")|title }}</h2>
+<p>{{ 'assoc.route.create.intro'|trans({},"orgs")|raw }}</p>
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+<dl>
+	<dt>{{ form_label(form.name)}}</dt><dd>{{ form_widget(form.name) }}</dd>
+	<dt>{{ form_label(form.formal_name)}}</dt><dd>{{ form_widget(form.formal_name) }}</dd>
+	<dt>{{ form_label(form.faith_name)}}</dt><dd>{{ form_widget(form.faith_name) }}</dd>
+	<dt>{{ form_label(form.follower_name)}}</dt><dd>{{ form_widget(form.follower_name) }}</dd>
+	<dt>{{ form_label(form.type)}}</dt><dd>{{ form_widget(form.type) }}</dd>
+	<dt>{{ form_label(form.motto)}}</dt><dd>{{ form_widget(form.motto) }}</dd>
+	<dt>{{ form_label(form.short_description)}}</dt><dd>{{ form_widget(form.short_description) }}</dd>
+	<dt>{{ form_label(form.description)}}</dt><dd>{{ form_widget(form.description) }}</dd>
+	<dt>{{ form_label(form.superior)}}</dt><dd>{{ form_widget(form.superior) }}</dd>
+	{{ form_widget(form.submit) }}
+{{ form_end(form) }}
+</dl>
+
+{% endblock %}
