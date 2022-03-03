@@ -272,14 +272,16 @@ class AssociationManager {
 		);
 	}
 
-	public function addDeity(Association $assoc, Deity $deity, Character $char, $words) {
+	public function addDeity(Association $assoc, Deity $deity, Character $char, $words = null) {
 		$aDeity = new AssociationDeity();
 		$this->em->persist($aDeity);
 		$aDeity->setAssociation($assoc);
 		$aDeity->setDeity($deity);
-		$aDeity->setWords($words);
-		$aDeity->setWordsTimestamp(new \DateTime("now"));
-		$aDeity->setWordsFrom($char);
+		if ($words) {
+			$aDeity->setWords($words);
+			$aDeity->setWordsTimestamp(new \DateTime("now"));
+			$aDeity->setWordsFrom($char);
+		}
 		$this->em->flush();
 		$this->history->logEvent(
 			$assoc,
@@ -292,6 +294,9 @@ class AssociationManager {
 	public function removeDeity(Association $assoc, Deity $deity, Character $char) {
 		$aDeity = $this->em->getRepository('BM2SiteBundle:AssociationDeity')->findOneBy(['association'=>$assoc, 'deity'=>$deity]);
 		$this->em->remove($aDeity);
+		if ($aDeity->getDeity()->getMainRecognizer() === $assoc) {
+			$aDeity->getDeity()->setMainRecognizer(null);
+		}
 		$this->em->flush();
 		$this->history->logEvent(
 			$assoc,
