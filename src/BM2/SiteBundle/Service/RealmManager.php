@@ -113,6 +113,16 @@ class RealmManager {
 				$this->politics->changeSettlementRealm($e, null, 'fail');
 			}
 		}
+		foreach ($realm->getSpawns() as $spawn) {
+			$spawn->setActive(false);
+		}
+		foreach ($realm->getPlaces() as $place) {
+			if ($realm->getSuperior() && $realm->getSuperior()->getActive()) {
+				$this->politics->changePlaceRealm($place, $realm->getSuperior(), 'fail');
+			} else {
+				$this->politics->changePlaceRealm($place, null, 'fail');
+			}
+		}
 	}
 
 	private function updateHierarchy(Character $char, Realm $realm, $setrealm=true) {
