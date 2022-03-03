@@ -16,6 +16,10 @@
 		</dt>
 		<dd>
 			<p>{{deity.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
+			{% set check = dispatcher.assocAddDeityTest(null, [assoc, deity]) %}
+			{% if check.url is defined %}
+				<p><a href="{{ path('maf_assoc_deities_add', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.addDeity.name'|trans({}) }}</a></p>
+			{% endif %}
 		</dd>
 	{% endfor %}
 	</dl>
