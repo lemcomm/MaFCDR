@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\GameRequest;
 
 use BM2\SiteBundle\Form\AreYouSureType;
@@ -183,7 +184,7 @@ class AssociationController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/addDeity/{deity}", name="maf_assoc_deities_add", requirements={"id"="\d+"})
+	  * @Route("/{id}/addDeity/{deity}", name="maf_assoc_deities_add", requirements={"id"="\d+", "deity"="\d+"})
 	  */
 
 	public function addDeityAction(Association $id, Deity $deity, Request $request) {
@@ -192,12 +193,12 @@ class AssociationController extends Controller {
 
 		$this->get('association_manager')->addDeity($assoc, $deity, $char);
 
-		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.added', ['%link-deity%'=>$deity], 'orgs'));
+		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.added', ['%link-deity%'=>$deity->getId()], 'orgs'));
 		return $this->redirectToRoute('maf_assoc_deities', ['id'=>$assoc->getId()]);
 	}
 
 	/**
-	  * @Route("/{id}/removeDeity/{deity}", name="maf_assoc_deities_remove", requirements={"id"="\d+"})
+	  * @Route("/{id}/removeDeity/{deity}", name="maf_assoc_deities_remove", requirements={"id"="\d+", "deity"="\d+"})
 	  */
 
 	public function removeDeityAction(Association $id, Deity $deity, Request $request) {
@@ -206,12 +207,12 @@ class AssociationController extends Controller {
 
 		$this->get('association_manager')->removeDeity($assoc, $deity, $char);
 
-		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.removed', ['%link-deity%'=>$deity], 'orgs'));
+		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.removed', ['%link-deity%'=>$deity->getId()], 'orgs'));
 		return $this->redirectToRoute('maf_assoc_deities', ['id'=>$assoc->getId()]);
 	}
 
 	/**
-	  * @Route("/{id}/adopteDeity/{deity}", name="maf_assoc_deities_adopt", requirements={"id"="\d+"})
+	  * @Route("/{id}/adoptDeity/{deity}", name="maf_assoc_deities_adopt", requirements={"id"="\d+", "deity"="\d+"})
 	  */
 
 	public function adoptDeityAction(Association $id, Deity $deity, Request $request) {
@@ -220,7 +221,7 @@ class AssociationController extends Controller {
 
 		$this->get('association_manager')->adoptDeity($assoc, $deity, $char);
 
-		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.adopted', ['%link-deity%'=>$deity], 'orgs'));
+		$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.adopted', ['%link-deity%'=>$deity->getId()], 'orgs'));
 		return $this->redirectToRoute('maf_assoc_deities', ['id'=>$assoc->getId()]);
 	}
 
