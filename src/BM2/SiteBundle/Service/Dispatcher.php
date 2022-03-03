@@ -745,6 +745,7 @@ class Dispatcher {
 			if ($this->getCharacter()->getUser()->getCrests()) {
 				$actions[] = $this->metaHeraldryTest();
 			}
+			$actions[] = $this->metaFaithTest();
 			$actions[] = $this->metaLoadoutTest();
 			$actions[] = $this->metaSettingsTest();
 			$actions[] = $this->metaRenameTest();
@@ -3684,6 +3685,40 @@ class Dispatcher {
 		}
 	}
 
+	public function assocAdoptDeityTest($ignored, $opts) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.$check");
+		}
+
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		$assoc = $opts[0];
+		$deity = $opts[1];
+		if (!($assoc instanceof Association) || !($deity instanceof Deity)) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavaible.badinput");
+		}
+		if ($deity->getMainRecognizer() !== null) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.alreadyrecognized");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notinassoc");
+		}
+		if (!$this->assocman->findDeity($assoc, $deity)) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.deities.remove", "maf_assoc_deities_remove", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
 	/* ========== Meta Actions ========== */
 
 	public function metaBackgroundTest() {
@@ -3705,6 +3740,13 @@ class Dispatcher {
 			return array("name"=>"meta.loadout.name", "description"=>"unavailable.npc");
 		}
 		return array("name"=>"meta.loadout.name", "url"=>"maf_character_loadout", "description"=>"meta.loadout.description");
+	}
+
+	public function metaFaithTest() {
+		if ($this->getCharacter()->isNPC()) {
+			return array("name"=>"meta.faith.name", "description"=>"unavailable.npc");
+		}
+		return array("name"=>"meta.faith.name", "url"=>"maf_character_faith", "description"=>"meta.faith.description");
 	}
 
 	public function metaSettingsTest() {
