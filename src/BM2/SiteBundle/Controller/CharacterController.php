@@ -12,6 +12,7 @@ use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Entity\UnitSettings;
 
+use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\CharacterBackgroundType;
 use BM2\SiteBundle\Form\CharacterLoadoutType;
 use BM2\SiteBundle\Form\CharacterPlacementType;
@@ -60,9 +61,9 @@ class CharacterController extends Controller {
 	}
 
 
-   /**
-     * @Route("/", name="bm2_character")
-     */
+	/**
+	  * @Route("/", name="bm2_character")
+	  */
 	public function indexAction() {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -702,9 +703,9 @@ class CharacterController extends Controller {
 	}
 
 
-   /**
-     * @Route("/background")
-     */
+	/**
+	  * @Route("/background")
+	  */
 	public function backgroundAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter(true, true, true);
 		if (! $character instanceof Character) {
@@ -831,9 +832,9 @@ class CharacterController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/settings")
-     */
+	/**
+	  * @Route("/settings")
+	  */
 	public function settingsAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -860,9 +861,9 @@ class CharacterController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/loadout", name="maf_character_loadout")
-     */
+	/**
+	  * @Route("/loadout", name="maf_character_loadout")
+	  */
 	public function loadoutAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
@@ -892,9 +893,45 @@ class CharacterController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/kill")
-     */
+	/**
+	  * @Route("/faith", name="maf_character_faith")
+	  */
+	public function faithAction(Request $request) {
+		$character = $this->get('appstate')->getCharacter();
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$opts = new ArrayCollection();
+		foreach($character->findAssociations() as $assoc) {
+			if ($assoc->getFaithname() && $assoc->getFollowerName()) {
+				$opts->add($assoc);
+			}
+		}
+
+		$form = $this->createForm(new AssocSelectType($opts, 'faith', $character));
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$character->setFaith($data['target']);
+			$this->getDoctrine()->getManager()->flush();
+			if ($data['target']) {
+				$this->addFlash('notice', $this->get('translator')->trans('assoc.route.faith.success', array("%faith%"=>$data['target']->getFaithName()), 'orgs'));
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('assoc.route.faith.success2', array(), 'orgs'));
+			}
+
+			return $this->redirectToRoute('bm2_recent');
+		}
+
+		return $this->render('Character/faith.html.twig', [
+			'form'=>$form->createView(),
+		]);
+	}
+
+	/**
+	  * @Route("/kill")
+	  */
 	public function killAction(Request $request) {
 		$character = $this->get('appstate')->getCharacter();
 		if (! $character instanceof Character) {
