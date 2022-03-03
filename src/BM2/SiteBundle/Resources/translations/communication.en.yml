@@ -292,6 +292,10 @@ event:
   gained2:      Gained ownership of %settlement% from %realm%.
   lost:         Lost ownership of %settlement%.
   lost2:        Lost ownership of %settlement% to %realm%.
+  gainedplace:       Gained ownership of %place%.
+  gainedplace2:      Gained ownership of %place% from %realm%.
+  lostplace:         Lost ownership of %place%.
+  lostplace2:        Lost ownership of %place% to %realm%.
   abdicated:    %character-1% has abdicated and handed control of the realm to %character-2%.
   abdicated2:   %character% has abdicated without a successor.
   deserted:     Vanished into history with no members remaining.
@@ -382,8 +386,15 @@ event:
   newowner:     Onwership has been transferred to %character%.
   inherited:    Was inherited by %character%.
   inherifail:   Fell to independence on the death of %character%, who left no heir.
+  realmfail:    Returned to independence with the failing of %realm%.
+  realmfail2:   Became part of %realm-1% with the failing of %realm-2%.
  assoc:
   founded:      Formalized by %character%.
+  deity:
+   adopted:     Primary recognition of %deity% has been taken over by the Association under orders of %character%.
+   recognized:  %character% has recognized the deity of %deity% as a member of the Association's pantheon.
+   removed:     %character% has removed the deity of %deity% fromt he Association's pantheon.
+
 
 report:
  building:
