@@ -501,13 +501,13 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		if ($olddescription = $place->getDescription()) {
-			$olddescription = $place->getDescription()->getText();
+		if ($oldDescription = $place->getDescription()) {
+			$oldDescription = $place->getDescription()->getText();
 		} else {
-			$olddescription = null;
+			$oldDescription = null;
 		}
 
-		$form = $this->createForm(new PlaceManageType($olddescription, $type, $place));
+		$form = $this->createForm(new PlaceManageType($oldDescription, $type, $place, $character));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -524,6 +524,24 @@ class PlaceController extends Controller {
 				}
 				if ($olddescription != $data['description']) {
 					$this->get('description_manager')->newDescription($place, $data['description'], $character);
+				}
+				$pol = $this->get('politics');
+				if ($oldRealm != $data['realm']) {
+					$pol->changePlaceRealm($place, $data['realm'], 'change');
+				}
+				if ($type=='embassy') {
+					if ($place->getHostingRealm() != $data['hosting_realm']) {
+						$place->setHostingRealm($data['hosting_realm']);
+						$place->setOwningRealm(null);
+						$place->setAmbassador(null);
+					}
+					if ($place->getOwningRealm() != $data['owning_realm']) {
+						$place->setOwningRealm($data['owning_realm']);
+						$place->setAmbassador(null);
+					}
+					if ($place->getAmbassador() != $data['ambassador']) {
+						$place->setAmbassador($data['ambassador']);
+					}
 				}
 
 				$this->getDoctrine()->getManager()->flush();
