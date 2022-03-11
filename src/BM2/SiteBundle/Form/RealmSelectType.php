@@ -18,6 +18,7 @@ class RealmSelectType extends AbstractType {
 	private $label;
 	private $submit;
 	private $domain;
+	private $req;
 	private $msg;
 
 	public function __construct($realms, $type) {
@@ -27,6 +28,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= '';
 				$this->label	= 'control.changerealm.realm';
 				$this->submit	= 'control.changerealm.submit';
+				$this->req	= false;
 				$this->msg      = null;
 				$this->domain	= 'actions';
 				break;
@@ -34,6 +36,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= '';
 				$this->label	= 'control.take.realm';
 				$this->submit	= 'control.take.submit';
+				$this->req	= false;
 				$this->msg      = null;
 				$this->domain	= 'actions';
 				break;
@@ -41,6 +44,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= 'diplomacy.join.empty';
 				$this->label	= 'diplomacy.join.label';
 				$this->submit	= 'diplomacy.join.submit';
+				$this->req	= true;
 				$this->msg      = 'diplomacy.join.msg';
 				$this->domain	= 'politics';
 				break;
@@ -48,6 +52,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= '';
 				$this->label	= 'control.changeoccupier.realm';
 				$this->submit	= 'control.changeoccupier.submit';
+				$this->req	= false;
 				$this->msg      = null;
 				$this->domain	= 'actions';
 				break;
@@ -55,6 +60,7 @@ class RealmSelectType extends AbstractType {
 				$this->empty	= '';
 				$this->label	= 'control.occupy.realm';
 				$this->submit	= 'control.occupy.submit';
+				$this->req	= false;
 				$this->msg      = null;
 				$this->domain	= 'actions';
 				break;
@@ -84,6 +90,7 @@ class RealmSelectType extends AbstractType {
 		$builder->add('target', EntityType::class, array(
 			'placeholder' => $this->empty,
 			'label' => $this->label,
+			'required' => $this->req,
 			'class'=>'BM2SiteBundle:Realm', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($bloodystupidunnecessarynonsense) {
 				$qb = $er->createQueryBuilder('r');
 				$qb->where('r IN (:realms)');
