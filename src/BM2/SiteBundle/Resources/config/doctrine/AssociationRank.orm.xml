@@ -12,6 +12,7 @@
 		<field name="view_self" type="boolean" nullable="true"/>
 		<field name="owner" type="boolean" nullable="true"/>
 		<field name="manager" type="boolean" nullable="true"/>
+		<field name="build" type="boolean" nullable="true"/>
 		<field name="subcreate" type="boolean" nullable="true"/>
 
 		<many-to-one field="superior" target-entity="AssociationRank" inversed-by="subordinates"/>
