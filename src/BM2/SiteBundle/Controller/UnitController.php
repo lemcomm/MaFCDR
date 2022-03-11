@@ -597,6 +597,7 @@ class UnitController extends Controller {
                 }
                 if (count($units) < 1) {
                         $units[] = $this->get('military_manager')->newUnit(null, $settlement, null); #Ensure we always have atleast 1!
+     			return $this->redirectToRoute('maf_recruit'); # Reload page to avoid the "property assessore requires a graph or array of objects to operate on" error.
                 }
 
 		$soldierscount = 0;
