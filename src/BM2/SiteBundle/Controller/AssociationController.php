@@ -401,4 +401,27 @@ class AssociationController extends Controller {
 		]);
 	}
 
+	/**
+	  * @Route("/{id}/leave", name="maf_assoc_leave", requirements={"id"="\d+"})
+	  */
+
+	public function leaveAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocLeaveTest', $assoc);
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+		if ($form->isValid()) {
+			$data = $form->getData();
+			if ($data['sure']) {
+				$this->get('association_manager')->removeMember($assoc, $char);
+				$this->addFlash('notice', $this->get('translator')->trans('assoc.route.leave.success', ['%name%'=>$assoc->getName()], 'orgs'));
+				return $this->redirectToRoute('maf_place_actionable');
+			}
+		}
+		return $this->render('Assoc/join.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
 }
