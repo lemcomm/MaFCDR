@@ -219,6 +219,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'place':		return 'maf_place';
 			case 'unit':		return 'maf_units_info';
 			case 'conversation':	return 'maf_conv_read';
+			case 'assoc':
 			case 'association':	return 'maf_assoc';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
