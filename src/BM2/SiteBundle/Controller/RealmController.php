@@ -458,19 +458,6 @@ class RealmController extends Controller {
 		]);
 	}
 
-	/**
-	  * @Route("/{realm}/laws", requirements={"realm"="\d+"})
-	  */
-	public function lawsAction(Realm $realm, Request $request) {
-		// FIXME: these should be visible to all realm members - seperate method or same?
-		$character = $this->gateway($realm, 'hierarchyRealmLawsTest');
-
-		return $this->render('Realm/laws.html.twig', [
-			'realm' => $realm,
-			'laws' => $realm->getLaws(),
-		]);
-	}
-
 
 	/**
 	  * @Route("/{realm}/positions", requirements={"realm"="\d+"})
@@ -1202,7 +1189,7 @@ class RealmController extends Controller {
 		if ($id->getRealm()) {
 			$character = $this->gateway($id->getRealm(), 'hierarchyElectionsTest');
 		}
-		
+
 		# Because people were sneaking random outsiders into elections.
 		# This method will also allow us to setup alternative security checks later for this page, if it gets expanded.
 		$election = $id; // we use ID in the route because the links extension always uses id
