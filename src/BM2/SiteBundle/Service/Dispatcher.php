@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Unit;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 
@@ -529,7 +530,10 @@ class Dispatcher {
 			$actions['placeTransferTest'] = $this->placeTransferTest(null, $place);
 			$actions['placePermissionsTest'] = $this->placePermissionsTest(null, $place);
 			$actions['placeDestroyTest'] = $this->placeDestroyTest(null, $place);
-			$actions['assocCreateTest'] = $this->assocCreateTest(true);
+			if ($type->getAssociations()) {
+				$actions['assocCreateTest'] = $this->assocCreateTest(true);
+				$actions['placeAddAssocTest'] = $this->placeAddAssocTest(null, $place);
+			}
 
 			if ($pHouse = $place->getHouse()) {
 				if (!$char->getHouse()) {
@@ -544,6 +548,7 @@ class Dispatcher {
 				foreach ($place->getAssociations() as $rel) {
 					$assoc = $rel->getAssociation(); # Places have a many-to-many defined relationship with associations.
 					$actions['assocs_'.$assoc->getId()] = $this->assocJoinTest(null, $assoc);
+					$actions['evictAssoc_'.$assoc->getId()] = $this->placeEvictAssocTest(null, [$place, $assoc]);
 				}
 			}
 
@@ -636,7 +641,7 @@ class Dispatcher {
 				$actions[] = $this->hierarchyRealmSpawnsTest();
 				$actions[] = $this->hierarchyAbdicateTest();
 				$actions[] = $this->hierarchyRealmPositionsTest();
-				$actions[] = $this->hierarchyRealmLawsTest();
+				$actions[] = $this->hierarchyRealmLawsTest(null, $realm);
 				$actions[] = $this->hierarchyWarTest();
 				$actions[] = $this->hierarchyDiplomacyTest();
 				$actions[] = $this->hierarchyAbolishRealmTest();
@@ -662,6 +667,7 @@ class Dispatcher {
 		foreach ($this->getCharacter()->findAssociations() as $assoc) {
 			$actions[] = array("title"=>$assoc->getFormalName());
 			$actions[] = array("name"=>"assoc.view.name", "url"=>"maf_assoc", "parameters"=>array("id"=>$assoc->getId()), "description"=>"assoc.view.description");
+			$actions[] = $this->assocLawsTest(null, $assoc);
 			$actions[] = $this->assocViewRanksTest(null, $assoc);
 			$actions[] = $this->assocGraphRanksTest(null, $assoc);
 			$actions[] = $this->assocCreateRankTest(null, $assoc);
@@ -669,6 +675,7 @@ class Dispatcher {
 			$actions[] = $this->assocDeitiesAllTest(null, $assoc);
 			$actions[] = $this->assocDeitiesMinetest(null, $assoc);
 			$actions[] = $this->assocNewDeityTest(null, $assoc);
+			$actions[] = $this->assocLeaveTest(null, $assoc);
 		}
 
 		return array("name"=>"politics.name", "intro"=>"politics.intro", "elements"=>$actions);
@@ -2375,6 +2382,79 @@ class Dispatcher {
 		}
 	}
 
+	public function placeAddAssocTest($ignored, Place $place) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"place.addAssoc.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		if ($place->getOccupier() || $place->getOccupant()) {
+			return array("name"=>"place.addAssoc.name", "description"=>"unavailable.occupied");
+		}
+		$valid = false;
+		$already = false;
+		$assocs = new ArrayCollection();
+		foreach ($place->getAssociations() as $placeAssoc) {
+			$assocs->add($placeAssoc->getAssociation());
+		}
+		foreach($char->getAssociationMemberships() as $mbr) {
+			$rank = $mbr->getRank();
+			if ($assocs->contains($mbr->getAssociation())) {
+				$already = true;
+				continue;
+			}
+			if ($rank) {
+				if ($rank->canBuild()) {
+					$valid = true;
+				}
+			}
+		}
+		if (!$valid) {
+			if ($already) {
+				return array("name"=>"place.addAssoc.name", "description"=>"unavailable.assocalready");
+			}
+			return array("name"=>"place.addAssoc.name", "description"=>"unavailable.noassocbuild");
+		} else {
+			return $this->action("place.addAssoc", "maf_place_assoc_add", true,
+				array('id'=>$place->getId()),
+				array("%name%"=>$place->getName())
+			);
+		}
+	}
+
+	public function placeEvictAssocTest($ignored, $vars) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
+			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.$check");
+		}
+		$place = $vars[0];
+		$assoc = $vars[1];
+		if (!($place instanceof Place) || !($assoc instanceof Association)) {
+			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.badinput");
+		}
+		$found = false;
+		foreach ($place->getAssociations() as $assocPlace) {
+			if ($assocPlace->getAssociation() === $assoc) {
+				$found = true;
+				break;
+			}
+		}
+		if (!$found) {
+			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.assocnothere");
+		}
+		if ($place->getOccupier() || $place->getOccupant()) {
+			$occupied = true;
+		} else {
+			$occupied = false;
+		}
+		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'manage', false, $occupied)) {
+			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.notmanager");
+		} else {
+			return $this->action("place.evictAssoc", "maf_place_assoc_evict", true,
+				array('id'=>$place->getId(), 'assoc'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
 	public function placeManageTest($ignored, Place $place) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
@@ -2530,7 +2610,7 @@ class Dispatcher {
 			(!$place->getAmbassador() && !$place->getOwningRealm() && $place->getHostingRealm() && $place->getHostingRealm()->findRulers()->conntains($character)) ||
 			(!$place->getAmbassador() && !$place->getOwningRealm() && !$place->getHostingRealm() && $place->getOwner() == $character)
 		) {
-			return $this->action("place.embassy", "maf_place_embassy", true,
+			return $this->action("place.embassy", "maf_place_manage", true,
 					array('id'=>$place->getId()),
 					array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 				);
@@ -2986,16 +3066,16 @@ class Dispatcher {
 		}
 	}
 
-	public function hierarchyRealmLawsTest() {
+	public function hierarchyRealmLawsTest($ignored, Realm $realm) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"realm.laws.name", "description"=>"unavailable.$check");
 		}
-		if (!$this->realm->findRulers()->contains($this->getCharacter())) {
-			return array("name"=>"realm.laws.name", "description"=>"unavailable.notleader");
+		if (!$this->getCharacter()->findRealms()->contains($realm)) {
+			return array("name"=>"realm.laws.name", "description"=>"unavailable.notmember");
 		} else {
-			return $this->action("realm.laws", "bm2_site_realm_laws", true,
-				array('realm'=>$this->realm->getId()),
-				array("%name%"=>$this->realm->getName(), "%formalname%"=>$this->realm->getFormalName())
+			return $this->action("realm.laws", "maf_realm_laws", true,
+				array('realm'=>$realm->getId()),
+				array("%name%"=>$realm->getName(), "%formalname%"=>$realm->getFormalName())
 			);
 		}
 	}
@@ -3486,21 +3566,21 @@ class Dispatcher {
 
 	public function assocJoinTest($ignored, Association $assoc) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
-			return ["name"=>"assoc.join.name", "description"=>"unavailable.$check"];
+			return ["name"=>"place.associations.join.name2", "description"=>"unavailable.$check"];
 		}
 		$character = $this->getCharacter();
 		if (!$character->getInsidePlace()) {
-			return ["name"=>"assoc.join.name", "description"=>"unavailable.outsideplace"];
+			return ["name"=>"place.associations.join.name2", "description"=>"unavailable.outsideplace"];
 		} else {
 			$place = $character->getInsidePlace();
 		}
 		if (!$place->containsAssociation($assoc)) {
-			return ["name"=>"assoc.join.name", "description"=>"unavailable.assocnothere"];
+			return ["name"=>"place.associations.join.name2", "description"=>"unavailable.assocnothere"];
 		}
-		if ($assoc->findMember($assoc, $character)) {
-			return ["name"=>"assoc.join.name", "description"=>"unavailable.alreadyinassoc"];
+		if ($assoc->findMember($character)) {
+			return ["name"=>"place.associations.join.name2", "description"=>"unavailable.alreadyinassoc"];
 		}
-		return $this->action('assoc.join', 'maf_assoc_join', true,
+		return $this->action('place.associations.join', 'maf_assoc_join', true,
 			['id'=>$assoc->getId()],
 			["%name%"=>$assoc->getName()],
 			['id'=>$assoc->getId()]
@@ -3536,6 +3616,21 @@ class Dispatcher {
 		}
 	}
 
+	public function assocLeaveTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.leave.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$assoc->isPublic() && !$member) {
+			return array("name"=>"assoc.leave.name", "description"=>"unavailable.notinassoc");
+		}
+		return $this->action("assoc.leave", "maf_assoc_leave", false,
+			array('id'=>$assoc->getId()),
+			array("%name%"=>$assoc->getName())
+		);
+	}
+
 	public function assocViewRanksTest($ignored, Association $assoc) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"assoc.viewRanks.name", "description"=>"unavailable.$check");
@@ -3565,6 +3660,22 @@ class Dispatcher {
 			array('id'=>$assoc->getId()),
 			array("%name%"=>$assoc->getName())
 		);
+	}
+
+	public function assocLawsTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.laws.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.laws.name", "description"=>"unavailable.notinassoc");
+		} else {
+			return $this->action("assoc.laws", "maf_assoc_laws", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
 	}
 
 	public function assocDeitiesMineTest($ignored, Association $assoc) {
