@@ -178,6 +178,16 @@ class Realm {
 		return $this->all_active_characters;
 	}
 
+	public function findActivePlayers() {
+		$users = new ArrayCollection();
+		foreach ($this->findActiveMembers() as $each) {
+			if (!$users->contains($each->getUser())) {
+				$users->add($each->getUser());
+			}
+		}
+		return $users;
+	}
+
 	private function addRealmMember(Character $char) {
 		if (!$this->all_characters->contains($char)) {
 			$this->all_characters->add($char);
@@ -283,5 +293,6 @@ class Realm {
 		}
 		return $all;
 	}
+	
 	
 }
