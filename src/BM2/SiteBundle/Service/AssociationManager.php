@@ -213,6 +213,17 @@ class AssociationManager {
 		return $loc;
 	}
 
+	public function removeLocation($assoc, $place, $flush=true) {
+		$loc = $this->em->getRepository('BM2SiteBundle:AssociationPlace')->findOneBy(["association"=>$assoc, "place"=>$place]);
+		if ($loc) {
+			$this->em->remove($loc);
+			if ($flush) {
+				$this->em->flush();
+			}
+		}
+		return $loc;
+	}
+
 	public function updateMember($assoc, $rank=null, $char, $flush=true) {
 		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
 		if ($member && $rank && $member->getRank() === $rank) {
@@ -234,6 +245,47 @@ class AssociationManager {
 			$this->em->flush();
 		}
 		return $member;
+	}
+
+	public function removeMember(Association $assoc, Character $char) {
+		$member = $this->em->getRepository('BM2SiteBundle:AssociationMember')->findOneBy(["association"=>$assoc, "character"=>$char]);
+		if ($member) {
+			$this->em->remove($member);
+			$this->em->flush();
+			foreach ($assoc->getConversations() as $conv) {
+				if ($perm = $conv->findActiveCharPermission($char)) {
+					$perm->setActive(FALSE);
+					$perm->setEndTime(new \DateTime("now"));
+				}
+			}
+			if ($assoc->getMembers()->count() == 0) {
+				# Collapsed.
+				$assoc->setActive(false);
+				foreach ($assoc->getRanks() as $rank) {
+					$this->em->remove($rank);
+				}
+				foreach ($assoc->getPlaces() as $place) {
+					$this->get('history')->logEvent(
+						$place->getPlace(),
+						'event.place.assoc.collapsed',
+						array('%link-assoc%'=>$assoc->getId()),
+						History::HIGH, true
+					);
+					$this->em->remove($place);
+				}
+				foreach ($assoc->getRecognizedDeities() as $deity) {
+					$deity->setMainRecognizer(NULL);
+				}
+
+				$this->em->flush();
+				$this->history->logEvent(
+					$assoc,
+					'event.assoc.collapsed',
+					array(),
+					History::ULTRA, true
+				);
+			}
+		}
 	}
 
 	public function findMember(Association $assoc, Character $char) {
