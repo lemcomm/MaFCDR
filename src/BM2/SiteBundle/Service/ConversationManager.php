@@ -250,7 +250,7 @@ class ConversationManager {
                 }
         }
 
-        public function removeOrpahnConversations() {
+        public function removeOrphanConversations() {
                 $all = $this->em->getRepository('BM2SiteBundle:Conversation');
                 $count = 0;
                 foreach ($all as $conv) {
