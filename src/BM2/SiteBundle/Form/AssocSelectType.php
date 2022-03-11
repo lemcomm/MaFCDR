@@ -21,6 +21,8 @@ class AssocSelectType extends AbstractType {
 	private $msg;
 	private $help;
 	private $me;
+	private $choiceLabel;
+	private $required;
 
 	public function __construct($assocs, $type, $me = null) {
 		$this->assocs = $assocs;
@@ -32,6 +34,18 @@ class AssocSelectType extends AbstractType {
 				$this->msg      = null;
 				$this->domain	= 'orgs';
 				$this->help	= 'assoc.help.faith';
+				$this->choiceLabel	= 'faith_name';
+				$this->required = false;
+				break;
+			case 'addToPlace':
+				$this->empty	= 'assoc.form.addToPlace.empty';
+				$this->label	= 'assoc.form.addToPlace.name';
+				$this->submit	= 'assoc.form.submit';
+				$this->msg      = null;
+				$this->domain	= 'orgs';
+				$this->help	= 'assoc.help.addToPlace';
+				$this->choiceLabel	= 'name';
+				$this->required = true;
 				break;
 		}
 		$this->me = $me;
@@ -53,10 +67,10 @@ class AssocSelectType extends AbstractType {
 		$builder->add('target', EntityType::class, array(
 			'placeholder' => $this->empty,
 			'label' => $this->label,
-			'required'=>false,
+			'required'=>$this->required,
 			'attr' => array('title'=>$this->help),
 			'class'=>'BM2SiteBundle:Association',
-			'choice_label'=>'faith_name',
+			'choice_label'=>$this->choiceLabel,
 			'choices'=>$this->assocs,
 			'data'=>$this->me->getFaith()
 		));
