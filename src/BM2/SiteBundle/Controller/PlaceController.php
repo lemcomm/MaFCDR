@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
@@ -9,6 +10,7 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
@@ -522,11 +524,11 @@ class PlaceController extends Controller {
 				if ($place->getShortDescription() != $data['short_description']) {
 					$place->setShortDescription($data['short_description']);
 				}
-				if ($olddescription != $data['description']) {
+				if ($oldDescription != $data['description']) {
 					$this->get('description_manager')->newDescription($place, $data['description'], $character);
 				}
 				$pol = $this->get('politics');
-				if ($oldRealm != $data['realm']) {
+				if ($place->getRealm() != $data['realm']) {
 					$pol->changePlaceRealm($place, $data['realm'], 'change');
 				}
 				if ($type=='embassy') {
@@ -763,6 +765,87 @@ class PlaceController extends Controller {
                 }
 		return $this->render('Place/destroy.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/addAssoc", requirements={"id"="\d+"}, name="maf_place_assoc_add")
+	  */
+	public function addAssocAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeAddAssocTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$assocs = new ArrayCollection();
+		foreach($character->getAssociationMemberships() as $mbr) {
+			if ($rank = $mbr->getRank()) {
+				if ($rank->canBuild()) {
+					$assocs->add($rank->getAssociation());
+				}
+			}
+		}
+
+		$form = $this->createForm(new AssocSelectType($assocs, 'addToPlace', $character));
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$this->get('association_manager')->newLocation($data['target'], $place);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.assoc.new',
+				array('%link-character%'=>$character->getId(), '%link-assoc%'=>$data['target']->getId()),
+				History::HIGH, true
+			);
+			$this->get('history')->logEvent(
+				$place,
+				'event.assoc.place.new',
+				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+				History::HIGH, true
+			);
+
+                        return $this->redirectToRoute('maf_place_actionable');
+                }
+		return $this->render('Place/addAssoc.html.twig', [
+			'place'=>$place,
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/evictAssoc/{assoc}", requirements={"id"="\d+", "assoc"="\d+"}, name="maf_place_assoc_evict")
+	  */
+	public function evictAssocAction(Place $id, Association $assoc, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeEvictAssocTest', false, true, false, [$place, $assoc]);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+			$this->get('association_manager')->removeLocation($assoc, $place);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.assoc.evict',
+				array('%link-character%'=>$character->getId(), '%link-assoc%'=>$assoc->getId()),
+				History::HIGH, true
+			);
+			$this->get('history')->logEvent(
+				$place,
+				'event.assoc.place.evict',
+				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+				History::HIGH, true
+			);
+
+                        return $this->redirectToRoute('maf_place_actionable');
+                }
+		return $this->render('Place/evictAssoc.html.twig', [
+			'place'=>$place,
+			'assoc'=>$assoc,
+			'form'=>$form->createView()
 		]);
 	}
 
