@@ -112,7 +112,7 @@ class User extends BaseUser {
 	}
 
 	public function getFreePlaces() {
-		$months = $this->getCreated()->diff(new \DateTime("now"), true)->m;
+		$months = floor($this->getCreated()->diff(new \DateTime("now"), true)->days/30);
 		$count = 0;
 		foreach ($this->getCharacters() as $character) {
 			$count += $character->getCreatedPlaces()->count();
