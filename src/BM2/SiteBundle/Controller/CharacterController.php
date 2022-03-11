@@ -340,17 +340,17 @@ class CharacterController extends Controller {
 
 	/**
 	  * @Route("/spawn/r{realm}", requirements={"realm"="\d+"}, name="maf_spawn_realm")
-  	  * @Route("/spawn/h{house}", requirements={"house"="\d+"}, name="maf_spawn_house")
-  	  * @Route("/spawn/myhouse", name="maf_spawn_myhouse")
+	  * @Route("/spawn/h{house}", requirements={"house"="\d+"}, name="maf_spawn_house")
+	  * @Route("/spawn/myhouse", name="maf_spawn_myhouse")
 	  */
 	  public function spawnAction(Realm $realm = null, House $house = null) {
-  		$character = $this->get('appstate')->getCharacter(true, false, true);
-  		if (! $character instanceof Character) {
-  			return $this->redirectToRoute($character);
-  		}
-  		if ($character->getLocation()) {
-  			return $this->redirectToRoute('bm2_character');
-  		}
+		$character = $this->get('appstate')->getCharacter(true, false, true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		if ($character->getLocation()) {
+			return $this->redirectToRoute('bm2_character');
+		}
 
 		$spawns = new ArrayCollection();
 		$myHouse = null;
@@ -1126,13 +1126,13 @@ class CharacterController extends Controller {
 			$act->setBlockTravel(false);
 			$result = $this->get('action_manager')->queue($act);
 
-			return $this->render('Character/surrender.html.twig', [
+			return $this->render('Character/escape.html.twig', [
 				'queued'=>true,
 				'hours'=>$hours
 			]);
 		}
 
-		return $this->render('Character/surrender.html.twig', [
+		return $this->render('Character/escape.html.twig', [
 			'captor_active' => $captor_active,
 			'form'=>$form->createView()
 		]);
