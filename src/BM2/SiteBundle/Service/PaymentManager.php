@@ -118,7 +118,7 @@ class PaymentManager {
 			$myfee = $this->calculateUserFee($user);
 			$levels = $this->getPaymentLevels();
 			if ($myfee > 0) {
-				$this->logger->info("    --Fee of ".$myfee." detected...");
+				#$this->logger->info("    --Fee of ".$myfee." detected...");
 				if ($this->spend($user, 'subscription', $myfee, true)) {
 					$this->logger->info("    --Credit spend successful...");
 					$active++;
@@ -132,7 +132,7 @@ class PaymentManager {
 					$expired++;
 				}
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
-				$this->logger->info("    --Patron detected...");
+				#$this->logger->info("    --Patron detected...");
 				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$sufficient = false;
 				#TODO: We'll need to expand this to support other creators, if we add any.
@@ -146,12 +146,12 @@ class PaymentManager {
 						$this->refreshPatreonTokens($patron);
 					}
 
-					$this->logger->info("    --Checking pledge status...");
+					#$this->logger->info("    --Checking pledge status...");
 					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
 					$this->logger->info("    --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
 
 					if ($patreonLevel <= $entitlement) {
-						$this->logger->info("    --Pledge is sufficient...");
+						#$this->logger->info("    --Pledge is sufficient...");
 						$sufficient = true;
 					}
 				}
@@ -169,19 +169,19 @@ class PaymentManager {
 					# TODO: Give overpledge back as credits?
 				}
 			} else {
-				$this->logger->info("    --Non-payer detected, either trial or dev account...");
+				#$this->logger->info("    --Non-payer detected, either trial or dev account...");
 				if ($user->getLastLogin()) {
 					$inactive_days = $user->getLastLogin()->diff(new \DateTime("now"), true)->days;
 				} else {
 					$inactive_days = $user->getCreated()->diff(new \DateTime("now"), true)->days;
 				}
 				if ($inactive_days > 60) {
-					$this->logger->info("    --Account inactive, storing account...");
+					#$this->logger->info("    --Account inactive, storing account...");
 					// after 2 months, we put you into storage
 					$user->setAccountLevel(0);
 					$storage++;
 				} else {
-					$this->logger->info("    --Accont active, logging as free...");
+					#$this->logger->info("    --Accont active, logging as free...");
 					$free++;
 				}
 			}
@@ -215,6 +215,22 @@ class PaymentManager {
 		$patron->setCurrentAmount($entitlement);
 		return [$status, $entitlement];
 	}
+
+	/*
+	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
+		$papi = new PAPI($patron->getAccessToken());
+		$member = $papi->fetch_user($args);
+		if (!$patron->getPatreonId()) {
+			$patron->setPatreonId($member['data']['id']);
+		}
+		echo "<pre>".print_r($member,true)."</pre>";
+		$status = $member['included'][0]['attributes']['patron_status'];
+		$patron->setStatus($status);
+		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
+		$patron->setCurrentAmount($entitlement);
+		return [$status, $entitlement];
+	}
+	*/
 
 	private function ChangeNotification(User $user, $subject, $text) {
 		$subject = $this->translator->trans("account.payment.mail.".$subject, array());
