@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AssociationRank {
 
+        public function isOwner() {
+                return $this->owner;
+        }
+
         public function canSubcreate() {
                 if ($this->owner || $this->subcreate) {
                         return true;
@@ -19,10 +23,17 @@ class AssociationRank {
         }
 
         public function canManage() {
-                if ($this->owner || $this->manager) {
+                if ($this->owner) {
                         return true;
                 }
-                return false;
+                return $this->manager;
+        }
+
+        public function canBuild() {
+                if ($this->owner) {
+                        return true;
+                }
+                return $this->build;
         }
 
         public function findAllKnownSubordinates() {
