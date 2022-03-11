@@ -522,7 +522,7 @@ class WarController extends Controller {
 								# We already know they're *a* leader, now to figure out what group they lead.
 								#TODO: Later when we add more sides to a battle, we'll need to expand this.
 								if ($siege->getAttacker()->getCharacters()->contains($character)) {
-									$group = $siege->getAttackers();
+									$group = $siege->getAttacker();
 								} else {
 									$group = $siege->getDefender();
 								}
