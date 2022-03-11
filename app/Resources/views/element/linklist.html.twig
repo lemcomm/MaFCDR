@@ -34,7 +34,7 @@
 				<a href="{{ path(element.url, params) }}">{{ (element.name ~ '.activate')|trans({},domain)|title }}</a>
 			{% endif %}
 		{% else %}
-			<a href="{{ path(element.url, params) }}">{{ element.name|trans({},domain)|title }}</a>
+			<a href="{{ path(element.url, params) }}">{{ element.name|trans(transkeys,domain)|title }}</a>
 		{% endif %}
 	{% else %}
 		{% set inside = true %}
@@ -43,7 +43,7 @@
 		{% else %}
 			<li class="disabled">
 		{% endif %}
-		<span class="nolink">{{ element.name|trans({},domain)|title }}</span>
+		<span class="nolink">{{ element.name|trans(transkeys,domain)|title }}</span>
 	{% endif %}
 	{% if element.description is defined %}
 		{% if element.url is defined %}
