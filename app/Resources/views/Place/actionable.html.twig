@@ -2,10 +2,7 @@
 
 {% block content %}
 	<h2>{{ 'place.actionable.name'|trans({},"places") }}</h2>
-	<button id="style">{{ 'togglelist'|trans }}</button>
 	<p>{{ 'place.actionable.intro'|trans({},"places")|raw }}</p>
-
-	<h3> {{ 'place.actionable.list'|trans({},"places")|title }}</h3>
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for place in places %}
 		{% set house = place.house %}
