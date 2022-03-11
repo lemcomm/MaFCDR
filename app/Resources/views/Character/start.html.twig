@@ -25,8 +25,14 @@
 		{% for realm in realms %}
 			<hr>
 			<h3><u>{{ realm.formalName }}</u></h3>
-			<p>{{ 'character.start.nobles'|trans|raw }}: {{ realm.findActiveMembers.count }}<br />
-			{{ 'character.start.regions'|trans|raw }}: {{ realm.findTerritory.count }}<br /></p>
+			<p><i>{% if realm.superior %}
+				{{ 'character.start.realmSuperior'|trans()|raw }}: {{ link(realm.findUltimate) }}
+			{% else %}
+				{{ 'character.start.realmIsUltimate'|trans()|raw }}
+			{% endif %}</i><br>
+			{{ 'character.start.players'|trans|raw }}: {{ realm.findActivePlayers.count }}<br>
+			{{ 'character.start.nobles'|trans|raw }}: {{ realm.findActiveMembers.count }}<br>
+			{{ 'character.start.regions'|trans|raw }}: {{ realm.findTerritory.count }}<br></p>
 			<p>{{ realm.spawnDescription.text}}<br /><br />
 			<a href="{{ path('maf_spawn_realm', {"realm":realm.id}) }}">{{ 'character.start.join.realm'|trans({"%name%":realm.name})|raw }}</a></p>
 		{% endfor %}
@@ -38,8 +44,14 @@
 		{% for house in houses %}
 			<hr>
 			<h3><u>{{ house.name }}</u></h3>
-			<p>{{ 'character.start.nobles'|trans|raw }}: {{ house.findAllActive.count }}<br />
-			<p>{{ house.spawnDescription.text}}<br /><br />
+			<p><i>{% if house.superior %}
+				{{ 'character.start.houseSuperior'|trans()|raw }}: {{ link(house.findUltimate) }}
+			{% else %}
+				{{ 'character.start.houseIsUltimate'|trans()|raw }}
+			{% endif %}</i><br>
+			{{ 'character.start.players'|trans|raw }}: {{ house.findActivePlayers.count }}<br>
+			{{ 'character.start.nobles'|trans|raw }}: {{ house.findAllActive.count }}<br>
+			<p>{{ house.spawnDescription.text}}<br><br>
 			<a href="{{ path('maf_spawn_house', {"house":house.id}) }}">{{ 'character.start.join.house'|trans({"%name%":house.name})|raw }}</a></p>
 		{% endfor %}
 	{% endif %}
