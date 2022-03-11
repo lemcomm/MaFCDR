@@ -33,6 +33,7 @@ place:
  manage:
   name:      Manage Place Details
   description: Manage the details of %formalname%.
+  longdesc:  From here you can manage some of the more intricate details of your Place.
   intro:     While there's not much here right now, you can presently change the name and descriptions of your Place. In time, we plan to expand this menu greatly.
   success:   Place details updated successfully.
  permissions:
@@ -70,6 +71,7 @@ place:
  transfer:
   name:         Transfer Place
   description:  Transfer ownership of %formalname%.
+  longdesc:     Tired of ownership? Transfer it to another character.
   intro: >
     Any place of interest under your ownership can be transferred to another First One in the vicinity, all you need to do is say the word.
   to:           New Owner
@@ -94,7 +96,22 @@ place:
   create:       Formalize an Association
   none:         No associations are present here.
   list:         Associations Located Here:
-  join:         Join %name%
+  join:
+   name:         Join %name%
+   name2:        Join Association
+   description: It looks like the %assoc% is available for joining.
+ addAssoc:
+  name:   Add a new Association Location
+  description:  It looks like you have the means expand one of your associations to this Place.
+  longdesc: Associations are largely limited by their reach. And you have the means to extend that to this Place, if you so desire.
+  intro: >
+    From here you can spend a bit of your time to expand an Association you're part of to this Place of Interest. All you've to do is select which one you'd like to see expanded, and the Second Ones shall make it happen.
+ evictAssoc:
+  name:   Evict the %name%
+  description:  Tired of an association causing problems? Evict them.
+  longdesc: Associations can be quite extensive. And you're well within your abilities to remdey that problem.
+  intro: >
+    If you've found the %name% to be troublesome, it's a fairly simple matter to evict them.
 
 by:
  ambassador: As a Manager of Diplomacy...
