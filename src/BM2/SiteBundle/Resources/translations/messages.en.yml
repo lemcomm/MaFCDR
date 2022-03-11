@@ -606,14 +606,19 @@ character:
   returnsuccess:  You have successfully restarted your career in this world of roles, politics, and warfare.
   realm:      Available Realm(s) to Join
   realmintro: Sometimes called nations or countries, Realms are the governments in Might & Fealty, and are usually made up of a host of various characters all with their own agendas. This list is presented in varying orders, selected at random.
+  realmSuperior: This is a Subject Realm of
+  realmIsUltimate: This is a Sovereign Realm
   house:      Available House(s) to Join
   houseintro: Houses can be anything from a tribe to a family to a clan, and unlike Realms are generally permanent affairs. Once you're in one, it is usually very hard to leave, without joining another. That said, they're not bound by realm borders and do offer their own means to keep in touch. If a character has children with someone in the same house, their child will be in that house automatically.
+  houseSuperior: This is a Cadet House of
+  houseIsUltimate: This is an Independent House
   myhouse:    Start at your House's Home
   myhouseintro: As you already have a House, you can always join it.
   join:
    realm:     Start your career in the realm of %name%
    house:     Start your career in the house of %name%
    myhouse:   "Start in your house: %name%"
+  players:    Active Players
   nobles:     Active Characters
   regions:    Held Settlements
  spawn:
@@ -1646,6 +1651,9 @@ unavailable:
  notyourunit:   This isn't your unit to manage.
  toocrowded:    This is too close to another place or settlement.
  noassociationsallowed: This Place does not allow for the creation of Associations.
+ assocalready:  Association(s) are already present here.
+ nobuild:       You don't have permission from an Association to expand them.
+ alreadyinassoc: You are already in this Association.
 marker:
  name:      Marker name
  type:      Marker type
