@@ -23,17 +23,31 @@ class LawManager {
 	public function updateLaw($org, $type, $setting, $title, $description = null, Character $character, $allowed, $mandatory, $cascades, $sol, $flush=true) {
 		# All laws are kept eternal, new laws are made whenever a law is changed, the old is inactivated.
 
-		$oldLaw = $assoc->findLaw($type);
+		if ($org instanceof Association) {
+			$assoc = $org;
+			$realm = false;
+			$cat = 'assoc';
+		} else {
+			$assoc = false;
+			$realm = $org;
+			$cat = 'realm';
+		}
+		if ($type != 'freeform') {
+			$oldLaw = $org->findLaw($type);
+		} else {
+			$oldLaw = false;
+		}
+
 		if (!$oldLaw || ($oldLaw->getSetting() != $setting)) {
 			$law = new Law();
 			$this->em->persist($law);
-			$lawType = $this->em->getRepository(LawType::class)->findOneBy(['name'=>$type, 'category'=>'assocation']);
-			if ($type) {
+			$lawType = $this->em->getRepository(LawType::class)->findOneBy(['name'=>$type, 'category'=>$cat]);
+			if ($lawType) {
 				$law->setType($lawType);
 			} else {
-				return false; #Bad Type passed.
+				return ['error', 'badType']; #Bad Type passed.
 			}
-			if ($org instanceof Association) {
+			if ($assoc) {
 				$law->setAssociation($org);
 			} else {
 				$law->setRealm($org);
@@ -56,7 +70,7 @@ class LawManager {
 			return [$law, $changes];
 		} else {
 			# No change to the law. Inform the user they did nothing.
-			return ['no change', []];
+			return ['no change', null];
 		}
 	}
 
