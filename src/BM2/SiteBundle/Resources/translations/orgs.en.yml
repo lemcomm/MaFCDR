@@ -35,6 +35,9 @@ assoc:
   faith:
    name: Faith to Follow
    empty: (none)
+  addToPlace:
+   name: Assocation to Expand
+   empty: (select one)
 
  help:
   name: A short, and easily referred to, name for the association.
@@ -112,6 +115,13 @@ assoc:
    header: Review the List of Known Deities
    description: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p>
    empty: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps the First Ones have not yet remembered from where they originate? Someone should read the lore.</p>
+  place:
+   add:
+    name: Extend an Association to this Place
+    intro: If you're a member of an association with the right rank, you can always add your association to a place you control. Below you'll find a list you can select from that includes all associations of which you are the owner or have been granted permission to organize new locations of.
+   evict:
+    name: Evict %name%
+    intro: As the owner of %place% you can always evict any associations hosted within. For instance, judging by your presence it here, it seems you are considering evicting %assoc%. If you'd like to do so, all you need to do is check the box and confirm your orders and it'll be done.
 
  requests:
   join:
