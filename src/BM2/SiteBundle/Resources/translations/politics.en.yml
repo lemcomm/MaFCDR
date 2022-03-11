@@ -4,10 +4,11 @@
 # Contact: mafteam@lemuriacommunity.org
 status:
  self:
-  landless:			You are a landless knight.
+  faith:        You are a member of <a href="%link%">%name%</a>.
+  landless:			  You are a landless knight.
   landless2:    You are a landless noble.
-  independent:	You are an independent lord.
-  vassal:			  You are a vassal of %liege%.
+  independent:	 You are an independent lord.
+  vassal:			    You are a vassal of %liege%.
   realm:        You are a member of %realm%
   ultimate:     You are an independent leader, but have not formed a realm yet.
   liege:        Liege of:
@@ -22,6 +23,7 @@ status:
   liegeplace2:  You are a knight of the independent place of %liege%.
   liegeposition: You are a knight of the %liege% of %realm%.
  other:
+  faith:       %He% is a member of <a href=%link%>%name%</a>.
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
   independent:	%He% is an independent lord.
