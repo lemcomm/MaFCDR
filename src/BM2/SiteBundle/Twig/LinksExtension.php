@@ -135,6 +135,10 @@ class LinksExtension extends \Twig_Extension {
 				case 'conversation':
 					$type = 'Conversation';
 					break;
+				case 'l':
+				case 'law':
+					$type = 'Law';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
@@ -221,6 +225,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'conversation':	return 'maf_conv_read';
 			case 'assoc':
 			case 'association':	return 'maf_assoc';
+			case 'law':		return 'maf_law';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
@@ -288,6 +293,10 @@ class LinksExtension extends \Twig_Extension {
 			case 'NewsEdition':
 				$id = $entity->getId();
 				$name = $entity->getPaper->getName();
+				break;
+			case 'Law':
+				$id = $entity->getId();
+				$name = $entity->getTitle();
 				break;
 			default:
 				$id = $entity->getId();
