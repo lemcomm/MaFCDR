@@ -775,42 +775,6 @@ perm:
   placedescribe: >
     Allows those with this permission to edit the description of this Place.
 
-law:
- header:
-  name:     Name
-  desc:     Description
-  current:  Current law
- label:
-  succession:       Succession by heir
-  ruler_election:   Ruler election method
-  estates:          Estates inheritance
- desc:
-  succession:       Determines whether the ruler's successor can inherit the realm or not. If not, the ruler's death or resignation will always trigger an election.
-  ruler_election:   How a new ruler is elected whenever such is necessary.
-  estates:          If estates can be inherited, or who they fall to in case of death of the lord.
-# these are defined in the RealmManager
- value:
-  enabled:    Enabled
-  disabled:   Disabled
-  name:
-   banner:    by Banner
-   spears:    by Spears
-   swords:    by Swords
-   land:      by Land
-   heads:     by Heads
-   inherit:   inherit
-   liege:     liege
-   ruler:     ruler
-  desc:
-   banner:    one vote per First One
-   spears:    one vote per warrior commanded
-   swords:    one vote per vassal
-   land:      one vote per estate
-   heads:     one vote per peasant ruled
-   inherit:   inherited by successor
-   liege:     fall to the lord
-   ruler:     fall to the ruler
-
 claim:
  title:       Claims
  none:        No current claims
