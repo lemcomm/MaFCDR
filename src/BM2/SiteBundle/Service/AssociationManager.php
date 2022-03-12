@@ -80,10 +80,10 @@ class AssociationManager {
 		# Because I'll never remember this, these are, in order:
 		# Realm/Assocation , Law Name, 'Value', Law Title, Description (fluff), allowed/disallowed, mandatory/guideline, cascades to subs, statute of limitations cycles, db flush;
 		if ($public) {
-			$lawman->updateLaw($assoc, 'assocVisibility', 'true', null, null, $founder, null, true, null, null);
+			$lawman->updateLaw($assoc, 'assocVisibility', 'yes', null, null, $founder, null, true, null, null);
 			$lawman->updateLaw($assoc, 'rankVisibility', 'all', null, null, $founder, null, true, null, null);
 		} else {
-			$lawman->updateLaw($assoc, 'assocVisibility', 'false', null, null, $founder, null, true, null, null);
+			$lawman->updateLaw($assoc, 'assocVisibility', 'no', null, null, $founder, null, true, null, null);
 			$lawman->updateLaw($assoc, 'rankVisibility', 'direct', null, null, $founder, null, true, null, null);
 		}
 		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, true, null, true, true, true, false);
