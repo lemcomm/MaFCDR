@@ -11,15 +11,18 @@
 		<field name="cascades" type="boolean" nullable="true"/>
 		<field name="value" type="string" nullable="true"/>
 		<field name="enacted" type="datetime" nullable="true"/>
+		<field name="repealed_on" type="datetime" nullable="true"/>
 		<field name="invalidated_on" type="datetime" nullable="true"/>
 		<field name="sol_cycles" type="integer" nullable="true"/>
-		<many-to-one field="invalidated_by" target-entity="Law" inversed-by="invalidates"/>
-		<one-to-many field="invalidates" target-entity="Law" mapped-by="invalidated_by"/>
+		<one-to-one field="invalidated_by" target-entity="Law" inversed-by="invalidates"/>
+		<one-to-one field="invalidates" target-entity="Law" mapped-by="invalidated_by"/>
 
-		<many-to-one field="character" target-entity="Character" inversed-by="enacted_laws"/>
-		<many-to-one field="association" target-entity="Association" inversed-by="laws"/>
-		<many-to-one field="realm" target-entity="Realm" inversed-by="laws"/>
-		<many-to-one field="type" target-entity="LawType"/>
+		<many-to-one field="enacted_by" target-entity="Character" fetch="EAGER"/>
+		<many-to-one field="repealed_by" target-entity="Character" fetch="EAGER"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="type" target-entity="LawType" fetch="EAGER"/>
 
 	</entity>
 </doctrine-mapping>
