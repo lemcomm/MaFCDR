@@ -57,7 +57,7 @@ class AssocSelectType extends AbstractType {
 
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
-			'intention'       => 'realm_9012356',
+			'intention'       => 'assoc_90210',
 			'translation_domain' => $this->domain
 		));
 	}
