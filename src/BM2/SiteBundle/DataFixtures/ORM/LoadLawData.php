@@ -21,7 +21,7 @@ class LoadLawData extends AbstractFixture implements OrderedFixtureInterface {
 		'realm' => [
 			'freeform'		=> ['allow_multiple'=>true],
 			'slumberingAccess'	=> ['allow_multiple'=>false],
-			'estateInheritance'	=> ['allow_multiple'=>false],
+			'settlementInheritance'	=> ['allow_multiple'=>false],
 			'placeInheritance'	=> ['allow_multiple'=>false],
 			'slumberingClaims'	=> ['allow_multiple'=>false],
 			'subrealmAutonomy'	=> ['allow_multiple'=>false],
