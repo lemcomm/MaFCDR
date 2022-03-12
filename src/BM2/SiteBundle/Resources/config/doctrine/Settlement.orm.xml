@@ -72,5 +72,6 @@
 		<one-to-many field="vassals" target-entity="Character" mapped-by="liege_land"/>
 
 		<one-to-many field="activities" target-entity="Activity" mapped-by="settlement"/>
+		<one-to-many field="laws" target-entity="Law" mapped-by="settlements" fetch="EXTRA_LAZY"/>
 	</entity>
 </doctrine-mapping>
