@@ -152,3 +152,154 @@ deity:
   words: Some words about the deity for your faithful, within the Association only.
 # Generic one off strings.
 nobody: Nobody
+
+
+law:
+ update:    Update Law
+ repeal:    Repeal Law
+ route:
+  list:
+   name:    Laws of %name%
+   intro:   Listed here you will find the laws, and previous laws, of %name%, for you to review, or, if you have permission to, update.
+ header:
+  mandatory: Type
+  name:      Name
+  desc:      Description
+  cascades:  Cascades
+  current:   Current law
+  sol:       Statute of Limitations
+  character: Enacted By
+  enacted:   Enacted On
+  invalidated: Superseded
+ info:
+  yes:       'True'
+  no:        'False'
+  mandatory: Law
+  from:      From %org%
+  recommendation: Recommendation
+  sol:       %days% Days
+  assocVisibility:
+   label:    Association Visibility
+   desc:     Determines whether the Association is visible to those outside of it.
+   yes:
+    name:    Visible to All
+    desc:    Can be viewed by anyone
+   no:
+    name:    Known to Members
+    desc:    Cannot be viewed by outsiders
+  rankVisibility:
+   label:    Rank Visibility by Members
+   desc:     Determines whether all ranks should be known by all or whether more selective rules should be applied. Applies to not only knowing ranks, but also reading messages in the Association.
+   all:
+    name:    Known to All
+    desc:    All ranks are visible
+   direct:
+    name:    Determined by Rank
+    desc:    Rank visibility is determined based on a member's rank and how that rank is setup.
+  assocInheritance:
+   label:    Association Ownership Inheritance
+   desc:     Determines who, if anyone, and/or how ownership is passed on the owner's death or retirement.
+   character:
+    name:    Inherited by Owner's Successor
+    desc:    Will follow traditional character inheritance
+   senior:
+    name:    Inherited by Next Highest Member
+    desc:    Will pass to the next highest ranking and oldest member.
+   oldest:
+    name:    Inherited by the Longest Serving Member
+    desc:    Will pass to the member who has been in the association longest.
+  slumberingAccess:
+   label:    Realm Access to Slumbering Estates
+   desc:     Determines if local permissions of slumbering settlement lords are overriden to allow others access.
+   none:
+    name:    No Overrides
+    desc:    Permissions remain unaffected by slumbering
+   direct:
+    name:    Local Realm Only
+    desc:    All members of this realm directly shall be granted access.
+   realm:
+    name:    Any Realm Members
+    desc:    All members of the realm, including subordinates, shall be granted access.
+   any:
+    name:    All First Ones
+    desc:    Anyone shall be granted access. (Dangerous)
+  settlementInheritance:
+   label:    Settlement Inheritance
+   desc:     Determines inheritance of settlemenets within the realm.
+   none:
+    name:    Not Inherited
+    desc:    Lord position will be vacant (Dangerous)
+   characterInternal:
+    name:    Internal Successor Inheritance
+    desc:    Inherited by sucessor if they are within the realm.
+   characterAny:
+    name:    Successor Inheritance
+    desc:    Inherited by succesor, regardless of realm affiliation.
+   ruler:
+    name:    Ruler Inherits
+    desc:    Realm Ruler shall inherit settlements. If no ruler, defaults to successor if in realm.
+   liege:
+    name:    Liege Inherits
+    desc:    Liege, if any, shall inherit the settlement. If no liege, then the ruler. If no ruler, defaults to successor if in realm.
+   steward:
+    name:    Steward Inherits
+    desc:    The Steward of a settlement shall inherit it. If none, defaults to successor if in realm.
+  placeInheritance:
+   label:    Place Inheritance
+   desc:     Determines inheritance of places within the realm.
+   none:
+    name:    Not Inherited
+    desc:    Lord position will be vacant (Dangerous)
+   characterInternal:
+    name:    Internal Successor Inheritance
+    desc:    Inherited by sucessor if they are within the realm.
+   characterAny:
+    name:    Successor Inheritance
+    desc:    Inherited by succesor, regardless of realm affiliation.
+   ruler:
+    name:    Ruler Inherits
+    desc:    Realm Ruler shall inherit settlements. If no ruler, defaults to successor if in realm.
+   liege:
+    name:    Liege Inherits
+    desc:    Liege, if any, shall inherit the settlement. If no liege, then the ruler. If no ruler, defaults to successor if in realm.
+   lord:
+    name:    Settlement Lord Inherits
+    desc:    The Lord of a settlement shall inherit it. If none, defaults to successor if in realm.
+  slumberingClaims:
+   label:    Grant Claims Against Slumbering Settlements
+   desc:     Determines whether a claim is granted during the takeover of a settlement within the realm.
+   all:
+    name:    All First Ones
+    desc:    All First Ones, from within the realm or not, shall be granted an automatic claim to slumbered settlements.
+   internal:
+    name:    Realm First Ones
+    desc:    Any first ones of the realm (including subordinate realms) shall be granted a claim.
+   direct:
+    name:    This Realm's First Ones
+    desc:    First ones directly associated to this realm shall be granted a claim.
+   none:
+    name:    No Claims Granted
+    desc:    No automatic claims shall be granted.
+  subrealmAutonomy:
+   label:    Subordinate Realm Autonomy
+   desc:     Determines if subordinate realms are fully autonomous, but subordinate, entities, or if they are truly subordinate entities. (Not Implmented)
+  subrealmReclassing:
+   label:    Subordinate Realms Able to Change Type
+   desc:     Determines whether subordinate realms are allowed to change their own type so long as they do not conflict with their superior realm. (Not Implemented)
+  subrealmSubcreate:
+   label:    Subordinate Realm Creation
+   desc:     Determines whether subordinate realms are permitted to make thier own subordinate realms (within type limitations). (Not Implemented)
+  taxes:     Payable to %settlement%
+  taxes2:    Payable to the Government
+  taxesFood:
+   label:    Realm Tax on Food
+   desc:     Declares the amount of food to be taxed by the realm.
+  taxesWood:
+   label:    Realm Tax on Wood
+   desc:     Declares the amount of wood to be taxed by the realm.
+  taxesMetal:
+   label:    Realm Tax on Metal
+   desc:     Declares the amount of metal to be taxed by the realm.
+  taxesWealth:
+   label:    Realm Tax on Wealth
+   desc:     Declares the amount of wealth to be taxed by the realm.
