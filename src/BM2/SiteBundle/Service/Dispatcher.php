@@ -2922,7 +2922,7 @@ class Dispatcher {
 		$character = $this->getCharacter();
 		$settlement = $unit->getSettlement();
 		if (!$character->getUnits()->contains($unit)) {
-			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') || $unit->getMarshal() != $character)) {
+			if($settlement && (!$this->permission_manager->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character)) {
 				if($unit->getSettlement() != $character->getInsideSettlement()) {
 					return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
 				}
@@ -3074,6 +3074,34 @@ class Dispatcher {
 			return array("name"=>"realm.laws.name", "description"=>"unavailable.notmember");
 		} else {
 			return $this->action("realm.laws", "maf_realm_laws", true,
+				array('realm'=>$realm->getId()),
+				array("%name%"=>$realm->getName(), "%formalname%"=>$realm->getFormalName())
+			);
+		}
+	}
+
+	public function hierarchyRealmLawNewTest($ignored, Realm $realm) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"realm.law.new.name", "description"=>"unavailable.$check");
+		}
+		if (!$this->getCharacter()->findRealms()->contains($realm)) {
+			return array("name"=>"realm.law.new.name", "description"=>"unavailable.notmember");
+		}
+		$legislative = false;
+		foreach ($realm->getPositions() as $pos) {
+			if ($pos->getRuler()) {
+				$legislative = true;
+				break;
+			}
+			if ($pos->getLegislative()) {
+				$legislative = true;
+				break;
+			}
+		}
+		if (!$legislative) {
+			return array("name"=>"realm.law.new.name", "description"=>"unavailable.notlegislative");
+		} else {
+			return $this->action("realm.law.new", "maf_realm_laws_new", true,
 				array('realm'=>$realm->getId()),
 				array("%name%"=>$realm->getName(), "%formalname%"=>$realm->getFormalName())
 			);
