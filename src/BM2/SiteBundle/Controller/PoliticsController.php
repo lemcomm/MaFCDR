@@ -211,7 +211,7 @@ class PoliticsController extends Controller {
 			}
 			if ($otherchar->getPositions()) {
 				foreach ($otherchar->getPositions() as $pos) {
-					if ($pos->getVassals() && !in_array($pos, $options)) {
+					if (($pos->getRuler() || $pos->getHaveVassals()) && !in_array($pos, $options)) {
 						$options[] = $pos;
 					}
 				}
