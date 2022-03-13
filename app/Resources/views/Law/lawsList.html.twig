@@ -3,6 +3,9 @@
 {% block content %}
 <h2>{{ 'law.route.list.name'|trans({"%name%":org.name},"orgs")|title }}</h2>
 <p>{{ 'law.route.list.intro'|trans({"%name%":org.name},"orgs")|raw}}</p>
+{% if change %}
+	<p><a href="{{ path(new, {(orgType):org.id})}}">{{ ('law.new')|trans({},"orgs") }}</a>
+{% endif %}
 
 <table class="laws">
 	<thead>
@@ -74,7 +77,7 @@
 					{% elseif law.invalidates is not null %}
 						{{ ('law.info.'~law.invalidates.type.name~'.label')|trans({},"orgs") }}<br>
 						<small>{{ law.invalidates.enacted|date }}</small>
-					{% else %}
+					{% elseif law.org is same as(org) %}
 						<a href="{{ path(update, {(orgType):law.org.id, 'type':law.type.id, 'law':law.id})}}">{{ ('law.update')|trans({},"orgs") }}</a> | <a href="{{ path('maf_law_repeal', {'law':law.id})}}">{{ ('law.repeal')|trans({},"orgs") }}</a>
 					{% endif %}
 				</td>
