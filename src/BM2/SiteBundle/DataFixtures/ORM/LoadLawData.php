@@ -49,9 +49,11 @@ class LoadLawData extends AbstractFixture implements OrderedFixtureInterface {
 			foreach ($members as $name=>$data) {
 				$law = $manager->getRepository('BM2SiteBundle:LawType')->findOneBy(array('name'=>$name, 'category'=>$class));
 				if (!$law) {
-					$law = new Permission();
+					$law = new LawType();
 					$manager->persist($law);
 				}
+				$law->setName($name);
+				$law->setCategory($class);
 				$law->setAllowMultiple($data['allow_multiple']);
 			}
 		}
