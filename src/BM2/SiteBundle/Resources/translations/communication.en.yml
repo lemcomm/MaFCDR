@@ -126,6 +126,7 @@ event:
   knownas2:     No longer known as "%oldname%".
   death:        Died.
   death2:       Died in battle.
+  lightningbolt: Killed by a Lightning Bolt from the Heavens.
   retired:      Has retired from war and politics.
   liegeretired: No longer has a liege after the retirement of %character%.
   npcdeath:     Without troops, disappeared and died.
@@ -444,6 +445,11 @@ politics:
   new2:       %character-1% has visited you and sworn an oath of fealty, breaking his old oath to %character-3% and becoming your vassal.
   mynew:      Has sworn an oath of fealty to %character-2%.
   mynew2:     Has broken the oath of fealty to %character-3% and sworn an oath to %character-2% instead.
+  lost:       Has become a knight of %realm% after the taking of %settlement%.
+  lost2:       Has become a knight of %realm% after the taking of %place%.
+  lost3:       Is no longer a knight of anywhere after the taking of %settlement%.
+  lost4:       Is no longer a knight of anywhere after the taking of %place%.
+  notcurrent: With the change in lordship of %settlement%, your oath to it is no longer considered current.
  successor:
   set:        Has set %character% as their successor.
   changed:    Has declared a new successor, instead of %character-1% it will now be %character-2%.
