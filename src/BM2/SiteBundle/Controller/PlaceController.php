@@ -470,6 +470,15 @@ class PlaceController extends Controller {
 					array('%link-settlement%'=>$settlement->getId()),
 					History::MEDIUM, true, 20
 				);
+				foreach ($place->getVassals() as $vassal) {
+					$vassal->setOathCurrent(false);
+					$this->history->logEvent(
+						$vassal,
+						'politics.oath.notcurrent2',
+						array('%link-place%'=>$place->getId()),
+						History::HIGH, true
+					);
+				}
 				$this->addFlash('notice', $this->get('translator')->trans('control.placetransfer.success', ["%name%"=>$data['target']->getName()], 'actions'));
 				$this->getDoctrine()->getManager()->flush();
 				return $this->redirectToRoute('maf_place_actionable');
