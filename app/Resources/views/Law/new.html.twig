@@ -1,0 +1,9 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'law.route.new.header'|trans({},"orgs")|title }}</h2>
+<p>{{ 'law.route.new.intro'|trans({'%name%':org.name},"orgs")|raw }}</p>
+
+<p>{{ form(form) }}</p>
+
+{% endblock %}
