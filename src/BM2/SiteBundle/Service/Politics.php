@@ -219,6 +219,28 @@ class Politics {
 				if ($oldowner && $oldowner->isAlive() && !$oldowner->getSlumbering()) {
 					$this->addClaim($oldowner, $settlement, true, false);
 				}
+				foreach ($settlement->getVassals() as $vassal) {
+					$vassal->setLiegeLand(null);
+					$vassal->setOathCurrent(false);
+					$vassal->setOathTime(null);
+					$realm = $settlement->getRealm();
+					$vassal->setRealm($settlement->getRealm());
+					if ($realm) {
+						$this->history->logEvent(
+							$vassal,
+							'politics.oath.lost',
+							array('%link-realm%'=>$realm->getId(), '%link-settlement%'=>$settlement->getId()),
+							History::HIGH, true
+						);
+					} else {
+						$this->history->logEvent(
+							$vassal,
+							'politics.oath.lost3',
+							array('%link-settlement%'=>$settlement->getId()),
+							History::HIGH, true
+						);
+					}
+				}
 				break;
 			case 'grant':
 				$this->history->logEvent(
@@ -249,6 +271,15 @@ class Politics {
 				}
 				if ($settlement->getSteward() == $character) {
 					$settlement->setSteward(null);
+				}
+				foreach ($settlement->getVassals() as $vassal) {
+					$vassal->setOathCurrent(false);
+					$this->history->logEvent(
+						$vassal,
+						'politics.oath.notcurrent',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
 				}
 				break;
 			case 'grant_fief':
@@ -287,6 +318,15 @@ class Politics {
 				// the real question is: how do we get how long he ruled?
 				if ($oldowner && $oldowner->isAlive() && !$oldowner->getSlumbering()) {
 					$this->addClaim($oldowner, $settlement, true, true);
+				}
+				foreach ($settlement->getVassals() as $vassal) {
+					$vassal->setOathCurrent(false);
+					$this->history->logEvent(
+						$vassal,
+						'politics.oath.notcurrent',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
 				}
 				break;
 		}
