@@ -249,7 +249,7 @@ class WarManager {
 						array('%link-character%'=>$character->getId()),
 						History::MEDIUM, false, 60
 					);
-					$type = 'sortie';
+					$type = 'skirmish';
 				}
 			} else {
 				# You've somehow broke the laws of space, and appear to exist in neither inside nor outside. Congrats.
@@ -306,6 +306,7 @@ class WarManager {
 		// setup actions and lock travel
 		switch ($type) {
 			case 'siegeassault':
+			case 'assault':
 				$acttype = 'siege.assault';
 				break;
 			case 'siegesortie':
@@ -723,7 +724,7 @@ class WarManager {
 		} else {
 			$target = $siege->getPlace();
 		}
-		if ($attacker == $victor && $assault) {
+		if ($attacker === $victor && $assault) {
 			if ($current < $max && !$bypass) {
 				# Siege moves forward
 				$siege->setStage($current+1);
@@ -777,7 +778,7 @@ class WarManager {
 				}
 
 			}
-		} else if ($attacker != $victor && $sortie) {
+		} else if ($attacker !== $victor && $sortie) {
 			if ($current > 1 && !$bypass) {
 				# Siege moves backwards.
 				$siege->setStage($current-1);
