@@ -73,6 +73,16 @@ class RealmPositionType extends AbstractType {
 				'required' => false,
 				'attr' => array('title'=>'position.help.retired'),
 			));
+			$builder->add('legislative', 'checkbox', array(
+				'label'=>'position.legislative',
+				'required' => false,
+				'attr' => array('title'=>'position.help.legislative'),
+			));
+			$builder->add('have_vassals', 'checkbox', array(
+				'label'=>'position.haveVassals',
+				'required' => false,
+				'attr' => array('title'=>'position.help.haveVassals'),
+			));
 		}
 		$builder->add('minholders', 'integer', array(
 			'label'=>'position.minholders',
