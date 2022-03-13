@@ -112,7 +112,7 @@ class Association {
 
 	public function isPublic() {
 		$law = $this->findLaw('assocVisibility');
-		if ($law->getValue() === 'true') {
+		if ($law->getValue() === 'yes') {
 			return true;
 		} else {
 			return false;
