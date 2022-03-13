@@ -447,7 +447,8 @@ position:
  remove:        Remove Position
  keeponslumber: Position kept on slumber?
  retired:       Position is retired?
- welcomer:      Position is a Welcomer?
+ legislative:   Position can change laws?
+ haveVassals:   Position can have vassals?
  year:          Next election year?
  week:          Next election week?
  minholders:    Minimum number of holders?
