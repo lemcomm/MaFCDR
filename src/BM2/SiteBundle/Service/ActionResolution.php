@@ -222,7 +222,7 @@ class ActionResolution {
 			}
 		}
 		if ($victims) {
-			$this->createBattle($action->getCharacter(), null, $victims);
+			$this->warman->createBattle($action->getCharacter(), null, null, $victims);
 			$this->em->remove($action);
 		}
 	}
@@ -485,7 +485,6 @@ class ActionResolution {
 		$chance *= 1/$biome->getSpot();
 
 		// avoid the abusive "catch with small army to engage, while large army moves in for the kill" abuse for extreme scenarios
-		$enemies = $action->getTargetBattlegroup()->getEnemy()->getActiveSoldiers()->count();
 		$eGrps = $action->getTargetBattlegroup()->getEnemies();
 		$enemies = 0;
 		$eChars = new ArrayCollection();
