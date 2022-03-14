@@ -11,6 +11,7 @@ use BM2\SiteBundle\Form\SoldierFoodType;
 use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -693,7 +694,7 @@ class GameRequestController extends Controller {
 			}
 		}
 		if ($liege = $character->findLiege()) {
-			if ($liege instanceof ArrayCollection) {
+			if ($liege instanceof Collection) {
 				$lieges = $liege;
 				foreach ($lieges as $liege) {
 					foreach ($liege->getOwnedSettlements() as $settlement) {
