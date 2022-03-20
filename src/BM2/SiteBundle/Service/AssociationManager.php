@@ -88,7 +88,7 @@ class AssociationManager {
 			$this->lawman->updateLaw($assoc, $vis, 'assocVisibility.no', null, null, $founder, null, true, null, null);
 			$this->lawman->updateLaw($assoc, $ranks, 'rankVisibility.direct', null, null, $founder, null, true, null, null);
 		}
-		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, true, null, true, true, true, false);
+		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, true, null, true, true, true, true, false);
 		$this->newLocation($assoc, $place, true, false);
 		$this->descman->newDescription($assoc, $full_desc, $founder, TRUE); #Descman includes a flush for the EM.
 		$this->updateMember($assoc, $rank, $founder, true);
@@ -132,11 +132,11 @@ class AssociationManager {
 		return $assoc;
 	}
 
-	public function newRank($assoc, AssociationRank $myRank = null, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $owner = false, $flush=true) {
+	public function newRank($assoc, AssociationRank $myRank = null, $name, $viewAll, $viewUp, $viewDown, $viewSelf, AssociationRank $superior=null, $createSubs, $manager, $createAssocs, $owner = false, $flush=true) {
 		$rank = new AssociationRank;
 		$this->em->persist($rank);
 		$rank->setAssociation($assoc);
-		$this->updateRank($myRank, $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, $superior, $createSubs, $manager, $owner, $flush);
+		$this->updateRank($myRank, $rank, $name, $viewAll, $viewUp, $viewDown, $viewSelf, $superior, $createSubs, $manager, $createAssocs, $owner, $flush);
 		if ($flush) {
 			$this->em->flush();
 		}
