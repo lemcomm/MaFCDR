@@ -6,11 +6,11 @@
 		</id>
 		<field name="title" type="text" nullable="true"/>
 		<field name="description" type="text" nullable="true"/>
-		<field name="allow" type="boolean" nullable="true"/>
 		<field name="mandatory" type="boolean" nullable="true"/>
 		<field name="cascades" type="boolean" nullable="true"/>
 		<field name="value" type="string" nullable="true"/>
 		<field name="enacted" type="datetime" nullable="true"/>
+		<field name="cycle" type="integer" nullable="true"/>
 		<field name="repealed_on" type="datetime" nullable="true"/>
 		<field name="invalidated_on" type="datetime" nullable="true"/>
 		<field name="sol_cycles" type="integer" nullable="true"/>
