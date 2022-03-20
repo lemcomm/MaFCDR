@@ -308,7 +308,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $result) {
 			$data = array(
 				'realm' =>		$result->getRealm(),
-				'settlements' =>	$result->getSettlements(),
+				'settlements' =>	$result->getEstates(), #TODO: Change this to getSettlements.
 				'population'=>	$result->getPopulation(),
 				'soldiers'=>	$result->getSoldiers(),
 				'militia'=>		$result->getMilitia(),
@@ -404,7 +404,7 @@ class GameController extends Controller {
 			$data[$type]["data"]+=$row['number'];
 		}
 
-		return $this->render('Game/troopstatistics.html.twig', [
+		return $this->render('Game/troopsstatistics.html.twig', [
 			'data'=>$data
 		]);
 	}
