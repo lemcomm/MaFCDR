@@ -62,9 +62,10 @@ class LawManager {
 
 	public $taxLaws = ['taxesFood', 'taxesWood', 'taxesMetal', 'taxesWealth'];
 
-	public function __construct(EntityManager $em, AppState $appstate) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history) {
 		$this->em = $em;
 		$this->appstate = $appstate;
+		$this->history = $history;
 	}
 
 	public function updateLaw($org, LawType $type, $setting, $title, $desc = null, Character $character, $mandatory, $cascades, $sol, Settlement $settlement = null, Law $oldLaw=null, $flush=true) {
@@ -109,6 +110,7 @@ class LawManager {
 					$law->setDescription($desc);
 				} else {
 					$law->setValue($setting);
+					$title = $law->getType()->getName();
 				}
 				$law->setEnacted(new \DateTime("now"));
 				$law->setCycle($this->appstate->getCycle());
@@ -119,6 +121,13 @@ class LawManager {
 				if ($oldLaw) {
 					$this->lawSequenceUpdater($oldLaw, $law, $tName);
 				}
+
+				$this->history->logEvent(
+					$org,
+					'event.'.$cat.'.lawchanged',
+					array('%link-character%'=>$character->getId(), '%title%'=>$title),
+					History::HIGH, true
+				);
 				if ($flush) {
 					$this->em->flush();
 				}
