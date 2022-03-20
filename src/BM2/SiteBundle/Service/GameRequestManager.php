@@ -110,7 +110,7 @@ class GameRequestManager {
 		foreach ($char->getOwnedSettlements() as $settlement) {
 			$settlementIDs[] = $settlement->getId();
 		}
-		if (!empty($settlements)) {
+		if (!empty($settlementIDs)) {
 			$innerString .= ' OR r.to_settlement IN (:settlements)';
 			$params['settlements'] = $settlementIDs;
 		}
