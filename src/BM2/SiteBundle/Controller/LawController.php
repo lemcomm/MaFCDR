@@ -28,11 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LawController extends Controller {
 
 	private function gateway($test, $secondary = null) {
-		$char = $this->get('dispatcher')->gateway($test, false, true, false, $secondary);
-		if (!($char instanceof Character)) {
-			return $this->redirectToRoute($char);
-		}
-		return $char;
+		return $this->get('dispatcher')->gateway($test, false, true, false, $secondary);
 	}
 
 	/**
@@ -42,10 +38,17 @@ class LawController extends Controller {
 	  * @Route("/a{assoc}/", requirements={"assoc"="\d+"})
 	  */
 	public function lawsAction(Realm $realm=null, Association $assoc=null) {
+		if (!$realm && !$assoc) {
+			$this->addFlash('error', $this->get('translator')->trans('law.route.lawsList.noorg', [], 'orgs'));
+			return $this->redirectToRoute('bm2_actions');
+		}
 		if ($realm) {
 			$char = $this->gateway('hierarchyRealmLawsTest', $realm);
 		} else {
 			$char = $this->gateway('assocLawsTest', $assoc);
+		}
+		if (!($char instanceof Character)) {
+			return $this->redirectToRoute($char);
 		}
 		$change = false;
 		if ($realm) {
@@ -96,6 +99,9 @@ class LawController extends Controller {
 		} else {
 			$char = $this->gateway('assocLawNewTest', $assoc);
 		}
+		if (!($char instanceof Character)) {
+			return $this->redirectToRoute($char);
+		}
 		if ($realm) {
 			$org = $realm;
 			$type = 'realm';
@@ -127,6 +133,9 @@ class LawController extends Controller {
 	  */
 	public function repealAction(Law $law, Request $request) {
 		$char = $this->gateway('lawRepealTest', $law);
+		if (!($char instanceof Character)) {
+			return $this->redirectToRoute($char);
+		}
 
 		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
@@ -163,6 +172,10 @@ class LawController extends Controller {
 		} else {
 			$char = $this->gateway('assocLawNewTest', $assoc);
 		}
+		if (!($char instanceof Character)) {
+			return $this->redirectToRoute($char);
+		}
+
 		if ($law && $type !== $law->getType()) {
 			$this->addFlash('error', $this->get('translator')->trans('unavailable.badlawtype'));
 			if ($realm) {
