@@ -120,14 +120,21 @@ class LawManager {
 				}
 				if ($oldLaw) {
 					$this->lawSequenceUpdater($oldLaw, $law, $tName);
+					$this->history->logEvent(
+						$org,
+						'event.law.changed',
+						array('%title%'=>$title),
+						History::HIGH, true
+					);
+				} else {
+					$this->history->logEvent(
+						$org,
+						'event.law.new',
+						array('%title%'=>$title),
+						History::HIGH, true
+					);
 				}
 
-				$this->history->logEvent(
-					$org,
-					'event.'.$cat.'.lawchanged',
-					array('%link-character%'=>$character->getId(), '%title%'=>$title),
-					History::HIGH, true
-				);
 				if ($flush) {
 					$this->em->flush();
 				}
@@ -153,6 +160,13 @@ class LawManager {
 	public function repealLaw(Law $law, Character $char) {
 		$law->setRepealedBy($char);
 		$law->setRepealedOn(new \DateTime("now"));
+		$this->history->logEvent(
+			$org,
+			'event.law.repeal',
+			array('%title%'=>$title),
+			History::HIGH, true
+		);
+		$this->em->flush();
 	}
 
 	public function findTaxLaws(Realm $org) {
