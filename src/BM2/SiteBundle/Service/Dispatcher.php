@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\House;
+use BM2\SiteBundle\Entity\Law;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
@@ -1632,12 +1633,12 @@ class Dispatcher {
 				$inSiege = TRUE;
 				if ($group->isAttacker()) {
 					$isAttacker = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive()) {
 						$attLeader = TRUE;
 					}
 				} else {
 					$isDefender = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive()) {
 						$defLeader = TRUE;
 					}
 				}
@@ -1646,9 +1647,12 @@ class Dispatcher {
 				}
 			}
 		}
-		if (!$isLeader) {
-			# Isn't leader.
+		if ($isLeader) {
+			# Is already leader.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
+		}
+		if (($isDefender && $defLeader) || ($isAttacker && $attLeader)) {
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.alreadylead");
 		}
 		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
@@ -3108,6 +3112,15 @@ class Dispatcher {
 		}
 	}
 
+	public function lawRepealTest($ignored, Law $law) {
+		if ($law->getOrg() instanceof Realm) {
+			$return = $this->hierarchyRealmLawNewTest(null, $law->getRealm());
+		} else {
+			$return = $this->assocLawNewTest(null, $law->getAssociation());
+		}
+		return $this->varCheck($return, 'law.repeal.name', 'maf_law_repeal', 'law.repeal.description', 'law.repeal.longdesc', ['law'=>$law->getId()]);
+	}
+
 	public function hierarchyRealmSpawnsTest() {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"realm.spawns.name", "description"=>"unavailable.$check");
@@ -4205,7 +4218,7 @@ class Dispatcher {
 		if ($name) {
 			$data['name'] = $name;
 		}
-		if ($url) {
+		if ($url && $data['url']) {
 			$data['url'] = $url;
 		}
 		if ($desc) {
