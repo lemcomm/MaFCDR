@@ -293,9 +293,6 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getOwnedSettlements()) {
-					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
-				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("    Character set as known dead.");
 			} else {
@@ -354,79 +351,12 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getOwnedSettlements()) {
-					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
-				}
 				if ($character->getHeadOfHouse()) {
-					$house = $character->getHeadOfHouse();
-					$inheritor = false;
-					$difhouse = false;
 					$this->logger->info("  Detectd character is head of house ID #".$house->getId());
-					#TODO: Make this it's own method on CharMan, and call it from there, merging it with the two similar instances theres, with switch on event firing for different circumstances.
-					if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
-						$inheritor = true;
-						$successor = $character->getHeadOfHouse->getSuccessor();
-					} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
-						$inheritor = true;
-						$successor = $character->getSuccessor();
-						if ($successor->getHouse() != $character->getHouse()) {
-							$difhouse = true;
-						}
-					}
-					if ($inheritor) {
-						$house->setHead($successor);
-						$house->setSuccessor(null);
-						if (!$difhouse) {
-							$this->history->logEvent(
-								$house,
-								'event.house.inherited.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-						} else {
-							$this->history->logEvent(
-								$house,
-								'event.house.merged.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-							$this->history->logEvent(
-								$successor->getHouse(),
-								'event.house.merged.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-							$house->setSuperior($successor->getHouse());
-							$successor->setHouse($house);
-						}
-					} else {
-						$best = null;
-						foreach ($house->findAllActive() as $member) {
-							if ($best === null) {
-								$best = $member;
-							}
-							if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
-								$best = $member;
-							}
-						}
-						$house->setHead($best);
-						$house->setSuccessor(null);
-						if ($best !== null) {
-							$this->history->logEvent(
-								$house,
-								'event.house.newhead.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-								History::ULTRA, true
-							);
-						} else {
-							$this->history->logEvent(
-								$house,
-								'event.house.collapsed.slumber',
-								array(),
-								History::ULTRA, true
-							);
-						}
-					}
+					$this->cm->houseInheritance($character, 'slumber');
+				}
+				foreach ($character->getAssociationMemberships() as $mbrshp) {
+					$this->cm->assocInheritance($mbrshp);
 				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("  Character set as known slumber.");
