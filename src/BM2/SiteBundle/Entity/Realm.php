@@ -2,34 +2,16 @@
 
 namespace BM2\SiteBundle\Entity;
 
+use BM2\SiteBundle\Entity\Faction;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
+class Realm extends Faction {
 
-class Realm {
-
-	protected $ultimate=false;
 	protected $all_characters=false;
 	protected $all_active_characters=false;
 	protected $rulers=false;
 
-
-	public function findUltimate() {
-		if ($this->ultimate!==false) return $this->ultimate;
-		if (!$superior=$this->getSuperior()) {
-			$this->ultimate=$this;
-		} else {
-			while ($superior->getSuperior()) {
-				$superior=$superior->getSuperior();
-			}
-			$this->ultimate=$superior;
-		}
-		return $this->ultimate;
-	}
-
-	public function isUltimate() {
-		if ($this->findUltimate() == $this) return true;
-		return false;
-	}
 
 	public function findTerritory($with_subs=true, $all_subs=true) {
 		if (!$with_subs) return $this->getSettlements();
@@ -178,16 +160,6 @@ class Realm {
 		return $this->all_active_characters;
 	}
 
-	public function findActivePlayers() {
-		$users = new ArrayCollection();
-		foreach ($this->findActiveMembers() as $each) {
-			if (!$users->contains($each->getUser())) {
-				$users->add($each->getUser());
-			}
-		}
-		return $users;
-	}
-
 	private function addRealmMember(Character $char) {
 		if (!$this->all_characters->contains($char)) {
 			$this->all_characters->add($char);
@@ -210,70 +182,6 @@ class Realm {
 		}
 	}
 
-	public function findAllInferiors($include_myself = false) {
-		$all = new ArrayCollection;
-		if ($include_myself) {
-			$all->add($this);
-		}
-
-		foreach ($this->getInferiors() as $subrealm) {
-			$all->add($subrealm);
-			$suball = $subrealm->findAllInferiors();
-			foreach ($suball as $sub) {
-				if (!$all->contains($sub)) {
-					$all->add($sub);
-				}
-			}
-		}
-
-		return $all;
-	}
-
-	public function findDeadInferiors() {
-		$all = new ArrayCollection;
-		foreach ($this->getInferiors() as $subrealm) {
-			if (!$subrealm->getActive()) {
-			$all->add($subrealm);
-			}
-		}
-
-		return $all;
-	}
-
-	public function findAllSuperiors($include_myself = false) {
-		$all = new ArrayCollection;
-		if ($include_myself) {
-			$all->add($this);
-		}
-
-		if ($superior = $this->getSuperior()) {
-			$all->add($superior);
-			$supall = $superior->findAllSuperiors();
-			foreach ($supall as $sup) {
-				if (!$all->contains($sup)) {
-					$all->add($sup);
-				}
-			}
-		}
-
-		return $all;
-
-	}
-
-	public function findHierarchy($include_myself = false) {
-		$all = new ArrayCollection;
-		if ($include_myself) {
-			$all->add($this);
-		}
-		foreach ($this->findAllSuperiors() as $realm) {
-			$all->add($realm);
-		}
-		foreach ($this->findAllInferiors() as $realm) {
-			$all->add($realm);
-		}
-		return $all;
-	}
-
 	public function findFriendlyRelations() {
 		$all = new ArrayCollection();
 		foreach ($this->getMyRelations() as $rel) {
@@ -293,6 +201,5 @@ class Realm {
 		}
 		return $all;
 	}
-	
 	
 }
