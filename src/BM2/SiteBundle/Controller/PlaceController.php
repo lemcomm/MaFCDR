@@ -12,6 +12,7 @@ use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
@@ -239,13 +240,14 @@ class PlaceController extends Controller {
 		# Build the list of requirements we have.
 		$rights[] = NULL;
 		$notTooClose = false;
+		$canPlace = false;
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
-			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside');
 			$notTooClose = true;
 		} elseif ($region = $this->get('geography')->findMyRegion($character)) {
 			$settlement = $region->getSettlement();
-			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_outside');
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeoutside');
 			$notTooClose = $this->get('geography')->checkPlacePlacement($character); #Too close? Returns false. Too close is under 500 meteres to nearest place or settlement.
 		}
 
