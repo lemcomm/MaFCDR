@@ -415,6 +415,25 @@ class ConversationController extends Controller {
 		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
 
 		if ($conv->findType() == 'org') {
+			if ($assoc = $conv->getAssociation()) {
+				if ($law = $assoc->findLaw('rankVisibility')) {
+					if ($law->getValue() == 'all') {
+						$known = null;
+						$privacy = false;
+					} else {
+						$privacy = true;
+						$rank = $assoc->findMember($char)->getRank();
+						if ($rank) {
+							$known = $rank->findALlKnownCharacters();
+						} else {
+							$known = new ArrayCollection;
+						}
+					}
+				}
+			} else {
+				$known = null;
+				$privacy = false;
+			}
 			return $this->render('Conversation/layout_wrapper.html.twig', [
 				'type' => 'org',
 				'conversation' => $conv,
@@ -422,6 +441,8 @@ class ConversationController extends Controller {
 				'veryold' => $veryold,
 				'last' => $last,
 				'active'=> $lastPerm->getActive(),
+				'privacy' => $privacy,
+				'known' => $known,
 				'archive'=> false
 			]);
 		} else {
@@ -527,6 +548,25 @@ class ConversationController extends Controller {
 				'archive'=> true
 			]);
 		} elseif ($org) {
+			if ($assoc = $conv->getAssociation()) {
+				if ($law = $assoc->findLaw('rankVisibility')) {
+					if ($law->getValue() == 'all') {
+						$known = null;
+						$privacy = false;
+					} else {
+						$privacy = true;
+						$rank = $assoc->findMember($char)->getRank();
+						if ($rank) {
+							$known = $rank->findALlKnownCharacters();
+						} else {
+							$known = new ArrayCollection;
+						}
+					}
+				}
+			} else {
+				$known = null;
+				$privacy = false;
+			}
 			return $this->render('Conversation/archive.html.twig', [
 				'type' => 'org',
 				'conversation' => $conv,
@@ -534,6 +574,8 @@ class ConversationController extends Controller {
 				'veryold' => $veryold,
 				'last' => NULL,
 				'active'=> $lastPerm->getActive(),
+				'privacy' => $privacy,
+				'known' => $known,
 				'archive'=> true
 			]);
 		} else {
