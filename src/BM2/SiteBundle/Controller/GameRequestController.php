@@ -38,10 +38,10 @@ class GameRequestController extends Controller {
 		$result;
 		switch ($id->getType()) {
 			case 'soldier.food':
-				if ($id->getToSettlement()->getOwner() != $char || $id->getToSettlement()->getSteward() != $char) {
-					$result = false;
-				} else {
+				if ($id->getToSettlement()->getOwner() === $char || $id->getToSettlement()->getSteward() === $char) {
 					$result = true;
+				} else {
+					$result = false;
 				}
 				break;
 			case 'assoc.join':
