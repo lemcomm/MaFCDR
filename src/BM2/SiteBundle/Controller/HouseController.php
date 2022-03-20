@@ -81,10 +81,12 @@ class HouseController extends Controller {
 			}
 			$settlement = $character->getInsideSettlement();
 			$place = $character->getInsidePlace();
-			if ($settlement = $character->getInsideSettlement()) {
-				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $place, $settlement, $crest, $character);
-			}
+			$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $place, $settlement, $crest, $character);
 			# No flush needed, HouseMan flushes.
+			$topic = $house->getName().' Announcements';
+			$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $house, 'announcements');
+			$topic = $house->getName().' General Discussion';
+			$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $house, 'general');
 			$this->addFlash('notice', $this->get('translator')->trans('house.updated.created', array(), 'messages'));
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
