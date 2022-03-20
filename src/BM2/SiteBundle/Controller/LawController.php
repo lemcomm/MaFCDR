@@ -5,11 +5,12 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Law;
+use BM2\SiteBundle\Entity\LawType;
 use BM2\SiteBundle\Entity\Realm;
 
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\LawTypeSelectType;
-use BM2\SiteBundle\Form\LawCreateType;
+use BM2\SiteBundle\Form\LawEditType;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
@@ -46,39 +47,48 @@ class LawController extends Controller {
 		} else {
 			$char = $this->gateway('assocLawsTest', $assoc);
 		}
+		$change = false;
 		if ($realm) {
 			$org = $realm;
 			$update = 'maf_realm_laws_update';
+			$new = 'maf_realm_laws_new';
 			$type = 'realm';
+			foreach ($realm->getPositions() as $pos) {
+				if ($pos->getRuler()) {
+					$change = true;
+					break;
+				} elseif ($pos->getLegislative()) {
+					$change = true;
+					break;
+				}
+			}
 		} else {
 			$org = $assoc;
+			$mbr = $assoc->findMember($char);
+			if ($rank = $mbr->getRank()) {
+				if ($rank->isOwner()) {
+					$change = true;
+				}
+			}
 			$update = 'maf_assoc_laws_update';
+			$new = 'maf_assoc_laws_new';
 			$type = 'assoc';
 		}
-		$active = new ArrayCollection;
-		$inactive = new ArrayCollection;
-		foreach ($org->getLaws() as $law) {
-			if (!$law->getInvalidatedOn()) {
-				$active->add($law);
-			} else {
-				$inactive->add($law);
-			}
-		}
 
+		#TODO: Add inactive laws display.
 		return $this->render('Law/lawsList.html.twig', [
 			'org' => $org,
-			'active' => $active,
-			'inactive' => $inactive,
+			'active' => $org->findActiveLaws(),
 			'update' => $update,
-			'orgType' => $type
+			'orgType' => $type,
+			'change' => $change,
+			'new' => $new
 		]);
 	}
 
-	#TODO: HERE DOWN!
-
 	/**
-	  * @Route("/r{realm}/new", name="maf_assoc_laws_new", requirements={"realm"="\d+"})
-	  * @Route("/a{assoc}/new", name="maf_realm_laws_new", requirements={"assoc"="\d+"})
+	  * @Route("/r{realm}/new", name="maf_realm_laws_new", requirements={"realm"="\d+"})
+	  * @Route("/a{assoc}/new", name="maf_assoc_laws_new", requirements={"assoc"="\d+"})
 	  */
 	public function newLawAction(Realm $realm=null, Association $assoc=null, Request $request) {
 		if ($realm) {
@@ -95,61 +105,15 @@ class LawController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 
-		$form = $this->createForm(new LawSelectType($em->getRepository(LawType::class)->findBy(['category'=>$type])));
+		$form = $this->createForm(new LawTypeSelectType($em->getRepository(LawType::class)->findBy(['category'=>$type])));
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 			if ($realm) {
-				$this->redirectToRoute('maf_realm_laws_finalize', ['realm'=>$realm->getId(), 'type'=>$data['type']->getName()]);
+				return $this->redirectToRoute('maf_realm_laws_finalize', ['realm'=>$realm->getId(), 'type'=>$data['target']->getId()]);
 			} else {
-				$this->redirectToRoute('maf_assoc_laws_finalize', ['assoc'=>$assoc->getId(), 'type'=>$data['type']->getName()]);
+				return $this->redirectToRoute('maf_assoc_laws_finalize', ['assoc'=>$assoc->getId(), 'type'=>$data['target']->getId()]);
 			}
-		}
-
-		return $this->render('Law/new.html.twig', [
-			'org' => $org,
-			'form' => $form->createView(),
-		]);
-	}
-
-	/**
-	  * @Route("/a{assoc}/{type}", name="maf_assoc_laws_finalize", requirements={"type"="\d+", "assoc"="\d+"})
-	  * @Route("/a{assoc}/{type}/", requirements={"type"="\d+", "realm"="\d+"})
-	  * @Route("/a{assoc}/{type}/{law}", name="maf_assoc_laws_update", requirements={"type"="\d+", "assoc"="\d+", "law"="\d+"})
-	  * @Route("/r{realm}/{type}", name="maf_realm_laws_finalize", requirements={"type"="\d+", "realm"="\d+"})
-	  * @Route("/r{realm}/{type}/", requirements={"type"="\d+", "assoc"="\d+"})
-	  * @Route("/r{realm}/{type}/{law}", name="maf_realm_laws_update", requirements={"type"="\d+", "realm"="\d+", "law"="\d+"})
-	  */
-	public function finalizeLawAction(Realm $realm=null, Association $assoc=null, Law $law=null, LawType $type, Request $request) {
-		if ($realm) {
-			$char = $this->gateway('hierarchyRealmLawNewTest', $realm);
-		} else {
-			$char = $this->gateway('assocLawNewTest', $assoc);
-		}
-		if ($law && $type !== $law->getType()) {
-			$this->addFlash('error', $this->get('translator')->trans('unavailable.badlawtype'));
-			if ($realm) {
-				return $this->redirectToRoute('maf_realm_laws', ['realm'=>$realm->getId()]);
-			} else {
-				return $this->redirectToRoute('maf_assoc_laws', ['assoc'=>$assoc->getId()]);
-			}
-		}
-		if ($realm) {
-			$org = $realm;
-			$type = 'realm';
-		} else {
-			$org = $assoc;
-			$type = 'assoc';
-		}
-		$em = $this->getDoctrine()->getManager();
-
-		$form = $this->createForm(new LawCreateType($type, $law));
-		$form->handleRequest($request);
-                if ($form->isValid() && $form->isSubmitted()) {
-			$data = $form->getData();
-			#updateLaw($org, $type, $setting, $title, $description = null, Character $character, $allowed, $mandatory, $cascades, $sol, $flush=true)
-			$this->get('law_manager')->updateLaw($org, $data['type'], $data['setting'], $data['title']);
-
 		}
 
 		return $this->render('Law/new.html.twig', [
@@ -178,9 +142,67 @@ class LawController extends Controller {
 			}
 		}
 
-		return $this->render('Law/lawsList.html.twig', [
+		return $this->render('Law/repeal.html.twig', [
 			'law' => $law,
-			'form' => $form->createView()
+			'form' => $form->createView(),
+			'org' => $law->getOrg()
+		]);
+	}
+
+	/**
+	  * @Route("/a{assoc}/{type}", name="maf_assoc_laws_finalize", requirements={"type"="\d+", "assoc"="\d+"})
+	  * @Route("/a{assoc}/{type}/", requirements={"type"="\d+", "realm"="\d+"})
+	  * @Route("/a{assoc}/{type}/{law}", name="maf_assoc_laws_update", requirements={"type"="\d+", "assoc"="\d+", "law"="\d+"})
+	  * @Route("/r{realm}/{type}", name="maf_realm_laws_finalize", requirements={"type"="\d+", "realm"="\d+"})
+	  * @Route("/r{realm}/{type}/", requirements={"type"="\d+", "assoc"="\d+"})
+	  * @Route("/r{realm}/{type}/{law}", name="maf_realm_laws_update", requirements={"type"="\d+", "realm"="\d+", "law"="\d+"})
+	  */
+	public function finalizeLawAction(Realm $realm=null, Association $assoc=null, Law $law=null, LawType $type, Request $request) {
+		if ($realm) {
+			$char = $this->gateway('hierarchyRealmLawNewTest', $realm);
+		} else {
+			$char = $this->gateway('assocLawNewTest', $assoc);
+		}
+		if ($law && $type !== $law->getType()) {
+			$this->addFlash('error', $this->get('translator')->trans('unavailable.badlawtype'));
+			if ($realm) {
+				return $this->redirectToRoute('maf_realm_laws', ['realm'=>$realm->getId()]);
+			} else {
+				return $this->redirectToRoute('maf_assoc_laws', ['assoc'=>$assoc->getId()]);
+			}
+		}
+		if ($realm) {
+			$org = $realm;
+			$settlements = $realm->findTerritory();
+		} else {
+			$org = $assoc;
+			$settlements = false;
+		}
+		$lawMan = $this->get('law_manager');
+
+		$form = $this->createForm(new LawEditType($type, $law, $lawMan->choices, $settlements));
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			#updateLaw($org, $type, $setting, $title, $description = null, Character $character, $allowed, $mandatory, $cascades, $sol, $flush=true)
+			$result = $this->get('law_manager')->updateLaw($org, $type, $data['value'], $data['title'], $data['description'], $char, $data['mandatory'], $data['cascades'], $data['sol'], $data['settlement'], $law, true);
+			if ($result instanceof Law) {
+				$this->addFlash('error', $this->get('translator')->trans('law.form.edit.success', [], 'orgs'));
+				if ($realm) {
+					return $this->redirectToRoute('maf_realm_laws', ['realm'=>$realm->getId()]).'#'.$result->getId();
+				} else {
+					return $this->redirectToRoute('maf_assoc_laws', ['assoc'=>$assoc->getId()]).'#'.$result->getId();
+				}
+			} else {
+				$this->addFlash('error', $this->get('translator')->trans('law.form.edit.fail'.$result['error'], [], 'orgs'));
+			}
+		}
+
+		return $this->render('Law/edit.html.twig', [
+			'org' => $org,
+			'type' => $type,
+			'form' => $form->createView(),
+			'law' => $law,
 		]);
 	}
 
