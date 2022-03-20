@@ -33,7 +33,7 @@
 						{{ ('law.info.recommendation')|trans({},"orgs") }}<br>
 					{% endif %}
 					{% if law.org and law.org is not same as(org) %}
-						<i>{{ ('law.info.from')|trans({'%org%':link(law.org)},"orgs") }}</i>
+						<i>{{ ('law.info.from')|trans({'%org%':link(law.org)},"orgs")|raw }}</i>
 					{% endif %}
 				</td>
 				{% if law.type.name != 'freeform' %}
@@ -54,7 +54,7 @@
 					{% if type in ['taxesFood', 'taxesWood', 'taxesMetal', 'taxesWealth'] %}
 						<b>{{ law.value }}</b><br>
 						{% if law.settlement %}
-							<small>{{ ('law.info.taxes')|trans({'%settlement%':link(law.settlement)},"orgs") }}</small>
+							<small>{{ ('law.info.taxes')|trans({'%settlement%':link(law.settlement)},"orgs")|raw }}</small>
 						{% else %}
 							<small>{{ ('law.info.taxes2')|trans({},"orgs") }}</small>
 						{% endif %}
@@ -71,18 +71,22 @@
 				<td>{{ link(law.enactedBy) }}</td>
 				<td>{{ law.enacted|date }}</td>
 				<td>
-					{% if law.repealedBy is not null %}
-						{{ link(law.repealedBy) }}<br>
-						<small>{{ law.repealedOn|date }}</small>
-					{% elseif law.invalidates is not null %}
-						{{ ('law.info.'~law.invalidates.type.name~'.label')|trans({},"orgs") }}<br>
-						<small>{{ law.invalidates.enacted|date }}</small>
-					{% elseif law.org is same as(org) %}
+					{% if law.org is same as(org) %}
 						<a href="{{ path(update, {(orgType):law.org.id, 'type':law.type.id, 'law':law.id})}}">{{ ('law.update')|trans({},"orgs") }}</a> | <a href="{{ path('maf_law_repeal', {'law':law.id})}}">{{ ('law.repeal')|trans({},"orgs") }}</a>
 					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}
+		{# for law in inactive #}
+		{#
+			{% if law.repealedBy is not null %}
+				{{ link(law.repealedBy) }}<br>
+				<small>{{ law.repealedOn|date }}</small>
+			{% elseif law.invalidatedBy is not null %}
+				{{ ('law.info.'~law.invalidates.type.name~'.label')|trans({},"orgs") }}<br>
+				<small>{{ law.invalidates.enacted|date }}</small>
+			{% endif %}
+		#}
 	</tbody>
 </table>
 
