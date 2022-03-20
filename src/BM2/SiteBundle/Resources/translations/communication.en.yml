@@ -245,6 +245,10 @@ event:
   recvdplace:   Has received ownership of %place%.
   assoc:
    founded:     Founded the association of %association%.
+  law:
+   new:         A new law on %title% has been put in place.
+   changed:     The law on %title% has been updated.
+   repealed:    The law on %title% has been repelead.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
