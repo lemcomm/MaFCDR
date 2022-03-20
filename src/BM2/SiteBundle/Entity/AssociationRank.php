@@ -121,6 +121,16 @@ class AssociationRank {
                 return $all;
         }
 
+        public function findAllKnownCharacters() {
+                $all = new ArrayCollection();
+                foreach ($this->findAllKnownRanks() as $rank) {
+                        foreach ($rank->getMembers() as $mbr) {
+                                $all->add($mbr->getCharacter());
+                        }
+                }
+                return $all;
+        }
+
         public function findAllSuperiors() {
                 $sups = new ArrayCollection();
                 if ($mySup = $this->superior) {
@@ -181,6 +191,5 @@ class AssociationRank {
                 }
                 return 'Outside Range'; #This should only happen if you compare between associations or chains of hierarchy.
         }
-	
 	
 }
