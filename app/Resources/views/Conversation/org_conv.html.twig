@@ -2,7 +2,7 @@
 
 	{% if not archive %}
 		<h2>{{ 'conversation.title'|trans({}, "conversations")|title }}</h2>
-		
+
 		<p align="right">
 		<a href="{{path('maf_conv_print', {"conv":conversation.id}) }}" target="_blank"><button class="cmsg_button" title="{{ 'conversation.export.print'|trans({}, "conversations") }}">{{ 'conversation.export.print'|trans({}, "conversations") }}</button></a>
 		</p>
@@ -51,7 +51,11 @@
 			<div class="cmsg_message_wrapper_{{message.type}}">
 				<div class="cmsg_message_header_{{message.type}}">
 					{% if message.sender %}
-						{% set sender = link(message.sender) %}
+						{% if privacy and not known.contains(message.sender) %}
+							{% set sender = "<i>Someone</i>" %}
+						{% else %}
+							{% set sender = link(message.sender) %}
+						{% endif %}
 					{% else %}
 						{% set sender = "<i>The System</i>" %}
 					{% endif %}
@@ -69,7 +73,11 @@
 						 --
 						<a href="#{{message.replyTo.id}}">
 							{% if message.replyTo.sender %}
-								{{ 'index.reply' |trans({"%sender%":message.replyTo.sender.name, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+								{% if privacy and not known.contains(message.replyTo.sender) %}
+									{{ 'index.reply' |trans({"%sender%":"<i>Someone</i>", "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+								{% else %}
+									{{ 'index.reply' |trans({"%sender%":message.replyTo.sender.name, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+								{% endif %}
 							{% else %}
 								{{ 'index.reply' |trans({"%sender%":'<i>The System</i>', "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
 							{% endif %}
@@ -96,8 +104,12 @@
 							<ul>
 								{% for msg in message.replies %}
 									<a href="#{{msg.id}}">
-										{% if msg.sender %}
-											<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+										{% if message.sender %}
+											{% if privacy and not known.contains(message.sender) %}
+												<li>{{ 'index.repliedto' |trans({"%sender%":"<i>Someone</i>", "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+											{% else %}
+												<li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+											{% endif %}
 										{% else %}
 											<li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
 										{% endif %}
