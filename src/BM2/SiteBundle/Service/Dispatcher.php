@@ -2375,10 +2375,12 @@ class Dispatcher {
 		if ($occupied) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.occupied");
 		}
-		if (
-			($character->getInsideSettlement() && $this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside'))
-			|| (!$character->getInsideSettlement() && $this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside'))
-		) {
+		if ($character->getInsideSettlement()) {
+			$can = $this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside');
+		} else {
+			$can = $this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside');
+		}
+		if ($can) {
 			# It's a long line, but basically, but if we're in a settlement or in a region and have the respective permission, we're allowed. If not, denied.
 			return array("name"=>"place.new.name", "url"=>"maf_place_new", "description"=>"place.new.description", "long"=>"place.new.longdesc");
 		} else {
