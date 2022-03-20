@@ -1,0 +1,13 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'law.route.edit.header'|trans({},"orgs")|title }}</h2>
+<p>{{ 'law.route.edit.intro'|trans({'%name%':org.name},"orgs")|raw }}</p>
+
+<hr>
+<h3>{{ ('law.info.'~type.name~'.label')|trans({},"orgs")|title}}</h3>
+<p>{{ ('law.info.'~type.name~'.desc')|trans({},"orgs")|raw}}</p>
+
+<p>{{ form(form) }}</p>
+
+{% endblock %}
