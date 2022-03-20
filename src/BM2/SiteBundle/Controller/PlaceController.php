@@ -12,6 +12,7 @@ use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
