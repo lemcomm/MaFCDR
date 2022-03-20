@@ -1654,6 +1654,7 @@ unavailable:
  assocalready:  Association(s) are already present here.
  nobuild:       You don't have permission from an Association to expand them.
  alreadyinassoc: You are already in this Association.
+ notassocowner: You are not the owner of this association.
 marker:
  name:      Marker name
  type:      Marker type
