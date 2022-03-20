@@ -50,6 +50,7 @@ security:
         - { path: ^/(../)?character, roles: ROLE_USER }
         - { path: ^/(../)?actions, roles: ROLE_USER }
         - { path: ^/(../)?artifacts, roles: ROLE_USER }
+        - { path: ^/(../)?laws, roles: ROLE_USER }
         - { path: ^/(../)?politics, roles: ROLE_USER }
         - { path: ^/(../)?messages, roles: ROLE_USER }
         - { path: ^/(../)?realm/[0-9]+/viewrelations, roles: ROLE_USER }
