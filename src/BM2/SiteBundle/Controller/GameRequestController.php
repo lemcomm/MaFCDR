@@ -11,6 +11,7 @@ use BM2\SiteBundle\Form\SoldierFoodType;
 use BM2\SiteBundle\Service\Appstate;
 use BM2\SiteBundle\Service\History;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -37,10 +38,23 @@ class GameRequestController extends Controller {
 		$result;
 		switch ($id->getType()) {
 			case 'soldier.food':
-				if ($id->getToSettlement()->getOwner() != $char || $id->getToSettlement()->getSteward() != $char) {
-					$result = false;
-				} else {
+				if ($id->getToSettlement()->getOwner() === $char || $id->getToSettlement()->getSteward() === $char) {
 					$result = true;
+				} else {
+					$result = false;
+				}
+				break;
+			case 'assoc.join':
+				$mbrs = $char->getAssociationMemberships();
+				$result = false;
+				if ($mbrs->count() > 0) {
+					foreach ($mbrs as $mbr) {
+						$rank = $mbr->getRank();
+						if ($mbr->getAssociation() === $id->getToAssociation() && $rank && $rank->getManager()) {
+							$result = true;
+							break;
+						}
+					}
 				}
 				break;
 			case 'house.join':
@@ -53,8 +67,12 @@ class GameRequestController extends Controller {
 			case 'oath.offer':
 				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char)) {
 					$result = false;
-				} elseif ($id->getToPlace() && $id->getToPlace()->getOwner() != $char) {
-					$result = false;
+				} elseif ($id->getToPlace()) {
+					if ($id->getToPlace()->getType() != 'embassy' && $id->getToPlace()->getOwner() != $char) {
+						$result = false;
+					} elseif ($id->getToPlace()->getType() == 'embassy' && $id->getToPlace()->getAmbassador() != $char) {
+						$result = false;
+					}
 				} elseif ($id->getToPosition() && !$id->getToPosition()->getHolders()->contains($char)) {
 					$result = false;
 				} else {
@@ -135,6 +153,32 @@ class GameRequestController extends Controller {
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notlord');
+				}
+				break;
+			case 'assoc.join':
+				if ($allowed) {
+					$assoc = $id->getToAssociation();
+					$character = $id->getFromCharacter();
+					$this->get('association_manager')->updateMember($assoc, null, $character, false);
+					$this->get('history')->openLog($assoc, $character);
+					$this->get('history')->logEvent(
+						$assoc,
+						'event.assoc.newmember',
+						array('%link-character%'=>$id->getFromCharacter()->getId()),
+						History::MEDIUM, true
+					);
+					$this->get('history')->logEvent(
+						$id->getFromCharacter(),
+						'event.character.joinassoc.approved',
+						array('%link-assoc%'=>$assoc->getId()),
+						History::ULTRA, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('assoc.requests.manage.applicant.approved', array('%character%'=>$character->getName(), '%assoc%'=>$assoc->getName()), 'orgs'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
 				break;
 			case 'house.join':
@@ -263,6 +307,8 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$target = $id->getToRealm();
 					$realm = $id->getFromRealm();
+					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'realm.join' AND r.id != :id AND r.from_realm = :realm");
+					$query->setParameters(['id'=>$id->getId(), 'realm'=>$realm->getId()]);
 
 					$realm->setSuperior($target);
 					$target->addInferior($realm);
@@ -297,9 +343,10 @@ class GameRequestController extends Controller {
 							], 'politics'
 						)
 					);
+					$query->execute();
 					$em->remove($id);
 					$em->flush();
-
+					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notruler');
 				}
@@ -408,6 +455,24 @@ class GameRequestController extends Controller {
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notlord');
+				}
+				break;
+			case 'assoc.join':
+				if ($allowed) {
+					$assoc = $id->getToAssociation();
+					$char = $id->getFromCharacter();
+					$this->get('history')->logEvent(
+						$char,
+						'event.character.joinassoc.denied',
+						array('%link-assoc%'=>$assoc->getId()),
+						History::HIGH, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('assoc.requests.manage.applicant.denied', array('%character%'=>$char->getName(), '%assoc%'=>$assoc->getName()), 'orgs'));
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.notmanager');
 				}
 				break;
 			case 'house.join':
@@ -525,9 +590,6 @@ class GameRequestController extends Controller {
 				if ($allowed) {
 					$target = $id->getToRealm();
 					$realm = $id->getFromRealm();
-					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'realm.join' AND r.id != :id AND r.from_realm = :realm");
-					$query->setParameters(['id'=>$id->getId(), 'realm'=>$realm->getId()]);
-
 					$this->get('history')->logEvent(
 						$realm,
 						'event.realm.joinrejected',
@@ -546,7 +608,6 @@ class GameRequestController extends Controller {
 					);
 					$em->remove($id);
 					$em->flush();
-					$query->execute();
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.notruler');
@@ -633,7 +694,7 @@ class GameRequestController extends Controller {
 			}
 		}
 		if ($liege = $character->findLiege()) {
-			if ($liege instanceof ArrayCollection) {
+			if ($liege instanceof Collection) {
 				$lieges = $liege;
 				foreach ($lieges as $liege) {
 					foreach ($liege->getOwnedSettlements() as $settlement) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Law">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="title" type="text" nullable="true"/>
+		<field name="description" type="text" nullable="true"/>
+		<field name="mandatory" type="boolean" nullable="true"/>
+		<field name="cascades" type="boolean" nullable="true"/>
+		<field name="value" type="string" nullable="true"/>
+		<field name="enacted" type="datetime" nullable="true"/>
+		<field name="cycle" type="integer" nullable="true"/>
+		<field name="repealed_on" type="datetime" nullable="true"/>
+		<field name="invalidated_on" type="datetime" nullable="true"/>
+		<field name="sol_cycles" type="integer" nullable="true"/>
+		<one-to-one field="invalidated_by" target-entity="Law" inversed-by="invalidates"/>
+		<one-to-one field="invalidates" target-entity="Law" mapped-by="invalidated_by"/>
+
+		<many-to-one field="enacted_by" target-entity="Character" fetch="EAGER"/>
+		<many-to-one field="repealed_by" target-entity="Character" fetch="EAGER"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="settlement" target-entity="Settlement" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="realm" target-entity="Realm" inversed-by="laws" fetch="EAGER"/>
+		<many-to-one field="type" target-entity="LawType" fetch="EAGER"/>
+
+	</entity>
+</doctrine-mapping>

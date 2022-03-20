@@ -3,6 +3,8 @@
 # Author: Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
 
+placeactions: Place of Interest Actions
+
 buttons:
  submit:     submit
 
@@ -29,12 +31,14 @@ place:
  name:       Name
  insidenow:  You are currently within this Place of Interest.
  manage:
-  button:    Manage Place
-  name:      Place Details
+  name:      Manage Place Details
+  description: Manage the details of %formalname%.
+  longdesc:  From here you can manage some of the more intricate details of your Place.
   intro:     While there's not much here right now, you can presently change the name and descriptions of your Place. In time, we plan to expand this menu greatly.
   success:   Place details updated successfully.
  permissions:
   name:      Place Permissions
+  description: Set and manage the permissions of others.
   intro:     From this screen you can manage the many aspects of this Place, from changing individual permissions (which are further detailed in the manual) to allowing those who know about this location to spawn here (TODO: soon ;) ).
   manage:    Manage Your Permissions
  history:    History
@@ -42,28 +46,40 @@ place:
   name:      View Local Places of Interest
   intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Eventually these will be expanded to allow realms to do customized introductions for new players with separate arrival descriptions, as well as exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
   list:      Local Places
- enter:      Visit Place
- exit:       Exit Place
+ enter:
+  name: Visit Place
+  description: Visit this place of interest.
+ exit:
+  name: Exit Place
+  description: Leave this place for another.
  newplayer:
   name: Review Place Spawn Description
   name2: Update the Spawn Description of %name%
-  description: Modify the new player description of the place.
+  description: Modify the new player description of %formalname%.
   longdesc: This page will let you modify the new player description of the place, which is displayed as part of the new character spawn selection process.
   intro: Here you can alter the  information that is displayed to players creating a new character, after they opt to spawn in to the game. This description is specific to this location, so should be used to guide new players in the first actions. It is understood that this will also, likely, include propaganda about your realm, but that is your choice.
   button:    Change Intro Message
+ togglenewplayer:
+  name:
+   activate:   Enable Arrival of New Characters Here
+   deactivate: Disable New Character Arrivals
+  description: Toggle the ability for players to spawn characters here.
+  longdesc:    This will let you enable or disable (as appropriate) the ability for others to create new characters at this Place of Interest.
  spawn:
   activate:    Enable Spawning
   deactivate:  Disable Spawning
  transfer:
   name:         Transfer Place
-  description:  Transfer ownership of this Place.
+  description:  Transfer ownership of %formalname%.
+  longdesc:     Tired of ownership? Transfer it to another character.
   intro: >
     Any place of interest under your ownership can be transferred to another First One in the vicinity, all you need to do is say the word.
   to:           New Owner
   success:      You have transferred control of the Place to %name%.
  destroy:
   name:         Destroy Place
-  description:  Destroy this place.
+  description:  Destroy %formalname%.
+  longdesc:     If you own a place, you can destroy a place. Once gone, they can't be reamde or recovered, though.
   intro: >
     If you own a place, you can destroy a place. Once gone though, they can't be reamde or recovered, so be certain before you do this.
  hosthouse:     Currently residing here...
@@ -76,6 +92,26 @@ place:
   norealmdesc:  This Place can have arrivals but the realm has no new player description.
  realmspawn:    This Place appears to be correctly setup to support arrivals for %realm%.
  housespawn:    This Place appears to be correctly setup to support arrivals for %house%.
+ associations:
+  create:       Formalize an Association
+  none:         No associations are present here.
+  list:         Associations Located Here:
+  join:
+   name:         Join %name%
+   name2:        Join Association
+   description: It looks like the %assoc% is available for joining.
+ addAssoc:
+  name:   Add a new Association Location
+  description:  It looks like you have the means expand one of your associations to this Place.
+  longdesc: Associations are largely limited by their reach. And you have the means to extend that to this Place, if you so desire.
+  intro: >
+    From here you can spend a bit of your time to expand an Association you're part of to this Place of Interest. All you've to do is select which one you'd like to see expanded, and the Second Ones shall make it happen.
+ evictAssoc:
+  name:   Evict the %name%
+  description:  Tired of an association causing problems? Evict them.
+  longdesc: Associations can be quite extensive. And you're well within your abilities to remdey that problem.
+  intro: >
+    If you've found the %name% to be troublesome, it's a fairly simple matter to evict them.
 
 by:
  ambassador: As a Manager of Diplomacy...
@@ -127,3 +163,43 @@ help:
 unknown:
  title:      Unknown Place
  place:      It seems this isn't a place that you know anything about.
+
+assoc:
+ new:
+  name:         Form a New Association Here
+  description:  As a First One, you can always form a new association in any place of interest capable of supporting it, assuming you have permissions of the owner to do so.
+  longdesc:     Associations, otherwise known as guilds, religions, companies, cults, orders, and the like, are realm-less and family-less organizations of First Ones for various purposes. Just like real life though, the name and type of an association doesn't always describe it's purpose truthfully.
+military:
+ siege:
+  name:         Siege Actions
+  no_action:    (Select an Action)
+  start:
+   name:        Declare a Siege
+   description: Order a siege of this settlement.
+  leadership:
+   name:        Change Siege Leader
+   description: Hand off control of the siege to another.
+  assume:
+   name:        Take Siege Leadership
+   description: By the rights of your position, assume leadership.
+  build:
+   name:        Build Siege Equipment
+   description: Or rather, order your soldiers to do so.
+  assault:
+   name:        Order an Assault/Sortie
+   description: Lead the combined forces of your side into conflict.
+  disband:
+   name:        Disband Siege
+   description: For whatever reason, end the siege.
+  leave:
+   name:        Leave the Siege Forces
+   description: Though you may not neccessarily be able to leave altogether...
+  attack:
+   name:        Lead an Attack
+   description: Though others may not follow you...
+  joinattack:
+   name:        Join a Pending Attack
+   description: Order your men to join you in joining the pending attack.
+  join:
+   name:        Join an Ongoing Siege
+   description: Order your men to join you in partaking in the ongoing siege.

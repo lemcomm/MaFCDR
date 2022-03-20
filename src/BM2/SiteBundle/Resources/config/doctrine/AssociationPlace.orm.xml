@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\AssociationPlace">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="headquarters" type="boolean" nullable="true"/>
+		<many-to-one field="association" target-entity="Association" inversed-by="places"/>
+		<many-to-one field="place" target-entity="Place" inversed-by="associations"/>
+	</entity>
+</doctrine-mapping>

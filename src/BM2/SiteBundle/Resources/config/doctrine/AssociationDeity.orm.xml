@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\AssociationDeity">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<many-to-one field="association" target-entity="Association" inversed-by="deities"/>
+		<many-to-one field="deity" target-entity="Deity" inversed-by="associations"/>
+		<field name="words" type="text" nullable="true"/>
+		<many-to-one field="words_from" target-entity="Character"/>
+		<field name="words_timestamp" type="datetime" nullable="true"/>
+	</entity>
+</doctrine-mapping>

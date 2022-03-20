@@ -13,6 +13,7 @@ class EventLog {
 		if ($this->house) return 'house';
 		if ($this->quest) return 'quest';
 		if ($this->artifact) return 'artifact';
+		if ($this->association) return 'association';
 		return false;
 	}
 
@@ -24,6 +25,7 @@ class EventLog {
 		if ($this->house) return $this->house;
 		if ($this->quest) return $this->quest;
 		if ($this->artifact) return $this->artifact;
+		if ($this->association) return $this->association;
 		return false;
 	}
 
@@ -35,6 +37,7 @@ class EventLog {
 		if ($this->house) return $this->house->getName();
 		if ($this->quest) return $this->quest->getSummary();
 		if ($this->artifact) return $this->artifact->getName();
+		if ($this->association) return $this->association->getName();
 		return false;
 	}
 

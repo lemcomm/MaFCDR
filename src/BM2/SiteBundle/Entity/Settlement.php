@@ -2,6 +2,9 @@
 
 namespace BM2\SiteBundle\Entity;
 
+use BM2\SiteBundle\Entity\BuildingType;
+use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\ResourceType;
 use Doctrine\Common\Collections\ArrayCollection;
 
 
@@ -94,15 +97,28 @@ class Settlement {
 		// 500 = 19h / 1000 = 23h / 2000 = 28h / 5000 = 35h / 10000 = 40h
 		$time_to_take = 3600 * (12 + log10(pow(1+$this->getPopulation()/400, 20)));
 
-		// enforcing an enforceable claim makes things a lot faster
-		if ($enforce_claim) {
-			$time_to_take *= 0.2;
-		}
-
 		// inactive lord = half time, in addition to the change above (which also includes inactive ones)
 		if ($owner = $this->getOwner() && $this->getOwner()->getAlive()) {
 			if ($this->getOwner()->getSlumbering()) {
 				$mod = 0.5;
+				if (!$enforce_claim) {
+					if ($realm = $this->getRealm()) {
+						if ($law = $realm->findLaw('slumberingClaims')) {
+							$value = $law->getValue();
+							$members = false;
+							if ($value == 'all') {
+								$enforce_claim = true;
+							} elseif ($value == 'direct') {
+								$members = $realm->findMembers(false);
+							} elseif ($value == 'internal') {
+								$members = $realm->findMembers();
+							}
+							if ($members && $members->contains($taker)) {
+								$enforce_claim = true;
+							}
+						}
+					}
+				}
 			} else {
 				if ($opposers && $opposers->contains($owner)) {
 					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
@@ -110,6 +126,11 @@ class Settlement {
 					$mod = 10;
 				}
 			}
+		}
+
+		// enforcing an enforceable claim makes things a lot faster
+		if ($enforce_claim) {
+			$time_to_take *= 0.2;
 		}
 		$time_to_take *= $mod;
 

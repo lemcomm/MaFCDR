@@ -1,0 +1,18 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'assoc.route.join.header'|trans({},"orgs")|title }}</h2>
+<p>{{ 'assoc.route.join.intro'|trans({},"orgs")|raw }}</p>
+
+<div class="fullwidth texts">
+	{{ form_start(form) }}
+	{{ form_errors(form) }}
+	<h4>{{ "assoc.route.join.subject.name"|trans({}, "orgs") }}</h4>
+	{{ "assoc.route.join.subject.desc"|trans({}, "orgs")|raw }}<br>{{ form_widget(form.subject) }}
+	<h4>{{ "assoc.route.join.text.name"|trans({}, "orgs") }}</h4>
+	{{ "assoc.route.join.text.desc"|trans({}, "orgs")|raw }}{{ form_widget(form.text) }}
+	{{ form_row(form.sure) }}
+	<br><br>{{ form_end(form) }}
+</div>
+
+{% endblock %}

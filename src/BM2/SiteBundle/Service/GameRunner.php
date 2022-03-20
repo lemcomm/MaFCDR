@@ -293,9 +293,6 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getOwnedSettlements()) {
-					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
-				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("    Character set as known dead.");
 			} else {
@@ -354,79 +351,12 @@ class GameRunner {
 						}
 					}
 				}
-				if ($character->getOwnedSettlements()) {
-					#TODO: Add logic for transfering settlements after we add realm laws (so we can check if the realm allows inheriting settlements).
-				}
 				if ($character->getHeadOfHouse()) {
-					$house = $character->getHeadOfHouse();
-					$inheritor = false;
-					$difhouse = false;
 					$this->logger->info("  Detectd character is head of house ID #".$house->getId());
-					#TODO: Make this it's own method on CharMan, and call it from there, merging it with the two similar instances theres, with switch on event firing for different circumstances.
-					if ($character->getHeadOfHouse()->getSuccessor() && $character->getAlive() && $character->getHeadOfHouse()->getSuccessor()->getHouse() == $character->getHouse() && !$character->getHeadOfHouse()->getSuccessor()->getRetired() && !$character->getHeadOfHouse()->getSuccessor()->getSlumbering()) {
-						$inheritor = true;
-						$successor = $character->getHeadOfHouse->getSuccessor();
-					} else if ($character->getSuccessor() && $character->getAlive() && !$character->getSuccessor()->getSlumbering() && !$character->getSuccessor()->getRetired() && ($character->getSuccessor()->getHouse() == $character->getHouse() OR ($character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()))) {
-						$inheritor = true;
-						$successor = $character->getSuccessor();
-						if ($successor->getHouse() != $character->getHouse()) {
-							$difhouse = true;
-						}
-					}
-					if ($inheritor) {
-						$house->setHead($successor);
-						$house->setSuccessor(null);
-						if (!$difhouse) {
-							$this->history->logEvent(
-								$house,
-								'event.house.inherited.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-						} else {
-							$this->history->logEvent(
-								$house,
-								'event.house.merged.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-							$this->history->logEvent(
-								$successor->getHouse(),
-								'event.house.merged.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-								History::ULTRA, true
-							);
-							$house->setSuperior($successor->getHouse());
-							$successor->setHouse($house);
-						}
-					} else {
-						$best = null;
-						foreach ($house->findAllActive() as $member) {
-							if ($best === null) {
-								$best = $member;
-							}
-							if ($member->getHouseJoinDate() < $best->getHouseJoinDate()) {
-								$best = $member;
-							}
-						}
-						$house->setHead($best);
-						$house->setSuccessor(null);
-						if ($best !== null) {
-							$this->history->logEvent(
-								$house,
-								'event.house.newhead.slumber',
-								array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-								History::ULTRA, true
-							);
-						} else {
-							$this->history->logEvent(
-								$house,
-								'event.house.collapsed.slumber',
-								array(),
-								History::ULTRA, true
-							);
-						}
-					}
+					$this->cm->houseInheritance($character, 'slumber');
+				}
+				foreach ($character->getAssociationMemberships() as $mbrshp) {
+					$this->cm->assocInheritance($mbrshp);
 				}
 				$character->setSystem('procd_inactive');
 				$this->logger->info("  Character set as known slumber.");
@@ -1143,14 +1073,65 @@ class GameRunner {
 		return true;
 	}
 
-	public function runConversationsCycle() {
-		# This has to be under runRealmsCycle so we don't update dead realms and so we don't have to force update members.
-		$last = $this->appstate->getGlobal('cycle.convs', 0);
+	public function runAssociationsCycle() {
+		$last = $this->appstate->getGlobal('cycle.assocs', 0);
+		if ($last==='complete') return true;
+        	$last=(int)$last;
+		$this->logger->info("Associations Cycle...");
+
+		$this->logger->info("  Checking for missing Assoc conversations...");
+
+		$query = $this->em->createQuery('SELECT a FROM BM2SiteBundle:Association a WHERE a.active = true OR a.active IS NULL');
+
+		foreach ($query->getResult() as $assoc) {
+			$anno = false;
+			$gen = false;
+
+                	$criteria = Criteria::create()->where(Criteria::expr()->eq("system", "announcements"))->orWhere(Criteria::expr()->eq("system", "general"));
+			$convs = $assoc->getConversations()->matching($criteria);
+			if ($convs->count() > 0) {
+				foreach ($convs as $conv) {
+					if (!$anno && $conv->getSystem() == 'announcements') {
+						$anno = true;
+						continue;
+					}
+					if (!$gen && $conv->getSystem() == 'general') {
+						$gen = true;
+						continue;
+					}
+					if ($gen && $anno) {
+						break;
+					}
+				}
+			}
+			if (!$anno) {
+				$topic = $assoc->getName().' Announcements';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $assoc, 'announcements');
+				$this->logger->notice("  ".$assoc->getName()." announcements created");
+			}
+			if (!$gen) {
+				$topic = $assoc->getName().' General Discussion';
+				$conversation = $this->convman->newConversation(null, null, $topic, null, null, $assoc, 'general');
+				$this->logger->notice("  ".$assoc->getName()." general discussion created");
+			}
+		}
+
+		$this->appstate->setGlobal('cycle.assocs', 'complete');
+		$this->em->flush();
+		$this->em->clear();
+
+		return true;
+	}
+
+	public function runConversationsCleanup() {
+		# This is run separately from the main turn command, and runs after it. It remains here because it is still primarily turn logic.
+		# Ideally, this does nothing. If it does something though, it just means we caught a character that should or shouldn't be part of a conversation and fixed it.
 		$lastRealm = $this->appstate->getGlobal('cycle.convs.realm', 0);
 		$lastHouse = $this->appstate->getGlobal('cycle.convs.house', 0);
-		if ($last==='complete') return true;
+		$lastAssoc = $this->appstate->getGlobal('cycle.convs.assoc', 0);
 		$lastRealm=(int)$lastRealm;
 		$lastHouse=(int)$lastHouse;
+		$lastAssoc=(int)$lastAssoc;
 		$this->logger->info("Conversation Cycle...");
 		$this->logger->info("  Updating realm conversation permissions...");
 		$query = $this->em->createQuery("SELECT r from BM2SiteBundle:Realm r WHERE r.active = TRUE AND r.id > :last ORDER BY r.id ASC");
@@ -1212,7 +1193,7 @@ class GameRunner {
 				break;
 			}
 			$house = $row[0];
-			$lastHouse = $realm->getId();
+			$lastHouse = $house->getId();
 			$this->logger->info("  -- Updating ".$house->getName()."...");
 			$total++;
 			$members = $house->findAllActive();
@@ -1232,7 +1213,51 @@ class GameRunner {
 		$this->logger->info("  Result: ".$total." houses, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
 		$this->em->flush();
 		$this->em->clear();
-		$this->appstate->setGlobal('cycle.convs', 'complete');
+
+		$this->logger->info("  Updating association conversation permissions...");
+		$query = $this->em->createQuery("SELECT a from BM2SiteBundle:Association a WHERE (a.active = TRUE OR a.active IS NULL) AND a.id > :last ORDER BY a.id ASC");
+		$query->setParameters(['last'=>$lastAssoc]);
+		$assocs = $query->getResult();
+		$added = 0;
+		$total = 0;
+		$removed = 0;
+		$convs = 0;
+		$iterableResult = $query->iterate();
+
+		$done = false;
+		$complete = false;
+		while (!$done) {
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				$complete=true;
+				break;
+			}
+			$assoc = $row[0];
+			$lastAssoc = $assoc->getId();
+			$this->logger->info("  -- Updating ".$assoc->getName()."...");
+			$total++;
+			$members = $assoc->findAllMemberCharacters();
+			foreach ($assoc->getConversations() as $conv) {
+				$rtn = $this->convman->updateMembers($conv, $members);
+				$convs++;
+				$removed += $rtn['removed']->count();
+				$added += $rtn['added']->count();
+			}
+		}
+
+		if ($complete) {
+			$this->appstate->setGlobal('cycle.convs.assoc', 'complete');
+		} else {
+			$this->appstate->setGlobal('cycle.convs.assoc', $lastAssoc);
+		}
+		$this->logger->info("  Result: ".$total." associations, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
+
+		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Setting s SET s.value=0 WHERE s.name LIKE :cycle');
+		$query->setParameter('cycle', 'cycle.convs.'.'%');
+		$query->execute();
 		return true;
 	}
 

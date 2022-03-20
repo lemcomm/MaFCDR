@@ -1,5 +1,3 @@
-### This manual page is detailing a highly experimental and incomplete feature that is in the process of being implemented. Everything on this page, while as detailed as it may be, is subject to change. ###
-
 Guilds, Religions, Cults, Sects, Companies, Corps, Orders, Societies, and probably more, these are all collectively "Associations" within Might & Fealty. These organizations exist somewhere between Houses and Realms, being closer Realms in functionality, but like Houses they can be cross-border entities.
 
 So, what makes them truly different? Associations all work via membership. And Membership can be private. Don't want the lower orders of your sect to know who the high priest is? Then don't tell them. Send a message in confidence, knowing it'll be delivered, by someone of authority, but without your name being associated. Similarly, you can force members to send messages anonymously, where only certain ranks within the association knowing who is who.
@@ -18,14 +16,11 @@ Technical Rundown
 * Knowing much of anything about the association is optional
 * Associations can be subordinate to other associations
 * Must be located with places (See: publicity is optional)
-* Types are largely for flavor at the moment, with exception of religion which allows setting it as a official faith and setting up a pantheon
-* Can allow character spawning
 * Support diplomacy (also against characters soon)
 * Cannot own land -- reserved for realms
 * Can leave whenever -- unlike houses
-* Can be open to join
-* Can have elections
-* Cannot command soldiers directly
+* Can be open to join (Coming Soon)
+* Have Laws -- like Realms
 
 Related Topics
 ==============

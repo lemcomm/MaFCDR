@@ -1,0 +1,27 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+
+<h2>{{ 'assoc.route.viewAllDeities.name'|trans({"%name%":assoc.name})|title }}</h2>
+{% if deities|length < 1 %}
+	{{ 'assoc.route.viewAllDeities.empty'|trans({})|raw }}
+{% else %}
+	{{ 'assoc.route.viewAllDeities.description'|trans({})|raw }}
+	<dl class="long">
+	{% for deity in deities %}
+		<dt>
+			<a id="{{deity.id}}"></a>
+			{{ deity.name }}
+		</dt>
+		<dd>
+			<p>{{deity.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
+			{% set check = dispatcher.assocAddDeityTest(null, [assoc, deity]) %}
+			{% if check.url is defined %}
+				<p><a href="{{ path('maf_assoc_deities_add', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.addDeity.name'|trans({}) }}</a></p>
+			{% endif %}
+		</dd>
+	{% endfor %}
+	</dl>
+{% endif %}
+{% endblock %}

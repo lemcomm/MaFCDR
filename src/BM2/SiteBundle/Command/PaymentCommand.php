@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class PaymentCommand extends ContainerAwareCommand {
@@ -59,7 +60,7 @@ class PaymentCommand extends ContainerAwareCommand {
 				);
 			}
 			if ($liege = $char->findLiege()) {
-				if ($liege instanceof ArrayCollection) {
+				if ($liege instanceof Collection) {
 					foreach ($liege as $one) {
 						$history->logEvent(
 							$one,

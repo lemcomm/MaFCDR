@@ -1,29 +1,154 @@
 {% extends "Conversation/layout.html.twig" %}
 
 {% block content %}
+	{% set archive = false %}
+	{# Not ruling out an export of this just yet, but I'm not accomodating it yet #}
+
         <h2>{{ 'conversation.recent'|trans({}, "conversations")|title }}</h2>
 
         <div class="cmsg_conversation">
         {% for message in messages %}
-                {% include "Conversation/one_message.html.twig" with {"message":message, "recent":true, "period":period, "archive":false} only %}
+                {% set convType = message.conversation.findType %}
+                <div class="cmsg_message" data-id="{{ message.id }}" data-conv="{{ message.conversation.id }}" data-conv_type="{{ convType }}" data-topic="{{message.topic}}" data-target="{{message.target}}">
+                        <div class="cmsg_message_wrapper_{{message.type}}">
+                                <div class="cmsg_message_header_{{message.type}}">
+                                        {% if message.sender %}
+                                                {% set sender = link(message.sender) %}
+                                        {% else %}
+                                                {% set sender = "<i>The System</i>" %}
+                                        {% endif %}
+
+                                        <a id="{{message.id}}"></a>
+                                        {% if message.target %}
+                                                {{ 'index.localpre' |trans({}, "conversations")|raw }}
+                                        {% endif %}
+                                        {{ "index.#{message.type}" |trans({"%sender%":sender, "%day%":message.cycle|gametime("short"), "%ts%":message.sent|date}, "conversations")|raw  }}
+                                        --
+                                        {% if message.recipientCount %}
+                                                {% set recips = message.recipientCount %}
+                                        {% else %}
+                                                {% set recips = '???' %}
+                                        {% endif %}
+                                        {% if not message.target %}
+                                                {{ 'index.conversation' |trans({"%conv%":message.conversation.topic, "%i%":recips}, "conversations")|raw }}
+                                        {% else %}
+                                                {{ 'index.local' |trans({"%topic%":message.topic, "%i%":recips}, "conversations")|raw }}
+                                        {% endif %}
+                                        {% if message.replyTo %}
+                                                 --
+                                                <a href="#{{message.replyTo.id}}">
+                                                        {% if message.replyTo.sender %}
+                                                                {{ 'index.reply' |trans({"%sender%":message.replyTo.sender.name, "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+                                                        {% else %}
+                                                                {{ 'index.reply' |trans({"%sender%":'<i>The System</i>', "%day%":message.replyTo.cycle|gametime("short"), "%ts%":message.replyTo.sent|date}, "conversations")|raw }}
+                                                        {% endif %}
+                                                </a>
+                                        {% endif %}
+                                </div>
+
+                                <div class="cmsg_content_{{message.type}}">
+                                {{ message.content|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
+                                </div>
+
+                                {% if message.type != 'system' and archive == false %}
+                                        <div class="cmsg_message_meta_{{message.type}}">
+                                                <ul class="cmsg_actions">
+                                                        {% if not convType == 'local' %}
+                                                                <button class="recent_reply cmsg_button">{{ 'button.reply'|trans({}, "conversations") }}</button> |
+                                                                {# Disabled for now. --Andrew
+                                                                        <li><a href="{{ path('maf_conv_recent_reply', {"msg":message.id, "window":period}) }}"><button class="reply cmsg_button">{{ 'button.writereply'|trans({},"conversations") }}</button></a></li> |
+                                                                #}
+                                                                <li><a href="{{ path('maf_conv_read', {"conv":message.conversation.id}) }}#{{message.id}}"><button class="cmsg_button" id="view_conv">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li>
+                                                        {% else %}
+                                                                {# Disabled for now. --Andrew
+                                                                        <li><button class="local_reply cmsg_button" disabled>{{ 'button.nolocalreply'|trans({},"conversations") }}</button></li> |
+                                                                #}
+                                                                <button class="recent_reply cmsg_button">{{ 'button.reply'|trans({}, "conversations") }}</button> |
+                                                                <li><a href="{{ path('maf_conv_local') }}#{{message.id}}"><button class="cmsg_button" id="view_local">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li> |
+                                                                <li><a href="{{ path('maf_conv_local_remove', {"msg":message.id, "source":'2'}) }}"><button class="cmsg_button" id="remove_local">{{ 'button.remove'|trans({},"conversations") }}</button></a></li>
+                                                        {% endif %}
+                                                </ul>
+                                                {% if message.replies and message.replies.count > 0 %}<br>
+                                                        <br>{{ 'index.replies' |trans({}, "conversations")|raw }}
+                                                        <ul>
+                                                                {% for msg in message.replies %}
+                                                                        <a href="#{{msg.id}}">
+                                                                                {% if msg.sender %}
+                                                                                        <li>{{ 'index.repliedto' |trans({"%sender%":msg.sender.name, "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+                                                                                {% else %}
+                                                                                        <li>{{ 'index.repliedto' |trans({"%sender%":'<i>The System</i>', "%ts%":msg.sent|date}, "conversations")|raw }}, </li>
+                                                                                {% endif %}
+                                                                        </a>
+                                                                {% endfor %}
+                                                        </ul>
+                                                {% endif %}
+                                        </div>
+                                {% endif %}
+                        </div>
+                </div>
+
         {% endfor %}
         </div>
+	<div id="replydialog" title="{{ 'message.reply.title'|trans({}, "conversations")|title }}">
+		{% include "Conversation/syntax.html.twig" %}
+		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyRecentAction', {}, {'msg': null, 'window':period} )) }}
+	</div>
 
 {% endblock %}
 
 {% block jquery %}
+{% include "element/msgautocomplete.js.twig" %}
 
-$("#oldmessages").hide();
-var old_visible = false;
-$("#hidetoggle").click(function(){
-	if (old_visible) {
-		$("#hidetoggle").html("{{ 'conversation.old.show'|trans({},"conversations") }}");
-		$("#oldmessages").hide("blind", 1200);
-		old_visible = false;
-	} else {
-		$("#hidetoggle").html("{{ 'conversation.old.hide'|trans({},"conversations") }}");
-		$("#oldmessages").show("blind", 1200);
-		old_visible = true;
-	}
+function search_insert(insert) {
+        var caretPos = document.getElementById("recent_reply_content").selectionStart;
+        var textAreaTxt = $("#recent_reply_content").val();
+        $("#recent_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+}
+
+$("#syntaxhelp").click(function(){
+	$("#help").toggle();
 });
+
+$("#replydialog").dialog({
+	autoOpen: false,
+	width: "65%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+
+$(".cmsg_conversation").on("click", "button.recent_reply", function(){
+	var id = $(this).closest('.cmsg_message').data('id');
+	var topic = $(this).closest('.cmsg_message').data('topic');
+        var convType = $(this).closest('.cmsg_message').data('conv_type');
+        var target = null;
+        if (convType == 'local') {
+        	if (!topic.startsWith("Re:")) {
+        		topic = "Re: " + topic;
+        	}
+	       var target = $(this).closest('.cmsg_message').data('target');
+        }
+	replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", id, convType, topic, target);
+});
+
+function replyform(title, reply_to, convType, topic, target) {
+	$("#replydialog").dialog("option", "title", title);
+	$("#replydialog").dialog("open");
+	$("#recent_reply_reply_to").val(reply_to);
+        if (convType == 'local') {
+                $("#recent_reply_target").prop('disabled', false);
+                $("#recent_reply_topic").prop('disabled', false);
+                $("#recent_reply_target").val(target);
+                $("#recent_reply_topic").val(topic);
+        } else {
+                $("#recent_reply_topic").val(topic);
+                $("#recent_reply_target").prop('disabled', true);
+                $("#recent_reply_topic").prop('disabled', true);
+        }
+        var url = "{{ path('maf_conv_recent_reply', {msg: 0, window: period}) }}";
+        var replacement = "/recent/reply/" + reply_to.toString();
+        url.replace("/recent/reply/0", replacement);
+	$("#replydialog form").attr('action', url);
+}
+
+
 {% endblock %}

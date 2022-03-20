@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Place;
@@ -9,12 +10,14 @@ use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\GeoFeature;
 use BM2\SiteBundle\Entity\Spawn;
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
 use BM2\SiteBundle\Form\PlaceNewType;
 use BM2\SiteBundle\Service\History;
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -90,6 +93,14 @@ class PlaceController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 		$places = $this->get('geography')->findPlacesInActionRange($character);
+
+		$coll = new ArrayCollection($places);
+		$iterator = $coll->getIterator();
+		$iterator->uasort(function ($a, $b) {
+		    return ($a->getName() < $b->getName()) ? -1 : 1;
+		});
+		$places = new ArrayCollection(iterator_to_array($iterator));
+
 
 		return $this->render('Place/actionable.html.twig', [
 			'places' => $places,
@@ -260,15 +271,44 @@ class PlaceController extends Controller {
 
 		# Check for inside settlement...
 		if ($character->getInsideSettlement()) {
-			if ($settlement->hasBuildingNamed('Library')) {
-				$rights[] = 'library';
+			foreach ($settlement->getBuildings() as $bldg) {
+				$name = $bldg->getType()->getName();
+				if ($name == 'Library') {
+					$rights[] = 'library';
+				}
+				if ($name == 'Inn') {
+					$rights[] = 'inn';
+				}
+				if ($name == 'Tavern') {
+					$rights[] = 'tavern';
+				}
+				if ($name == 'Arena') {
+					$rights[] = 'arena';
+				}
+				if ($name == 'Blacksmith') {
+					$rights[] = 'smith';
+				}
+				if ($name == 'List Field') {
+					$rights[] = 'list field';
+				}
+				if ($name == 'Racetrack') {
+					$rights[] = 'track';
+				}
+				if ($name == 'Temple') {
+					$rights[] = 'temple';
+				}
+				if ($name == 'Warehouse') {
+					$rights[] = 'warehouse';
+				}
+				if ($name == 'Tournament Grounds') {
+					$rights[] = 'tournament';
+				}
+				if ($name == 'Academy') {
+					$rights[] = 'academy';
+				}
 			}
-			if ($settlement->hasBuildingNamed('Inn')) {
-				$rights[] = 'inn';
-			}
-			if ($settlement->hasBuildingNamed('Tavern')) {
-				$rights[] = 'tavern';
-			}
+		} else {
+			$rights[] = 'outside';
 		}
 
 		$realm = $settlement->getRealm();
@@ -277,9 +317,6 @@ class PlaceController extends Controller {
 				$rights[] = 'ruler';
 				break;
 			}
-		}
-		if ($settlement->hasBuildingNamed('Academy')) {
-			$rights[] = 'academy';
 		}
 		$diplomacy = $character->findForeignAffairsRealms(); #Returns realms or null.
 		if ($diplomacy) {
@@ -293,6 +330,18 @@ class PlaceController extends Controller {
 
 		if ($character->getHouse() && $character->getHouse()->getHead() == $character) {
 			$rights[] = 'dynasty head';
+		}
+
+		# Economy checks.
+		$econ = $this->get('economy');
+		if ($econ->checkSpecialConditions($settlement, 'mine')) {
+			$rights[] = 'metals';
+		}
+		if ($econ->checkSpecialConditions($settlement, 'quarry')) {
+			$rights[] = 'stone';
+		}
+		if ($econ->checkSpecialConditions($settlement, 'lumber yard')) {
+			$rights[] = 'forested';
 		}
 
 
@@ -421,6 +470,15 @@ class PlaceController extends Controller {
 					array('%link-settlement%'=>$settlement->getId()),
 					History::MEDIUM, true, 20
 				);
+				foreach ($place->getVassals() as $vassal) {
+					$vassal->setOathCurrent(false);
+					$this->history->logEvent(
+						$vassal,
+						'politics.oath.notcurrent2',
+						array('%link-place%'=>$place->getId()),
+						History::HIGH, true
+					);
+				}
 				$this->addFlash('notice', $this->get('translator')->trans('control.placetransfer.success', ["%name%"=>$data['target']->getName()], 'actions'));
 				$this->getDoctrine()->getManager()->flush();
 				return $this->redirectToRoute('maf_place_actionable');
@@ -454,9 +512,13 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$olddescription = $place->getDescription()->getText();
+		if ($oldDescription = $place->getDescription()) {
+			$oldDescription = $place->getDescription()->getText();
+		} else {
+			$oldDescription = null;
+		}
 
-		$form = $this->createForm(new PlaceManageType($olddescription, $type, $place));
+		$form = $this->createForm(new PlaceManageType($oldDescription, $type, $place, $character));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
@@ -471,8 +533,26 @@ class PlaceController extends Controller {
 				if ($place->getShortDescription() != $data['short_description']) {
 					$place->setShortDescription($data['short_description']);
 				}
-				if ($olddescription != $data['description']) {
+				if ($oldDescription != $data['description']) {
 					$this->get('description_manager')->newDescription($place, $data['description'], $character);
+				}
+				$pol = $this->get('politics');
+				if ($place->getRealm() != $data['realm']) {
+					$pol->changePlaceRealm($place, $data['realm'], 'change');
+				}
+				if ($type=='embassy') {
+					if ($place->getHostingRealm() != $data['hosting_realm']) {
+						$place->setHostingRealm($data['hosting_realm']);
+						$place->setOwningRealm(null);
+						$place->setAmbassador(null);
+					}
+					if ($place->getOwningRealm() != $data['owning_realm']) {
+						$place->setOwningRealm($data['owning_realm']);
+						$place->setAmbassador(null);
+					}
+					if ($place->getAmbassador() != $data['ambassador']) {
+						$place->setAmbassador($data['ambassador']);
+					}
 				}
 
 				$this->getDoctrine()->getManager()->flush();
@@ -638,7 +718,7 @@ class PlaceController extends Controller {
 	  * @Route("/{place}/spawn", requirements={"place"="\d+"}, name="maf_place_spawn_toggle")
 	  */
 	public function placeSpawnToggleAction(Place $place) {
-		$character = $this->get('dispatcher')->gateway('placeNewPlayerInfoTest', false, true, false, $place);
+		$character = $this->get('dispatcher')->gateway('placeSpawnToggleTest', false, true, false, $place);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -694,6 +774,87 @@ class PlaceController extends Controller {
                 }
 		return $this->render('Place/destroy.html.twig', [
 			'settlement'=>$settlement, 'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/addAssoc", requirements={"id"="\d+"}, name="maf_place_assoc_add")
+	  */
+	public function addAssocAction(Place $id, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeAddAssocTest', false, true, false, $place);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$assocs = new ArrayCollection();
+		foreach($character->getAssociationMemberships() as $mbr) {
+			if ($rank = $mbr->getRank()) {
+				if ($rank->canBuild()) {
+					$assocs->add($rank->getAssociation());
+				}
+			}
+		}
+
+		$form = $this->createForm(new AssocSelectType($assocs, 'addToPlace', $character));
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$this->get('association_manager')->newLocation($data['target'], $place);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.assoc.new',
+				array('%link-character%'=>$character->getId(), '%link-assoc%'=>$data['target']->getId()),
+				History::HIGH, true
+			);
+			$this->get('history')->logEvent(
+				$place,
+				'event.assoc.place.new',
+				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+				History::HIGH, true
+			);
+
+                        return $this->redirectToRoute('maf_place_actionable');
+                }
+		return $this->render('Place/addAssoc.html.twig', [
+			'place'=>$place,
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/evictAssoc/{assoc}", requirements={"id"="\d+", "assoc"="\d+"}, name="maf_place_assoc_evict")
+	  */
+	public function evictAssocAction(Place $id, Association $assoc, Request $request) {
+		$place = $id;
+		$character = $this->get('dispatcher')->gateway('placeEvictAssocTest', false, true, false, [$place, $assoc]);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+                if ($form->isValid() && $form->isSubmitted()) {
+			$this->get('association_manager')->removeLocation($assoc, $place);
+			$this->get('history')->logEvent(
+				$place,
+				'event.place.assoc.evict',
+				array('%link-character%'=>$character->getId(), '%link-assoc%'=>$assoc->getId()),
+				History::HIGH, true
+			);
+			$this->get('history')->logEvent(
+				$place,
+				'event.assoc.place.evict',
+				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
+				History::HIGH, true
+			);
+
+                        return $this->redirectToRoute('maf_place_actionable');
+                }
+		return $this->render('Place/evictAssoc.html.twig', [
+			'place'=>$place,
+			'assoc'=>$assoc,
+			'form'=>$form->createView()
 		]);
 	}
 

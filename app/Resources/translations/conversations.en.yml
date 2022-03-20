@@ -25,9 +25,10 @@ index:
  reply:     replying to %sender% on %day% (%ts%)
  replies:   "Replies to this message:"
  repliedto: %sender% on %ts%
- conversation: Sent to "%conv%" (%i% recipients)
+ conversation: Sent to "%conv%" (%i% recipient(s))
  conversation2: Sent to "%conv%"
- local: %topic% (%i% recipients)
+ conversation3: %i% recipient(s)
+ local: %topic% (%i% recipient(s))
  viewlocal: View in Conversation
  toomany:   It looks like you have a significant number of conversations here. Perhaps you might want to consider removing yourself from some of the older ones, potentially after exporting them?
  private:  Private Conversations

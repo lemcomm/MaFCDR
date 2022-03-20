@@ -5,7 +5,6 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Election;
 use BM2\SiteBundle\Entity\Realm;
-use BM2\SiteBundle\Entity\RealmLaw;
 use BM2\SiteBundle\Entity\RealmPosition;
 use Doctrine\ORM\EntityManager;
 
@@ -16,15 +15,14 @@ class RealmManager {
 	protected $history;
 	protected $politics;
 	protected $convman;
+	protected $lawman;
 
-	public $available_ruler_election = array('banner', 'spears', 'swords', 'land', 'heads');
-
-
-	public function __construct(EntityManager $em, History $history, Politics $politics, ConversationManager $convman) {
+	public function __construct(EntityManager $em, History $history, Politics $politics, ConversationManager $convman, LawManager $lawman) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->politics = $politics;
 		$this->convman = $convman;
+		$this->lawman = $lawman;
 	}
 
 	public function create($name, $formalname, $type, Character $founder) {
@@ -97,15 +95,6 @@ class RealmManager {
 
 		$this->makeRuler($realm, $ruler);
 
-		// default laws
-		$elect = new RealmLaw;
-		$elect->setRealm($realm);
-		$elect->setName('estates')->setDescription("");
-		$elect->setMandatory(true);
-		$elect->setValueString("inherit");
-		$this->em->persist($elect);
-		$realm->addLaw($elect);
-
 		return $realm;
 	}
 
@@ -122,6 +111,16 @@ class RealmManager {
 				$this->politics->changeSettlementRealm($e, $realm->getSuperior(), 'fail');
 			} else {
 				$this->politics->changeSettlementRealm($e, null, 'fail');
+			}
+		}
+		foreach ($realm->getSpawns() as $spawn) {
+			$spawn->setActive(false);
+		}
+		foreach ($realm->getPlaces() as $place) {
+			if ($realm->getSuperior() && $realm->getSuperior()->getActive()) {
+				$this->politics->changePlaceRealm($place, $realm->getSuperior(), 'fail');
+			} else {
+				$this->politics->changePlaceRealm($place, null, 'fail');
 			}
 		}
 	}

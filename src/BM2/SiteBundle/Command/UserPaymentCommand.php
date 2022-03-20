@@ -20,7 +20,7 @@ class UserPaymentCommand extends ContainerAwareCommand {
 			->setDescription('Manually process a payment')
 			->addArgument('user', InputArgument::REQUIRED, 'user email or id')
 			->addArgument('type', InputArgument::REQUIRED, 'type (e.g. "PayPal Payment")')
-			->addArgument('amount', InputArgument::REQUIRED, 'amount (in EUR)')
+			->addArgument('amount', InputArgument::REQUIRED, 'amount (in EUR) to credit, will be multiplied by 100')
 			->addArgument('id', InputArgument::REQUIRED, 'transaction id')
 		;
 	}

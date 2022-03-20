@@ -1088,6 +1088,9 @@ meta:
  settings:
   name:         Settings
   description:  Change character settings
+ faith:
+  name:         Faith
+  description:  Change publicly known faith
  loadout:
   name:         Loadout
   description:  Change character loadout

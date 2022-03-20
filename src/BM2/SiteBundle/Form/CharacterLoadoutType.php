@@ -35,7 +35,7 @@ class CharacterLoadoutType extends AbstractType {
                 $builder->add('weapon', EntityType::class, array(
                         'label'=>'loadout.weapon',
                         'placeholder'=>'loadout.none',
-                        'required'=>True,
+                        'required'=>False,
                         'choice_label'=>'nameTrans',
                         'choice_translation_domain' => 'messages',
                         'class'=>EquipmentType::class,
@@ -44,7 +44,7 @@ class CharacterLoadoutType extends AbstractType {
                 $builder->add('armour', EntityType::class, array(
                         'label'=>'loadout.armor',
                         'placeholder'=>'loadout.none',
-                        'required'=>True,
+                        'required'=>False,
                         'choice_label'=>'nameTrans',
                         'choice_translation_domain' => 'messages',
                         'class'=>EquipmentType::class,
@@ -53,7 +53,7 @@ class CharacterLoadoutType extends AbstractType {
                 $builder->add('equipment', EntityType::class, array(
                         'label'=>'loadout.equipment',
                         'placeholder'=>'loadout.none',
-                        'required'=>True,
+                        'required'=>False,
                         'choice_label'=>'nameTrans',
                         'choice_translation_domain' => 'messages',
                         'class'=>EquipmentType::class,
@@ -62,7 +62,7 @@ class CharacterLoadoutType extends AbstractType {
                 $builder->add('mount', EntityType::class, array(
                         'label'=>'loadout.mount',
                         'placeholder'=>'loadout.none',
-                        'required'=>True,
+                        'required'=>False,
                         'choice_label'=>'nameTrans',
                         'choice_translation_domain' => 'messages',
                         'class'=>EquipmentType::class,

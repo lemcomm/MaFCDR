@@ -5,6 +5,9 @@
 
 assoc:
  form:
+  areyousure: Are You Sure?
+  select: (select one)
+  submit: Submit
   new:
    name: Name
    formalname: Formal Name
@@ -12,17 +15,319 @@ assoc:
    public: Public
    motto: Motto
    founder: Founder Rank Name
+   created: Association has been succesfully created!
   description:
    short: Short Description
-   full:  Full, Longer Description
+   full:  Full Description
+  join:
+   subject: Subject For Your Application
+   text: Message For Your Application
+  createRank:
+   name: Rank Name
+   viewAll: Rank can view all ranks
+   viewUp: 'Upward rank visibility:'
+   viewDown: 'Downward rank visibility:'
+   viewSelf: View own rank members?
+   superior: Which rank should this own answer to?
+   selectsuperior: (no one)
+   createSubs: Rank can create subordinate ranks.
+   manager: Rank can manage Association applicants and memberships.
+  faith:
+   name: Faith to Follow
+   empty: (none)
+  addToPlace:
+   name: Assocation to Expand
+   empty: (select one)
+
  help:
-  new:
-   name: A short, and easily referred to, name for the association.
-   formalname: The formal, and likely long, name for the association.
-   type: Separate from how it functions, this is what you style it as, and changes how the game refers to it.
-   public: Is the organization intended to be public knowledge? Should anyone be able to view basic details on it?
-   motto: Perhaps a battlecry for the order, or common chant of the faith? Something your association will be known to say or represent.
-   founder: This is the rank name for your character's rank within the association.
+  name: A short, and easily referred to, name for the association.
+  formalname: The formal, and likely long, name for the association.
+  type: Separate from how it functions, this is what you style it as, and changes how the game refers to it.
+  public: Is the organization intended to be public knowledge? Should anyone be able to view basic details on it?
+  motto: Perhaps a battlecry for the order, or common chant of the faith? Something your association will be known to say or represent.
+  founder: This is the rank name for your character's rank within the association.
   description:
    short: The short description is used anywhere the game needs to be brief. Depending on how you structure this association, it may not show anywhere.
    full: The full description is used primarily on the association details page, but depending on how you structure this association, it may not be visible even there.
+  rankname: The name of the rank. Ideally, these are unique in the association, but that's entirely up to you.
+  rankdesc: The description of the rank. Flavor text.
+  viewAll: Granting this means that this rank can view all other ranks and view the members who hold those ranks. This overrides the view up, view down, and view self settings.
+  viewUp: Determines how far up a rank can view the hierarchy. This is relative to the rank.
+  viewDown: Determines how far down a rank can view the hierarchy. This is relative to the rank.
+  viewSelf: Determines if a rank can view it's own membership.
+  superior: This determines who has management rights over this rank and where they fall in the hierarchy. Unless ranks are public of someone can view all ranks, members can only view ranks within their hierarchy.
+  createSubs: Determines whether this rank can make new ranks below it and manage them.
+  manage: Determines wehtehr this rank can handle applicants and manage membership of ranks below them.
+ route:
+  create:
+   header: Formalize a New Association
+   intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>It should be worth noting that one option here has fairly reaching impact. Unlike Houses and Realms which are, by design, public, Associations need not be. You can decide the moment you create it that you don't want this association to be Public, and that only members of it should know about it.</p><p>Finally, there is one last thing you should understand about Associations in M&F. Type is only what your association styles itself as, and has no formal functionality beyond that. You can be the Gold Star Merchant Company that believes in a pantheon or a Temple of Fire Lake that operates exclusively to sell mercenary contracts. How your Association works is entirely up to you to decide.</p>
+  createRank:
+   header: Create a New Rank within the Association
+   intro: <p>Ranks are a simple thing that help you manage the structure of the organization. Some of these options are overruled by association laws (like Rank Visibility and viewability) while others always take effect. If you're unsure what an option does, additional help is available for each.</p>
+  faith:
+   name: Declare Your Faith
+   intro: You can always decide that you simply which to, at least nominally, follow one faith or another that you're part of. Any Association that you are a member of that has named what their faith and followers is called is eligible to pick from. All regions you own will follow your choice here.
+   success: You've successfully changed your official religion to that of %faith%.
+   success2: You've successfully changed your official religion to that of not having one.
+  manageRank:
+   header: Update an Existing Rank
+  view:
+   history:
+    name: History
+  graphRanks:
+   name:   Rank Hierarchy Graph
+  viewRanks:
+   name:   View Association Ranks
+   desc:   Look through the ranks you know of.
+   description:  Associations can be completely transparent or absolutely arcane, by design. Unless you run the association, this is only the ranks you've been allowed to see by whoever created the rank you hold, if you even hold one. Unlike realms, there's no retiring ranks, and no history of them.
+   empty:  If there's nothing here it is probably because you don't hold a rank of your own. You should reach out to whoever invited you or approved your joining to fix this.
+  rankInfo:
+   superior: "Answers to:"
+   holders:  Rank Holders
+  manageRank:
+   name:   Manage %name%
+  createRank:
+   name:   Create a New Rank
+   desc:   Add a new rank to this assocciation
+  join:
+   header: Join an Association
+   intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>Unlike other games, these entities tend to be very free form. Functionally, they all have access to the same options, a mercenary company can have a patron saint or a temple can run trade routes--this is up to the association to decide.</p>
+   subject:
+    name: Subject for your Application
+    desc: A title for your message asking to join.
+   text:
+    name: Message Body for your Application
+    desc: The message you want to send explaining why you would like to join this particular group.
+   success: Your request to join %name% has been submitted.
+  newDeity:
+   name:  Formalize a New Deity
+   header: Formalize a New Deity
+   intro: <p>Deities are known things in Might & Fealty, for all First Ones trace their lineage back to the moment they were created by one deity or another. Whether or not you follow a deity is up to you, but the existence of deities beyond this realm is fact. How you interpret that is up to you.</p><p>Warning: No real world or clearly from popular fiction religions. This is a game. Make up something new or interesting.</p>
+  viewDeities:
+   name:  Review the Association's Recognized Deities
+   header: Review the Association's Recognized Deities
+   description: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p>
+   empty: <p>Here you can review all the deities currently recognized by the Association, and if you run this association, also remove them from recognition.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps this association doesn't care for religion? Or maybe it just hasn't had time to figure things out.</p>
+   words: Additionally, the association has some words of their own to offer...
+  viewAllDeities:
+   name:  All Known Deities
+   header: Review the List of Known Deities
+   description: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p>
+   empty: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps the First Ones have not yet remembered from where they originate? Someone should read the lore.</p>
+  place:
+   add:
+    name: Extend an Association to this Place
+    intro: If you're a member of an association with the right rank, you can always add your association to a place you control. Below you'll find a list you can select from that includes all associations of which you are the owner or have been granted permission to organize new locations of.
+   evict:
+    name: Evict %name%
+    intro: As the owner of %place% you can always evict any associations hosted within. For instance, judging by your presence it here, it seems you are considering evicting %assoc%. If you'd like to do so, all you need to do is check the box and confirm your orders and it'll be done.
+
+ requests:
+  join:
+   preamble: You've received a request to join the Association of %link-assoc% from %link-character%, on %date%, as follows:
+   approve:     Approve
+   approved:    The applcation from %character% to join %assoc% has been approved.
+   deny:        Deny
+   denied:      The applcation from %character% to join %assoc% has been denied.
+  manage:
+   applicant:
+    approved:   The request from %character% to join %assoc% has been approved.
+    denied:     The request from %character% to join %assoc% has been denied.
+
+deity:
+ form:
+  submit: Submit
+  new:
+   name: Name
+   aspects: Aspects
+   words:  Words of your Own
+  description:
+   short: Short Description
+   full:  Full Description
+ help:
+  name:  The name of the deity. Will be semi-public knowledge.
+  aspects: These describe what the deity is the deity of. If anything. Perhaps of everything?
+  desc:  A description of the deity, to describe them to all who might follow, outside this Association, or within.
+  words: Some words about the deity for your faithful, within the Association only.
+# Generic one off strings.
+nobody: Nobody
+
+
+law:
+ update:    Update Law
+ repeal:    Repeal Law
+ new:       Create Law
+ route:
+  list:
+   name:    Laws of %name%
+   intro:   Listed here you will find the laws, and previous laws, of %name%, for you to review, or, if you have permission to, update.
+  new:
+   header:    Enact a New Law
+   intro:   With the authority granted to you by your held positions or ranks, you are within your capabilities to enact a new law for %name%. This is a two step process, beginning here with selecting the type of law, to be followed by actually defining the particulars of the law after submission here.
+  edit:
+   header:    Finalize or Update a Law
+   intro:     Here you can finalize the details of a law you wish to update or enact. Different law types will have different values you can select here, which can have far reaching consequences in how the game does things in your realm. If you're not sure what each does, or wish to request a new law, please reach out on the Forum or the Discord.
+  repeal:
+   header:    Repeal a Law
+   intro:     If a law has outlived it's usefulness, you can always just repeal it rather than update and replace it. Of course, if you change your mind later, you can just enact a new one. The law currently under review is displayed below.
+ header:
+  mandatory: Type
+  name:      Name
+  desc:      Description
+  cascades:  Cascades
+  current:   Current law
+  sol:       Statute of Limitations
+  character: Enacted By
+  enacted:   Enacted On
+  invalidated: Superseded
+ form:
+  submit:    Submit
+  type:
+   label:    Law Type to Enact
+   empty:    (Select One)
+  edit:
+   title:    Law Title
+   desc:     Description of Law
+   cascades: Applies to Subordinate Realms
+   value:    Law Intent
+   amount:   Amount
+   mandatory:
+    label:   Law or Guideline
+    yes:     Law
+    no:      Guideline
+
+ info:
+  yes:       'True'
+  no:        'False'
+  mandatory: Law
+  from:      From %org%
+  recommendation: Recommendation
+  sol:       %days% Days
+  freeform:
+   label:    User Defined Law
+  assocVisibility:
+   label:    Association Visibility
+   desc:     Determines whether the Association is visible to those outside of it.
+   yes:
+    name:    Visible to All
+    desc:    Can be viewed by anyone
+   no:
+    name:    Known to Members
+    desc:    Cannot be viewed by outsiders
+  rankVisibility:
+   label:    Rank Visibility by Members
+   desc:     Determines whether all ranks should be known by all or whether more selective rules should be applied. Applies to not only knowing ranks, but also reading messages in the Association.
+   all:
+    name:    Known to All
+    desc:    All ranks are visible
+   direct:
+    name:    Determined by Rank
+    desc:    Rank visibility is determined based on a member's rank and how that rank is setup.
+  assocInheritance:
+   label:    Association Ownership Inheritance
+   desc:     Determines who, if anyone, and/or how ownership is passed on the owner's death or retirement.
+   character:
+    name:    Inherited by Owner's Successor
+    desc:    Will follow traditional character inheritance
+   senior:
+    name:    Inherited by Next Highest Member
+    desc:    Will pass to the next highest ranking and oldest member.
+   oldest:
+    name:    Inherited by the Longest Serving Member
+    desc:    Will pass to the member who has been in the association longest.
+  slumberingAccess:
+   label:    Realm Access to Slumbering Estates
+   desc:     Determines if local permissions of slumbering settlement lords are overriden to allow others access.
+   none:
+    name:    No Overrides
+    desc:    Permissions remain unaffected by slumbering
+   direct:
+    name:    Local Realm Only
+    desc:    All members of this realm directly shall be granted access.
+   internal:
+    name:    Any Realm Members
+    desc:    All members of the realm, including subordinates, shall be granted access.
+   any:
+    name:    All First Ones
+    desc:    Anyone shall be granted access. (Dangerous)
+  settlementInheritance:
+   label:    Settlement Inheritance
+   desc:     Determines inheritance of settlemenets within the realm.
+   none:
+    name:    Not Inherited
+    desc:    Lord position will be vacant (Dangerous)
+   characterInternal:
+    name:    Internal Successor Inheritance
+    desc:    Inherited by sucessor if they are within the realm.
+   characterAny:
+    name:    Successor Inheritance
+    desc:    Inherited by succesor, regardless of realm affiliation.
+   ruler:
+    name:    Ruler Inherits
+    desc:    Realm Ruler shall inherit settlements. If no ruler, defaults to successor if in realm.
+   liege:
+    name:    Liege Inherits
+    desc:    Liege, if any, shall inherit the settlement. If no liege, then the ruler. If no ruler, defaults to successor if in realm.
+   steward:
+    name:    Steward Inherits
+    desc:    The Steward of a settlement shall inherit it. Defaults to liege if there is no steward.
+  placeInheritance:
+   label:    Place Inheritance
+   desc:     Determines inheritance of places within the realm.
+   none:
+    name:    Not Inherited
+    desc:    Lord position will be vacant (Dangerous)
+   characterInternal:
+    name:    Internal Successor Inheritance
+    desc:    Inherited by sucessor if they are within the realm.
+   characterAny:
+    name:    Successor Inheritance
+    desc:    Inherited by succesor, regardless of realm affiliation.
+   ruler:
+    name:    Ruler Inherits
+    desc:    Realm Ruler shall inherit settlements. If no ruler, defaults to successor if in realm.
+   liege:
+    name:    Liege Inherits
+    desc:    Liege, if any, shall inherit the settlement. If no liege, then the ruler. If no ruler, defaults to successor if in realm.
+   lord:
+    name:    Settlement Lord Inherits
+    desc:    The Lord of a settlement shall inherit it. If none, defaults to successor if in realm.
+  slumberingClaims:
+   label:    Grant Claims Against Slumbering Settlements
+   desc:     Determines whether a claim is granted during the takeover of a settlement within the realm.
+   all:
+    name:    All First Ones
+    desc:    All First Ones, from within the realm or not, shall be granted an automatic claim to slumbered settlements.
+   internal:
+    name:    Realm First Ones
+    desc:    Any first ones of the realm (including subordinate realms) shall be granted a claim.
+   direct:
+    name:    This Realm's First Ones
+    desc:    First ones directly associated to this realm shall be granted a claim.
+   none:
+    name:    No Claims Granted
+    desc:    No automatic claims shall be granted.
+  subrealmAutonomy:
+   label:    Subordinate Realm Autonomy
+   desc:     Determines if subordinate realms are fully autonomous, but subordinate, entities, or if they are truly subordinate entities. (Not Implmented)
+  subrealmReclassing:
+   label:    Subordinate Realms Able to Change Type
+   desc:     Determines whether subordinate realms are allowed to change their own type so long as they do not conflict with their superior realm. (Not Implemented)
+  subrealmSubcreate:
+   label:    Subordinate Realm Creation
+   desc:     Determines whether subordinate realms are permitted to make thier own subordinate realms (within type limitations). (Not Implemented)
+  taxes:     Payable to %settlement%
+  taxes2:    Payable to the Government
+  taxesFood:
+   label:    Realm Tax on Food
+   desc:     Declares the amount of food to be taxed by the realm.
+  taxesWood:
+   label:    Realm Tax on Wood
+   desc:     Declares the amount of wood to be taxed by the realm.
+  taxesMetal:
+   label:    Realm Tax on Metal
+   desc:     Declares the amount of metal to be taxed by the realm.
+  taxesWealth:
+   label:    Realm Tax on Wealth
+   desc:     Declares the amount of wealth to be taxed by the realm.

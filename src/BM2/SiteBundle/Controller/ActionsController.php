@@ -764,6 +764,15 @@ class ActionsController extends Controller {
 			foreach ($trades as $t) {
 				$dests[] = $t->getSource()->getId();
 			}
+
+			# Add law based destinations.
+			foreach ($character->findRealms() as $realm) {
+				foreach ($this->get('law_manager')->findTaxLaws($realm) as $law) {
+					if ($law->getSettlement()) {
+						$dests[] = $law->getSettlement()->getId();
+					}
+				}
+			}
 			# Remove duplicates.
 			$dests = array_unique($dests);
 		}

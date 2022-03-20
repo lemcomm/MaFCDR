@@ -454,7 +454,9 @@ class Geography {
 			$results = [];
 			if ($settlement->getPlaces()) {
 				foreach ($settlement->getPlaces() as $place) {
-					$results[] = $place;
+					if (!$place->getDestroyed()) {
+						$results[] = $place;
+					}
 				}
 			} else {
 				return NULL;

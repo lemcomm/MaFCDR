@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
 use BM2\SiteBundle\Service\AppState;
+use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\ConversationPermission;
@@ -38,13 +39,13 @@ class ConversationManager {
         }
 
         public function getOrgConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL) ORDER BY c.realm ASC, c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL) ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
 
         public function getPrivateConversations(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL ORDER BY c.updated DESC');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND c.realm IS NULL AND c.house IS NULL AND c.association IS NULL ORDER BY c.updated DESC');
                 $query->setParameter('me', $char);
                 return $query->getResult();
         }
@@ -56,7 +57,7 @@ class ConversationManager {
         }
 
         public function getOrgConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL)');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
@@ -74,13 +75,13 @@ class ConversationManager {
         }
 
         public function getActiveOrgConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND (c.realm IS NOT NULL OR c.house IS NOT NULL)');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND (c.realm IS NOT NULL OR c.house IS NOT NULL OR c.association IS NOT NULL)');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
 
         public function getActivePrivateConversationsCount(Character $char) {
-                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND c.realm IS NULL AND c.house IS NULL');
+                $query = $this->em->createQuery('SELECT count(c.id) FROM BM2SiteBundle:Conversation c JOIN c.permissions p WHERE p.character = :me AND p.active = true AND c.realm IS NULL AND c.house IS NULL AND c.association IS NULL');
                 $query->setParameter('me', $char);
                 return $query->getSingleScalarResult();
         }
@@ -102,7 +103,7 @@ class ConversationManager {
         }
 
         public function getActivePrivatePermissions(Character $char) {
-                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.active = true and c.realm is null and c.house is null and p.character = :me');
+                $query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:ConversationPermission p JOIN p.conversation c WHERE p.active = true and c.realm is null and c.house is null AND c.association IS NULL and p.character = :me');
                 $query->setParameters(['me'=>$char]);
                 return new ArrayCollection($query->getResult());
         }
@@ -249,7 +250,7 @@ class ConversationManager {
                 }
         }
 
-        public function removeOrpahnConversations() {
+        public function removeOrphanConversations() {
                 $all = $this->em->getRepository('BM2SiteBundle:Conversation');
                 $count = 0;
                 foreach ($all as $conv) {
@@ -353,7 +354,7 @@ class ConversationManager {
                 return $conv;
         }
 
-        public function writeLocalMessage(Character $char, $target, $topic, $type, $text, $replyTo = null, $group) {
+        public function writeLocalMessage(Character $char, $target, $topic = null, $type, $text, $replyTo = null, $group) {
                 #TODO: Finish reworking this.
                 if ($target == 'place') {
                         $recipients = $char->getInsidePlace()->getCharactersPresent();
@@ -371,6 +372,9 @@ class ConversationManager {
                 $cycle = $this->appstate->getCycle();
                 if ($replyTo) {
                         $origTarget = $this->em->getRepository('BM2SiteBundle:Message')->findOneById($replyTo);
+                        if (!$topic && $origTarget) {
+                                $topic = $origTarget->getTopic();
+                        }
                 } else {
                         $origTarget = FALSE;
                 }
@@ -392,9 +396,9 @@ class ConversationManager {
                         $msg->setSent($now);
                         $msg->setContent($text);
                         if ($origTarget) {
-                                $targetMsg = $this->em->getRepository('BM2SiteBundle:Message')->findOneBy(['sent'=>$origTarget->getSent(), 'sender'=>$origTarget->getSender(), 'content'=>$origTarget->getContent()]);
+                                $targetMsg = $this->em->getRepository('BM2SiteBundle:Message')->findOneBy(['conversation'=>$conv, 'sender'=>$origTarget->getSender(), 'content'=>$origTarget->getContent()]);
                                 if ($targetMsg) {
-                                        $msg->setReplyTo($target);
+                                        $msg->setReplyTo($targetMsg);
                                 }
                         }
                         $msg->setRecipientCount($count);
@@ -419,9 +423,12 @@ class ConversationManager {
                 }
                 $realm = null;
                 $house = null;
+                $assoc = null;
                 if ($org) {
                         if ($org instanceof Realm) {
                                 $realm = $org;
+                        } elseif ($org instanceof Association) {
+                                $assoc = $org;
                         } elseif ($org instanceof House) {
                                 $house = $org;
                         }
@@ -442,7 +449,7 @@ class ConversationManager {
                 $added = [];
                 $this->em->flush();
 
-                if (!$realm && !$house && !$local) {
+                if (!$realm && !$house && !$assoc && !$local) {
                         $creator = new ConversationPermission();
                         $this->em->persist($creator);
                         $creator->setOwner(true);
@@ -458,6 +465,11 @@ class ConversationManager {
                         $conv->setRealm($realm);
                         if (!$recipients) {
                                 $recipients = $realm->findMembers();
+                        }
+                } elseif ($assoc) {
+                        $conv->setAssociation($assoc);
+                        if (!$recipients) {
+                                $recipients = $assoc->findAllMemberCharacters();
                         }
                 } elseif ($house) {
                         $conv->setHouse($house);
@@ -651,6 +663,7 @@ class ConversationManager {
         public function updateMembers(Conversation $conv, ArrayCollection $members=null) {
                 $realm = $conv->getRealm();
                 $house = $conv->getHouse();
+                $assoc = $conv->getAssociation();
                 $added = new ArrayCollection();
                 $removed = new ArrayCollection();
                 $now = new \DateTime("now");
@@ -659,6 +672,11 @@ class ConversationManager {
                         $entity = $realm;
                         if (!$members) {
                                 $members = $realm->findMembers();
+                        }
+                } elseif ($assoc) {
+                        $entity = $assoc;
+                        if (!$members) {
+                                $members = $assoc->findMembers();
                         }
                 } else {
                         $entity = $house;
@@ -827,5 +845,14 @@ class ConversationManager {
                         $perm->setOwner(false);
                 }
                 return $perm;
+        }
+
+        public function updateSystemConversations($orgType = 'realm', $org) {
+                $sysConvs = ['announcements'=>'Announcements', 'general'=>'General Discussions'];
+                foreach ($sysConvs as $sys=>$name) {
+                        $conv = $this->em->getRepository('BM2SiteBundle:Conversation')->findOneBy([$orgType=>$org, 'system'=>$sys]);
+                        $conv->setName($org->getName().' '.$name);
+                }
+                $this->em->flush();
         }
 }

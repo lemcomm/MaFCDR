@@ -146,6 +146,7 @@
 		<many-to-one field="liege_place" target-entity="Place" inversed-by="vassals"/>
 		<many-to-one field="liege_position" target-entity="RealmPosition" inversed-by="vassals"/>
 		<field name="oath_current" type="boolean" nullable="true"/>
+		<field name="oath_time" type="datetime" nullable="true"/>
 
 		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
 		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
@@ -155,5 +156,6 @@
 		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
 		<one-to-many field="founded_associations" target-entity="Association" mapped-by="founder"/>
 		<one-to-many field="association_memberships" target-entity="AssociationMember" mapped-by="character"/>
+		<many-to-one field="faith" target-entity="Association" inversed-by="followers"/>
 	</entity>
 </doctrine-mapping>

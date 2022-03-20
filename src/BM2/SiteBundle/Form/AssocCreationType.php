@@ -2,20 +2,27 @@
 
 namespace BM2\SiteBundle\Form;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
 use BM2\SiteBundle\Entity\AssociationType;
 
 class AssocCreationType extends AbstractType {
 
 	private $types;
-	private $realms;
+	private $assocs;
 
-	public function __construct($types, $realms) {
+	public function __construct($types, $assocs) {
 		$this->types = $types;
-		$this->realms = $realms;
+		$this->assocs = $assocs;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -27,71 +34,99 @@ class AssocCreationType extends AbstractType {
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$types = $this->types;
-		$realms = $this->realms;
-		$builder->add('name', 'text', array(
+		$assocs = $this->assocs;
+		$builder->add('name', TextType::class, array(
 			'label'=>'assoc.form.new.name',
 			'required'=>true,
 			'attr' => array(
 				'size'=>20,
 				'maxlength'=>40,
-				'title'=>'assoc.help.new.name'
+				'title'=>'assoc.help.name'
 			)
 		));
-		$builder->add('formal_name', 'text', array(
+		$builder->add('formal_name', TextType::class, array(
 			'label'=>'assoc.form.new.formalname',
 			'required'=>true,
 			'attr' => array(
 				'size'=>40,
 				'maxlength'=>160,
-				'title'=>'assoc.help.new.formalname'
+				'title'=>'assoc.help.formalname'
 			)
 		));
-		$builder->add('type', 'entity', array(
+		$builder->add('faith_name', TextType::class, array(
+			'label'=>'assoc.form.new.faithname',
+			'required'=>false,
+			'attr' => array(
+				'size'=>80,
+				'maxlength'=>255,
+				'title'=>'assoc.help.faithname'
+			)
+		));
+		$builder->add('follower_name', TextType::class, array(
+			'label'=>'assoc.form.new.followername',
+			'required'=>false,
+			'attr' => array(
+				'size'=>80,
+				'maxlength'=>255,
+				'title'=>'assoc.help.followername'
+			)
+		));
+		$builder->add('type', EntityType::class, array(
 			'label'=>'assoc.form.new.type',
 			'required'=>true,
-			'placeholder' => 'type.empty',
-			'attr' => array('title'=>'help.new.type'),
+			'placeholder' => 'assoc.form.select',
+			'attr' => array('title'=>'assoc.help.type'),
 			'class' => 'BM2SiteBundle:AssociationType',
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
 			'choices' => $types
 		));
-		$builder->add('motto', 'text', array(
+		$builder->add('motto', TextType::class, array(
 			'label'=>'assoc.form.new.motto',
 			'required'=>false,
-			'data'=>$motto,
 			'attr' => array(
 				'size'=>40,
 				'maxlength'=>160,
-				'title'=>'assoc.help.new.motto')
+				'title'=>'assoc.help.motto')
 		));
-		$builder->add('founder', 'text', array(
+		$builder->add('founder', TextType::class, array(
 			'label'=>'assoc.form.new.founder',
 			'required'=>true,
 			'attr' => array(
 				'size'=>20,
 				'maxlength'=>160,
-				'title'=>'assoc.help.new.founder'
+				'title'=>'assoc.help.founder'
 			)
 		));
-		$builder->add('public', 'checkbox', array(
-			'label'=>'assoc.form.description.public',
+		$builder->add('public', CheckboxType::class, array(
+			'label'=>'assoc.form.new.public',
 			'attr' => array('title'=>'assoc.help.public'),
-			'placeholder' => true
+			'data' => true
 		));
-		$builder->add('short_description', 'textarea', array(
+		$builder->add('short_description', TextareaType::class, array(
 			'label'=>'assoc.form.description.short',
 			'attr' => array('title'=>'assoc.help.shortdesc'),
 			'required'=>true,
 		));
-		$builder->add('description', 'textarea', array(
+		$builder->add('description', TextareaType::class, array(
 			'label'=>'assoc.form.description.full',
 			'attr' => array('title'=>'assoc.help.longdesc'),
 			'required'=>true,
 		));
+		$builder->add('superior', EntityType::class, array(
+			'label'=>'assoc.form.new.superior',
+			'required'=>false,
+			'placeholder' => 'assoc.form.superior',
+			'attr' => array('title'=>'assoc.help.type'),
+			'class' => 'BM2SiteBundle:Association',
+			'choice_translation_domain' => true,
+			'choice_label' => 'name',
+			'choices' => $types
+		));
+		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
 
 	public function getName() {
-		return 'placenew';
+		return 'assoccreate';
 	}
 }

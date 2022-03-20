@@ -74,8 +74,7 @@
 		<one-to-many field="vassals" target-entity="Character" mapped-by="liege_place"/>
 
 		<one-to-many field="activities" target-entity="Activity" mapped-by="place"/>
-		<one-to-many field="hq_of" target-entity="Association" mapped-by="headquarters"/>
-		<many-to-one field="association" target-entity="Association" inversed-by="places"/>
+		<one-to-many field="associations" target-entity="AssociationPlace" mapped-by="place"/>
 
 		<one-to-many field="battles" target-entity="Battle" mapped-by="place" fetch="EXTRA_LAZY"/>
 

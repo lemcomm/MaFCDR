@@ -1,0 +1,7 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'assoc.route.place.add.name'|trans({},"orgs")|title }}</h2>
+	<p>{{ 'assoc.route.place.add.intro'|trans({},"orgs")|raw }}</p>
+	{{ form(form) }}
+{% endblock %}

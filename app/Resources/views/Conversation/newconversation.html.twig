@@ -13,7 +13,7 @@
 	{% else %}
 		{{ 'conversation.new.title'|trans({}, "conversations")|title }}</h2>
 	{% endif %}
-	
+
 {% include "Conversation/reply.html.twig" %}
 
 {% endblock %}
@@ -21,5 +21,12 @@
 {% block jquery %}
 
 {% include "element/msgautocomplete.js.twig" %}
+
+function search_insert(insert) {
+	var caretPos = document.getElementById("new_conversation_content").selectionStart;
+	var textAreaTxt = $("#new_conversation_content").val();
+	$("#new_conversation_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+}
 
 {% endblock %}

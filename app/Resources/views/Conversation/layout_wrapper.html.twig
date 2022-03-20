@@ -1,0 +1,102 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% block content %}
+
+{% if type == 'org' %}
+	{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive, "privacy": privacy, "known": known} %}
+{% elseif type == 'local' %}
+	{% include "Conversation/local_conv.html.twig" with {"messages": messages, "conversation": conversation, "archive": archive} %}
+{% else %}
+	{% include "Conversation/priv_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
+{% endif %}
+
+{% endblock %}
+
+{% block jquery %}
+{% include "element/msgautocomplete.js.twig" %}
+
+$("#syntaxhelp").click(function(){
+	$("#help").toggle();
+});
+
+$("#replydialog").dialog({
+	autoOpen: false,
+	width: "65%",
+	position: { my: "center top", at: "center bottom", of: $("#symfony-header") }
+});
+
+{% if type != 'local' %}
+	{# Private or Org Conversation Reply #}
+
+	function search_insert(insert) {
+		var caretPos = document.getElementById("message_reply_content").selectionStart;
+		var textAreaTxt = $("#message_reply_content").val();
+		$("#message_reply_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+	}
+
+	$(".cmsg_conversation").on("click", "button.topicreply", function(){
+		var id = $(this).data('id');
+		replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", id,);
+	});
+	$(".cmsg_conversation").on("click", "button.reply", function(){
+		var id = $(this).closest('.cmsg_message').data('id');
+		replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", {{ conversation.id }}, id);
+	});
+
+	function replyform(title, conversation, reply_to) {
+		$("#replydialog").dialog("option", "title", title);
+		$("#message_reply_topic").parent().hide();
+		$("#replydialog").dialog("open");
+		$("#message_reply_conversation").val(conversation);
+		$("#message_reply_reply_to").val(reply_to);
+		$("#replydialog form").attr('action', '{{ path('maf_conv_reply', {conv: conversation.id}) }}');
+	}
+{% else %}
+	{# Local Conversation Reply #}
+
+	function search_insert(insert) {
+		var caretPos = document.getElementById("new_local_message_content").selectionStart;
+		var textAreaTxt = $("#new_local_message_content").val();
+		$("#new_local_message_content").val(textAreaTxt.substring(0, caretPos) + insert + textAreaTxt.substring(caretPos) );
+
+	}
+
+	$(".cmsg_conversation").on("click", "button.topicreply", function(){
+		replyform("{{ 'conversation.reply.title'|trans({}, "conversations")|title }}", null, null, null);
+	});
+	$(".cmsg_conversation").on("click", "button.reply", function(){
+		var id = $(this).closest('.cmsg_message').data('id');
+		var topic = $(this).closest('.cmsg_message').data('topic');
+		if (!topic.startsWith("Re:")) {
+			topic = "Re: " + topic;
+		}
+		var target = $(this).closest('.cmsg_message').data('target');
+		replyform("{{ 'message.reply.title'|trans({}, "conversations")|title }}", id, topic, target);
+	});
+
+	function replyform(title, reply_to, topic, target) {
+		$("#replydialog").dialog("option", "title", title);
+		$("#replydialog").dialog("open");
+		$("#new_local_message_topic").val(topic);
+		$("#new_local_message_reply_to").val(reply_to);
+		$("#new_local_message_target").val(target);
+		$("#replydialog form").attr('action', '{{ path('maf_conv_local_new') }}');
+	}
+{% endif %}
+
+$("#oldmessages").hide();
+var old_visible = false;
+$("#hidetoggle").click(function(){
+	if (old_visible) {
+		$("#hidetoggle").html("{{ 'conversation.old.show'|trans({},"conversations") }}");
+		$("#oldmessages").hide("blind", 1200);
+		old_visible = false;
+	} else {
+		$("#hidetoggle").html("{{ 'conversation.old.hide'|trans({},"conversations") }}");
+		$("#oldmessages").show("blind", 1200);
+		old_visible = true;
+	}
+});
+
+{% endblock %}

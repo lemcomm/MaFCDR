@@ -522,7 +522,7 @@ class WarController extends Controller {
 								# We already know they're *a* leader, now to figure out what group they lead.
 								#TODO: Later when we add more sides to a battle, we'll need to expand this.
 								if ($siege->getAttacker()->getCharacters()->contains($character)) {
-									$group = $siege->getAttackers();
+									$group = $siege->getAttacker();
 								} else {
 									$group = $siege->getDefender();
 								}
@@ -652,9 +652,16 @@ class WarController extends Controller {
 							if ($data['subaction'] == 'assume') {
 								# First, make sure they're in a position to actually do this.
 								#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
-								# TODO: expand this for attackers and other defenders. This is a good step 1 though.
-								if ($siege->getDefender()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
-									$siege->setLeader('defenders', $character);
+								if ($siege->getDefender()->getCharacters()->contains($character)) {
+									if ($settlement->getOwner() == $character) {
+										$siege->setLeader('defenders', $character);
+										$em->flush();
+									} elseif (!$siege->getDefender()->getLeader()) {
+										$siege->setLeader('defenders', $character);
+										$em->flush();
+									}
+								} elseif ($siege->getAttacker()->getCharacters()->contains($character) && !$siege->getAttacker()->getLeader()) {
+									$siege->setLeader('attackers', $character);
 									$em->flush();
 								}
 								if ($place) {
@@ -721,9 +728,9 @@ class WarController extends Controller {
 			if ($ratio > 0.25) { $ratio = 0.25; }
 			if (!$inside) {
 				if ($settlement->isFortified()) {
-					$ratio *= 0.25;
-				} else {
 					$ratio *= 0.1;
+				} else {
+					$ratio *= 0.25;
 				}
 			}
 

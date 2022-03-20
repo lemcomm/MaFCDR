@@ -11,6 +11,7 @@
 		<field name="public" type="boolean" nullable="true"/>
 		<field name="spawnable" type="boolean" nullable="true"/>
 		<field name="vassals" type="boolean" nullable="true"/>
+		<field name="associations" type="boolean" nullable="true"/>
 		<one-to-many field="subtypes" target-entity="PlaceSubType" mapped-by="place_type"/>
 	</entity>
 </doctrine-mapping>

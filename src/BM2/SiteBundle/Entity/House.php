@@ -29,6 +29,16 @@ class House {
 		return false;
 	}
 
+	public function findActivePlayers() {
+		$users = new ArrayCollection();
+		foreach ($this->findAllActive() as $each) {
+			if (!$users->contains($each->getUser())) {
+				$users->add($each->getUser());
+			}
+		}
+		return $users;
+	}
+
 	public function findAllLiving() {
 		$all_living = new ArrayCollection;
 		$all_members = $this->findAllMembers();
@@ -109,5 +119,6 @@ class House {
 		return $all_sups;
 
 	}
+	
 	
 }

@@ -3,7 +3,10 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Artifact;
+use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\Description;
 use BM2\SiteBundle\Entity\Item;
 use BM2\SiteBundle\Entity\Place;
@@ -38,12 +41,25 @@ class DescriptionManager {
 		if ($entity->getDescription()) {
 			$olddesc = $entity->getDescription();
 		}
+		$eClass = $this->getClassName($entity);
 		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
 		if ($olddesc) {
 			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-			switch($this->getClassName($entity)) {
+			switch($eClass) {
 				case 'Artifact':
 					$olddesc->setActiveArtifact(NULL);
+					$this->em->flush();
+					break;
+				case 'Association':
+					$olddesc->setActiveAssociation(NULL);
+					$this->em->flush();
+					break;
+				case 'AssociationRank':
+					$olddesc->setActiveAssociationRank(NULL);
+					$this->em->flush();
+					break;
+				case 'Deity':
+					$olddesc->setActiveDeity(NULL);
 					$this->em->flush();
 					break;
 				case 'House':
@@ -72,10 +88,22 @@ class DescriptionManager {
 		$desc = new Description();
 		$this->em->persist($desc);
 		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-		switch($this->getClassName($entity)) {
+		switch($eClass) {
 			case 'Artifact':
 				$desc->setActiveArtifact($entity);
 				$desc->setArtifact($entity);
+				break;
+			case 'Association':
+				$desc->setActiveAssociation($entity);
+				$desc->setAssociation($entity);
+				break;
+			case 'AssociationRank':
+				$desc->setActiveAssociationRank($entity);
+				$desc->setAssociationRank($entity);
+				break;
+			case 'Deity':
+				$desc->setActiveDeity($entity);
+				$desc->setDeity($entity);
 				break;
 			case 'House':
 				$desc->setActiveHouse($entity);
@@ -106,14 +134,31 @@ class DescriptionManager {
 		$desc->setUpdater($character);
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
-		$this->em->flush($desc);
+		$this->em->flush();
 		if (!$new) {
 			/* No need to tell the people that just made the thing that they updated the descriptions. */
-			switch($this->getClassName($entity)) {
+			/* Association Ranks deliberately ommitted. */
+			switch($eClass) {
 				case 'Artifact':
 					$this->history->logEvent(
 						$entity,
 						'event.description.updated.artifact',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Association':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.assoc',
+						null,
+						History::LOW
+					);
+					break;
+				case 'Deity':
+					$this->history->logEvent(
+						$entity,
+						'event.description.updated.deity',
 						null,
 						History::LOW
 					);
@@ -168,10 +213,11 @@ class DescriptionManager {
 		if ($entity->getSpawnDescription()) {
 			$olddesc = $entity->getSpawnDescription();
 		}
+		$eClass = $this->getClassName($entity);
 		/* If we don't unset these and commit those changes, we create a unique key constraint violation when we commit the new ones. */
 		if ($olddesc) {
 			/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-			switch($this->getClassName($entity)) {
+			switch($eClass) {
 				case 'House':
 					$olddesc->setActiveHouse(null);
 					break;
@@ -188,7 +234,7 @@ class DescriptionManager {
 		$desc = new SpawnDescription();
 		$this->em->persist($desc);
 		/* NOTE: If other things get descriptions, this needs updating with the new logic. */
-		switch($this->getClassName($entity)) {
+		switch($eClass) {
 			case 'House':
 				$desc->setActiveHouse($entity);
 				$desc->setHouse($entity);

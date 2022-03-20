@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace BM2\SiteBundle\Entity;
 
@@ -112,17 +112,18 @@ class User extends BaseUser {
 	}
 
 	public function getFreePlaces() {
-		$months = $this->getCreated()->diff(new \DateTime("now"), true)->m;
+		$months = floor($this->getCreated()->diff(new \DateTime("now"), true)->days/30);
 		$count = 0;
 		foreach ($this->getCharacters() as $character) {
 			$count += $character->getCreatedPlaces()->count();
 		}
 		if ($this->account_level >= 20) {
-			$mod = 1;
+			$mod = 2;
 		} else {
-			$mod = 0;
+			$mod = 1;
 		}
-		return $months - $count + $mod;
+		return ($months * $mod) - $count;
 	}
+
 	
 }

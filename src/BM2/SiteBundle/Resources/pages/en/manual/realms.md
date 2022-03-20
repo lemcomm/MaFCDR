@@ -29,6 +29,19 @@ Settlements and Realms
 ----------------------
 As opposed to [characters], [settlements] can only belong to one realm. Even if their lord is a member in several realms, the settlement has to belong to exactly one. The lord can, however, change the settlement allegiance at any time between all the realms he belongs to.
 
+Realm Laws
+----------
+There are several types of Realm Laws that can be implemented. These are:
+* Settlement Inheritance
+* Place Inheritance
+* Access to Slumbering Estates
+* Automatic Claims on Slumbering Estates
+* Realm Taxes on Food, Wood, Metal, or Wealth
+* And User Defined Laws which you describe yourself.
+
+With exception of the ones you define, these all have in game mechanics supporting them. Inheritance laws will take precedence over in-game heirs. Access to slumbering estates will let you bypass militias and guards to take these back sooner. Automatic claims on slumbering estates grant faster takeover times. And tax laws automatically load their target settlement into realm trade pages--but do not automatically take the resource.
+
+Additionally, while they aren't displayed in game, all laws are stored for historical purposes. Access to historic changes will come soon.
 
 ---
 

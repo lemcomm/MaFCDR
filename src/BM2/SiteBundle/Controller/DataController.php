@@ -58,4 +58,49 @@ class DataController extends Controller {
 		return $response;
 	}
 
+	/**
+     * @Route("/assocs")
+     */
+	public function assocsAction(Request $request) {
+		$term = $request->query->get("term");
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT a.id, a.name as value FROM BM2SiteBundle:Association a WHERE LOWER(a.name) LIKE :term OR LOWER(a.formal_name) LIKE :term ORDER BY a.name ASC');
+		$query->setParameter('term', '%'.strtolower($term).'%');
+		$result = $query->getArrayResult();
+
+		$response = new Response(json_encode($result));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+	}
+
+	/**
+     * @Route("/places")
+     */
+	public function placesAction(Request $request) {
+		$term = $request->query->get("term");
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT p.id, p.name as value FROM BM2SiteBundle:Place p WHERE LOWER(p.name) LIKE :term OR LOWER(p.formal_name) LIKE :term ORDER BY p.name ASC');
+		$query->setParameter('term', '%'.strtolower($term).'%');
+		$result = $query->getArrayResult();
+
+		$response = new Response(json_encode($result));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+	}
+
+	/**
+     * @Route("/houses")
+     */
+	public function housesAction(Request $request) {
+		$term = $request->query->get("term");
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT h.id, h.name as value FROM BM2SiteBundle:House h WHERE LOWER(h.name) LIKE :term ORDER BY h.name ASC');
+		$query->setParameter('term', '%'.strtolower($term).'%');
+		$result = $query->getArrayResult();
+
+		$response = new Response(json_encode($result));
+		$response->headers->set('Content-Type', 'application/json');
+		return $response;
+	}
+
 }

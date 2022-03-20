@@ -9,6 +9,7 @@
 		<field name="description" type="text"/>
 		<many-to-one field="type" target-entity="PositionType" nullable="true"/>
 		<field name="ruler" type="boolean"/>
+		<field name="legislative" type="boolean" nullable="true"/>
 		<field name="elected" type="boolean"/>
 		<field name="electiontype" type="string" nullable="true"/>
 		<field name="inherit" type="boolean"/>
@@ -21,7 +22,6 @@
 		<field name="retired" type="boolean" nullable="true"/>
 		<field name="keeponslumber" type="boolean" nullable="true"/>
 		<field name="minholders" type="integer" nullable="true"/>
-		<field name="welcomer" type="boolean" nullable="true"/>
 		<field name="have_vassals" type="boolean" nullable="true"/>
 
 		<many-to-one field="realm" target-entity="Realm" inversed-by="positions"/>

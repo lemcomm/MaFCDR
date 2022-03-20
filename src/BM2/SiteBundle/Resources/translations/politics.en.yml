@@ -4,10 +4,11 @@
 # Contact: mafteam@lemuriacommunity.org
 status:
  self:
-  landless:			You are a landless knight.
+  faith:        You are a member of <a href="%link%">%name%</a>.
+  landless:			  You are a landless knight.
   landless2:    You are a landless noble.
-  independent:	You are an independent lord.
-  vassal:			  You are a vassal of %liege%.
+  independent:	 You are an independent lord.
+  vassal:			    You are a vassal of %liege%.
   realm:        You are a member of %realm%
   ultimate:     You are an independent leader, but have not formed a realm yet.
   liege:        Liege of:
@@ -22,6 +23,7 @@ status:
   liegeplace2:  You are a knight of the independent place of %liege%.
   liegeposition: You are a knight of the %liege% of %realm%.
  other:
+  faith:       %He% is a member of <a href=%link%>%name%</a>.
   landless:			%He% is a landless knight.
   landless2:    %He% is a landless noble.
   independent:	%He% is an independent lord.
@@ -445,7 +447,8 @@ position:
  remove:        Remove Position
  keeponslumber: Position kept on slumber?
  retired:       Position is retired?
- welcomer:      Position is a Welcomer?
+ legislative:   Position can change laws?
+ haveVassals:   Position can have vassals?
  year:          Next election year?
  week:          Next election week?
  minholders:    Minimum number of holders?
@@ -773,42 +776,6 @@ perm:
   placedescribe: >
     Allows those with this permission to edit the description of this Place.
 
-law:
- header:
-  name:     Name
-  desc:     Description
-  current:  Current law
- label:
-  succession:       Succession by heir
-  ruler_election:   Ruler election method
-  estates:          Estates inheritance
- desc:
-  succession:       Determines whether the ruler's successor can inherit the realm or not. If not, the ruler's death or resignation will always trigger an election.
-  ruler_election:   How a new ruler is elected whenever such is necessary.
-  estates:          If estates can be inherited, or who they fall to in case of death of the lord.
-# these are defined in the RealmManager
- value:
-  enabled:    Enabled
-  disabled:   Disabled
-  name:
-   banner:    by Banner
-   spears:    by Spears
-   swords:    by Swords
-   land:      by Land
-   heads:     by Heads
-   inherit:   inherit
-   liege:     liege
-   ruler:     ruler
-  desc:
-   banner:    one vote per First One
-   spears:    one vote per warrior commanded
-   swords:    one vote per vassal
-   land:      one vote per estate
-   heads:     one vote per peasant ruled
-   inherit:   inherited by successor
-   liege:     fall to the lord
-   ruler:     fall to the ruler
-
 claim:
  title:       Claims
  none:        No current claims
@@ -821,6 +788,44 @@ claim:
  cancelled:   You have withdrawn your claim.
  donthave:    You cannot withdraw a claim you do not hold.
  enforceable: Holds an enforceable claim, which makes taking control very easy.
+
+assoc:
+ view:
+  name:         View Details
+  description:  Bring up details on the Association
+ graphRanks:
+  name:   Rank Hierarchy Graph
+  description:  View known ranks hiearchically.
+ viewRanks:
+  name:   View Association Ranks
+  description:  Look through the ranks you know of.
+ new:
+  name:         Create an Association
+  description:  Create a new association at this place of interest.
+  longdesc:     First Ones can always organize themselves into yet more complex groups.
+ update:
+  name:         Update Association Details
+  description:  Announce the new to replace the old.
+  longdesc:     Times change, so do Associations.
+ create:
+  rank:
+   name:        Add a New Rank
+   description: Add a new rank to the internal hierarchy
+   longdesc:    If you feel like there's a missing role within the strucutre of the association, you can always add one.
+ deities:
+  new:
+   name:         Formalize a New Deity
+   description:  Bring recognition to one previously unknown.
+   longdesc:     Higher powers are a known thing in M&F. Why not recognize them?
+  viewAll:
+   name:         View All Known Deities
+   description:  Perhaps one another knows is really one you also know?
+   longdesc:     Many deities are known by many people. You can always add one to your pantheon.
+  viewMine:
+   name:         "View Recognized Deities"
+   description:  Review the deities recognized or honored by the assocation.
+   longdesc:     These are those recognized by this association.
+
 
 house:
  history:

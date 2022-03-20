@@ -1,6 +1,10 @@
 {% if list.elements %}
 {% if list.name is defined %}
-	<h2 class="clear">{{ list.name|trans({},domain)|title }}</h2>
+	{% if submenu is defined %}
+		<{{submenu}} class="clear">{{ list.name|trans({},domain)|title }}</{{submenu}}>
+	{% else %}
+		<h2 class="clear">{{ list.name|trans({},domain)|title }}</h2>
+	{% endif %}
 {% endif %}
 <ul>
 {% set inside = false %}
@@ -23,7 +27,15 @@
 		{% else %}
 			<li>
 		{% endif %}
-		<a href="{{ path(element.url, params) }}">{{ element.name|trans({},domain)|title }}</a>
+		{% if element.vars.spawn is defined %}
+			{% if element.vars.spawn %}
+				<a href="{{ path(element.url, params) }}">{{ (element.name ~ '.deactivate')|trans({},domain)|title }}</a>
+			{% elseif element.vars.spawn is defined and not element.vars.spawn %}
+				<a href="{{ path(element.url, params) }}">{{ (element.name ~ '.activate')|trans({},domain)|title }}</a>
+			{% endif %}
+		{% else %}
+			<a href="{{ path(element.url, params) }}">{{ element.name|trans(transkeys,domain)|title }}</a>
+		{% endif %}
 	{% else %}
 		{% set inside = true %}
 		{% if element.long is defined %}
@@ -31,7 +43,7 @@
 		{% else %}
 			<li class="disabled">
 		{% endif %}
-		<span class="nolink">{{ element.name|trans({},domain)|title }}</span>
+		<span class="nolink">{{ element.name|trans(transkeys,domain)|title }}</span>
 	{% endif %}
 	{% if element.description is defined %}
 		{% if element.url is defined %}

@@ -16,6 +16,7 @@ pg_dump -C maf | gzip > $BACKUPDIR/maf-$DAY.sql.gz
 php $APP maf:process:expires --env=prod 2>&1 > $LOGDIR/turn-$DAY.log
 php $APP maf:run -t -d turn --env=prod 2>&1 >> $LOGDIR/turn-$DAY.log
 php $APP maf:process:economy --env=prod -t 2>&1 >> $LOGDIR/turn-$DAY.log
+php $APP maf:process:convs --env=prod 2>&1 >> $LOGDIR/turn-$DAY.log
 echo "----- turn done -----" >> $LOGDIR/turn-$DAY.log
 
 # If you're on a server where you want mails, you may want to setup the below as appropriate.

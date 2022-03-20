@@ -58,7 +58,7 @@ class PlaceNewType extends AbstractType {
 			'group_by' => function($val, $key, $index) {
 				if ($val->getRequires() == NULL) {
 					return 'by.none';
-				} elseif (in_array($val->getRequires(), ['inn', 'tavern', 'castle', 'fort', 'docks', 'track', 'arena', 'academy'])) {
+				} elseif (in_array($val->getRequires(), ['inn', 'library', 'tavern', 'castle', 'fort', 'docks', 'track', 'arena', 'academy', 'warehouse', 'temple', 'list field', 'tournament', 'smith'])) {
 					return 'by.building';
 				} else {
 					return 'by.'.$val->getRequires();

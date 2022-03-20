@@ -86,7 +86,7 @@ class InfoController extends Controller {
 	  * @Route("/equipmenttypes")
 	  */
 	public function allequipmenttypesAction() {
-		
+
 		return $this->render('Info/all.html.twig', $this->alltypes('EquipmentType'));
 	}
 
@@ -117,5 +117,13 @@ class InfoController extends Controller {
 			"all" => $all
 		);
 	}
+
+	/**
+	  * @Route("/{page}")
+	  */
+	  public function infoWildcardAction($page) {
+
+		  return $this->redirectToRoute('bm2_manual', ['page'=>$page]);
+	  }
 
 }

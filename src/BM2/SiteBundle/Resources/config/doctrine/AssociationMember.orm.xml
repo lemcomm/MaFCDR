@@ -5,7 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="join_date" type="datetime"/>
-		<field name="rank_date" type="datetime"/>
+		<field name="rank_date" type="datetime" nullable="true"/>
 		<many-to-one field="association" target-entity="Association" inversed-by="members"/>
 		<many-to-one field="character" target-entity="Character" inversed-by="association_memberships"/>
 		<many-to-one field="rank" target-entity="AssociationRank" inversed-by="members"/>

@@ -16,7 +16,7 @@ Without an estate to draw from, knights are dependent on lords to supply them wi
 
 Outside of war, knights often struggle to find much activity, which is the main driving force behind both distractions such as tournaments and new wars. As such, even though the individual knight is low in the hierarchy, when united, the knights of a realm can be a powerful political force.
 
-If there is no war or other duties, you can also [explore dungeons](http://forum.mightandfealty.com/index.php/board,20.0.html).
+If there is no war or other duties, you can also explore dungeons, which are intentionally undocumented.
 
 
 Becoming a Lord

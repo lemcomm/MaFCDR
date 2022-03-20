@@ -54,7 +54,7 @@ class NewLocalMessageType extends AbstractType {
 			$target['settlement'] = 'conversation.target.settlement';
 		}
 		$builder->add('topic', TextType::class, array(
-			'required' => true,
+			'required' => false,
 			'label' => 'conversation.topic.label',
 			'attr' => array('size'=>40, 'maxlength'=>80)
 		));

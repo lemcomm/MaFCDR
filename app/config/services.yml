@@ -62,7 +62,7 @@ services:
         arguments:  [@doctrine.orm.entity_manager, @appstate, @logger]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions']
+        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
     twig.extension.dispatcher:
         class:      BM2\SiteBundle\Twig\DispatcherExtension
         arguments:  ['@dispatcher']
@@ -73,13 +73,16 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
     character_manager:
         class:      BM2\SiteBundle\Service\CharacterManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager', '@association_manager']
     npc_manager:
         class:      BM2\SiteBundle\Service\NpcManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
+    law_manager:
+        class:      BM2\SiteBundle\Service\LawManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     realm_manager:
         class:      BM2\SiteBundle\Service\RealmManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager', '@law_manager']
     news_manager:
         class:      BM2\SiteBundle\Service\NewsManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@geography']
@@ -91,7 +94,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
     association_manager:
         class:      BM2\SiteBundle\Service\AssociationManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
     action_resolution:
         class:      BM2\SiteBundle\Service\ActionResolution
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager']

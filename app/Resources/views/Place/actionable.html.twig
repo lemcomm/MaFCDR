@@ -3,12 +3,10 @@
 {% block content %}
 	<h2>{{ 'place.actionable.name'|trans({},"places") }}</h2>
 	<p>{{ 'place.actionable.intro'|trans({},"places")|raw }}</p>
-
-	<h3> {{ 'place.actionable.list'|trans({},"places")|title }}</h2>
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for place in places %}
-		{% set type = place.type %}
 		{% set house = place.house %}
+
 		{% if character.insidePlace == place %}
 			{% set inside = true %}
 		{% else %}
@@ -17,41 +15,13 @@
 		{% if place.visible or inside or (not place.visible and place.owner == character) %}
 			<hr>
 			<div class="subcontent inline_announcements" style="color:#460702">
-				<h3>{{ place.name|title }}</h4>
+				<h2>{{ place.name|title }}</h2>
 				{% if inside %}
 					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
 				{% endif %}
-				{{ place.description.text }}<br><br>
-				{% set spawncheck = dispatcher.placeNewPlayerInfoTest(null, place) %}
-				{% if spawncheck.url is defined %}
-					{% set spawnfail = false %}
-
-					{% if not place.spawn %}
-						{% set spawnfail = true %}
-						<i>{{ 'place.spawnfail.nospawn'|trans({}, "places")|raw }}</i><br><br>
-					{% elseif not place.spawnDescription %}
-						{% set spawnfail = true %}
-						<i>{{ 'place.spawnfail.nodesc'|trans({}, "places")|raw }}</i><br><br>
-					{% endif %}
-					{% if not spawnfail and place.spawn.house %}
-						{% if not place.spawn.active %}
-							<i>{{ 'place.spawnfail.houseinactive'|trans({}, "places")|raw }}</i><br><br>
-						{% elseif not place.house.spawnDescription %}
-							<i>{{ 'place.spawnfail.nohousedesc'|trans({}, "places")|raw }}</i><br><br>
-						{% else %}
-							<i>{{ 'place.housespawn'|trans({"%house%":place.house.name}, "places")|raw }}</i><br><br>
-						{% endif %}
-					{% elseif not spawnfail and place.spawn.realm %}
-						{% if not place.spawn.active %}
-							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i><br><br>
-						{% elseif not place.realm.spawnDescription %}
-							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i><br><br>
-						{% else %}
-							<i>{{ 'place.realmspawn'|trans({"%realm%":place.realm.name}, "places")|raw }}</i><br><br>
-						{% endif %}
-					{% endif %}
+				{% if place.description %}
+					<p>{{ place.description.text }}</p>
 				{% endif %}
-
 				{% if house %}
 					<i>{{ 'place.hosthouse'|trans({}, "places")|raw }}</i>
 					<hr>
@@ -62,79 +32,46 @@
 					{% else %}
 						{{ 'house.nodesc'|trans({}, "politics")|raw }}
 					{% endif %}
+					<hr>
 				{% endif %}
-				{% if not inside %}
-					{% set check = dispatcher.placeEnterTest(true, place) %}
-					{% if check.url is defined %}
-						<a href="{{path('maf_place_enter', {"id":place.id}) }}"><button id="enter">{{ 'place.enter'|trans({}, "places")|raw }}</button></a>
+				{% if not place.associations.isEmpty %}
+					{{ 'place.associations.list'|trans({}, "places")|raw }} {% for assoc in place.associations %}{{ link(assoc.association) }}{% if not loop.last %}, {% endif %}{% endfor %}
+					<hr>
+				{% endif %}
+
+				{% set list = dispatcher.placeActions(place) %}
+				{% if list.elements.placeNewPlayerInfoTest.url is defined %}
+					{% set spawnfail = false %}
+					<p>
+					{% if not place.spawn %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nospawn'|trans({}, "places")|raw }}</i>
+					{% elseif not place.spawnDescription %}
+						{% set spawnfail = true %}
+						<i>{{ 'place.spawnfail.nodesc'|trans({}, "places")|raw }}</i>
 					{% endif %}
-				{% else %}
-					<a href="{{path('maf_place_exit') }}"><button id="exit">{{ 'place.exit'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% set destroyable = false %}
-				{% if type.name == 'embassy' %}
-					{% set mngcheck = dispatcher.placeManageEmbassyTest(null, place) %}
-				{% elseif type.name == 'capital' %}
-					{% set mngcheck = dispatcher.placeManageRulersTest(null, place) %}
-					{% set destroyable = true %}
-				{% else %}
-					{% set mngcheck = dispatcher.placeManageTest(null, place) %}
-					{% set destroyable = true %}
-				{% endif %}
-				{% if mngcheck.url is defined %}
-					<a href="{{path('maf_place_manage', {"id":place.id}) }}"><button id="manage">{{ 'place.manage.button'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% set check = dispatcher.placeTransferTest(null, place) %}
-				{% if check.url is defined %}
-					<a href="{{path('maf_place_transfer', {"id":place.id}) }}"><button id="transfer">{{ 'place.transfer.name'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% if spawncheck.url is defined %}
-					<a href="{{path('maf_place_newplayer', {"place":place.id}) }}"><button id="spawn_description">{{ 'place.newplayer.button'|trans({}, "places")|raw }}</button></a>
-					<a href="{{path('maf_place_spawn_toggle', {"place":place.id}) }}"><button id="toggle_spawn">{% if place.spawn %}{{ 'place.spawn.deactivate'|trans({}, "places")|raw }}{% else %}{{ 'place.spawn.activate'|trans({}, "places")|raw }}{% endif %}</button></a>
-				{% endif %}
-				{% set check = dispatcher.placePermissionsTest(null, place) %}
-				{% if check.url is defined %}
-					<a href="{{path('maf_place_permissions', {"id":place.id}) }}"><button id="permissions">{{ 'place.permissions.button'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% set check = dispatcher.militarySiegePlaceTest(null, place) %}
-				{% if check.url is defined %}
-					<a href="{{path('maf_war_siege_place', {"place":place.id}) }}"><button id="siege">{{ 'place.siege.button'|trans({}, "places")|raw }}</button></a>
-				{% endif %}
-				{% if inside %}
-					{% if place.getType.getDefensible() %}
-						{% if place.getOccupier() == character %}
-							<a href="{{path('maf_place_occupant', {"place":place.id}) }}"><button id="siege">{{ 'place.occupant.button'|trans({}, "places")|raw }}</button></a>
-							<a href="{{path('maf_place_occupier', {"place":place.id}) }}"><button id="siege">{{ 'place.occupier.button'|trans({}, "places")|raw }}</button></a>
-							<a href="{{path('maf_place_occupation_end', {"place":place.id}) }}"><button id="siege">{{ 'place.occupy.button.end'|trans({}, "places")|raw }}</button></a>
+					{% if not spawnfail and place.spawn.house %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.houseinactive'|trans({}, "places")|raw }}</i>
+						{% elseif not place.house.spawnDescription %}
+							<i>{{ 'place.spawnfail.nohousedesc'|trans({}, "places")|raw }}</i>
+						{% else %}
+							<i>{{ 'place.housespawn'|trans({"%house%":place.house.name}, "places")|raw }}</i>
+						{% endif %}
+					{% elseif not spawnfail and place.spawn.realm %}
+						{% if not place.spawn.active %}
+							<i>{{ 'place.spawnfail.realminactive'|trans({}, "places")|raw }}</i>
+						{% elseif not place.realm.spawnDescription %}
+							<i>{{ 'place.spawnfail.norealmdesc'|trans({}, "places")|raw }}</i>
+						{% else %}
+							<i>{{ 'place.realmspawn'|trans({"%realm%":place.realm.name}, "places")|raw }}</i>
 						{% endif %}
 					{% endif %}
+					</p>
 				{% endif %}
-				{% if character.getInsidePlace() == place and place.getType.getName() == 'home' %}
-					{% set check = dispatcher.houseManageRelocateTest() %}
-					{% if check.url is defined %}
-						<a href="{{path('maf_house_relocate') }}"><button id="siege">{{ 'house.manage.relocate.name'|trans({}, "politics")|raw }}</button></a>
-					{% endif %}
-				{% endif %}
-				{% if house %}
-					{% if house != myHouse and myHouse == null %}
-						<a href="{{path('maf_house_join', {"house":house.id}) }}"><button id="join">{{ 'house.join.button'|trans({},"politics") }}</button></a>
-					{% elseif house != myHouse and myHouse != null %}
-						{% set check = dispatcher.houseManageCadetTest(null, house) %}
-						{% if check.url is defined %}
-							<a href="{{path('maf_house_cadetship', {"house":house.id}) }}"><button id="cadetship">{{ 'house.cadet.name'|trans({}, "politics")|raw }}</button></a>
-						{% endif %}
-					{% endif %}
-				{% endif %}
-				{% if mngcheck.url is defined %}
-					{% if destroyable == false %}
-						{# We only get this if we're talking about embassies, which require the regular manage check vs the special checks. #}
-						{% set mngcheck = dispatcher.placeManageTest(null, place) %}
-					{% endif %}
-					{# We just redefined this, so we check again, just in case. #}
-					{% if mngcheck.url is defined %}
-						<a href="{{path('maf_place_destroy', {"id":place.id}) }}"><button id="manage">{{ 'place.destroy.name'|trans({}, "places")|raw }}</button></a>
-					{% endif %}
-				{% endif %}
+				<div id="actionlist" class="subcontent linklist">
+				{% include "element/linklist.html.twig" with {"list":list, "domain":'places', "submenu":'h3'} only %}
+				</div>
 			</div>
 		{% endif %}
 	{% endfor %}

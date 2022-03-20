@@ -57,6 +57,11 @@ is still required, but we'll leave it in the code just in case. --Andrew
 {% endif %}
 
 <ul>
+{% if character.faith %}
+	<li>
+		{{ ("status."~who~".faith")|trans({"%He%":gender_he, "%link%":path('maf_assoc', {id: character.faith.id}), "%name%":character.faith.faithName},"politics")|raw }}
+	</li>
+{% endif %}
 {% if character.house %}
 	<li>
 		{% if character.house.head == character %}
