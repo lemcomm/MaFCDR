@@ -17,8 +17,10 @@ class LoadAssociationData extends AbstractFixture implements OrderedFixtureInter
 		'company',
 		'corps',
 		'cult',
+		'faith',
 		'guild',
 		'order',
+		'religion',
 		'sect',
 		'society',
 		'temple',
@@ -28,7 +30,7 @@ class LoadAssociationData extends AbstractFixture implements OrderedFixtureInter
 	 * {@inheritDoc}
 	 */
 	public function getOrder() {
-		return 2; // must be after place data
+		return 1; // or anywhere really
 	}
 
 	/**
