@@ -240,13 +240,14 @@ class PlaceController extends Controller {
 		# Build the list of requirements we have.
 		$rights[] = NULL;
 		$notTooClose = false;
+		$canPlace = false;
 		if ($character->getInsideSettlement()) {
 			$settlement = $character->getInsideSettlement();
-			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_inside');
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeinside');
 			$notTooClose = true;
 		} elseif ($region = $this->get('geography')->findMyRegion($character)) {
 			$settlement = $region->getSettlement();
-			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'place_outside');
+			$canPlace = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'placeoutside');
 			$notTooClose = $this->get('geography')->checkPlacePlacement($character); #Too close? Returns false. Too close is under 500 meteres to nearest place or settlement.
 		}
 
