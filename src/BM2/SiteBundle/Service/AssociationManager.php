@@ -10,6 +10,7 @@ use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Deity;
 use BM2\SiteBundle\Entity\DeityAspect;
+use BM2\SiteBundle\Entity\LawType;
 use BM2\SiteBundle\Entity\Place;
 use Doctrine\ORM\EntityManager;
 
@@ -73,18 +74,19 @@ class AssociationManager {
 		}
 
 		$assoc->setFounder($founder);
-		$assoc->setGold(0);
 		$assoc->setActive(true);
 		$this->em->flush();
 
+		$vis = $this->em->getRepository(LawType::class)->findOneBy(['category'=>'assoc', 'name'=>'assocVisibility']);
+		$ranks = $this->em->getRepository(LawType::class)->findOneBy(['category'=>'assoc', 'name'=>'rankVisibility']);
 		# Because I'll never remember this, these are, in order:
 		# Realm/Assocation , Law Name, 'Value', Law Title, Description (fluff), allowed/disallowed, mandatory/guideline, cascades to subs, statute of limitations cycles, db flush;
 		if ($public) {
-			$lawman->updateLaw($assoc, 'assocVisibility', 'yes', null, null, $founder, null, true, null, null);
-			$lawman->updateLaw($assoc, 'rankVisibility', 'all', null, null, $founder, null, true, null, null);
+			$this->lawman->updateLaw($assoc, $vis, 'assocVisibility.yes', null, null, $founder, null, true, null, null);
+			$this->lawman->updateLaw($assoc, $ranks, 'rankVisibility.all', null, null, $founder, null, true, null, null);
 		} else {
-			$lawman->updateLaw($assoc, 'assocVisibility', 'no', null, null, $founder, null, true, null, null);
-			$lawman->updateLaw($assoc, 'rankVisibility', 'direct', null, null, $founder, null, true, null, null);
+			$this->lawman->updateLaw($assoc, $vis, 'assocVisibility.no', null, null, $founder, null, true, null, null);
+			$this->lawman->updateLaw($assoc, $ranks, 'rankVisibility.direct', null, null, $founder, null, true, null, null);
 		}
 		$rank = $this->newRank($assoc, null, $founderRank, true, 0, 0, true, null, true, true, true, false);
 		$this->newLocation($assoc, $place, true, false);
@@ -175,10 +177,10 @@ class AssociationManager {
 				} else {
 					$rank->setManager(false);
 				}
-				if ($myRank->getCreateAssocs()) {
-					$rank->setCreateAssocs($createAssocs);
+				if ($myRank->getSubcreate()) {
+					$rank->setSubcreate($createAssocs);
 				} else {
-					$rank->setCreateAssocs(false);
+					$rank->setSubcreate(false);
 				}
 			}
 		} else {
@@ -188,7 +190,7 @@ class AssociationManager {
 			$rank->setViewDown($viewDown);
 			$rank->setViewSelf($viewSelf);
 			$rank->setSubcreate($createSubs);
-			$rank->setCreateAssocs($createAssocs);
+			$rank->setSubcreate($createAssocs);
 			$rank->setManager($manager);
 			$rank->setOwner($owner);
 			$rank->setSuperior($superior);

@@ -419,8 +419,9 @@ class AssociationController extends Controller {
 				return $this->redirectToRoute('maf_place_actionable');
 			}
 		}
-		return $this->render('Assoc/join.html.twig', [
-			'form' => $form->createView()
+		return $this->render('Assoc/leave.html.twig', [
+			'form' => $form->createView(),
+			'assoc' => $assoc,
 		]);
 	}
 

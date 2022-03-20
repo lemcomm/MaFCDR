@@ -59,6 +59,7 @@ building:
  Irrigation Ditches: Irrigation Ditches
  Leather Tanner: Leather Tanner
  Library: Library
+ List Field: List Field
  Local Seat: Local Seat
  Lumber Yard: Lumber Yard
  Market: Market
@@ -84,6 +85,7 @@ building:
  Tailor: Tailor
  Tavern: Tavern
  Temple: Temple
+ Tournament Grounds: Tournament Grounds
  Town Hall: Town Hall
  Training Ground: Training Ground
  University: University
@@ -223,6 +225,8 @@ description:
  Library: >
    Storage place for books and manuscripts of both holy and secular importance. <br />
    This building is also required to create your own publications.
+ List Field: >
+   Sometimes more commonly referred to as 'The Lists', this is a location for holding Jousts.
  Local Seat: >
    The Seat of Power for a Barony or County, the Local Seat supports the administration of such powers, and contains
    the various bureaucratic workers and offices that keep it all working.
@@ -296,6 +300,8 @@ description:
    their evening ale and some gossip.
  Temple: >
    A large place of religious worship, usually with one or more full-time priests as well as a number of helpers.
+ Tournament Grounds: >
+   A large compound of buildings for holding various tournaments.
  Town Hall: >
    A public building with room for offices, a public court and other administrative necessities of a growing town.
  Training Ground: >

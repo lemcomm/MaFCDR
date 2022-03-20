@@ -39,8 +39,8 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.new.name',
 			'required'=>true,
 			'attr' => array(
-				'size'=>20,
-				'maxlength'=>40,
+				'size'=>40,
+				'maxlength'=>255,
 				'title'=>'assoc.help.name'
 			)
 		));
@@ -48,8 +48,8 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.new.formalname',
 			'required'=>true,
 			'attr' => array(
-				'size'=>40,
-				'maxlength'=>160,
+				'size'=>80,
+				'maxlength'=>255,
 				'title'=>'assoc.help.formalname'
 			)
 		));
@@ -57,7 +57,7 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.new.faithname',
 			'required'=>false,
 			'attr' => array(
-				'size'=>80,
+				'size'=>40,
 				'maxlength'=>255,
 				'title'=>'assoc.help.faithname'
 			)
@@ -66,12 +66,12 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.new.followername',
 			'required'=>false,
 			'attr' => array(
-				'size'=>80,
+				'size'=>40,
 				'maxlength'=>255,
 				'title'=>'assoc.help.followername'
 			)
 		));
-		$builder->add('type', EntityType::class, array(
+		$builder->add('type', 'entity', array(
 			'label'=>'assoc.form.new.type',
 			'required'=>true,
 			'placeholder' => 'assoc.form.select',
@@ -85,15 +85,14 @@ class AssocCreationType extends AbstractType {
 			'label'=>'assoc.form.new.motto',
 			'required'=>false,
 			'attr' => array(
-				'size'=>40,
-				'maxlength'=>160,
+				'size'=>80,
 				'title'=>'assoc.help.motto')
 		));
 		$builder->add('founder', TextType::class, array(
 			'label'=>'assoc.form.new.founder',
 			'required'=>true,
 			'attr' => array(
-				'size'=>20,
+				'size'=>40,
 				'maxlength'=>160,
 				'title'=>'assoc.help.founder'
 			)
@@ -116,12 +115,12 @@ class AssocCreationType extends AbstractType {
 		$builder->add('superior', EntityType::class, array(
 			'label'=>'assoc.form.new.superior',
 			'required'=>false,
-			'placeholder' => 'assoc.form.superior',
+			'placeholder' => 'assoc.form.empty',
 			'attr' => array('title'=>'assoc.help.type'),
 			'class' => 'BM2SiteBundle:Association',
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
-			'choices' => $types
+			'choices' => $assocs
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
