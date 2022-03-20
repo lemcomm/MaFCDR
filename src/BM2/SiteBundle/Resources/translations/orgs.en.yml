@@ -107,6 +107,9 @@ assoc:
     name: Message Body for your Application
     desc: The message you want to send explaining why you would like to join this particular group.
    success: Your request to join %name% has been submitted.
+  leave:
+   header: Leave %name%
+   intro:  If you tire of your membership, you can always decide to leave.
   newDeity:
    name:  Formalize a New Deity
    header: Formalize a New Deity
