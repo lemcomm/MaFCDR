@@ -277,7 +277,6 @@ class AssociationManager {
 					$deity->setMainRecognizer(NULL);
 				}
 
-				$this->em->flush();
 				$this->history->logEvent(
 					$assoc,
 					'event.assoc.collapsed',
@@ -285,6 +284,7 @@ class AssociationManager {
 					History::ULTRA, true
 				);
 			}
+			$this->em->flush();
 		}
 	}
 
