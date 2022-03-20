@@ -825,6 +825,14 @@ assoc:
    name:         "View Recognized Deities"
    description:  Review the deities recognized or honored by the assocation.
    longdesc:     These are those recognized by this association.
+ laws:
+  name:         Association Laws
+  description:  Review Laws of the Association
+  longdesc:     Each association operates differently, some of these are defined by laws, which you can review here.
+ leave:
+  name:         Leave Association
+  description:  Tired of your membership? Get rid of it.
+  longdesc:     You can always leave an association, if that's what you want to do.
 
 
 house:
