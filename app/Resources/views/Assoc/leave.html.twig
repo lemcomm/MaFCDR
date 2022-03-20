@@ -1,0 +1,9 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'assoc.route.leave.header'|trans({'%name%':assoc.formalName},"orgs")|title }}</h2>
+<p>{{ 'assoc.route.leave.intro'|trans({},"orgs")|raw }}</p>
+
+{{ form(form) }}
+
+{% endblock %}
