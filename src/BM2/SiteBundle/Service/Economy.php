@@ -751,16 +751,16 @@ class Economy {
 		}
 
 		$total = $need + $buildings_operation + $buildings_construction;
-		$corruption = $this->calculateCorruption($settlement);
+		#$corruption = $this->calculateCorruption($settlement);
 		if ($split_results) {
 			return array(
 				'base' => round($need),
 				'operation' => round($buildings_operation),
 				'construction' => round($buildings_construction),
-				'corruption' => round($total * $corruption)
+				'corruption' => 0
 			);
 		} else {
-			return round($total * (1 + $this->calculateCorruption($settlement)));
+			return round($total);
 		}
 	}
 
