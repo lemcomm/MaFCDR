@@ -652,9 +652,16 @@ class WarController extends Controller {
 							if ($data['subaction'] == 'assume') {
 								# First, make sure they're in a position to actually do this.
 								#Yes, the form does this too, but if we don't check here you could manipulate the URL to bypass that security check.
-								# TODO: expand this for attackers and other defenders. This is a good step 1 though.
-								if ($siege->getDefender()->getCharacters()->contains($character) && $settlement->getOwner() == $character) {
-									$siege->setLeader('defenders', $character);
+								if ($siege->getDefender()->getCharacters()->contains($character)) {
+									if ($settlement->getOwner() == $character) {
+										$siege->setLeader('defenders', $character);
+										$em->flush();
+									} elseif (!$siege->getDefender()->getLeader()) {
+										$siege->setLeader('defenders', $character);
+										$em->flush();
+									}
+								} elseif ($siege->getAttacker()->getCharacters()->contains($character) && !$siege->getAttacker()->getLeader()) {
+									$siege->setLeader('attackers', $character);
 									$em->flush();
 								}
 								if ($place) {
