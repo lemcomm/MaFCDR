@@ -7,6 +7,7 @@ assoc:
  form:
   areyousure: Are You Sure?
   select: (select one)
+  empty: (none)
   submit: Submit
   new:
    name: Name
@@ -16,6 +17,9 @@ assoc:
    motto: Motto
    founder: Founder Rank Name
    created: Association has been succesfully created!
+   faithname: Faith Name
+   followername: Follower Name
+   superior: Superior Association
   description:
    short: Short Description
    full:  Full Description
@@ -58,6 +62,9 @@ assoc:
   superior: This determines who has management rights over this rank and where they fall in the hierarchy. Unless ranks are public of someone can view all ranks, members can only view ranks within their hierarchy.
   createSubs: Determines whether this rank can make new ranks below it and manage them.
   manage: Determines wehtehr this rank can handle applicants and manage membership of ranks below them.
+  faithname: The name for the faith this association is part of. Leave blank if this isn't a religious association.
+  followername: The name for the followers of the faith. Leave blank if this isn't a religious association.
+  superior: The association this one should answer to, if any.
  route:
   create:
    header: Formalize a New Association
