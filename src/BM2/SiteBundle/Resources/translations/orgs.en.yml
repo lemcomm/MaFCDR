@@ -157,10 +157,20 @@ nobody: Nobody
 law:
  update:    Update Law
  repeal:    Repeal Law
+ new:       Create Law
  route:
   list:
    name:    Laws of %name%
    intro:   Listed here you will find the laws, and previous laws, of %name%, for you to review, or, if you have permission to, update.
+  new:
+   header:    Enact a New Law
+   intro:   With the authority granted to you by your held positions or ranks, you are within your capabilities to enact a new law for %name%. This is a two step process, beginning here with selecting the type of law, to be followed by actually defining the particulars of the law after submission here.
+  edit:
+   header:    Finalize or Update a Law
+   intro:     Here you can finalize the details of a law you wish to update or enact. Different law types will have different values you can select here, which can have far reaching consequences in how the game does things in your realm. If you're not sure what each does, or wish to request a new law, please reach out on the Forum or the Discord.
+  repeal:
+   header:    Repeal a Law
+   intro:     If a law has outlived it's usefulness, you can always just repeal it rather than update and replace it. Of course, if you change your mind later, you can just enact a new one. The law currently under review is displayed below.
  header:
   mandatory: Type
   name:      Name
@@ -171,6 +181,22 @@ law:
   character: Enacted By
   enacted:   Enacted On
   invalidated: Superseded
+ form:
+  submit:    Submit
+  type:
+   label:    Law Type to Enact
+   empty:    (Select One)
+  edit:
+   title:    Law Title
+   desc:     Description of Law
+   cascades: Applies to Subordinate Realms
+   value:    Law Intent
+   amount:   Amount
+   mandatory:
+    label:   Law or Guideline
+    yes:     Law
+    no:      Guideline
+
  info:
   yes:       'True'
   no:        'False'
@@ -178,6 +204,8 @@ law:
   from:      From %org%
   recommendation: Recommendation
   sol:       %days% Days
+  freeform:
+   label:    User Defined Law
   assocVisibility:
    label:    Association Visibility
    desc:     Determines whether the Association is visible to those outside of it.
@@ -217,7 +245,7 @@ law:
    direct:
     name:    Local Realm Only
     desc:    All members of this realm directly shall be granted access.
-   realm:
+   internal:
     name:    Any Realm Members
     desc:    All members of the realm, including subordinates, shall be granted access.
    any:
@@ -243,7 +271,7 @@ law:
     desc:    Liege, if any, shall inherit the settlement. If no liege, then the ruler. If no ruler, defaults to successor if in realm.
    steward:
     name:    Steward Inherits
-    desc:    The Steward of a settlement shall inherit it. If none, defaults to successor if in realm.
+    desc:    The Steward of a settlement shall inherit it. Defaults to liege if there is no steward.
   placeInheritance:
    label:    Place Inheritance
    desc:     Determines inheritance of places within the realm.
