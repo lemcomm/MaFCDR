@@ -41,6 +41,8 @@ event:
    lost:				Has lost control of %settlement%, because it has been taken by %character%.
   inherited:    Was inherited by %character%.
   inherifail:   Fell to independence on the death of %character%, who left no heir.
+  lawnoinherit: In accordance with realm law, is now without lord after the passing of %character%.
+  lawinherit:   Passed to %character% in accordance with realm law.
   take:
    started:     %character% has initiated actions to take control.
    stopped:     %character% has abandoned attempts to take control.
@@ -113,6 +115,7 @@ event:
   steward:      %character% has been appointed as the new steward.
   stewarddeath: Is now steward-less due to the passing of %character%.
   stewardretire: Is now steward-less due to the retiring of %character%.
+  stewardpromote: Is now steward-less due to the promotion of %character%.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
