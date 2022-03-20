@@ -15,7 +15,7 @@ class LawTypeSelectType extends AbstractType {
 
 	private $types;
 
-	public function __construct($types, $type, $me = null) {
+	public function __construct($types) {
 		$this->types = $types;
 	}
 
@@ -26,23 +26,26 @@ class LawTypeSelectType extends AbstractType {
 	public function configureOptions(OptionsResolver $resolver) {
 		$resolver->setDefaults(array(
 			'intention'       => 'law_313375',
-			'translation_domain' => $this->domain
+			'translation_domain' => 'orgs'
 		));
 	}
 
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 
 		$builder->add('target', EntityType::class, array(
-			'placeholder' => 'laws.form.type.empty',
-			'label' => 'laws.form.type.label',
+			'placeholder' => 'law.form.type.empty',
+			'label' => 'law.form.type.label',
 			'required'=>true,
 			'attr' => array('title'=>'laws.help.types'),
 			'class'=>'BM2SiteBundle:LawType',
-			'choice_label'=>'name',
+			'choice_translation_domain'=>'orgs',
+			'choice_label'=>function($choice, $key, $value) {
+				return 'law.info.'.$choice->getName().'.label';
+			},
 			'choices'=>$this->types
 		));
 
-		$builder->add('submit', SubmitType::class, array('label'=>$this->submit));
+		$builder->add('submit', SubmitType::class, array('label'=>'law.form.submit'));
 	}
 
 
