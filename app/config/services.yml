@@ -79,7 +79,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
     law_manager:
         class:      BM2\SiteBundle\Service\LawManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     realm_manager:
         class:      BM2\SiteBundle\Service\RealmManager
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager', '@law_manager']
