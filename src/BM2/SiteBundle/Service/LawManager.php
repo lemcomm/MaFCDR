@@ -5,22 +5,69 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Law;
+use BM2\SiteBundle\Entity\LawType;
 use BM2\SiteBundle\Entity\Realm;
+use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Service\AppState;
 use Doctrine\ORM\EntityManager;
-
 
 class LawManager {
 
 	protected $em;
-	protected $history;
-	protected $descman;
-	protected $convman;
+	protected $appstate;
 
-	public function __construct(EntityManager $em) {
+	public $choices = [
+		'assocVisibility' => [
+			'assocVisibility.yes'=>'yes',
+			'assocVisibility.no'=>'no'
+		],
+		'rankVisibility' => [
+			'rankVisibility.all'=>'all',
+			'rankVisibility.direct'=>'direct'
+		],
+		'assocInheritance' => [
+			'assocInheritance.character'=>'character',
+			'assocInheritance.senior'=>'senior',
+			'assocInheritance.oldest'=>'oldest',
+		],
+		'slumberingAccess' => [
+			'slumberingAccess.none'=>'none',
+			'slumberingAccess.direct'=>'direct',
+			'slumberingAccess.realm'=>'internal',
+			'slumberingAccess.any'=>'any'
+		],
+		'settlementInheritance' => [
+			'settlementInheritance.none'=>'none',
+			'settlementInheritance.characterInternal'=>'characterInternal',
+			'settlementInheritance.characterAny'=>'characterAny',
+			'settlementInheritance.ruler'=>'ruler',
+			'settlementInheritance.liege'=>'liege',
+			'settlementInheritance.steward'=>'steward'
+		],
+		'placeInheritance' => [
+			'placeInheritance.none'=>'none',
+			'placeInheritance.characterInternal'=>'characterInternal',
+			'placeInheritance.characterAny'=>'characterAny',
+			'placeInheritance.ruler'=>'ruler',
+			'placeInheritance.liege'=>'liege',
+			'placeInheritance.lord'=>'lord'
+		],
+		'slumberingClaims' => [
+			'slumberingClaims.all'=>'all',
+			'slumberingClaims.internal'=>'internal',
+			'slumberingClaims.direct'=>'direct',
+			'slumberingClaims.none'=>'none'
+		],
+	];
+
+	public $taxLaws = ['taxesFood', 'taxesWood', 'taxesMetal', 'taxesWealth'];
+
+	public function __construct(EntityManager $em, AppState $appstate) {
 		$this->em = $em;
+		$this->appstate = $appstate;
 	}
 
-	public function updateLaw($org, $type, $setting, $title, $description = null, Character $character, $allowed, $mandatory, $cascades, $sol, $flush=true) {
+	public function updateLaw($org, LawType $type, $setting, $title, $desc = null, Character $character, $mandatory, $cascades, $sol, Settlement $settlement = null, Law $oldLaw=null, $flush=true) {
 		# All laws are kept eternal, new laws are made whenever a law is changed, the old is inactivated.
 
 		if ($org instanceof Association) {
@@ -32,57 +79,75 @@ class LawManager {
 			$realm = $org;
 			$cat = 'realm';
 		}
-		if ($type != 'freeform') {
-			$oldLaw = $org->findLaw($type);
+		$choices = $this->choices;
+		$tName = $type->getName();
+		$freeform = $tName==='freeform'?true:false;
+		$taxes = in_array($tName, $this->taxLaws);
+		# Validate that this is a type we can set.
+		if ($freeform || $taxes || $choices[$tName] !== null) {
+			# Validate the setting (value) is a valid one.
+			if ($freeform || $taxes || ($choices[$tName] && $choices[$tName][$setting] !== null)) {
+				#Looks valid. Process the change.
+				$law = new Law;
+				$this->em->persist($law);
+				$law->setType($type);
+				if($realm) {
+					$law->setRealm($realm);
+				} else {
+					$law->setAssociation($assoc);
+				}
+				$law->setMandatory($mandatory);
+				$law->setCascades($cascades);
+				if ($sol) {
+					$law->setSolCycles($sol);
+				}
+				if (!$freeform && !$taxes) {
+					$setting = $choices[$tName][$setting];
+				}
+				if ($tName === 'freeform') {
+					$law->setTitle($title);
+					$law->setDescription($desc);
+				} else {
+					$law->setValue($setting);
+				}
+				$law->setEnacted(new \DateTime("now"));
+				$law->setCycle($this->appstate->getCycle());
+				$law->setEnactedBy($character);
+				if ($settlement) {
+					$law->setSettlement($settlement);
+				}
+				if ($oldLaw) {
+					$this->lawSequenceUpdater($oldLaw, $law, $tName);
+				}
+				if ($flush) {
+					$this->em->flush();
+				}
+				return $law;
+			} else {
+				return ['error', 'badValue']; #Bad Type passed.
+			}
 		} else {
-			$oldLaw = false;
-		}
-
-		if (!$oldLaw || ($oldLaw->getSetting() != $setting)) {
-			$law = new Law();
-			$this->em->persist($law);
-			$lawType = $this->em->getRepository(LawType::class)->findOneBy(['name'=>$type, 'category'=>$cat]);
-			if ($lawType) {
-				$law->setType($lawType);
-			} else {
-				return ['error', 'badType']; #Bad Type passed.
-			}
-			if ($assoc) {
-				$law->setAssociation($org);
-			} else {
-				$law->setRealm($org);
-			}
-			$law->setEnacted(new \DateTime("now"));
-			$law->setCharacter($character);
-			$law->setTitle($title);
-			$law->setAllowed($allowed);
-			$law->setMandatory($mandatory);
-			$law->setCascades($cascades);
-			$law->setSolCycles($sol);
-			if ($oldLaw) {
-				$changes = $this->lawSequenceUpdater($oldLaw, $law, $type, $setting);
-			} else {
-				$changes = null;
-			}
-			if ($flush) {
-				$this->em->flush();
-			}
-			return [$law, $changes];
-		} else {
-			# No change to the law. Inform the user they did nothing.
-			return ['no change', null];
+			return ['error', 'badTypeName']; #Bad Type passed.
 		}
 	}
 
-	public function lawSequenceUpdater($old, $law, $type, $setting, $changes = []) {
+	public function lawSequenceUpdater($old, $law, $type) {
 		# This primarily exists for cascading law changes,
-		$simpleLaws = ['assocVisibility', 'rankVisibility'];
+		# Not yet seriously needed for the laws we have, but down the line this could get interesting.
+		$simpleLaws = ['assocVisibility', 'rankVisibility', 'assocInheritance', 'slumberingAccess', 'settlementInheritance', 'placeInheritance', 'slumberingClaims'];
 		if (in_array($type, $simpleLaws)) {
-			$old->setInactivatedBy($law);
-			$old->setInactivatedOn(new \DateTime("now"));
-			$changes[] = $old;
+			$old->setInvalidatedBy($law);
+			$old->setInvalidatedOn(new \DateTime("now"));
 		}
-		return $changes;
+	}
+
+	public function repealLaw(Law $law, Character $char) {
+		$law->setRepealedBy($char);
+		$law->setRepealedOn(new \DateTime("now"));
+	}
+
+	public function findTaxLaws(Realm $org) {
+		return $org->findMultipleLaws($this->taxLaws);
 	}
 
 }
