@@ -6,7 +6,7 @@
 </head>
 {% block content %}
 	{% if type == 'org' %}
-		{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
+		{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive, "privacy": privacy, "known": known} %}
 	{% elseif type == 'local' %}
 		{% include "Conversation/local_conv.html.twig" with {"messages": messages, "conversation": conversation, "archive": archive} %}
 	{% else %}
