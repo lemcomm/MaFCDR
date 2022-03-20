@@ -16,3 +16,13 @@ class Law {
                         return $this->association;
                 }
         }
+
+        public function isActive() {
+                if (!$this->invalidated_on && !$this->repealed_on) {
+                        return true;
+                }
+                return false;
+        }
+        
+}
+
