@@ -267,7 +267,7 @@ class AssociationManager {
 					$this->em->remove($rank);
 				}
 				foreach ($assoc->getPlaces() as $place) {
-					$this->get('history')->logEvent(
+					$this->history->logEvent(
 						$place->getPlace(),
 						'event.place.assoc.collapsed',
 						array('%link-assoc%'=>$assoc->getId()),
