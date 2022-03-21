@@ -357,13 +357,13 @@ class UnitController extends Controller {
                         $data = $form->getData();
                         $em = $this->getDoctrine()->getManager();
                         $unit->setCharacter($data['target']);
-                        $em->flush();
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.assigned',
 				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
 				History::MEDIUM, false, 30
 			);
+                        $em->flush();
                         $this->addFlash('notice', $this->get('translator')->trans('unit.assign.success', array(), 'actions'));
                         return $this->redirectToRoute('maf_units');
                 }
@@ -404,13 +404,13 @@ class UnitController extends Controller {
                         $data = $form->getData();
                         $em = $this->getDoctrine()->getManager();
                         $unit->setMarshal($data['target']);
-                        $em->flush();
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.appointed',
 				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
 				History::MEDIUM, false, 30
 			);
+                        $em->flush();
                         $this->addFlash('notice', $this->get('translator')->trans('unit.appoint.success', array(), 'actions'));
                         return $this->redirectToRoute('maf_units');
                 }
@@ -561,6 +561,7 @@ class UnitController extends Controller {
         				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
         				History::MEDIUM, false, 30
         			);
+				$this->getDoctrine()->getManager()->flush();
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.recall.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
                         } else {
