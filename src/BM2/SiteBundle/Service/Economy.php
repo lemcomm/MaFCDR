@@ -546,8 +546,8 @@ class Economy {
 		foreach ($units as $unit) {
 			$this->supplySoldiers($unit, $real_shortage);
 		}
-		$this->em->flush();
 		*/
+		$this->em->flush();
 	}
 
 	public function getSupplyTravelTime(Settlement $start, Unit $end) {
