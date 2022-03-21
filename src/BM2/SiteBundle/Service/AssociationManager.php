@@ -317,13 +317,13 @@ class AssociationManager {
 
 	public function adoptDeity(Association $assoc, Deity $deity, Character $char) {
 		$deity->setMainRecognizer($assoc);
-		$this->em->flush();
 		$this->history->logEvent(
 			$assoc,
 			'event.assoc.deity.adopted',
 			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
 			History::HIGH, true
 		);
+		$this->em->flush();
 	}
 
 	public function addDeity(Association $assoc, Deity $deity, Character $char, $words = null) {
@@ -336,13 +336,13 @@ class AssociationManager {
 			$aDeity->setWordsTimestamp(new \DateTime("now"));
 			$aDeity->setWordsFrom($char);
 		}
-		$this->em->flush();
 		$this->history->logEvent(
 			$assoc,
 			'event.assoc.deity.recognized',
 			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
 			History::HIGH, true
 		);
+		$this->em->flush();
 	}
 
 	public function removeDeity(Association $assoc, Deity $deity, Character $char) {
@@ -351,13 +351,13 @@ class AssociationManager {
 		if ($aDeity->getDeity()->getMainRecognizer() === $assoc) {
 			$aDeity->getDeity()->setMainRecognizer(null);
 		}
-		$this->em->flush();
 		$this->history->logEvent(
 			$assoc,
 			'event.assoc.deity.removed',
 			['%link-character%'=>$char->getId(), '%link-deity%'=>$deity->getId()],
 			History::HIGH, true
 		);
+		$this->em->flush();
 	}
 
 }
