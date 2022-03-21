@@ -253,6 +253,7 @@ class MilitaryManager {
 				History::MEDIUM, false, 30
 			);
 		}
+		$this->em->flush();
 
 		return array($success, $fail);
 	}
