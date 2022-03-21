@@ -429,7 +429,7 @@ class PlaceController extends Controller {
 					);
 				}
 				$newdesc = $this->get('description_manager')->newDescription($place, $data['description'], $character);
-				$this->getDoctrine()->getManager()->flush($place);
+				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('new.success', ["%name%"=>$place->getName()], 'places'));
 				return $this->redirectToRoute('maf_place_actionable');
 			}
@@ -815,6 +815,7 @@ class PlaceController extends Controller {
 				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
 				History::HIGH, true
 			);
+			$this->getDoctrine()->getManager()->flush();
 
                         return $this->redirectToRoute('maf_place_actionable');
                 }
@@ -850,6 +851,7 @@ class PlaceController extends Controller {
 				array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
 				History::HIGH, true
 			);
+			$this->getDoctrine()->getManager()->flush();
 
                         return $this->redirectToRoute('maf_place_actionable');
                 }
