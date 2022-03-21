@@ -130,6 +130,7 @@ class Interactions {
 				$this->history->visitLog($settlement, $captor);
 			}
 		}
+		$this->em->flush();
 
 		return true;
 	}
@@ -181,6 +182,7 @@ class Interactions {
 			}
 		}
 		// if you're a prisoner yourself, your captor can stay, sorry, you don't get to define his location...
+		$this->em->flush();
 
 		return true;
 	}
@@ -371,6 +373,7 @@ class Interactions {
 				$this->history->visitLog($place, $captor);
 			}
 		}
+		$this->em->flush();
 
 		return true;
 	}
@@ -409,6 +412,7 @@ class Interactions {
 			}
 		}
 		// if you're a prisoner yourself, your captor can stay, sorry, you don't get to define his location...
+		$this->em->flush();
 
 		return true;
 	}
