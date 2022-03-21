@@ -884,6 +884,7 @@ class PoliticsController extends Controller {
 				array('%link-character%'=>$character->getId()),
 				History::MEDIUM, true, 90
 			);
+			$this->getDoctrine()->getManager()->flush();
 		} else {
 			$this->addFlash('error', $this->get('translator')->trans('claim.donthave', array(), 'politics'));
 		}
