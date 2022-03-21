@@ -29,8 +29,7 @@ class ActionsResolveCommand extends ContainerAwareCommand {
 		$ar = $this->getContainer()->get('action_resolution');
 
 		$ar->progress();
-		$em->flush();
+		# In order to be error tolerant, each action flushes upon completion. Meaning one error breaks one action.
 	}
 
 }
-
