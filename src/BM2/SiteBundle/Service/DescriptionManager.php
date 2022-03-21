@@ -134,7 +134,6 @@ class DescriptionManager {
 		$desc->setUpdater($character);
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
-		$this->em->flush();
 		if (!$new) {
 			/* No need to tell the people that just made the thing that they updated the descriptions. */
 			/* Association Ranks deliberately ommitted. */
@@ -204,6 +203,7 @@ class DescriptionManager {
 					break;
 			}
 		}
+		$this->em->flush();
 		return $desc;
 	}
 
