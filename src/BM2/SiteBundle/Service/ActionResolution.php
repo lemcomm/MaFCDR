@@ -121,6 +121,7 @@ class ActionResolution {
 				array('%link-character%'=>$action->getCharacter()->getId()),
 				History::HIGH, true, 20
 			);
+			$this->em->flush();
 			return false;
 		} else {
 			return true;
@@ -247,6 +248,7 @@ class ActionResolution {
 			History::LOW, false, 15
 		);
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	// TODO: this is not actually being used anymore - do we still want to keep it?
@@ -277,6 +279,7 @@ class ActionResolution {
 			);
 		}
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	private function settlement_rename(Action $action) {
@@ -316,6 +319,7 @@ class ActionResolution {
 
 		}
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	private function settlement_grant(Action $action) {
@@ -354,6 +358,7 @@ class ActionResolution {
 			}
 		}
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 
@@ -380,6 +385,7 @@ class ActionResolution {
 			$this->politics->changeSettlementOccupier($to, $settlement, $settlement->getOccupier());
 		}
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	private function settlement_attack(Action $action) {
@@ -415,6 +421,7 @@ class ActionResolution {
 				History::LOW, false, 10
 			);
 			$this->em->remove($action);
+			$this->em->flush();
 		}
 	}
 
@@ -441,6 +448,7 @@ class ActionResolution {
 				}
 
 				$this->em->remove($action);
+				$this->em->flush();
 			}
 		}
 	}
@@ -454,6 +462,7 @@ class ActionResolution {
 			History::LOW, false, 10
 		);
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	private function military_battle(Action $action) {
@@ -551,6 +560,7 @@ class ActionResolution {
 
 			$get_away = 0.05;
 		}
+		$this->em->flush();
 
 		// find the battle action and make it not blocking travel
 		foreach ($char->getActions() as $sub_action) {
@@ -643,6 +653,7 @@ class ActionResolution {
 		}
 
 		$this->em->remove($action);
+		$this->em->flush();
 	}
 
 	private function task_research(Action $action) {
@@ -681,6 +692,7 @@ class ActionResolution {
 				History::LOW, false, 30
 			);
 			$this->em->remove($action);
+			$this->em->flush();
 		}
 	}
 
