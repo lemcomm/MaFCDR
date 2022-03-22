@@ -336,7 +336,7 @@ class AssociationController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->createRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
+			$assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.created', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
