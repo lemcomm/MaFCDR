@@ -216,7 +216,7 @@ class GameController extends Controller {
 			$value = false;
 			switch ($what) {
 				case 'area':		$value = $row->getArea(); break;
-				case 'settlements':	$value = $row->getSettlements(); break;
+				case 'settlements':	$value = $row->getEstates(); break;
 				case 'players':	$value = $row->getPlayers(); break;
 				case 'soldiers':	$value = $row->getSoldiers(); break;
 			}
@@ -251,7 +251,7 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $row) {
 			$cycle = $row->getCycle();
 
-			$data["settlements"]["data"][] 	= array($cycle, $row->getSettlements());
+			$data["settlements"]["data"][] 	= array($cycle, $row->getEstates());
 			$data["population"]["data"][] = array($cycle, $row->getPopulation());
 			$data["soldiers"]["data"][] 	= array($cycle, $row->getSoldiers());
 			$data["militia"]["data"][] 	= array($cycle, $row->getMilitia());
