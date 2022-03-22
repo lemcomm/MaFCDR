@@ -319,10 +319,17 @@ class Character {
 
 		if ($check_lord && $this->findAllegiance()) {
 			$alg = $this->findAllegiance();
-			if (!$alg instanceof Realm) {
+			if (!($alg instanceof Realm)) {
 				if ($alg->getRealm() != NULL) {
 					if (!$realms->contains($alg->getRealm())) {
 						$realms->add($alg->getRealm());
+					}
+				} elseif ($alg instanceof Character) {
+					foreach ($alg->findRealms() as $realm) {
+						# Backwards compatibility junk. Remove this when we remvoe $this->liege.
+						if (!$realms->contains($realm)) {
+							$realms->add($realm);
+						}
 					}
 				}
 			} else {
