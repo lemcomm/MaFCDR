@@ -298,6 +298,7 @@ class GameRunner {
 			} else {
 				$knowndead++;
 			}
+			$this->em->flush();
 		}
 		foreach ($slumbered as $character) {
 			if ($character->getSystem() != 'procd_inactive') {
@@ -363,6 +364,7 @@ class GameRunner {
 			} else {
 				$knownslumber++;
 			}
+			$this->em->flush();
 		}
 		if ($keeponslumbercount > 0) {
 			$this->logger->info("  $keeponslumbercount positions kept on slumber!");

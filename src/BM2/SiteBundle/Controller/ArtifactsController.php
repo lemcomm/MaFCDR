@@ -191,6 +191,7 @@ class ArtifactsController extends Controller {
 				array('%area%'=>$data['poi']->getName()),
 				History::MEDIUM, true
 			);
+			$this->getDoctrine()->getManager()->flush();
 
 		}
 		return $this->render('Artifacts/spawn.html.twig', [

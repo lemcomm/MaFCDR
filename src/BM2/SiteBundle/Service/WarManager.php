@@ -134,6 +134,7 @@ class WarManager {
 					);
 				}
 			}
+			$this->em->flush();
 		} else if ($settlement || $place) {
 			if ($settlement) {
 				$battle->setSettlement($settlement);
@@ -254,6 +255,7 @@ class WarManager {
 			} else {
 				# You've somehow broke the laws of space, and appear to exist in neither inside nor outside. Congrats.
 			}
+			$this->em->flush();
 		} else {
 			$x=0; $y=0; $count=0; $outside = false;
 			foreach ($targets as $target) {
@@ -402,6 +404,7 @@ class WarManager {
 				$target->setTravelLocked(true);
 			}
 		}
+		$this->em->flush();
 
 		return array('time'=>$time, 'outside'=>$outside, 'battle'=>$battle);
 	}
@@ -661,9 +664,9 @@ class WarManager {
 						$battle->setSiege(NULL); # Detach the siege from the battle. Only one battle per siege at the moment, so we can just grab the only one present.
 					}
 				}
-				$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
 			}
+			$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 		}
 	}
 
@@ -918,9 +921,9 @@ class WarManager {
 					}
 				}
 			}
-			$this->em->flush();
 			$this->disbandSiege($siege, null, TRUE);
 		}
+		$this->em->flush();
 
 	}
 }

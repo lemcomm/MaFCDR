@@ -156,6 +156,7 @@ class RealmController extends Controller {
 			if (!$fail) {
 				// good name, create realm
 				$realm = $this->get('realm_manager')->create($data['name'], $data['formal_name'], $data['type'], $character);
+				$this->getDoctrine()->getManager()->flush();
 				// and create the initial realm conversation, making sure our ruler is set up for the messaging system
 
 				$topic = $realm->getName().' Announcements';
@@ -163,7 +164,6 @@ class RealmController extends Controller {
 				$topic = $realm->getName().' General Discussion';
 				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $realm, 'general');
 
-				$this->getDoctrine()->getManager()->flush();
 				$this->get('appstate')->setSessionData($character); // update, because we changed our realm count
 				return $this->redirectToRoute('bm2_site_realm_manage', array('realm'=>$realm->getId()));
 			}
@@ -871,6 +871,7 @@ class RealmController extends Controller {
 				foreach ($data['settlement'] as $e) {
 					$this->get('politics')->changeSettlementRealm($e, $subrealm, 'subrealm');
 				}
+				$this->getDoctrine()->getManager()->flush();
 
 				// and setup the realm conversation
 				$topic = $subrealm->getName().' Announcements';
