@@ -8,6 +8,9 @@
 
 {% block content %}
 <h2>Statistics for {{ link(realm) }}</h2>
+Active Players: {{realm.findActivePlayers.count}}<br>
+Active Characters: {{realm.findActiveMembers.count}}<br>
+Held Land: {{realm.findTerritory.count}}
 <ul>
 	<li class="plot" data-id="settlements">settlements</li>
 	<li class="plot" data-id="population">population</li>
