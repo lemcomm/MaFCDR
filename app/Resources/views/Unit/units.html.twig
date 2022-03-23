@@ -24,16 +24,16 @@
 		{% elseif not unit.obj.settlement == null %}
 			<br />{{ 'unit.list.nomarshal'|trans({}, "actions")|raw }}
 		{% endif %}
-		{% if unit.obj.travel_days %}
-			<br />{{ 'unit.list.traveling'|trans({"%days%":unit.obj.travel_days}, "actions")|raw }}
+		{% if unit.obj.travelDays %}
+			<br />{{ 'unit.list.traveling'|trans({"%days%":unit.obj.travelDays}, "actions")|raw }}
 		{% endif %}
 		<br /><br />
         	<a href="{{ path('maf_unit_manage', {"unit":id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
 		 | <a href="{{ path('maf_unit_soldiers', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
 		{% if unit.owner %}
-			{% if not unit.obj.character and not unit.obj.travel_days %}
+			{% if not unit.obj.character and not unit.obj.travelDays %}
 				 | <a href="{{ path('maf_unit_assign', {"unit":id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a>
-			{% elseif unit.obj.character != character and unit.base and not unit.obj.travel_days %}
+			{% elseif unit.obj.character != character and unit.base and not unit.obj.travelDays %}
 				 | <a href="{{ path('maf_unit_recall', {"unit":id}) }}"><button id="assign">{{ 'unit.list.recall'|trans({},"actions") }}</button></a>
 			{% endif %}
 			{% if unit.base %}
@@ -42,10 +42,10 @@
 			{% if unit.marshal %}
 				 | <a href="{{ path('maf_unit_revoke', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.revoke'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if character.insideSettlement != unit.obj.settlement and not unit.obj.travel_days %}
+			{% if character.insideSettlement != unit.obj.settlement and not unit.obj.travelDays %}
 				 | <a href="{{ path('maf_unit_rebase', {"unit":id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if not unit.obj.travel_days %}
+			{% if not unit.obj.travelDays %}
 			 	| <a href="{{ path('maf_unit_disband', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.disband'|trans({},"actions") }}</button></a>
 			{% endif %}
 		{% endif %}

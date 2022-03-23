@@ -109,6 +109,9 @@ queue:
   hire:         Hire mercenaries
   reclaim:      Reclaim soldiers
   siege:        Conduct siege
+ siege:
+  assault:      Partaking in a siege assault
+  sortie:       Partaking in a siege sortie
  task:
   research:     Research journal
  dungeon:
