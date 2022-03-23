@@ -34,15 +34,111 @@ class Politics {
 		return false;
 	}
 
-	public function breakoath(Character $character) {
-		$alleg = $character->findAllegiance();
-		if (!$alleg instanceof RealmPosition) {
-			$this->history->logEvent(
-				$alleg,
-				'politics.oath.broken',
-				array('%link-character%'=>$character->getId()),
-				History::MEDIUM, true
-			);
+	public function breakoath(Character $character, $alleg = null, $to = null, $thing = null) {
+		if (!$alleg) {
+			$alleg = $character->findAllegiance();
+		}
+		$same = false;
+		$done = false;
+		if ($to) {
+			if ($thing === 'realm') {
+				$target = $to;
+			} else {
+				$target = $to->getRealm();
+			}
+			if ($alleg instanceof Character) {
+				# Legacy oath.
+				$done = true;
+				$this->history->logEvent(
+					$alleg,
+					'politics.oath.legacy',
+					array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+					History::MEDIUM, true
+				);
+			} elseif (!($alleg instanceof Realm)) {
+				$realm = $alleg->getRealm();
+			} elseif ($alleg instanceof Realm) {
+				$realm = $alleg;
+			}
+			if (!$done) {
+				if ($realm === $target) {
+					if (!($alleg instanceof RealmPosition)) {
+						$this->history->logEvent(
+							$alleg,
+							'politics.oath.internal',
+							array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+							History::MEDIUM, true
+						);
+					} else {
+						foreach ($alleg->getHolders() as $each) {
+							$this->history->logEvent(
+								$each,
+								'politics.oath.internal',
+								array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+								History::MEDIUM, true
+							);
+						}
+					}
+				} else {
+					$ultimate = $realm->findUltimate();
+					$hierarchy = $ultimate->findAllInferiors(true);
+					if ($hierarchy->contains($target)) {
+						if (!($alleg instanceof RealmPosition)) {
+							$this->history->logEvent(
+								$alleg,
+								'politics.oath.sovereign',
+								array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+								History::MEDIUM, true
+							);
+						} else {
+							foreach ($alleg->getHolders() as $each) {
+								$this->history->logEvent(
+									$each,
+									'politics.oath.sovereign',
+									array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+									History::MEDIUM, true
+								);
+							}
+						}
+					} else {
+						if (!($alleg instanceof RealmPosition)) {
+							$this->history->logEvent(
+								$alleg,
+								'politics.oath.external',
+								array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+								History::MEDIUM, true
+							);
+						} else {
+							foreach ($alleg->getHolders() as $each) {
+								$this->history->logEvent(
+									$each,
+									'politics.oath.external',
+									array('%link-character%'=>$character->getId(), '%link-realm%'=>$target->getId()),
+									History::MEDIUM, true
+								);
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if (!($alleg instanceof RealmPosition)) {
+				$this->history->logEvent(
+					$alleg,
+					'politics.oath.broken',
+					array('%link-character%'=>$character->getId()),
+					History::MEDIUM, true
+				);
+			} else {
+				foreach ($alleg->getHolders() as $each) {
+					$this->history->logEvent(
+						$each,
+						'politics.oath.broken',
+						array('%link-character%'=>$character->getId()),
+						History::MEDIUM, true
+					);
+				}
+			}
 		}
 		if ($character->getLiege()) {
 			$character->setLiege(null);
