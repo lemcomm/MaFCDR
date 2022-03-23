@@ -633,6 +633,7 @@ class Dispatcher {
 			$actions[] = array("title"=>$realm->getFormalName());
 			$actions[] = array("name"=>"realm.view.name", "url"=>"bm2_site_realm_hierarchy", "parameters"=>array("realm"=>$realm->getId()), "description"=>"realm.view.description", "long"=>"realm.view.longdesc");
 			$actions[] = $this->hierarchyElectionsTest();
+			$actions[] = $this->hierarchyRealmLawsTest(null, $realm);
 			if ($realm->findRulers()->contains($this->getCharacter())) {
 				# NOTE: We'll have to rework this later when othe positions can manage a realm.
 				$actions[] = $this->hierarchyManageRealmTest();
@@ -642,7 +643,6 @@ class Dispatcher {
 				$actions[] = $this->hierarchyRealmSpawnsTest();
 				$actions[] = $this->hierarchyAbdicateTest();
 				$actions[] = $this->hierarchyRealmPositionsTest();
-				$actions[] = $this->hierarchyRealmLawsTest(null, $realm);
 				$actions[] = $this->hierarchyWarTest();
 				$actions[] = $this->hierarchyDiplomacyTest();
 				$actions[] = $this->hierarchyAbolishRealmTest();
