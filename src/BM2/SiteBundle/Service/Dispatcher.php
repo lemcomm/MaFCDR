@@ -4220,7 +4220,7 @@ class Dispatcher {
 		if ($name) {
 			$data['name'] = $name;
 		}
-		if ($url && $data['url']) {
+		if ($url && array_key_exists('url', $data)) {
 			$data['url'] = $url;
 		}
 		if ($desc) {
