@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -201,10 +202,11 @@ class LawController extends Controller {
 			$result = $this->get('law_manager')->updateLaw($org, $type, $data['value'], $data['title'], $data['description'], $char, $data['mandatory'], $data['cascades'], $data['sol'], $data['settlement'], $law, true);
 			if ($result instanceof Law) {
 				$this->addFlash('error', $this->get('translator')->trans('law.form.edit.success', [], 'orgs'));
+				# These return a different redirect due to how the route is built. if you use the other ones ($this->redirectToRoute) Symfony complains that the controller isn't returning a response.
 				if ($realm) {
-					return $this->redirectToRoute('maf_realm_laws', ['realm'=>$realm->getId()]).'#'.$result->getId();
+					return new RedirectResponse($this->generateUrl('maf_realm_laws', ['realm'=>$realm->getId()]).'#'.$result->getId());
 				} else {
-					return $this->redirectToRoute('maf_assoc_laws', ['assoc'=>$assoc->getId()]).'#'.$result->getId();
+					return new RedirectResponse($this->generateUrl('maf_assoc_laws', ['assoc'=>$assoc->getId()]).'#'.$result->getId());
 				}
 			} else {
 				$this->addFlash('error', $this->get('translator')->trans('law.form.edit.fail'.$result['error'], [], 'orgs'));

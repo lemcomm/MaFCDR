@@ -686,6 +686,9 @@ military:
    attackers:   Attackers
    defenders:   Defenders
    none:        (none)
+  status:
+   encircled:   Siege is currently at stage %current% of %max%, and the settlement is encircled (needed %soldiers% soldiers).
+   notencircled: Siege is currently at stage %current% of %max%, and the settlement is not currently encircled (needs %soldiers% soldiers besieging).
   menu:
    name:
     settlement: Siege Settlement

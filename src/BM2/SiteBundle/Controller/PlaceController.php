@@ -763,7 +763,11 @@ class PlaceController extends Controller {
 		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
+			$em = $this->getDoctrine()->getManager();
                         $place->setDestroyed(true);
+			if ($spawn = $place->getSpawn()) {
+				$em->remove($spawn);
+			}
 			$this->get('history')->logEvent(
 				$place,
 				'event.place.destroyed',
@@ -771,7 +775,7 @@ class PlaceController extends Controller {
 				History::HIGH, true
 			);
 
-			$this->getDoctrine()->getManager()->flush();
+			$em->flush();
                         return $this->redirectToRoute('maf_place_actionable');
                 }
 		return $this->render('Place/destroy.html.twig', [

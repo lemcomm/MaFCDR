@@ -403,6 +403,10 @@ class CharacterManager {
 			}
 		}
 
+		foreach ($character->getRequests() as $req) {
+			$this->em->remove($req);
+		}
+
 		// TODO: permission lists - plus clear out those of old dead characters!
 
 
@@ -574,6 +578,10 @@ class CharacterManager {
 			if ($log != $character->getLog()) {
 				$this->history->closeLog($log, $character);
 			}
+		}
+
+		foreach ($character->getRequests() as $req) {
+			$this->em->remove($req);
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!

@@ -49,7 +49,7 @@ class AssocCreateRankType extends AbstractType {
 		$builder->add('description', TextareaType::class, array(
 			'label'=>'assoc.form.description.full',
 			'attr' => array('title'=>'assoc.help.rankdesc'),
-			'data' => $me ? $me->getDescription()->getText() : null
+			'data' => $me ? $me->getDescription() ? $me->getDescription()->getText() : null : null
 		));
 		$builder->add('viewAll', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.viewAll',

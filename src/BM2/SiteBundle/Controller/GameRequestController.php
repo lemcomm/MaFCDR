@@ -215,8 +215,15 @@ class GameRequestController extends Controller {
 			case 'oath.offer':
 				if ($allowed) {
 					$character = $id->getFromCharacter();
-					if ($character->findAllegiance()) {
-						$this->get('politics')->breakoath($character);
+					if ($to = $id->getToSettlement()) {
+						$thing = 'settlement';
+					} elseif ($to = $id->getToPlace()) {
+						$thing = 'place';
+					} elseif ($to = $id->getToPosition()) {
+						$thing = 'realmposition';
+					}
+					if ($alleg = $character->findAllegiance()) {
+						$this->get('politics')->breakoath($character, $alleg, $to, $thing);
 					}
 					if ($id->getToSettlement()) {
 						$settlement = $id->getToSettlement();
