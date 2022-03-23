@@ -96,7 +96,11 @@ class BattleRunner {
 			}
 		}
 		$this->log(15, "Found ".$char_count." characters and ".$slumberers." slumberers\n");
-		$xpRatio = $slumberers/$char_count;
+		if ($char_count > 0) {
+			$xpRatio = $slumberers/$char_count;
+		} else {
+			$xpRatio = 1;
+		}
 		if ($xpRatio < 0.1) {
 			$xpMod = 1;
 		} else if ($xpRatio < 0.2) {
@@ -255,15 +259,20 @@ class BattleRunner {
 		$this->log(15, "preparing...\n");
 
 		$preparations = $this->prepare();
-		if ($preparations === TRUE) {
+		if ($preparations[0] === 'success') {
 			// the main call to actually run the battle:
 			$this->log(15, "Resolving Battle...\n");
 			$this->resolveBattle($myStage, $maxStage);
 			$this->log(15, "Post Battle Cleanup...\n");
 			$victor = $this->concludeBattle();
+			$victorReport = $victor->getActiveReport();
 		} else {
 			// if there are no soldiers in the battle
 			$this->log(1, "failed battle\n");
+			if ($battle->getSiege()) {
+				$victor = $preparations[1];
+				$victorReport = $victor->getActiveReport();
+			}
 			foreach ($battle->getGroups() as $group) {
 				foreach ($group->getCharacters() as $char) {
 					$this->history->logEvent(
@@ -318,9 +327,17 @@ class BattleRunner {
 				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
 		} else {
-			$this->log(15, "Siege battle detected, progressing siege...\n");
+			$this->log(1, "Siege battle detected, progressing siege...\n");
+			$this->log(1, "Siege ID: ".$battle->getSiege()->getId()."\n");
+			$this->log(1, "Battle ID: ".$battle->getId()."\n");
+			if ($victorReport) {
+				$this->log(1, "Victor ID: ".$victorReport->getId()." (".($victor->getAttacker()?"attacker":"defender").")\n");
+			}
+			$this->log(1, "preparations: ".$preparations[0]."\n");
+			$this->log(1, "report ID: ".$this->report->getId()."\n");
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
-			$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations, $this->report);
+			$this->em->flush();
+			$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations[0], $this->report);
 		}
 		$this->em->flush();
 		$this->em->remove($battle);
@@ -387,7 +404,7 @@ class BattleRunner {
 				$combatworthygroups++;
 				if ($battle->getSiege()) {
 					if ($siege->getAttacker() == $group) {
-						$haveAttacekr = TRUE;
+						$haveAttacker = TRUE;
 					} else if ($siege->getDefender() == $group) {
 						$haveDefender = TRUE;
 					}
@@ -487,16 +504,16 @@ class BattleRunner {
 				}
 			}
 			$this->em->flush(); # Save all active reports for characters, and all character reports to their group reports.
-			return true;
+			return ['success', true];
 		} else {
 			if ($battle->getSiege()) {
 				if ($haveAttacker) {
-					return 'haveAttacker';
-				} else if ($haveDefender) {
-					return 'haveDefender';
+					return ['haveAttacker', $siege->getAttacker()];
+				} elseif ($haveDefender) {
+					return ['haveDefender', $siege->getDefender()];
 				}
 			}
-			return false;
+			return ['failed', false];
 		}
 	}
 
@@ -639,6 +656,7 @@ class BattleRunner {
 			$chargeFail =0;
 			$missed = 0;
 			$crowded = 0;
+			$notarget = 0;
 			#$attSlain = $this->attSlain; # For Sieges.
 			#$defSlain = $this->defSlain; # For Sieges.
 			$extras = array();
@@ -1174,6 +1192,7 @@ class BattleRunner {
 		$this->prepareRound(); // to update the isFighting setting correctly
 		$survivors=array();
 		foreach ($battle->getGroups() as $group) {
+			$this->log(5, "Evaluating ".$group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") for survivors...\n");
 			foreach ($group->getSoldiers() as $soldier) {
 				if ($soldier->getCasualties() > 0) {
 					$this->history->addToSoldierLog($soldier, 'casualties', array("%nr%"=>$soldier->getCasualties()));
@@ -1214,16 +1233,21 @@ class BattleRunner {
 				}
 			)->count();
 			if ($my_survivors > 0) {
+				$this->log(5, "Group ".$group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") has survivors, and is victor.\n");
 				$victory = true;
 				if (!$primaryVictor) {
+					$this->log(5, "Considering ".$group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") as primary victor.\n");
 					# Because it's handy to know who won, primarily for sieges.
 					# TODO: Rework for more than 2 sides. This should be really easy. Just checking to see if we have soldiers and finding our top-level group.
 					if ($battle->getPrimaryAttacker() == $group) {
 						$primaryVictor = $group;
+						$this->log(5, $group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") ID'd as primary attacker and primary victor.\n");
 					} elseif ($battle->getPrimaryDefender() == $group) {
 						$primaryVictor = $group;
+						$this->log(5, $group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") ID'd as primary defender and primary victor.\n");
 					} elseif ($battle->getPrimaryAttacker()->getReinforcedBy->contains($group) || $battle->getPrimaryDefender()->getReinforcedBy->contains($group)) {
 						$primaryVictor = $group->getReinforcing();
+						$this->log(5, $group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") ID'd as primary victor but is reninforcing group #".$primaryVictor()->getActiveReport()->getId()." (".($primaryVictor->getAttacker()?"attacker":"defender").").\n");
 					} else {
 						# I have so many questions about how you ended up here...
 					}
@@ -1304,6 +1328,7 @@ class BattleRunner {
 		$this->em->flush();
 		$this->log(1, "unlocked...\n");
 		unset($allNobles);
+		$this->log(5, "concludeBattle returning ".$primaryVictor->getId()." (".($primaryVictor->getAttacker()?"attacker":"defender").") as primary victor.\n");
 		return $primaryVictor;
 	}
 
