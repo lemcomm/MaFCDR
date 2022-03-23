@@ -445,6 +445,10 @@ politics:
   taken:      Has appeared as a knight of %character% at %settlement%.
   taken2:     Has appeared as a vassal of %character% and received lordship of %settlement%.
   broken:     %character% has broken their oath of fealty and become a rogue.
+  legacy:     %character% has broken their legacy oath of fealty to you for one in %realm%.
+  internal:   %character% has broken their oath of fealty to you and taken another inside %realm%.
+  sovereign:  %character% has broken their oath of fealty to you to take another within the sovereignty in %realm%.
+  external:   %character% has broken their oath of fealty to you for one outside this sovereignty in %realm%.
   disowned:   Oath of fealty dissolved by your liege, %character%.
   nowruler:   %character% has become ruler of %realm% and is thus no longer a vassal.
   changed:    %character-1% has broken the oath of fealty to you and sworn an oath to %character-2% instead.
