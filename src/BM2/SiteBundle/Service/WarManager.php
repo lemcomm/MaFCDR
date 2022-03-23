@@ -17,6 +17,7 @@ use BM2\SiteBundle\Service\History;
 use BM2\SiteBundle\Service\Interactions;
 use BM2\SiteBundle\Service\MilitaryManager;
 use BM2\SiteBundle\Twig\GameTimeExtension;
+use Monolog\Logger;
 
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 
@@ -32,8 +33,12 @@ class WarManager {
 	protected $actman;
 	protected $interactions;
 	protected $politics;
+	protected $logger;
 
-	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime, Interactions $interactions, Politics $politics) {
+	private $report;
+	private $debug=0;
+
+	public function __construct(EntityManager $em, History $history, MilitaryManager $milman, ActionManager $actman, GameTimeExtension $gametime, Interactions $interactions, Politics $politics, Logger $logger) {
 		$this->em = $em;
 		$this->history = $history;
 		$this->milman = $milman;
@@ -41,6 +46,7 @@ class WarManager {
 		$this->gametime = $gametime;
 		$this->interactions = $interactions;
 		$this->politics = $politics;
+		$this->logger = $logger;
 	}
 
 	public function createBattle(Character $character, Settlement $settlement=null, Place $place=null, $targets=array(), Siege $siege=null, BattleGroup $attackers=null, BattleGroup $defenders=null) {
@@ -134,7 +140,6 @@ class WarManager {
 					);
 				}
 			}
-			$this->em->flush();
 		} else if ($settlement || $place) {
 			if ($settlement) {
 				$battle->setSettlement($settlement);
@@ -255,7 +260,6 @@ class WarManager {
 			} else {
 				# You've somehow broke the laws of space, and appear to exist in neither inside nor outside. Congrats.
 			}
-			$this->em->flush();
 		} else {
 			$x=0; $y=0; $count=0; $outside = false;
 			foreach ($targets as $target) {
@@ -303,6 +307,7 @@ class WarManager {
 		$complete = new \DateTime('now');
 		$complete->add(new \DateInterval('PT'.$time.'S'));
 		$battle->setInitialComplete($complete)->setComplete($complete);
+		$this->em->flush();
 
 
 		// setup actions and lock travel
@@ -549,6 +554,19 @@ class WarManager {
 		} else {
 			$place = $siege->getPlace();
 		}
+		$siege->setAttacker(null);
+		foreach ($siege->getBattles() as $battle) {
+			$battle->setSiege(null);
+		}
+		if ($siege->getSettlement()) {
+			$siege->getSettlement()->setSiege(NULL);
+			$siege->setSettlement(NULL);
+		} else {
+			$siege->getPlace()->setSiege(NULL);
+			$siege->getPlace(NULL);
+		}
+		$this->em->flush();
+
 		foreach ($siege->getGroups() as $group) {
 			foreach ($group->getCharacters() as $character) {
 				if (!$completed) {
@@ -568,12 +586,18 @@ class WarManager {
 						);
 					}
 				} else {
-					# Do nothing, because this is already handled by the siege code. :)
+					foreach ($group->getCharacters() as $char) {
+						if ($group->getLeader() == $char) {
+							$group->setLeader(null);
+							$char->removeLeadingBattlegroup($group);
+						}
+					}
 				}
-				$this->removeCharacterFromBattlegroup($character, $group);
+				$this->removeCharacterFromBattlegroup($character, $group, true);
 				$this->addRegroupAction(null, $character);
 			}
 		}
+		$this->em->remove($siege);
 		$this->em->flush();
 		return true;
 	}
@@ -588,7 +612,7 @@ class WarManager {
 		return true;
 	}
 
-	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg) {
+	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg, $disbandSiege = false) {
 		$bg->removeCharacter($character);
 		if ($bg->getCharacters()->count()==0) {
 			// there are no more participants in this battlegroup
@@ -626,16 +650,8 @@ class WarManager {
 						$this->em->remove($group); # If this battle isn't tied to a siege, we can safely remove the battlegroup. Groups tied to a siege and a battle will be handled by the siege closing out (which will, if a battle remains, detach the group from the siege and just let this code handle it afterwards.)
 					}
 				}
-			} else if ($type == 'siege' && $focus->getAttacker() == $bg) {
-				# Since attackers control the siege, the siege only ends if the attackers disband it (or are otherwise broken)
-				if ($focus->getSettlement()) {
-					$focus->getSettlement()->setSiege(NULL);
-					$focus->setSettlement(NULL);
-				} else {
-					$focus->getPlace()->setSiege(NULL);
-					$focus->getPlace(NULL);
-				}
-				$focus->setAttacker(NULL);
+			} else if ($type == 'siege' && $disbandSiege) {
+				$this->log(1, "Removing".$character->getName()." (".$character->getId().") from battlegroup for siege... \n");
 				// siege is terminated, as sieges don't care how many groups, only if the attacker group has no more attackers in it.
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
@@ -644,12 +660,6 @@ class WarManager {
 						}
 					}
 					foreach ($group->getCharacters() as $char) {
-						$this->history->logEvent(
-							$char,
-							'siege.ended',
-							array(),
-							History::HIGH, false, 25
-						);
 						if ($group->getLeader() == $char) {
 							$group->setLeader(null);
 							$char->removeLeadingBattlegroup($bg);
@@ -660,11 +670,8 @@ class WarManager {
 					} else {
 						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 					}
-					if ($battle = $focus->getBattles()->first()) {
-						$battle->setSiege(NULL); # Detach the siege from the battle. Only one battle per siege at the moment, so we can just grab the only one present.
-					}
 				}
-				$this->em->remove($focus); #Unlike battles, if the attacker group has no members, we definitely have no more siege.
+				$this->log(1, "Removed.\n");
 			}
 			$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 		}
@@ -704,33 +711,41 @@ class WarManager {
 	}
 
 	public function progressSiege(Siege $siege, Battle $battle, BattleGroup $victor = null, $flag, BattleReport $report) {
+		$this->report = $report;
 		$current = $siege->getStage();
 		$max = $siege->getMaxStage();
 		$assault = FALSE;
 		$sortie = FALSE;
 		$bypass = FALSE;
+		$completed = FALSE;
 		if ($battle->getType() == 'siegeassault') {
 			$assault = TRUE;
+			$this->log(1, "Siege assualt\n");
 		} elseif ($battle->getType() == 'siegesortie') {
 			$sortie = TRUE;
+			$this->log(1, "Siege sortie\n");
 		}
 		$attacker = $battle->getPrimaryAttacker();
 		if ($flag === 'haveAttacker') {
 			$victor = $siege->getAttacker();
 			$bypass = TRUE; #Defenders failed to muster any defenders.
-		} else if ($flag === 'haveDefender') {
+			$this->log(1, "Bypass defenders. Default victory to attackers\n");
+		} elseif ($flag === 'haveDefender') {
 			$victor = $siege->getDefender();
 			$bypass = TRUE; #Attackers failed to muster any attackers.
+			$this->log(1, "Bypass attackers. Default victory to defenders\n");
 		}
 		if ($siege->getSettlement()) {
 			$target = $siege->getSettlement();
 		} else {
 			$target = $siege->getPlace();
 		}
-		if ($attacker === $victor && $assault) {
+		if ($assault) {
+			$this->log(1, "Attacker matches victor and this is an assault.\n");
 			if ($current < $max && !$bypass) {
 				# Siege moves forward
 				$siege->setStage($current+1);
+				$this->log(1, "Incrememnting stage.\n");
 				# "After the [link], the siege has advanced in favor of the attackers"
 				$this->history->logEvent(
 					$target,
@@ -750,6 +765,7 @@ class WarManager {
 				}
 			}
 			if ($current == $max || $bypass) {
+				$this->log(1, "Max stage reached or bypass flag set due to failed defense.\n");
 				$completed = TRUE;
 				# Siege is over, attackers win.
 				if (!$bypass) {
@@ -761,6 +777,7 @@ class WarManager {
 						History::MEDIUM, false
 					);
 				} else {
+					$this->log(1, "Bypassed!\n");
 					# "After the [link], the siege concluded in an attacker victory."
 					$this->history->logEvent(
 						$target,
@@ -768,23 +785,23 @@ class WarManager {
 						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
-					if ($victor) {
-						foreach ($victor->getCharacters() as $char) {
-							$this->history->logEvent(
-								$char,
-								'battle.failed',
-								array(),
-								History::MEDIUM, false, 20
-							);
-						}
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
 					}
 				}
 
 			}
-		} else if ($attacker !== $victor && $sortie) {
+		} elseif ($sortie) {
+			$this->log(1, "Attacker is not victor. This must be a sortie by the defenders.\n");
 			if ($current > 1 && !$bypass) {
 				# Siege moves backwards.
 				$siege->setStage($current-1);
+				$this->log(1, "Decrementing stage.\n");
 				# "After the [link], the siege has advanced in favor of the defenders"
 				$this->history->logEvent(
 					$target,
@@ -804,10 +821,12 @@ class WarManager {
 				}
 			}
 			if ($current <= 1 || $bypass) {
+				$this->log(1, "Minimum stage reached or bypass flag set due to failure by siege attackers to muster any force. Siege broken.\n");
 				$completed = TRUE;
 				# Siege is over, defender victory.
 				if ($bypass) {
 					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
+					$this->log(1, "Bypassed!\n");
 					$this->history->logEvent(
 						$target,
 						'siege.victor.defender',
@@ -822,15 +841,13 @@ class WarManager {
 						array('%link-battle%'=>$report->getId()),
 						History::MEDIUM, false
 					);
-					if ($victor) {
-						foreach ($victor->getCharacters() as $char) {
-							$this->history->logEvent(
-								$char,
-								'battle.failed',
-								array(),
-								History::MEDIUM, false, 20
-							);
-						}
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
 					}
 				}
 			}
@@ -838,14 +855,18 @@ class WarManager {
 		# Yes, this means that if attackers lose an assault or defenders lose a sortie, nothing changes. This is intentional.
 		$battle->setPrimaryAttacker(NULL);
 		$battle->setPrimaryDefender(NULL);
+		$this->log(1, "Unset primary flags!\n");
 		foreach ($siege->getGroups() as $group) {
 			$group->setBattle(NULL);
 		}
+		$this->log(1, "Unset group battle associations!\n");
 
 		if ($completed) {
-			if ($victor == $attacker) {
-				$realm = $siege->getRealm();
+			$this->log(1, "Completed checks.\n");
+			$realm = $siege->getRealm();
+			if ($assault) {
 				if ($target instanceof Settlement) {
+					$this->log(1, "Target is settlement\n");
 					foreach ($victor->getCharacters() as $char) {
 							# Force move victorious attackers inside the settlement.
 							$this->interactions->characterEnterSettlement($char, $target, true);
@@ -896,6 +917,7 @@ class WarManager {
 						}
 					}
 				} else {
+					$this->log(1, "Target is place\n");
 					foreach ($victor->getCharacters() as $char) {
 							# Force move victorious attackers inside the place.
 							$this->interactions->characterEnterPlace($char, $target, true);
@@ -921,9 +943,20 @@ class WarManager {
 					}
 				}
 			}
+			$this->em->flush();
+			$this->log(1, "Passing siege to disbandSiege function\n");
 			$this->disbandSiege($siege, null, TRUE);
 		}
 		$this->em->flush();
 
+	}
+
+	public function log($level, $text) {
+		if ($this->report) {
+			$this->report->setDebug($this->report->getDebug().$text);
+		}
+		if ($level <= $this->debug) {
+			$this->logger->info($text);
+		}
 	}
 }
