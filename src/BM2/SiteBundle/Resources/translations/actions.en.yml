@@ -659,9 +659,13 @@ military:
   disband:
    name:        Disband Siege
    description: For whatever reason, end the siege.
+   success:     Siege has been disbanded.
+   failure:     You cannot disband a siege when a battle is pending.
   leave:
    name:        Leave the Siege Forces
    description: Though you may not neccessarily be able to leave altogether...
+   success:     You have left the siege forces.
+   failure:     You cannot leave a siege when part of an upcoming siege battle.
   attack:
    name:        Lead an Attack
    description: Though others may not follow you...
