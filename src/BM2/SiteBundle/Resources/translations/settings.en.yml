@@ -12,6 +12,8 @@ character:
  description:        Using this menu you can choose to enable or disable different character level settings aimed at making your gameplay more enjoyable. One example of this is the ability to automatically set new realm messages as read for your character.
  auto:
   readrealms:        Automatically mark realm messages as read?
+  readassocs:        Automatically mark association messages as read?
+  readhouse:         Automatically mark house messages as read?
  non_hetero_options: Show homosexual partnership options?
 
 loadout:
