@@ -3320,16 +3320,19 @@ class Dispatcher {
 			return array("name"=>"house.new.name", "description"=>"unavailable.$check");
 		}
 		$character = $this->getCharacter();
+		$approved = false;
 		if ($character->getHouse()) {
 			foreach ($character->getRequests() as $req) {
 				if ($req->getType() == 'house.subcreate') {
-					if (!$req->getApproved()) {
-						return array("name"=>"house.new.name", "description"=>"unavailable.notcadetapproved");
-					} else {
+					if ($req->getApproved()) {
+						$approved = true;
 						break;
 					}
 				}
 			}
+		}
+		if (!$approved) {
+			return array("name"=>"house.new.name", "description"=>"unavailable.notcadetapproved");
 		}
 		if (!$character->getInsidePlace()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.outsideplace");
