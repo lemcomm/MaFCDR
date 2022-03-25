@@ -29,6 +29,11 @@
 	<form class="wide" action="{{ path('maf_place_permissions', {'id':place.id}) }}" method="post" {{ form_start(form) }}
 		{{ form_errors(form) }}
 		{{ form_widget(form._token) }}
+		<h3>{{ "control.permissions.general"|trans({},"actions")|title }}</h3>
+		<div style="clear:both; margin-top: 1em">
+			{{ form_label(form.public) }}
+			{{ form_widget(form.public) }}
+		</div>
 		<h3>{{ "place.permissions.manage"|trans({},"places")|title }}</h3>
 		<table class="permissions">
 			<thead><tr>
