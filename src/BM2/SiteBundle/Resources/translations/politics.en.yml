@@ -844,6 +844,7 @@ house:
   name:         Formalize Your House
   description:  Any First One can declare themselves head of their House
   longdesc:     Formalizing a House is something any First One may do, if they so desire and are not already part of a house. You are no exception to this.
+  hashouse:     As you have been granted permission to make this house, your new house shall be a cadet of %house%.
   intro: >
    If you peer into the history books, you will usually find that Houses came before Realms. As to what a "House" is, well
    that really depends on the culture. Some were dynasties traced back by blood through eons, others were tribes, united
@@ -926,6 +927,17 @@ house:
   sure:
    name:        Certain?
    desc:        Once you join a house, it's not up to you whether you are allowed to leave or not, so be certain.
+  button:       Petition to Join
+ subcreate:
+  name:         Petition for the Right to Create a Cadet
+  intro: >
+   Cadets are houses that are subordinate to another House. Any member of a house may petition for one to be made.
+  subject:
+   name:        Subject
+   desc:        A short, and to the point summary
+  text:
+   name:        Message Contents
+   desc:        If there is any particular reason for your request, this is where you would detail it.
   button:       Petition to Join
  manage:
   details:
