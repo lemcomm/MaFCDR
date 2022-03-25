@@ -609,6 +609,8 @@ class Dispatcher {
 				}
 				$actions[] = $this->houseNewPlayerInfoTest();
 				$actions[] = $this->houseSpawnToggleTest();
+			} else {
+				$actions[] = $this->houseSubcreateTest();
 			}
 		}
 
@@ -3364,6 +3366,20 @@ class Dispatcher {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.house", "maf_house_manage", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseSubcreateTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.subcreate.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house && $this->house->getHead() === $this->getCharacter()) {
+			return array("name"=>"house.subcreate.name", "description"=>"unavailable.ishead");
+		} else {
+			return $this->action("house.subcreate", "maf_house_subcreate", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
