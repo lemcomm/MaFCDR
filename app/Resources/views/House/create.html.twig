@@ -3,6 +3,9 @@
 {% block content %}
 <h2>{{ 'house.new.name'|trans({},"politics")|title }}</h2>
 <p>{{ 'house.new.intro'|trans({},"politics")|raw }}</p>
+{% if house %}
+	<p>{{ 'house.new.hashouse'|trans({'%house%':link(house)},"politics")|raw }}</p>
+{% endif %}
 
 <div class="fullwidth texts">
 {{ form_start(form) }}
