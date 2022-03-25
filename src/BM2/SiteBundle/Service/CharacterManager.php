@@ -631,7 +631,8 @@ class CharacterManager {
 		$character->setInsideSettlement($captor->getInsideSettlement());
 	}
 
-	public function locationInheritance($thing, Character $char, Character $heir, Character $via) {
+	public function locationInheritance($thing, Character $char, $heir, $via) {
+		# $heir and $via can be false or Character objects.
 		if ($thing instanceof Settlement) {
 			$type = 'settlement';
 			$bequeath = 'bequeathEstate';
