@@ -709,6 +709,14 @@ perm:
  realmdescribe: Update Description
  placeinside: Construct Place Inside
  placeoutside: Construct Place Outside
+ see:     See
+ placevisit: Enter
+ placedocks: Embark
+ placedescribe: Edit Description
+ placeresupply: Resupply
+ placemobilize: Mobilize
+ placeconstruct: Build / Upgrade
+ manage: Manage
  desc:
   title:    Description of permissions
   visit: >
@@ -775,6 +783,8 @@ perm:
     Allow the use of the docks (if you have them) to embark on sea journeys.
   placedescribe: >
     Allows those with this permission to edit the description of this Place.
+  manage: >
+    Grants owner-level permissions to do most things.
 
 claim:
  title:       Claims
