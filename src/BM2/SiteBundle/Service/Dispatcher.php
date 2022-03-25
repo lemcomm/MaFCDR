@@ -3319,7 +3319,15 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if ($character->getHouse()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+			foreach ($character->getRequests() as $req) {
+				if ($req->getType() == 'house.subcreate') {
+					if (!$req->getApproved()) {
+						return array("name"=>"house.new.name", "description"=>"unavailable.notcadetapproved");
+					} else {
+						break;
+					}
+				}
+			}
 		}
 		if (!$character->getInsidePlace()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.outsideplace");
