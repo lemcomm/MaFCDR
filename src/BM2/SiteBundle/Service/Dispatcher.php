@@ -2566,7 +2566,7 @@ class Dispatcher {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
 		return $this->action("place.permissions", "maf_place_permissions", true,
-				array('place'=>$place->getId()),
+				array('id'=>$place->getId()),
 				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 			);
 	}
