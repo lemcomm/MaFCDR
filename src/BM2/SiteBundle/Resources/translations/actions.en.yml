@@ -1296,7 +1296,7 @@ unit:
   count:    %soldiers% Soldiers
   manage:   Manage Unit Settings
   youcommand: Under your direct command.
-  commander: Under comamnd of %name%.
+  commander: Under command of %name%.
   nocommander: Not currently under anyone's command.
   supplied: Supplied by
   nosupplier: <i>no one</i>
