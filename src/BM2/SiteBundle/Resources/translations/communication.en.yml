@@ -224,9 +224,8 @@ event:
    approved:    After review, the %house% has decided to accept you as one of it's own.
    denied:      Try as you might, %house% does not consider you worthy.
   house:
-   founded:     Formalized the %house%.
-   subcreated:  Formalized the %house% as a cadet of %house-2%.
-   subfouned:   Became leader of %house-2% through it's creation as part of %house-1%.
+   founded:     Formalized %house%.
+   subfounded:   Became leader of %house-2% through it's creation as part of %house-1%.
    newhead:     Took over leadership of the house after the passing of %character%.
    revived:     Revived under the leadership of %character%.
    arrival:      %character% has arrived in the house at %place%.
@@ -352,7 +351,7 @@ event:
  house:
   founded:      By decree of %character% the house was formalized!
   newmember:    %character% was accepted into the ranks.
-  subfounded:   By decree of %house%, the house was formalized.
+  subfounded:   The cadet house of %house% has been formalized under leadership of %character%.
   subcreated:   By decree of %character%, the house was formalized as a cadet of %house%.
   exile:        By decree of %character-1%, %character-2% has been cast out of of the House.
   merged:

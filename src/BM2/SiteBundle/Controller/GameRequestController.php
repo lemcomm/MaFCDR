@@ -57,6 +57,9 @@ class GameRequestController extends Controller {
 					}
 				}
 				break;
+			case 'house.subcreate':
+			case 'house.cadet':
+			case 'house.uncadet':
 			case 'house.join':
 				if ($char->getHeadOfHouse() != $id->getToHouse()) {
 					$result = false;
@@ -84,20 +87,6 @@ class GameRequestController extends Controller {
 					$result = true;
 				} else {
 					$result = false;
-				}
-				break;
-			case 'house.cadet':
-				if ($char->getHeadOfHouse() != $id->getToHouse()) {
-					$result = false;
-				} else {
-					$result = true;
-				}
-				break;
-			case 'house.uncadet':
-				if ($char->getHeadOfHouse() != $id->getToHouse()) {
-					$result = false;
-				} else {
-					$result = true;
 				}
 				break;
 		}
@@ -208,6 +197,22 @@ class GameRequestController extends Controller {
 					} else {
 						return $this->redirectToRoute($route);
 					}
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
+			case 'house.subcreate':
+				if ($allowed) {
+					$id->setAccepted(true);
+					$this->get('history')->logEvent(
+						$id->getFromCharacter(),
+						'event.character.createcadet.accepted',
+						array('%link-house%'=>$id->getToHouse()->getId()),
+						History::HIGH, true
+					);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.subcreate.approved', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
+					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');
 				}
@@ -497,6 +502,22 @@ class GameRequestController extends Controller {
 					$em->flush();
 					$this->addFlash('notice', $this->get('translator')->trans('house.manage.applicant.denied', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
 					$query->execute();
+					return $this->redirectToRoute($route);
+				} else {
+					throw new AccessDeniedHttpException('unavailable.nothead');
+				}
+				break;
+			case 'house.subcreate':
+				if ($allowed) {
+					$this->get('history')->logEvent(
+						$id->getFromCharacter(),
+						'event.character.createcadet.denied',
+						array('%link-house%'=>$id->getToHouse()->getId()),
+						History::HIGH, true
+					);
+					$em->remove($id);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('house.manage.subcreate.denied', array('%character%'=>$id->getFromCharacter()->getName()), 'politics'));
 					return $this->redirectToRoute($route);
 				} else {
 					throw new AccessDeniedHttpException('unavailable.nothead');

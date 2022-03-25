@@ -18,7 +18,7 @@ class HouseManager {
 		$this->descman = $descman;
 	}
 
-	public function create($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $superior = null, $place=null, $settlement=null, $crest = null, Character $founder) {
+	public function create($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $place=null, $settlement=null, $crest = null, Character $founder) {
 		# _create(name, description, private description, secret description, superior house, place, settlement, crest, and founder)
 		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, null, $place, $settlement, $crest, $founder);
 
@@ -39,40 +39,35 @@ class HouseManager {
 		return $house;
 	}
 
-	public function subcreate(Character $character, $name, $motto = null, $description = null, $place = null, $settlement = null, $founder, House $id) {
-		# Cadet houses won't be created with these so we set them to null in order to ensure they exist for passing to _create.
-		$private_description = null;
-		$secret_description = null;
-		$crest = $founder->getCrest();
-
+	public function subcreate($name, $motto = null, $description = null, $private_description = null, $secret_description = null, $place = null, $settlement = null, $crest = null, $founder, House $id) {
 		# _create(name, description, private description, secret description, superior house, settlement, crest, and founder)
-		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, $id, $crest, $settlement, $founder);
+		$house = $this->_create($name, $motto, $description, $private_description, $secret_description, $id, $place, $settlement, $crest, $founder);
 
 		$this->history->openLog($house, $founder);
 		$this->history->logEvent(
 			$id,
 			'event.house.subfounded',
-			array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId(), '%link-house%'=>$house->getId()),
+			array('%link-character%'=>$founder->getId(), '%link-house%'=>$house->getId()),
 			History::ULTRA, true
-		);
-		$this->history->logEvent(
-			$character,
-			'event.character.house.subcreated',
-			array('%link-house%'=>$house->getId(), '%link-character%'=>$founder->getId()),
-			History::HIGH, true
 		);
 		$this->history->logEvent(
 			$founder,
 			'event.character.house.subfounded',
-			array('%link-character%'=>$founder->getId(), '%link-house-1%'=>$id->getId(), '%link-house-2%'=>$house->getId()),
+			array('%link-house-1%'=>$id->getId(), '%link-house-2%'=>$house->getId()),
 			History::HIGH, true
 		);
 		$this->history->logEvent(
 			$house,
 			'event.house.subcreated',
-			array('%link-house-1%'=>$id->getId(), '%link-house-2%'=>$id->getId(), '%link-character-1%'=>$character->getId(), '%link-character-2%'=>$founder->getId()),
+			array('%link-house%'=>$id->getId(), '%link-character%'=>$founder->getId()),
 			History::ULTRA, true
 		);
+		foreach ($founder->getRequests() as $req) {
+			if ($req->getType() == 'house.subcreate') {
+				$this->em->remove($req);
+			}
+		}
+		$this->em->flush();
 		return $house;
 	}
 

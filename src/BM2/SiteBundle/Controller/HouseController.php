@@ -12,6 +12,7 @@ use BM2\SiteBundle\Form\HouseCadetType;
 use BM2\SiteBundle\Form\HouseUncadetType;
 use BM2\SiteBundle\Form\HouseCreationType;
 use BM2\SiteBundle\Form\HouseJoinType;
+use BM2\SiteBundle\Form\HouseSubcreateType;
 use BM2\SiteBundle\Form\HouseMembersType;
 
 use BM2\SiteBundle\Service\DescriptionManager;
@@ -81,7 +82,13 @@ class HouseController extends Controller {
 			}
 			$settlement = $character->getInsideSettlement();
 			$place = $character->getInsidePlace();
-			$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], null, $place, $settlement, $crest, $character);
+			if ($character->getHouse()) {
+				#public function subcreate(Character $character, $name, $motto = null, $description = null, $place = null, $settlement = null, $crest = null, $founder, House $id) {
+				$house = $this->get('house_manager')->subcreate($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], $place, $settlement, $crest, $character, $character->getHouse());
+			} else {
+				$house = $this->get('house_manager')->create($data['name'], $data['motto'], $data['description'], $data['private'], $data['secret'], $place, $settlement, $crest, $character);
+			}
+
 			# No flush needed, HouseMan flushes.
 			$topic = $house->getName().' Announcements';
 			$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $house, 'announcements');
@@ -91,6 +98,32 @@ class HouseController extends Controller {
 			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
 		}
 		return $this->render('House/create.html.twig', [
+			'form' => $form->createView(),
+			'house' => $character->getHouse()
+		]);
+	}
+
+	/**
+	  * @Route("/{house}/subcreate", name="maf_house_subcreate", requirements={"house"="\d+"})
+	  */
+
+	public function requestCreateHouse(House $house, Request $request) {
+		$character = $this->get('dispatcher')->gateway('houseSubcreateTest');
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+		$form = $this->createForm(new HouseSubcreateType());
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$fail = true;
+			$data = $form->getData();
+			#newRequestFromCharacterToHouse ($type, $expires = null, $numberValue = null, $stringValue = null, $subject = null, $text = null, Character $fromChar = null, House $toHouse = null, Character $includeChar = null, Settlement $includeSettlement = null, Realm $includeRealm = null, House $includeHouse = null, Soldier $includeSoldiers = null, EquipmentType $includeEquipment = null) {
+			$this->get('game_request_manager')->newRequestFromCharacterToHouse('house.subcreate', null, null, null, $data['subject'], $data['text'], $character, $character->getHouse());
+			$this->addFlash('notice', $this->get('translator')->trans('house.member.createrequested', array(), 'actions'));
+			return $this->redirectToRoute('maf_house', array('id'=>$house->getId()));
+		}
+		return $this->render('House/subcreate.html.twig', [
 			'form' => $form->createView()
 		]);
 	}

@@ -18,7 +18,7 @@ type:
 
 new:
  name:       Formalize a New Place
- intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.<br /><br />Please be advised, both capitals and embassies require you to be in a realm.
+ intro:      From here you can formally create a new place at this location, either inside a settlement if you're in one, or outside one if you are not. Your choices are limited by your location, and your roles in the various realms you are a part of, as well as certain restrictions on where each place can be built and what they each require.<br /><br />Please be advised, both capitals and embassies require you to be in a realm.<br><br><b>Note: your first "Place" should probably be a Home so you can create a House for your characters or a Capital if you're soon to be the ruler of a realm.</b>
  success:    Successfully created %name%
 
 description:
@@ -112,6 +112,22 @@ place:
   longdesc: Associations can be quite extensive. And you're well within your abilities to remdey that problem.
   intro: >
     If you've found the %name% to be troublesome, it's a fairly simple matter to evict them.
+
+control:
+ place:
+  public: Place Allows Any Visitors?
+perm:
+ desc:
+  title:  Permissions Described
+ see:     See
+ placevisit: Enter
+ placedocks: Embark
+ placedescribe: Edit Description
+ placeresupply: Resupply
+ placemobilize: Mobilize
+ placeconstruct: Build / Upgrade
+ manage: Manage
+ choose: -- Choose --
 
 by:
  ambassador: As a Manager of Diplomacy...

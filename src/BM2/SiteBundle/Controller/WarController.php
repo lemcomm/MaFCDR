@@ -570,7 +570,11 @@ class WarController extends Controller {
 						case 'disband':
 							# Stop the siege.
 							if ($siege->getAttacker()->getLeader() == $character && $data['subaction'] == 'disband' && $data['disband'] == TRUE) {
-								$this->get('war_manager')->disbandSiege($siege, $character);
+								if ($this->get('war_manager')->disbandSiege($siege, $character)) {
+									$this->addFlash('notice', $this->get('translator')->trans('military.siege.disband.success', [], "actions"));
+								} else {
+									$this->addFlash('notice', $this->get('translator')->trans('military.siege.disband.failure', [], "actions"));
+								}
 								return $this->redirectToRoute('bm2_actions');
 							} else {
 								throw $this->createNotFoundException('error.notfound.change');
@@ -583,7 +587,11 @@ class WarController extends Controller {
 								throw $this->createNotFoundException('error.notfound.areleader');
 							} else {
 								# Leave siege will remove the siege action and add a regroup action, as well as remove them from the siege battelgroup they're in.
-								$this->get('war_manager')->leaveSiege($character, $siege);
+								if ($this->get('war_manager')->leaveSiege($character, $siege)) {
+									$this->addFlash('notice', $this->get('translator')->trans('military.siege.leave.success', [], "actions"));
+								} else {
+									$this->addFlash('notice', $this->get('translator')->trans('military.siege.leave.failure', [], "actions"));
+								}
 								return $this->redirectToRoute('bm2_actions');
 							}
 							break;

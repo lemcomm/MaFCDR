@@ -301,6 +301,15 @@ class ConversationManager {
                         $valid = $conv->findActiveCharPermission($char);
                 }
                 if ($valid) {
+                        if ($conv->getRealm()) {
+                                $org = 'realm';
+                        } elseif ($conv->getAssociation()) {
+                                $org = 'assoc';
+                        } elseif ($conv->getHouse()) {
+                                $org = 'house';
+                        } else {
+                                $org = false;
+                        }
                         $now = new \DateTime("now");
                         $new = new Message();
                         $this->em->persist($new);
@@ -320,8 +329,18 @@ class ConversationManager {
                         if (!$total) {
                                 $count = 0;
                                 foreach ($conv->findActivePermissions() as $perm) {
-                                        if (!$antiTickUp && $perm->getCharacter() != $char && (!$conv->getRealm() || !$perm->getCharacter()->getAutoReadRealms())) {
-                                                $perm->setUnread($perm->getUnread()+1);
+                                        if (!$antiTickUp && $perm->getCharacter() != $char) {
+                                                if ($org) {
+                                                        if ($org === 'realm' && !$perm->getCharacter()->getAutoReadRealms()) {
+                                                                $perm->setUnread($perm->getUnread()+1);
+                                                        } elseif ($org === 'assoc' && !$perm->getCharacter()->getAutoReadAssocs()) {
+                                                                $perm->setUnread($perm->getUnread()+1);
+                                                        } elseif ($org === 'house' && !$perm->getCharacter()->getAutoReadHouse()) {
+                                                                $perm->setUnread($perm->getUnread()+1);
+                                                        }
+                                                } else {
+                                                        $perm->setUnread($perm->getUnread()+1);
+                                                }
                                         }
                                         $count++;
                                 }

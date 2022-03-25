@@ -545,6 +545,9 @@ class WarManager {
 	}
 
 	public function disbandSiege(Siege $siege, Character $leader = null, $completed = FALSE) {
+		if ($siege->getBattle()) {
+			return false;
+		}
 		# Siege disbandment and removal actually happens as part of removeCharacterFromBattlegroup.
 		# This needs either completed to be true and leader to be null, or completed to be false and leader to be a Character.
 		$place = null;
@@ -678,6 +681,9 @@ class WarManager {
 	}
 
 	public function leaveSiege($character, $siege) {
+		if ($siege->getBattle()) {
+			return false;
+		}
 		foreach ($character->findActions('military.siege') as $action) {
 			#This should only ever be one, but just in case, and because findActions returns an ArrayCollection...
 			$this->em->remove($action);

@@ -40,6 +40,8 @@
 		<field name="visibility" type="integer"/>
 
 		<field name="auto_read_realms" type="boolean" nullable="true"/>
+		<field name="auto_read_assocs" type="boolean" nullable="true"/>
+		<field name="auto_read_house" type="boolean" nullable="true"/>
 		<field name="non_hetero_options" type="boolean" nullable="true"/>
 		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="armour" target-entity="EquipmentType"/>

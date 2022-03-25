@@ -112,10 +112,14 @@ class User extends BaseUser {
 	}
 
 	public function getFreePlaces() {
-		$months = floor($this->getCreated()->diff(new \DateTime("now"), true)->days/30);
+		$months = floor($this->getCreated()->diff(new \DateTime("now"), true)->days/14);
 		$count = 0;
 		foreach ($this->getCharacters() as $character) {
-			$count += $character->getCreatedPlaces()->count();
+			foreach ($character->getCreatedPlaces() as $place) {
+				if (!$place->getDestroyed()) {
+					$count++;
+				}
+			}
 		}
 		if ($this->account_level >= 20) {
 			$mod = 2;
@@ -124,6 +128,5 @@ class User extends BaseUser {
 		}
 		return ($months * $mod) - $count;
 	}
-
 	
 }

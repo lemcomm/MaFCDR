@@ -583,7 +583,7 @@ character:
   150: Ancestors
  start:
   title:      Character Arrival Organizations
-  intro:      Select the arrival organization for %name%. You can either choose to start in a Realm, a House, or, if your character has one already through their lineage, their own House. Realms can offer a variety of locations to start the game in, while Houses will only let you start at their Home. Houses do offer you the chance to start outside of a regular realm organization though, but are very hard to leave--generally requiring your character's death to do so.<br /><br />If you're unsure what whether to start in a Realm or a House, we suggest starting in a Realm.
+  intro:      Select the arrival organization for %name%. You can either choose to start in a Realm, a House, or, if your character has one already through their lineage, their own House. Realms can offer a variety of locations to start the game in, while Houses will only let you start at their Home. Houses do offer you the chance to start outside of a regular realm organization though, but <b>are very hard to leave</b>--generally requiring your character's death to do so.<br /><br />If you're unsure what whether to start in a Realm or a House, we suggest starting in a Realm.
   offer:      Accept fealty offer
   offerintro: >
     Many landed nobles offer a contingent of troops for loyal knights to fight in their name. Accepting one of these offers
@@ -609,7 +609,7 @@ character:
   realmSuperior: This is a Subject Realm of
   realmIsUltimate: This is a Sovereign Realm
   house:      Available House(s) to Join
-  houseintro: Houses can be anything from a tribe to a family to a clan, and unlike Realms are generally permanent affairs. Once you're in one, it is usually very hard to leave, without joining another. That said, they're not bound by realm borders and do offer their own means to keep in touch. If a character has children with someone in the same house, their child will be in that house automatically.
+  houseintro: Houses can be anything from a tribe to a family to a clan, and unlike Realms are generally permanent affairs. Once you're in one, it is <b>usually very hard to leave</b>. That said, they're not bound by realm borders and do offer their own means to keep in touch. If a character has children with someone in the same house, their child will be in that house automatically.
   houseSuperior: This is a Cadet House of
   houseIsUltimate: This is an Independent House
   myhouse:    Start at your House's Home

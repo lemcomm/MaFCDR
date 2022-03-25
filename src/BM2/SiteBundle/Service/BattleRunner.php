@@ -123,7 +123,12 @@ class BattleRunner {
 		$myStage = NULL;
 		$maxStage = NULL;
 		$place = $battle->getPlace();
-		switch ($battle->getType()) {
+		$type = $battle->getType();
+		if (in_array($battle->getType(), ['siegesortie', 'siegeassault']) && !$battle->getSiege()) {
+			# Ideally, it shouldn't be possible to have a siege battle without a siege, but just in case...
+			$type = 'field';
+		}
+		switch ($type) {
 			case 'siegesortie':
 				$this->report->setSortie(TRUE);
 				$myStage = $battle->getSiege()->getStage();

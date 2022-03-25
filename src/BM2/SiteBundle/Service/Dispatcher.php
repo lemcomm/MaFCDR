@@ -609,6 +609,8 @@ class Dispatcher {
 				}
 				$actions[] = $this->houseNewPlayerInfoTest();
 				$actions[] = $this->houseSpawnToggleTest();
+			} else {
+				$actions[] = $this->houseSubcreateTest();
 			}
 		}
 
@@ -1860,6 +1862,10 @@ class Dispatcher {
 			# Can't cancel a siege you didn't start.
 			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.notbesieger");
 		}
+		if ($this->getCharacter()->isDoingAction('siege.assault') || $this->getCharacter()->isDoingAction('siege.sortie')) {
+			# Already preparing to engage
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.preparing");
+		}
 		if ($this->getCharacter()->isInBattle()) {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.inbattle");
@@ -1875,6 +1881,10 @@ class Dispatcher {
 		}
 		if ($siege->getAttacker()->getLeader() == $this->getCharacter()) {
 			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.areleader");
+		}
+		if ($this->getCharacter()->isDoingAction('siege.assault') || $this->getCharacter()->isDoingAction('siege.sortie')) {
+			# Already preparing to engage
+			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.preparing");
 		}
 		$inSiege = FALSE;
 		foreach ($siege->getGroups() as $group) {
@@ -2548,11 +2558,15 @@ class Dispatcher {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOwner() != $this->getCharacter() || $place->getOccupant() != $this->getCharacter()) {
+		if ($place->getOccupant() || $place->getOccupier()) {
+			if (!$place->getOccupant() != $this->getCharacter()) {
+				return array("name"=>"place.permissions.name", "description"=>"unavailable.notoccupant");
+			}
+		} elseif ($place->getOwner() != $this->getCharacter()) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
 		}
 		return $this->action("place.permissions", "maf_place_permissions", true,
-				array('place'=>$place->getId()),
+				array('id'=>$place->getId()),
 				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 			);
 	}
@@ -2634,7 +2648,7 @@ class Dispatcher {
 		} else {
 			$occupied = false;
 		}
-		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit', false, $occupied)) {
+		if (!$place->getPublic() && !$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit', false, $occupied)) {
 			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
 		}
 		if ($this->getCharacter()->isNPC()) {
@@ -3307,7 +3321,15 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		if ($character->getHouse()) {
-			return array("name"=>"house.new.name", "description"=>"unavailable.havehouse");
+			foreach ($character->getRequests() as $req) {
+				if ($req->getType() == 'house.subcreate') {
+					if (!$req->getApproved()) {
+						return array("name"=>"house.new.name", "description"=>"unavailable.notcadetapproved");
+					} else {
+						break;
+					}
+				}
+			}
 		}
 		if (!$character->getInsidePlace()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.outsideplace");
@@ -3344,6 +3366,20 @@ class Dispatcher {
 			return array("name"=>"house.manage.house.name", "description"=>"unavailable.nothead");
 		} else {
 			return $this->action("house.manage.house", "maf_house_manage", true,
+				array('house'=>$this->house->getId()),
+				array("%name%"=>$this->house->getName())
+			);
+		}
+	}
+
+	public function houseSubcreateTest() {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"house.subcreate.name", "description"=>"unavailable.$check");
+		}
+		if ($this->house && $this->house->getHead() === $this->getCharacter()) {
+			return array("name"=>"house.subcreate.name", "description"=>"unavailable.ishead");
+		} else {
+			return $this->action("house.subcreate", "maf_house_subcreate", true,
 				array('house'=>$this->house->getId()),
 				array("%name%"=>$this->house->getName())
 			);
