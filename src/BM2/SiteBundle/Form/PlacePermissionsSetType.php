@@ -14,11 +14,13 @@ class PlacePermissionsSetType extends AbstractType {
 	private $me;
 	private $em;
 	private $owner;
+	private $p;
 
-	public function __construct(Character $me, EntityManager $em, $owner) {
+	public function __construct(Character $me, EntityManager $em, $owner, $p) {
 		$this->me = $me;
 		$this->em = $em;
 		$this->owner = $owner;
+		$this->p = $p;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -32,7 +34,7 @@ class PlacePermissionsSetType extends AbstractType {
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$owner = $this->owner;
 		if ($owner) {
-			if ($p->getType()->getPublic() === false) {
+			if ($this->p->getType()->getPublic() === false) {
 				$builder->add('public', 'checkbox', [
 					'required'=> false,
 					'label'=> 'control.place.public',
