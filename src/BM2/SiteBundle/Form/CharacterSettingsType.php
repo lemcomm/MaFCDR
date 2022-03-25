@@ -22,6 +22,14 @@ class CharacterSettingsType extends AbstractType {
 			'label'=>'character.auto.readrealms',
 			'required'=>false,
 		));
+		$builder->add('auto_read_assocs', 'checkbox', array(
+			'label'=>'character.auto.readassocs',
+			'required'=>false,
+		));
+		$builder->add('auto_read_house', 'checkbox', array(
+			'label'=>'character.auto.readhouse',
+			'required'=>false,
+		));
 		$builder->add('non_hetero_options', 'checkbox', array(
 			'label'=>'character.non_hetero_options',
 			'required'=>false,
@@ -32,5 +40,5 @@ class CharacterSettingsType extends AbstractType {
 	public function getName() {
 		return 'charactersettings';
 	}
-			
+
 }
