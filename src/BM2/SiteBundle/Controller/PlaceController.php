@@ -173,7 +173,7 @@ class PlaceController extends Controller {
 			$page = 'Place/occupationPermissions.html.twig';
 		}
 
-		$form = $this->createForm(new PlacePermissionsSetType($character, $this->getDoctrine()->getManager(), $owner), $place);
+		$form = $this->createForm(new PlacePermissionsSetType($character, $this->getDoctrine()->getManager(), $owner, $place), $place);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
