@@ -113,6 +113,22 @@ place:
   intro: >
     If you've found the %name% to be troublesome, it's a fairly simple matter to evict them.
 
+control:
+ place:
+  public: Place Allows Any Visitors?
+perm:
+ desc:
+  title:  Permissions Described
+ see:     See
+ placevisit: Enter
+ placedocks: Embark
+ placedescribe: Edit Description
+ placeresupply: Resupply
+ placemobilize: Mobilize
+ placeconstruct: Build / Upgrade
+ manage: Manage
+ choose: -- Choose --
+
 by:
  ambassador: As a Manager of Diplomacy...
  lord:    As the Lord...
