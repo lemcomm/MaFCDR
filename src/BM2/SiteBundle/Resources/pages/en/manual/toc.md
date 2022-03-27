@@ -58,6 +58,10 @@ Experimental
 ------------
 * [Battles](battles2)
 
+Guides & Tutorials
+------------------
+* [Arrivals](arrivals)
+
 Other
 -----
 * [Test](test)
