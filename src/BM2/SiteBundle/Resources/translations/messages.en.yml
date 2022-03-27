@@ -1420,7 +1420,8 @@ manual:
  houses:        Houses
  units:         Units
  battles2:      Battles (Upcoming Change)
- sieges:        Sieges (Upcoming Feature)
+ sieges:        Sieges
+ arrivals:      Arrivals System
 
 list:
  buildingtypes:   list of all building types
