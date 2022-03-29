@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationDeity;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Deity;
@@ -11,6 +12,8 @@ use BM2\SiteBundle\Entity\GameRequest;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\AssocCreationType;
 use BM2\SiteBundle\Form\AssocDeityType;
+use BM2\SiteBundle\Form\AssocDeityUpdateType;
+use BM2\SiteBundle\Form\AssocDeityWordsType;
 use BM2\SiteBundle\Form\AssocUpdateType;
 use BM2\SiteBundle\Form\AssocCreateRankType;
 use BM2\SiteBundle\Form\AssocJoinType;
@@ -179,6 +182,79 @@ class AssociationController extends Controller {
 			return $this->redirectToRoute('maf_assoc_deities', array('id'=>$assoc->getId()));
 		}
 		return $this->render('Assoc/newDeity.html.twig', [
+			'form' => $form->createView(),
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/updatedeity/{deity}", name="maf_assoc_update_deity", requirements={"id"="\d+", "deity"="\d+"})
+	  */
+
+	public function updateDeityAction(Association $id, Deity $deity, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocUpdateDeityTest', [$assoc, $deity]);
+
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AssocDeityUpdateType($deity, $em->getRepository('BM2SiteBundle:AspectType')->findAll()));
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+
+			$deity = $this->get('association_manager')->updateDeity($deity, $char, $data);
+			foreach ($deity->getAssociations() as $bassoc) {
+				if ($bassoc !== $assoc) {
+					$this->get('history')->logEvent(
+						$bassoc,
+						'event.assoc.deity.changeother',
+						array('%link-deity%'=>$deity->getId(), '%link-assoc%'=>$assoc->getId())
+					);
+				} else {
+					$this->get('history')->logEvent(
+						$bassoc,
+						'event.assoc.deity.changeself',
+						array('%link-deity%'=>$deity->getId())
+					);
+				}
+			}
+			# No flush needed, AssocMan flushes.
+			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.updated', [], 'orgs'));
+			return $this->redirectToRoute('maf_assoc_deities', array('id'=>$assoc->getId()));
+		}
+		return $this->render('Assoc/updateDeity.html.twig', [
+			'form' => $form->createView(),
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/wordsdeity/{deity}", name="maf_assoc_words_deity", requirements={"id"="\d+", "deity"="\d+"})
+	  */
+
+	public function wordsDeityAction(Association $id, AssociationDeity $deity, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocWordsDeityTest', [$assoc, $deity]);
+
+		$em = $this->getDoctrine()->getManager();
+		$form = $this->createForm(new AssocDeityWordsType($deity));
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($deity->getWords() !== $data['words']) {
+				$deity->setWords($data['words']);
+			}
+			$deity->setWordsTimestamp(new \DateTime("now"));
+			$deity->setWordsFrom($char);
+			$this->get('history')->logEvent(
+				$assoc,
+				'event.assoc.deity.newwords',
+				array('%link-deity%'=>$deity->getDeity()->getId()),
+				History::LOW
+			);
+			$this->getDoctrine()->getManager()->flush();
+
+			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.deity.updated', [], 'orgs'));
+			return $this->redirectToRoute('maf_assoc_deities', array('id'=>$assoc->getId()));
+		}
+		return $this->render('Assoc/wordsDeity.html.twig', [
 			'form' => $form->createView(),
 		]);
 	}
