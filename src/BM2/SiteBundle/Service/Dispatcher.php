@@ -2583,8 +2583,7 @@ class Dispatcher {
 			'place.permissions.description',
 			'place.permissions.longdesc',
 			array('id'=>$place->getId()),
-			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName()),
-			array('spawn'=>$place->getSpawn()?true:false)
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 		);
 	}
 
