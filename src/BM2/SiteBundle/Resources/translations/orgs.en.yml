@@ -137,6 +137,8 @@ assoc:
    header: Review the List of Known Deities
    description: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p>
    empty: <p>Here you can review all the deities currently recognized by anyone, ever, and if you run this association, also recognize them in your own association.</p><p>Unforunately, it doesn't look like there are any currently recognized. Perhaps the First Ones have not yet remembered from where they originate? Someone should read the lore.</p>
+  viewDeity:
+   name:  %name%
   place:
    add:
     name: Extend an Association to this Place
