@@ -888,8 +888,10 @@ charstatus:
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 requests:     %number% request|%number% requests
-inside:       inside %place%
-near:         near %place%
+inside:       Inside %settlement%
+inside2:      Inside %place%, in %settlement%
+inside3:      Inside %place%, near %settlement%
+near:         Near %settlement%
 familiarity:
  0:           You are new to this region and not familiar with the environment.
  1:           You are not very familiar with this region.
@@ -1624,6 +1626,7 @@ unavailable:
  location:
   yours:        You already control this settlement.
   fortified:    You cannot take control of a fortified settlement from the outside.
+  defended:     The defending forces prevent your occupation of this settlement.
   nodefenders:  There are no troops defending this settlement, you can simply take it.
  trade:
   noestate:     You do not have any estates with which to trade.
@@ -1656,6 +1659,8 @@ unavailable:
  nobuild:       You don't have permission from an Association to expand them.
  alreadyinassoc: You are already in this Association.
  notassocowner: You are not the owner of this association.
+ cantxfercapital: This place type cannot be transferred to another owner.
+
 marker:
  name:      Marker name
  type:      Marker type

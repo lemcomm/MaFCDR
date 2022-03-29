@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationDeity;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
@@ -294,6 +295,8 @@ class Dispatcher {
 				$actions[] = $this->controlOccupationEndTest(true);
 				$actions[] = $this->controlChangeOccupantTest(true);
 				$actions[] = $this->controlChangeOccupierTest(true);
+			} else {
+				$actions[] = $this->controlOccupationStartTest(true);
 			}
 			$actions[] = $this->controlChangeRealmTest(true, $settlement);
 			$actions[] = $this->controlSettlementDescriptionTest(null, $settlement);
@@ -1056,7 +1059,6 @@ class Dispatcher {
 		}
 	}
 
-	/* Only implemented for testing. Starting an occupation requires a siege.
 	public function controlOccupationStartTest($check_duplicate=false, $check_regroup=true) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.$check");
@@ -1067,8 +1069,8 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.notinside");
 		}
-		if ($settlement->isFortified() && $this->getCharacter()->getInsideSettlement()!=$settlement) {
-			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.location.fortified");
+		if ($settlement->isDefended()) {
+			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.location.defended");
 		}
 		if ($check_regroup && $this->getCharacter()->isDoingAction('military.regroup')) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.regrouping");
@@ -1081,7 +1083,6 @@ class Dispatcher {
 		}
 		return $this->action("control.occupationstart", "maf_settlement_occupation_start");
 	}
-	*/
 
 	public function controlOccupationEndTest($check_duplicate=false, $check_regroup=true) {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
@@ -2446,6 +2447,11 @@ class Dispatcher {
 		if (!($place instanceof Place) || !($assoc instanceof Association)) {
 			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.badinput");
 		}
+		if ($place->getType()->getName() === 'capital') {
+			$return = $this->placeManageRulersTest(null, $place);
+		} else {
+			$return = $this->placeManageTest(null, $place);
+		}
 		$found = false;
 		foreach ($place->getAssociations() as $assocPlace) {
 			if ($assocPlace->getAssociation() === $assoc) {
@@ -2456,19 +2462,15 @@ class Dispatcher {
 		if (!$found) {
 			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.assocnothere");
 		}
-		if ($place->getOccupier() || $place->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'manage', false, $occupied)) {
-			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.notmanager");
-		} else {
-			return $this->action("place.evictAssoc", "maf_place_assoc_evict", true,
-				array('id'=>$place->getId(), 'assoc'=>$assoc->getId()),
-				array("%name%"=>$assoc->getName())
-			);
-		}
+		return $this->varCheck(
+			$return,
+			'place.evictAssoc.name',
+			'maf_place_assoc_evict',
+			'place.evictAssoc.description',
+			'place.evictAssoc.longdesc',
+			array('id'=>$place->getId(), 'assoc'=>$assoc->getId()),
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+		);
 	}
 
 	public function placeManageTest($ignored, Place $place) {
@@ -2491,8 +2493,7 @@ class Dispatcher {
 	}
 
 	public function placeDestroyTest($ignored, Place $place) {
-		$type = $place->getType();
-		if ($type->getName() === 'capital') {
+		if ($place->getType()->getName() === 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
 			$return = $this->placeManageTest(null, $place);
@@ -2503,6 +2504,9 @@ class Dispatcher {
 	public function placeTransferTest($ignored, Place $place) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.transfer.name", "description"=>"unavailable.$check");
+		}
+		if ($place->getType()->getName() === 'capital') {
+			return array("name"=>"place.transfer.name", "description"=>"unavailable.cantxfercapitals");
 		}
 		if ($place->getOwner() !== $this->getCharacter()) {
 			return array("name"=>"place.transfer.name", "description"=>"unavailable.notowner");
@@ -2517,74 +2521,68 @@ class Dispatcher {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupant()) {
-			return array("name"=>"place.newplayer.name", "description"=>"unavailable.occupied");
-		}
-		if ($place->getOwner() != $this->getCharacter()) {
-			return array("name"=>"place.newplayer.name", "description"=>"unavailable.notowner");
-		}
 		if (!$place->getType()->getSpawnable()) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.notspawnable");
-		} else {
-			return $this->action("place.newplayer", "maf_place_newplayer", true,
-				array('place'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-			);
 		}
+		if ($place->getType()->getName() === 'capital') {
+			$return = $this->placeManageRulersTest(null, $place);
+		} else {
+			$return = $this->placeManageTest(null, $place);
+		}
+		return $this->varCheck(
+			$return,
+			'place.newplayer.name',
+			'maf_place_newplayer',
+			'place.newplayer.description',
+			'place.newplayer.longdesc',
+			array('place'=>$place->getId()),
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+		);
 	}
 
 	public function placeSpawnToggleTest($ignored, $place) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"place.togglenewplayer.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupant()) {
-			return array("name"=>"place.togglenewplayer.name", "description"=>"unavailable.occupied");
-		}
-		if ($place->getOwner() != $this->getCharacter()) {
-			return array("name"=>"place.togglenewplayer.name", "description"=>"unavailable.notowner");
-		}
 		if (!$place->getType()->getSpawnable()) {
 			return array("name"=>"place.togglenewplayer.name", "description"=>"unavailable.notspawnable");
-		} else {
-			return $this->action("place.togglenewplayer", "maf_place_spawn_toggle", true,
-				array('place'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName()),
-				array('spawn'=>$place->getSpawn()?true:false)
-			);
 		}
+		if ($place->getType()->getName() === 'capital') {
+			$return = $this->placeManageRulersTest(null, $place);
+		} else {
+			$return = $this->placeManageTest(null, $place);
+		}
+		return $this->varCheck(
+			$return,
+			'place.togglenewplayer.name',
+			'maf_place_spawn_toggle',
+			'place.togglenewplayer.description',
+			'place.togglenewplayer.longdesc',
+			array('place'=>$place->getId()),
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName()),
+			array('spawn'=>$place->getSpawn()?true:false)
+		);
 	}
 
 	public function placePermissionsTest($ignored, Place $place) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupant() || $place->getOccupier()) {
-			if (!$place->getOccupant() != $this->getCharacter()) {
-				return array("name"=>"place.permissions.name", "description"=>"unavailable.notoccupant");
-			}
-		} elseif ($place->getOwner() != $this->getCharacter()) {
-			return array("name"=>"place.permissions.name", "description"=>"unavailable.notowner");
+		if ($place->getType()->getName() === 'capital') {
+			$return = $this->placeManageRulersTest(null, $place);
+		} else {
+			$return = $this->placeManageTest(null, $place);
 		}
-		return $this->action("place.permissions", "maf_place_permissions", true,
-				array('id'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-			);
-	}
-
-	public function placeAllowRealmUseTest($ignored, Place $place) {
-		if (($check = $this->placeActionsGenericTests()) !== true) {
-			return array("name"=>"place.allowuse.name", "description"=>"unavailable.$check");
-		}
-		if ($place->getOwner() != $this->getCharacter()) {
-			return array("name"=>"place.allowuse.name", "description"=>"unavailable.notowner");
-		}
-		if ($place->getType()->getName() != 'embassy' && $place->getType()->getSpawnable()) {
-			return array("name"=>"place.allowuse.name", "description"=>"unavailable.notrealmuseable");
-		}
-		return $this->action("place.allowuse", "maf_place_allowuse", true,
-				array('place'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-			);
+		return $this->varCheck(
+			$return,
+			'place.permissions.name',
+			'maf_place_permissions',
+			'place.permissions.description',
+			'place.permissions.longdesc',
+			array('id'=>$place->getId()),
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName()),
+			array('spawn'=>$place->getSpawn()?true:false)
+		);
 	}
 
 	public function placeManageRulersTest($ignored, Place $place) {
@@ -3321,7 +3319,9 @@ class Dispatcher {
 		}
 		$character = $this->getCharacter();
 		$approved = false;
+		$hasHouse = false;
 		if ($character->getHouse()) {
+			$hasHouse = true;
 			foreach ($character->getRequests() as $req) {
 				if ($req->getType() == 'house.subcreate') {
 					if ($req->getApproved()) {
@@ -3331,7 +3331,7 @@ class Dispatcher {
 				}
 			}
 		}
-		if (!$approved) {
+		if ($hasHouse && !$approved) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.notcadetapproved");
 		}
 		if (!$character->getInsidePlace()) {
@@ -3817,6 +3817,63 @@ class Dispatcher {
 		}
 	}
 
+	public function assocUpdateDeityTest($ignored, $opts) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.$check");
+		}
+		$assoc = $opts[0];
+		$deity = $opts[1];
+		if (!($assoc instanceof Association) || !($deity instanceof Deity)) {
+			return array("name"=>"assoc.deities.update.name", "description"=>"unavaible.badinput");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.notassocowner");
+		}
+		if ($deity->getMainRecognizer() !== $assoc) {
+			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.notmainrecognizer");
+		} else {
+			return $this->action("assoc.deities.update", "maf_assoc_update_deity", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocWordsDeityTest($ignored, $opts) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.deities.words.name", "description"=>"unavailable.$check");
+		}
+		$assoc = $opts[0];
+		$deity = $opts[1];
+		if (!($assoc instanceof Association) || !($deity instanceof AssociationDeity)) {
+			return array("name"=>"assoc.deities.words.name", "description"=>"unavaible.badinput");
+		}
+
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.deities.words.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank->getOwner()) {
+			return array("name"=>"assoc.deities.words.name", "description"=>"unavailable.notassocowner");
+		} if ($deity->getAssociation() !== $assoc) {
+			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
+		} else {
+			return $this->action("assoc.deities.words", "maf_assoc_words_deity", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
 	public function assocAddDeityTest($ignored, $opts) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.$check");
@@ -3835,7 +3892,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.notinassoc");
 		}
 		if ($this->assocman->findDeity($assoc, $deity)) {
-			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deityalreadyofassoc");
+			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.deityalreadyofassoc");
 		}
 		$rank = $member->getRank();
 		if (!$rank->getOwner()) {
