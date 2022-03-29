@@ -654,7 +654,13 @@ class ConversationController extends Controller {
 					$em->flush();
 				}
 			}
-			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', new ArrayCollection($data['contacts']), $char, false);
+
+			# These lines are just here to make this can handle single object collections.
+			$all = new ArrayCollection();
+			foreach ($data['contacts'] as $each) {
+				$all->add($each);
+			}
+			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'newperms', $all, $char, false);
 			$em->flush();
 			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
 		}
