@@ -27,6 +27,7 @@ use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -136,6 +137,10 @@ class UnitController extends Controller {
 		$em = $this->getDoctrine()->getManager();
                 $pm = $this->get('permission_manager');
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
+                $here = $character->getInsideSettlement()->getId();
+                if (!in_array($here, $settlements)) {
+                        $settlements[] = $here;
+                }
 
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, null, true));
 
@@ -633,7 +638,7 @@ class UnitController extends Controller {
      				$form->addError(new FormError($this->get('translator')->trans("recruit.troops.toomany2"), null, array('%max%'=>$settlement->getRecruitLimit(true))));
                                 return $this->render('Unit/recruit.html.twig', $renderArray);
      			}
-                        if ($data['number'] > $remaining = 200 - $unit->getSoldiers()->count()) {
+                        if ($data['number'] > $data['unit']->getAvailable()) {
                                 $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
                                 $data['number'] = $remaining;
                         }
@@ -645,10 +650,6 @@ class UnitController extends Controller {
      				}
      			}
      			$count = 0;
-			if ($data['unit']->getAvailable() < $data['number']) {
-				$data['number'] = $data['unit']->getAvailable();
-				$this->addFlash('notice', $this->get('translator')->trans('recruit.troops.availability', array('%unit%'=>$data['unit']->getSettings()->getName()), 'actions'));
-			}
      			$corruption = $this->get('economy')->calculateCorruption($settlement);
      			for ($i=0; $i<$data['number']; $i++) {
      				if ($soldier = $generator->randomSoldier($data['weapon'], $data['armour'], $data['equipment'], $data['mount'], $settlement, $corruption, $data['unit'])) {
