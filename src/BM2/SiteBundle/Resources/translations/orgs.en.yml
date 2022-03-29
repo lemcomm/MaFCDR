@@ -114,6 +114,18 @@ assoc:
    name:  Formalize a New Deity
    header: Formalize a New Deity
    intro: <p>Deities are known things in Might & Fealty, for all First Ones trace their lineage back to the moment they were created by one deity or another. Whether or not you follow a deity is up to you, but the existence of deities beyond this realm is fact. How you interpret that is up to you.</p><p>Warning: No real world or clearly from popular fiction religions. This is a game. Make up something new or interesting.</p>
+  removeDeity:
+   name:  Remove this Deity from your Pantheon
+  adoptDeity:
+   name:  Become this Deity's Main Recognizer
+  addDeity:
+   name:  Add this Deity to your Pantheon
+  updateDeity:
+   name:  Update this Deity's Information
+   intro: As the main recognizer of this deity, you can always update the details of them. Hopefully the followers will take it well.
+  wordsDeity:
+   name:  Update your Words About this Deity
+   intro: Each association always has some words about the deities they recognize. You can update yours, here.
   viewDeities:
    name:  Review the Association's Recognized Deities
    header: Review the Association's Recognized Deities
