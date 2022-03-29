@@ -28,6 +28,14 @@
 				{#  Since you can always see your own rank, if there are no ranks either their's a bug or we don't have a rank. If we don't have a rank, we can't manage any ranks or create new ones. #}
 				<p><a href="{{ path('maf_assoc_deities_adopt', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.adoptDeity.name'|trans({}) }}</a></p>
 			{% endif %}
+			{% set check = dispatcher.assocUpdateDeityTest(null, [assoc, deity]) %}
+			{% if check.url is defined %}
+				<p><a href="{{ path('maf_assoc_update_deity', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.updateDeity.name'|trans({}) }}</a></p>
+			{% endif %}
+			{% set check = dispatcher.assocWordsDeityTest(null, [assoc, each]) %}
+			{% if check.url is defined %}
+				<p><a href="{{ path('maf_assoc_words_deity', {'id':assoc.id, 'deity':each.id}) }}">{{ 'assoc.route.wordsDeity.name'|trans({}) }}</a></p>
+			{% endif %}
 			{% set check = dispatcher.assocRemoveDeityTest(null, [assoc, deity]) %}
 			{% if check.url is defined %}
 				<p><a href="{{ path('maf_assoc_deities_remove', {'id':assoc.id, 'deity':deity.id}) }}">{{ 'assoc.route.removeDeity.name'|trans({}) }}</a></p>
