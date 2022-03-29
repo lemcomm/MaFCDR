@@ -154,14 +154,6 @@ class DescriptionManager {
 						History::LOW
 					);
 					break;
-				case 'Deity':
-					$this->history->logEvent(
-						$entity,
-						'event.description.updated.deity',
-						null,
-						History::LOW
-					);
-					break;
 				case 'House':
 					$this->history->logEvent(
 						$entity,
