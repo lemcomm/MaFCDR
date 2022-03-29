@@ -545,7 +545,7 @@ class WarManager {
 	}
 
 	public function disbandSiege(Siege $siege, Character $leader = null, $completed = FALSE) {
-		if ($siege->getBattle()) {
+		if ($siege->getBattles()->count() > 0) {
 			return false;
 		}
 		# Siege disbandment and removal actually happens as part of removeCharacterFromBattlegroup.
@@ -599,6 +599,9 @@ class WarManager {
 				$this->removeCharacterFromBattlegroup($character, $group, true);
 				$this->addRegroupAction(null, $character);
 			}
+			if (!$group->getBattle()) {
+				$this->em->remove($group);
+			}
 		}
 		$this->em->remove($siege);
 		$this->em->flush();
@@ -611,11 +614,14 @@ class WarManager {
 			$this->removeCharacterFromBattlegroup($character, $group);
 			$this->addRegroupAction($battlesize, $character);
 		}
+		if (!$group->getSiege()) {
+			$this->em->remove($group);
+		}
 		$this->em->flush();
 		return true;
 	}
 
-	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg, $disbandSiege = false) {
+	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg, $disbandSiege = false, $source = 'battlerunner') {
 		$bg->removeCharacter($character);
 		if ($bg->getCharacters()->count()==0) {
 			// there are no more participants in this battlegroup
@@ -649,9 +655,6 @@ class WarManager {
 							$char->removeLeadingBattlegroup($bg);
 						}
 					}
-					if (!$focus->getSiege()) {
-						$this->em->remove($group); # If this battle isn't tied to a siege, we can safely remove the battlegroup. Groups tied to a siege and a battle will be handled by the siege closing out (which will, if a battle remains, detach the group from the siege and just let this code handle it afterwards.)
-					}
 				}
 			} else if ($type == 'siege' && $disbandSiege) {
 				$this->log(1, "Removing".$character->getName()." (".$character->getId().") from battlegroup for siege... \n");
@@ -668,13 +671,8 @@ class WarManager {
 							$char->removeLeadingBattlegroup($bg);
 						}
 					}
-					if (!$group->getBattle()) {
-						$this->em->remove($group); # No battle? Remove the group. Groups can only be tied to 1x Siege, and 1x Battle.
-					} else {
-						$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
-					}
+					$group->setSiege(NULL); # We have a battle, but we use this code to cleanup sieges, so we need to detach this group from the siege, so the siege can close properly. The battle will close out the group after it finishes.
 				}
-				$this->log(1, "Removed.\n");
 			}
 			$this->em->flush(); # This *must* be here or we encounter foreign key constaint errors when removing the siege, in order to commit everything we've done above.
 		}
