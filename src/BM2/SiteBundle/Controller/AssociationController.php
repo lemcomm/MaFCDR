@@ -163,6 +163,16 @@ class AssociationController extends Controller {
 	}
 
 	/**
+	  * @Route("/deity/{id}", name="maf_deity", requirements={"id"="\d+"})
+	  */
+
+	public function deityAction(Deity $id) {
+		return $this->render('Assoc/deity.html.twig', [
+			'deity' => $id
+		]);
+	}
+
+	/**
 	  * @Route("/{id}/newdeity", name="maf_assoc_new_deity", requirements={"id"="\d+"})
 	  */
 
