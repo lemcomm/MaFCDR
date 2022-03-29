@@ -3409,9 +3409,10 @@ class Dispatcher {
 		if (($character->getInsideSettlement() && $character->getInsideSettlement()->getHousesPresent()->isEmpty()) OR (!$character->getInsideSettlement() && $character->getInsidePlace() && !$character->getInsidePlace()->getHouse())) {
 			return array("name"=>"house.join.name", "description"=>"unavailable.housenothere");
 		} else {
+			$house = $character->getInsidePlace()->getHouse();
 			return $this->action("house.join.house", "maf_house_join", true,
-				array('house'=>$this->house->getId()),
-				array("%name%"=>$this->house->getName()));
+				array('house'=>$house->getId()),
+				array("%name%"=>$house->getName()));
 		}
 	}
 
