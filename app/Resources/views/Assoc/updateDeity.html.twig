@@ -1,0 +1,17 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ 'assoc.route.updateDeity.name'|trans({},"orgs")|title }}</h2>
+<p>{{ 'assoc.route.updateDeity.intro'|trans({},"orgs")|raw }}</p>
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+<dl>
+	<dt>{{ form_label(form.name)}}</dt><dd>{{ form_widget(form.name) }}</dd>
+	<dt>{{ form_label(form.aspects)}}</dt><dd>{{ form_widget(form.aspects) }}</dd>
+	<dt>{{ form_label(form.description)}}</dt><dd>{{ form_widget(form.description) }}</dd>
+	{{ form_widget(form.submit) }}
+{{ form_end(form) }}
+</dl>
+
+{% endblock %}
