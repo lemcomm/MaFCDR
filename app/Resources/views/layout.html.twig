@@ -132,11 +132,17 @@
 		<br />
 		{% if character.travelatsea %}
 			{# nothing #}
-		{% elseif character.insidesettlement %}
-			{% trans with {'%place%':link(character.insidesettlement)} %}inside{% endtrans %}
+		{% elseif character.insidePlace %}
+			{% if character.insideSettlement %}
+				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)} %}inside2{% endtrans %}
+			{% else %}
+				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)} %}inside3{% endtrans %}
+			{% endif %}
+		{% elseif character.insideSettlement %}
+			{% trans with {'%settlement%':link(character.insidesettlement)} %}inside{% endtrans %}
 		{% elseif character.location and app.session.get('nearest_settlement') %}
 			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
-			{% trans with {'%place%':link(app.session.get('nearest_settlement'))} %}near{% endtrans %}
+			{% trans with {'%settlement%':link(app.session.get('nearest_settlement'))} %}near{% endtrans %}
 		{% endif %}
 	</div>
 	{% endif %}
