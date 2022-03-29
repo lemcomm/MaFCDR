@@ -1069,6 +1069,9 @@ class Dispatcher {
 		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.notinside");
 		}
+		if ($this->getCharacter()->hasNoSoldiers()) {
+			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.nosoldiers");
+		}
 		if ($settlement->isDefended()) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.location.defended");
 		}
@@ -2723,8 +2726,11 @@ class Dispatcher {
 		if (!$place = $this->getCharacter()->getInsidePlace()) {
 			return array("name"=>"place.occupationstart.name", "description"=>"unavailable.notinside");
 		}
-		if ($place->isFortified() && $this->getCharacter()->getInsidePlace()!=$place) {
-			return array("name"=>"place.occupationstart.name", "description"=>"unavailable.location.fortified");
+		if ($this->getCharacter()->hasNoSoldiers()) {
+			return array("name"=>"place.occupationstart.name", "description"=>"unavailable.nosoldiers");
+		}
+		if ($place->isDefended()) {
+			return array("name"=>"place.occupationstart.name", "description"=>"unavailable.location.defended");
 		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			return array("name"=>"place.occupationstart.name", "description"=>"unavailable.regrouping");
