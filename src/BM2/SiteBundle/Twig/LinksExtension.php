@@ -139,6 +139,11 @@ class LinksExtension extends \Twig_Extension {
 				case 'law':
 					$type = 'Law';
 					break;
+				case 'd':
+				case 'deity':
+				case 'god':
+					$type = 'Deity';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
@@ -226,6 +231,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'assoc':
 			case 'association':	return 'maf_assoc';
 			case 'law':		return 'maf_law';
+			case 'deity':		return 'maf_deity';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}

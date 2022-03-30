@@ -2583,8 +2583,7 @@ class Dispatcher {
 			'place.permissions.description',
 			'place.permissions.longdesc',
 			array('id'=>$place->getId()),
-			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName()),
-			array('spawn'=>$place->getSpawn()?true:false)
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
 		);
 	}
 
@@ -3406,7 +3405,7 @@ class Dispatcher {
 		if (!$character->getInsideSettlement() AND !$character->getInsidePlace()) {
 			return array("name"=>"house.new.name", "description"=>"unavailable.outsideall");
 		}
-		if (($character->getInsideSettlement() && $character->getInsideSettlement()->getHousesPresent()->isEmpty()) OR (!$character->getInsideSettlement() && $character->getInsidePlace() && !$character->getInsidePlace()->getHouse())) {
+		if ($character->getInsidePlace() && !$character->getInsidePlace()->getHouse()) {
 			return array("name"=>"house.join.name", "description"=>"unavailable.housenothere");
 		} else {
 			$house = $character->getInsidePlace()->getHouse();

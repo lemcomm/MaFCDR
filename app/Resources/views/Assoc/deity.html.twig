@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+
+<h2>{{ 'assoc.route.viewDeity.name'|trans({"%name%":deity.name})|title }}</h2>
+<dl class="long">
+	<dt>
+		{{ deity.name }}
+	</dt>
+	<dd>
+		<p>{{deity.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}</p>
+	</dd>
+</dl>
+{% endblock %}

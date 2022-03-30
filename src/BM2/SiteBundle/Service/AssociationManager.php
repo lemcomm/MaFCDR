@@ -315,6 +315,31 @@ class AssociationManager {
 		$this->addDeity($assoc, $deity, $char, $data['words']);
 	}
 
+	public function updateDeity(Deity $deity, Character $char, $data) {
+		if ($deity->getName() !== $data['name']) {
+			$deity->setName($data['name']);
+		}
+		$list = [];
+		foreach ($deity->getAspects() as $old) {
+			$list[] = $old->getAspect();
+			if (!in_array($old->getAspect(), $data['aspects'])) {
+				$this->em->remove($old);
+			}
+		}
+		foreach ($data['aspects'] as $new) {
+			if (!in_array($new, $list)) {
+				$aspect = new DeityAspect();
+				$this->em->persist($aspect);
+				$aspect->setAspect($new);
+				$aspect->setDeity($deity);
+			}
+		}
+		if ($deity->getDescription()->getText() !== $data['description']) {
+			$this->descman->newDescription($deity, $data['description'], $char, TRUE); #Not new, but we pass it to save processing time.
+		}
+		$this->em->flush();
+	}
+
 	public function adoptDeity(Association $assoc, Deity $deity, Character $char) {
 		$deity->setMainRecognizer($assoc);
 		$this->history->logEvent(
