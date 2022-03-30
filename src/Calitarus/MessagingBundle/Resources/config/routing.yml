@@ -1,3 +1,0 @@
-bm2:
-    resource: "@MsgBundle/Controller"
-    type:     annotation
