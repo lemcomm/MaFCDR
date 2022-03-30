@@ -4,8 +4,9 @@ security:
 
     role_hierarchy:
         ROLE_TESTER:      ROLE USER
-        ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER]
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_TESTER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_OLYMPUS:     ROLE USER
+        ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER, ROLE_OLYMPUS]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
         fos_userbundle:
