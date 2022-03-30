@@ -21,8 +21,6 @@ class AppKernel extends Kernel
             new Knp\Bundle\MarkdownBundle\KnpMarkdownBundle(),
             new BM2\SiteBundle\BM2SiteBundle(),
             new BM2\DungeonBundle\DungeonBundle(),
-#            new Calitarus\BitPayBundle\CalitarusBitPayBundle(),
-            new Calitarus\MessagingBundle\MsgBundle(),
             new BM2\UserBundle\UserBundle()
         );
 
