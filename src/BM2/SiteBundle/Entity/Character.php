@@ -390,7 +390,7 @@ class Character {
 		$assocs = new ArrayCollection;
 		foreach ($this->getAssociationMemberships() as $mbr) {
 			if ($rank = $mbr->getRank()) {
-				if ($rank->getOwner() || $mbr->getCreateAssocs()) {
+				if ($rank->getOwner() || $rank->getSubcreate()) {
 					$assocs->add($mbr->getAssociation());
 				}
 			}
