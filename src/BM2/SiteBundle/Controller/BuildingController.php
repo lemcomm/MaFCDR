@@ -155,4 +155,18 @@ class BuildingController extends Controller {
 		]);
 	}
 
+	/**
+	  * @Route("/archeryrange")
+	  */
+	public function archeryRangeAction() {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('locationArcheryRangeTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Building/archeryrange.html.twig', [
+			'settlement'=>$settlement,
+		]);
+	}
+
 }
