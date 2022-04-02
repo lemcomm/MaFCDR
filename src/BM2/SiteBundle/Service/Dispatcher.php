@@ -28,16 +28,16 @@ class Dispatcher {
 
 	const FREE_ACCOUNT_ESTATE_LIMIT = 3;
 
-	private $character;
-	private $realm;
-	private $house;
-	private $settlement;
-	private $appstate;
-	private $permission_manager;
-	private $geography;
-	private $milman;
-	private $interactions;
-	private $assocman;
+	protected $character;
+	protected $realm;
+	protected $house;
+	protected $settlement;
+	protected $appstate;
+	protected $permission_manager;
+	protected $geography;
+	protected $milman;
+	protected $interactions;
+	protected $assocman;
 
 	// test results to store because they are expensive to calculate
 	private $actionableSettlement=false;
@@ -141,7 +141,7 @@ class Dispatcher {
 		}
 	}
 
-	private function veryGenericTests() {
+	protected function veryGenericTests() {
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
@@ -223,7 +223,7 @@ class Dispatcher {
 		return array("name"=>"location.title", "elements"=>$actions);
 	}
 
-	private function interActionsGenericTests() {
+	protected function interActionsGenericTests() {
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
@@ -254,6 +254,10 @@ class Dispatcher {
 		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
+		$has = $this->locationArcheryRangeTest();
+		if (isset($has['url'])) {
+			$actions[] = $has;
+		}
 
 		return array("name"=>"building.title", "elements"=>$actions);
 	}
@@ -262,9 +266,10 @@ class Dispatcher {
 	public function locationLibraryTest() { return $this->locationHasBuildingTest("Library"); }
 	public function locationTempleTest() { return $this->locationHasBuildingTest("Temple"); }
 	public function locationBarracksTest() { return $this->locationHasBuildingTest("Barracks"); }
+	public function locationArcheryRangeTest() { return $this->locationHasBuildingTest("Archery Range"); }
 
 	public function locationHasBuildingTest($name) {
-		$lname = strtolower($name);
+		$lname = strtolower(str_replace(' ', '', $name));
 		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"building.$lname.name", "description"=>"unavailable.$check");
 		}
@@ -1020,6 +1025,9 @@ class Dispatcher {
 		}
 		if ($settlement->isFortified() && $this->getCharacter()->getInsideSettlement()!=$settlement) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.location.fortified");
+		}
+		if ($this->getCharacter()->getInsidePlace() && !in_array($this->getCharacter()->getInsidePlace()->getType()->getName(), ['tavern', 'inn'])) {
+			return array("name"=>"control.take.name", "description"=>"unavailable.insideplace");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('settlement.take')) {
 			return array("name"=>"control.take.name", "description"=>"unavailable.already");
@@ -4318,7 +4326,7 @@ class Dispatcher {
 
 
 
-	private function action($trans, $url, $with_long=false, $parameters=null, $transkeys=null, $vars=null) {
+	protected function action($trans, $url, $with_long=false, $parameters=null, $transkeys=null, $vars=null) {
 		$data = array(
 			"name"			=> $trans.'.name',
 			"url"				=> $url,
@@ -4339,7 +4347,7 @@ class Dispatcher {
 		return $data;
 	}
 
-	private function varCheck($data, $name = null, $url = null, $desc = null, $longdesc = null, $params = null, $trans = null, $vars = null) {
+	protected function varCheck($data, $name = null, $url = null, $desc = null, $longdesc = null, $params = null, $trans = null, $vars = null) {
 		# Function for overriding the action output, in order to allow one check to use one of multiple checks and then return a correct output for that check.
 		if ($name) {
 			$data['name'] = $name;
