@@ -30,13 +30,14 @@ class ActionResolution {
 	private $gametime;
 	private $warman;
 	private $actman;
+	private $activity;
 
 	private $max_progress = 5; // maximum number of actions to resolve in each background progression call
 	private $debug=100;
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman) {
+	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman, ActivityManager $activity) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->charman = $charman;
@@ -50,6 +51,7 @@ class ActionResolution {
 		$this->gametime = $gametime;
 		$this->warman = $warman;
 		$this->actman = $actman;
+		$this->activity = $activity;
 		$this->characters = new ArrayCollection();
 
 		$this->speedmod = (float)$this->appstate->getGlobal('travel.speedmod', 1.0);
@@ -656,7 +658,7 @@ class ActionResolution {
 		$this->em->flush();
 	}
 
-	private function task_research(Action $action) {
+	private function update_task_research(Action $action) {
 		// TODO: shift event journal start max(one day, one task) into the past
 		// easily done: get cycle of next-oldest date and shift to there
 
@@ -679,7 +681,19 @@ class ActionResolution {
 		$next = $query->getSingleScalarResult();
 		$meta->setAccessFrom($next);
 
-		// TODO: merging of meta data when we have multiple periods of access
+		$allMeta = $this->em->getRepository('BM2SiteBundle:EventMetadata')->findBy(array('log'=>$log, 'reader'=>$action->getCharacter()));
+		if (count($allMeta) > 1) {
+			# We have multiple, check for possible merges.
+			foreach ($allMeta as $each) {
+				foreach ($allMeta as $other) {
+					if ($other->getAccessFrom() <= $each->getAccessUntil()) {
+						$other->setAccessUntil($each->getAccessUntil());
+						$this->em->remove($each);
+					}
+				}
+			}
+		}
+
 		// see history::investigateLog() - actually, we might move this code here to there
 
 		if (!$next) {
@@ -694,6 +708,10 @@ class ActionResolution {
 			$this->em->remove($action);
 			$this->em->flush();
 		}
+	}
+
+	private function update_train_skill(Action $action) {
+		$this->activity->trainSkill($action->getcharacter(), $action->getTargetSkill(), 0, 1);
 	}
 
 	public function log($level, $text) {
