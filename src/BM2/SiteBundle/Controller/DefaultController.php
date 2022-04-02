@@ -16,8 +16,15 @@ class DefaultController extends Controller {
 	  * @Route("/", name="bm2_homepage")
 	  */
 	public function indexAction() {
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT j from BM2SiteBundle:Journal j WHERE j.public = true AND j.graphic = false AND j.pending_review = false AND j.GM_private = false AND j.GM_graphic = false ORDER BY j.date DESC')->setMaxResults(3);
+		$journals = $query->getResult();
+		foreach ($journals as $journal) {
+
+		}
 		return $this->render('Default/index.html.twig', [
-			"simple"=>true
+			"simple"=>true,
+			"journals"=>$journals
 		]);
 	}
 
