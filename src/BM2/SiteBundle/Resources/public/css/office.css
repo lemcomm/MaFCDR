@@ -544,6 +544,14 @@ th.topspace {
     width: 75%;
 }
 
+.index_maincontent {
+        width: 50%;
+}
+
+.index_journal {
+    width: 50%;
+    float: right;
+}
 .leftmain {
     float:  left;
     clear:  left;
