@@ -2,10 +2,28 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-<img class="sketch" src="{{ asset('bundles/bm2site/images/title1.jpg') }}" />
+{#<img class="sketch" src="{{ asset('bundles/bm2site/images/title1.jpg') }}" />#}
 
+<div class="index_journal">
+	<div class="subcontent">
+		<h2>Recent Journal Entries</h2>
+		<p>Recent writings from player characters about in-game events, observations, or thoughts.</p>
+	{% for journal in journals %}
+		<div class="subcontent">
+			<h2>{{ journal.topic|title }}</h2>
+			{{ 'journal.view.by'|trans({'%character%':link(journal.character), "%day%":journal.cycle|gametime("short"), "%ts%":journal.date|date}, "messages")|raw }}
+			{% set length = journal.length %}
+			{% if length > 500 %}
+				{{ ((journal.entry|slice(0,500))~'...')|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}<a href="{{ path('maf_journal', {"id":journal.id}) }}">Read more...</a></p>
+			{% else %}
+				{{ journal.entry|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
+			{% endif %}
+		</div>
+	{% endfor %}
+</div>
+</div>
+<div style="font-size:1.2em" class="index_maincontent">
 <h1>Create History</h1>
-<div style="font-size:1.2em">
 	<p>
 		In this entirely player-driven, persistent world, sandbox game.
 	</p>
