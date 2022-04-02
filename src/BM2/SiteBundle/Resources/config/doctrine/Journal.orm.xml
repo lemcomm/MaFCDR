@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\Journal">
+		<id name="id" type="integer">
+			<generator strategy="AUTO"/>
+		</id>
+		<field name="topic" type="string"/>
+		<field name="entry" type="text"/>
+                <field name="date" type="datetime"/>
+		<field name="cycle" type="integer"/>
+		<field name="public" type="boolean"/>
+		<field name="graphic" type="boolean"/>
+		<field name="ooc" type="boolean"/>
+		<field name="pending_review" type="boolean"/>
+		<field name="GM_reviewed" type="boolean"/>
+		<field name="GM_private" type="boolean" nullable="true"/>
+		<field name="GM_graphic" type="boolean" nullable="true"/>
+		<field name="language" type="string"/>
+                <many-to-one field="character" target-entity="Character" inversed-by="journals"/>
+                <one-to-many field="reports" target-entity="UserReport" mapped-by="journal"/>
+	</entity>
+</doctrine-mapping>
