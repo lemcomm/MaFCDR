@@ -385,6 +385,22 @@ class ActionsController extends Controller {
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
+		if ($place = $character->getInsidePlace()) {
+			#Only taverns will pass this check, so we know what is going on here.
+			if ($place->getType()->getName() === 'tavern') {
+				$type = 'tavern';
+			} else {
+				$type = 'inn';
+			}
+			return $this->render('Actions/takeTavern.html.twig', [
+				'type' => $type,
+				'char' => $char,
+				'settlement' => $settlement,
+				'place'=> $place,
+				'morale' => rand(0,25)
+			]);
+
+		}
 
 		$realms = $character->findRealms();
 		if ($realms->isEmpty()) {
@@ -498,9 +514,9 @@ class ActionsController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/grant")
-     */
+	/**
+	  * @Route("/grant")
+	  */
 	public function grantAction(Request $request) {
 		list($character, $settlement) = $this->get('dispatcher')->gateway('controlGrantTest', true);
 		if (! $character instanceof Character) {
