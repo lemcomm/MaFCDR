@@ -4177,6 +4177,26 @@ class Dispatcher {
 		return ["name"=>"conv.localreply.name", "url"=>"maf_conv_local_reply", "description"=>"conv.localreply.description"];
 	}
 
+	/* ========== Journal Tests ============== */
+
+
+
+	public function journalMineTest() {
+		#if (($check = $this->interActionsGenericTests()) !== true) {
+		#	return array("name"=>"journal.mine.name", "description"=>"unavailable.$check");
+		#}
+
+		return array("name"=>"journal.mine", "url"=>"maf_journal_mine", "description"=>"journal.mine.description", "long"=>"journal.mine.longdesc");
+	}
+
+	public function journalWriteTest() {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
+		}
+
+		return array("name"=>"journal.write", "url"=>"maf_journal_write", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+	}
+
 	/* ========== various tests and helpers ========== */
 
 	public function getActionableSettlement() {
