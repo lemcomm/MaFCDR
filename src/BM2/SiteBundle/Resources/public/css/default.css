@@ -556,10 +556,20 @@ th.topspace {
     width:  98%;
 }
 
+.index_maincontent {
+    width: 50%;
+}
+
+.index_journal {
+    width: 50%;
+    float: right;
+}
+
 .subcontent_wrapper {
     width: 24%;
     float: right;
 }
+
 .subcontent {
     background:     rgba(255,250,242,0.4);
     box-shadow:     0 0 1em rgba(0, 0, 0, 0.75) inset;

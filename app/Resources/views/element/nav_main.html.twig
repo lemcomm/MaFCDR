@@ -1,4 +1,7 @@
 <ul>
+	{% if app.user and is_granted("ROLE_OLYMPUS") %}
+		<li><a href="{{ path('maf_gm_pending') }}">{{ 'menu.gm'|trans}}</a></li>
+	{% endif %}
 	<li><a href="{{ path('bm2_map') }}">{{ 'menu.travel'|trans }}</a></li>
 	<li>
 		<a href="{{ path('bm2_character') }}">{{ 'menu.status'|trans }}</a>
@@ -40,6 +43,8 @@
 			<ul class="row">
 				<li><a href="{{ path('maf_conv_summary') }}">{{ 'summary.title'|trans({}, "conversations")|title }}</a></li>
 				<li><a href="{{ path('bm2_news') }}">{{ 'menu.news'|trans }}</a></li>
+				<li><a href="{{ path('maf_journal_mine') }}">{{ 'menu.journal'|trans }}</a></li>
+				<li><a href="{{ path('maf_journal_write') }}">{{ 'menu.newjournal'|trans }}</a></li>
 				<hr>
 				<li class="part">
 					<h3>{{ 'menu.messages2'|trans|title }}</h3>

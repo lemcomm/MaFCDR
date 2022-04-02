@@ -217,7 +217,7 @@ class DescriptionManager {
 					$olddesc->setActivePlace(null);
 					break;
 				case 'Realm':
-					$desc->setActiveRealm(null);
+					$olddesc->setActiveRealm(null);
 					break;
 			}
 			$this->em->flush();

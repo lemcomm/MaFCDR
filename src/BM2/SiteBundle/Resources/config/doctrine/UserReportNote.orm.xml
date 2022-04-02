@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\UserReportNote">
+		<id name="id" type="bigint">
+			<generator strategy="AUTO"/>
+		</id>
+		<field name="text" type="text"/>
+                <field name="date" type="datetime"/>
+                <field name="pending" type="boolean"/>
+		<field name="verdict" type="text"/>
+		<many-to-one field="from" target-entity="User" inversed-by="added_report_notes"/>
+		<many-to-one field="report" target-entity="UserReport" inversed-by="notes"/>
+	</entity>
+</doctrine-mapping>

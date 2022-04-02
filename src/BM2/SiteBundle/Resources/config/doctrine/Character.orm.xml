@@ -49,6 +49,12 @@
 		<many-to-one field="mount" target-entity="EquipmentType"/>
 
 		<one-to-many field="achievements" target-entity="Achievement" mapped-by="character"/>
+		<one-to-many field="fame" target-entity="Fame" mapped-by="character"/>
+		<one-to-many field="journals" target-entity="Journal" mapped-by="character" fetch="EXTRA_LAZY">
+			<order-by>
+				<order-by-field name="date" direction="DESC"/>
+			</order-by>
+		</one-to-many>
 		<one-to-many field="ratings" target-entity="CharacterRating" mapped-by="character" fetch="EXTRA_LAZY"/>
 
 		<one-to-many field="prisoners" target-entity="Character" mapped-by="prisoner_of" index-by="id"/>
@@ -60,8 +66,6 @@
 
 		<one-to-many field="newspapers_editor" target-entity="NewsEditor" mapped-by="character" fetch="EXTRA_LAZY"/>
 		<one-to-many field="newspapers_reader" target-entity="NewsReader" mapped-by="character" fetch="EXTRA_LAZY"/>
-
-		<one-to-one field="msg_user" target-entity="Calitarus\MessagingBundle\Entity\User" mapped-by="app_user"/>
 
 		<one-to-many field="artifacts" target-entity="Artifact" mapped-by="owner" fetch="EXTRA_LAZY"/>
 		<one-to-many field="quests_owned" target-entity="Quest" mapped-by="owner"/>

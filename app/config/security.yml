@@ -4,8 +4,9 @@ security:
 
     role_hierarchy:
         ROLE_TESTER:      ROLE USER
-        ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER]
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_TESTER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_OLYMPUS:     ROLE USER
+        ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER, ROLE_OLYMPUS]
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     providers:
         fos_userbundle:
@@ -38,6 +39,7 @@ security:
 
     access_control:
         - { path: ^/(../)?admin, roles: ROLE_ADMIN }
+        - { path: ^/(../)?GM, roles: ROLE_OLYMPUS }
         - { path: ^/(../)?gamerequest, roles: ROLE_USER } # Without this, users will be locked out of the gamerequest path by the line below. --Andrew
         - { path: ^/(../)?game, roles: ROLE_ADMIN }
         - { path: ^/(../)?account, roles: ROLE_USER }
@@ -48,6 +50,8 @@ security:
         - { path: ^/(../)?payment, roles: ROLE_USER }
         - { path: ^/(../)?publications, roles: ROLE_USER }
         - { path: ^/(../)?character, roles: ROLE_USER }
+        - { path: ^/(../)?journal/[0-9]+, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(../)?journal, roles: ROLE_USER }
         - { path: ^/(../)?actions, roles: ROLE_USER }
         - { path: ^/(../)?artifacts, roles: ROLE_USER }
         - { path: ^/(../)?laws, roles: ROLE_USER }
