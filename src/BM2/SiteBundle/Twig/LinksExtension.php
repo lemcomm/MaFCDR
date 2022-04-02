@@ -144,6 +144,10 @@ class LinksExtension extends \Twig_Extension {
 				case 'god':
 					$type = 'Deity';
 					break;
+				case 'j':
+				case 'journal':
+					$type = 'Journal';
+					break;
 				default:
 					return "[<em>invalid reference</em>]";
 			}
@@ -162,7 +166,7 @@ class LinksExtension extends \Twig_Extension {
 				} else {
 					$url = $this->generator->generate($this->getLink($type), array('id' => $id));
 				}
-				if ($type != 'NewsEdition' && $type != 'Unit' && $type != 'Conversation') {
+				if (!in_array($type, ['NewsEdition', 'Unit', 'Conversation', 'Journal'])) {
 					$name = $entity->getName();
 				} elseif ($type == 'Unit') {
 					$name = $entity->getSettings()->getName();
@@ -172,6 +176,8 @@ class LinksExtension extends \Twig_Extension {
 					} else {
 						$name = $entity->getTopic();
 					}
+				} elseif ($type == 'Journal') {
+					$name = $entity->getTopic();
 				} else {
 					$name = $entity->getPaper()->getName();
 				}
@@ -232,6 +238,7 @@ class LinksExtension extends \Twig_Extension {
 			case 'association':	return 'maf_assoc';
 			case 'law':		return 'maf_law';
 			case 'deity':		return 'maf_deity';
+			case 'journal':		return 'maf_journal';
 		}
 		return 'invalid link entity "'.$name.'", this should never happen!';
 	}
@@ -303,6 +310,10 @@ class LinksExtension extends \Twig_Extension {
 			case 'Law':
 				$id = $entity->getId();
 				$name = $entity->getTitle();
+				break;
+			case 'Journal':
+				$id = $entity->getId();
+				$name = $entity->getTopic();
 				break;
 			default:
 				$id = $entity->getId();
