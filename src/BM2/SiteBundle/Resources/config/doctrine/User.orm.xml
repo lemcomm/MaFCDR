@@ -6,6 +6,7 @@
 		</id>
 		<field name="ip" type="string" nullable="true"/>
 		<field name="display_name" type="string"/>
+		<field name="gm_name" type="string" nullable="true"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
@@ -43,6 +44,8 @@
 			</join-table>
 		</many-to-many>
 		<one-to-many field="patronizing" target-entity="Patron" mapped-by="user"/>
+		<one-to-many field="reports" target-entity="UserReport" mapped-by="user"/>
+		<one-to-many field="added_report_notes" target-entity="UserReportNote" mapped-by="from"/>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />
