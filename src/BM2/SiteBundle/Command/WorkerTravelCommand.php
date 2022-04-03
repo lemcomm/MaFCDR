@@ -43,7 +43,7 @@ class WorkerTravelCommand extends ContainerAwareCommand {
 		foreach ($query->getResult() as $char) {
 			if ($char->findActions('train.skill')->count() > 0) {
 				# Auto cancel any training actions.
-				foreach ($character->findActions('train.skill') as $each) {
+				foreach ($char->findActions('train.skill') as $each) {
 					$em = $this->getDoctrine()->getManager();
 					$em->remove($each);
 				}
