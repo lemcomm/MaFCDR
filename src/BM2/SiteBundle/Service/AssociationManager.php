@@ -120,7 +120,9 @@ class AssociationManager {
 		}
 
 		if ($assoc->getSuperior() !== $data['superior']) {
-			$assoc->getSuperior()->removeCadet($assoc);
+			if ($assoc->getSuperior()) {
+				$assoc->getSuperior()->removeCadet($assoc);
+			}
 			$assoc->setSuperior($data['superior']);
 			$data['superior']->addCadet($assoc);
 		}
