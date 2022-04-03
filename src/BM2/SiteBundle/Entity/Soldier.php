@@ -392,7 +392,7 @@ class Soldier extends NPC {
 			}
 			if ($eqpt && $eqpt->getName() != 'Pavise') {
 				$power += 32;
-			} elseif ($this->hasMount()) {
+			} elseif ($this->getMount()) {
 				$power += 7;
 			}  elseif ($melee) {
 				$power += 13;
@@ -414,7 +414,7 @@ class Soldier extends NPC {
 		if ($this->getEquipment()) {
 			if ($this->getEquipment()->getName() != 'Pavise') {
 				$power += $this->getEquipment()->getDefense();
-			} elseif ($this->hasMount()) {
+			} elseif ($this->getMount()) {
 				$power += $this->getEquipment()->getDefense()/10; #It isn't worthless, but it can't be used effectively.
 			} elseif ($melee) {
 				$power += $this->getEquipment()->getDefense()/5;
