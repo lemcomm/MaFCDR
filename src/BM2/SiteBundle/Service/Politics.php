@@ -79,7 +79,7 @@ class Politics {
 							);
 						}
 					}
-				} else {
+				} elseif ($realm) {
 					$ultimate = $realm->findUltimate();
 					$hierarchy = $ultimate->findAllInferiors(true);
 					if ($hierarchy->contains($target)) {
