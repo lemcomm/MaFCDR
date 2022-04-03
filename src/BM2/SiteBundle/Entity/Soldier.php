@@ -390,7 +390,7 @@ class Soldier extends NPC {
 			if ($this->getMount()) {
 				$power += 38;
 			}
-			if ($eqpt->getName() != 'Pavise') {
+			if ($eqpt && $eqpt->getName() != 'Pavise') {
 				$power += 32;
 			} elseif ($this->hasMount()) {
 				$power += 7;
