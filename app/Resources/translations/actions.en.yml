@@ -195,7 +195,7 @@ building:
  title:         Local Buildings
  all:           All building actions
  archeryrange:
-  name:         Visit Arhcery Range
+  name:         Visit Archery Range
   description:  A noble sport, perhaps you should practice.
   intro: >
     Arhcery ranges are excellent locations to practice the theory of archery. It won't help you do it under pressure, but it'll help you have an idea of what to do when you need to.
