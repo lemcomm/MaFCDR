@@ -936,11 +936,19 @@ class ActionsController extends Controller {
 			}
 			if ($total > $settlement->getPopulation()) {
 				$form->addError(new FormError("recruit.entourage.toomany"));
-				return array('settlement'=>$settlement, 'entourage'=>$entourage, 'form'=>$form->createView());
+				return $this->render('Actions/entourage.html.twig', [
+					'settlement'=>$settlement,
+					'entourage'=>$entourage,
+					'form'=>$form->createView()
+				]);
 			}
 			if ($total > $settlement->getRecruitLimit()) {
 				$form->addError(new FormError($this->get('translator')->trans("recruit.entourage.toomany2", array('%max%'=>$settlement->getRecruitLimit(true)))));
-				return array('settlement'=>$settlement, 'entourage'=>$entourage, 'form'=>$form->createView());
+				return $this->render('Actions/entourage.html.twig', [
+					'settlement'=>$settlement,
+					'entourage'=>$entourage,
+					'form'=>$form->createView()
+				]);
 			}
 
 			foreach ($data['recruits'] as $id=>$amount) {
