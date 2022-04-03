@@ -384,7 +384,7 @@ class Soldier extends NPC {
 		} else {
 			if ($this->rDefense!=-1) return $this->rDefense;
 		}
-		$eqpt = $this->getEquipemnt();
+		$eqpt = $this->getEquipment();
 		if ($this->isNoble) {
 			$power = 100;
 			if ($this->getMount()) {
