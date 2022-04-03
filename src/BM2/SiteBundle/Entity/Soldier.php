@@ -7,7 +7,7 @@ class Soldier extends NPC {
 
 	protected $morale=0;
 	protected $is_fortified=false;
-	protected $ranged=-1, $melee=-1, $defense=-1, $charge=-1;
+	protected $ranged=-1, $melee=-1, $defense=-1, $rDefense=-1, $charge=-1;
 	protected $isNoble = false;
 	protected $isFighting = false;
 	protected $attacks = 0;
@@ -260,31 +260,43 @@ class Soldier extends NPC {
 		if ($this->ranged!=-1) return $this->ranged;
 
 		$power = 0;
+		$hasW = false;
+		$hasE = false;
 		if ($this->getWeapon()) {
-			$power += $this->getWeapon()->getRanged();
+			if ($rPower = $this->getWeapon()->getRanged()) {
+				$hasW = true;
+				$power += $rPower;
+			}
 		}
 		if ($this->getEquipment()) {
 			if ($this->getEquipment()->getRanged() > $power) {
 				$power = $this->getEquipment()->getRanged();
+				$hasE = true;
 			}
 		}
 
 		// all the below only adds if we have some ranged power to start with
 		if ($power<=0) return 0;
 
+		if ($this->isNoble) {
+			$power = 0;
+			if ($hasW) {
+				$power += 112;
+			} elseif ($hasE) {
+				$power += 81;
+			}
+			return $power;
+		}
+
 		$power += $this->ExperienceBonus($power);
 
 		// TODO: heavy armour should reduce this quite a bit
 
-		if ($this->isNoble) {
+		$fighters = $this->getAllInUnit()->count();
+		if ($fighters>1) {
+			$this->ranged = $power * pow($fighters, 0.96)/$fighters;
+		} else {
 			$this->ranged = $power;
-		}else {
-			$fighters = $this->getAllInUnit()->count();
-			if ($fighters>1) {
-				$this->ranged = $power * pow($fighters, 0.96)/$fighters;
-			} else {
-				$this->ranged = $power;
-			}
 		}
 		return $this->ranged;
 	}
@@ -294,8 +306,14 @@ class Soldier extends NPC {
 		if ($this->melee!=-1) return $this->melee;
 
 		$power = 0;
+		$hasW = false;
+		$hasM = false;
+		$hasE = false;
 		if ($this->getWeapon()) {
-			$power += $this->getWeapon()->getMelee();
+			if ($mPower = $this->getWeapon()->getMelee() > 0) {
+				$hasW = true;
+				$power += $mPower;
+			}
 		} else {
 			// improvised weapons
 			$power += 5;
@@ -303,10 +321,25 @@ class Soldier extends NPC {
 		if ($this->getEquipment()) {
 			if ($this->getEquipment()->getName() != 'Lance') {
 				$power += $this->getEquipment()->getMelee();
+				$hasE = true;
 			}
 		}
 		if ($this->getMount()) {
 			$power += $this->getMount()->getMelee();
+			$hasM = false;
+		}
+		if ($this->isNoble) {
+			$power = 0;
+			if ($hasW) {
+				$power += 112;
+			}
+			if ($hasM) {
+				$power += 32;
+			}
+			if ($hasE) {
+				$power += 12;
+			}
+			return $power;
 		}
 		if ($power>0) {
 			$power += $this->ExperienceBonus($power);
@@ -314,30 +347,29 @@ class Soldier extends NPC {
 
 		// TODO: heavy armour should reduce this a little
 
-		if ($this->isNoble) {
-			$this->melee = $power;
+		$fighters = $this->getAllInUnit()->count();
+		if ($fighters>1) {
+			$this->melee = $power * pow($fighters, 0.96)/$fighters;
 		} else {
-			$fighters = $this->getAllInUnit()->count();
-			if ($fighters>1) {
-				$this->melee = $power * pow($fighters, 0.96)/$fighters;
-			} else {
-				$this->melee = $power;
-			}
+			$this->melee = $power;
 		}
 		return $this->melee;
 	}
 
 	public function ChargePower() {
 //		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
-
+		if ($this->isNoble) {
+			$this->charge = 156;
+			return 156;
+		}
+		$power = 0;
 		if (!$this->getMount()) {
 			return 0;
+		} else {
+			$power += $this->getMount()->getMelee();
 		}
 		if ($this->getEquipment()) {
-			$power = $this->getEquipment()->getMelee();
-		}
-		if ($this->getMount()) {
-			$power += $this->getMount()->getMelee();
+			$power += $this->getEquipment()->getMelee();
 		}
 		$power += $this->ExperienceBonus($power);
 
@@ -347,7 +379,33 @@ class Soldier extends NPC {
 
 	public function DefensePower($melee = true) {
 //		if (!$this->getAlive() || $this->isWounded()) return 0;
-		if ($this->defense!=-1) return $this->defense;
+		if ($melee) {
+			if ($this->defense!=-1) return $this->defense;
+		} else {
+			if ($this->rDefense!=-1) return $this->rDefense;
+		}
+		$eqpt = $this->getEquipemnt();
+		if ($this->isNoble) {
+			$power = 100;
+			if ($this->getMount()) {
+				$power += 38;
+			}
+			if ($eqpt->getName() != 'Pavise') {
+				$power += 32;
+			} elseif ($this->hasMount()) {
+				$power += 7;
+			}  elseif ($melee) {
+				$power += 13;
+			} else {
+				$power += 63;
+			}
+			if ($melee) {
+				$this->defense = $power;
+			} else {
+				$this->rDefense = $power;
+			}
+			return $power;
+		}
 
 		$power = 5; // basic defense power which represents luck, instinctive dodging, etc.
 		if ($this->getArmour()) {
@@ -369,7 +427,11 @@ class Soldier extends NPC {
 		}
 
 		$power += $this->ExperienceBonus($power);
-		$this->defense = $power; // defense does NOT scale down with number of men in the unit
+		if ($melee) {
+			$this->defense = $power; // defense does NOT scale down with number of men in the unit
+		} else {
+			$this->rDefense = $power;
+		}
 		return $this->defense;
 	}
 
