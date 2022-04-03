@@ -3652,7 +3652,7 @@ class Dispatcher {
 			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->canSubcreate()) {
+		if (!$rank || !$rank->canSubcreate()) {
 			return array("name"=>"assoc.create.rank.name", "description"=>"unavailable.nosubcreate");
 		} else {
 			return $this->action("assoc.create.rank", "maf_assoc_createrank", true,
