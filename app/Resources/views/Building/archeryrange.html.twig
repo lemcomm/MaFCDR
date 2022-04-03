@@ -1,0 +1,13 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "building.archeryrange.name"|trans({},"actions")|title }}</h2>
+<p>{{ "building.archeryrange.intro"|trans({"%settlement%":link(settlement)},"actions")|raw }}</p>
+<ul>
+<li><a href="{{ path('maf_train_skill', {"skill":'sling'}) }}">{{ 'building.archeryrange.train.sling'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'staff sling'}) }}">{{ 'building.archeryrange.train.staffsling'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'shortbow'}) }}">{{ 'building.archeryrange.train.shortbow'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'crossbow'}) }}">{{ 'building.archeryrange.train.crossbow'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'longbow'}) }}">{{ 'building.archeryrange.train.longbow'|trans({},"actions") }}</a></li>
+</ul>
+{% endblock %}

@@ -18,15 +18,29 @@ class GMController extends Controller {
 	  * @Route("/olympus/", name="maf_gm_pending")
 	  */
 
-	public function pendingAction(Journal $id) {
+	public function pendingAction() {
 		# Security is handled by Syfmony Firewall.
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT r from BM2SiteBundle:UserReport r WHERE r.pending = true');
-		$journals = $query->getResult();
+		$query = $em->createQuery('SELECT r from BM2SiteBundle:UserReport r WHERE r.actioned = false');
+		$reports = $query->getResult();
 
 		return $this->render('GM/pending.html.twig',  [
-			'journal'=>$id,
+			'reports'=>$reports,
 		]);
 	}
 
+	/**
+	  * @Route("/olympus/archive", name="maf_gm_pending")
+	  */
+
+	public function actionedAction() {
+		# Security is handled by Syfmony Firewall.
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT r from BM2SiteBundle:UserReport r WHERE r.actioned = true');
+		$reports = $query->getResult();
+
+		return $this->render('GM/pending.html.twig',  [
+			'reports'=>$reports,
+		]);
+	}
 }

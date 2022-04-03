@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "control.takeTavern.name"|trans({'%place%':link(place)},"actions")|title }}</h2>
+	{% if type == 'inn' %}
+		{{ "control.takeTavern.intro"|trans({'%place%':link(place),'%morale%':morale},"actions")|raw }}
+	{% else %}
+		{{ "control.takeTavern.intro2"|trans({'%place%':link(place),'%morale%':morale},"actions")|raw }}
+	{% endif %}
+{% endblock %}

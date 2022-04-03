@@ -88,7 +88,7 @@
 			{% else %}
 				{{ other.distance|distance(true) }}
 				{% if other.character.insidesettlement %}
-					, {{ 'inside'|trans({'%place%':link(other.character.insidesettlement)})|raw }}
+					, {{ 'inside'|trans({'%settlement%':link(other.character.insidesettlement)})|raw }}
 				{% endif %}
 			{% endif %}
 		)</li>
@@ -104,7 +104,7 @@
 	{% for spot in spottings %}
 		<li>{{ link(spot.target) }}
 			{% if spot.target.insidesettlement %}
-				, {{ 'inside'|trans({'%place%':link(spot.target.insidesettlement)})|raw }}
+				, {{ 'inside'|trans({'%settlement%':link(spot.target.insidesettlement)})|raw }}
 			{% endif %}
 			{% if spot.target.prisonerof %}
 				, {{ 'prisonerof'|trans({'%captor%':link(spot.target.prisonerof)})|raw }}

@@ -72,6 +72,8 @@ queue:
  block:         Blocks travel?
  start:         Started
  end:           Est. complete
+ train:
+  skill:        Training Skill
  target:
   character:    Character
   battle:       Battle
@@ -192,6 +194,17 @@ location:
 building:
  title:         Local Buildings
  all:           All building actions
+ archeryrange:
+  name:         Visit Arhcery Range
+  description:  A noble sport, perhaps you should practice.
+  intro: >
+    Arhcery ranges are excellent locations to practice the theory of archery. It won't help you do it under pressure, but it'll help you have an idea of what to do when you need to.
+  train:
+   sling:       Train on Slings
+   staffsling:  Train on Staff Slings
+   shortbow:    Train on Short Bow
+   crossbow:    Train on Crossbow
+   longbow:     Train on Longbow
  tavern:
   name:         Visit Tavern
   description:  Peasants' rumours from the area.
@@ -298,6 +311,12 @@ control:
   realm:        In the name of
   submit:       Take control
   success:      You are now in the process of taking control of this settlement. The process will take an estimated %time%, though this estimate will change with the support or opposition of other First Ones.
+ takeTavern:
+  name:         Successful Takeover of %place%
+  intro: >
+    <p>No travelling required for this one, and while the owner may not be happy, your succesful takeover of this inn has raised the morale of your soldiers by %morale% points!</p>
+  intro2: >
+    <p>You've succesfully enforced your will through military might upon the poor tavernkeep and free access to his stocks has risen the morale of your soldiers by %morale% points!</p>
  takeX:
   name:         Defend against taking
   description:  Your estate is currently being claimed by others, oppose them.
@@ -1353,3 +1372,17 @@ unit:
   intro:    From here you can choose to completely disband a unit, sending all the soldiers on home and reliquishing %name% to the annals of history.
   success:  Unit has been disbanded.
   fail:     Unit disbandment has failed.
+
+
+train:
+ noduplicate: Other training actions have been automatically removed. Sorry, you can only train one skill at a time.
+ sling:
+  success:   Finding an unused sling at the range, you begin practicing.
+ staff sling:
+  success:   Finding an unused staff sling at the range, you begin practicing.
+ shortbow:
+  success:   Finding an unused shortbow at the range, you begin practicing.
+ crossbow:
+  success:   Finding an unused crossbow at the range, you begin practicing.
+ longbow:
+  success:   Finding an unused longbow at the range, you begin practicing.

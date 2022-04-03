@@ -27,6 +27,7 @@
 		<many-to-one field="target_equipment_type" target-entity="EquipmentType"/>
 		<many-to-one field="target_battlegroup" target-entity="BattleGroup" inversed-by="related_actions"/>
 		<many-to-one field="target_listing" target-entity="Listing"/>
+		<many-to-one field="target_skill" target-entity="SkillType"/>
 
 		<many-to-one field="supported_action" target-entity="Action" inversed-by="supporting_actions">
 			<join-column name="supported_action_id" referenced-column-name="id" on-delete="CASCADE" on-update="CASCADE"/>

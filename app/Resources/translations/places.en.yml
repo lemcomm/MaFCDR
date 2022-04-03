@@ -101,7 +101,7 @@ place:
    name2:        Join Association
    description: It looks like the %assoc% is available for joining.
  addAssoc:
-  name:   Add a new Association Location
+  name:   Expand Association Here
   description:  It looks like you have the means expand one of your associations to this Place.
   longdesc: Associations are largely limited by their reach. And you have the means to extend that to this Place, if you so desire.
   intro: >
@@ -183,7 +183,7 @@ unknown:
 assoc:
  new:
   name:         Form a New Association Here
-  description:  As a First One, you can always form a new association in any place of interest capable of supporting it, assuming you have permissions of the owner to do so.
+  description:  As a First One, you can always form a new association in any place of interest capable of supporting it.
   longdesc:     Associations, otherwise known as guilds, religions, companies, cults, orders, and the like, are realm-less and family-less organizations of First Ones for various purposes. Just like real life though, the name and type of an association doesn't always describe it's purpose truthfully.
 military:
  siege:

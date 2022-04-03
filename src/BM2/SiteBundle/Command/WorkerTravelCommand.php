@@ -41,6 +41,14 @@ class WorkerTravelCommand extends ContainerAwareCommand {
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.id >= :start AND c.id <= :end AND c.travel IS NOT NULL AND c.travel_locked = false');
 		$query->setParameters(array('start'=>$start, 'end'=>$end));
 		foreach ($query->getResult() as $char) {
+			if ($char->findActions('train.skill')->count() > 0) {
+				# Auto cancel any training actions.
+				foreach ($character->findActions('train.skill') as $each) {
+					$em = $this->getDoctrine()->getManager();
+					$em->remove($each);
+				}
+				$em->flush();
+			}
 			if ($char->getInsideSettlement()) {
 				$interactions->characterLeaveSettlement($char);
 			}

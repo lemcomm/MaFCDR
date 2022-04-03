@@ -76,9 +76,9 @@
 	<h2>{{ 'location'|trans|capitalize }}</h2>
 	<ul class="simple">
 		{% if character.insidesettlement %}
-			<li>{{ 'inside'|trans({'%place%':link(character.insidesettlement)})|raw }}, {{ settlement.type|trans }}</li>
+			<li>{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|raw }}, {{ settlement.type|trans }}</li>
 		{% elseif settlement %}
-			<li>{{ 'near'|trans({'%place%':link(settlement)})|raw }}, {{ settlement.type|trans }}, {{ 'distance'|trans }} {{ nearest.distance|distance }}</li>
+			<li>{{ 'near'|trans({'%settlement%':link(settlement)})|raw }}, {{ settlement.type|trans }}, {{ 'distance'|trans }} {{ nearest.distance|distance }}</li>
 		{% else %}
 			<li>{{ 'nothingnear'|trans }}</li>
 		{% endif %}

@@ -131,6 +131,7 @@ class EventsController extends Controller {
 						$act->setBlockTravel(false);
 					}
 					$act->setCanCancel(true);
+					$act->setHourly(true);
 					$func = 'setTarget'.ucfirst($log->getType());
 					$act->$func($log->getSubject());
 					$result = $this->get('action_manager')->queue($act);
