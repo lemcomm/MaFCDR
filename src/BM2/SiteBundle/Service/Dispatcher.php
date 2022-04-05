@@ -2399,8 +2399,10 @@ class Dispatcher {
 		}
 		if ($character->getInsideSettlement()) {
 			$can = $this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside');
+		} elseif ($region = $this->geography->findMyRegion($character)) {
+			$can = $this->permission_manager->checkSettlementPermission($region->getSettlement(), $character, 'placeoutside');
 		} else {
-			$can = $this->permission_manager->checkSettlementPermission($this->geography->findMyRegion($character)->getSettlement(), $character, 'placeoutside');
+			return array("name"=>"place.new.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($can) {
 			# It's a long line, but basically, but if we're in a settlement or in a region and have the respective permission, we're allowed. If not, denied.
