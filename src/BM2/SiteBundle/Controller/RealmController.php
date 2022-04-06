@@ -1304,12 +1304,12 @@ class RealmController extends Controller {
 
 				$input = $data['candidate'];
 				# First strip it of all non-numeric characters and see if we can find a character.
-				$id = preg_replace('/(?:[^123456790]*)/', '', $input);
+				$id = preg_replace('/(?:[^1234567890]*)/', '', $input);
 				if ($id) {
 					$candidate = $em->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$id, 'alive' => TRUE));
 				} else {
 					# Presumably, that wasn't an ID. Assume it's just a name.
-					$name = trim(preg_replace('/(?:[123456790()]*)/', '', $input));
+					$name = trim(preg_replace('/(?:[1234567890()]*)/', '', $input));
 					$candidate = $em->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
 				}
 				if ($candidate) {
