@@ -1,0 +1,11 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+<h2>{{ "building.garrison.name"|trans({},"actions")|title }}</h2>
+<p>{{ "building.garrison.intro"|trans({"%settlement%":link(settlement)},"actions")|raw }}</p>
+<ul>
+<li><a href="{{ path('maf_train_skill', {"skill":'broadsword'}) }}">{{ 'building.garrison.train.broadsword'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'great axe'}) }}">{{ 'building.garrison.train.greataxe'|trans({},"actions") }}</a></li>
+<li><a href="{{ path('maf_train_skill', {"skill":'morning star'}) }}">{{ 'building.garrison.train.morningstar'|trans({},"actions") }}</a></li>
+</ul>
+{% endblock %}
