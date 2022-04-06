@@ -205,6 +205,15 @@ building:
    shortbow:    Train on Short Bow
    crossbow:    Train on Crossbow
    longbow:     Train on Longbow
+ garrison:
+  name:         Visit Garrison
+  description:  A professional's barracks.
+  intro: >
+    The soldiers here might not be as easily impressed as those in the barracks, but they do still have plenty of equipment available for you to train on, if you feel so inclined.
+  train:
+   morningstar:       Train on Morningstar
+   broadsword:        Train on Broadsword
+   greataxe:          Train on Great Axe
  tavern:
   name:         Visit Tavern
   description:  Peasants' rumours from the area.
@@ -257,8 +266,11 @@ building:
     within the settlement.<br />
     A clerk has prepared a nice graph for you. As he explains, the height of the line shows the number of militia in the
     settlement on any given day, with higher meaning more. The far right shows yesterday, while the line further to the
-    left goes into the past, with the number at the bottom showing how many days into the past.
-
+    left goes into the past, with the number at the bottom showing how many days into the past.<br><br>
+    There are also some training weapons available for use in the barracks' training hall, if you feel like aweing the mortals with your prowess.
+  train:
+   mace:        Train on Mace
+   sword:       Train on Sword
 nearby:
  spy:
   name:         Spy on an estate
