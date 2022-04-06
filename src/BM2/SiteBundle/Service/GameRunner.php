@@ -353,7 +353,7 @@ class GameRunner {
 					}
 				}
 				if ($character->getHeadOfHouse()) {
-					$this->logger->info("  Detectd character is head of house ID #".$house->getId());
+					$this->logger->info("  Detectd character is head of house ID #".$character->getHeadOfHouse()->getId());
 					$this->cm->houseInheritance($character, 'slumber');
 				}
 				foreach ($character->getAssociationMemberships() as $mbrshp) {

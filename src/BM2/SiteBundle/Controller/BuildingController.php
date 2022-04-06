@@ -169,4 +169,18 @@ class BuildingController extends Controller {
 		]);
 	}
 
+	/**
+	  * @Route("/garrison")
+	  */
+	public function garrisonAction() {
+		list($character, $settlement) = $this->get('dispatcher')->gateway('locationGarrisonTest', true);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Building/garrison.html.twig', [
+			'settlement'=>$settlement,
+		]);
+	}
+
 }

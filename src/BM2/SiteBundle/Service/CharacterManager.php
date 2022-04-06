@@ -652,54 +652,54 @@ class CharacterManager {
 				switch ($value) {
 					case 'steward':
 						if ($steward = $settlement->getSteward()) {
-							$this->$bequeath($thing, $steward, $character, null);
+							$this->$bequeath($thing, $steward, $char, null);
 							$thing->setSteward(null);
 							$this->history->logEvent(
 								$settlement,
 								'event.settlement.stewardpromote',
-								array('%link-character%'=>$character->getId()),
+								array('%link-character%'=>$char->getId()),
 								History::MEDIUM, true
 							);
 							break;
 						}
 					case 'liege':
-						if ($liege = $character->findLiege()) {
+						if ($liege = $char->findLiege()) {
 							if ($liege instanceof Collection) {
 								$liege = $liege->first();
 							}
-							$this->$bequeath($thing, $liege, $character, null);
+							$this->$bequeath($thing, $liege, $char, null);
 							break;
 						}
 					case 'ruler':
 						if ($rulers = $realm->findRulers()) {
 							if ($rulers->count() > 0) {
-								$this->$bequeath($thing, $rulers->first(), $character, null);
+								$this->$bequeath($thing, $rulers->first(), $char, null);
 								break;
 							}
 						}
 					case 'characterInternal':
 						if ($heir && $heir->findRealms()->contains($realm)) {
-							$this->$bequeath($thing, $heir, $character, $via);
+							$this->$bequeath($thing, $heir, $char, $via);
 						} else {
-							$this->$fail($character, $thing, 'lawnoinherit');
+							$this->$fail($char, $thing, 'lawnoinherit');
 						}
 						break;
 					case 'characterAny':
 						if ($heir) {
 							$this->$bequeath($thing, $heir, $character, $via);
 						} else {
-							$this->$fail($character, $thing, 'lawnoinherit');
+							$this->$fail($char, $thing, 'lawnoinherit');
 						}
 						break;
 					case 'none':
-						$this->$fail($character, $thing, 'lawnoinherit');
+						$this->$fail($char, $thing, 'lawnoinherit');
 						break;
 				}
 			}
 		} elseif ($heir) {
-			$this->$bequeath($thing, $heir, $character, $via);
+			$this->$bequeath($thing, $heir, $char, $via);
 		} else {
-			$this->$fail($character, $thing);
+			$this->$fail($char, $thing);
 		}
 	}
 
