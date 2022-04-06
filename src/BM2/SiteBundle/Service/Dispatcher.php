@@ -258,6 +258,10 @@ class Dispatcher {
 		if (isset($has['url'])) {
 			$actions[] = $has;
 		}
+		$has = $this->locationGarrisonTest();
+		if (isset($has['url'])) {
+			$actions[] = $has;
+		}
 
 		return array("name"=>"building.title", "elements"=>$actions);
 	}
@@ -267,6 +271,7 @@ class Dispatcher {
 	public function locationTempleTest() { return $this->locationHasBuildingTest("Temple"); }
 	public function locationBarracksTest() { return $this->locationHasBuildingTest("Barracks"); }
 	public function locationArcheryRangeTest() { return $this->locationHasBuildingTest("Archery Range"); }
+	public function locationGarrisonTest() { return $this->locationHasBuildingTest("Garrison"); }
 
 	public function locationHasBuildingTest($name) {
 		$lname = strtolower(str_replace(' ', '', $name));
