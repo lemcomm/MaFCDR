@@ -250,6 +250,26 @@ class CharacterController extends Controller {
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
+
+		$now = new \DateTime('now');
+		$user = $character->getUser();
+		if ($user->getNextSpawnTime() === null) {
+			$newest = null;
+			$count = 0;
+			foreach ($user->getLivingCharacters() as $char) {
+				if ($char->getLocation() && $char->getCreated() > $newest) {
+					$newest = $char->getCreated();
+				}
+				$count++;
+			}
+			$newest->modify('+'.$count.' days');
+			$user->setNextSpawnTime($newest);
+			$this->getDoctrine()->getManager()->flush();
+		}
+		if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+			return $this->redirectToRoute('bm2_characters');
+		}
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
@@ -351,6 +371,25 @@ class CharacterController extends Controller {
 		if ($character->getLocation()) {
 			return $this->redirectToRoute('bm2_character');
 		}
+		$user = $character->getUser();
+		$now = new \DateTime('now');
+		if ($user->getNextSpawnTime() === null) {
+			$newest = null;
+			$count = 0;
+			foreach ($user->getLivingCharacters() as $char) {
+				if ($char->getLocation() && $char->getCreated() > $newest) {
+					$newest = $char->getCreated();
+				}
+				$count++;
+			}
+			$newest->modify('+'.$count.' days');
+			$user->setNextSpawnTime($newest);
+			$this->getDoctrine()->getManager()->flush();
+		}
+		if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+			return $this->redirectToRoute('bm2_characters');
+		}
 
 		$spawns = new ArrayCollection();
 		$myHouse = null;
@@ -390,6 +429,24 @@ class CharacterController extends Controller {
 		$conv = null;
 		$supConv = null;
 		if (!$character->getLocation()) {
+			$user = $character->getUser();
+			$now = new \DateTime('now');
+			if ($user->getNextSpawnTime() === null) {
+				$newest = null;
+				$count = 0;
+				foreach ($user->getLivingCharacters() as $char) {
+					if ($char->getLocation() && $char->getCreated() > $newest) {
+						$newest = $char->getCreated();
+					}
+					$count++;
+				}
+				$newest->modify('+'.$count.' days');
+				$user->setNextSpawnTime($newest);
+			}
+			if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
+				$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+				return $this->redirectToRoute('bm2_characters');
+			}
 			if ($spawn) {
 				$place = $spawn->getPlace();
 				if ($spawn->getRealm()) {
@@ -462,6 +519,8 @@ class CharacterController extends Controller {
 				);
 				$this->get('history')->visitLog($settlement, $character);
 			}
+			$em->flush();
+			$character->getUser()->updateNextSpawnTime();
 			$em->flush();
 		} else {
 			$place = $spawn->getPlace();

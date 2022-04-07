@@ -42,7 +42,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@politics']
     interactions:
         class:      BM2\SiteBundle\Service\Interactions
-        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@logger']
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@politics', '@logger']
     military_manager:
         class:      BM2\SiteBundle\Service\MilitaryManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']

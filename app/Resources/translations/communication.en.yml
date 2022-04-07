@@ -39,6 +39,9 @@ event:
   ownership:
    gained:			Has taken control of %settlement%.
    lost:				Has lost control of %settlement%, because it has been taken by %character%.
+   abandon:     Has abandoned ownership of %settlement%.
+  stewardship:
+   lost:        Has lost stewardship of %settlement%.
   inherited:    Was inherited by %character%.
   inherifail:   Fell to independence on the death of %character%, who left no heir.
   lawnoinherit: In accordance with realm law, is now without lord after the passing of %character%.
@@ -109,6 +112,8 @@ event:
    othertake:   The occupation lead by %character% has ended due to the takeover of the administration by another.
    warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
    manual2:      %character% has declared an end to the occupation.
+   forced:      The occupation by %realm% has been forcefully ended by %character%.
+   forced2:      The occupation by %character-1% has been forcefully ended by %character-2%.
   besieged:     %character% has declared a siege of the Settlement.
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
@@ -241,6 +246,7 @@ event:
    place:       The owner of %place% has rejected your offer of vassalge.
    position:    The %realmposition% has rejected your offer of vassalge.
   steward:      Has been appointed as the steward of %settlement%.
+  stewardabandon: Has gained a strong claim on %settlement% after the previous lord abandoned it.
   recvdplace:   Has received ownership of %place%.
   assoc:
    founded:     Founded the association of %association%.
@@ -299,6 +305,8 @@ event:
   gained2:      Gained ownership of %settlement% from %realm%.
   lost:         Lost ownership of %settlement%.
   lost2:        Lost ownership of %settlement% to %realm%.
+  abandon:      Ownership of %settlement% was abandoned.
+  abandon2:     Ownership of %settlement% was abandoned to %realm%.
   gainedplace:       Gained ownership of %place%.
   gainedplace2:      Gained ownership of %place% from %realm%.
   lostplace:         Lost ownership of %place%.
@@ -460,6 +468,7 @@ politics:
   lost3:       Is no longer a knight of anywhere after the taking of %settlement%.
   lost4:       Is no longer a knight of anywhere after the taking of %place%.
   notcurrent: With the change in lordship of %settlement%, your oath to it is no longer considered current.
+  abandon:    As the lordship of %settlement% has been abandoned, your oath is no longer considered current and you have gained a claim over it.
  successor:
   set:        Has set %character% as their successor.
   changed:    Has declared a new successor, instead of %character-1% it will now be %character-2%.

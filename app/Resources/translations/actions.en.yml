@@ -441,8 +441,9 @@ control:
   name:         Abandon Settlement
   description:  Reliquish control of this settlement.
   help: >
-    As the rightful owner of %settlement%, you can always decide that you simply don't want to be the lord any longer.<br/>
-    You can also decide if you simply wish to be rid of the region, or for you AND your realm to be rid of the region.
+    As the rightful owner of %settlement%, you can always decide that you simply don't want to be the lord any longer.<br>
+    You can also decide if you simply wish to be rid of the region, or for you AND your realm to be rid of the region.<br><br>
+    If there is an ongoing occupation of this land and you abandon it, it will default to the occupier's control if you do not set it to stay in the realm.
   keep:         Keep in realm?
   sure:         Are you sure?
   success:      Settlement has been abandoned.
@@ -477,7 +478,7 @@ control:
   name:         End Occupation
   description:  Declare an end to the occupation?
   intro: >
-    As the occupant of %settlement% you are well within your capabilities to declare an end to the occupation of this settlement.
+    As either the occupant of %settlement%, or any first one in an undefended but occupied settlement, you are well within your capabilities to declare an end to the occupation of this settlement. If they aren't here to defend their claim, that's their problem.
  changeoccupant:
   name:         Change Occupant
   description:  Someone else can manage this

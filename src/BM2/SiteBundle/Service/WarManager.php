@@ -354,7 +354,7 @@ class WarManager {
 				if ($place) {
 					$act = new Action;
 					$act->setType($acttype);
-					$act->setCharacter($character)
+					$act->setCharacter($BGChar)
 						->setTargetPlace($place)
 						->setTargetSettlement($settlement)
 						->setTargetBattlegroup($attackers)
@@ -364,7 +364,7 @@ class WarManager {
 				} else {
 					$act = new Action;
 					$act->setType($acttype);
-					$act->setCharacter($character)
+					$act->setCharacter($BGChar)
 						->setTargetSettlement($settlement)
 						->setTargetBattlegroup($attackers)
 						->setCanCancel(false)

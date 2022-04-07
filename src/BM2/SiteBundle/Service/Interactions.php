@@ -17,14 +17,15 @@ class Interactions {
 	private $history;
 	private $permission_manager;
 	private $logger;
+	private $pol;
 
-
-	public function __construct(EntityManager $em, Geography $geo, History $history, PermissionManager $pm, Logger $logger) {
+	public function __construct(EntityManager $em, Geography $geo, History $history, PermissionManager $pm, Politics $pol, Logger $logger) {
 		$this->em = $em;
 		$this->geo = $geo;
 		$this->history = $history;
 		$this->pm = $pm;
 		$this->logger = $logger;
+		$this->pol = $pol;
 	}
 
 
@@ -32,16 +33,11 @@ class Interactions {
 		if ($character->getInsideSettlement() == $settlement) {
 			return true; // we are already inside
 		}
-		if ($settlement->getOccupier()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
 
 		#TODO: The entire if below this line might be redundant now that dispatcher also has all this logic.
 		if (!$force) {
 			// check if we are allowed inside - but only for fortified settlements
-			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit', $occupied)) {
+			if ($settlement->isFortified() && !$this->pm->checkSettlementPermission($settlement, $character, 'visit')) {
 				return false;
 			}
 
@@ -419,10 +415,8 @@ class Interactions {
 
 	public function abandonSettlement(Character $character, Settlement $settlement, $keepRealm) {
 		if ($settlement->getOwner() == $character) {
-			if (!$keepRealm) {
-				$settlement->setRealm(null);
-			}
-			$settlement->setOwner(null);
+			$this->pol->changeSettlementRealm($settlement, $settlement->getOccupier(), 'abandon');
+			$this->pol->changeSettlementOwner($settlement, $settlement->getOccupant(), 'abandon');
 			$this->em->flush();
 			return true;
 		} else {

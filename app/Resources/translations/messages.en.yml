@@ -471,6 +471,7 @@ newcharacter:
  spawnlimit:  You currently have several unspawned characters. Please start playing them first, before you create more characters.
  accountlimit:  You are currently playing %active% of %limit% possible characters.
  overlimit: You already have as many characters as your current subscription level allows. If you want to create additional characters, you will need to raise your subcription level first.
+ overspawn: Living character spawning or unretiring is restricted to only happen as often as the number of currently living characters you have. If you have 3 and trying to spawn a fourth, you must wait 3 days since your last. If you have 20 living charactesr, then you'll be waiting 20 days from the last. You can next spawn a character at %date% (server time).
  help:
   name:      The full name of your character, including given and family name, but not including any titles. required
   gender:    required
@@ -1575,6 +1576,7 @@ unavailable:
  nofeatures:    No damageable features nearby.
  notyours:      The settlement owner has not granted you permission to do this.
  notyours2:     You do not control this settlement.
+ notoccupant:   You are not the occupant of this settlement.
  notowner:      You do not control this place of interest.
  notrain:       No available training options.
  nobody:        No other First Ones within range.

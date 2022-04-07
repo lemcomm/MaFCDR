@@ -450,12 +450,7 @@ class Dispatcher {
 		if (!$settlement) {
 			$actions[] = array("name"=>"recruit.all", "description"=>"unavailable.notinside");
 		} else {
-			if ($settlement->getOccupier() || $settlement->getOccupant()) {
-				$occupied = true;
-			} else {
-				$occupied = false;
-			}
-			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit', false, $occupied)) {
+			if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'recruit', false)) {
 				$actions[] = $this->unitNewTest();
 				$actions[] = $this->personalEntourageTest();
 				$actions[] = $this->unitRecruitTest(); #This page handles recruiting.
@@ -814,12 +809,7 @@ class Dispatcher {
 		if ($this->getCharacter()->isInBattle()) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.inbattle");
 		}
-		if ($settlement->getOccupier() || $settlement->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if ($settlement->isFortified() && !$this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'visit', false, $occupied)) {
+		if ($settlement->isFortified() && !$this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'visit', false)) {
 			return array("name"=>"location.enter.name", "description"=>"unavailable.nopermission");
 		}
 
@@ -1119,10 +1109,11 @@ class Dispatcher {
 		if (!$settlement->getOccupant()) {
 			return array("name"=>"control.occupationend.name", "description"=>"unavailable.notoccupied");
 		}
-		if ($settlement->getOccupant() != $this->getCharacter()) {
+		if (!$settlement->isDefended() || $settlement->getOccupant() === $this->getCharacter()) {
+			return $this->action("control.occupationend", "maf_settlement_occupation_end");
+		} else {
 			return array("name"=>"control.occupationend.name", "description"=>"unavailable.notyours");
 		}
-		return $this->action("control.occupationend", "maf_settlement_occupation_end");
 	}
 
 	public function controlChangeRealmTest($check_duplicate=false, $settlement) {
@@ -1309,10 +1300,19 @@ class Dispatcher {
 			return array("name"=>"control.permissions.name", "description"=>"unavailable.$check");
 		}
 		$char = $this->getCharacter();
-		if (($settlement->getOwner() == $char || $settlement->getSteward() == $char) || $settlement->getOccupant() == $char) {
-			return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
+		$occ = $settlement->getOccupant();
+		if ($occ || $settlement->getOccupier()) {
+			if ($char === $occ) {
+				return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
+			} else {
+				return array("name"=>"control.permissions.name", "description"=>"unavailable.notoccupant");
+			}
 		} else {
-			return array("name"=>"control.permissions.name", "description"=>"unavailable.notyours2");
+			if ($char === $settlement->getOwner() || $char === $settlement->getSteward()) {
+				return $this->action("control.permissions", "bm2_site_settlement_permissions", false, array('id'=>$settlement->getId()));
+			} else {
+				return array("name"=>"control.permissions.name", "description"=>"unavailable.notyours2");
+			}
 		}
 	}
 
@@ -2301,12 +2301,7 @@ class Dispatcher {
 		}
 
 		// TODO: need a merchant in your entourage for trade options? or just foreign trade?
-		if ($settlement->getOccupier() || $settlement->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'trade', false, $occupied)) {
+		if ($this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'trade', false)) {
 			return array("name"=>"economy.trade.name", "url"=>"bm2_site_actions_trade", "description"=>"economy.trade.owner");
 		} else {
 			if ($this->getCharacter()->getOwnedSettlements()->isEmpty()) {
@@ -2321,12 +2316,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier() || $settlement->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false, $occupied)) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false)) {
 			return array("name"=>"economy.roads.name", "description"=>"unavailable.notyours");
 		}
 
@@ -2338,12 +2328,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier() || $settlement->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false, $occupied)) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false)) {
 			return array("name"=>"economy.features.name", "description"=>"unavailable.notyours");
 		}
 
@@ -2355,12 +2340,7 @@ class Dispatcher {
 		if (($check = $this->economyActionsGenericTests($settlement)) !== true) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOccupier() || $settlement->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false, $occupied)) {
+		if ( ! $this->permission_manager->checkSettlementPermission($settlement, $this->getCharacter(), 'construct', false)) {
 			return array("name"=>"economy.build.name", "description"=>"unavailable.notyours");
 		}
 

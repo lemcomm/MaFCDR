@@ -252,7 +252,7 @@ class Politics {
 		$settlement->setOwner($character);
 
 		$occupantTakeOver = false;
-		if ($reason == 'take' && $settlement->getOccupant()) {
+		if (($reason == 'take' || $reason == 'abandon') && $settlement->getOccupant()) {
 			if ($settlement->getOccupant() == $character) {
 				$occupantTakeOver = true;
 				$this->endOccupation($settlement, 'take', true);
@@ -298,7 +298,7 @@ class Politics {
 				if ($settlement->getSteward() && $settlement->getSteward() != $character) {
 					$this->history->logEvent(
 						$settlement->getSteward(),
-						'event.settlement.ownership.lost',
+						'event.settlement.stewardship.lost',
 						array('%link-settlement%'=>$settlement->getId(), '%link-character%'=>$character->getId()),
 						History::HIGH, true
 					);
@@ -420,6 +420,43 @@ class Politics {
 					$this->history->logEvent(
 						$vassal,
 						'politics.oath.notcurrent',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				}
+				break;
+			case 'abandon':
+				if ($settlement->getOwner()) {
+					$this->history->logEvent(
+						$oldowner,
+						'event.settlement.ownership.abandon',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				}
+				if ($steward = $settlement->getSteward()) {
+					$this->addClaim($steward, $settlement, true, true);
+					$this->history->logEvent(
+						$steward,
+						'event.character.stewardabandon',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				}
+				if ($character) {
+					$this->history->logEvent(
+						$character,
+						'event.settlement.ownership.gained',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::HIGH, true
+					);
+				}
+				foreach ($settlement->getVassals() as $vassal) {
+					$vassal->setOathCurrent(false);
+					$this->addClaim($vassal, $settlement, true, true);
+					$this->history->logEvent(
+						$vassal,
+						'politics.oath.abandon',
 						array('%link-settlement%'=>$settlement->getId()),
 						History::HIGH, true
 					);
@@ -610,6 +647,38 @@ class Politics {
 					History::MEDIUM
 				);
 				break;
+			case 'abandon':	// settlement owner has decided to change
+				if ($newrealm) {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.changed',
+						array('%link-realm%'=>$newrealm->getId()),
+						History::MEDIUM
+					);
+				}
+				if ($oldrealm && $newrealm) {
+					// TODO: different text when the new realm is related to the old realm (subrealm, parent realm, etc.)
+					$this->history->logEvent(
+						$oldrealm,
+						'event.realm.abandon2',
+						array('%link-settlement%'=>$settlement->getId(), '%link-realm%'=>$newrealm->getId()),
+						History::MEDIUM
+					);
+					$this->history->logEvent(
+						$newrealm,
+						'event.realm.gained2',
+						array('%link-settlement%'=>$settlement->getId(), '%link-realm%'=>$oldrealm->getId()),
+						History::MEDIUM
+					);
+				} else if ($oldrealm) {
+					$this->history->logEvent(
+						$oldrealm,
+						'event.realm.abandon',
+						array('%link-settlement%'=>$settlement->getId()),
+						History::MEDIUM
+					);
+				}
+				break;
 			default:
 				// error, this should never happen
 		} /* end switch */
@@ -778,7 +847,7 @@ class Politics {
 		}
 	}
 
-	public function endOccupation($target, $why = null, $occupantTakeOver = false) {
+	public function endOccupation($target, $why = null, $occupantTakeOver = false, Character $char = null) {
 		$occupier = $target->getOccupier();
 		$occupant = $target->getOccupant();
 		$target->setOccupant(null);
@@ -835,6 +904,13 @@ class Politics {
 						History::HIGH, true
 					);
 				}
+			} elseif ($why == 'forced') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.forced',
+					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$char->getId()),
+					History::HIGH, true
+				);
 			} else {
 				$this->history->logEvent(
 					$target,
@@ -867,6 +943,13 @@ class Politics {
 						History::HIGH, true
 					);
 				}
+			} elseif ($why == 'forced') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.forced',
+					array("%link-character-1%"=>$occupant->getId(), "%link-character-2%"=>$char->getId()),
+					History::HIGH, true
+				);
 			}
 		}
 
