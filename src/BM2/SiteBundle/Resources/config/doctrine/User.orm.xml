@@ -15,6 +15,7 @@
 		<field name="notifications" type="boolean"/>
 		<field name="newsletter" type="boolean"/>
 		<field name="artifacts_limit" type="smallint"/>
+		<field name="next_spawn_time" type="datetime" nullable="true"/>
 
 		<field name="account_level" type="smallint"/>
 		<field name="vip_status" type="smallint"/>
