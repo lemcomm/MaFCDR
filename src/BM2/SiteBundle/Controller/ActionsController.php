@@ -743,7 +743,7 @@ class ActionsController extends Controller {
 			}
 			$sources[] = $stewarded->getId();
 		}
-		$permission = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', true, $settlement->getOccupier()?true:false);
+		$permission = $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'trade', true);
 		# permission[0] returns true or false depending on if they have permission by any means.
 		if ($permission[0]) {
 			$allowed = true;
@@ -1118,7 +1118,11 @@ class ActionsController extends Controller {
 		$form = $this->createForm(new AreYouSureType());
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $this->get('politics')->endOccupation($settlement, 'manual');
+			$type = 'manual';
+			if ($character !== $settlement->getOccupant()) {
+				$type = 'forced';
+			}
+                        $this->get('politics')->endOccupation($settlement, $type);
 			$this->getDoctrine()->getManager()->flush();
                         $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
                         return $this->redirectToRoute('bm2_actions');
