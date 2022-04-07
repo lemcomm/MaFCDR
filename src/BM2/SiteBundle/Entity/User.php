@@ -130,8 +130,14 @@ class User extends BaseUser {
 	}
 
 	public function updateNextSpawnTime() {
-		$alive = $this->getLivingCharacters()->count();
-		$this->setNextSpawnTime("+".$alive." days");
+		$alive = $this->getLivingCharacters();
+		$count = 0;
+		foreach ($alive as $each) {
+			if ($each->getLocation()) {
+				$count++;
+			}
+		}
+		$this->setNextSpawnTime(new \DateTime("+".$alive." days"));
 	}
 	
 }
