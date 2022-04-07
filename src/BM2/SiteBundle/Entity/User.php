@@ -128,5 +128,10 @@ class User extends BaseUser {
 		}
 		return ($months * $mod) - $count;
 	}
+
+	public function updateNextSpawnTime() {
+		$alive = $this->getLivingCharacters()->count();
+		$this->setNextSpawnTime("+".$alive." days");
+	}
 	
 }
