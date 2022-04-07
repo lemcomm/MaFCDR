@@ -481,7 +481,6 @@ class CharacterController extends Controller {
 				$place = $house->getPlace();
 			}
 			# new character spawn in.
-			$character->getUser()->updateNextSpawnTime();
 			if ($place->getLocation()) {
 				$character->setLocation($place->getLocation());
 				$settlement = null;
@@ -520,6 +519,8 @@ class CharacterController extends Controller {
 				);
 				$this->get('history')->visitLog($settlement, $character);
 			}
+			$em->flush();
+			$character->getUser()->updateNextSpawnTime();
 			$em->flush();
 		} else {
 			$place = $spawn->getPlace();
