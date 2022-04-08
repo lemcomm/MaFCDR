@@ -18,7 +18,6 @@ class DebugKillCommand extends ContainerAwareCommand {
 			->setDescription('Debug command for fixing failed deaths (by rerunning them)')
 			->addArgument('c', InputArgument::REQUIRED, 'Which character are we killing? Character::id.')
 			->addArgument('k', InputArgument::OPTIONAL, 'Who killed them? Character::id. Can be null.')
-			->addArgument('f', InputArgument::OPTIONAL, 'Was it forced? Boolean. Can be null.')
 			->addArgument('m', InputArgument::OPTIONAL, 'Which message should we use for events? Text.')
 		;
 	}
@@ -36,15 +35,11 @@ class DebugKillCommand extends ContainerAwareCommand {
 		} elseif ($killer) {
 			$killer = $em->getRepository('BM2SiteBundle:Character')->findOneById($killer);
 		}
-		$forcekiller = $input->getArgument('f');
-		if ($forcekiller && $forcekiller == 'null') {
-			$forcekiller = null;
-		}
 		$msg = $input->getArgument('m');
 
 		$cm = $this->getContainer()->get('character_manager');
 
-		if ($cm->kill($char, $killer, $forcekiller, $msg)) {
+		if ($cm->kill($char, $killer, false, $msg)) {
 	                $output->writeln('Character '.$char->getName().' ('.$id.') killed succesfully!');
 		} else {
                 	$output->writeln("Something went wrong");
