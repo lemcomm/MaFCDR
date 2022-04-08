@@ -907,18 +907,22 @@ class WarManager {
 									History::HIGH, true
 								);
 							}
+							$this->history->logEvent(
+								$unit->getCharacter(),
+								'event.character.isolated',
+								array("%link-unit%"=>$unit->getId()),
+								History::HIGH, true
+							);
 						}
 					}
 					foreach ($target->getDefendingUnits() as $unit) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
-						if ($realm) {
-							$this->history->logEvent(
-								$unit,
-								'event.unit.defenselost',
-								array("%link-settlement%"=>$target->getId()),
-								History::HIGH, true
-							);
-						}
+						$this->history->logEvent(
+							$unit,
+							'event.unit.defenselost',
+							array("%link-settlement%"=>$target->getId()),
+							History::HIGH, true
+						);
 					}
 				} else {
 					$this->log(1, "Target is place\n");
@@ -936,14 +940,12 @@ class WarManager {
 					}
 					foreach ($target->getUnits() as $unit) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
-						if ($realm) {
-							$this->history->logEvent(
-								$unit,
-								'event.unit.defenselost2',
-								array("%link-place%"=>$target->getId()),
-								History::HIGH, true
-							);
-						}
+						$this->history->logEvent(
+							$unit,
+							'event.unit.defenselost2',
+							array("%link-place%"=>$target->getId()),
+							History::HIGH, true
+						);
 					}
 				}
 			}
