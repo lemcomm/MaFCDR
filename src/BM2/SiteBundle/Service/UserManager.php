@@ -75,4 +75,43 @@ class UserManager extends FosUserManager {
 		return implode('', $genome);
 	}
 
+	public function calculateCharacterSpawnLimit(User $user, $refresh = false) {
+		$newest = null;
+		$count = 0;
+		foreach ($user->getLivingCharacters() as $char) {
+			if ($char->getLocation() && $char->getCreated() > $newest) {
+				$newest = $char->getCreated();
+			}
+			$count++;
+		}
+		if ($count < 5) {
+			$change = 0;
+		} elseif (11 > $count && $count > 3) {
+			$change = 3;
+		} elseif (26 > $count && $count > 10) {
+			$change = 7;
+		} else {
+			$change = 15;
+		}
+		$newest->modify('+'.$change.' days');
+		if ($newest !== $user->getNextSpawnTime()) {
+			$user->setNextSpawnTime($newest);
+		}
+		return $newest;
+	}
+
+	public function checkIfUserCanSpawnCharacters(User $user, $refresh = false) {
+		$now = new \DateTime('now');
+		if ($user->getNextSpawnTime() === null || $refresh) {
+			$next = $this->calculateCharacterSpawnLimit($user, $refresh);
+		} else {
+			$next = $user->getNextSpawnTime();
+		}
+		if ($user->getLivingCharacters()->count() > 3 && $next > $now) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 }
