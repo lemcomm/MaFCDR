@@ -1084,9 +1084,6 @@ class Dispatcher {
 		if ($settlement->getOwner() == $this->getCharacter()) {
 			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.location.yours");
 		}
-		if ($settlement->getOccupant()) {
-			return array("name"=>"control.occupationstart.name", "description"=>"unavailable.occupied");
-		}
 		return $this->action("control.occupationstart", "maf_settlement_occupation_start");
 	}
 
@@ -2901,15 +2898,17 @@ class Dispatcher {
 	public function unitDisbandTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $unit->getSettlement();
-		$permission = $this->permission_manager->checkSettlementPermission($settlement, $character, 'units');
-		if ($unit->getCharacter()) {
-			return array("name"=>"unit.disband.name", "description"=>"unavailable.recallfirst");
-		}
-		if ($settlement && !$character->getUnits()->contains($unit)) {
-			if(!$character->getInsideSettlement() || $settlement != $character->getInsideSettlement()) {
-				return array("name"=>"unit.disband.name", "description"=>"unavailable.notinside");
-			} elseif($settlement && !$permission) {
-				return array("name"=>"unit.disband.name", "description"=>"unavailable.notlord");
+		if ($settlement) {
+			$permission = $this->permission_manager->checkSettlementPermission($settlement, $character, 'units');
+			if ($unit->getCharacter()) {
+				return array("name"=>"unit.disband.name", "description"=>"unavailable.recallfirst");
+			}
+			if ($settlement && !$character->getUnits()->contains($unit)) {
+				if(!$character->getInsideSettlement() || $settlement != $character->getInsideSettlement()) {
+					return array("name"=>"unit.disband.name", "description"=>"unavailable.notinside");
+				} elseif($settlement && !$permission) {
+					return array("name"=>"unit.disband.name", "description"=>"unavailable.notlord");
+				}
 			}
 		}
 		if ($unit->getSoldiers()->count() > 0) {
