@@ -7,6 +7,7 @@
                 <field name="line" type="integer" nullable="true"/>
 		<field name="travel_days" type="smallint" nullable="true"/>
 		<field name="destination" type="string" nullable="true"/>
+		<field name="disbanded" type="boolean" nullable="true"/>
 
 		<one-to-one field="log" target-entity="EventLog" inversed-by="unit"/>
 
