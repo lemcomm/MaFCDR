@@ -646,55 +646,58 @@ class CharacterManager {
 			$fail = 'failInheritPlace';
 		}
 		if ($realm = $thing->getRealm()) {
-			if ($law = $realm->findLaw('settlementInheritance')) {
+			$law = $realm->findLaw('settlementInheritance');
+			if ($law) {
 				$value = $law->getValue();
-				# Break locations are intentional and provide law condition cascading, as intended.
-				switch ($value) {
-					case 'steward':
-						if ($steward = $settlement->getSteward()) {
-							$this->$bequeath($thing, $steward, $char, null);
-							$thing->setSteward(null);
-							$this->history->logEvent(
-								$settlement,
-								'event.settlement.stewardpromote',
-								array('%link-character%'=>$char->getId()),
-								History::MEDIUM, true
-							);
+			} else {
+				$value = 'characterAny';
+			}
+			# Break locations are intentional and provide law condition cascading, as intended.
+			switch ($value) {
+				case 'steward':
+					if ($steward = $settlement->getSteward()) {
+						$this->$bequeath($thing, $steward, $char, null);
+						$thing->setSteward(null);
+						$this->history->logEvent(
+							$settlement,
+							'event.settlement.stewardpromote',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, true
+						);
+						break;
+					}
+				case 'liege':
+					if ($liege = $char->findLiege()) {
+						if ($liege instanceof Collection) {
+							$liege = $liege->first();
+						}
+						$this->$bequeath($thing, $liege, $char, null);
+						break;
+					}
+				case 'ruler':
+					if ($rulers = $realm->findRulers()) {
+						if ($rulers->count() > 0) {
+							$this->$bequeath($thing, $rulers->first(), $char, null);
 							break;
 						}
-					case 'liege':
-						if ($liege = $char->findLiege()) {
-							if ($liege instanceof Collection) {
-								$liege = $liege->first();
-							}
-							$this->$bequeath($thing, $liege, $char, null);
-							break;
-						}
-					case 'ruler':
-						if ($rulers = $realm->findRulers()) {
-							if ($rulers->count() > 0) {
-								$this->$bequeath($thing, $rulers->first(), $char, null);
-								break;
-							}
-						}
-					case 'characterInternal':
-						if ($heir && $heir->findRealms()->contains($realm)) {
-							$this->$bequeath($thing, $heir, $char, $via);
-						} else {
-							$this->$fail($char, $thing, 'lawnoinherit');
-						}
-						break;
-					case 'characterAny':
-						if ($heir) {
-							$this->$bequeath($thing, $heir, $character, $via);
-						} else {
-							$this->$fail($char, $thing, 'lawnoinherit');
-						}
-						break;
-					case 'none':
+					}
+				case 'characterInternal':
+					if ($heir && $heir->findRealms()->contains($realm)) {
+						$this->$bequeath($thing, $heir, $char, $via);
+					} else {
 						$this->$fail($char, $thing, 'lawnoinherit');
-						break;
-				}
+					}
+					break;
+				case 'characterAny':
+					if ($heir) {
+						$this->$bequeath($thing, $heir, $character, $via);
+					} else {
+						$this->$fail($char, $thing, 'lawnoinherit');
+					}
+					break;
+				case 'none':
+					$this->$fail($char, $thing, 'lawnoinherit');
+					break;
 			}
 		} elseif ($heir) {
 			$this->$bequeath($thing, $heir, $char, $via);
@@ -967,17 +970,27 @@ class CharacterManager {
 	private function failInheritPlace(Character $character, Place $place, $string = 'inherifail') {
 		$oldowner = $place->getOwner();
 		if ($oldowner) {
-			$oldowner->removeOwnedPlace($settlement);
+			$oldowner->removeOwnedPlace($place);
 		}
 		if ($character) {
-			$character->addOwnedPlace($settlement);
+			$character->addOwnedPlace($place);
 		}
 		$place->setOwner(null);
 		foreach ($place->getPermissions() as $perm) {
 			$place->removePermission($perm);
 			$this->em->remove($perm);
 		}
-		$this->politics->changePlaceOwner($place, null);
+		$place->setOwner(null);
+
+		foreach ($place->getVassals() as $vassal) {
+			$vassal->setOathCurrent(false);
+			$this->history->logEvent(
+				$vassal,
+				'politics.oath.notcurrent2',
+				array('%link-place%'=>$place->getId()),
+				History::HIGH, true
+			);
+		}
 		$this->history->logEvent(
 			$place, 'event.place.'.$string,
 			array('%link-character%'=>$character->getId()),
