@@ -276,7 +276,11 @@ class BattleRunner {
 			$this->log(1, "failed battle\n");
 			if ($battle->getSiege()) {
 				$victor = $preparations[1];
-				$victorReport = $victor->getActiveReport();
+				if ($victor instanceof BattleGroup) {
+					$victorReport = $victor->getActiveReport();
+				} else {
+					$victorReport = false;
+				}
 			}
 			foreach ($battle->getGroups() as $group) {
 				foreach ($group->getCharacters() as $char) {
@@ -342,7 +346,9 @@ class BattleRunner {
 			$this->log(1, "report ID: ".$this->report->getId()."\n");
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
 			$this->em->flush();
-			$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations[0], $this->report);
+			if ($victor) {
+				$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations[0], $this->report);
+			}
 		}
 		$this->em->flush();
 		$this->em->remove($battle);
@@ -1424,7 +1430,9 @@ class BattleRunner {
 			if (in_array($soldier->getType(), ['armoured archer', 'archer'])) {
 				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
 			} else {
-				$this->actman->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
+				if ($soldier->getEquipment()) {
+					$this->actman->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
+				}
 			}
 		} else {
 			$soldier->gainExperience(1*$xpMod);
