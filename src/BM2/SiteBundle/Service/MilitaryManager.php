@@ -909,21 +909,6 @@ class MilitaryManager {
 				array(),
 				History::MEDIUM, false, 30
 			);
-		} else {
-			foreach ($unit->getLog()->getMetadata as $each) {
-				$this->em->remove($each);
-			}
-			foreach ($unit->getLog()->getEvents() as $each) {
-				$this->em->remove($each);
-			}
-			foreach ($unit->getSupplies() as $each) {
-				$this->em->remove($each);
-			}
-			foreach ($unit->getIncomingSupplies() as $each) {
-				$this->em->remove($each);
-			}
-			$this->em->remove($unit->getSettings());
-			$this->em->remove($unit);
 		}
 		if (!$bulk) {
 			$this->em->flush();
