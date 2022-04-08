@@ -468,6 +468,7 @@ politics:
   lost3:       Is no longer a knight of anywhere after the taking of %settlement%.
   lost4:       Is no longer a knight of anywhere after the taking of %place%.
   notcurrent: With the change in lordship of %settlement%, your oath to it is no longer considered current.
+  notcurrent: With the change in ownership of %place%, your oath to it is no longer considered current.
   abandon:    As the lordship of %settlement% has been abandoned, your oath is no longer considered current and you have gained a claim over it.
  successor:
   set:        Has set %character% as their successor.
