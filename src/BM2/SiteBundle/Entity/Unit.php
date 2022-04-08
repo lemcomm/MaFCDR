@@ -22,6 +22,14 @@ class Unit {
 		);
 	}
 
+	public function getTravellingSoldiers() {
+		return $this->getSoldiers()->filter(
+			function($entry) {
+				return ($entry->getTravelDays() > 0);
+			}
+		);
+	}
+
 	public function getLivingSoldiers() {
 		return $this->getSoldiers()->filter(
 			function($entry) {
