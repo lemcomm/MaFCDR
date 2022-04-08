@@ -25,7 +25,15 @@ class Unit {
 	public function getTravellingSoldiers() {
 		return $this->getSoldiers()->filter(
 			function($entry) {
-				return ($entry->getTravelDays() > 0);
+				return ($entry->getTravelDays() > 0 && $entry->isAlive());
+			}
+		);
+	}
+
+	public function getWoundedSoldiers() {
+		return $this->getSoldiers()->filter(
+			function($entry) {
+				return ($entry->getWounded() > 0 && $entry->isAlive());
 			}
 		);
 	}
