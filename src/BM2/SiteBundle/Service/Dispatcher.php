@@ -3619,7 +3619,7 @@ class Dispatcher {
 			return array("name"=>"assoc.update.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.update.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.update", "maf_assoc_update", true,
@@ -3789,7 +3789,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.viewAll.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.viewAll.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.deities.viewAll", "maf_all_deities", true,
@@ -3810,7 +3810,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.new.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.new.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.deities.new", "maf_assoc_new_deity", true,
@@ -3836,7 +3836,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.update.name", "description"=>"unavailable.notassocowner");
 		}
 		if ($deity->getMainRecognizer() !== $assoc) {
@@ -3865,7 +3865,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.words.name", "description"=>"unavailable.notinassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.words.name", "description"=>"unavailable.notassocowner");
 		} if ($deity->getAssociation() !== $assoc) {
 			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
@@ -3898,7 +3898,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.deityalreadyofassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.add.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.deities.add", "maf_assoc_deities_add", true,
@@ -3929,7 +3929,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.deities.remove", "maf_assoc_deities_remove", true,
@@ -3963,7 +3963,7 @@ class Dispatcher {
 			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.deitynotofassoc");
 		}
 		$rank = $member->getRank();
-		if (!$rank->getOwner()) {
+		if (!$rank || !$rank->getOwner()) {
 			return array("name"=>"assoc.deities.remove.name", "description"=>"unavailable.notassocowner");
 		} else {
 			return $this->action("assoc.deities.remove", "maf_assoc_deities_remove", true,
