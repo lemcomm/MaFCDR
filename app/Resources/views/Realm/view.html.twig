@@ -75,6 +75,12 @@
 			{% if subrealm.active %}<li>{{ link(subrealm) }}</li>{% endif %}
 		{% endfor %}
 	</ul>
+	{{ 'status.realm.deadinferiors'|trans({"%name%":link(realm)},"politics")|raw }}:
+	<ul class="shortlist">
+		{% for subrealm in realm.inferiors %}
+			{% if not subrealm.active %}<li>{{ link(subrealm) }}</li>{% endif %}
+		{% endfor %}
+	</ul>
 {% endif %}
 
 {% if realm.superior or realm.inferiors is not empty %}
