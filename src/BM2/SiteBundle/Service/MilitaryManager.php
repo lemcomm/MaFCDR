@@ -590,12 +590,14 @@ class MilitaryManager {
 			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
 		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
-		$this->history->logEvent(
-			$data['assignto'],
-			'event.military.newUnit',
-			array('%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()),
-			History::MEDIUM, false, 30
-		);
+		if ($character) {
+			$this->history->logEvent(
+				$data['assignto'],
+				'event.military.newUnit',
+				array('%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()),
+				History::MEDIUM, false, 30
+			);
+		}
 		if ($home) {
 			$this->history->logEvent(
 				$unit,
