@@ -833,18 +833,24 @@ class ConversationManager {
                 }
                 if ($realm && $same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
-                        $this->addParticipant($conv, $char);
-                        $em->flush();
-                        $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        if ($conv) {
+                                $this->addParticipant($conv, $char);
+                                $em->flush();
+                                $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        }
                 } elseif ($realm && !$same) {
                         $conv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$realm, 'system'=>'announcements']);
-                        $this->addParticipant($conv, $char);
-                        $em->flush();
-                        $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        if ($conv) {
+                                $this->addParticipant($conv, $char);
+                                $em->flush();
+                                $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        }
                         $supConv = $em->getRepository('BM2SiteBundle:Conversation')->findOneBy(['realm'=>$ultimate, 'system'=>'announcements']);
-                        $this->addParticipant($supConv, $char);
-                        $em->flush();
-                        $this->newSystemMessage($supConv, $string.'2', null, $char, null, $extra);
+                        if ($supConv) {
+                                $this->addParticipant($conv, $char);
+                                $em->flush();
+                                $this->newSystemMessage($conv, $string, null, $char, null, $extra);
+                        }
                 }
                 return [$conv, $supConv];
         }
