@@ -254,7 +254,11 @@ class BattleRunner {
 				$characters[] = $char->getId();
 				$char->setBattling(true);
 				if (!$this->regionType) {
-					$this->regionType = $this->geo->findMyRegion($char)->getBiome()->getName(); #We're hijacking this loop to grab the region type for later calculations.
+					if ($myRegion = $this->geo->findMyRegion($char)) {
+						$this->regionType = $myRegion->getBiome()->getName(); #We're hijacking this loop to grab the region type for later calculations.
+					} else {
+						$this->regionType = 'grassland'; # Because apparently this can happen... :\
+					}
 				}
 			}
 
