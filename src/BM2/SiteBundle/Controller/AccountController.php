@@ -121,11 +121,6 @@ class AccountController extends Controller {
 
 		$now = new \DateTime("now");
 		$a_week_ago = $now->sub(new \DateInterval("P7D"));
-		if ($newest <= $now) {
-			$canSpawn = true;
-		} else {
-			$canSpawn = false;
-		}
 
 		foreach ($user->getCharacters() as $character) {
 			//building our list of character statuses --Andrew
