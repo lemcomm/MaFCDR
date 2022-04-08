@@ -110,19 +110,11 @@ class AccountController extends Controller {
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 
-		if ($user->getNextSpawnTime() === null) {
-			$newest = null;
-			$count = 0;
-			foreach ($user->getLivingCharacters() as $char) {
-				if ($char->getLocation() && $char->getCreated() > $newest) {
-					$newest = $char->getCreated();
-				}
-				$count++;
-			}
-			$newest->modify('+'.$count.' days');
-			$user->setNextSpawnTime($newest);
+		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, false);
+		$em->flush();
+		if (!$canSpawn) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 		}
-		$this->getDoctrine()->getManager()->flush();
 
 		$characters = array();
 		$npcs = array();
@@ -372,23 +364,17 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
 		$form = $this->createForm(new CharacterCreationType($user, $user->getNewCharsLimit()>0));
 
 		list($make_more, $characters_active, $characters_allowed) = $this->checkCharacterLimit($user);
 		if (!$make_more) {
 			throw new AccessDeniedHttpException('newcharacter.overlimit');
 		}
-		if ($user->getNextSpawnTime() === null) {
-			$newest = null;
-			$count = 0;
-			foreach ($user->getLivingCharacters() as $char) {
-				if ($char->getLocation() && $char->getCreated() > $newest) {
-					$newest = $char->getCreated();
-				}
-				$count++;
-			}
-			$newest->modify('+'.$count.' days');
-			$user->setNextSpawnTime($newest);
+		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$em->flush();
+		if (!$canSpawn) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 		}
 
 		// Don't allow "reserves" - set a limit of 2 created but unspawned characters
@@ -409,7 +395,6 @@ class AccountController extends Controller {
 				$data = $form->getData();
 				if ($user->getNewCharsLimit() <= 0) { $data['dead']=true; } // validation doesn't catch this because the field is disabled
 
-				$em = $this->getDoctrine()->getManager();
 				$works = true;
 
 				// avoid bursts / client bugs by only allowing a character creation every 60 seconds
