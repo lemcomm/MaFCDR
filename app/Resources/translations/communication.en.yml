@@ -254,6 +254,12 @@ event:
    new:         A new law on %title% has been put in place.
    changed:     The law on %title% has been updated.
    repealed:    The law on %title% has been repelead.
+  take:
+   start:       Your settlement of %settlement% is being taken over by %character%.
+   start2:      Your stewardship of %settlement% is being taken over by %character%.
+   start3:      Your liege's land of %settlement% is being taken over by %character%.
+   stopped:     The takeover of %settlement% by %character% has been stopped.
+  isolated:     With the taking of %settlement%, %unit% has been isolated.
  military:
   assigned:     You were assigned %count% soldiers by %character%. They have been added as group %group%.
   assigned2:    You were assigned %count% entourage by %character%.
@@ -268,6 +274,15 @@ event:
     rejected:   Your request for food to be supplied from %settlement% was rejected by the lord.
     end:        Your ability to draw food from %settlement% has reached the agreed upon conclusion.
   soldierarrivals:  "New soldiers have recently arrived to and joined up with the unit: %link-unit%"
+  renamed:      %unit% has been renamed from %name%.
+  newUnit:      %character% has created the new unit of %unit%.
+  newUnit2:     Created at %settlement% by %character%.
+  recalled:     Recalled to %settlement%.
+  recalled2:    The settlement of %settlement% has recalled %unit%.
+  returned:     Returned to %settlement%.
+  returned2:    %unit% has been returned to %settlement%.
+  rebased:      Unit has been rebased from %settlement-1% to %settlement-2%.
+  disbanded:    Unit has been retired.
  unit:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
@@ -468,6 +483,7 @@ politics:
   lost3:       Is no longer a knight of anywhere after the taking of %settlement%.
   lost4:       Is no longer a knight of anywhere after the taking of %place%.
   notcurrent: With the change in lordship of %settlement%, your oath to it is no longer considered current.
+  notcurrent: With the change in ownership of %place%, your oath to it is no longer considered current.
   abandon:    As the lordship of %settlement% has been abandoned, your oath is no longer considered current and you have gained a claim over it.
  successor:
   set:        Has set %character% as their successor.

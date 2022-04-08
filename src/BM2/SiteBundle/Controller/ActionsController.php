@@ -445,6 +445,30 @@ class ActionsController extends Controller {
 				array('%link-character%'=>$character->getId()),
 				History::HIGH, true, 20
 			);
+			if ($owner = $settlement->getOwner()) {
+				$this->get('history')->logEvent(
+					$owner,
+					'event.character.take.start',
+					array('%link-character%'=>$character->getId(), '%link-settlement'=>$settlement->getId()),
+					History::HIGH, false, 20
+				);
+			}
+			if ($steward = $settlement->getSteward()) {
+				$this->get('history')->logEvent(
+					$steward,
+					'event.character.take.start2',
+					array('%link-character%'=>$character->getId(), '%link-settlement'=>$settlement->getId()),
+					History::HIGH, false, 20
+				);
+			}
+			foreach ($settlement->getVassals() as $vassal) {
+				$this->get('history')->logEvent(
+					$vassal,
+					'event.character.take.start3',
+					array('%link-character%'=>$character->getId(), '%link-settlement'=>$settlement->getId()),
+					History::HIGH, false, 20
+				);
+			}
 			$this->getDoctrine()->getManager()->flush();
 			$endTime = new \DateTime("+ ".$time_to_take." Seconds");
 

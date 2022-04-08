@@ -528,8 +528,7 @@ class GameRequestController extends Controller {
 					$character = $id->getFromCharacter();
 					$query = $em->createQuery("DELETE FROM BM2SiteBundle:GameRequest r WHERE r.type = 'oath.offer' AND r.id != :id AND r.from_character = :char");
 					$query->setParameters(['id'=>$id->getId(), 'char'=>$character->getId()]);
-					if ($id->getToSettlement()) {
-						$settlement = $id->getToSettlement();
+					if ($settlement = $id->getToSettlement()) {
 						$this->get('history')->logEvent(
 							$settlement,
 							'event.settlement.rejectknight',
@@ -548,8 +547,7 @@ class GameRequestController extends Controller {
 						$query->execute();
 						return $this->redirectToRoute($route);
 					}
-					if ($id->getToPlace()) {
-						$place = $id->getToPlace();
+					if ($place = $id->getToPlace()) {
 						$this->get('history')->logEvent(
 							$place,
 							'event.place.rejectknight',
@@ -575,8 +573,7 @@ class GameRequestController extends Controller {
 						$query->execute();
 						return $this->redirectToRoute($route);
 					}
-					if ($id->getToPosition()) {
-						$pos = $id->getToPlace();
+					if ($pos = $id->getToPosition()) {
 						/*$this->get('history')->logEvent(
 							$pos,
 							'event.position.rejectknight',

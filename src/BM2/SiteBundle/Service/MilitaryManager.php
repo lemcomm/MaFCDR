@@ -590,6 +590,20 @@ class MilitaryManager {
 			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
 		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
+		$this->history->logEvent(
+			$data['assignto'],
+			'event.military.newUnit',
+			array('%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()),
+			History::MEDIUM, false, 30
+		);
+		if ($home) {
+			$this->history->logEvent(
+				$unit,
+				'event.military.newUnit2',
+				array('%link-settlement%'=>$home->getId(), '%link-character%'=>$character->getId()),
+				History::MEDIUM, false, 30
+			);
+		}
 		$this->em->flush();
 		return $unit;
 	}
@@ -719,8 +733,11 @@ class MilitaryManager {
 		if (!$lord && !$commander) {
 			return false;
 		}
+		$renamed = false;
 		if ($lord OR ($commander && $settings->getRenamable())) {
+			$oldName = $settings->getName();
 			$settings->setName($data['name']);
+			$renamed = true;
 		}
 		if ($data['strategy']) {
 			$settings->setStrategy($data['strategy']);
@@ -749,6 +766,15 @@ class MilitaryManager {
 		if ($data['reinforcements']) {
 			$settings->setReinforcements($data['reinforcements']);
 		}
+		if ($renamed) {
+			$this->history->logEvent(
+				$unit,
+				'event.military.renamed',
+				array('%link-unit%'=>$unit->getId(), '%name%'=>$oldName),
+				History::MEDIUM, false, 30
+			);
+		}
+
 		$this->em->flush();
 		return true;
 	}
@@ -761,6 +787,7 @@ class MilitaryManager {
 	}
 
 	public function returnUnitHome (Unit $unit, $reason='recalled', Character $origin, $bulk = false) {
+		$dest = false;
 		if ($unit->getSettlement()) {
 			$dest = $unit->getSettlement();
 			$toHome = true;
@@ -787,6 +814,35 @@ class MilitaryManager {
 		$unit->setCharacter(null);
 		$unit->setDefendingSettlement(null);
 		$unit->setPlace(null);
+		if ($dest) {
+			if ($reason === 'recalled') {
+				$this->history->logEvent(
+					$unit,
+					'event.military.recalled',
+					array('%link-settlement%'=>$dest->getId()),
+					History::MEDIUM, false, 30
+				);
+				$this->history->logEvent(
+					$origin,
+					'event.military.recalled2',
+					array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
+					History::MEDIUM, false, 30
+				);
+			} elseif ($reason === 'returned') {
+				$this->history->logEvent(
+					$unit,
+					'event.military.returned',
+					array('%link-settlement%'=>$dest->getId()),
+					History::MEDIUM, false, 30
+				);
+				$this->history->logEvent(
+					$origin,
+					'event.military.returned2',
+					array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
+					History::MEDIUM, false, 30
+				);
+			}
+		}
 		if (!$bulk) {
 			$this->em->flush();
 		}
@@ -827,6 +883,12 @@ class MilitaryManager {
 			} else {
 				$unit->setSupplier(null);
 			}
+			$this->history->logEvent(
+				$unit,
+				'event.military.rebased',
+				array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
+				History::MEDIUM, false, 30
+			);
 
 			return true;
 		} else {
@@ -835,8 +897,19 @@ class MilitaryManager {
 	}
 
 	public function disbandUnit (Unit $unit, $bulk = false) {
-		$this->em->remove($unit->getSettings());
-		$this->em->remove($unit);
+		$unit->setDisbanded(true);
+		$unit->setCharcter(null);
+		$unit->setMarshall(null);
+		$unit->setPlace(null);
+		$unit->setSupplier(null);
+		if ($unit->getSettlement()) {
+			$this->history->logEvent(
+				$unit,
+				'event.military.disbanded',
+				array(),
+				History::MEDIUM, false, 30
+			);
+		}
 		if (!$bulk) {
 			$this->em->flush();
 		}

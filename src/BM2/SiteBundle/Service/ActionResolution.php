@@ -123,6 +123,30 @@ class ActionResolution {
 				array('%link-character%'=>$action->getCharacter()->getId()),
 				History::HIGH, true, 20
 			);
+			if ($owner = $settlement->getOwner()) {
+				$this->get('history')->logEvent(
+					$owner,
+					'event.character.take.stopped',
+					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
+					History::MEDIUM, false, 20
+				);
+			}
+			if ($steward = $settlement->getSteward()) {
+				$this->get('history')->logEvent(
+					$steward,
+					'event.character.take.stopped',
+					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
+					History::MEDIUM, false, 20
+				);
+			}
+			foreach ($settlement->getVassals() as $vassal) {
+				$this->get('history')->logEvent(
+					$vassal,
+					'event.character.take.stopped',
+					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
+					History::MEDIUM, false, 20
+				);
+			}
 			$this->em->flush();
 			return false;
 		} else {
