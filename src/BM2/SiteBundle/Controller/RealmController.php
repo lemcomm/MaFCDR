@@ -978,7 +978,7 @@ class RealmController extends Controller {
 		);
 		$em->flush();
 		$this->addFlash('notice', $this->get('translator')->trans('realm.restore.success', array(), 'politics'));
-		return $this->redirectToRoute('bm2_realm', ["id"=>$id]);
+		return $this->redirectToRoute('bm2_realm', ["id"=>$realm->getId()]);
 	}
 
 	/**
