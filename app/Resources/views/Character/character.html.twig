@@ -97,7 +97,7 @@
 			<h3>{{ 'nearbyothers'|trans|title }} <button id="expandscouting">expand</button></h3>
 			<ul>
 			{% for other in others %}
-				<li>{{ link(other.character) }} ({{ other.distance|distance(true) }}{% if other.character.insidesettlement %}, {{ 'inside'|trans({'%place%':link(other.character.insidesettlement)})|raw }}{% endif %})</li>
+			<li>{{ link(other.character) }} ({{ other.distance|distance(true) }}{% if other.character.insidesettlement %}, {{ 'inside'|trans({'%settlement%':link(other.character.insidesettlement)})|raw }}{% endif %})</li>
 			{% endfor %}
 			</ul>
 		</div>
@@ -117,9 +117,9 @@
 		<ul>
 		{% for unit in units %}
 			{% if unit.settlement %}
-				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':link(unit.settlement),'%amount%':unit.soldiers.count})|raw}}</li>
+				<li>{{unit.settings.name}} - {{ 'unit.info'|trans({'%settlement%':link(unit.settlement),"%soldiers%":unit.getActiveSoldiers.count, "%travelers%":unit.getTravellingSoldiers.count, "%recruits%":unit.getRecruits.count, "%wounded%":unit.getWoundedSoldiers.count, "%dead%":unit.getDeadSoldiers.count}, "actions")|raw}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a></li>
 			{% else %}
-				<li>{{unit.settings.name}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> - {{ 'unit.info'|trans({'%link-settlement%':'-','%amount%':unit.soldiers.count})|raw}}</li>
+				<li>{{unit.settings.name}} - {{ 'unit.info'|trans({'%settlement%':'-',"%soldiers%":unit.getActiveSoldiers.count, "%travelers%":unit.getTravellingSoldiers.count, "%recruits%":unit.getRecruits.count, "%wounded%":unit.getWoundedSoldiers.count, "%dead%":unit.getDeadSoldiers.count}, "actions")|raw}} - <a href="{{path('maf_unit_soldiers', {"unit":unit.id}) }}">{{ 'unit.manage.link'|trans|title }}</a> </li>
 			{% endif %}
 		{% endfor %}
 		</ul>
