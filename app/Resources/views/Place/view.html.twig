@@ -3,13 +3,7 @@
 {% block content %}
 	{% if details %}
 		<div class="queue">
-			<h3>{{ 'place.history'|trans({},"politics")|title }}</h3>
-			<dl>
-			{% for event in place.log.events if event.public %}
-				<dt>{{ event.cycle|gametime('short') }}</dt>
-				<dd>{{ event|eventtranslate }}</dd>
-			{% endfor %}
-			</dl>
+			<h3>{{ 'place.history'|trans({},"politics")|title }}</h3>\
 		</div>
 
 		<h2>{{ place.formalname }}</h2>
