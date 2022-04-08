@@ -180,9 +180,6 @@ class CharacterManager {
 		$character->setSystem(null);
 		// remove from hierarchy
 		$character->setLiege(null);
-		$spawn = $character->getUser()->getNextSpawnTime();
-		$spawn->modify('-1 day');
-		$character->getUser()->setNextSpawnTime($spawn);
 
 		$this->history->logEvent($character, 'event.character.'.$deathmsg, $killer?array('%link-character%'=>$killer->getId()):null, History::ULTRA, true);
 
@@ -429,9 +426,6 @@ class CharacterManager {
 		// remove from map and hiearchy
 		$character->setLocation(null)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
 		$character->setLiege(null);
-		$spawn = $character->getUser()->getNextSpawnTime();
-		$spawn->modify('-1 day');
-		$character->getUser()->setNextSpawnTime($spawn);
 
 		$this->history->logEvent($character, 'event.character.retired', array(), History::HIGH, true);
 

@@ -679,7 +679,7 @@ class WarManager {
 	}
 
 	public function leaveSiege($character, $siege) {
-		if ($siege->getBattle()) {
+		if ($siege->getBattles()->count() > 0) {
 			return false;
 		}
 		foreach ($character->findActions('military.siege') as $action) {

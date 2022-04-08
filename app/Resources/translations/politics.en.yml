@@ -52,6 +52,7 @@ status:
   inferior:     %name% is a part of %superior% and both are parts of %ultimate%.
   partof:       , part of %superior%
   myinferiors:  Realms that are a part of %name%
+  deadinferiors: Inactive realms that are aprt of %name%
 
 relations:
  name:        Relations

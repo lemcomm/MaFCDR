@@ -253,21 +253,11 @@ class CharacterController extends Controller {
 
 		$now = new \DateTime('now');
 		$user = $character->getUser();
-		if ($user->getNextSpawnTime() === null) {
-			$newest = null;
-			$count = 0;
-			foreach ($user->getLivingCharacters() as $char) {
-				if ($char->getLocation() && $char->getCreated() > $newest) {
-					$newest = $char->getCreated();
-				}
-				$count++;
-			}
-			$newest->modify('+'.$count.' days');
-			$user->setNextSpawnTime($newest);
-			$this->getDoctrine()->getManager()->flush();
-		}
-		if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
-			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+		$em = $this->getDoctrine()->getManager();
+		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$em->flush();
+		if (!$canSpawn) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 			return $this->redirectToRoute('bm2_characters');
 		}
 		if ($character->getLocation()) {
@@ -281,7 +271,6 @@ class CharacterController extends Controller {
 		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
 		$this->get('character_manager')->checkReturnability($character);
 
-		$em = $this->getDoctrine()->getManager();
 		switch(rand(0,7)) {
 			case 0:
 				$query = $em->createQuery('SELECT s, r FROM BM2SiteBundle:Spawn s JOIN s.realm r WHERE r.active = true AND s.active = true ORDER BY r.id DESC');
@@ -372,22 +361,11 @@ class CharacterController extends Controller {
 			return $this->redirectToRoute('bm2_character');
 		}
 		$user = $character->getUser();
-		$now = new \DateTime('now');
-		if ($user->getNextSpawnTime() === null) {
-			$newest = null;
-			$count = 0;
-			foreach ($user->getLivingCharacters() as $char) {
-				if ($char->getLocation() && $char->getCreated() > $newest) {
-					$newest = $char->getCreated();
-				}
-				$count++;
-			}
-			$newest->modify('+'.$count.' days');
-			$user->setNextSpawnTime($newest);
-			$this->getDoctrine()->getManager()->flush();
-		}
-		if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
-			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+		$em = $this->getDoctrine()->getManager();
+		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$em->flush();
+		if (!$canSpawn) {
+			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 			return $this->redirectToRoute('bm2_characters');
 		}
 
@@ -430,21 +408,10 @@ class CharacterController extends Controller {
 		$supConv = null;
 		if (!$character->getLocation()) {
 			$user = $character->getUser();
-			$now = new \DateTime('now');
-			if ($user->getNextSpawnTime() === null) {
-				$newest = null;
-				$count = 0;
-				foreach ($user->getLivingCharacters() as $char) {
-					if ($char->getLocation() && $char->getCreated() > $newest) {
-						$newest = $char->getCreated();
-					}
-					$count++;
-				}
-				$newest->modify('+'.$count.' days');
-				$user->setNextSpawnTime($newest);
-			}
-			if ($user->getLivingCharacters()->count() > 3 && $user->getNextSpawnTime() > $now) {
-				$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()), 'messages'));
+			$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+			$em->flush();
+			if (!$canSpawn) {
+				$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 				return $this->redirectToRoute('bm2_characters');
 			}
 			if ($spawn) {
@@ -1091,10 +1058,6 @@ class CharacterController extends Controller {
 				$fail = true;
 			}
 			if (!$fail) {
-				foreach ($character->getUnits() as $unit) {
-					$mm->returnUnitHome($unit, 'retired', $character);
-				}
-				$em->flush();
 				if ($data['retirement']) {
 					// dynamically create when needed
 					if (!$character->getBackground()) {
