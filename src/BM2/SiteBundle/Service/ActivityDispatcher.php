@@ -27,7 +27,7 @@ class ActivityDispatcher extends Dispatcher {
 			case 'staff sling':
 				$bldg = 'Archery Range';
 				break;
-			case 'broadsword':
+			case 'long sword':
 			case 'morning star':
 			case 'great axe':
 				$bldg = 'Garrison';
