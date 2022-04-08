@@ -61,7 +61,7 @@ class Politics {
 				$realm = $alleg;
 			}
 			if (!$done) {
-				if ($realm === $target) {
+				if ($realm && $target && $realm === $target) {
 					if (!($alleg instanceof RealmPosition)) {
 						$this->history->logEvent(
 							$alleg,
