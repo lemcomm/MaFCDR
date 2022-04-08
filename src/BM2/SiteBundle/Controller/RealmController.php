@@ -224,6 +224,14 @@ class RealmController extends Controller {
 			}
 			$fail = $this->checkRealmNames($form, $data->getName(), $data->getFormalName(), $realm);
 			if (!$fail) {
+				foreach ($realm->getConversations() as $convo) {
+					if ($convo->getSystem() == 'announcements') {
+						$convo->setTopic($realm->getName().' Announcements');
+					}
+					if ($convo->getSystem() == 'general') {
+						$convo->setTopic($realm->getName().' General Discussion');
+					}
+				}
 				$this->getDoctrine()->getManager()->flush();
 				$this->addFlash('notice', $this->get('translator')->trans('realm.manage.success', array(), 'politics'));
 			}
