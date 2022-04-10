@@ -690,7 +690,7 @@ class CharacterManager {
 					break;
 				case 'characterAny':
 					if ($heir) {
-						$this->$bequeath($thing, $heir, $character, $via);
+						$this->$bequeath($thing, $heir, $char, $via);
 					} else {
 						$this->$fail($char, $thing, 'lawnoinherit');
 					}
