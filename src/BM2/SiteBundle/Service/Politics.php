@@ -771,7 +771,7 @@ class Politics {
 		} /* end switch */
 	}
 
-	public function changeSettlementOccupier(Character $char, Settlement $settlement, Realm $realm = null) {
+	public function changeSettlementOccupier(Character $char = null, Settlement $settlement, Realm $realm = null) {
 		$new = false;
 		$old = null;
 		if (!$settlement->getOccupier()) {
@@ -786,37 +786,125 @@ class Politics {
 		if ($old || $realm) {
 			$wars = $this->updateWarTargets($settlement, $old, $realm);
 		}
-		if ($realm) {
-			if ($new) {
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.occupied',
-					array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
-					History::HIGH, true
-				);
+		foreach ($settlement->getSuppliedUnits() as $unit) {
+			if ($char) {
+				if ($unit->getCharacter() != $char) {
+					$unit->setSupplier(NULL);
+					$this->history->logEvent(
+						$unit,
+						'event.unit.supplierlost',
+						array("%link-settlement%"=>$settlement->getId()),
+						History::HIGH, false
+					);
+				}
 			} else {
+				$unit->setSupplier(NULL);
 				$this->history->logEvent(
-					$settlement,
-					'event.settlement.occupied2',
-					array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
-					History::MEDIUM, true
+					$unit,
+					'event.unit.supplierlost',
+					array("%link-settlement%"=>$settlement->getId()),
+					History::HIGH, false
 				);
 			}
-		} else {
-			if ($new) {
-				$this->history->logEvent(
-					$settlement,
-					'event.settlement.occupied3',
-					array("%link-character%"=>$char->getId()),
-					History::HIGH, true
-				);
+		}
+		foreach ($settlement->getUnits() as $unit) {
+			$unit->setMarshal(NULL);
+			if ($char) {
+				if ($unit->getCharacter() != $char) {
+					if ($realm) {
+						$this->history->logEvent(
+							$unit,
+							'event.unit.basetaken',
+							array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
+							History::HIGH, false
+						);
+					} else {
+						$this->history->logEvent(
+							$unit,
+							'event.unit.basetaken2',
+							array("%link-settlement%"=>$target->getId()),
+							History::HIGH, false
+						);
+					}
+					$this->history->logEvent(
+						$unit->getCharacter(),
+						'event.character.isolated',
+						array("%link-unit%"=>$unit->getId()),
+						History::HIGH, false
+					);
+					$unit->setSettlement(NULL);
+				}
 			} else {
+				if ($realm) {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.basetaken',
+						array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
+						History::HIGH, false
+					);
+				} else {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.basetaken2',
+						array("%link-settlement%"=>$target->getId()),
+						History::HIGH, false
+					);
+				}
 				$this->history->logEvent(
-					$settlement,
-					'event.settlement.occupied4',
-					array("%link-character%"=>$char->getId()),
-					History::MEDIUM, true
+					$unit->getCharacter(),
+					'event.character.isolated',
+					array("%link-unit%"=>$unit->getId()),
+					History::HIGH, false
 				);
+				$unit->setSettlement(NULL);
+			}
+		}
+		foreach ($settlement->getDefendingUnits() as $unit) {
+			if (!$char) {
+				$this->milman->returnUnitHome($unit, 'defenselost', $settlement);
+			} else {
+				$this->milman->returnUnitHome($unit, 'defenselost', $char);
+			}
+			$this->history->logEvent(
+				$unit,
+				'event.unit.defenselost',
+				array("%link-settlement%"=>$settlement->getId()),
+				History::HIGH, true
+			);
+		}
+		if ($char) {
+			if ($realm) {
+				if ($new) {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.occupied',
+						array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.occupied2',
+						array("%link-realm%"=>$realm->getId(), "%link-character%"=>$char->getId()),
+						History::MEDIUM, true
+					);
+				}
+			} else {
+				if ($new) {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.occupied3',
+						array("%link-character%"=>$char->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$this->history->logEvent(
+						$settlement,
+						'event.settlement.occupied4',
+						array("%link-character%"=>$char->getId()),
+						History::MEDIUM, true
+					);
+				}
 			}
 		}
 	}
