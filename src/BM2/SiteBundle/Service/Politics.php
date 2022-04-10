@@ -815,14 +815,14 @@ class Politics {
 						$this->history->logEvent(
 							$unit,
 							'event.unit.basetaken',
-							array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
+							array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
 							History::HIGH, false
 						);
 					} else {
 						$this->history->logEvent(
 							$unit,
 							'event.unit.basetaken2',
-							array("%link-settlement%"=>$target->getId()),
+							array("%link-settlement%"=>$settlement->getId()),
 							History::HIGH, false
 						);
 					}
@@ -839,14 +839,14 @@ class Politics {
 					$this->history->logEvent(
 						$unit,
 						'event.unit.basetaken',
-						array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
+						array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
 						History::HIGH, false
 					);
 				} else {
 					$this->history->logEvent(
 						$unit,
 						'event.unit.basetaken2',
-						array("%link-settlement%"=>$target->getId()),
+						array("%link-settlement%"=>$settlement->getId()),
 						History::HIGH, false
 					);
 				}
