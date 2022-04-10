@@ -788,7 +788,7 @@ class MilitaryManager {
 		return $days*0.925*1.33; #Average travel speed of all region types.
 	}
 
-	public function returnUnitHome (Unit $unit, $reason='recalled', Character $origin, $bulk = false) {
+	public function returnUnitHome (Unit $unit, $reason='recalled', $origin = null, $bulk = false) {
 		$dest = false;
 		if ($unit->getSettlement()) {
 			$dest = $unit->getSettlement();
@@ -806,7 +806,13 @@ class MilitaryManager {
 			$this->disbandUnit($unit, true);
 			return true;
 		}
-		$distance = $this->geo->calculateDistanceToSettlement($origin, $unit->getSettlement());
+		if ($origin instanceof Character) {
+			$char = true;
+			$distance = $this->geo->calculateDistanceToSettlement($origin, $unit->getSettlement());
+		} else {
+			$char = false;
+			$distance = $this->geo->calculateDistanceBetweenSettlements($unit->getSettlement(), $origin);
+		}
 		$count = $unit->getSoldiers()->count();
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
@@ -824,12 +830,14 @@ class MilitaryManager {
 					array('%link-settlement%'=>$dest->getId()),
 					History::MEDIUM, false, 30
 				);
-				$this->history->logEvent(
-					$origin,
-					'event.military.recalled2',
-					array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
-					History::MEDIUM, false, 30
-				);
+				if ($char) {
+					$this->history->logEvent(
+						$origin,
+						'event.military.recalled2',
+						array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
+						History::MEDIUM, false, 30
+					);
+				}
 			} elseif ($reason === 'returned') {
 				$this->history->logEvent(
 					$unit,
@@ -837,12 +845,14 @@ class MilitaryManager {
 					array('%link-settlement%'=>$dest->getId()),
 					History::MEDIUM, false, 30
 				);
-				$this->history->logEvent(
-					$origin,
-					'event.military.returned2',
-					array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
-					History::MEDIUM, false, 30
-				);
+				if ($char) {
+					$this->history->logEvent(
+						$origin,
+						'event.military.returned2',
+						array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
+						History::MEDIUM, false, 30
+					);
+				}
 			}
 		}
 		if (!$bulk) {
