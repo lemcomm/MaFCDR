@@ -148,7 +148,7 @@ class PermissionManager {
 						} elseif ($value == 'realm') {
 							$members = $realm->findMembers();
 						}
-						if ($members == $members->contains($character)) {
+						if ($members && $members->contains($character)) {
 							return true;
 						}
 					}
