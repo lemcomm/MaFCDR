@@ -598,7 +598,7 @@ class MilitaryManager {
 				History::MEDIUM, false, 30
 			);
 		}
-		if ($home && $charcter) {
+		if ($home && $character) {
 			$this->history->logEvent(
 				$unit,
 				'event.military.newUnit2',
@@ -910,7 +910,7 @@ class MilitaryManager {
 
 	public function disbandUnit (Unit $unit, $bulk = false) {
 		$unit->setDisbanded(true);
-		$unit->setCharcter(null);
+		$unit->setCharacter(null);
 		$unit->setMarshall(null);
 		$unit->setPlace(null);
 		$unit->setSupplier(null);
