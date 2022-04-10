@@ -598,7 +598,7 @@ class MilitaryManager {
 				History::MEDIUM, false, 30
 			);
 		}
-		if ($home) {
+		if ($home && $charcter) {
 			$this->history->logEvent(
 				$unit,
 				'event.military.newUnit2',

@@ -734,6 +734,9 @@ class PlaceController extends Controller {
 			$spawn->setPlace($place);
 			$em->persist($spawn);
 			if($place->getType()->getName() == 'home' && $place->getHouse()) {
+				if ($old = $place->getHouse()->getSpawn()) {
+					$em->remove($old);
+				}
 				$spawn->setHouse($place->getHouse());
 			} else {
 				$spawn->setRealm($place->getRealm());
