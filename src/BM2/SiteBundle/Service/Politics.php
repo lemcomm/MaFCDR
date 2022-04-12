@@ -829,7 +829,7 @@ class Politics {
 					$this->history->logEvent(
 						$unit->getCharacter(),
 						'event.character.isolated',
-						array("%link-unit%"=>$unit->getId()),
+						array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
 						History::HIGH, false
 					);
 					$unit->setSettlement(NULL);
@@ -853,7 +853,7 @@ class Politics {
 				$this->history->logEvent(
 					$unit->getCharacter(),
 					'event.character.isolated',
-					array("%link-unit%"=>$unit->getId()),
+					array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
 					History::HIGH, false
 				);
 				$unit->setSettlement(NULL);
@@ -965,8 +965,8 @@ class Politics {
 				$this->em->remove($perm);
 			}
 			foreach ($target->getOccupationPermissions() as $perm) {
-				$perm->set.$type($perm->getOccupied.$type());
-				$perm->setOccupied.$type(null);
+				$perm->{set.$type}($perm->{getOccupied.$type}());
+				$perm->{setOccupied.$type}(null);
 			}
 		}
 		if ($occupier) {
