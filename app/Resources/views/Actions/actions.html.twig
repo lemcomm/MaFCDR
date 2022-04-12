@@ -33,7 +33,7 @@
 	{% include "element/linklist.html.twig" with {"list":dispatcher.buildingActions, "domain":'actions'} only %}
 	{% include "element/linklist.html.twig" with {"list":dispatcher.controlActions, "domain":'actions'} only %}
 	{% include "element/linklist.html.twig" with {"list":dispatcher.economyActions, "domain":'actions'} only %}
-	{% include "element/linklist.html.twig" with {"list":dispatcher.recruitActions, "domain":'actions'} only %}
+	{% include "element/linklist.html.twig" with {"list":unitDispatcher.recruitActions, "domain":'actions'} only %}
 	</div>
 	<br class="clear"/>
 {% endblock %}
