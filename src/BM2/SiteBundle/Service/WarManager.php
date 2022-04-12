@@ -880,50 +880,7 @@ class WarManager {
 					if (!$leader) {
 						$leader = $victor->getCharacters()->first(); #Get one at random.
 					}
-					if ($leader) {
-						$this->politics->changeSettlementOccupier($leader, $target, $realm);
-					}
-					foreach ($target->getSuppliedUnits() as $unit) {
-						if ($unit->getCharacter() != $victor->getLeader() && $unit->getSettlement() != $target) {
-							$unit->setSupplier(NULL);
-						}
-					}
-					foreach ($target->getUnits() as $unit) {
-						if ($unit->getCharacter() != $victor->getLeader() && $unit->getCharacter() !== NULL) {
-							$unit->setSettlement(NULL);
-							$unit->setMarshal(NULL);
-							if ($realm) {
-								$this->history->logEvent(
-									$unit,
-									'event.unit.basetaken',
-									array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$target->getId()),
-									History::HIGH, true
-								);
-							} else {
-								$this->history->logEvent(
-									$unit,
-									'event.unit.basetaken2',
-									array("%link-settlement%"=>$target->getId()),
-									History::HIGH, true
-								);
-							}
-							$this->history->logEvent(
-								$unit->getCharacter(),
-								'event.character.isolated',
-								array("%link-unit%"=>$unit->getId()),
-								History::HIGH, true
-							);
-						}
-					}
-					foreach ($target->getDefendingUnits() as $unit) {
-						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
-						$this->history->logEvent(
-							$unit,
-							'event.unit.defenselost',
-							array("%link-settlement%"=>$target->getId()),
-							History::HIGH, true
-						);
-					}
+					$this->politics->changeSettlementOccupier($leader, $target, $realm);
 				} else {
 					$this->log(1, "Target is place\n");
 					foreach ($victor->getCharacters() as $char) {

@@ -35,8 +35,11 @@ class HourlyCommand extends ContainerAwareCommand {
 		$query = $em->createQuery('SELECT count(d.id) FROM DungeonBundle:Dungeon d');
 		$dungeons = $query->getSingleScalarResult();
 
-		$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
-		$players = $query->getSingleScalarResult();
+		$query = $em->createQuery('SELECT s FROM BM2SiteBundle:StatisticGlobal s ORDER BY s.id DESC')->setMaxResults(1);
+		$result = $query->getSingleResult();
+		$players = $result->getReallyActiveUsers(); # This isn't exact, but it's better than counting the spam bots.
+		#$query = $em->createQuery('SELECT count(u.id) FROM BM2SiteBundle:User u WHERE u.account_level > 0');
+		#$players = $query->getSingleScalarResult();
 
 		$want = ceil($players/10);
 
@@ -49,7 +52,7 @@ class HourlyCommand extends ContainerAwareCommand {
 				$creator->createRandomDungeon();
 			}
 			$em->flush();
-		}		
+		}
 
 		$this->debug("updating parties...");
 		$query = $em->createQuery('UPDATE DungeonBundle:DungeonParty p SET p.counter=p.counter + 1 WHERE p.counter IS NOT NULL');
