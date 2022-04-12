@@ -1254,6 +1254,7 @@ battle:
   chargewound:  %i% was wounded by the enemy in the charge|%i% were wounded by the enemy in the charge
   chargecapture: %i% was captured by the enemy in the carge|%i% were captured by the enemy in the carge
   chargekill:   %i% was killed by the enemy in the charge|%i% were killed by the enemy in the charge
+  stared:       %i% First One refused to reteat|%i% First Ones refused to retreat
  hunt:
   title:        hunt
   killed:       %i% enemy was killed or wounded while fleeing.|%i% enemies were killed or wounded while fleeing.
@@ -1589,6 +1590,7 @@ unavailable:
  noassigned:    You have no soldiers assigned.
  nospies:       You don't have any spies in your employ.
  inbattle:      You are already involved in a battle.
+ inbattle2:     This unit is currently involved in a battle.
  nobattle:      You are not involved in any battle.
  nobattle2:     You are not being forced into any battle, but have committed yourself.
  fresh:         You are freshly arrived and are currently establishing yourself.
