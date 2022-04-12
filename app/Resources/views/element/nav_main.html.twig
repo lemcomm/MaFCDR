@@ -115,7 +115,8 @@
 						<a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a>
 					</ul>
 				{% endif %}
-				{% if character.insidesettlement and character.insidesettlement.owner == character %}
+				{#{% if character.insidesettlement and character.insidesettlement.owner == character %}#}
+				{% if character.insidesettlement %}
 					{% set check = dispatcher.placeListTest() %}
 					{% if check.url is defined %}
 						<ul>
@@ -146,19 +147,19 @@
 					<li class="part">
 						<h3>{{ 'menu.military'|trans|title }}</h3>
 						<ul>
-							{% set check = dispatcher.unitNewTest() %}
+							{% set check = unitDispatcher.unitNewTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
-							{% set check = dispatcher.personalAssignedUnitsTest() %}
+							{% set check = unitDispatcher.personalAssignedUnitsTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
-							{% set check = dispatcher.personalEntourageTest() %}
+							{% set check = unitDispatcher.personalEntourageTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
-							{% set check = dispatcher.unitRecruitTest() %}
+							{% set check = unitDispatcher.unitRecruitTest() %}
 							{% if check.url is defined %}
 								<li><a href="{{ path(check.url) }}">{{ check.name|trans({},"actions") }}</a></li>
 							{% endif %}
