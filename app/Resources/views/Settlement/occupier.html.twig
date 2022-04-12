@@ -3,7 +3,11 @@
 {% block content %}
 	<h2>{{ "control.changeoccupier.name"|trans({},"actions")|title }}</h2>
 
-	<p>{{ "control.changeoccupier.intro"|trans({"%settlement%":link(settlement), "%realm%":link(settlement.occupier)},"actions")|raw}}</p>
+	{% if settlement.occupier %}
+		<p>{{ "control.changeoccupier.intro"|trans({"%settlement%":link(settlement), "%realm%":link(settlement.occupier)},"actions")|raw}}</p>
+	{% else %}
+		<p>{{ "control.changeoccupier.intro2"|trans({"%settlement%":link(settlement)},"actions")|raw}}</p>
+	{% endif %}
 
 	{{ form(form) }}
 
