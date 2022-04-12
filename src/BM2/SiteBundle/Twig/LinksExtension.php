@@ -315,6 +315,11 @@ class LinksExtension extends \Twig_Extension {
 				$id = $entity->getId();
 				$name = $entity->getTopic();
 				break;
+			case 'Unit':
+				$id = $entity->getId();
+				$name = $entity->getSettings()->getName();
+				$linktype = 'unit';
+				break;
 			default:
 				$id = $entity->getId();
 				$name = $entity->getName();
@@ -388,7 +393,7 @@ class LinksExtension extends \Twig_Extension {
 		// FIXME: above still not working, so trying with all absolute paths now
 		$type = UrlGeneratorInterface::ABSOLUTE_URL;
 
-		if ($class != 'Unit') {
+		if ($class != 'unit') {
 			$url = $this->generator->generate($path, array('id' => $id), $type);
 		} else {
 			$url = $this->generator->generate($path, array('unit' => $id), $type);
