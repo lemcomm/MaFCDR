@@ -240,15 +240,14 @@ class UnitDispatcher extends Dispatcher {
 	public function unitRecallTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $unit->getSettlement();
-		if (!$character->getUnits()->contains($unit)) {
-			if($settlement && (!$this->pm->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character)) {
-				if($unit->getSettlement() != $character->getInsideSettlement()) {
-					return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
-				}
-				return array("name"=>"unit.recall.name", "description"=>"unavailable.notyours");
-			}
-		} elseif ($unit->getCharacter() != $character) {
+		if (!$settlement) {
+			return array("name"=>"unit.recall.name", "description"=>"unavailable.notinside");
+		}
+		if ($unit->getSettlement() !== $settlement) {
 			return array("name"=>"unit.recall.name", "description"=>"unavailable.notyourunit");
+		}
+		if (!$this->pm->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character) {
+			return array("name"=>"unit.recall.name", "description"=>"unavailable.notyours");
 		}
 		if ($unit->getCharacter()->isInBattle()) {
 			return array("name"=>"unit.return.all", "description"=>"unavailable.inbattle2");
