@@ -121,7 +121,13 @@ class PermissionManager {
 		} else {
 			$occupied = false;
 		}
-		if ((($settlement->getOwner() == $character || $settlement->getSteward() == $character) && $settlement->getOccupant() == false) OR $settlement->getOccupant() == $character) {
+		if (!$occupied && ($settlement->getOwner() == $character || $settlement->getSteward() == $character)) {
+			if ($return_details) {
+				return array(true, null, 'owner', null);
+			} else {
+				return true;
+			}
+		} elseif ($occupied && $settlement->getOccupant() == $character) {
 			if ($return_details) {
 				return array(true, null, 'owner', null);
 			} else {
