@@ -911,7 +911,7 @@ class MilitaryManager {
 	public function disbandUnit (Unit $unit, $bulk = false) {
 		$unit->setDisbanded(true);
 		$unit->setCharacter(null);
-		$unit->setMarshall(null);
+		$unit->setMarshal(null);
 		$unit->setPlace(null);
 		$unit->setSupplier(null);
 		if ($unit->getSettlement()) {
