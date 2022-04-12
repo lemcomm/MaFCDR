@@ -672,6 +672,8 @@ class BattleRunner {
 			$missed = 0;
 			$crowded = 0;
 			$notarget = 0;
+			$staredDeath = 0;
+			$noTargets = 0;
 			#$attSlain = $this->attSlain; # For Sieges.
 			#$defSlain = $this->defSlain; # For Sieges.
 			$extras = array();
@@ -800,10 +802,15 @@ class BattleRunner {
 							$count++;
 							$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
 							if ($soldier->getMorale()*2 < rand(0,100)) {
-								$this->log(50, " - panics");
-								$soldier->setRouted(true);
-								$this->history->addToSoldierLog($soldier, 'routed.ranged');
-								$routed++;
+								if ($soldier->isNoble()) {
+									$this->log(50, " - has no fear");
+									$staredDeath++;
+								} else {
+									$this->log(50, " - panics");
+									$soldier->setRouted(true);
+									$this->history->addToSoldierLog($soldier, 'routed.ranged');
+									$routed++;
+								}
 							}
 							$this->log(50, "\n");
 						}
@@ -811,7 +818,7 @@ class BattleRunner {
 					$this->log(10, "==> avg. morale: ".round($total/max(1,$count))."\n");
 				}
 
-				$stageResult = array('shots'=>$shots, 'rangedHits'=>$rangedHits, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'routed'=>$routed);
+				$stageResult = array('shots'=>$shots, 'rangedHits'=>$rangedHits, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'routed'=>$routed, 'stared'=>$staredDeath);
 			}
 			/*
 
@@ -835,10 +842,12 @@ class BattleRunner {
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$strikes++;
+							$noTargets = 0;
 							$result = $this->ChargeAttack($soldier, $target);
 						} else {
 							// no more targets
 							$this->log(10, "but finds no target\n");
+							$noTargets++;
 						}
 					} else if ($soldier->isRanged() && $doRanged) {
 						// Continure firing with a reduced hit chance in regular battle. If we skipped the ranged phase due to this being the last battle in a siege, we forego ranged combat to pure melee instead.
@@ -848,6 +857,7 @@ class BattleRunner {
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$shots++;
+							$noTargets = 0;
 							if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($soldier->RangedPower()+$bonus)*$rangedPenalty)) {
 								$rangedHits++;
 								$result = $this->RangedHit($soldier, $target);
@@ -858,6 +868,7 @@ class BattleRunner {
 						} else {
 							// no more targets
 							$this->log(10, "no more targets\n");
+							$noTargets++;
 						}
 					} else if ($soldier->MeleePower() > 0) {
 						// We are either in a siege assault and we have contact points left, OR we are not in a siege assault. We are a melee unit or ranged unit with melee capabilities in final siege battle.
@@ -865,6 +876,7 @@ class BattleRunner {
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$strikes++;
+							$noTargets = 0;
 							$result = $this->MeleeAttack($soldier, $target, $phase);
 							/*
 							if ($battle->getType() == 'siegeassault') {
@@ -881,6 +893,7 @@ class BattleRunner {
 						} else {
 							// no more targets
 							$this->log(10, "but finds no target\n");
+							$noTargets++;
 						}
 					} else {
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") is unable to attack\n");
@@ -946,6 +959,10 @@ class BattleRunner {
 						} elseif ($result2=='chargekill') {
 							$chargeKill++;
 						}
+					}
+					if ($noTargets > 4) {
+						break;
+						$this->log(10, "Unable to locate viable targets -- skipping further calculations\n");
 					}
 				}
 				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$notarget, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'chargefail' => $chargeFail, 'chargewound'=>$chargeWound, 'chargecapture'=>$chargeCapture, 'chargekill'=>$chargeKill);
@@ -1020,18 +1037,35 @@ class BattleRunner {
 						$mod = min(0.99, $mod+0.1);
 					}
 					$soldier->setMorale($soldier->getMorale() * $mod);
+					if ($soldier->getMorale()*2 < rand(0,100)) {
+						if ($soldier->isNoble()) {
+							$this->log(50, " - has no fear");
+							$staredDeath++;
+						} else {
+							$this->log(50, " - panics");
+							$soldier->setRouted(true);
+							$this->history->addToSoldierLog($soldier, 'routed.ranged');
+							$routed++;
+						}
+					}
 					if ($soldier->getMorale() < rand(0,100)) {
-						$routed++;
-						$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - panics\n");
-						$soldier->setRouted(true);
-						$countUs--;
-						$this->history->addToSoldierLog($soldier, 'routed.melee');
+						if ($soldier->isNoble()) {
+							$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - has no fear\n");
+							$staredDeath++;
+						} else {
+							$routed++;
+							$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - panics\n");
+							$soldier->setRouted(true);
+							$countUs--;
+							$this->history->addToSoldierLog($soldier, 'routed.melee');
+						}
 					} else {
 						$this->log(20, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())."\n");
 					}
 				}
 				$combatResults = $stageResult->getData(); # CFetch original array.
 				$combatResults['routed'] = $routed; # Append routed info.
+				$combatResults['stared'] = $staredDeath;
 				$stageResult->setData($combatResults); # Add routed to array and save.
 			}
 		}
@@ -1242,11 +1276,7 @@ class BattleRunner {
 		$primaryVictor = null;
 		foreach ($allGroups as $group) {
 			$nobleGroup=array();
-			$my_survivors = $group->getActiveSoldiers()->filter(
-				function($entry) {
-					return (!$entry->isNoble());
-				}
-			)->count();
+			$my_survivors = $group->getActiveSoldiers()->count();
 			if ($my_survivors > 0) {
 				$this->log(5, "Group ".$group->getActiveReport()->getId()." (".($group->getAttacker()?"attacker":"defender").") has survivors, and is victor.\n");
 				$victory = true;
