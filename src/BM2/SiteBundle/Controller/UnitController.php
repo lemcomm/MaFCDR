@@ -370,7 +370,7 @@ class UnitController extends Controller {
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.assigned',
-				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
+				array('%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()),
 				History::MEDIUM, false, 30
 			);
                         $em->flush();
