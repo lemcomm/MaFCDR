@@ -730,15 +730,18 @@ class PlaceController extends Controller {
 			$em->remove($place->getSpawn());
 			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.success.stop', ["%name%"=>$place->getName()], 'actions'));
 		} else {
-			$spawn = new Spawn();
-			$spawn->setPlace($place);
 			if($place->getType()->getName() == 'home' && $place->getHouse()) {
 				if ($old = $place->getHouse()->getSpawn()) {
 					$em->remove($old);
 					$em->flush();
 				}
+				#This need to be after the flush above or we get entity persistence errors from doctrine for creating this and not persisting it.
+				$spawn = new Spawn();
+				$spawn->setPlace($place);
 				$spawn->setHouse($place->getHouse());
 			} else {
+				$spawn = new Spawn();
+				$spawn->setPlace($place);
 				$spawn->setRealm($place->getRealm());
 			}
 			$em->persist($spawn);
