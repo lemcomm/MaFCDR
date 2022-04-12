@@ -732,15 +732,16 @@ class PlaceController extends Controller {
 		} else {
 			$spawn = new Spawn();
 			$spawn->setPlace($place);
-			$em->persist($spawn);
 			if($place->getType()->getName() == 'home' && $place->getHouse()) {
 				if ($old = $place->getHouse()->getSpawn()) {
 					$em->remove($old);
+					$em->flush();
 				}
 				$spawn->setHouse($place->getHouse());
 			} else {
 				$spawn->setRealm($place->getRealm());
 			}
+			$em->persist($spawn);
 			$spawn->setActive(false);
 			$this->addFlash('notice', $this->get('translator')->trans('control.spawn.success.start', ["%name%"=>$place->getName()], 'actions'));
 		}
