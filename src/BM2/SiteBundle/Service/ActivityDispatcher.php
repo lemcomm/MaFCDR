@@ -5,14 +5,10 @@ namespace BM2\SiteBundle\Service;
 class ActivityDispatcher extends Dispatcher {
 
 	protected $appstate;
-	protected $pm;
-	protected $geo;
 
 
-	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo) {
+	public function __construct(AppState $appstate) {
 		$this->appstate = $appstate;
-		$this->pm = $pm;
-		$this->geo = $geo;
 
 	}
 
