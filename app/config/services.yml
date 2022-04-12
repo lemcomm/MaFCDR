@@ -24,6 +24,16 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@translator', '@twig.extension.links', '@twig.extension.geography']
         tags:
             - { name: twig.extension }
+    twig.extension.dispatcher:
+        class:      BM2\SiteBundle\Twig\DispatcherExtension
+        arguments:  ['@dispatcher']
+        tags:
+            - { name: twig.extension }
+    twig.extension.unitDispatcher:
+        class:      BM2\SiteBundle\Twig\UnitDispatcherExtension
+        arguments:  ['@unit_dispatcher']
+        tags:
+            - { name: twig.extension }
 
     geography:
         class:      BM2\SiteBundle\Service\Geography
@@ -62,12 +72,10 @@ services:
         arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
     activity_dispatcher:
         class:      BM2\SiteBundle\Service\ActivityDispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography']
-    twig.extension.dispatcher:
-        class:      BM2\SiteBundle\Twig\DispatcherExtension
-        arguments:  ['@dispatcher']
-        tags:
-            - { name: twig.extension }
+        arguments:  ['@appstate']
+    unit_dispatcher:
+        class:      BM2\SiteBundle\Service\UnitDispatcher
+        arguments:  ['@appstate', '@permission_manager', '@military_manager']
     conversation_manager:
         class:      BM2\SiteBundle\Service\ConversationManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
