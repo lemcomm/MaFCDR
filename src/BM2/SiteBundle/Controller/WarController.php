@@ -747,13 +747,17 @@ class WarController extends Controller {
 			foreach ($data['method'] as $method) {
 				if (($method=='thralls' || $method=='resources') && !$data['target']) {
 					$form->addError(new FormError("loot.target"));
-					return array('form'=>$form->createView());
+					return $this->render('War/lootSettlement.html.twig', [
+						'form'=>$form->createView(), 'settlement'=>$settlement
+					]);
 				}
 				if ($method=='thralls') {
 					// check if target settlement allows slaves
 					if ($data['target']->getAllowThralls()==false) {
 						$form->addError(new FormError("loot.noslaves"));
-						return array('form'=>$form->createView());
+						return $this->render('War/lootSettlement.html.twig', [
+							'form'=>$form->createView(), 'settlement'=>$settlement
+						]);
 					}
 				}
 			}

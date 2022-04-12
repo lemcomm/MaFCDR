@@ -93,10 +93,13 @@ class UserManager extends FosUserManager {
 		} else {
 			$change = 15;
 		}
-		$newest->modify('+'.$change.' days');
-		if ($newest !== $user->getNextSpawnTime()) {
-			$user->setNextSpawnTime($newest);
+		if ($newest) {
+			$newest->modify('+'.$change.' days');
+			if ($newest !== $user->getNextSpawnTime()) {
+				$user->setNextSpawnTime($newest);
+			}
 		}
+		# If there are no characters, this can legitimately return null.
 		return $newest;
 	}
 
@@ -107,11 +110,17 @@ class UserManager extends FosUserManager {
 		} else {
 			$next = $user->getNextSpawnTime();
 		}
-		if ($user->getLivingCharacters()->count() > 3 && $next > $now) {
-			return false;
+		if ($next) {
+			if ($user->getLivingCharacters()->count() > 3 && $next > $now) {
+				return false;
+			} else {
+				return true;
+			}
 		} else {
+			# Next can only be null if there are no characters to check against.
 			return true;
 		}
+
 	}
 
 }

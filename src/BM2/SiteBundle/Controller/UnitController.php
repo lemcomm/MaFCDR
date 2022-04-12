@@ -62,12 +62,18 @@ class UnitController extends Controller {
                 }
         }
 
+
+	private function gateway($test, $secondary = null, $settlement = false) {
+                return $this->get('unit_dispatcher')->gateway($test, $settlement, true, false, $secondary);
+
+	}
+
         /**
           * @Route("/units", name="maf_units")
           */
 
         public function indexAction(Request $request) {
-                $character = $this->get('dispatcher')->gateway('personalAssignedUnitsTest');
+                $character = $this->gateway('personalAssignedUnitsTest');
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
@@ -114,7 +120,7 @@ class UnitController extends Controller {
           */
 
         public function infoAction(Unit $unit) {
-                $character = $this->get('dispatcher')->gateway('unitInfoTest');
+                $character = $this->gateway('unitInfoTest');
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
@@ -130,7 +136,7 @@ class UnitController extends Controller {
           */
 
         public function createAction(Request $request) {
-		$character = $this->get('dispatcher')->gateway('unitNewTest');
+                $character = $this->gateway('unitNewTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -168,8 +174,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitManageAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitManageTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', default, default, default, UnitId)
+                $character = $this->gateway('unitManageTest', $unit);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -207,7 +212,7 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/soldiers", name="maf_unit_soldiers", requirements={"unit"="\d+"})
 	  */
 	public function unitSoldiersAction(Request $request, Unit $unit) {
-                $character = $this->get('dispatcher')->gateway('unitSoldiersTest', false, true, false, $unit);
+                $character = $this->gateway('unitSoldiersTest', $unit);
                 if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
@@ -301,7 +306,7 @@ class UnitController extends Controller {
 	  * @Route("/units/{unit}/cancel/{recruit}", name="maf_recruit_cancel", requirements={"unit"="\d+", "recruit"="\d+"})
 	  */
         public function cancelTrainingAction(Request $request, Unit $unit, Soldier $recruit) {
-                list($character, $settlement) = $this->get('dispatcher')->gateway('unitCancelTrainingTest', true, true, false, $unit);
+                list($character, $settlement) = $this->gateway('unitSoldiersTest', $unit, true);
                 if (! $character instanceof Character) {
                 	return $this->redirectToRoute($character);
                 }
@@ -347,7 +352,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitAssignAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitManageTest', false, true, false, $unit);
+                $character = $this->gateway('unitManageTest', $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -365,7 +370,7 @@ class UnitController extends Controller {
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.assigned',
-				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
+				array('%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()),
 				History::MEDIUM, false, 30
 			);
                         $em->flush();
@@ -384,7 +389,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitAppointAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitAppointTest', false, true, false, $unit);
+                $character = $this->gateway('unitAppointTest', $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -431,7 +436,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitRevokeAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitAppointTest', false, true, false, $unit);
+                $character = $this->gateway('unitAppointTest', $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
@@ -449,8 +454,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitRebaseAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitRebaseTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', default, default, default, UnitId)
+                $character = $this->gateway('unitRebaseTest', $unit);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -489,8 +493,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitDisbandAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitDisbandTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', default, default, default, UnitId)
+                $character = $this->gateway('unitDisbandTest', $unit);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -518,8 +521,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitReturnAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitReturnTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', default, default, default, UnitId)
+                $character = $this->gateway('unitReturnTest', $unit);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -548,8 +550,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitRecallAction(Request $request, Unit $unit) {
-		$character = $this->get('dispatcher')->gateway('unitRecallTest', false, true, false, $unit);
-                # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
+                $character = $this->gateway('unitRecallTest', $unit);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
@@ -583,8 +584,7 @@ class UnitController extends Controller {
           * @Route("/units/recruit", name="maf_recruit")
           */
      	public function unitRecruitAction(Request $request) {
-     		list($character, $settlement) = $this->get('dispatcher')->gateway('unitRecruitTest', true);
-                # Distpatcher->getTest('test', getSettlement, checkDuplicate, getPlace, parameter)
+                list($character, $settlement) = $this->gateway('unitRecruitTest', null, true);
      		if (! $character instanceof Character) {
      			return $this->redirectToRoute($character);
      		}

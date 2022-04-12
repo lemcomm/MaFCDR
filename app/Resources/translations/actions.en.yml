@@ -652,7 +652,7 @@ military:
    allow:         Allow these, attack all others
    attack:        Attack these, allow all others
   target:         Target
-  submit:         Tssue block orders
+  submit:         Issue block orders
   success:        Your men will now set up camp and patrol the area.
  damage:
   name:           Damage feature

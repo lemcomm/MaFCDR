@@ -937,7 +937,7 @@ class ActionsController extends Controller {
      * @Route("/entourage")
      */
 	public function entourageAction(Request $request) {
-		list($character, $settlement) = $this->get('dispatcher')->gateway('personalEntourageTest', true);
+		list($character, $settlement) = $this->get('unit_dispatcher')->gateway('personalEntourageTest', true);
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}

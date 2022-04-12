@@ -249,11 +249,7 @@ event:
   stewardabandon: Has gained a strong claim on %settlement% after the previous lord abandoned it.
   recvdplace:   Has received ownership of %place%.
   assoc:
-   founded:     Founded the association of %association%.
-  law:
-   new:         A new law on %title% has been put in place.
-   changed:     The law on %title% has been updated.
-   repealed:    The law on %title% has been repelead.
+   founded:     Founded the association of %assoc%.
   take:
    start:       Your settlement of %settlement% is being taken over by %character%.
    start2:      Your stewardship of %settlement% is being taken over by %character%.
@@ -425,6 +421,10 @@ event:
    adopted:     Primary recognition of %deity% has been taken over by the Association under orders of %character%.
    recognized:  %character% has recognized the deity of %deity% as a member of the Association's pantheon.
    removed:     %character% has removed the deity of %deity% fromt he Association's pantheon.
+  law:
+   new:         A new law on %title% has been put in place.
+   changed:     The law on %title% has been updated.
+   repealed:    The law on %title% has been repelead.
 
 
 report:
