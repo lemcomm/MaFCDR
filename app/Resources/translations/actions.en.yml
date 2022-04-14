@@ -487,8 +487,9 @@ control:
  changeoccupier:
   name:         Change Occupying Realm
   description:  Replace the flag of the occupation
-  intro: >
-    As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement.
+  intro:        As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by %realm%.
+  intro2:       As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by a first one without a realm's backing.
+
  spawn:
   success:
    start:       You have enabled spawning at %name%, further action may be required by the realm rulers or house head, as appropriate.

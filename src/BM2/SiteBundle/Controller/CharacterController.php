@@ -487,7 +487,7 @@ class CharacterController extends Controller {
 				$this->get('history')->visitLog($settlement, $character);
 			}
 			$em->flush();
-			$character->getUser()->updateNextSpawnTime();
+			$this->get('bm2.user_manager')->calculateCharacterSpawnLimit($user, true); #This can return the date but we don't need it.
 			$em->flush();
 		} else {
 			$place = $spawn->getPlace();

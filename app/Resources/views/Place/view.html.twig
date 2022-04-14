@@ -10,7 +10,11 @@
 
 		<dl>
 			<dt>{{ 'place.owner'|trans({},"places") }}</dt>
-			<dd>{{ link(place.owner) }}</dd>
+			{% if place.owner %}
+				<dd>{{ link(place.owner) }}</dd>
+			{% else %}
+				{{ 'place.noowner'|trans({}, "places") }}
+			{% endif %}
 			<dt>{{ 'place.name'|trans({},"places") }}</dt>
 			<dd>{{ place.name }}</dd>
 		</dl>
