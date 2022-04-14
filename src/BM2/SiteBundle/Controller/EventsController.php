@@ -228,7 +228,12 @@ class EventsController extends Controller {
 		$access = false;
 		$unit = $soldier->getUnit();
 		$base = $unit->getSettlement();
-		$perm = $this->get('permission_manager')->checkSettlementPermission($base, $character, 'units');
+		if ($base) {
+			$perm = $this->get('permission_manager')->checkSettlementPermission($base, $character, 'units');
+		} elseif ($unit->getCharacter() === $character) {
+			$perm = true;
+		}
+
 		if ($unit->getCharacter() === $character || $perm || $unit->getMarshal() === $character) {
 			return $this->render('Events/soldierlog.html.twig', [
 				'soldier'=>$soldier
