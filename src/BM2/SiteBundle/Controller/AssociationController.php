@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationDeity;
+use BM2\SiteBundle\Entity\AssociationMember;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Deity;
@@ -15,6 +16,7 @@ use BM2\SiteBundle\Form\AssocDeityType;
 use BM2\SiteBundle\Form\AssocDeityUpdateType;
 use BM2\SiteBundle\Form\AssocDeityWordsType;
 use BM2\SiteBundle\Form\AssocUpdateType;
+use BM2\SiteBundle\Form\AssocManageMemberType;
 use BM2\SiteBundle\Form\AssocCreateRankType;
 use BM2\SiteBundle\Form\AssocJoinType;
 use BM2\SiteBundle\Form\DescriptionNewType;
@@ -350,6 +352,44 @@ class AssociationController extends Controller {
 	}
 
 	/**
+	  * @Route("/{id}/viewMembers", name="maf_assoc_viewmembers", requirements={"id"="\d+"})
+	  */
+
+	public function viewMembersAction(Association $id, Request $request) {
+		$assoc = $id;
+		$char = $this->gateway('assocViewMembersTest', $assoc);
+
+		$em = $this->getDoctrine()->getManager();
+		$assocman = $this->get('association_manager');
+		$member = $assocman->findMember($assoc, $char);
+		$rank = false;
+		$canManage = false;
+		if ($member) {
+			$rank = $member->getRank();
+			if ($rank) {
+				$allRanks = $member->getRank()->findAllKnownRanks();
+				$mngRanks = $member->getRank()->findManageableSubordinates();
+				$canManage = $rank->canManage();
+				$rank = true; # Flip this back to boolean so we can resuse the below bit for those that don't hold ranks as well, without doing costly object comparisons.
+			} else {
+				$rank = false;
+			}
+		}
+		if (!$member || !$rank) {
+			$allRanks = $assoc->findPubliclyVisibleRanks();
+			$mngRanks = new ArrayCollection; # No rank, can't manage any. Return empty collection.
+		}
+
+		return $this->render('Assoc/viewMembers.html.twig', [
+			'assoc' => $assoc,
+			'myMbr' => $member,
+			'allMbrs' => $assoc->getMembers(),
+			'manageable' => $mngRanks,
+			'canManage' => $canManage
+		]);
+	}
+
+	/**
 	  * @Route("/{id}/graphranks", name="maf_assoc_graphranks", requirements={"id"="\d+"})
 	  */
 
@@ -433,15 +473,15 @@ class AssociationController extends Controller {
 	}
 
 	/**
-	  * @Route("/{id}/managerank/{rank}", name="maf_assoc_managerank", requirements={"id"="\d+", "rank"="\d+"})
+	  * @Route("/managerank/{rank}", name="maf_assoc_managerank", requirements={"rank"="\d+"})
 	  */
 
-	public function manageRankAction(Association $id, AssociationRank $rank, Request $request) {
-		$assoc = $id;
-		$char = $this->gateway('assocManageRankTest', [$assoc, $rank]);
+	public function manageRankAction(AssociationRank $rank, Request $request) {
+		$char = $this->gateway('assocManageRankTest', $rank);
 
 		$em = $this->getDoctrine()->getManager();
 		$assocman = $this->get('association_manager');
+		$assoc = $rank->getAssociation();
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
 		$subordinates = $myRank->findAllKnownSubordinates();
@@ -462,6 +502,65 @@ class AssociationController extends Controller {
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
 		}
 		return $this->render('Assoc/manageRank.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/managemember/{mbr}", name="maf_assoc_managemember", requirements={"mbr"="\d+"})
+	  */
+
+	public function manageMemberAction(AssociationMember $mbr, Request $request) {
+		$char = $this->gateway('assocManageMemberTest', $mbr);
+
+		$em = $this->getDoctrine()->getManager();
+		$assocman = $this->get('association_manager');
+		$assoc = $mbr->getAssociation();
+		$member = $assocman->findMember($assoc, $char);
+		$myRank = $member->getRank();
+		$subordinates = $myRank->findManageableSubordinates();
+
+		$form = $this->createForm(new AssocManageMemberType($subordinates, $mbr));
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$newRank = $data['rank'];
+			if ($newRank !== $mbr->getRank() && $subordinates->contains($newRank)) {
+				$assocman->updateMember($assoc, $newRank, $mbr->getCharacter());
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.manageMember.updated', array(), 'orgs'));
+			return $this->redirectToRoute('maf_assoc_viewmembers', array('id'=>$assoc->getId()));
+		}
+		return $this->render('Assoc/manageMember.html.twig', [
+			'form' => $form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/evictmember/{mbr}", name="maf_assoc_evictmember", requirements={"mbr"="\d+"})
+	  */
+
+	public function evictMemberAction(AssociationMember $mbr, Request $request) {
+		$char = $this->gateway('assocEvictMemberTest', $mbr);
+
+		$em = $this->getDoctrine()->getManager();
+		$assocman = $this->get('association_manager');
+		$assoc = $mbr->getAssociation();
+		$member = $assocman->findMember($assoc, $char);
+		$myRank = $member->getRank();
+		$subordinates = $myRank->findManageableSubordinates();
+
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			if ($data['sure']) {
+				$assocman->removeMember($assoc, $mbr->getCharacter());
+			}
+			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.evictMember.success', array(), 'orgs'));
+			return $this->redirectToRoute('maf_assoc_viewmembers', array('id'=>$assoc->getId()));
+		}
+		return $this->render('Assoc/evictMember.html.twig', [
 			'form' => $form->createView()
 		]);
 	}
