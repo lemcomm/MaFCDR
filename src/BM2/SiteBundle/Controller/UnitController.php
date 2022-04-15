@@ -194,7 +194,7 @@ class UnitController extends Controller {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
                         $data = $form->getData();
-                        $success = $this->get('military_manager')->updateSettings($unit, $data, $character);
+                        $success = $this->get('military_manager')->updateSettings($unit, $data, $character, $lord);
                         if ($success) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.manage.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
