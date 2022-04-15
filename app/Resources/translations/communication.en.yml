@@ -269,7 +269,7 @@ event:
     start:      %character% has authorized you to pull food from their storehouses at %settlement% for your troops.
     rejected:   Your request for food to be supplied from %settlement% was rejected by the lord.
     end:        Your ability to draw food from %settlement% has reached the agreed upon conclusion.
-  soldierarrivals:  "New soldiers have recently arrived to and joined up with the unit: %link-unit%"
+  soldierarrivals:  "New soldiers have recently arrived to and joined up with: %unit%"
   renamed:      %unit% has been renamed from %name%.
   newUnit:      %character% has created the new unit of %unit%.
   newUnit2:     Created at %settlement% by %character%.
@@ -282,7 +282,7 @@ event:
  unit:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
-  basetaken:    %settlement% has been occupied by %realm%, leaving this unit to your direct command.
+  basetaken:    %settlement% has been taken by %realm%, leaving this unit to your direct command.
   basetaken2:   %settlement% has been taken by an unaligned first one, leaving this unit to your direct command.
   supplierlost: %settlement% has been taken by an occupation force, cutting the unit off from supplies.
   defenselost:  The defense of %settlement% has failed, so the unit has returned home.
