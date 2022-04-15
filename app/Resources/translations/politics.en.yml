@@ -810,6 +810,9 @@ assoc:
  viewRanks:
   name:   View Association Ranks
   description:  Look through the ranks you know of.
+ viewMembers:
+  name:   View Association Members
+  description:  Look through the members you know of.
  new:
   name:         Create an Association
   description:  Create a new association at this place of interest.
