@@ -462,8 +462,11 @@ class AssociationController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
-			# No flush needed, AssocMan flushes.
+			$rank = $assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
+			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
+				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
+			}
+			# No flush needed, AssocMan and DescMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.created', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
 		}
@@ -497,7 +500,10 @@ class AssociationController extends Controller {
 			}
 
 			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
-			# No flush needed, AssocMan flushes.
+			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
+				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
+			}
+			# No flush needed, AssocMan and DescMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.updated', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
 		}
