@@ -31,7 +31,7 @@
 				{{ 'assoc.route.rankInfo.holders'|trans }}:
 				<ul class="shortlist" style="display:inline">
 					{% for members in rank.members %}
-						<li>{{ link(member.character) }}</li>
+						<li>{{ link(members.character) }}</li>
 					{% else %}
 						<li><i>{{ 'nobody' |trans }}</i></li>
 					{% endfor %}
