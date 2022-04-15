@@ -455,7 +455,12 @@ class AssociationController extends Controller {
 		$assocman = $this->get('association_manager');
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
-		$ranks = $myRank->findAllKnownSubordinates();
+		if ($myRank->isOwner()) {
+			$assoc->getRanks();
+		} else {
+			$ranks = $myRank->findAllKnownSubordinates();
+			$ranks->add($myRank);
+		}
 
 		$form = $this->createForm(new AssocCreateRankType($ranks, false));
 		$form->handleRequest($request);
@@ -487,7 +492,12 @@ class AssociationController extends Controller {
 		$assoc = $rank->getAssociation();
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
-		$subordinates = $myRank->findAllKnownSubordinates();
+		if ($myRank->isOwner()) {
+			$assoc->getRanks();
+		} else {
+			$ranks = $myRank->findAllKnownSubordinates();
+			$ranks->add($myRank);
+		}
 
 		$form = $this->createForm(new AssocCreateRankType($subordinates, $rank));
 		$form->handleRequest($request);
