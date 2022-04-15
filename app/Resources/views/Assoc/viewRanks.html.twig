@@ -23,11 +23,11 @@
 			{% if rank.superior %}
 				{{ 'assoc.route.rankInfo.superior' |trans }} <a href="{{rank.superior.id}}">{{rank.superior.name}}</a>
 			{% endif %}
-			<p>{{ rank.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
+			{#<p>{{ rank.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>#}
 
 			{% if member %}
 			{# If you're a member, these aren't public ranks, but ranks you can see. Which means you can see who holds them as well. #}
-				<hr />
+				{#<hr />#}
 				{{ 'assoc.route.rankInfo.holders'|trans }}:
 				<ul class="shortlist" style="display:inline">
 					{% for members in rank.members %}
@@ -37,7 +37,7 @@
 					{% endfor %}
 				</ul><br><br>
 				{% if rank in manageable %}
-					<a href="{{ path('maf_assoc_managerank', {'id':assoc.id, 'rank':rank.id}) }}">{{ 'assoc.route.manageRank.name'|trans({'%name%':rank.name}) }}</a>
+					<a href="{{ path('maf_assoc_managerank', {'rank':rank.id}) }}">{{ 'assoc.route.manageRank.name'|trans({'%name%':rank.name}) }}</a>
 				{% endif %}
 			{% endif %}
 		</dd>
