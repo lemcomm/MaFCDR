@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+<h2>{{ 'assoc.route.evictMember.name'|trans|title }}</h2>
+<p>{{ 'assoc.route.evictMember.intro'|trans|raw }}</p>
+
+{{ form(form) }}
+
+{% endblock %}
