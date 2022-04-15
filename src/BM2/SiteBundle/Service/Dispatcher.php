@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationDeity;
+use BM2\SiteBundle\Entity\AssociationMember;
 use BM2\SiteBundle\Entity\AssociationRank;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
@@ -634,6 +635,7 @@ class Dispatcher {
 			$actions[] = array("title"=>$assoc->getFormalName());
 			$actions[] = array("name"=>"assoc.view.name", "url"=>"maf_assoc", "parameters"=>array("id"=>$assoc->getId()), "description"=>"assoc.view.description");
 			$actions[] = $this->assocLawsTest(null, $assoc);
+			$actions[] = $this->assocViewMembersTest(null, $assoc);
 			$actions[] = $this->assocViewRanksTest(null, $assoc);
 			$actions[] = $this->assocGraphRanksTest(null, $assoc);
 			$actions[] = $this->assocCreateRankTest(null, $assoc);
@@ -3448,18 +3450,13 @@ class Dispatcher {
 		);
 	}
 
-	public function assocManageRankTest($ignored, $opts) {
-		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
-		$assoc = $opts[0];
-		$rank = $opts[1];
-		if (!($assoc instanceof Association) || !($rank instanceof AssociationRank)) {
-			return array("name"=>"assoc.manage.rank.name", "description"=>"unavaible.badinput");
-		}
+	public function assocManageRankTest($ignored, AssociationRank $rank) {
 		if (($check = $this->politicsActionsGenericTests()) !== true) {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.$check");
 		}
 		$char = $this->getCharacter();
-		$member = $this->assocman->findMember($assoc, $char);
+		$assoc = $rank->getAssociation();
+		$member = $this->assocman->findMember($rank->getAssociation(), $char);
 		if (!$member) {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notinassoc");
 		}
@@ -3474,6 +3471,56 @@ class Dispatcher {
 			);
 		} else {
 			return array("name"=>"assoc.manage.rank.name", "description"=>"unavailable.notmanageablerank");
+		}
+	}
+
+	public function assocManageMemberTest($ignored, AssociationMember $mbr) {
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.manage.member.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$assoc = $mbr->getAssociation();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.manage.member.name", "description"=>"unavailable.notinassoc");
+		}
+		$myRank = $member->getRank();
+		if (!$myRank->canManage()) {
+			return array("name"=>"assoc.manage.member.name", "description"=>"unavailable.notmanager");
+		}
+		if (!$mbr->getRank() || $myRank->findManageableSubordinates()->contains($mbr->getRank())) {
+			return $this->action("assoc.manage.member", "maf_assoc_managemember", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		} else {
+			return array("name"=>"assoc.manage.member.name", "description"=>"unavailable.notmanageablerank");
+		}
+	}
+
+	public function assocEvictMemberTest($ignored, AssociationMember $mbr) {
+		#We need to check both of these, and Dispatcher isn't built for multiple secondary var passes.
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.evict.member.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$assoc = $mbr->getAssociation();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.evict.member.name", "description"=>"unavailable.notinassoc");
+		}
+		$myRank = $member->getRank();
+		if (!$myRank->canManage()) {
+			return array("name"=>"assoc.evict.member.name", "description"=>"unavailable.notmanager");
+		}
+		if (!$mbr->getRank() || $myRank->findManageableSubordinates()->contains($mbr->getRank())) {
+			return $this->action("assoc.evict.member", "maf_assoc_evictmember", true,
+				array('id'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		} else {
+			return array("name"=>"assoc.evict.member.name", "description"=>"unavailable.notmanageablerank");
 		}
 	}
 
@@ -3502,6 +3549,21 @@ class Dispatcher {
 			return array("name"=>"assoc.viewRanks.name", "description"=>"unavailable.notinassoc");
 		}
 		return $this->action("assoc.viewRanks", "maf_assoc_viewranks", false,
+			array('id'=>$assoc->getId()),
+			array("%name%"=>$assoc->getName())
+		);
+	}
+
+	public function assocViewMembersTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.viewMembers.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$assoc->isPublic() && !$member) {
+			return array("name"=>"assoc.viewMembers.name", "description"=>"unavailable.notinassoc");
+		}
+		return $this->action("assoc.viewMembers", "maf_assoc_viewmembers", false,
 			array('id'=>$assoc->getId()),
 			array("%name%"=>$assoc->getName())
 		);

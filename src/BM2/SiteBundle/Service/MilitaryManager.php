@@ -716,24 +716,21 @@ class MilitaryManager {
 		return $settings;
 	}
 
-	public function updateSettings(Unit $unit, $data, Character $char) {
+	public function updateSettings(Unit $unit, $data, Character $char, $lord = false) {
 		if (!$unit->getSettings()) {
 			$settings = new UnitSettings;
 		} else {
 			$settings = $unit->getSettings();
 		}
-		if ($unit->getSettlement() && ($char == $unit->getSettlement()->getOwner() || $char == $unit->getSettlement()->getSteward())) {
-			$lord = true;
-		} else {
-			$lord = false;
-		}
-		if ($unit->getCharacter() == $char) {
-			$commander = true;
-		} else {
-			$commander = false;
-		}
-		if (!$lord && !$commander) {
-			return false;
+		if (!$lord) {
+			if ($unit->getCharacter() == $char) {
+				$commander = true;
+			} else {
+				$commander = false;
+			}
+			if (!$lord && !$commander) {
+				return false;
+			}
 		}
 		$renamed = false;
 		if ($lord OR ($commander && $settings->getRenamable())) {

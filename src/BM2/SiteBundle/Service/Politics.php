@@ -338,6 +338,71 @@ class Politics {
 						);
 					}
 				}
+				foreach ($settlement->getUnits() as $unit) {
+					$unit->setMarshal(NULL);
+					if ($char) {
+						if ($unit->getCharacter() != $char) {
+							if ($realm) {
+								$this->history->logEvent(
+									$unit,
+									'event.unit.basetaken',
+									array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
+									History::HIGH, false
+								);
+							} else {
+								$this->history->logEvent(
+									$unit,
+									'event.unit.basetaken2',
+									array("%link-settlement%"=>$settlement->getId()),
+									History::HIGH, false
+								);
+							}
+							$this->history->logEvent(
+								$unit->getCharacter(),
+								'event.character.isolated',
+								array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
+								History::HIGH, false
+							);
+							$unit->setSettlement(NULL);
+						}
+					} else {
+						if ($realm) {
+							$this->history->logEvent(
+								$unit,
+								'event.unit.basetaken',
+								array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
+								History::HIGH, false
+							);
+						} else {
+							$this->history->logEvent(
+								$unit,
+								'event.unit.basetaken2',
+								array("%link-settlement%"=>$settlement->getId()),
+								History::HIGH, false
+							);
+						}
+						$this->history->logEvent(
+							$unit->getCharacter(),
+							'event.character.isolated',
+							array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
+							History::HIGH, false
+						);
+						$unit->setSettlement(NULL);
+					}
+				}
+				foreach ($settlement->getDefendingUnits() as $unit) {
+					if (!$char) {
+						$this->milman->returnUnitHome($unit, 'defenselost', $settlement);
+					} else {
+						$this->milman->returnUnitHome($unit, 'defenselost', $char);
+					}
+					$this->history->logEvent(
+						$unit,
+						'event.unit.defenselost',
+						array("%link-settlement%"=>$settlement->getId()),
+						History::HIGH, true
+					);
+				}
 				break;
 			case 'grant':
 				$this->history->logEvent(

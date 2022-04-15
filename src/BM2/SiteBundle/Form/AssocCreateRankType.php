@@ -110,6 +110,12 @@ class AssocCreateRankType extends AbstractType {
 			'attr' => array('title'=>'assoc.help.manager'),
 			'data' => $me ? $me->getManager() : null
 		));
+		$builder->add('createAssocs', CheckboxType::class, array(
+			'label'=>'assoc.form.createRank.createAssocs',
+			'required'=>false,
+			'attr' => array('title'=>'assoc.help.createAssocs'),
+			'data' => $me ? $me->getSubCreate() : null
+		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
 

@@ -42,6 +42,9 @@ assoc:
   addToPlace:
    name: Assocation to Expand
    empty: (select one)
+  member:
+   rank: New Rank
+  
 
  help:
   name: A short, and easily referred to, name for the association.
@@ -65,6 +68,9 @@ assoc:
   faithname: The name for the faith this association is part of. Leave blank if this isn't a religious association.
   followername: The name for the followers of the faith. Leave blank if this isn't a religious association.
   superior: The association this one should answer to, if any.
+
+
+
  route:
   create:
    header: Formalize a New Association
@@ -89,6 +95,23 @@ assoc:
    desc:   Look through the ranks you know of.
    description:  Associations can be completely transparent or absolutely arcane, by design. Unless you run the association, this is only the ranks you've been allowed to see by whoever created the rank you hold, if you even hold one. Unlike realms, there's no retiring ranks, and no history of them.
    empty:  If there's nothing here it is probably because you don't hold a rank of your own. You should reach out to whoever invited you or approved your joining to fix this.
+  viewMembers:
+   name:   View Association Membership
+   desc:   Look through the members you know of.
+   description:  Associations can be completely transparent or absolutely arcane, by design. Unless you run the association, this is only the members you've been allowed to see by whoever created the rank you hold, if you even hold one. Unlike realms, there's only the history of membership that you maintain.
+   empty:  If there's nothing here it is probably because you don't hold a rank of your own. You should reach out to whoever invited you or approved your joining to fix this.
+   table:
+    name:  Member Name
+    joined:  Join Date
+    rank:  Member Rank
+    ranked: Date of Rank
+    actions: Actions
+  manageMember:
+   name:    Manage Member
+   intro:   From here you can change a members rank according to the ones you are able to manage yourself.
+  evictMember:
+   name:    Evict Member
+   intro:   Tired of having someone around? Evict them.
   rankInfo:
    superior: "Answers to:"
    holders:  Rank Holders

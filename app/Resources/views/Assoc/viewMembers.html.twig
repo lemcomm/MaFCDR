@@ -1,0 +1,44 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'orgs' %}
+{% block content %}
+
+<h2>{{ 'assoc.route.viewMembers.name'|trans({"%name%":assoc.name})|title }}</h2>
+{% if allMbrs|length < 1 %}
+	{{ 'assoc.route.viewMembers.empty'|trans }}
+{% else %}
+	{{ 'assoc.route.viewMembers.description'|trans }}
+	<table>
+	<thead>
+	<th>{{ 'assoc.route.viewMembers.table.name'|trans }}</th>
+	<th>{{ 'assoc.route.viewMembers.table.joined'|trans }}</th>
+	<th>{{ 'assoc.route.viewMembers.table.rank'|trans }}</th>
+	<th>{{ 'assoc.route.viewMembers.table.ranked'|trans }}</th>
+	<th>{{ 'assoc.route.viewMembers.table.actions'|trans }}</th>
+	</thead>
+	<tbody>
+	{% for member in allMbrs %}
+	{% if assoc.isPublic or (not member.rank and canManage) or (member.rank in manageable) %}
+		<tr>
+		<td>{{ link(member.character) }}</td>
+		<td>{{ member.joinDate|date("D, d M Y H:i:s") }}</td>
+		{% if member.rank %}<td>{{ member.rank.name }}</td>
+			<td>{{ member.rankDate|date("D, d M Y H:i:s") }}</td>
+		{% else %}
+			<td></td>
+			<td></td>
+		{% endif %}
+		{% if canManage %}
+			{% if (not member.rank and canManage) or (member.rank in manageable) %}
+				<td><a href="{{ path('maf_assoc_managemember', {'mbr':member.id}) }}">{{ 'assoc.route.manageMember.name'|trans}}</a> | <a href="{{ path('maf_assoc_evictmember', {'mbr':member.id}) }}">{{ 'assoc.route.evictMember.name'|trans }}</a></td>
+			{% endif %}
+		{% else %}
+			<td></td>
+		{% endif %}
+		<tr>
+	{% endif %}
+	{% endfor %}
+	</tbody>
+	</table>
+{% endif %}
+{% endblock %}
