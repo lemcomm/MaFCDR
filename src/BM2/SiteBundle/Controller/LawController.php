@@ -161,17 +161,21 @@ class LawController extends Controller {
 
 	/**
 	  * @Route("/a{assoc}/{type}", name="maf_assoc_laws_finalize", requirements={"type"="\d+", "assoc"="\d+"})
-	  * @Route("/a{assoc}/{type}/", requirements={"type"="\d+", "realm"="\d+"})
-	  * @Route("/a{assoc}/{type}/{law}", name="maf_assoc_laws_update", requirements={"type"="\d+", "assoc"="\d+", "law"="\d+"})
+	  * @Route("/a{assoc}/{type}/", requirements={"type"="\d+", "assoc"="\d+"})
+	  * @Route("/a{assoc}/{type}/{law}", name="maf_assoc_laws_update", requirements={"assoc"="\d+", "type"="\d+", "law"="\d+"})
 	  * @Route("/r{realm}/{type}", name="maf_realm_laws_finalize", requirements={"type"="\d+", "realm"="\d+"})
-	  * @Route("/r{realm}/{type}/", requirements={"type"="\d+", "assoc"="\d+"})
-	  * @Route("/r{realm}/{type}/{law}", name="maf_realm_laws_update", requirements={"type"="\d+", "realm"="\d+", "law"="\d+"})
+	  * @Route("/r{realm}/{type}/", requirements={"type"="\d+", "realm"="\d+"})
+	  * @Route("/r{realm}/{type}/{law}", name="maf_realm_laws_update", requirements={"realm"="\d+", "type"="\d+", "law"="\d+"})
 	  */
 	public function finalizeLawAction(Realm $realm=null, Association $assoc=null, Law $law=null, LawType $type, Request $request) {
-		if ($realm) {
+		if (in_array($request->get('_route'), ['maf_realm_laws_finalize', 'maf_realm_laws_update'])) {
 			$char = $this->gateway('hierarchyRealmLawNewTest', $realm);
+			$rCheck = true;
+			$aCheck = false;
 		} else {
 			$char = $this->gateway('assocLawNewTest', $assoc);
+			$rCheck = false;
+			$aCheck = true;
 		}
 		if (!($char instanceof Character)) {
 			return $this->redirectToRoute($char);
@@ -179,13 +183,13 @@ class LawController extends Controller {
 
 		if ($law && $type !== $law->getType()) {
 			$this->addFlash('error', $this->get('translator')->trans('unavailable.badlawtype'));
-			if ($realm) {
+			if ($rCheck) {
 				return $this->redirectToRoute('maf_realm_laws', ['realm'=>$realm->getId()]);
 			} else {
 				return $this->redirectToRoute('maf_assoc_laws', ['assoc'=>$assoc->getId()]);
 			}
 		}
-		if ($realm) {
+		if ($rCheck) {
 			$org = $realm;
 			$settlements = $realm->findTerritory();
 		} else {

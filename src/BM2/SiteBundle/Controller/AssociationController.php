@@ -456,7 +456,7 @@ class AssociationController extends Controller {
 				$owner = false;
 			}
 
-			$assocman->updateRank($rank, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
+			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
 			# No flush needed, AssocMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.updated', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));

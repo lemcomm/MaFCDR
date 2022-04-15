@@ -3533,7 +3533,27 @@ class Dispatcher {
 			return array("name"=>"assoc.laws.name", "description"=>"unavailable.notinassoc");
 		} else {
 			return $this->action("assoc.laws", "maf_assoc_laws", true,
-				array('id'=>$assoc->getId()),
+				array('assoc'=>$assoc->getId()),
+				array("%name%"=>$assoc->getName())
+			);
+		}
+	}
+
+	public function assocLawNewTest($ignored, Association $assoc) {
+		if (($check = $this->politicsActionsGenericTests()) !== true) {
+			return array("name"=>"assoc.law.new.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$member = $this->assocman->findMember($assoc, $char);
+		if (!$member) {
+			return array("name"=>"assoc.law.new.name", "description"=>"unavailable.notinassoc");
+		}
+		$rank = $member->getRank();
+		if (!$rank || !$rank->getOwner()) {
+			return array("name"=>"assoc.law.new.name", "description"=>"unavailable.notassocowner");
+		} else {
+			return $this->action("assoc.law.new", "maf_assoc_laws_new", true,
+				array('assoc'=>$assoc->getId()),
 				array("%name%"=>$assoc->getName())
 			);
 		}
