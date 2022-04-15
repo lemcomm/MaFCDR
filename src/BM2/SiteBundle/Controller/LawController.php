@@ -207,7 +207,7 @@ class LawController extends Controller {
 			if ($result instanceof Law) {
 				$this->addFlash('error', $this->get('translator')->trans('law.form.edit.success', [], 'orgs'));
 				# These return a different redirect due to how the route is built. if you use the other ones ($this->redirectToRoute) Symfony complains that the controller isn't returning a response.
-				if ($realm) {
+				if ($rCheck) {
 					return new RedirectResponse($this->generateUrl('maf_realm_laws', ['realm'=>$realm->getId()]).'#'.$result->getId());
 				} else {
 					return new RedirectResponse($this->generateUrl('maf_assoc_laws', ['assoc'=>$assoc->getId()]).'#'.$result->getId());
