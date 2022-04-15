@@ -34,8 +34,9 @@ assoc:
    viewSelf: View own rank members?
    superior: Which rank should this own answer to?
    selectsuperior: (no one)
-   createSubs: Rank can create subordinate ranks.
-   manager: Rank can manage Association applicants and memberships.
+   createSubs: Can create subordinate ranks?
+   manager: Can manage Association applicants and memberships?
+   createAssocs: Can create subordinate associations?
   faith:
    name: Faith to Follow
    empty: (none)
@@ -44,7 +45,7 @@ assoc:
    empty: (select one)
   member:
    rank: New Rank
-  
+
 
  help:
   name: A short, and easily referred to, name for the association.
