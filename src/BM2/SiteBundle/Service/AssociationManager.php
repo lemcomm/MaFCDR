@@ -185,6 +185,8 @@ class AssociationManager {
 					$rank->setSubcreate(false);
 				}
 			}
+			$rank->setViewDown($viewDown);
+			$rank->setViewSelf($viewSelf);
 		} else {
 			# No creator rank, must be a new association, assume all inputs correct.
 			$rank->setViewAll($viewAll);
@@ -192,7 +194,7 @@ class AssociationManager {
 			$rank->setViewDown($viewDown);
 			$rank->setViewSelf($viewSelf);
 			$rank->setSubcreate($createSubs);
-			$rank->setSubcreate($createAssocs);
+			$rank->setCreateAssocs($createAssocs);
 			$rank->setManager($manager);
 			$rank->setOwner($owner);
 			$rank->setSuperior($superior);
