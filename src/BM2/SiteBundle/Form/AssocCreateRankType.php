@@ -49,7 +49,7 @@ class AssocCreateRankType extends AbstractType {
 		$builder->add('description', TextareaType::class, array(
 			'label'=>'assoc.form.description.full',
 			'attr' => array('title'=>'assoc.help.rankdesc'),
-			'data' => $me ? $me->getDescription() ? $me->getDescription()->getText() : null : null
+			'data' => ($me && $me->getDescription()) ? $me->getDescription()->getText() : null
 		));
 		$builder->add('viewAll', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.viewAll',
@@ -67,7 +67,7 @@ class AssocCreateRankType extends AbstractType {
 					'value' => -1,
 				]),
 			],
-			'data' => $me ? $me->getViewUp() : null
+			'data' => ($me && $me->getViewUp() !== null) ? $me->getViewUp() : null
 		));
 		$builder->add('viewDown', IntegerType::class, array(
 			'label'=>'assoc.form.createRank.viewDown',
@@ -79,13 +79,13 @@ class AssocCreateRankType extends AbstractType {
 					'value' => -1,
 				]),
 			],
-			'data' => $me ? $me->getViewDown() : null
+			'data' => ($me && $me->getViewDown() !== null) ? $me->getViewDown() : null
 		));
 		$builder->add('viewSelf', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.viewSelf',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.public'),
-			'data' => $me ? $me->getViewSelf() : null
+			'data' => ($me && $me->getViewSelf() !== null) ? $me->getViewSelf() : null
 		));
 		$builder->add('superior', EntityType::class, array(
 			'label'=>'assoc.form.createRank.superior',
@@ -96,25 +96,25 @@ class AssocCreateRankType extends AbstractType {
 			'choice_translation_domain' => true,
 			'choice_label' => 'name',
 			'choices' => $ranks,
-			'data' => $me ? $me->getSuperior() : null
+			'data' => $me? $me->getSuperior() : null
 		));
 		$builder->add('createSubs', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.createSubs',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.createSubs'),
-			'data' => $me ? $me->getSubCreate() : null
+			'data' => ($me && $me->getSubCreate() !== null) ? $me->getSubCreate() : null
 		));
 		$builder->add('manager', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.manager',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.manager'),
-			'data' => $me ? $me->getManager() : null
+			'data' => ($me && $me->getManager() !== null) ? $me->getManager() : null
 		));
 		$builder->add('createAssocs', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.createAssocs',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.createAssocs'),
-			'data' => $me ? $me->getSubCreate() : null
+			'data' => ($me && $me->getCreateAssocs() !== null) ? $me->getCreateAssocs() : null
 		));
 		$builder->add('submit', SubmitType::class, array('label'=>'assoc.form.submit'));
 	}
