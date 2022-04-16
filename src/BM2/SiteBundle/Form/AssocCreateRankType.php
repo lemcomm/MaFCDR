@@ -61,7 +61,6 @@ class AssocCreateRankType extends AbstractType {
 			'label'=>'assoc.form.createRank.viewUp',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.viewUp'),
-			'empty_data' => 1,
 			'constraints' => [
 				new GreaterThan([
 					'value' => -1,
@@ -73,7 +72,6 @@ class AssocCreateRankType extends AbstractType {
 			'label'=>'assoc.form.createRank.viewDown',
 			'required'=>false,
 			'attr' => array('title'=>'assoc.help.viewDown'),
-			'empty_data' => 1,
 			'constraints' => [
 				new GreaterThan([
 					'value' => -1,
@@ -97,6 +95,12 @@ class AssocCreateRankType extends AbstractType {
 			'choice_label' => 'name',
 			'choices' => $ranks,
 			'data' => $me? $me->getSuperior() : null
+		));
+		$builder->add('build', CheckboxType::class, array(
+			'label'=>'assoc.form.createRank.build',
+			'required'=>false,
+			'attr' => array('title'=>'assoc.help.build'),
+			'data' => ($me && $me->getBuild() !== null) ? $me->getBuild() : null
 		));
 		$builder->add('createSubs', CheckboxType::class, array(
 			'label'=>'assoc.form.createRank.createSubs',
