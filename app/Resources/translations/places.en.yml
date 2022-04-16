@@ -102,7 +102,7 @@ place:
    description: It looks like the %assoc% is available for joining.
  addAssoc:
   name:   Expand Association Here
-  description:  It looks like you have the means expand one of your associations to this Place.
+  description:  It looks like you have the means to expand one of your associations to this Place.
   longdesc: Associations are largely limited by their reach. And you have the means to extend that to this Place, if you so desire.
   intro: >
     From here you can spend a bit of your time to expand an Association you're part of to this Place of Interest. All you've to do is select which one you'd like to see expanded, and the Second Ones shall make it happen.
