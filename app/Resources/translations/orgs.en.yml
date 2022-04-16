@@ -37,6 +37,7 @@ assoc:
    createSubs: Can create subordinate ranks?
    manager: Can manage Association applicants and memberships?
    createAssocs: Can create subordinate associations?
+   build: Can expand Association?
   faith:
    name: Faith to Follow
    empty: (none)
@@ -79,6 +80,8 @@ assoc:
   createRank:
    header: Create a New Rank within the Association
    intro: <p>Ranks are a simple thing that help you manage the structure of the organization. Some of these options are overruled by association laws (like Rank Visibility and viewability) while others always take effect. If you're unsure what an option does, additional help is available for each.</p>
+   name:   Create a New Rank
+   desc:   Add a new rank to this assocciation
   faith:
    name: Declare Your Faith
    intro: You can always decide that you simply which to, at least nominally, follow one faith or another that you're part of. Any Association that you are a member of that has named what their faith and followers is called is eligible to pick from. All regions you own will follow your choice here.
@@ -86,6 +89,7 @@ assoc:
    success2: You've successfully changed your official religion to that of not having one.
   manageRank:
    header: Update an Existing Rank
+   name:   Manage %name%
   view:
    history:
     name: History
@@ -116,11 +120,6 @@ assoc:
   rankInfo:
    superior: "Answers to:"
    holders:  Rank Holders
-  manageRank:
-   name:   Manage %name%
-  createRank:
-   name:   Create a New Rank
-   desc:   Add a new rank to this assocciation
   join:
    header: Join an Association
    intro: <p>Associations are a term of many meanings within Might & Fealty. They represent any player organization that is not representing a government (realms) or familial-esque (houses) structure. In other words, these are the guilds, cults, brotheroods, secret societies, religions, orders, companies, and corps you'd find in other games.</p><p>Unlike other games, these entities tend to be very free form. Functionally, they all have access to the same options, a mercenary company can have a patron saint or a temple can run trade routes--this is up to the association to decide.</p>
