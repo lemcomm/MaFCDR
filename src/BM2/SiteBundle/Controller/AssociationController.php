@@ -69,7 +69,7 @@ class AssociationController extends Controller {
 				}
 			}
 		}
-		if (!$public && $assoc->getPublic()) {
+		if (!$public && $assoc->isPublic()) {
 			$public = true;
 		}
 
