@@ -456,7 +456,7 @@ class AssociationController extends Controller {
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
 		if ($myRank->isOwner()) {
-			$assoc->getRanks();
+			$ranks = $assoc->getRanks();
 		} else {
 			$ranks = $myRank->findAllKnownSubordinates();
 			$ranks->add($myRank);
@@ -467,7 +467,7 @@ class AssociationController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$rank = $assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
+			$rank = $assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['build'], $data['createSubs'], $data['manager'], $data['createAssocs']);
 			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
 				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
 			}
@@ -493,13 +493,13 @@ class AssociationController extends Controller {
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
 		if ($myRank->isOwner()) {
-			$assoc->getRanks();
+			$ranks = $assoc->getRanks();
 		} else {
 			$ranks = $myRank->findAllKnownSubordinates();
 			$ranks->add($myRank);
 		}
 
-		$form = $this->createForm(new AssocCreateRankType($subordinates, $rank));
+		$form = $this->createForm(new AssocCreateRankType($ranks, $rank));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
@@ -509,7 +509,7 @@ class AssociationController extends Controller {
 				$owner = false;
 			}
 
-			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
+			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['build'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
 			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
 				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
 			}
