@@ -69,7 +69,7 @@ class AssociationController extends Controller {
 				}
 			}
 		}
-		if (!$public && $assoc->getPublic()) {
+		if (!$public && $assoc->isPublic()) {
 			$public = true;
 		}
 
@@ -455,15 +455,23 @@ class AssociationController extends Controller {
 		$assocman = $this->get('association_manager');
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
-		$ranks = $myRank->findAllKnownSubordinates();
+		if ($myRank->isOwner()) {
+			$ranks = $assoc->getRanks();
+		} else {
+			$ranks = $myRank->findAllKnownSubordinates();
+			$ranks->add($myRank);
+		}
 
 		$form = $this->createForm(new AssocCreateRankType($ranks, false));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 
-			$assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs']);
-			# No flush needed, AssocMan flushes.
+			$rank = $assocman->newRank($assoc, $myRank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['build'], $data['createSubs'], $data['manager'], $data['createAssocs']);
+			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
+				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
+			}
+			# No flush needed, AssocMan and DescMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.created', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
 		}
@@ -484,9 +492,14 @@ class AssociationController extends Controller {
 		$assoc = $rank->getAssociation();
 		$member = $assocman->findMember($assoc, $char);
 		$myRank = $member->getRank();
-		$subordinates = $myRank->findAllKnownSubordinates();
+		if ($myRank->isOwner()) {
+			$ranks = $assoc->getRanks();
+		} else {
+			$ranks = $myRank->findAllKnownSubordinates();
+			$ranks->add($myRank);
+		}
 
-		$form = $this->createForm(new AssocCreateRankType($subordinates, $rank));
+		$form = $this->createForm(new AssocCreateRankType($ranks, $rank));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
@@ -496,8 +509,11 @@ class AssociationController extends Controller {
 				$owner = false;
 			}
 
-			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
-			# No flush needed, AssocMan flushes.
+			$assocman->updateRank($myRank, $rank, $data['name'], $data['viewAll'], $data['viewUp'], $data['viewDown'], $data['viewSelf'], $data['superior'], $data['build'], $data['createSubs'], $data['manager'], $data['createAssocs'], $owner);
+			if (!$rank->getDescription() || $rank->getDescription()->getText() !== $data['description']) {
+				$this->get('description_manager')->newDescription($rank, $data['description'], $char);
+			}
+			# No flush needed, AssocMan and DescMan flushes.
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.rank.updated', array(), 'orgs'));
 			return $this->redirectToRoute('maf_assoc_viewranks', array('id'=>$assoc->getId()));
 		}

@@ -59,6 +59,9 @@ class AccountController extends Controller {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
 		$user = $this->getUser();
 
 		// clean out character id so we have a clear slate (especially for the template)
@@ -80,6 +83,9 @@ class AccountController extends Controller {
 	public function dataAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
 			$form = $this->createForm(new UserDataType(), $user);
@@ -103,6 +109,9 @@ class AccountController extends Controller {
 	public function charactersAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
 		$em = $this->getDoctrine()->getManager();
@@ -321,6 +330,9 @@ class AccountController extends Controller {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
 		$user = $this->getUser();
 
 		$characters = array();
@@ -357,6 +369,9 @@ class AccountController extends Controller {
 	public function newcharAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
 		$em = $this->getDoctrine()->getManager();
@@ -527,6 +542,9 @@ class AccountController extends Controller {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
 		$user = $this->getUser();
 		$languages = $this->get('appstate')->availableTranslations();
 		$form = $this->createForm(new SettingsType($user, $languages));
@@ -624,6 +642,9 @@ class AccountController extends Controller {
 	public function playAction(Request $request, $id) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
 

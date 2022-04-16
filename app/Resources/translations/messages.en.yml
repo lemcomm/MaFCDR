@@ -1021,6 +1021,7 @@ error:
 
  banned:
   multi:        The account you're logged into has been banned for using multiple free accounts.
+  tos:          The account you're logged into has been banned for terms of service violations.
 
  payment:
   already:      This code has already been redeemed, maybe automatically as you logged in. Check your credit history, please. If you believe this to be an error, please contact tom@mightandfealty.com for details.

@@ -14,6 +14,7 @@
 		<field name="manager" type="boolean" nullable="true"/>
 		<field name="build" type="boolean" nullable="true"/>
 		<field name="subcreate" type="boolean" nullable="true"/>
+		<field name="createAssocs" type="boolean" nullable="true"/>
 
 		<many-to-one field="superior" target-entity="AssociationRank" inversed-by="subordinates"/>
 		<one-to-many field="subordinates" target-entity="AssociationRank" mapped-by="superior"/>

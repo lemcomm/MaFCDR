@@ -415,7 +415,9 @@ class Interactions {
 
 	public function abandonSettlement(Character $character, Settlement $settlement, $keepRealm) {
 		if ($settlement->getOwner() == $character) {
-			$this->pol->changeSettlementRealm($settlement, $settlement->getOccupier(), 'abandon');
+			if (!$keepRealm) {
+				$this->pol->changeSettlementRealm($settlement, $settlement->getOccupier(), 'abandon');
+			}
 			$this->pol->changeSettlementOwner($settlement, $settlement->getOccupant(), 'abandon');
 			$this->em->flush();
 			return true;
