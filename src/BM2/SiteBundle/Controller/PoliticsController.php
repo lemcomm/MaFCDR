@@ -611,6 +611,11 @@ class PoliticsController extends Controller {
 					$can_delete = false;
 					$locked_reasons[] = "used";
 				}
+				$usingPlaces = $em->getRepository('BM2SiteBundle:PlacePermission')->findByListing($listing);
+				if ($usingPlaces && !empty($usingPlaces)) {
+					$can_delete = false;
+					$locked_reasons[] = "used";
+				}
 			}
 			$is_new = false;
 		} else {
@@ -693,14 +698,33 @@ class PoliticsController extends Controller {
 
 		$used_by = array();
 		if ($using) foreach ($using as $perm) {
-			if (!in_array($perm->getSettlement(), $used_by)) {
-				$used_by[] = $perm->getSettlement();
+			if ($perm->getSettlement()) {
+				if (!in_array($perm->getSettlement(), $used_by)) {
+					$used_by[] = $perm->getSettlement();
+				}
+			} elseif ($perm->getOccupiedSettlement()) {
+				if (!in_array($perm->getOccupiedSettlement(), $used_by)) {
+					$used_by[] = $perm->getOccupiedSettlement();
+				}
+			}
+		}
+		$usedByPlaces = [];
+		if ($usingPlaces) foreach ($usingPlaces as $perm) {
+			if ($perm->getPlace()) {
+				if (!in_array($perm->getPlace(), $usedByPlaces)) {
+					$usedByPlaces[] = $perm->getPlace();
+				}
+			} elseif ($perm->getOccupiedSettlement()) {
+				if (!in_array($perm->getOccupiedPlace(), $usedByPlaces)) {
+					$usedByPlaces[] = $perm->getOccupiedPlace();
+				}
 			}
 		}
 
 		return $this->render('Politics/list.html.twig', [
 			'listing' => $listing,
 			'used_by' => $used_by,
+			'used_by_places' => $usedByPlaces,
 			'can_delete' => $can_delete,
 			'locked_reasons' => $locked_reasons,
 			'is_new' => $is_new,
