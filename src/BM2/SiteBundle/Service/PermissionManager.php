@@ -52,17 +52,14 @@ class PermissionManager {
 
 	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false, $occupied = false) {
 		// settlement owner always has all permissions without limits
-		if (($place->getOwner() == $character && $place->getOccupant() == false) OR $place->getOccupant() == $character) {
+		if ($place->getOccupier() || $place->getOccupant()) {
+			$occupied = true;
+		} else {
+			$occupied = false;
+		}
+		if (($place->isOwner($character) && !$occupied) OR ($occupied && $place->getOccupant() == $character)) {
 			if ($return_details) {
 				return array(true, null, 'owner', null);
-			} else {
-				return true;
-			}
-		}
-
-		if ($place->getOwner() == null) {
-			if ($return_details) {
-				return array(true, null, 'unowned', null);
 			} else {
 				return true;
 			}

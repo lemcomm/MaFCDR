@@ -2378,7 +2378,10 @@ class Dispatcher {
 		if (!($place instanceof Place) || !($assoc instanceof Association)) {
 			return array("name"=>"place.evictAssoc.name", "description"=>"unavailable.badinput");
 		}
-		if ($place->getType()->getName() === 'capital') {
+		$tName = $place->getType()->getName();
+		if ($tName == 'embassy') {
+			$return = $this->placeManageEmbassyTest(null, $place);
+		} elseif ($tName == 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
 			$return = $this->placeManageTest(null, $place);
@@ -2424,11 +2427,7 @@ class Dispatcher {
 	}
 
 	public function placeDestroyTest($ignored, Place $place) {
-		if ($place->getType()->getName() === 'capital') {
-			$return = $this->placeManageRulersTest(null, $place);
-		} else {
-			$return = $this->placeManageTest(null, $place);
-		}
+		$return = $this->placeManageTest(null, $place);
 		return $this->varCheck($return, 'place.destroy.name', 'maf_place_destroy', 'place.destroy.description', 'place.destroy.longdesc');
 	}
 
@@ -2455,7 +2454,10 @@ class Dispatcher {
 		if (!$place->getType()->getSpawnable()) {
 			return array("name"=>"place.newplayer.name", "description"=>"unavailable.notspawnable");
 		}
-		if ($place->getType()->getName() === 'capital') {
+		$tName = $place->getType()->getName();
+		if ($tName == 'embassy') {
+			$return = $this->placeManageEmbassyTest(null, $place);
+		} elseif ($tName == 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
 			$return = $this->placeManageTest(null, $place);
@@ -2478,7 +2480,10 @@ class Dispatcher {
 		if (!$place->getType()->getSpawnable()) {
 			return array("name"=>"place.togglenewplayer.name", "description"=>"unavailable.notspawnable");
 		}
-		if ($place->getType()->getName() === 'capital') {
+		$tName = $place->getType()->getName();
+		if ($tName == 'embassy') {
+			$return = $this->placeManageEmbassyTest(null, $place);
+		} elseif ($tName == 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
 			$return = $this->placeManageTest(null, $place);
@@ -2499,7 +2504,10 @@ class Dispatcher {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.permissions.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getType()->getName() === 'capital') {
+		$tName = $place->getType()->getName();
+		if ($tName == 'embassy') {
+			$return = $this->placeManageEmbassyTest(null, $place);
+		} elseif ($tName == 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
 			$return = $this->placeManageTest(null, $place);
@@ -2571,12 +2579,7 @@ class Dispatcher {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupier() || $place->getOccupant()) {
-			$occupied = true;
-		} else {
-			$occupied = false;
-		}
-		if (!$place->getPublic() && !$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit', false, $occupied)) {
+		if (!$place->getPublic() && !$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'visit', false)) {
 			return array("name"=>"place.enter.name", "desciprtion"=>"unavailable.noaccess");
 		}
 		if ($this->getCharacter()->isNPC()) {

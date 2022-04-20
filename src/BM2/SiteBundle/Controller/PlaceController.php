@@ -786,7 +786,7 @@ class PlaceController extends Controller {
                         return $this->redirectToRoute('maf_place_actionable');
                 }
 		return $this->render('Place/destroy.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
+			'form'=>$form->createView()
 		]);
 	}
 

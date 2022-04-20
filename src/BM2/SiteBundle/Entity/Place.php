@@ -55,4 +55,27 @@ class Place {
                 return false;
         }
 
+        public function isOwner(Character $char) {
+                $type = $this->getType()->getName();
+                if ($type == 'capital') {
+                        if (
+        			(!$this->getRealm() && $this->getOwner() === $char) ||
+        			$this->getRealm()->findRulers()->contains($char)
+        		) {
+                                return true;
+                        }
+                } elseif ($type == 'embassy') {
+                        if (
+                                $this->getAmbassador() === $char ||
+        			(!$this->getAmbassador() && $this->getOwningRealm() && $this->getOwningRealm()->findRulers()->contains($char)) ||
+        			(!$this->getAmbassador() && !$this->getOwningRealm() && $this->getHostingRealm() && $this->getHostingRealm()->findRulers()->conntains($char)) ||
+        			(!$this->getAmbassador() && !$this->getOwningRealm() && !$this->getHostingRealm() && $this->getOwner() == $char)
+                        ) {
+                                return true;
+                        }
+                } elseif ($this->getOwner() === $char) {
+                        return true;
+                } elseif (!$this->getOwner() && ($this->getGeoData()->getSettlement()->getOwner() === $char || $this->getGeoData()->getSettlement()->getSteward() === $char))
+                
+
 }

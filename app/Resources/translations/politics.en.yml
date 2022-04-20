@@ -682,7 +682,8 @@ lists:
   used:         It is used in settlement permissions.
   descendants:  Other lists inherit from it.
   done:         The list "%name%" has been deleted.
- usedby:     Used by
+ usedby:     Used by Settlements (Including Occupations)
+ usedby2:    Used by Places (Including Occupations)
 
 perm:
  name:      Permission
