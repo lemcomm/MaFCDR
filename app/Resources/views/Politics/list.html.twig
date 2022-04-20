@@ -99,7 +99,16 @@
 		{% for settlement in used_by %}
 			<li>{{ link(settlement) }}</li>
 		{% endfor %}
-	</ul>
+		</ul>
+	{% endif %}
+
+	{% if used_by_places and used_by_places is not empty %}
+		<h3>{{ "lists.usedby2"|trans({},"politics")|title }}</h3>
+		<ul class="shortlist">
+		{% for place in used_by_places %}
+			<li>{{ link(place) }}</li>
+		{% endfor %}
+		</ul>
 	{% endif %}
 {% endif %}
 
