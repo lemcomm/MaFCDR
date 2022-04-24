@@ -306,7 +306,7 @@ class ActionsController extends Controller {
 				History::MEDIUM, true, 20
 			);
 			$em->flush();
-			return $this->render('Actions/givegold.html.twig', [
+			return $this->render('Actions/giveGold.html.twig', [
 				'success'=>true, 'amount'=>$data['amount'], 'target'=>$data['target']
 			]);
 		}
@@ -623,7 +623,7 @@ class ActionsController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
-			if ($data['target'] != $character) {
+			if ($data['target'] && $data['target'] != $character) {
 				$settlement->setSteward($data['target']);
 
 				$this->get('history')->logEvent(
