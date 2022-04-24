@@ -838,8 +838,12 @@ class ConversationController extends Controller {
 			$replyTo = $data['reply_to'];
 
 			$message = $this->get('conversation_manager')->writeMessage($conv, $replyTo, $char, $data['content'], $data['type']);
-
-			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
+			if ($message instanceof Message) {
+				return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('error.conversation.'.$message, [], 'conversations'));
+				return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]));
+			}
 		}
 
 		return $this->render('Conversation/reply.html.twig', [
