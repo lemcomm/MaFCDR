@@ -2537,7 +2537,7 @@ class Dispatcher {
 		}
 		if (
 			(!$place->getRealm() && $settlement->getOwner() != $character) ||
-			!$place->getRealm()->findRulers()->contains($character)
+			($place->getRealm() && !$place->getRealm()->findRulers()->contains($character))
 		) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
 		}
