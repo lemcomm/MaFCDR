@@ -892,12 +892,14 @@ class MilitaryManager {
 			} else {
 				$unit->setSupplier(null);
 			}
-			$this->history->logEvent(
-				$unit,
-				'event.military.rebased',
-				array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
-				History::MEDIUM, false, 30
-			);
+			if ($origin) {
+				$this->history->logEvent(
+					$unit,
+					'event.military.rebased',
+					array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
+					History::MEDIUM, false, 30
+				);
+			}
 
 			return true;
 		} else {
