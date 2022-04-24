@@ -124,7 +124,7 @@ class ActionResolution {
 				History::HIGH, true, 20
 			);
 			if ($owner = $settlement->getOwner()) {
-				$this->get('history')->logEvent(
+				$this->history->logEvent(
 					$owner,
 					'event.character.take.stopped',
 					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
@@ -132,7 +132,7 @@ class ActionResolution {
 				);
 			}
 			if ($steward = $settlement->getSteward()) {
-				$this->get('history')->logEvent(
+				$this->history->logEvent(
 					$steward,
 					'event.character.take.stopped',
 					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
@@ -140,7 +140,7 @@ class ActionResolution {
 				);
 			}
 			foreach ($settlement->getVassals() as $vassal) {
-				$this->get('history')->logEvent(
+				$this->history->logEvent(
 					$vassal,
 					'event.character.take.stopped',
 					array('%link-character%'=>$action->getCharacter()->getId(), '%link-settlement'=>$settlement->getId()),
