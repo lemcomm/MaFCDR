@@ -1146,7 +1146,7 @@ class ActionsController extends Controller {
 			if ($character !== $settlement->getOccupant()) {
 				$type = 'forced';
 			}
-                        $this->get('politics')->endOccupation($settlement, $type);
+                        $this->get('politics')->endOccupation($settlement, $type, false, $character);
 			$this->getDoctrine()->getManager()->flush();
                         $this->addFlash('notice', $this->get('translator')->trans('control.occupation.ended', array(), 'actions'));
                         return $this->redirectToRoute('bm2_actions');
