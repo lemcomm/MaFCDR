@@ -301,7 +301,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"control.all", "description"=>"unavailable.notinside");
 		} else {
 			$actions[] = $this->controlTakeTest(true);
-			if ($settlement->getOccupant() == $char) {
+			if ($settlement->getOccupant() || $settlement->getOccupier()) {
 				$actions[] = $this->controlOccupationEndTest(true);
 				$actions[] = $this->controlChangeOccupantTest(true);
 				$actions[] = $this->controlChangeOccupierTest(true);
