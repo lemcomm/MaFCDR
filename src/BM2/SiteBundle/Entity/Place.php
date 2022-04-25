@@ -60,7 +60,7 @@ class Place {
                 if ($type == 'capital') {
                         if (
         			(!$this->getRealm() && $this->getOwner() === $char) ||
-        			$this->getRealm()->findRulers()->contains($char)
+        			($this->getRealm() && $this->getRealm()->findRulers()->contains($char))
         		) {
                                 return true;
                         }
@@ -76,6 +76,7 @@ class Place {
                 } elseif ($this->getOwner() === $char) {
                         return true;
                 } elseif (!$this->getOwner() && ($this->getGeoData()->getSettlement()->getOwner() === $char || $this->getGeoData()->getSettlement()->getSteward() === $char))
-                
+                return false;
+        }
 
 }
