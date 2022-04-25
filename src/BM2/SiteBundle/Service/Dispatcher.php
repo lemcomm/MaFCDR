@@ -301,7 +301,7 @@ class Dispatcher {
 			$actions[] = array("name"=>"control.all", "description"=>"unavailable.notinside");
 		} else {
 			$actions[] = $this->controlTakeTest(true);
-			if ($settlement->getOccupant() == $char) {
+			if ($settlement->getOccupant() || $settlement->getOccupier()) {
 				$actions[] = $this->controlOccupationEndTest(true);
 				$actions[] = $this->controlChangeOccupantTest(true);
 				$actions[] = $this->controlChangeOccupierTest(true);
@@ -2537,7 +2537,7 @@ class Dispatcher {
 		}
 		if (
 			(!$place->getRealm() && $settlement->getOwner() != $character) ||
-			!$place->getRealm()->findRulers()->contains($character)
+			($place->getRealm() && !$place->getRealm()->findRulers()->contains($character))
 		) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notowner");
 		}

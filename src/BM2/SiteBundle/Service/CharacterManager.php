@@ -4,6 +4,8 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
+use BM2\SiteBundle\Entity\Association;
+use BM2\SiteBundle\Entity\AssociationMembership;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\House;
