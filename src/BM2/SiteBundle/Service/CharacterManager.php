@@ -852,7 +852,7 @@ class CharacterManager {
 				$this->em->flush();
 			}
 		}
-		$this->assocman->removeMember($mbr->getAssociation(), $char);
+		$this->assocman->removeMember($mbr->getAssociation(), $mbr->getCharacter());
 	}
 
 	public function bequeathAssoc(Association $assoc, Character $heir, Character $from, Character $via=null) {
