@@ -5,7 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\DungeonBundle\Service\DungeonMaster;
 use BM2\SiteBundle\Entity\Achievement;
 use BM2\SiteBundle\Entity\Association;
-use BM2\SiteBundle\Entity\AssociationMembership;
+use BM2\SiteBundle\Entity\AssociationMember;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\CharacterBackground;
 use BM2\SiteBundle\Entity\House;
@@ -657,7 +657,7 @@ class CharacterManager {
 			# Break locations are intentional and provide law condition cascading, as intended.
 			switch ($value) {
 				case 'steward':
-					if ($steward = $settlement->getSteward()) {
+					if ($steward = $thing->getSteward()) {
 						$this->$bequeath($thing, $steward, $char, null);
 						$thing->setSteward(null);
 						$this->history->logEvent(
@@ -802,7 +802,7 @@ class CharacterManager {
 		}
 	}
 
-	public function assocInheritance(AssociationMembership $mbr, Character $char, Character $heir=null, Character $via=null, $why = 'death') {
+	public function assocInheritance(AssociationMember $mbr, Character $char, Character $heir=null, Character $via=null, $why = 'death') {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();
