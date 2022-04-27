@@ -340,32 +340,7 @@ class Politics {
 				}
 				foreach ($settlement->getUnits() as $unit) {
 					$unit->setMarshal(NULL);
-					if ($char) {
-						if ($unit->getCharacter() != $char) {
-							if ($realm) {
-								$this->history->logEvent(
-									$unit,
-									'event.unit.basetaken',
-									array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
-									History::HIGH, false
-								);
-							} else {
-								$this->history->logEvent(
-									$unit,
-									'event.unit.basetaken2',
-									array("%link-settlement%"=>$settlement->getId()),
-									History::HIGH, false
-								);
-							}
-							$this->history->logEvent(
-								$unit->getCharacter(),
-								'event.character.isolated',
-								array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
-								History::HIGH, false
-							);
-							$unit->setSettlement(NULL);
-						}
-					} else {
+					if ($unit->getCharacter() && $unit->getCharacter() != $character) {
 						if ($realm) {
 							$this->history->logEvent(
 								$unit,
@@ -391,10 +366,10 @@ class Politics {
 					}
 				}
 				foreach ($settlement->getDefendingUnits() as $unit) {
-					if (!$char) {
+					if (!$character) {
 						$this->milman->returnUnitHome($unit, 'defenselost', $settlement);
 					} else {
-						$this->milman->returnUnitHome($unit, 'defenselost', $char);
+						$this->milman->returnUnitHome($unit, 'defenselost', $character);
 					}
 					$this->history->logEvent(
 						$unit,
