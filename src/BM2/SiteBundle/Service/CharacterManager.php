@@ -573,7 +573,7 @@ class CharacterManager {
 		}
 
 		foreach ($character->getAssociationMemberships() as $mbr) {
-			$this->assocInheritance($mbr, $heir, $via, 'retire');
+			$this->assocInheritance($mbr, $heir, $via);
 		}
 
 		foreach ($character->getReadableLogs() as $log) {
@@ -802,7 +802,7 @@ class CharacterManager {
 		}
 	}
 
-	public function assocInheritance(AssociationMember $mbr, Character $heir=null, Character $via=null, $why = 'death') {
+	public function assocInheritance(AssociationMember $mbr, Character $heir=null, Character $via=null) {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();
@@ -818,7 +818,7 @@ class CharacterManager {
 				switch ($value) {
 					case 'character':
 						$this->assocman->updateMember($assoc, $rank, $heir, false);
-						$this->bequeathAssoc($assoc, $rank, $heir, false);
+						$this->bequeathAssoc($assoc, $heir, $mbr->getCharacter());
 						break;
 					case 'senior':
 						$seniors = new ArrayCollection;
@@ -832,21 +832,21 @@ class CharacterManager {
 						$mostSenior = null;
 						foreach ($seniors as $each) {
 							if (!$mostSenior) {
-								$mostSenior = $each->getCharacter();
+								$mostSenior = $each;
 							}
 							if ($each->getRankDate() > $mostSenior->getRankDate()) {
-								$mostSenior = $each->getCharacter();
+								$mostSenior = $each;
 							}
 						}
-						$this->assocman->updateMember($assoc, $rank, $mostSenior, false);
-						$this->bequeathAssoc($assoc, $rank, $mostSenior, false);
+						$this->assocman->updateMember($assoc, $rank, $mostSenior->getCharacter(), false);
+						$this->bequeathAssoc($assoc, $mostSenior->getCharacter(), $mbr->getCharacter());
 						break;
 					case 'oldest':
 						$query = $this->em->createQuery('SELECT m, c FROM BM2SiteBundle:AssociationMember m JOIN m.character c WHERE m.association = :assoc ORDER BY m.join_date ASC LIMIT 1');
 						$query->setParameters(['assoc'=>$assoc]);
 						$oldest = $query->getResult();
 						$this->assocman->updateMember($assoc, $rank, $oldest->getCharacter(), false);
-						$this->bequeathAssoc($assoc, $rank, $oldest->getCharacter(), false);
+						$this->bequeathAssoc($assoc, $oldest->getCharacter(), $mbr->getCharacter());
 						break;
 				}
 				$this->em->flush();
@@ -860,21 +860,21 @@ class CharacterManager {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inherit.assoc',
-				array('%link-association%'=>$assoc->getId(), '%link-character%'=>$char->getId()),
+				array('%link-association%'=>$assoc->getId(), '%link-character%'=>$from->getId()),
 				HISTORY::HIGH, true
 			);
 		} else {
 			$this->history->logEvent(
 				$heir,
 				'event.character.inheritvia.assoc',
-				array('%link-association%'=>$assoc->getId(), '%link-character-1%'=>$char->getId(), '%link-character-2%'=>$via->getId()),
+				array('%link-association%'=>$assoc->getId(), '%link-character-1%'=>$from->getId(), '%link-character-2%'=>$via->getId()),
 				History::HIGH, true
 			);
 		}
 		$this->history->logEvent(
 			$assoc,
 			'event.assoc.inherited',
-			array('%link-character%'=>$char->getId()),
+			array('%link-character%'=>$from->getId()),
 			History::HIGH, true
 		);
 	}
