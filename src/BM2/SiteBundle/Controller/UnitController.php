@@ -245,11 +245,11 @@ class UnitController extends Controller {
                         }
 
                         # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
-			if (!$canResupply || $settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply')) {
+			if (!$canResupply && ($settlement == $unit->getSettlement() || $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'resupply'))) {
                                 $canResupply = true;
 				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
 			}
-			if (!$canRecruit || $unit->getSettlement() == $settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit')) {
+			if (!$canRecruit && ($unit->getSettlement() == $settlement && $this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'recruit'))) {
                                 $canRecruit = true;
 				$training = $this->get('military_manager')->findAvailableEquipment($settlement, true);
 			}
