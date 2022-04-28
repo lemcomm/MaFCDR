@@ -395,7 +395,7 @@ class CharacterManager {
 		}
 
 		foreach ($character->getAssociationMemberships() as $mbr) {
-			$this->assocInheritance($mbr, $character, $heir, $via);
+			$this->assocInheritance($mbr, $heir, $via);
 		}
 
 		// close all logs except my personal one
@@ -573,7 +573,7 @@ class CharacterManager {
 		}
 
 		foreach ($character->getAssociationMemberships() as $mbr) {
-			$this->assocInheritance($mbr, $character, $heir, $via, 'retire');
+			$this->assocInheritance($mbr, $heir, $via, 'retire');
 		}
 
 		foreach ($character->getReadableLogs() as $log) {
@@ -802,7 +802,7 @@ class CharacterManager {
 		}
 	}
 
-	public function assocInheritance(AssociationMember $mbr, Character $char, Character $heir=null, Character $via=null, $why = 'death') {
+	public function assocInheritance(AssociationMember $mbr, Character $heir=null, Character $via=null, $why = 'death') {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();
@@ -852,7 +852,7 @@ class CharacterManager {
 				$this->em->flush();
 			}
 		}
-		$this->assocman->removeMember($mbr->getAssociation(), $char);
+		$this->assocman->removeMember($mbr->getAssociation(), $mbr->getCharacter());
 	}
 
 	public function bequeathAssoc(Association $assoc, Character $heir, Character $from, Character $via=null) {
