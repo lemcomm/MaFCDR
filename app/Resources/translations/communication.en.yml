@@ -132,6 +132,7 @@ event:
   renamed:      Has changed name from "%oldname%" to "%newname%".
   knownas1:     Now known as "%newname%".
   knownas2:     No longer known as "%oldname%".
+  rerun:        Reaccounted for by the Heavens.
   death:        Died.
   death2:       Died in battle.
   lightningbolt: Killed by a Lightning Bolt from the Heavens.
