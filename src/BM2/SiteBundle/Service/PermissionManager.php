@@ -50,7 +50,7 @@ class PermissionManager {
 	}
 
 
-	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false, $occupied = false) {
+	public function checkPlacePermission(Place $place, Character $character, $permission, $return_details=false) {
 		// settlement owner always has all permissions without limits
 		if ($place->getOccupier() || $place->getOccupant()) {
 			$occupied = true;
