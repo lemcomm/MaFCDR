@@ -25,7 +25,7 @@ class HouseSubcreateType extends AbstractType {
 			'required' => true
 		));
 
-		$builder->add('submit', 'submit', array('label'=>'requet.generic.submit', 'translation_domain' => 'actions'));
+		$builder->add('submit', 'submit', array('label'=>'request.generic.submit', 'translation_domain' => 'actions'));
 	}
 
 	public function getName() {

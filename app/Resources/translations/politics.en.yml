@@ -945,7 +945,8 @@ house:
   button:       Petition to Join
  subcreate:
   name:         Petition for the Right to Create a Cadet
-  intro: >
+  description:  Ask your House Head for permission to create a cadet.
+  longdesc: >
    Cadets are houses that are subordinate to another House. Any member of a house may petition for one to be made.
   subject:
    name:        Subject

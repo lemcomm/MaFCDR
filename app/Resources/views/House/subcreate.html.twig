@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>{{ 'house.subcreate.name'|trans({},"politics")|title }}</h2>
-<p>{{ 'house.subcreate.intro'|trans({},"politics")|raw }}</p>
+<p>{{ 'house.subcreate.longdesc'|trans({},"politics")|raw }}</p>
 
 <div class="fullwidth texts">
 {{ form_start(form) }}
@@ -12,9 +12,6 @@
 
 	<h4>{{ "house.subcreate.text.name"|trans({}, "politics") }}</h4>
 	{{ "house.subcreate.text.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.text) }}
-
-	<h4>{{ "house.subcreate.sure.name"|trans({}, "politics") }}</h4>
-	{{ "house.subcreate.sure.desc"|trans({}, "politics")|raw }}<br />{{ form_widget(form.sure) }}
 <br /><br />{{ form_end(form) }}
 </div>
 
