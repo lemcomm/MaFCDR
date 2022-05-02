@@ -43,9 +43,15 @@
 				<th>{{ 'perm.listing'|trans({}, "politics") }}</th>
 			</tr></thead>
 			<tbody>
-			{% for permission in form.permissions %}
-				<tr>{{ macros.permission_row(permission) }}</tr>
-			{% endfor %}
+			{% if owner %}
+				{% for permission in form.permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% else %}
+				{% for permission in form.occupation_permissions %}
+					<tr>{{ macros.permission_row(permission) }}</tr>
+				{% endfor %}
+			{% endif %}
 			</tbody>
 		</table>
 
