@@ -378,6 +378,16 @@ class CharacterManager {
 			foreach ($character->findRulerships() as $realm) {
 				$this->failInheritRealm($character, $realm);
 			}
+			foreach ($character->getPositions() as $pos) {
+				$pos->removeHolder($character);
+				$character->removePosition($pos);
+				$this->history->logEvent(
+					$pos->getRealm(),
+					'event.position.death',
+					array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$pos->getId()),
+					History::LOW, true
+				);
+			}
 		}
 		#TODO: This should really also handle positions, rather than leaving them to the game runner.
 
@@ -407,6 +417,14 @@ class CharacterManager {
 
 		foreach ($character->getRequests() as $req) {
 			$this->em->remove($req);
+		}
+
+		foreach ($character->getOccupiedSettlements() as $each) {
+			$this->politics->endOccupation($each, 'death');
+		}
+
+		foreach ($character->getOccupiedPlaces() as $each) {
+			$this->politics->endOccupation($each, 'death');
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
@@ -556,7 +574,17 @@ class CharacterManager {
 			}
 		} else {
 			foreach ($character->findRulerships() as $realm) {
-				$this->failInheritRealm($character, $realm);
+				$this->failInheritRealm($character, $realm, 'retire');
+			}
+			foreach ($character->getPositions() as $pos) {
+				$pos->removeHolder($character);
+				$character->removePosition($pos);
+				$this->history->logEvent(
+					$pos->getRealm(),
+					'event.position.retire',
+					array('%link-character%'=>$character->getId(), '%link-realmposition%'=>$pos->getId()),
+					History::LOW, true
+				);
 			}
 		}
 		foreach ($character->getStewardingSettlements() as $settlement) {
@@ -584,6 +612,14 @@ class CharacterManager {
 
 		foreach ($character->getRequests() as $req) {
 			$this->em->remove($req);
+		}
+
+		foreach ($character->getOccupiedSettlements() as $each) {
+			$this->politics->endOccupation($each, 'retire');
+		}
+
+		foreach ($character->getOccupiedPlaces() as $each) {
+			$this->politics->endOccupation($each, 'retire');
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
