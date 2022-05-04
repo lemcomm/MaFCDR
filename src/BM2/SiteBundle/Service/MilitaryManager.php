@@ -805,7 +805,20 @@ class MilitaryManager {
 		}
 		if ($origin instanceof Character) {
 			$char = true;
-			$distance = $this->geo->calculateDistanceToSettlement($origin, $unit->getSettlement());
+			if ($unit->getSettlement()) {
+				$distance = $this->geo->calculateDistanceToSettlement($origin, $unit->getSettlement());
+			} else {
+				# No settlement, which means this was called on character death or retirement.
+				# As such, unit is disbanded.
+				foreach ($unit->getSoldiers() as $each) {
+					$this->disband($each);
+				}
+				$this->disbandUnit($unit, $bulk);
+				if (!$bulk) {
+					$this->em->flush();
+				}
+				return true;
+			}
 		} else {
 			$char = false;
 			$distance = $this->geo->calculateDistanceBetweenSettlements($unit->getSettlement(), $origin);

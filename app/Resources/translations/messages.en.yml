@@ -179,6 +179,7 @@ map:
   world:      You are trying to leave the known world. The gods will not allow that.
   prisoner:   As a prisoner, you cannot travel freely.
   restricted: Since your account is currently restricted, you cannot travel.
+  pointerror: You must set a destination before beggining travel. Click somewhere on the map to start the travel line. Each point adds a waypoint. Once you've completed a path, then hit the set route button.
  info:
   length:   Route length
 

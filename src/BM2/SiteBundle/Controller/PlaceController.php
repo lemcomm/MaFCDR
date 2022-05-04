@@ -221,10 +221,11 @@ class PlaceController extends Controller {
 			return $this->redirect($request->getUri());
 		}
 
-		return $this->render('Place/permissions.html.twig', [
+		return $this->render($page, [
 			'place' => $place,
 			'permissions' => $em->getRepository('BM2SiteBundle:Permission')->findByClass('place'),
-			'form' => $form->createView()
+			'form' => $form->createView(),
+			'owner' => $owner
 		]);
 	}
 

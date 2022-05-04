@@ -136,6 +136,11 @@ function updateRoute(data) {
 		if (errorlayer) {
 			errorlayer.removeAllFeatures();
 		}
+	} else if (data.pointerror) {
+		$("#result").html("{{ 'map.error.pointerror'|trans|e('js') }}");
+		if (errorlayer) {
+			errorlayer.removeAllFeatures();
+		}
 	} else if (data.prisoner) {
 		$("#result").html("{{ 'map.error.prisoner'|trans|e('js') }}");
 		if (errorlayer) {

@@ -2317,10 +2317,13 @@ class Dispatcher {
 		}
 		if ($character->getInsideSettlement()) {
 			$can = $this->permission_manager->checkSettlementPermission($character->getInsideSettlement(), $character, 'placeinside');
-		} elseif ($region = $this->geography->findMyRegion($character)) {
-			$can = $this->permission_manager->checkSettlementPermission($region->getSettlement(), $character, 'placeoutside');
 		} else {
-			return array("name"=>"place.new.name", "description"=>"unavailable.nosettlement");
+			$region = $this->geography->findMyRegion($character);
+			if ($region) {
+				$can = $this->permission_manager->checkSettlementPermission($region->getSettlement(), $character, 'placeoutside');
+			} else {
+				return array("name"=>"place.new.name", "description"=>"unavailable.nosettlement");
+			}
 		}
 		if ($can) {
 			# It's a long line, but basically, but if we're in a settlement or in a region and have the respective permission, we're allowed. If not, denied.
@@ -2407,16 +2410,24 @@ class Dispatcher {
 		);
 	}
 
-	public function placeManageTest($ignored, Place $place) {
+	public function placeManageTest($ignored, Place $place, $perm = true) {
 		if (($check = $this->placeActionsGenericTests()) !== true) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.$check");
 		}
-		if ($place->getOccupier() || $place->getOccupant()) {
-			$occupied = true;
+		$char = $this->getCharacter();
+		$valid = false;
+		if ($perm) {
+			$valid = $this->permission_manager->checkPlacePermission($place, $char, 'manage', false);
 		} else {
-			$occupied = false;
+			if ($place->getOccupant()) {
+				if ($place->getOccupant() === $char) {
+					$valid = true;
+				}
+			} elseif ($place->getOwner() === $char) {
+				$valid = true;
+			}
 		}
-		if (!$this->permission_manager->checkPlacePermission($place, $this->getCharacter(), 'manage', false, $occupied)) {
+		if (!$valid) {
 			return array("name"=>"place.manage.name", "description"=>"unavailable.notmanager");
 		} else {
 			return $this->action("place.manage", "maf_place_manage", true,
@@ -2510,7 +2521,7 @@ class Dispatcher {
 		} elseif ($tName == 'capital') {
 			$return = $this->placeManageRulersTest(null, $place);
 		} else {
-			$return = $this->placeManageTest(null, $place);
+			$return = $this->placeManageTest(null, $place, false);
 		}
 		return $this->varCheck(
 			$return,

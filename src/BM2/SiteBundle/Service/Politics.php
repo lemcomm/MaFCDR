@@ -1040,6 +1040,20 @@ class Politics {
 					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$char->getId()),
 					History::HIGH, true
 				);
+			} elseif ($why == 'death') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.death',
+					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
+					History::HIGH, true
+				);
+			} elseif ($why == 'retire') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.retire',
+					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
+					History::HIGH, true
+				);
 			} else {
 				$this->history->logEvent(
 					$target,
@@ -1077,6 +1091,20 @@ class Politics {
 					$target,
 					'event.'.$event.'.endoccupation.forced',
 					array("%link-character-1%"=>$occupant->getId(), "%link-character-2%"=>$char->getId()),
+					History::HIGH, true
+				);
+			} elseif ($why == 'death') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.death',
+					array("%link-character%"=>$occupant->getId()),
+					History::HIGH, true
+				);
+			} elseif ($why == 'retire') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.retire',
+					array("%link-character%"=>$occupant->getId()),
 					History::HIGH, true
 				);
 			}

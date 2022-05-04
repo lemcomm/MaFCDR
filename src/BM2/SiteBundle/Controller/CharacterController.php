@@ -27,6 +27,7 @@ use BM2\SiteBundle\Service\Geography;
 use BM2\SiteBundle\Service\History;
 
 use CrEOF\Spatial\PHP\Types\Geometry\LineString;
+use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -34,6 +35,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -1299,10 +1301,14 @@ class CharacterController extends Controller {
 			}
 			if ($character->isPrisoner()) {
 				// prisoners cannot travel on their own
-				return new Response(json_encode(array('turns'=>0, 'prisoner'=>true)));
+				$resp = new JsonResponse();
+				$resp->setData(array('turns'=>0, 'prisoner'=>true));
+				return $resp;
 			}
 			if ($character->getUser()->getRestricted()) {
-				return new Response(json_encode(array('turns'=>0, 'restricted'=>true)));
+				$resp = new JsonResponse();
+				$resp->setData(array('turns'=>0, 'restricted'=>true));
+				return $resp;
 			}
 			$em = $this->getDoctrine()->getManager();
 			$points = $request->request->get('route');
@@ -1335,13 +1341,17 @@ class CharacterController extends Controller {
 					|| $point[1] < $world['y_min']
 					|| $point[1] > $world['y_max']) {
 					// outside world boundaries
-					return new Response(json_encode(array('turns'=>0, 'leftworld'=>true)));
+					$resp = new JsonResponse();
+					$resp->setData(array('turns'=>0, 'leftworld'=>true));
+					return $resp;
 				}
 			}
 
 			// validate that we have at least 2 points
 			if (count($points) < 2) {
-				return new Response(json_encode(false));
+				$resp = new JsonResponse();
+				$resp->setData(array('turns'=>0, 'pointerror'=>true));
+				return $resp;
 			}
 
 			$route = new LineString($points);
@@ -1407,8 +1417,9 @@ class CharacterController extends Controller {
 		} else {
 			$result = false;
 		}
-
-		return new Response(json_encode($result));
+		$resp = new JsonResponse();
+		$resp->setData($result);
+		return $resp;
 	}
 
 	/**
