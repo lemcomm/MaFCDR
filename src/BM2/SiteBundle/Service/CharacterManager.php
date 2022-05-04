@@ -693,7 +693,8 @@ class CharacterManager {
 			# Break locations are intentional and provide law condition cascading, as intended.
 			switch ($value) {
 				case 'steward':
-					if ($steward = $thing->getSteward()) {
+					$steward = $thing->getSteward();
+					if ($steward) {
 						$this->$bequeath($thing, $steward, $char, null);
 						$thing->setSteward(null);
 						$this->history->logEvent(
@@ -705,7 +706,8 @@ class CharacterManager {
 						break;
 					}
 				case 'liege':
-					if ($liege = $char->findLiege()) {
+					$liege = $char->findLiege();
+					if ($liege) {
 						if ($liege instanceof Collection) {
 							$liege = $liege->first();
 						}
@@ -713,11 +715,10 @@ class CharacterManager {
 						break;
 					}
 				case 'ruler':
-					if ($rulers = $realm->findRulers()) {
-						if ($rulers->count() > 0) {
-							$this->$bequeath($thing, $rulers->first(), $char, null);
-							break;
-						}
+					$rulers = $realm->findRulers();
+					if ($rulers && $rulers->count() > 0) {
+						$this->$bequeath($thing, $rulers->first(), $char, null);
+						break;
 					}
 				case 'characterInternal':
 					if ($heir && $heir->findRealms()->contains($realm)) {
