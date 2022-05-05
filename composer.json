@@ -31,7 +31,8 @@
         "knplabs/knp-markdown-bundle": "1.4.*@dev",
         "codeception/codeception": "*",
         "paypal/merchant-sdk-php":"*",
-        "kagurati/patreon": "^1.1.0"
+        "kagurati/patreon": "^1.1.0",
+        "google/recaptcha": "^1.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
