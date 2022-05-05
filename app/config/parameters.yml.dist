@@ -17,3 +17,7 @@ parameters:
 
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
+
+    recaptcha_site_key: ~
+    recaptcha_secret_key: ~
+    
