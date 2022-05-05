@@ -27,6 +27,8 @@ twig:
     strict_variables: %kernel.debug%
     form_themes:
          - 'Form/form_theme.html.twig'
+    globals:
+         recaptcha_site_key: '%recaptcha_site_key%'
 
 # Assetic Configuration
 assetic:
