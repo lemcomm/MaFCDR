@@ -25,9 +25,17 @@
 	<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
 {#  non-mobile: #}
 	{% block includes %}
-		<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/'~theme~'.css') }}" title="{{ theme_name }}"/>
+		{% if theme == 'office' %}
+			<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/office.css') }}" title="Office Style"/>
+		{% else %}
+			<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/default.css') }}" title="Medieval Style"/>
+		{% endif %}
 		{% block jqueryuitheme %}
-			<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/{{ jquery_ui_theme }}/jquery-ui.css" />
+			{% if theme == 'office' %}
+				<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/overcast/jquery-ui.css" />
+			{% else %}
+				<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/swanky-purse/jquery-ui.css" />
+			{% endif %}
 		{% endblock %}
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
