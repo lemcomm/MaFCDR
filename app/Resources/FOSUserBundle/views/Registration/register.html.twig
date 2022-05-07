@@ -2,10 +2,11 @@
 
 {% block content %}
 <h2>{{ 'registration.title'|trans|title }}</h2>
+{#
 <p>Sorry, but user inititated registration is disabed at this time.</p>
 
 <p>If you really want to to play, please visit our <a href="https://discord.gg/7YpAhEh">Discord Server</a> and speak to Andrew (Kagurati#4938) and he can make an account if you're willing to risk waiting several hours until he's around to do so. Unfortunately, until we fix spammers using this form to mass email stuff at people, this is our only workaround.</p>
-{#
+#}
 <p>{{ 'registration.intro'|trans|raw }}</p>
 <p>{{ 'registration.toslink'|trans({'%url%':path('bm2_terms')})|raw }}</p>
 
@@ -21,7 +22,6 @@
 </div>
 
 <br class="clear" />
-#}
 
 {% endblock %}
 
