@@ -231,7 +231,7 @@ class UnitController extends Controller {
                         # If we can manage units, we can reassign and resupply. Build the list.
                         if ($this->get('permission_manager')->checkSettlementPermission($settlement, $character, 'units')) {
                                 foreach ($settlement->getUnits() as $each) {
-                                        if (!$each->getCharacter() && !$each->getPlace()) {
+                                        if (!$each->getCharacter() && !$each->getPlace() && !$each->getDisbanded()) {
                                                 $units[] = $each;
                                         }
                                 }
@@ -597,7 +597,7 @@ class UnitController extends Controller {
                 $allUnits = $settlement->getUnits();
                 $units = [];
                 foreach ($allUnits as $unit) {
-                        if($unit->getSoldiers()->count() < 200 && ($unit->getSettings()->getReinforcements() || !$unit->getCharacter())) {
+                        if($unit->getSoldiers()->count() < 200 && ($unit->getSettings()->getReinforcements() || !$unit->getCharacter()) && !$unit->getDisbanded()) {
                                 $units[] = $unit;
                         }
                 }
