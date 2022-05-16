@@ -8,10 +8,10 @@
         {% for unit in units %}
 		{% set id = unit.obj.id %}
 		{% set training = unit.obj.getRecruits.count %}
-		{% if training > 0 and not unit.settlement %}
-			{{ 'unit.list.untrainable'|trans({}, "actions")|raw }}
-		{% endif %}
                 <hr>
+		{% if training > 0 and not unit.settlement %}
+			<i>{{ 'unit.list.untrainable'|trans({}, "actions")|raw }}</i>
+		{% endif %}
                 <h4>{{ unit.obj.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>') }}</h4><br>
                 {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count2'|trans({"%soldiers%":unit.obj.getActiveSoldiers.count, "%travelers%":unit.obj.getTravellingSoldiers.count, "%recruits%":training, "%wounded%":unit.obj.getWoundedSoldiers.count, "%dead%":unit.obj.getDeadSoldiers.count}, "actions") }}<br />
 		{% if unit.obj.character == character %}
