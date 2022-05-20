@@ -130,10 +130,10 @@ class User extends BaseUser {
 	}
 
 	public function isBanned() {
-		if ($this->getOwner()->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+		if ($this->hasRole('ROLE_BANNED_MULTI')) {
 			return 'multi';
 		}
-		if ($this->getOwner()->getUser()->hasRole('ROLE_BANNED_TOS')) {
+		if ($this->hasRole('ROLE_BANNED_TOS')) {
 			return 'tos';
 		}
 		return false;
