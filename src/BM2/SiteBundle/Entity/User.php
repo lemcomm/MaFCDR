@@ -128,5 +128,15 @@ class User extends BaseUser {
 		}
 		return ($months * $mod) - $count;
 	}
+
+	public function isBanned() {
+		if ($this->getOwner()->getUser()->hasRole('ROLE_BANNED_MULTI')) {
+			return 'multi';
+		}
+		if ($this->getOwner()->getUser()->hasRole('ROLE_BANNED_TOS')) {
+			return 'tos';
+		}
+		return false;
+	}
 	
 }
