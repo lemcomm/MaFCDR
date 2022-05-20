@@ -20,7 +20,7 @@
 					<i>{{ 'place.insidenow'|trans({},"places")|raw }}<br><br></i>
 				{% endif %}
 				{% if place.description %}
-					<p>{{ place.description.text }}</p>
+					<p>{{ place.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
 				{% endif %}
 				{% if house %}
 					<i>{{ 'place.hosthouse'|trans({}, "places")|raw }}</i>

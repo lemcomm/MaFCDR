@@ -1349,6 +1349,7 @@ unit:
   recall:   Recall Unit
   revoke:   Remove Marshal
   traveling: Unit is currently traveling back to base and will arrive in %days% days.
+  untrainable: This unit cannot train new soldiers\ due to lack of training facilities. Assign it a base to fix this.
  assigned:
  assign:
   name:     Assign a Leader to %name%

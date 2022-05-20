@@ -184,11 +184,26 @@ class UnitController extends Controller {
                 Lord -> Local units and lead units
                 */
                 $lord = false;
-                if ($character->getInsideSettlement() && ($character == $character->getInsideSettlement()->getOwner() || $character == $character->getInsideSettlement()->getSteward())) {
-                        $lord = true;
+                $settlement = $unit->getSettlement();
+                $inside = $character->getInsideSettlement();
+                if ($inside) {
+                        if (($character == $character->getInsideSettlement()->getOwner() || $character == $character->getInsideSettlement()->getSteward()) || ($inside && $inside === $settlement && $this->get('permission_manager')->checkSettlementPermission($inside, $character, 'units'))) {
+                                $lord = true;
+                        }
                 }
 
+
                 $settlements = $this->get('game_request_manager')->getAvailableFoodSuppliers($character);
+                $supplier = $unit->getSupplier();
+                if ($supplier) {
+                        if (!in_array($supplier->getId(), $settlements)) {
+                                $settlements[] = $supplier->getId();
+                        }
+                }
+                if ($settlement && $lord) {
+                        $settlements[] = $settlement->getId();
+                }
+
                 $form = $this->createForm(new UnitSettingsType($character, true, $settlements, $unit->getSettings(), $lord));
 
                 $form->handleRequest($request);
