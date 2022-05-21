@@ -1781,7 +1781,7 @@ class Dispatcher {
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notinsiege");
 		}
 		if (!$isLeader) {
-			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notleader");
+			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.notcommander");
 		}
 		if ($this->getCharacter()->isDoingAction('military.regroup')) {
 			# Busy regrouping.

@@ -1608,6 +1608,7 @@ unavailable:
  notmember:     You are not a member of this realm.
  leader:        As the ruler of a realm, you cannot do this. Manage the allegiance of your realm instead.
  notleader:     You are not the ruler of this realm.
+ notcommander:  You are not in command of this battlegroup.
  notholder:     You do not hold the position of %name%.
  notdiplomat:   You do not hold a position with diplomacy permissions in this realm.
  noothers:      There are no other characters nearby.

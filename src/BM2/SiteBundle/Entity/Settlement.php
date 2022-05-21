@@ -99,7 +99,7 @@ class Settlement {
 
 		// inactive lord = half time, in addition to the change above (which also includes inactive ones)
 		if ($owner = $this->getOwner() && $this->getOwner()->getAlive()) {
-			if ($this->getOwner()->getSlumbering()) {
+			if ($this->getOwner()->getSlumbering() || $this->getOwner()->getUser()->isBanned()) {
 				$mod = 0.5;
 				if (!$enforce_claim) {
 					if ($realm = $this->getRealm()) {

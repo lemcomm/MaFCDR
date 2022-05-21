@@ -139,7 +139,7 @@ class PermissionManager {
 				return true;
 			}
 		} else {
-			if (!$settlement->getOwner()->isActive()) {
+			if (!$settlement->getOwner()->isActive() || $settlement->getOwner()->getUser()->isBanned()) {
 				if ($realm = $settlement->getRealm()) {
 					if ($law = $realm->findLaw('slumberingAccess')) {
 						$value = $law->getValue();
