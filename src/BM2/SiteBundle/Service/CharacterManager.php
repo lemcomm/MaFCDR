@@ -197,6 +197,9 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
+			if ($bg->getLeader() === $character) {
+				$bg->setLeader(null);
+			}
 			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
@@ -459,6 +462,12 @@ class CharacterManager {
 		// terminate all actions -- don't worry about battles because you can't retire when engaged in one.
 		foreach ($character->getActions() as $act) {
 			$this->em->remove($act);
+		}
+		foreach ($character->getBattlegroups() as $bg) {
+			if ($bg->getLeader() === $character) {
+				$bg->setLeader(null);
+			}
+			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
 		// remove all votes
