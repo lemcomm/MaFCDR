@@ -700,6 +700,12 @@ class ActionResolution {
 		}
 		$meta = $this->em->getRepository('BM2SiteBundle:EventMetadata')->findOneBy(array('log'=>$log, 'reader'=>$action->getCharacter()));
 
+		if (!$meta) {
+			# Somehow we're looking at a log we don't have our own version of?
+			$meta = $this->history->openLog($log->getSubject(), $action->getCharacter());
+			$this->em->flush(); #Probably not needed, but just in case.
+		}
+
 		$query = $this->em->createQuery('SELECT MAX(e.cycle) FROM BM2SiteBundle:Event e WHERE e.log=:log AND e.cycle < :earliest');
 		$query->setParameters(array('log'=>$log, 'earliest'=>$meta->getAccessFrom()));
 		$next = $query->getSingleScalarResult();
