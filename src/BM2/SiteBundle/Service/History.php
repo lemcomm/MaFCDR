@@ -71,7 +71,7 @@ class History {
 			$event->setSoldier($soldier);
 			$event->setContent('soldier.'.$translationKey);
 			$event->setData($data);
-			$event->setTs(new \DateTime("now"));		
+			$event->setTs(new \DateTime("now"));
 			$event->setCycle($this->appstate->getCycle());
 			$this->em->persist($event);
 			$soldier->addEvent($event);
@@ -89,7 +89,7 @@ class History {
 		if ($entity instanceof EventLog) {
 			$log = $entity;
 		} else {
-			$log = $this->findLog($entity);			
+			$log = $this->findLog($entity);
 		}
 		// no more access to new events in this log, but can still read old entries
 		$metadata = $this->em->getRepository('BM2SiteBundle:EventMetadata')->findBy(array('log'=>$log, 'reader'=>$reader, 'access_until'=>null));
@@ -108,8 +108,10 @@ class History {
 			$meta->setLastAccess(new \DateTime("now"));
 			$meta->setLog($log);
 			$meta->setReader($reader);
-			$this->em->persist($meta);			
+			$this->em->persist($meta);
+			return $meta;
 		}
+		return $exists;
 	}
 
 	public function visitLog($entity, Character $reader) {
@@ -124,7 +126,7 @@ class History {
 
 	public function investigateLog($log, Character $reader, $interval) {
 		// TODO: move your access back in time by spending time, money, whatever on gaining more knowledge
-		// this also requires changes to the above - openLog would be more limited, going back x days - 
+		// this also requires changes to the above - openLog would be more limited, going back x days -
 		// -- so it would be pretty much just like visitlog. but then this here would also have to merge log
 		// accesses if they start overlapping...
 	}
