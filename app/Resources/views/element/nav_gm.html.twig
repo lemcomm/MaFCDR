@@ -1,0 +1,33 @@
+<li>
+	<a href="#">{{ 'menu.gm'|trans }}</a>
+	<div class="sub">
+		<ul class="row">
+			<li class="part">
+				<h3>{{ 'menu.gmpart'|trans|title }}</h3>
+				<ul>
+					<li><a href="{{ path('maf_gm_pending') }}">{{ 'menu.gm'|trans}}</a></li>
+				</ul>
+			</li>
+			{% if is_granted("ROLE_ADMIN") %}
+				<li class="part">
+					<h3>{{ 'Administration'|title }}</h3>
+					<ul>
+						<li><a href="{{ path('maf_game_status') }}">Status</a></li>
+						<li><a href="{{ path('maf_game_users') }}">Users</a></li>
+						<li><a href="{{ path('maf_game_stats') }}">Broad Stats</a></li>
+						<li><a href="{{ path('maf_game_stats_realms') }}">Realms Stats</a></li>
+						<li><a href="{{ path('maf_game_stats_battles') }}">Battle Stats</a></li>
+						<li><a href="{{ path('maf_game_stats_troops') }}">Troops Stats</a></li>
+						<li><a href="{{ path('maf_game_stats_roads') }}">Raods Stats</a></li>
+						<li><a href="{{ path('maf_game_stats_resources') }}">Resources Stats</a></li>
+						<li><a href="{{ path('maf_game_settlements') }}">Settlements</a></li>
+						<li><a href="{{ path('maf_game_heraldry') }}">Heraldry</a></li>
+						<li><a href="{{ path('maf_game_techtree') }}">Tech Tree</a></li>
+						<li><a href="{{ path('maf_game_diplomacy') }}">Diplomacy</a></li>
+						<li><a href="{{ path('maf_game_buildings') }}">Buildings</a></li>
+					</ul>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+</li>
