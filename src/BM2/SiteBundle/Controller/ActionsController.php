@@ -105,13 +105,8 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-			return $this->render('Actions/support.html.twig', [
-				'action'=>$action,
-				'result'=>[
-					'success' => true,
-					'target' => $action->getTargetSettlement()
-				]
-			]);
+			$this->addFlash('notice', $this->get('translator')->trans('support.success.'.$action->getType(), ["%character%"=>$character->getName(), "%target"=>$action->getTargetSettlement()->getName()], 'actions'));
+			return $this->redirectToRoute('bm2_actions');
 		} else {
 			return $this->render('Actions/support.html.twig', [
 				'action'=>null,
@@ -165,13 +160,8 @@ class ActionsController extends Controller {
 			$this->get('action_resolution')->update($action);
 
 			$em->flush();
-			return $this->render('Actions/oppose.html.twig', [
-				'action'=>$action,
-				'result'=>[
-					'success' => true,
-					'target' => $action->getTargetSettlement()
-				]
-			]);
+			$this->addFlash('notice', $this->get('translator')->trans('oppose.success.'.$action->getType(), ["%character%"=>$character->getName(), "%target"=>$action->getTargetSettlement()->getName()], 'actions'));
+			return $this->redirectToRoute('bm2_actions');
 		} else {
 			return $this->render('Actions/oppose.html.twig', [
 				'action'=>null,
@@ -617,7 +607,8 @@ class ActionsController extends Controller {
 		$form = $this->createForm(new InteractionType(
 			'steward',
 			$this->get('geography')->calculateInteractionDistance($character),
-			$character
+			$character,
+			false, false, false
 		));
 
 		$form->handleRequest($request);
