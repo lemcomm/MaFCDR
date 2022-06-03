@@ -1,0 +1,44 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <h1>GeoData list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Settlement</th>
+                <th>Altitude</th>
+                <th>Hills</th>
+                <th>Coast</th>
+                <th>Lake</th>
+                <th>River</th>
+                <th>Humidity</th>
+                <th>Passable</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in regions %}
+            <tr>
+                <td>{{ entity.id }}</td>
+                <td>{% if entity.settlement %}{{ entity.settlement.name }}{% endif %}</td>
+                <td>{{ entity.altitude }}</td>
+                <td>{{ entity.hills }}</td>
+                <td>{{ entity.coast }}</td>
+                <td>{{ entity.lake }}</td>
+                <td>{{ entity.river }}</td>
+                <td>{{ entity.humidity }}</td>
+                <td>{{ entity.passable }}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('maf_region_edit', { 'id': entity.id }) }}">edit {{entity.id}}</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
