@@ -422,7 +422,7 @@ class UnitController extends Controller {
                         }
                 }
 
-                $form = $this->createForm(new CharacterSelectType($options, 'unit.appoint.empty', 'unit.appoint.select', 'unit.appoint.submit', 'actions'));
+                $form = $this->createForm(new CharacterSelectType($options, 'unit.appoint.empty', 'unit.appoint.select', 'unit.appoint.submit', 'actions', false));
 
                 $form->handleRequest($request);
                 if ($form->isValid()) {
