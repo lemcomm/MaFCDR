@@ -841,7 +841,7 @@ class CharacterManager {
 				$this->history->logEvent(
 					$house,
 					'event.place.abandoned.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
 					History::ULTRA, true
 				);
 			}
