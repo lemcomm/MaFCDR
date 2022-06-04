@@ -37,6 +37,9 @@
 		<many-to-one field="deity" target-entity="Deity" inversed-by="descriptions"/>
 		<one-to-one field="active_deity" target-entity="Deity" inversed-by="description"/>
 
+		<many-to-one field="user" target-entity="User" inversed-by="descriptions"/>
+		<one-to-one field="active_user" target-entity="User" inversed-by="description"/>
+
 		<one-to-one field="previous" target-entity="Description" inversed-by="next"/>
 		<one-to-one field="next" target-entity="Description" mapped-by="previous"/>
 		<many-to-one field="updater" target-entity="Character" inversed-by="updated_descriptions"/>
