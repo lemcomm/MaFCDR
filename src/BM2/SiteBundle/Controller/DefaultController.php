@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\User;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -106,6 +108,20 @@ class DefaultController extends Controller {
 
 		return $this->render('Default/terms.html.twig', [
 			"simple"=>true, "locale"=>$this->getRequest()->getLocale()
+		]);
+	}
+
+	/**
+	  * @Route("/user/{user}", name="maf_user")
+	  */
+	public function userAction($user) {
+		# This allows us to not have a user returned and sanitize the output. No user? Pretend they just private :)
+		$user = $this->getDoctrine()->getManager()->getRepository(User::class)->findOneBy(['id'=>$user]);
+		$gm = $this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS');
+
+		return $this->render('Default/user.html.twig', [
+			"user"=>$user,
+			"gm"=>$gm,
 		]);
 	}
 
