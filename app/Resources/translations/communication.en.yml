@@ -118,6 +118,7 @@ event:
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
   steward:      %character% has been appointed as the new steward.
+  nosteward:    No longer has a steward serving it.
   stewarddeath: Is now steward-less due to the passing of %character%.
   stewardretire: Is now steward-less due to the retiring of %character%.
   stewardpromote: Is now steward-less due to the promotion of %character%.
@@ -416,6 +417,7 @@ event:
   inherifail:   Fell to independence on the death of %character%, who left no heir.
   realmfail:    Returned to independence with the failing of %realm%.
   realmfail2:   Became part of %realm-1% with the failing of %realm-2%.
+  abandoned:    Abandoned after the collapse of %house% following the death of %character%.
  assoc:
   founded:      Formalized by %character%.
   deity:
