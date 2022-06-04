@@ -994,10 +994,6 @@ class Dispatcher {
 			return array("name"=>"control.take.name", "description"=>"unavailable.supporting");
 		}
 
-		if ($this->getCharacter()->isTrial() && $this->getCharacter()->getOwnedSettlements()->count() >= Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT) {
-			return array("name"=>"control.take.name", "description"=>"unavailable.free2");
-		}
-
 		if ($settlement->getOwner() == $this->getCharacter()) {
 			// I control this settlement - defend if applicable
 			if ($settlement->getRelatedActions()->exists(
@@ -2772,9 +2768,6 @@ class Dispatcher {
 	}
 
 	public function hierarchyCreateRealmTest() {
-		if ($this->getCharacter()->isTrial()) {
-			return array("name"=>"realm.new.name", "description"=>"unavailable.free");
-		}
 		if ($check = $this->politicsActionsGenericTests() !== true) {
 			return array("name"=>"realm.new.name", "description"=>'unavailable.'.$check);
 		}
