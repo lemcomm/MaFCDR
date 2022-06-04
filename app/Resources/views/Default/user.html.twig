@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.public or gm %}
+{% if (user and user.public) or gm %}
 	{% if gm and not user.public %}
 		<div class="warning">
 		<p>{{ 'user.profile.override'|trans }}</p>
