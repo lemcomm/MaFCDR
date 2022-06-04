@@ -29,7 +29,7 @@ class GameController extends Controller {
 	private $high_moving_average_cycles = 24; // 4 game weeks
 
 	/**
-	  * @Route("/")
+	  * @Route("/", name="maf_game_status")
 	  */
 	public function indexAction($time_spent=0) {
 		$game = $this->get('game_runner');
@@ -63,7 +63,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/users")
+	  * @Route("/users", name="maf_game_users")
 	  */
 	public function usersAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -92,7 +92,7 @@ class GameController extends Controller {
 
 
    /**
-     * @Route("/statistics/{start}", requirements={"start"="\d+"}, defaults={"start"=-1})
+     * @Route("/statistics/{start}", name="maf_game_stats", requirements={"start"="\d+"}, defaults={"start"=-1})
      */
 	public function statisticsAction($start) {
 		if ($start == -1) { $start = $this->start_cycle; }
@@ -182,7 +182,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/compare/{what}")
+	  * @Route("/statistics/compare/{what}", name="maf_game_stats_compare")
 	  */
 	public function comparedataAction($what) {
 		$em = $this->getDoctrine()->getManager();
@@ -232,7 +232,7 @@ class GameController extends Controller {
 
 
 	/**
-	  * @Route("/statistics/realm/{realm}", requirements={"realm"="\d+"})
+	  * @Route("/statistics/realm/{realm}", name="maf_game_stats_realm", requirements={"realm"="\d+"})
 	  */
 	public function realmdataAction(Realm $realm) {
 		$em = $this->getDoctrine()->getManager();
@@ -266,7 +266,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/settlement/{settlement}", requirements={"settlement"="\d+"})
+	  * @Route("/statistics/settlement/{settlement}", name="maf_game_stats_settlement", requirements={"settlement"="\d+"})
 	  */
 	public function settlementdataAction(Settlement $settlement) {
 		$em = $this->getDoctrine()->getManager();
@@ -297,7 +297,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/realms")
+	  * @Route("/statistics/realms", name="maf_game_stats_realms")
 	  */
 	public function realmstatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -325,7 +325,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/battles")
+	  * @Route("/statistics/battles", name="maf_game_stats_battles")
 	  */
 	public function battlestatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -370,7 +370,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/troops")
+	  * @Route("/statistics/troops", name="maf_game_stats_troops")
 	  */
 	public function troopsstatisticsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -440,7 +440,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/roads")
+	  * @Route("/statistics/roads", name="maf_game_stats_roads")
 	  * @Template
 	  */
 	public function roadsstatisticsAction() {
@@ -460,7 +460,7 @@ class GameController extends Controller {
 	}
 
 	/**
-	  * @Route("/statistics/resources")
+	  * @Route("/statistics/resources", name="maf_game_stats_resources")
 	  */
 	public function resourcesdataAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -491,7 +491,7 @@ class GameController extends Controller {
 
 
     /**
-     * @Route("/settlements")
+     * @Route("/settlements", name="maf_game_settlements")
      */
 	public function settlementsAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -507,7 +507,7 @@ class GameController extends Controller {
 	}
 
    /**
-     * @Route("/heraldry")
+     * @Route("/heraldry", name="maf_game_heraldry")
      */
 	public function heraldryAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -520,7 +520,7 @@ class GameController extends Controller {
 	}
 
 	/**
-     * @Route("/techtree")
+     * @Route("/techtree", name="maf_game_techtree")
      */
 	public function techtreeAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -566,7 +566,7 @@ class GameController extends Controller {
 
 
 	/**
-	  * @Route("/diplomacy")
+	  * @Route("/diplomacy", name="maf_game_diplomacy")
 	  */
 	public function diplomacyAction() {
 		$em = $this->getDoctrine()->getManager();
@@ -588,7 +588,7 @@ class GameController extends Controller {
 
 
 	/**
-	  * @Route("/buildings")
+	  * @Route("/buildings", name="maf_game_buildings")
 	  */
 	public function buildingsAction() {
 		$em = $this->getDoctrine()->getManager();

@@ -1,6 +1,6 @@
 <ul>
 	{% if app.user and is_granted("ROLE_OLYMPUS") %}
-		<li><a href="{{ path('maf_gm_pending') }}">{{ 'menu.gm'|trans}}</a></li>
+		{% include "element/nav_gm.html.twig" %}
 	{% endif %}
 	<li><a href="{{ path('bm2_map') }}">{{ 'menu.travel'|trans }}</a></li>
 	<li>

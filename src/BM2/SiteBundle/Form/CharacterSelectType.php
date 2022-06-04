@@ -17,13 +17,15 @@ class CharacterSelectType extends AbstractType {
 	private $label;
 	private $submit;
 	private $domain;
+	private $required;
 
-	public function __construct($characters, $empty="", $label="", $submit="", $domain="politics") {
+	public function __construct($characters, $empty="", $label="", $submit="", $domain="politics", $required=true) {
 		$this->characters = $characters;
 		$this->empty = $empty;
 		$this->label = $label;
 		$this->submit = $submit;
 		$this->domain = $domain;
+		$this->required = $required;
 	}
 
 	public function getName() {
@@ -45,6 +47,7 @@ class CharacterSelectType extends AbstractType {
 			'label' => $this->label,
 			'class'=>'BM2SiteBundle:Character',
 			'choice_label'=>'name',
+			'required'=>$this->required,
 			'query_builder'=>function(EntityRepository $er) use ($characters) {
 				$qb = $er->createQueryBuilder('c');
 				$qb->where('c IN (:characters)');

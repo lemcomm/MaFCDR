@@ -16,12 +16,13 @@ class InteractionType extends AbstractType {
 	private $multiple;
 	private $settlementcheck;
 
-	public function __construct($action, $maxdistance, $me, $multiple=false, $settlementcheck=false) {
+	public function __construct($action, $maxdistance, $me, $multiple=false, $settlementcheck=false, $required=true) {
 		$this->action = $action;
 		$this->maxdistance = $maxdistance;
 		$this->me = $me;
 		$this->multiple = $multiple;
 		$this->settlementcheck = $settlementcheck;
+		$this->required = $required;
 	}
 
 	public function getName() {
@@ -44,6 +45,7 @@ class InteractionType extends AbstractType {
 			'placeholder'=>$this->multiple?'character.none':null,
 			'multiple'=>$this->multiple,
 			'expanded'=>true,
+			'required'=>$this->required,
 			'class'=>'BM2SiteBundle:Character', 'choice_label'=>'name', 'query_builder'=>function(EntityRepository $er) use ($me, $maxdistance, $settlementcheck) {
 				$qb = $er->createQueryBuilder('c');
 				$qb->from('BM2SiteBundle:Character', 'me');

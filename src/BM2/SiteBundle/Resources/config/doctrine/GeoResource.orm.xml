@@ -23,6 +23,7 @@
 -->
 
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="resources"/>
+		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="resources"/>
 		<many-to-one field="type" target-entity="ResourceType"/>
 
 

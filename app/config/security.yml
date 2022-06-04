@@ -42,6 +42,7 @@ security:
         - { path: ^/(../)?GM, roles: ROLE_OLYMPUS }
         - { path: ^/(../)?gamerequest, roles: ROLE_USER } # Without this, users will be locked out of the gamerequest path by the line below. --Andrew
         - { path: ^/(../)?game, roles: ROLE_ADMIN }
+        - { path: ^/(../)?world, roles: ROLE_ADMIN }
         - { path: ^/(../)?account, roles: ROLE_USER }
         - { path: ^/(../)?heraldry, roles: ROLE_USER }
         - { path: ^/(../)?payment/google$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
