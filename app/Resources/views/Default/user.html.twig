@@ -7,10 +7,14 @@
 
 {% block content %}
 {% if (user and user.public) or gm %}
-	{% if gm and not user.public %}
-		<div class="warning">
-		<p>{{ 'user.profile.override'|trans }}</p>
-		</div>
+	{% if gm %}
+		{% if user and not user.public %}
+			<div class="warning">
+			<p>{{ 'user.profile.override'|trans }}</p>
+			</div>
+		{% elseif not user %}
+			This user ID either no longer or doesn't yet exist. Sorry!
+		{% endif %}
 	{% endif %}
 
 	{% if user.vipstatus > 0 %}
