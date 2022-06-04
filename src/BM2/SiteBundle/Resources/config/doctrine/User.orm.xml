@@ -7,6 +7,7 @@
 		<field name="ip" type="string" nullable="true"/>
 		<field name="display_name" type="string"/>
 		<field name="gm_name" type="string" nullable="true"/>
+		<field name="public_admin" type="boolean" nullable="true"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
@@ -14,8 +15,12 @@
 		<field name="language" type="string" nullable="true"/>
 		<field name="notifications" type="boolean"/>
 		<field name="newsletter" type="boolean"/>
+		<field name="public" type="boolean" nullable="true"/>
 		<field name="artifacts_limit" type="smallint"/>
 		<field name="next_spawn_time" type="datetime" nullable="true"/>
+
+		<one-to-many field="descriptions" target-entity="Description" mapped-by="user"/>
+		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 
 		<field name="account_level" type="smallint"/>
 		<field name="vip_status" type="smallint"/>
