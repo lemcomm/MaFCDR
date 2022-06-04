@@ -835,15 +835,15 @@ class CharacterManager {
 					array(),
 					History::ULTRA, true
 				);
-			}
-			if ($home = $house->getHome()) {
-				$home->setOwner(null);
-				$this->history->logEvent(
-					$house,
-					'event.place.abandoned.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-					History::ULTRA, true
-				);
+				if ($home = $house->getHome()) {
+					$home->setOwner(null);
+					$this->history->logEvent(
+						$home,
+						'event.place.abandoned.'.$why,
+						array('%link-house%'=>$house->getId(), '%link-character%'=>$character->getId()),
+						History::ULTRA, true
+					);
+				}
 			}
 		}
 	}
