@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\SpawnDescription;
+use BM2\SiteBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
@@ -82,6 +83,10 @@ class DescriptionManager {
 					$olddesc->setActiveSettlement(NULL);
 					$this->em->flush();
 					break;
+				case 'User':
+					$olddesc->setActiveUser(NULL);
+					$this->em->flush();
+					break;
 			}
 		}
 
@@ -125,13 +130,19 @@ class DescriptionManager {
 				$desc->setActiveSettlement($entity);
 				$desc->setSettlement($entity);
 				break;
+			case 'User':
+				$desc->setActiveUser($entity);
+				$desc->setUser($entity);
+				break;
 		}
 		$entity->setDescription($desc);
 		if ($olddesc) {
 			$desc->setPrevious($olddesc);
 		}
 		$desc->setText($text);
-		$desc->setUpdater($character);
+		if ($character) {
+			$desc->setUpdater($character);
+		}
 		$desc->setTs(new \DateTime("now"));
 		$desc->setCycle($this->appstate->getCycle());
 		if (!$new) {

@@ -472,7 +472,7 @@ class ActionsController extends Controller {
 			'settlement' => $settlement,
 			'others' => $others,
 			'timetotake' => $time_to_take,
-			'limit' => $character->isTrial()?Dispatcher::FREE_ACCOUNT_ESTATE_LIMIT:-1,
+			'limit' => -1,
 			'form' => $form->createView()
 		]);
 	}
@@ -558,9 +558,7 @@ class ActionsController extends Controller {
 			}
 
 			if ($data['target']) {
-				if ($data['target']->isTrial() && $data['target']->getOwnedSettlements()->count() >= 3) {
-					$form->addError(new FormError("settlement.grant.free2"));
-				} elseif ($data['target']->isNPC()) {
+				if ($data['target']->isNPC()) {
 					$form->addError(new FormError("settlement.grant.npc"));
 				} else {
 					$act = new Action;
@@ -614,15 +612,24 @@ class ActionsController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
-			if ($data['target'] && $data['target'] != $character) {
+			if ($data['target'] != $character) {
 				$settlement->setSteward($data['target']);
 
-				$this->get('history')->logEvent(
-					$settlement,
-					'event.settlement.steward',
-					array('%link-character%'=>$data['target']->getId()),
-					History::MEDIUM, true, 20
-				);
+				if ($data['target']) {
+					$this->get('history')->logEvent(
+						$settlement,
+						'event.settlement.steward',
+						array('%link-character%'=>$data['target']->getId()),
+						History::MEDIUM, true, 20
+					);
+				} else {
+					$this->get('history')->logEvent(
+						$settlement,
+						'event.settlement.nosteward',
+						array(),
+						History::MEDIUM, true, 20
+					);
+				}
 				$this->get('history')->logEvent(
 					$data['target'],
 					'event.character.steward',

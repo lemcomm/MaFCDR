@@ -78,6 +78,9 @@
 	{% if not char.alive %}
 		<img src="{{ asset('bundles/bm2site/images/cybergedeon_skull.svg') }}" alt="{{ 'dead'|trans }}" height="24px" align="bottom" />
 	{% endif %}
+	{% if char.user and (char.user.public or is_granted('ROLE_OLYMPUS') ) %}
+		<a href="{{ path("maf_user", {"user": char.user.id}) }}"><small><i>({{ 'user.profile.viewable'|trans }})</i></small></a>
+	{% endif %}
 </h2>
 {% if char.knownas %}
 	<h3 class="subtitle">{{ 'character.knownas'|trans({'%name%':char.knownas}) }}</h3>

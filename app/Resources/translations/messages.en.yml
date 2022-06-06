@@ -68,6 +68,32 @@ menu:
  journal:   Your Journal
  newjournal: New Journal Entry
 
+user:
+ profile:
+  viewable: View User Profile
+  isAdmin: (Might & Fealty Administrator)
+  joined: 'Date Joined:'
+  profile: 'User Comment:'
+  override: Access to this private profile has been granted by your GM status!
+  private: This user has not chosen to make their information public.
+  patron:
+   patron: 'Patron of:'
+   active: (Actively)
+   former: (Formerly)
+  characters: Played Characters
+  char:
+   name: Name
+   status: Status
+   realms: Realms
+   active: Active
+   notstarted: Not Arrived
+   retired: Retired
+   dead: Dead
+   rogue: (Rogue)
+   knownas: (AKA %name%)
+   realms: Realms
+
+
 contact:
  title:     Contact
  forum: >
@@ -687,8 +713,18 @@ form:
  choose:      -- Choose --
  none:        (None)
  submit:      Submit
+ gmname:     GM Alias
+ publicadmin: Display Admin Status
+ public:      Public User Profile
+ profile:     Public User Comments
  help:
   displayname:  The name shown in public lists such as the VIP players list
+  username: This is used to log into Might & Fealty and won't display anywhere in game.
+  email: This is your email and will be used to receive game notifications.
+  gmname: This is an alias you can have other GM's recognize you by. Perhaps your Discord handle?
+  publicadmin: Publicly display your admin status.
+  public: Opt to have your your public name, join date, user comments, and character list be public. Or not.
+  profile: These are your user comments. You can put anything here and you can link to other in-game things if you like.
 
 settlement:
  name:  Settlement

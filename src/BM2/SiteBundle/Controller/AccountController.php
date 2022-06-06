@@ -87,12 +87,33 @@ class AccountController extends Controller {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
 			throw new AccessDeniedException('error.banned.tos');
 		}
+		$gm = false;
+		$admin = false;
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS')) {
+			$gm = true;
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+				$admin = true;
+			}
+		}
 		$user = $this->getUser();
-			$form = $this->createForm(new UserDataType(), $user);
+
+		$desc = $user->getDescription();
+		if ($desc) {
+			$text = $desc->getText();
+		} else {
+			$text = null;
+		}
+
+		$form = $this->createForm(new UserDataType($gm, $text, $admin), $user);
 
 		$form->handleRequest($request);
 		if ($form->isValid()) {
+			$data = $form['text']->getData();
 			$this->get('bm2.usermanager')->updateUser($user);
+			if ($text != $data) {
+				$desc = $this->get('description_manager')->newDescription($user, $data);
+			}
+			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('account.data.saved'));
 			return $this->redirectToRoute('bm2_account');
 		}
