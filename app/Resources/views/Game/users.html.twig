@@ -16,21 +16,25 @@
 			<th>Created</th>
 			<th>Last Login</th>
 			<th>Characters</th>
+			<th>Active Characters</th>
 			<th>Retired</th>
 			<th>Dead</th>
+			<th>Public</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for u in users %}
 		<tr>
-			<td>{{ u.name }}</td>
+			<td><a href="{{ path("maf_user", {"user": u.id}) }}">{{ u.name }}</a></td>
 			<td align="right">{{ u.level }}</td>
 			<td>{{ u.credits }}</td>
 			<td>{{ u.created|date }}</td>
 			<td>{{ u.last_login|date }}</td>
 			<td align="right">{{ u.characters }}</td>
+			<td align="right">{{ u.active }}</td>
 			<td align="right">{{ u.retired }}</td>
 			<td align="right">{{ u.dead }}</td>
+			<td>{{ u.public }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
