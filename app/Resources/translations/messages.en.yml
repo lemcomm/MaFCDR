@@ -76,6 +76,7 @@ user:
   profile: 'User Comment:'
   override: Access to this private profile has been granted by your GM status!
   private: This user has not chosen to make their information public.
+  empty: It seems nothing has been written here.
   patron:
    patron: 'Patron of:'
    active: (Actively)
