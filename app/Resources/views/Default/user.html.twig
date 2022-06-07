@@ -41,10 +41,12 @@
 		{% endif %}
 	</dl><hr>
 
+	<h3>{{ 'user.profile.profile'|trans }}</h3>
 	{% if user.description %}
-		<h3>{{ 'user.profile.profile'|trans }}</h3>
 		{{ user.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 		<hr>
+	{% else %}
+		<i>{{ 'user.profile.empty'|trans }}</i>
 	{% endif %}
 
 	<h3>{{ 'user.profile.characters'|trans }}</h3>

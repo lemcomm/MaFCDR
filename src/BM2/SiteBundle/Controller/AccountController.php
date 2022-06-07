@@ -110,7 +110,7 @@ class AccountController extends Controller {
 		if ($form->isValid()) {
 			$data = $form['text']->getData();
 			$this->get('bm2.usermanager')->updateUser($user);
-			if ($text != $data) {
+			if ($data && $text != $data) {
 				$desc = $this->get('description_manager')->newDescription($user, $data);
 			}
 			$this->getDoctrine()->getManager()->flush();

@@ -56,7 +56,7 @@ class UserDataType extends AbstractType {
 			'label'=>'form.profile',
 			'data'=>$this->text,
 			'mapped'=>false,
-			'required'=>true,
+			'required'=>false,
 			'attr' => [
 				'title'=>'form.help.profile',
 				'class'=>'tt_bot'

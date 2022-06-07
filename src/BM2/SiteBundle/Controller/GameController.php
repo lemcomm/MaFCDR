@@ -73,14 +73,17 @@ class GameController extends Controller {
 		foreach ($query->getResult() as $user) {
 			if ($user->getActiveCharacters()->count()>0 OR $user->getRetiredCharacters()->count()>0) {
 				$users[] = array(
+					'id' => $user->getId(),
 					'name' => $user->getUsername(),
 					'level' => $user->getAccountLevel(),
 					'credits' => $user->getCredits(),
 					'created' => $user->getCreated(),
 					'last_login' => $user->getLastLogin(),
 					'characters' => $user->getLivingCharacters()->count(),
+					'active' => $user->getActiveCharacters()->count(),
 					'retired' => $user->getRetiredCharacters()->count(),
-					'dead' => $user->getDeadCharacters()->count()
+					'dead' => $user->getDeadCharacters()->count(),
+					'public' => $user->getPublic()?'yes':'no'
 				);
 			}
 		}
