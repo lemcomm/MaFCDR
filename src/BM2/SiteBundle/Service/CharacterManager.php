@@ -432,6 +432,11 @@ class CharacterManager {
 
 		// TODO: permission lists - plus clear out those of old dead characters!
 
+		# Remove all allegiances -- as the dead have no loyalties.
+		$character->setRealm(null);
+		$character->setLiegeLand(null);
+		$character->setLiegePlace(null);
+		$character->setLiegePosition(null);
 
 		// clean out dungeon stuff
 		$this->dm->cleanupDungeoneer($character);
@@ -633,6 +638,11 @@ class CharacterManager {
 
 		// TODO: permission lists - plus clear out those of old dead characters!
 
+		# Remove all allegiances -- as the retired have no loyalties.
+		$character->setRealm(null);
+		$character->setLiegeLand(null);
+		$character->setLiegePlace(null);
+		$character->setLiegePosition(null);
 
 		// clean out dungeon stuff
 		$this->dm->retireDungeoneer($character);
