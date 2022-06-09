@@ -18,6 +18,7 @@
 	{% if not journal.GMReviewed and journal.character and journal.character.user != user %}
 		{# <p>{{ 'journal.view.report'|trans({}, "messages")|raw }}</p> #}
 		<p><a href="{{ path('maf_journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
+		{#
 		{% if gm %}
 			<h4>{{ 'journal.gm.actions'|trans({}, "messages")}}<br>
 			<p>Public or Private? {% if journal.public %}<b>Public</b>{% elseif jounal.GMPrivate %}<b>Forced Private</b>{% else %}<b>Private</b>{% endif %}.<br>
@@ -29,5 +30,6 @@
 		{% if admin %}
 			<p><a href="{{ path('maf_journal_remove', {"id":journal.id}) }}">{{ 'journal.gm.remove'|trans({}, "messages") }}</a></p>
 		{% endif %}
+		#}
 	{% endif %}
 {% endblock %}
