@@ -97,6 +97,12 @@ user:
 
 contact:
  title:     Contact
+ discord: >
+   For questions, help, or most other things related to the game, the best way with the fastest response is very often just asking on our discord, which you can visit here:<br>
+   <br>
+   <a href="https://discord.gg/7YpAhEh">https://discord.gg/7YpAhEh</a><br>
+   <br>
+   If another player can't help you, the develop tries to check as often as he can for things he needs to provide input on.
  forum: >
    For questions, help or most other things related to the game, the best way with the fastest responses is very often our forum,
    which you can reach at this link:<br />
@@ -107,6 +113,7 @@ contact:
    because that way future players with the same question can find an answer there.
  tom: >
    If you need to contact Tom directly, send an e-mail to <a href="mailto:tom@mightandfealty.com">tom@mightandfealty.com</a>.
+ andrew: If you need to contact Andrew directly, and don't want to DM him on discord, you can also email him at <a href="mailto:andrew@lemuriacommunity.org">andrew@lemuriacommunity.org</a>.
 
 terms:
  title:     Terms of Service
@@ -776,6 +783,8 @@ settlement:
  unowned:     Independent
  owner:       Owner
  ownedby:     This settlement is ruled by %owner%.
+ occupier:    Contrary to ownership, it is flying the colors of %realm%.
+ occupant:    %char% appears to be directing an occupation here.
  stewardedby: %steward% is serving as steward.
  realm:       This settlement is part of %realm%.
  realm2:      Realm
