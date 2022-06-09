@@ -87,6 +87,7 @@ class UnitController extends Controller {
                         $units[$id] = [];
                         $units[$id]['obj'] = $each;
                         $settlement = $each->getSettlement();
+                        $units[$id]['settlement'] = $settlement;
                         if (!$settlement || $pm->checkSettlementPermission($settlement, $character, 'units'))  {
                                 $units[$id]['owner'] = true;
                         } else {
