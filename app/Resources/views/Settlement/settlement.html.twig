@@ -75,6 +75,12 @@
 
 	<h3>{{ 'settlement.political'|trans|title }}</h3>
 	<p class="condensed">
+	{% if settlement.occupier %}
+		{{ 'settlement.occupier'|trans({'%realm%':link(settlement.occupier)})|raw }}<br>
+	{% endif %}
+	{% if settlement.occupant %}
+		{{ 'settlement.occupant'|trans({'%char%':link(settlement.occupant)})|raw }}<br>
+	{% endif %}
 	{% if settlement.owner %}
 		{{ 'settlement.ownedby'|trans({'%owner%':link(settlement.owner)})|raw }}
 		{% if isowner or issteward %}
