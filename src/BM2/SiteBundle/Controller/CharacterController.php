@@ -462,6 +462,10 @@ class CharacterController extends Controller {
 				$character->setRetired(false);
 			}
 			$character->setInsidePlace($place);
+			if ($character->getList() != 1) {
+				# Resets this on formerly retired characters.
+				$character->setList(1);
+			}
 			list($conv, $supConv) = $convMan->sendNewCharacterMsg($realm, $house, $place, $character);
 			# $conv should always be a Conversation, while supConv will be if realm is not Ultimate--otherwise null.
 			# Both instances of Converstion.
