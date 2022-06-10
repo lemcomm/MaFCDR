@@ -83,7 +83,8 @@ class GameController extends Controller {
 					'active' => $user->getActiveCharacters()->count(),
 					'retired' => $user->getRetiredCharacters()->count(),
 					'dead' => $user->getDeadCharacters()->count(),
-					'public' => $user->getPublic()?'yes':'no'
+					'public' => $user->getPublic()?'yes':'no',
+					'restricted' => $user->getRestricted()?'yes':'no',
 				);
 			}
 		}
