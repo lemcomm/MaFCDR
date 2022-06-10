@@ -215,7 +215,7 @@ map:
   world:      You are trying to leave the known world. The gods will not allow that.
   prisoner:   As a prisoner, you cannot travel freely.
   restricted: Since your account is currently restricted, you cannot travel.
-  pointerror: You must set a destination before beggining travel. Click somewhere on the map to start the travel line. Each point adds a waypoint. Once you've completed a path, then hit the set route button.
+  pointerror: You must set a destination before beginning travel. Click somewhere on the map to start the travel line. Each point adds a waypoint. Once you've completed a path, then hit the set route button.
  info:
   length:   Route length
 
@@ -234,7 +234,7 @@ account:
  nocharacters:  You have not yet created any characters.
  abovelimit: >
    You have more active characters than your current subscription level allows. Until you have either raised your subscription level
-   or reduced the number of living characters, actions and travel on all your characters will be severely limited. You can write
+   or reduced your number of living characters, actions and travel on all your characters will be severely limited. You can write
    messages and check your characters in order to decide which to retire and do so in a proper way, but you will not be able to
    really play them.
  list:          Click to move this character to a different list
@@ -299,11 +299,11 @@ account:
     PayPal also handles <b>credit card payments</b>.<br />
     Payments are handled through my company, <b>Calitarus GmbH</b>, so that is what you'll see on your order and receipt.
   history:  Payment History
-  type:     transaction type
-  date:     date
-  amount:   amount
-  currency: currency
-  code:     transaction code
+  type:     Transaction type
+  date:     Date
+  amount:   Amount
+  currency: Currency
+  code:     Transaction code
   success:  The transaction has been completed successfully. It will take a few seconds to process.
   fail:     The transaction could not be completed. Sorry. Check your payment provider statement for errors. If the payment went through on your side, please contact tom@mightandfealty.com so I can fix this problem manually.
   mail:
@@ -420,7 +420,7 @@ account:
   intro: >
     You can make gifts to friends in the form of credits. Be it because you just like them, or they don't have a credit card
     or any of the other payment options, or for whatever other reason you have.<br />
-    You need to know your friends e-mail address for this. We will generate a code and send it to both you and your friend. If your friend
+    You need to know your friend's e-mail address for this. We will generate a code and send it to both you and your friend. If your friend
     doesn't want the gift, you can simply use the code yourself to take it back.
   email:    Send to e-mail
   credits:  Amount of credits
@@ -428,7 +428,7 @@ account:
   invite:   Invite your friend
   gift:     Make this gift
   success: >
-    Your gift of %credits% credits has been sent to your friends account, and an e-mail with the text you
+    Your gift of %credits% credits has been sent to your friend's account, and an e-mail with the text you
     entered should be in their mailbox in some moments. We will also send a copy to your e-mail address.
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
@@ -438,7 +438,7 @@ account:
    subject:   Might & Fealty Gift
    body: >
      <p>Your friend (cc'ed in this e-mail) has given you a gift of <b>%credits% credits</b> in Might & Fealty.</p>
-     <p>He also sends this message:</p>
+     <p>They also send this message:</p>
      <hr />
      <p>%message%</p>
  invite:
@@ -512,7 +512,7 @@ newcharacter:
  overspawn2: Living character spawning or unretiring is restricted to only happen as often as the number of currently living characters you have. First four characters aren't limited. Characters 5-10 have a three day cooldown. 11 through 25 have a week cooldown. Anything past that is a 15 day cooldown. You can next spawn a character at %date% (server time). While you can still make characters, you won't be able to place them in game.
  help:
   name:      The full name of your character, including given and family name, but not including any titles. required
-  gender:    required
+  gender:    Required
   father:    Your father can be any male character of yourself or in a sexual relationship with one of your female characters. In the latter case, the mother will have to be the (or one of the) father's partner(s).
   mother:    Your mother can be any female character of yourself or in a sexual relationship with one of your male characters. In the latter case, the father will have to be the (or one of the) mother's partner(s).
   partner:   If you want to start a character as married to another of your own characters. Marriages with characters of other players have to be secured in-game.
@@ -672,17 +672,17 @@ character:
    title:     Arriving in %name%
    intro:     As one of the many houses of the game, joining %name% will immediately start you as part of their house as a member but otherwise unaligned First One. This will get you in their conversations, announce your arrival, and, hopefully, get you towards something to do fairly quickly. Even though your presence is announced, it is suggested that you also introduce yourself as well.<br /><br />Note: Might & Fealty is a slower game, so it's entirely possible you won't get a response for several hours.
  details:
-  realm:      realm(s)
-  ultimate:   sovereign realm(s)
-  entourage:  entourage
-  soldiers:   soldiers
+  realm:      Realm(s)
+  ultimate:   Sovereign realm(s)
+  entourage:  Entourage
+  soldiers:   Soldiers
  personality: Personality
 
 bandits:
  title:   Bandits
  intro:   You can also temporarily play bandit characters, see [bandits]. Choose one of the free bandits below:
  choose:  Bandit to play:
- submit:  choose this bandit character
+ submit:  Choose this bandit character
 
 achievements:
  title:       Achievements
@@ -729,7 +729,7 @@ form:
   displayname:  The name shown in public lists such as the VIP players list
   username: This is used to log into Might & Fealty and won't display anywhere in game.
   email: This is your email and will be used to receive game notifications.
-  gmname: This is an alias you can have other GM's recognize you by. Perhaps your Discord handle?
+  gmname: This is an alias you can have other GMs recognize you by. Perhaps your Discord handle?
   publicadmin: Publicly display your admin status.
   public: Opt to have your your public name, join date, user comments, and character list be public. Or not.
   profile: These are your user comments. You can put anything here and you can link to other in-game things if you like.
@@ -911,8 +911,8 @@ hour:         hour|hours
 minute:       minute|minutes
 untilturn:    %h% %hours%, %m% %minutes% until next day change
 untilturn2:   %m% %minutes% until next day change
-location:     location
-coordinates:  coordinates
+location:     Location
+coordinates:  Coordinates
 spotdistance: Spotting distance
 actdistance:  Interaction distance
 travelspeed:  Travel speed
@@ -978,14 +978,14 @@ popdensity:  People per square mile
 day:         day|days
 today:       today
 
-source:      source
-destination: destination
-resources:   resources
-food:        food
-wood:        wood
-metal:       metal
-goods:       goods
-money:       wealth
+source:      Source
+destination: Destination
+resources:   Resources
+food:        Food
+wood:        Wood
+metal:       Metal
+goods:       Goods
+money:       Wealth
 
 background:  background
 estate:      estate|estates
