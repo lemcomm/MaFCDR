@@ -668,6 +668,7 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
+		$this->checkCharacterLimit($user);
 
 		$em = $this->getDoctrine()->getManager();
 		$character = $em->getRepository('BM2SiteBundle:Character')->find($id);
