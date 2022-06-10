@@ -102,11 +102,11 @@ description:
  tower: >
    The watch tower provides an elevated spot to watch for nearby activity. They do not serve as defensive
    structures and are not fortified.<br />
-   Whenever a watchtower is within your spotting distance, you automatically gain access to the towers spotting
+   Whenever a watchtower is within your spotting distance, you automatically gain access to the tower's spotting
    circle as your scouts use the tower to increase their own range.
  borderpost: >
-   Sometimes just a border marker, such as a boundary stone, and sometimes a toll booth and small guard post,
-   no matter the appearance, the border post shows where one crosses into a different territory.<br />
+   Sometimes just a border marker, such as a boundary stone, and sometimes a toll booth and small guard post.
+   No matter the appearance, the border post shows where one crosses into a different territory.<br />
    Border posts are mostly used as meeting points of roads between settlements.
  signpost: >
    Marked with directions, signposts are usually posted near crossroads or intersections. It also works the
@@ -124,7 +124,7 @@ description:
    in reality most of the experiments are far less dangerous or spectacular. While much of the research done
    here is of questionable quality, there is the occasional poison or interesting substance discovered.
  Apothecary: >
-   Sometimes called an herbalist, or a pharmacist, the apothecary formulates and dispenses medical herbs and drugs
+   Sometimes called a herbalist, or a pharmacist, the apothecary formulates and dispenses medicinal herbs and drugs
    to other medical workers or even to patients directly. The inclusion of such an individual in a society is
    certain to aid in survival.
  Archery Range: >
@@ -151,7 +151,7 @@ description:
  Blacksmith: >
    Forge, anvil and loud noises - the blacksmith turns metal into tools for sale and simple weapons to equip soldiers.
  Bladesmith: >
-   Specialised on swords, this craftsman knows the ancient secrets of how to make a blade both light and strong,
+   Specialised in swords, this craftsman knows the ancient secrets of how to make a blade both light and strong,
    and forge metal into swords.
  Bowyer: >
    A specialist craftsman who builds bows, crossbows and other personal ranged weapons.
@@ -171,17 +171,17 @@ description:
    The dockyard is an area in a settlement for processing and handling ships and their cargo and passengers. Some larger
    dockyards may also have shipbuilding capabilities, and many are capable of handling some smaller repairs.
  Empty Moat: >
-   An empty moat, otherwise known as a ditch, is an excavated area of land around a foritification put in place to deliberately
+   An empty moat, otherwise known as a ditch, is an excavated area of land around a fortification put in place to deliberately
    slow the advance of attackers. Normally, there is a bridge that can be let down to ease authorized travelers getting in and out.
  Fairground: >
    A larger and more permanent place of trade, the fairground allows for extensive trade and barter as well as special
    events which bring in traders from far away places and through trade increase the local wealth.
  Filled Moat: >
-   A filled moat, or a ditch filled with water or other liquid, is used to considerably slow attacking forces reaching the walls
+   A filled moat, or a ditch filled with water or other liquid, is used to considerably slow attacking forces from reaching the walls
    of a fortification. Some filled moats may also include animals in the water that attack anyone who may be so unlucky as to fall in.
  Fishery: >
-   A small port, boat yard and processing facilities for sea fishing, adding more fish to the menu of the local inhabitants
-   as fishermen can go further out with better boats and better nets than they can build by themselves.<br />
+   A small port, boat yard and processing facilities for sea or lake fishing, adding more fish to the menu of the local inhabitants
+   as fishermen can go further out with better boats and better nets than they could build by themselves.<br />
    Not the same as the dock feature, which is for military transport ships.
  Fortress: >
    Very few lords can afford the construction of one of these massive fortifications. A fortress is a reinforced stone
@@ -197,24 +197,24 @@ description:
    A small house for the guards and soldiers of the settlement to gather and store their equipment, allowing for the
    training and recruitment of some basic soldier types.
  Guild District: >
-   A larger and more formalized version of the Guild Square, the Guild District is an area in a city specifically setup by the
+   A larger and more formalized version of the Guild Square, the Guild District is an area in a city specifically set up by the
    administration for the dealings of the various guilds and associations.
  Guild Square: >
-   A square or plaza within a settlement that has come to home to various guilds and associations. Just the presence of the
+   A square or plaza within a settlement that has come to house various guilds and associations. Just the presence of the
    guild square is enough to draw some of the mortal guilds to a settlement, as having a guild square also entails a settlement
    having the administrative oversight to deal with guilds.
  Heavy Armourer: >
-   A rare specialist for heavy armor who can work miracles with metal and create the rare and valuable plate armor, the
+   A rare specialist for heavy armor who can work miracles with metal and create the rare and valuable plate armor - the
    ultimate in personal armor.
  Hunters Lodge: >
    A structure built for one or more woodland hunters in order to better take advantage of hunting in the area.
  Imperial Seat: >
    The Seat of Power for an Empire, the Imperial Seat supports the administration of such world powers, and contains
    the various bureaucratic workers and offices that keep it all working. The completion of such a complex array of offices
-   and buildings, tends to be quite an accomplishment.
+   and buildings tends to be quite an accomplishment.
  Inn: >
-   The village inn or for towns and cities a collection of roadhouses, inns, brothels and similar places for travellers to
-   rest and spend the night, this is where you can also find the odd talent to hire or meet shady figures at corner tables
+   The village inn or, for towns and cities, a collection of roadhouses, inns, brothels and similar places for travellers to
+   rest and spend the night. This is where you can also find the odd talent to hire or meet shady figures at corner tables
    who can provide you with mercenaries.
  Irrigation Ditches: >
    A series of small canals and ditches bringing water from a river deeper into the nearby farmland, which will improve
@@ -234,19 +234,19 @@ description:
    Central storage and processing area for woodcutting and forestry work. This improves the efficiency of woodcutting
    in the area, resulting in higher wood production.
  Market: >
-   A place for merchants and local farmers to buy and sell their products. A market improves trade and local economy,
+   A place for merchants and local farmers to buy and sell their products. A market improves trade and the local economy,
    giving a slight boost to wealth.
  Mason: >
    A basic craftsman, the mason is required for stoneworks and buildings made of stone.
  Master Mason: >
-   The most advanced masonry techniques of the age are known only to a select few craftsman.
+   The most advanced masonry techniques of the age are known only to a select few craftsmen.
  Merchants Quarter: >
    An entire section of the settlement dedicated to trade and commerce, housing warehouses, an exchange, market places and
    guild houses.
  Mill: >
    Wind or water mills turn grain into flour, enhancing local food production. The miller usually takes a part of the grain
    for himself as payment, which makes him both well-off and disliked in most places. Nevertheless, the mill is a lot faster
-   and less manual work than manual grindstones.
+   and involves less manual work than manual grindstones.
  Mine: >
    Ore and other valuables need to be dug up and that is what the miners do inside a mine. Greatly enhancing metal production,
    the mine improves the creation of metal-based goods, weapons and armors.<br />
@@ -324,7 +324,7 @@ description:
    Adding towers to the fortifications of a settlement allows the defenders to fight back and increases the spotting distance
    of the settlement, allowing for early warnings.
  Wood Wall: >
-   A more fortified and refined palisade, the wood wall encloses the settlement and provides it with basic defenses,
+   A more fortified and refined palisade, the wood wall encloses the settlement and provides it with basic defenses
    against wild animals, bandit and unorganized attackers.
 
 condition:
