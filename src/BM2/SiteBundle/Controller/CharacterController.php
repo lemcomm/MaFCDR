@@ -971,7 +971,7 @@ class CharacterController extends Controller {
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
 				'required'=>false,
-				'label'=>'meta.kill.death',
+				'label'=>'meta.background.death.desc',
 				'translation_domain'=>'actions'
 				))
 			->add('sure', 'checkbox', array(
