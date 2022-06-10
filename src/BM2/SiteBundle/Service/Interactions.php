@@ -414,13 +414,15 @@ class Interactions {
 	}
 
 	public function abandonSettlement(Character $character, Settlement $settlement, $keepRealm) {
-		if ($settlement->getOwner() == $character) {
+		if ($settlement->getOwner() === $character) {
 			if (!$keepRealm) {
 				$this->pol->changeSettlementRealm($settlement, $settlement->getOccupier(), 'abandon');
 			}
 			$this->pol->changeSettlementOwner($settlement, $settlement->getOccupant(), 'abandon');
 			$this->em->flush();
 			return true;
+		} elseif ($settlement->getOccupant() === $character) {
+			$this->pol->endOccupation($settlement, 'abandon', false, $character);
 		} else {
 			return false;
 		}
