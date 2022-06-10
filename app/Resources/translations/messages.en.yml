@@ -942,9 +942,9 @@ charstatus:
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 requests:     %number% request|%number% requests
-inside:       Inside %settlement%
-inside2:      Inside %place%, in %settlement%
-inside3:      Inside %place%, near %settlement%
+inside:       inside %settlement%
+inside2:      inside %place%, in %settlement%
+inside3:      inside %place%, near %settlement%
 near:         Near %settlement%
 familiarity:
  0:           You are new to this region and not familiar with the environment.
@@ -981,11 +981,11 @@ today:       today
 source:      Source
 destination: Destination
 resources:   Resources
-food:        Food
-wood:        Wood
-metal:       Metal
-goods:       Goods
-money:       Wealth
+food:        food
+wood:        wood
+metal:       metal
+goods:       goods
+money:       wealth
 
 background:  background
 estate:      estate|estates
