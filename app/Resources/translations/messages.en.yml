@@ -159,7 +159,7 @@ map:
  layers:       Layers
  map:          Abstract map
  graphical:    Graphical map
- search:       Search for settlement
+ search:       Search for a settlement
  searching:    Searching...
  settlements:  Settlements
  realms:       Sovereign realms
@@ -287,8 +287,8 @@ account:
     security experts and may contain additional weaknesses unknown at this time.</i><br />
     <br /><br />
     To activate or disable Auto-Login, click the buttons below:
-  enable:   enable
-  disable:  disable
+  enable:   Enable
+  disable:  Disable
  payment:
   title:    Account Balance
   credits:  You have %amount% credits in your account.
@@ -333,7 +333,7 @@ account:
   redeemed3:  The code you have entered is valid and has been redeemed for %credits% game credits.
   redeemed4:  The code you have entered is valid and has been redeemed for %credits% game credits and a VIP status of "%vip%".
  credits:
-  name:     credits
+  name:     Credits
   sum:      %amount% credits
   title:    Credits & Gifts
   link:     Credits and Gifts
