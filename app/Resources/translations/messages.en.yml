@@ -192,6 +192,7 @@ map:
  others:    Foreign characters
  past:      Outdated spottings
  ownedplace: Owned settlements
+ occupiedplace: Occupied settlements
  indyplace: Independent settlements
  spot:      Your spotting distance
  act:       Your interaction distance
@@ -234,7 +235,7 @@ account:
  nocharacters:  You have not yet created any characters.
  abovelimit: >
    You have more active characters than your current subscription level allows. Until you have either raised your subscription level
-   or reduced your number of living characters, actions and travel on all your characters will be severely limited. You can write
+   or reduced the number of living characters, actions and travel on all your characters will be severely limited. You can write
    messages and check your characters in order to decide which to retire and do so in a proper way, but you will not be able to
    really play them.
  list:          Click to move this character to a different list
@@ -428,7 +429,7 @@ account:
   invite:   Invite your friend
   gift:     Make this gift
   success: >
-    Your gift of %credits% credits has been sent to your friend's account, and an e-mail with the text you
+    Your gift of %credits% credits has been sent to your friends account, and an e-mail with the text you
     entered should be in their mailbox in some moments. We will also send a copy to your e-mail address.
   error:
    self:      You can make gifts to yourself, of course, but not in Might & Fealty credits.
@@ -783,6 +784,7 @@ settlement:
  unowned:     Independent
  owner:       Owner
  ownedby:     This settlement is ruled by %owner%.
+ occupation:  Occupation?
  occupier:    Contrary to ownership, it is flying the colors of %realm%.
  occupant:    %char% appears to be directing an occupation here.
  stewardedby: %steward% is serving as steward.
