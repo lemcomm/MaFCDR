@@ -98,14 +98,14 @@ conversation:
  child:
   reference: sub-topics to this:
  nearby:
-  label:		characters in the vicinity that you can contact
+  label:		Characters in the vicinity that you can contact
  captor:
-  label:		send a message to your captor
+  label:		Send a message to your captor
  owner:
-  label:    leave a message for the owner of the nearby settlement
+  label:    Leave a message for the owner of the nearby settlement
  recipients:
-  label:		existing contacts that you can include
- create:		create new conversation
+  label:		Existing contacts that you can include
+ create:		Create new conversation
  messages:  %total% messages, %unread% unread
  notmember: you are not a participant
  participants:
@@ -145,7 +145,7 @@ message:
   type:   Type
  reply:
   title:		Reply to Message
-  submit:	  send reply
+  submit:	  Send reply
  send:      Send Message
  new:       new
  response:  in response to:
