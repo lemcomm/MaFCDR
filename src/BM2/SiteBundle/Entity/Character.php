@@ -468,17 +468,21 @@ class Character {
 		}
 	}
 
-	public function hasNoSoldiers() {
-		$noSoldiers = true;
+	public function countSoldiers() {
+		$count = 0;
 		if (!$this->getUnits()->isEmpty()) {
 			foreach ($this->getUnits() as $unit) {
-				if ($unit->getActiveSoldiers()->count() > 0) {
-					$noSoldiers = false;
-					break;
-				}
+				$count += $unit->getActiveSoldiers()->count();
 			}
 		}
-		return $noSoldiers;
+		return $count;
+	}
+
+	public function hasNoSoldiers() {
+		if ($this->countSoldiers() == 0) {
+			return true;
+		}
+		return false;
 	}
 
 	public function findAllegiance() {
