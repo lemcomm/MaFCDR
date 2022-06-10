@@ -1,9 +1,9 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-<h2>{{ 'diplomacy.report.between'|trans({"%myrealm%":link(myrealm), "%targetrealm%":link(targetrealm)},"politics")|title|raw }}</h2>
+<h2>{{ 'diplomacy.report.between'|trans({"%myrealm%":link(myrealm), "%targetrealm%":link(targetrealm)},"politics")|raw }}</h2>
 
-<h3>{{ 'diplomacy.report.position'|trans({"%realm%":link(myrealm)},"politics")|title|raw }}</h3>
+<h3>{{ 'diplomacy.report.position'|trans({"%realm%":link(myrealm)},"politics")|raw }}</h3>
 {% if we_to_them %}
 	<dl class="wide">
 		<dt>{{ 'diplomacy.status.name'|trans({},"politics") }}</dt>
@@ -24,7 +24,7 @@
 {% endif %}
 
 
-<h3>{{ 'diplomacy.report.position'|trans({"%realm%":link(targetrealm)},"politics")|title|raw }}</h3>
+<h3>{{ 'diplomacy.report.position'|trans({"%realm%":link(targetrealm)},"politics")|raw }}</h3>
 {% if they_to_us %}
 	<dl class="wide">
 		<dt>{{ 'diplomacy.status.name'|trans({},"politics") }}</dt>

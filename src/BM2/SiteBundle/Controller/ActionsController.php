@@ -338,7 +338,7 @@ class ActionsController extends Controller {
 				);
 				$em->flush();
 
-				return $this->render('Actions/giveship.html.twig', [
+				return $this->render('Actions/giveShip.html.twig', [
 					'success'=>true
 				]);
 				return array('success'=>true);
@@ -347,7 +347,7 @@ class ActionsController extends Controller {
 			}
 		}
 
-		return $this->render('Actions/giveship.html.twig', [
+		return $this->render('Actions/giveShip.html.twig', [
 			'form'=>$form->createView()
 		]);
 	}

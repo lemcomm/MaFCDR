@@ -1349,7 +1349,7 @@ unit:
   recall:   Recall Unit
   revoke:   Remove Marshal
   traveling: Unit is currently traveling back to base and will arrive in %days% days.
-  untrainable: This soldier has units in training but is not able to carry out that training. Only units that are assigned a base can train soldiers due to how soldier training works in the game. This message is just here to explain why soldiers aren't being trained. You can fix this by assigning the unit to a base.
+  untrainable: This unit has soldiers in training but is not able to carry out that training. Only units that are assigned a base can train soldiers due to how soldier training works in the game. This message is just here to explain why soldiers aren't being trained. You can fix this by assigning the unit to a base.
  assigned:
  assign:
   name:     Assign a Leader to %name%
