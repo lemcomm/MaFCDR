@@ -62,7 +62,7 @@ class ProcessSlumbersCommand extends ContainerAwareCommand {
 				if (!$char->getBackground()) {
 					$cm->newBackground($char);
 				}
-				$char->getBackground()->setRetirement('Forced into retirement by the Second Ones who eventually noticed his long term slumbering.');
+				$char->getBackground()->setRetirement('Forced into retirement by the Second Ones who eventually noticed their long term slumbering.');
 				$cm->retire($char);
 				$logger->info("  ".$char->getName().", ".$char->getId()." has been retired.");
 				$output->writeln("<info>  ".$char->getName().", ".$char->getId()." has been retired</info>");
