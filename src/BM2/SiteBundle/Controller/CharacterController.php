@@ -1040,7 +1040,7 @@ class CharacterController extends Controller {
 		$form = $this->createFormBuilder()
 			->add('retirement', 'textarea', array(
 				'required'=>false,
-				'label'=>'meta.retire.label',
+				'label'=>'meta.background.retirement.desc',
 				'translation_domain'=>'actions'
 				))
 			->add('sure', 'checkbox', array(
