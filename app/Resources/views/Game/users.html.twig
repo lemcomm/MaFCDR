@@ -10,6 +10,7 @@
 <table id="usertable">
 	<thead>
 		<tr>
+			<th>ID</th>
 			<th>Username</th>
 			<th>Account Level</th>
 			<th>Credits</th>
@@ -20,11 +21,13 @@
 			<th>Retired</th>
 			<th>Dead</th>
 			<th>Public</th>
+			<th>Restricted</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% for u in users %}
 		<tr>
+			<td align="right">{{ u.id }}</td>
 			<td><a href="{{ path("maf_user", {"user": u.id}) }}">{{ u.name }}</a></td>
 			<td align="right">{{ u.level }}</td>
 			<td>{{ u.credits }}</td>
@@ -35,6 +38,7 @@
 			<td align="right">{{ u.retired }}</td>
 			<td align="right">{{ u.dead }}</td>
 			<td>{{ u.public }}</td>
+			<td>{{ u.restricted }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

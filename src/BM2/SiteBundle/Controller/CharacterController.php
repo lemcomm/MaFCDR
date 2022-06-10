@@ -462,6 +462,10 @@ class CharacterController extends Controller {
 				$character->setRetired(false);
 			}
 			$character->setInsidePlace($place);
+			if ($character->getList() != 1) {
+				# Resets this on formerly retired characters.
+				$character->setList(1);
+			}
 			list($conv, $supConv) = $convMan->sendNewCharacterMsg($realm, $house, $place, $character);
 			# $conv should always be a Conversation, while supConv will be if realm is not Ultimate--otherwise null.
 			# Both instances of Converstion.
@@ -971,7 +975,7 @@ class CharacterController extends Controller {
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
 				'required'=>false,
-				'label'=>'meta.kill.death',
+				'label'=>'meta.background.death.desc',
 				'translation_domain'=>'actions'
 				))
 			->add('sure', 'checkbox', array(
@@ -1040,7 +1044,7 @@ class CharacterController extends Controller {
 		$form = $this->createFormBuilder()
 			->add('retirement', 'textarea', array(
 				'required'=>false,
-				'label'=>'meta.retire.label',
+				'label'=>'meta.background.retirement.desc',
 				'translation_domain'=>'actions'
 				))
 			->add('sure', 'checkbox', array(
