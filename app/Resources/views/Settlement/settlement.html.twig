@@ -77,6 +77,9 @@
 	<p class="condensed">
 	{% if settlement.occupier %}
 		{{ 'settlement.occupier'|trans({'%realm%':link(settlement.occupier)})|raw }}<br>
+		{% if settlement.occupier == character %}
+			<a href="{{ path('bm2_site_settlement_abandon', {'id':settlement.id}) }}">{{ 'control.abandon.name'|trans({},"actions") }}</a>
+		{% endif %}
 	{% endif %}
 	{% if settlement.occupant %}
 		{{ 'settlement.occupant'|trans({'%char%':link(settlement.occupant)})|raw }}<br>
