@@ -1686,6 +1686,7 @@ unavailable:
   yours:        You already control this settlement.
   fortified:    You cannot take control of a fortified settlement from the outside.
   defended:     The defending forces prevent your occupation of this settlement.
+  defended2:     The defending forces prevent this.
   nodefenders:  There are no troops defending this settlement, you can simply take it.
  trade:
   noestate:     You do not have any estates with which to trade.
