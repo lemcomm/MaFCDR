@@ -255,7 +255,7 @@ law:
   sol:       %days% Days
   freeform:
    label:    User Defined Law
-   desc:     Write a description of your law and what it entails.
+   desc:     Write a description of your law and what it entails. Note that these laws will not be enforced by the game. You'll need to do that yourself, by whatever means you wish.
   assocVisibility:
    label:    Association Visibility
    desc:     Determines whether the Association is visible to those outside of it.
