@@ -945,7 +945,7 @@ requests:     %number% request|%number% requests
 inside:       inside %settlement%
 inside2:      inside %place%, in %settlement%
 inside3:      inside %place%, near %settlement%
-near:         Near %settlement%
+near:         near %settlement%
 familiarity:
  0:           You are new to this region and not familiar with the environment.
  1:           You are not very familiar with this region.
