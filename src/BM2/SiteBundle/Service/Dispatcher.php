@@ -2892,11 +2892,11 @@ class Dispatcher {
 		}
 		$legislative = false;
 		foreach ($realm->getPositions() as $pos) {
-			if ($pos->getRuler()) {
+			if ($pos->getRuler() && $pos->getHolders()->contains($this->getCharacter())) {
 				$legislative = true;
 				break;
 			}
-			if ($pos->getLegislative()) {
+			if ($pos->getLegislative() && $pos->getHolders()->contains($this->getCharacter())) {
 				$legislative = true;
 				break;
 			}
