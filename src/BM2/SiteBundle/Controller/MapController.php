@@ -146,7 +146,6 @@ class MapController extends Controller {
 			case 'towers':			return $this->jsonData($this->dataTowers($mode));
 			case 'realms':			return $this->jsonData($this->dataRealms($mode));
 			case 'cultures':		return $this->jsonData($this->dataCultures($mode, $lowleft, $upright));
-			case 'offers':			return $this->jsonData($this->dataOffers($mode, $lowleft, $upright));
 			case 'trades':
 				if ($request->query->get('secret')=='91c72c604637ec525591efac687690660d67d974') {
 					return $this->jsonData($this->dataTrades($mode, $request->query->get('resource')));
@@ -375,30 +374,10 @@ class MapController extends Controller {
 		return $features;
 	}
 
-	private function dataOffers($mode, $lowleft, $upright) {
-		$features = array();
-		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT o.id, s.id as settlement, count(t) as amount, ST_AsGeoJSON(g.center) as location FROM BM2SiteBundle:KnightOffer o JOIN o.settlement s JOIN s.geo_data g JOIN o.soldiers t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY o.id, s.id, g.center');
-		$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
-		$result = $query->getResult();
-		foreach ($result as $row) {
-			$features[] = array(
-				'type' => 'Feature',
-				'properties' => array(
-					'id' => $row['id'],
-					'place' => $row['settlement'],
-					'amount' => $row['amount']
-					),
-				'geometry' => json_decode($row['location'])
-			);
-		}
-		return $features;
-	}
-
 	private function dataSettlements($mode, $lowleft, $upright) {
 		$features = array();
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, s.population+s.thralls as population, ST_AsGeoJson(g.center) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, g.center');
+		$query = $em->createQuery('SELECT s.id, s.name, c.id as owner_id, r.id as occupier_id, o.id as occupant_id, s.population+s.thralls as population, ST_AsGeoJson(m.location) as center, SUM(CASE WHEN b.active = true THEN t.defenses ELSE 0 END) as defenses FROM BM2SiteBundle:Settlement s JOIN s.geo_data g LEFT JOIN s.geo_marker m LEFT JOIN s.owner c LEFT JOIN s.buildings b LEFT JOIN b.type t LEFT JOIN s.occupant r LEFT JOIN s.occupier o WHERE ST_Contains(ST_MakeBox2D(ST_Point(:ax,:ay), ST_Point(:bx,:by)), g.center) = true GROUP BY s.id, c.id, r.id, o.id, m.location');
 		$query->setParameters(array('ax'=>$lowleft[0], 'ay'=>$lowleft[1], 'bx'=>$upright[0], 'by'=>$upright[1]));
 		foreach ($query->getResult() as $r) {
 			$def = 0;
@@ -419,6 +398,7 @@ class MapController extends Controller {
 					'id' => $r['id'],
 					'name' => $r['name'],
 					'owned' => $r['owner_id']?true:false,
+					'occupied' => $r['occupier_id']?true:$r['occupant_id']?true:false,
 					'population' => $r['population'],
 					'defenses' => $def
 					),

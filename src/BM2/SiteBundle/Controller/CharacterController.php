@@ -186,7 +186,7 @@ class CharacterController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 
 		$settlements = array();
-		foreach ($character->getOwnedSettlements() as $settlement) {
+		foreach ($character->findControlledSettlements() as $settlement) {
 			// FIXME: better: some trend analysis
 			$query = $em->createQuery('SELECT s.population as pop FROM BM2SiteBundle:StatisticSettlement s WHERE s.settlement = :here ORDER BY s.cycle DESC');
 			$query->setParameter('here', $settlement);
@@ -196,6 +196,11 @@ class CharacterController extends Controller {
 				$popchange = $data[0]['pop'] - $data[2]['pop'];
 			} else {
 				$popchange = 0;
+			}
+			if ($settlement->getOwner()) {
+				$owner = ['id' => $settlement->getOwner()->getId(), 'name' => $settlement->getOwner()->getName()];
+			} else {
+				$owner = false;
 			}
 			if ($settlement->getRealm()) {
 				$r = $settlement->getRealm();
@@ -220,14 +225,27 @@ class CharacterController extends Controller {
 					$recruits += $unit->getRecruits()->count();
 				}
 			}
+			if ($settlement->getOccupant()) {
+				$occupant = ['id' => $settlement->getOccupant()->getId(), 'name' => $settlement->getOccupant()->getName()];
+			} else {
+				$occupant = false;
+			}
+			if ($settlement->getOccupier()) {
+				$occupier = ['id' => $settlement->getOccupier()->getId(), 'name' => $settlement->getOccupier()->getName()];
+			} else {
+				$occupier = false;
+			}
 
 			$settlements[] = array(
 				'id' => $settlement->getId(),
+				'owner' => $owner,
 				'name' => $settlement->getName(),
 				'pop' => $settlement->getFullPopulation(),
 				'peasants' => $settlement->getPopulation(),
 				'thralls' => $settlement->getThralls(),
 				'size' => $settlement->getSize(),
+				'occupier' => $occupier,
+				'occupant' => $occupant,
 				'popchange' => $popchange,
 				'militia' => $militia,
 				'recruits' => $recruits,

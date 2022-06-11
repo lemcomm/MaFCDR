@@ -108,7 +108,9 @@ event:
   occupied4:    %character% has taken over the occupation.
   endoccupation:
    manual:      %character% has declared an end to the occupation by %realm%.
-   take:        The occupation lead by %character% has ended due to his replacing the administration with his own.
+   abandon:     %character% has abandoned their occupation, ending the control of %realm% over it.
+   abandon2:    %character% has abandoned their occupation.
+   take:        The occupation lead by %character% has ended due to their replacing the administration with their own.
    othertake:   The occupation lead by %character% has ended due to the takeover of the administration by another.
    warended:    With the end of the war by %realm%, the occupation lead by %character% has ended.
    manual2:      %character% has declared an end to the occupation.
