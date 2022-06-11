@@ -1,6 +1,7 @@
 /*
 	OpenLayers Interface for Might & Fealty
 	(C)2013-2022 by Andrew Gwynn <andrew@lemuriacommunity.org>
+	Originally created by Tom Vogt <tom@lemuria.org>
 	All Rights Reserved
 */
 
@@ -886,7 +887,9 @@ var zoomSupport = {
 	settlementStrokeColor: function(feature) {
 		if (feature.attributes.defenses > 0 && scale() <= 100) {
 			return '#000000';
-		} else if (feature.attributes.owned) {
+		} else if (feature.attributes.occupied) {
+			return '#97059c';
+		} if (feature.attributes.owned) {
 			return '#a00000';
 		} else {
 			return '#0000a0';
