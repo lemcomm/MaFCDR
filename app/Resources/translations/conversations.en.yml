@@ -107,7 +107,7 @@ conversation:
   label:		Existing contacts that you can include
  create:		Create new conversation
  messages:  %total% messages, %unread% unread
- notmember: you are not a participant
+ notmember: You are not a participant.
  participants:
   label:    %count% participants
  leave:
