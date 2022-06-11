@@ -218,6 +218,7 @@ law:
   repeal:
    header:    Repeal a Law
    intro:     If a law has outlived it's usefulness, you can always just repeal it rather than update and replace it. Of course, if you change your mind later, you can just enact a new one. The law currently under review is displayed below.
+   success:   Law repealed successfully.
  header:
   mandatory: Type
   name:      Name
@@ -237,6 +238,7 @@ law:
    title:    Law Title
    desc:     Description of Law
    cascades: Applies to Subordinate Realms
+   success:  Law updated successfully.
    value:    Law Intent
    amount:   Amount
    mandatory:
@@ -253,6 +255,7 @@ law:
   sol:       %days% Days
   freeform:
    label:    User Defined Law
+   desc:     Write a description of your law and what it entails.
   assocVisibility:
    label:    Association Visibility
    desc:     Determines whether the Association is visible to those outside of it.
