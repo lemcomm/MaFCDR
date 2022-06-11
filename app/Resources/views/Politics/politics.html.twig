@@ -1,7 +1,7 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-<button id="style">toggle list style</button>
+<button id="style">Toggle list style</button>
 <div id="actionlist" class="boxlist">
 {% include "element/linklist.html.twig" with {"list":dispatcher.politicsActions, "domain":'politics', "who":'self'} %}
 </div>
