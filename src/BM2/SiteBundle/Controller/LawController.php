@@ -38,15 +38,19 @@ class LawController extends Controller {
 	  * @Route("/a{assoc}", name="maf_assoc_laws", requirements={"assoc"="\d+"})
 	  * @Route("/a{assoc}/", requirements={"assoc"="\d+"})
 	  */
-	public function lawsAction(Realm $realm=null, Association $assoc=null) {
+	public function lawsAction(Realm $realm=null, Association $assoc=null, Request $request) {
 		if (!$realm && !$assoc) {
 			$this->addFlash('error', $this->get('translator')->trans('law.route.lawsList.noorg', [], 'orgs'));
 			return $this->redirectToRoute('bm2_actions');
 		}
-		if ($realm) {
+		if ($request->get('_route') === 'maf_realm_laws') {
 			$char = $this->gateway('hierarchyRealmLawsTest', $realm);
+			$rCheck = true;
+			$aCheck = false;
 		} else {
 			$char = $this->gateway('assocLawsTest', $assoc);
+			$rCheck = false;
+			$aCheck = true;
 		}
 		if (!($char instanceof Character)) {
 			return $this->redirectToRoute($char);
@@ -58,10 +62,10 @@ class LawController extends Controller {
 			$new = 'maf_realm_laws_new';
 			$type = 'realm';
 			foreach ($realm->getPositions() as $pos) {
-				if ($pos->getRuler()) {
+				if ($pos->getRuler() && $pos->getHolders()->contains($this->getCharacter())) {
 					$change = true;
 					break;
-				} elseif ($pos->getLegislative()) {
+				} elseif ($pos->getLegislative() && $pos->getHolders()->contains($this->getCharacter())) {
 					$change = true;
 					break;
 				}
@@ -95,15 +99,19 @@ class LawController extends Controller {
 	  * @Route("/a{assoc}/new", name="maf_assoc_laws_new", requirements={"assoc"="\d+"})
 	  */
 	public function newLawAction(Realm $realm=null, Association $assoc=null, Request $request) {
-		if ($realm) {
+		if ($request->get('_route') === 'maf_realm_laws_new') {
 			$char = $this->gateway('hierarchyRealmLawNewTest', $realm);
+			$rCheck = true;
+			$aCheck = false;
 		} else {
 			$char = $this->gateway('assocLawNewTest', $assoc);
+			$rCheck = false;
+			$aCheck = true;
 		}
 		if (!($char instanceof Character)) {
 			return $this->redirectToRoute($char);
 		}
-		if ($realm) {
+		if ($rCheck) {
 			$org = $realm;
 			$type = 'realm';
 		} else {

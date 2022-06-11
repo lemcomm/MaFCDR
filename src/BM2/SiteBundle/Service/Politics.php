@@ -1017,6 +1017,13 @@ class Politics {
 					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
 					History::HIGH, true
 				);
+			} elseif ($why == 'abandon') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.abandon',
+					array("%link-realm%"=>$occupier->getId(), "%link-character%"=>$occupant->getId()),
+					History::HIGH, true
+				);
 			} elseif ($why =='take') {
 				if ($occupantTakeOver) {
 					$this->history->logEvent(
@@ -1067,6 +1074,13 @@ class Politics {
 				$this->history->logEvent(
 					$target,
 					'event.'.$event.'.endoccupation.manual2',
+					array("%link-character%"=>$occupant->getId()),
+					History::HIGH, true
+				);
+			} elseif ($why == 'abandon') {
+				$this->history->logEvent(
+					$target,
+					'event.'.$event.'.endoccupation.abandon2',
 					array("%link-character%"=>$occupant->getId()),
 					History::HIGH, true
 				);

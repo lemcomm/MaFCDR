@@ -1,6 +1,7 @@
 /*
 	OpenLayers Interface for Might & Fealty
-	(C)2013 by Tom Vogt <tom@lemuria.org>
+	(C)2013-2022 by Andrew Gwynn <andrew@lemuriacommunity.org>
+	Originally created by Tom Vogt <tom@lemuria.org>
 	All Rights Reserved
 */
 
@@ -13,7 +14,6 @@ var pastRouteFeature = null;
 var routelayer;
 var placerlayer;
 var roadlayer;
-var offerslayer;
 var errorlayer=null;
 var usedroadslayer=null;
 var hoverSelectPlace; var clickSelectPlace; var hoverSelectChars; var clickSelectChars; var clickSelectMarker;
@@ -89,7 +89,6 @@ if (typeof mapstrings == "undefined") {
 		'route': "Route Plot",
 		'invalid': "Invalid Route",
 		'usedroads': "Road Travel",
-		'offers': "Knight Offers",
 		'you': "Your Location",
 		'area': "Local Area"
 	};
@@ -144,7 +143,6 @@ function mapinit(divname, showswitcher, mode, keepsquare){
 			addsettlements(mode)
 			addrealms();
 			addroads();
-			addoffers();
 			break;
 		case 'featureconstruction':
 		case 'setmarker':
@@ -275,51 +273,6 @@ function addroads() {
 	roadlayer.setVisibility(true);
 	map.addLayer(roadlayer);
 	map.setLayerIndex(roadlayer, 10);
-}
-
-function addoffers() {
-	var styleMap = new OpenLayers.StyleMap ({
-		"default": new OpenLayers.Style({
-			'strokeColor': '#60a0f0',
-			'strokeWidth': 2,
-			'fillColor': '#0080a0',
-			'pointRadius': '${offersSize}'
-		}, {context: zoomSupport}),
-		"temporary": new OpenLayers.Style({
-			'strokeColor': '#a0ddff',
-			'strokeWidth': 2,
-			'fillColor': '#00a0f0',
-		}, {context: zoomSupport})
-	});
-
-	offerslayer = new OpenLayers.Layer.Vector(mapstrings.offers, {
-		renderers: ["SVG2", "SVG", "VML", "Canvas"],
-		styleMap: styleMap,
-		eventListeners: {
-			'loadstart': function(event){ loader_on('offers', mapstrings.offers); },
-			'loadend': function(event){ loader_off('offers'); }
-		},
-		strategies: [new OpenLayers.Strategy.BBOX()],
-		minScale: 50*minScaleMultiplier,
-		protocol: new OpenLayers.Protocol.HTTP({
-			url: basepath+"data?type=offers",
-			format: new OpenLayers.Format.GeoJSON()
-		})
-	});
-	offerslayer.setVisibility(true);
-	map.addLayer(offerslayer);
-	map.setLayerIndex(offerslayer, 8);
-
-	clickSelectOffer = new OpenLayers.Control.SelectFeature(offerslayer, {
-		hover: false,
-		highlightOnly: true,
-		renderIntent: "temporary",
-		eventListeners: {
-			featurehighlighted: OfferSelect,
-		}
-	});
-	map.addControl(clickSelectOffer);
-	clickSelectOffer.activate();
 }
 
 function addfeatures() {
@@ -666,22 +619,6 @@ function SettlementSelect(evt) {
 		}
 	});
 }
-function OfferSelect(evt) {
-	feature = evt.feature;
-
-	$("#sd").dialog("option", "title", mapstrings.offers);
-	$("#sd").html('<center><img src="'+loadimg+'"/></center>');
-	$("#sd").dialog("option", "buttons", null);
-	$.get(basepath+"details/offerslist/"+feature.attributes.place, function(data){
-		$("#sd").html(data);
-		$("#sd").dialog("option", "title", $("#sd_name").html());
-		$("#sd_name").hide();
-		$("#sd_details").hide();
-		if (! $("#sd").dialog("isOpen")) {
-			$("#sd").dialog("open");
-		}
-	});
-}
 function MarkerSelect(evt) {
 	feature = evt.feature;
 
@@ -939,7 +876,9 @@ var zoomSupport = {
 		return "";
 	},
 	settlementFillColor: function(feature) {
-		if (feature.attributes.owned) {
+		if (feature.attributes.occupied) {
+			return '#d907e0';
+		} else if (feature.attributes.owned) {
 			return '#c00000';
 		} else {
 			return '#0000c0';
@@ -948,7 +887,9 @@ var zoomSupport = {
 	settlementStrokeColor: function(feature) {
 		if (feature.attributes.defenses > 0 && scale() <= 100) {
 			return '#000000';
-		} else if (feature.attributes.owned) {
+		} else if (feature.attributes.occupied) {
+			return '#97059c';
+		} if (feature.attributes.owned) {
 			return '#a00000';
 		} else {
 			return '#0000a0';
@@ -1023,11 +964,6 @@ var zoomSupport = {
 	poiNameSize: function(feature) {
 		return 6000/scale();
 	},
-
-	offersSize: function(feature) {
-		var size = 5 + Math.sqrt(feature.attributes.amount);
-		return size*200/scale();
-	}
 }
 
 

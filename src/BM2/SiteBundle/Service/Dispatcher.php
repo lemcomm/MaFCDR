@@ -1057,10 +1057,10 @@ class Dispatcher {
 		if (!$settlement->getOccupant()) {
 			return array("name"=>"control.occupationend.name", "description"=>"unavailable.notoccupied");
 		}
-		if (!$settlement->isDefended() || $settlement->getOccupant() === $this->getCharacter()) {
+		if (!$settlement->isDefended() || $settlement->countDefenders()*2 <= $this->getCharacter()->countSoldiers()) {
 			return $this->action("control.occupationend", "maf_settlement_occupation_end");
 		} else {
-			return array("name"=>"control.occupationend.name", "description"=>"unavailable.notyours");
+			return array("name"=>"control.occupationend.name", "description"=>"unavailable.location.defended2");
 		}
 	}
 
@@ -1163,7 +1163,7 @@ class Dispatcher {
 		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.$check");
 		}
-		if ($settlement->getOwner() != $this->getCharacter()) {
+		if ($settlement->getOwner() != $this->getCharacter() && $settlement->getOccupant() != $this->getCharacter()) {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.notyours2");
 		}
 		return $this->action("control.abandon", "bm2_site_settlement_abandon");
@@ -2892,11 +2892,11 @@ class Dispatcher {
 		}
 		$legislative = false;
 		foreach ($realm->getPositions() as $pos) {
-			if ($pos->getRuler()) {
+			if ($pos->getRuler() && $pos->getHolders()->contains($this->getCharacter())) {
 				$legislative = true;
 				break;
 			}
-			if ($pos->getLegislative()) {
+			if ($pos->getLegislative() && $pos->getHolders()->contains($this->getCharacter())) {
 				$legislative = true;
 				break;
 			}

@@ -80,6 +80,9 @@
 	{% endif %}
 	{% if settlement.occupant %}
 		{{ 'settlement.occupant'|trans({'%char%':link(settlement.occupant)})|raw }}<br>
+		{% if character is not null and settlement.occupant == character %}
+			<a href="{{ path('bm2_site_settlement_abandon', {'id':settlement.id}) }}">{{ 'control.abandon.name'|trans({},"actions") }}</a><br>
+		{% endif %}
 	{% endif %}
 	{% if settlement.owner %}
 		{{ 'settlement.ownedby'|trans({'%owner%':link(settlement.owner)})|raw }}
