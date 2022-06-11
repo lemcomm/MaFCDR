@@ -149,10 +149,10 @@
 				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|capitalize }}
 			{% endif %}
 		{% elseif character.insideSettlement %}
-			{% trans with {'%settlement%':link(character.insidesettlement)} %}inside{% endtrans %}
+			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|capitalize }}
 		{% elseif character.location and app.session.get('nearest_settlement') %}
 			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
-			{% trans with {'%settlement%':link(app.session.get('nearest_settlement'))} %}near{% endtrans %}
+			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))}|capitalize }}
 		{% endif %}
 	</div>
 	{% endif %}
