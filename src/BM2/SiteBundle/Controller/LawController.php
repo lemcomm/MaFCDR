@@ -62,10 +62,10 @@ class LawController extends Controller {
 			$new = 'maf_realm_laws_new';
 			$type = 'realm';
 			foreach ($realm->getPositions() as $pos) {
-				if ($pos->getRuler() && $pos->getHolders()->contains($this->getCharacter())) {
+				if ($pos->getRuler() && $pos->getHolders()->contains($char)) {
 					$change = true;
 					break;
-				} elseif ($pos->getLegislative() && $pos->getHolders()->contains($this->getCharacter())) {
+				} elseif ($pos->getLegislative() && $pos->getHolders()->contains($char)) {
 					$change = true;
 					break;
 				}
