@@ -200,20 +200,20 @@ building:
   intro: >
     Arhcery ranges are excellent locations to practice the theory of archery. It won't help you do it under pressure, but it'll help you have an idea of what to do when you need to.
   train:
-   sling:       Train on Slings
-   staffsling:  Train on Staff Slings
-   shortbow:    Train on Short Bow
-   crossbow:    Train on Crossbow
-   longbow:     Train on Longbow
+   sling:       Train with a Sling
+   staffsling:  Train with a Staff Sling
+   shortbow:    Train with a Short Bow
+   crossbow:    Train with a Crossbow
+   longbow:     Train with a Longbow
  garrison:
   name:         Visit Garrison
   description:  A professional's barracks.
   intro: >
-    The soldiers here might not be as easily impressed as those in the barracks, but they do still have plenty of equipment available for you to train on, if you feel so inclined.
+    The soldiers here might not be as easily impressed as those in the barracks, but they do still have plenty of equipment available for you to train with, if you feel so inclined.
   train:
-   morningstar:       Train on Morningstar
-   broadsword:        Train on Broadsword
-   greataxe:          Train on Great Axe
+   morningstar:       Train with a Morningstar
+   broadsword:        Train with a Broadsword
+   greataxe:          Train with a Great Axe
  tavern:
   name:         Visit Tavern
   description:  Peasants' rumours from the area.
