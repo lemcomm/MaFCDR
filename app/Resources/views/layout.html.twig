@@ -144,9 +144,9 @@
 			{# nothing #}
 		{% elseif character.insidePlace %}
 			{% if character.insideSettlement %}
-				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)} %}inside2{% endtrans %}
+				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|capitalize }}
 			{% else %}
-				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)} %}inside3{% endtrans %}
+				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|capitalize }}
 			{% endif %}
 		{% elseif character.insideSettlement %}
 			{% trans with {'%settlement%':link(character.insidesettlement)} %}inside{% endtrans %}
