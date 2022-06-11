@@ -423,6 +423,8 @@ class Interactions {
 			return true;
 		} elseif ($settlement->getOccupant() === $character) {
 			$this->pol->endOccupation($settlement, 'abandon', false, $character);
+			$this->em->flush();
+			return true;
 		} else {
 			return false;
 		}
