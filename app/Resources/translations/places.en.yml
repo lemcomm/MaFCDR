@@ -44,7 +44,7 @@ place:
  history:    History
  actionable:
   name:      View Local Places of Interest
-  intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Eventually these will be expanded to allow realms to do customized introductions for new players with separate arrival descriptions, as well as exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
+  intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Places of interest allow realms and houses to establish an arrival location for new characters, with customized introductions to inform and attract new players. Eventually these will be expanded to exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
   list:      Local Places
  enter:
   name: Visit Place
