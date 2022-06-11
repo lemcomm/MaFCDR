@@ -1191,7 +1191,7 @@ personal:
   accepted: Conversely, you can also cancel some requests that you've previously accepted.
   cancelable:  Previously Accepted Requests
   list:        Pending Requests
-  empty:       For better or worse, it doesn't look like you have any request to review.
+  empty:       For better or worse, it doesn't look like you have any requests to review.
   summary:
    title:      Pending Requests
    none:       You don't currently have any pending requests.
@@ -1322,6 +1322,7 @@ unit:
  list:
   name:     Manage Units
   description: Oversee the units under your authority.
+  empty:    You currently have no units under your authority.
   intro:    From here you can manage those Units you command, marshall, or own, as appropriate.
   list:     Your Units
   rebase:   Rebase this Unit
