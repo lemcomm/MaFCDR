@@ -281,10 +281,10 @@ class ActionsController extends Controller {
 			$em = $this->getDoctrine()->getManager();
 
 			if ($data['amount'] > $character->getGold()) {
-				throw new \Exception("you cannot give more gold than you have.");
+				throw new \Exception("You cannot give more gold than you have.");
 			}
 			if ($data['amount'] < 0) {
-				throw new \Exception("you cannot give negative gold.");
+				throw new \Exception("You cannot give negative gold.");
 			}
 			$character->setGold($character->getGold() - $data['amount']);
 			$data['target']->setGold($data['target']->getGold() + $data['amount']);
