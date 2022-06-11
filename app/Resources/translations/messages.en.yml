@@ -1721,6 +1721,7 @@ unavailable:
  notassocowner: You are not the owner of this association.
  cantxfercapital: This place type cannot be transferred to another owner.
  notcadetapproved: Not approved by the Head of the House.
+ notlegislative: You do not hold a legislative position within this organisation.
 
 marker:
  name:      Marker name
