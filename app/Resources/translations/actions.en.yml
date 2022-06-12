@@ -1302,7 +1302,7 @@ place:
   name:   Visit A Place of Interest
  new:
   name:   Create Place of Interest
-  description:   Formalize a place of interest at your current location
+  description:   Formalize a place of interest at your current location.
   longdesc:       With the permission of the regional lord, you can formalize a new place of interest that others can visit. The creation is instant, but future upgrades will take time and resources.
  enter:
   name:   Enter Place
@@ -1391,17 +1391,3 @@ unit:
   intro:    From here you can choose to completely disband a unit, sending all the soldiers on home and reliquishing %name% to the annals of history.
   success:  Unit has been disbanded.
   fail:     Unit disbandment has failed.
-
-
-train:
- noduplicate: Other training actions have been automatically removed. Sorry, you can only train one skill at a time.
- sling:
-  success:   Finding an unused sling at the range, you begin practicing.
- staff sling:
-  success:   Finding an unused staff sling at the range, you begin practicing.
- shortbow:
-  success:   Finding an unused shortbow at the range, you begin practicing.
- crossbow:
-  success:   Finding an unused crossbow at the range, you begin practicing.
- longbow:
-  success:   Finding an unused longbow at the range, you begin practicing.
