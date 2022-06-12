@@ -30,6 +30,7 @@ place:
  owner:      Owner
  name:       Name
  insidenow:  You are currently within this Place of Interest.
+ noowner:    No one
  manage:
   name:      Manage Place Details
   description: Manage the details of %formalname%.
