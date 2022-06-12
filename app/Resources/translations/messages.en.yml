@@ -265,6 +265,10 @@ account:
   link:   Edit Data
   title:  Personal Data
   saved:  Your personal data has been updated.
+ password:
+  link:   Change Password
+  title:  Change Password
+  desc:   Tired of your old one? Feel like a new one? Change it here.
  settings:
   link:   Edit settings
   title:  Settings
