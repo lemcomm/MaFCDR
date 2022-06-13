@@ -2,3 +2,35 @@
 # Text translation strings for activities and skills
 # Author: Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
+train:
+ noduplicate: Other training actions have been automatically removed. Sorry, you can only train one skill at a time.
+ sling:
+  success:   Finding an unused sling at the range, you begin practicing.
+  notfound:  You find no slings at the range, and are unable to train.
+ staff sling:
+  success:   Finding an unused staff sling at the range, you begin practicing.
+  notfound:  You find no staff slings at the range, and are unable to train.
+ shortbow:
+  success:   Finding an unused shortbow at the range, you begin practicing.
+  notfound:  You find no shortbows at the range, and are unable to train.
+ crossbow:
+  success:   Finding an unused crossbow at the range, you begin practicing.
+  notfound:  You find no crossbows at the range, and are unable to train.
+ longbow:
+  success:   Finding an unused longbow at the range, you begin practicing.
+  notfound:  You find no longbows at the range, and are unable to train.
+ mace:
+  success:   Finding an unused mace at the barracks, you begin practicing.
+  notfound:  You find no maces at the barracks, and are unable to train.
+ sword:
+  success:   Finding an unused sword at the barracks, you begin practicing.
+  notfound:  You find no swords at the barracks, and are unable to train.
+ broadsword:
+  success:   Heaving an unused broadsword off the weapon rack, you begin practicing.
+  notfound:  You find no broadswords at the at the garrison's quarters, and are unable to train.
+ greataxe:
+  success:   Heaving an unused great axe off the weapon rack, you begin practicing.
+  notfound:  You find no great axes at the at the garrison's quarters, and are unable to train.
+ morningstar:
+  success:   Heaving an unused morningstar off the weapon rack, you begin practicing.
+  notfound:  You find no morningstars at the at the garrison's quarters, and are unable to train.

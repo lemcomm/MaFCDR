@@ -6,7 +6,7 @@
 placeactions: Place of Interest Actions
 
 buttons:
- submit:     submit
+ submit:     Submit
 
 names:
  name:       Short Name
@@ -30,6 +30,7 @@ place:
  owner:      Owner
  name:       Name
  insidenow:  You are currently within this Place of Interest.
+ noowner:    No one
  manage:
   name:      Manage Place Details
   description: Manage the details of %formalname%.
@@ -44,7 +45,7 @@ place:
  history:    History
  actionable:
   name:      View Local Places of Interest
-  intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Eventually these will be expanded to allow realms to do customized introductions for new players with separate arrival descriptions, as well as exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
+  intro:     Anyone with permission of the local lord can create a place of interest. Places of interest are semi-permanent, player created, in-game locations that share many functions with settlements. Places of interest allow realms and houses to establish an arrival location for new characters, with customized introductions to inform and attract new players. Eventually these will be expanded to exist as the gateway to player complexes which will allow you describe your world in more detail than ever before.
   list:      Local Places
  enter:
   name: Visit Place
@@ -79,7 +80,7 @@ place:
  destroy:
   name:         Destroy Place
   description:  Destroy %formalname%.
-  longdesc:     If you own a place, you can destroy a place. Once gone, they can't be reamde or recovered, though.
+  longdesc:     If you own a place, you can destroy a place. Once gone, they can't be remade or recovered, though.
   intro: >
     If you own a place, you can destroy a place. Once gone though, they can't be reamde or recovered, so be certain before you do this.
  hosthouse:     Currently residing here...
@@ -90,8 +91,8 @@ place:
   nohousedesc:  This Place can have arrivals but the house has no new player description.
   realminactive: This Place can have arrivals but the realm has not enabled it.
   norealmdesc:  This Place can have arrivals but the realm has no new player description.
- realmspawn:    This Place appears to be correctly setup to support arrivals for %realm%.
- housespawn:    This Place appears to be correctly setup to support arrivals for %house%.
+ realmspawn:    This Place appears to be correctly set up to support arrivals for %realm%.
+ housespawn:    This Place appears to be correctly set up to support arrivals for %house%.
  associations:
   create:       Formalize an Association
   none:         No associations are present here.
@@ -184,7 +185,7 @@ assoc:
  new:
   name:         Form a New Association Here
   description:  As a First One, you can always form a new association in any place of interest capable of supporting it.
-  longdesc:     Associations, otherwise known as guilds, religions, companies, cults, orders, and the like, are realm-less and family-less organizations of First Ones for various purposes. Just like real life though, the name and type of an association doesn't always describe it's purpose truthfully.
+  longdesc:     Associations, otherwise known as guilds, religions, companies, cults, orders, and the like, are realm-less and family-less organizations of First Ones for various purposes. Just like real life though, the name and type of an association doesn't always describe its purpose truthfully.
 military:
  siege:
   name:         Siege Actions

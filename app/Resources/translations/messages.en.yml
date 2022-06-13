@@ -948,10 +948,10 @@ charstatus:
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 requests:     %number% request|%number% requests
-inside:       Inside %settlement%
-inside2:      Inside %place%, in %settlement%
-inside3:      Inside %place%, near %settlement%
-near:         Near %settlement%
+inside:       inside %settlement%
+inside2:      inside %place%, in %settlement%
+inside3:      inside %place%, near %settlement%
+near:         near %settlement%
 familiarity:
  0:           You are new to this region and not familiar with the environment.
  1:           You are not very familiar with this region.
@@ -987,11 +987,11 @@ today:       today
 source:      Source
 destination: Destination
 resources:   Resources
-food:        Food
-wood:        Wood
-metal:       Metal
-goods:       Goods
-money:       Wealth
+food:        food
+wood:        wood
+metal:       metal
+goods:       goods
+money:       wealth
 
 background:  background
 estate:      estate|estates
@@ -1005,7 +1005,7 @@ build:
  underway:   under construction
 workforce:   workforce
 inheritance: inheritance
-nobody:      nobody
+nobody:      Nobody
 underconstruction:  Under construction
 finished:           Finished
 
@@ -1196,8 +1196,8 @@ events:
  log:       Journal
  type:      type
  logtitle:  Event Journal of %subject%
- from:      available from
- until:     available until
+ from:      Available from
+ until:     Available until
  events:    Events
  new:       new
  read:      read
@@ -1220,40 +1220,40 @@ events:
 
 interaction:
  message:
-  name:     recipient(s)
-  subject:  topic
-  body:     content
-  submit:   send letter
+  name:     Recipient(s)
+  subject:  Topic
+  body:     Content
+  submit:   Send letter
  attack:
-  name:     target(s)
-  message:  message to target(s)
-  submit:   initiate attack
+  name:     Target(s)
+  message:  Message to target(s)
+  submit:   Initiate attack
  grant:
-  name:         grant control
-  submit:       grant
+  name:         Grant control
+  submit:       Grant
  grant2:
-  name:         grant control
-  submit:       grant
+  name:         Grant control
+  submit:       Grant
  publication:
-  name:     new member(s)
-  submit:   add member(s)
+  name:     New member(s)
+  submit:   Add member(s)
  abdicate:
-  name:     announce as successor:
-  submit:   abdicate
+  name:     Announce as successor:
+  submit:   Abdicate
  giveship:
-  name:     give ship to:
-  submit:   give it
+  name:     Give ship to:
+  submit:   Give it
  givegold:
   name:     First One to receive your gold:
   amount:   Amount of gold to give:
-  submit:   give it
+  submit:   Give it
  giveartifact:
   name:     First One to receive the artifact:
   which:    Which artifact to give:
-  submit:   give artifact away
+  submit:   Give artifact away
  surrender:
   name:     First One to surrender to
-  submit:   surrender yourself
+  submit:   Surrender yourself
  steward:
   name:     First One to Appoint
   submit:   Delegate
@@ -1267,13 +1267,13 @@ battle:
  participants:  participants
  location:
   nowhere:      neverwhere battle
-  of:           the battle of %location%
-  siege:        the siege of %location%
-  assault:      the assault on %location%
-  sortie:       the sortie from %location%
-  near:         a battle near %location%
-  around:       a battle in the vicinity of %location%
- defenses:      an assault against a defended position with
+  of:           The battle of %location%
+  siege:        The siege of %location%
+  assault:      The assault on %location%
+  sortie:       The sortie from %location%
+  near:         A battle near %location%
+  around:       A battle in the vicinity of %location%
+ defenses:      An assault against a defended position with
  initial:       initial troops
  combat:        combat
  ranged:
@@ -1325,14 +1325,14 @@ battle:
   ranged:
    kill:        %who% was killed.
    capture:     %who% surrendered to %by%.
- finish:        survivors
+ finish:        Survivors
  fate:
   title:        fate of First Ones
   killed:       %character% was killed.
   wounded:      %character% was wounded.
   victory:      %character% was victorious.
   retreat:      %character% retreated.
-  captured:     %character% captured by the enemy
+  captured:     %character% was captured by the enemy.
 
 description:
  scout: >
@@ -1727,6 +1727,7 @@ unavailable:
  notassocowner: You are not the owner of this association.
  cantxfercapital: This place type cannot be transferred to another owner.
  notcadetapproved: Not approved by the Head of the House.
+ notlegislative: You do not hold a legislative position within this organisation.
 
 marker:
  name:      Marker name
