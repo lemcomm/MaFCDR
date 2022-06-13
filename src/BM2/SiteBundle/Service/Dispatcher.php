@@ -4199,23 +4199,26 @@ class Dispatcher {
 		if ($name) {
 			$data['name'] = $name;
 		}
-		if ($url && array_key_exists('url', $data)) {
-			$data['url'] = $url;
-		}
-		if ($desc) {
-			$data['description'] = $desc;
-		}
-		if ($longdesc) {
-			$data['long'] = $longdesc;
-		}
-		if ($params) {
-			$data['parameters'] = $params;
-		}
-		if ($trans) {
-			$data['transkeys'] = $trans;
-		}
-		if ($vars) {
-			$data['vars'] = $vars;
+		# If url is defined, test validated successfully. Overwrite other data. If not, only overwrite name and return.
+		if (array_key_exists('url', $data)) {
+			if ($url && array_key_exists('url', $data)) {
+				$data['url'] = $url;
+			}
+			if ($desc) {
+				$data['description'] = $desc;
+			}
+			if ($longdesc) {
+				$data['long'] = $longdesc;
+			}
+			if ($params) {
+				$data['parameters'] = $params;
+			}
+			if ($trans) {
+				$data['transkeys'] = $trans;
+			}
+			if ($vars) {
+				$data['vars'] = $vars;
+			}
 		}
 		return $data;
 	}
