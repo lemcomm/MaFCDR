@@ -239,6 +239,7 @@ law:
    cascades: Applies to Subordinate Realms
    value:    Law Intent
    amount:   Amount
+   settlement: Settlement
    mandatory:
     label:   Law or Guideline
     yes:     Law
