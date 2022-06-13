@@ -35,7 +35,13 @@
 				<li>{{ 'account.lastlogin'|trans({'%date%':app.user.lastLogin|date}) }}</li>
 			</ul>
 		</div>
-
+		<div data-role="collapsible">
+			<div class="act_actions">
+				<a href="{{ path("fos_user_change_password") }}">{{ 'account.password.link'|trans|title }}</a>
+			</div>
+			<h3>{{ 'account.password.title'|trans|title }}</h3>
+			<p>{{ 'account.password.desc'|trans|raw }}</p>
+		</div>
 		<div data-role="collapsible">
 			<div class="act_actions">
 				<a href="{{ path("bm2_site_account_settings") }}">{{ 'account.settings.link'|trans|title }}</a>
