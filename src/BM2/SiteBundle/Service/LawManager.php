@@ -123,14 +123,14 @@ class LawManager {
 					$this->history->logEvent(
 						$org,
 						'event.law.changed',
-						array('%title%'=>$title),
+						array('%title%'=>$title, '%subtrans%'=>'orgs', '%transprefix%'=>'law.info.', '%transsuffix%'=>'.label'),
 						History::HIGH, true
 					);
 				} else {
 					$this->history->logEvent(
 						$org,
 						'event.law.new',
-						array('%title%'=>$title),
+						array('%title%'=>$title, '%subtrans%'=>'orgs', '%transprefix%'=>'law.info.', '%transsuffix%'=>'.label'),
 						History::HIGH, true
 					);
 				}
@@ -150,7 +150,15 @@ class LawManager {
 	public function lawSequenceUpdater($old, $law, $type) {
 		# This primarily exists for cascading law changes,
 		# Not yet seriously needed for the laws we have, but down the line this could get interesting.
-		$simpleLaws = ['assocVisibility', 'rankVisibility', 'assocInheritance', 'slumberingAccess', 'settlementInheritance', 'placeInheritance', 'slumberingClaims'];
+		$simpleLaws = [
+			'assocVisibility',
+			'rankVisibility',
+			'assocInheritance',
+			'slumberingAccess',
+			'settlementInheritance',
+			'placeInheritance',
+			'slumberingClaims',
+		];
 		if (in_array($type, $simpleLaws)) {
 			$old->setInvalidatedBy($law);
 			$old->setInvalidatedOn(new \DateTime("now"));
@@ -161,9 +169,9 @@ class LawManager {
 		$law->setRepealedBy($char);
 		$law->setRepealedOn(new \DateTime("now"));
 		$this->history->logEvent(
-			$org,
+			$law->getOrg(),
 			'event.law.repeal',
-			array('%title%'=>$title),
+			array('%title%'=>$law->getType()->getName(), '%subtrans%'=>'orgs', '%transprefix%'=>'law.info.', '%transsuffix%'=>'.label'),
 			History::HIGH, true
 		);
 		$this->em->flush();
