@@ -426,10 +426,10 @@ event:
    adopted:     Primary recognition of %deity% has been taken over by the Association under orders of %character%.
    recognized:  %character% has recognized the deity of %deity% as a member of the Association's pantheon.
    removed:     %character% has removed the deity of %deity% fromt he Association's pantheon.
-  law:
-   new:         A new law on %title% has been put in place.
-   changed:     The law on %title% has been updated.
-   repealed:    The law on %title% has been repelead.
+ law:
+  new:         A new law on %title% has been put in place.
+  changed:     The law on %title% has been updated.
+  repeal:    The law on %title% has been repelead.
 
 
 report:
