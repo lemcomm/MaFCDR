@@ -19,19 +19,21 @@ class PaymentManager {
 	protected $mailer;
 	protected $translator;
 	protected $logger;
+	private $ruleset;
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
-	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger) {
+	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, $ruleset) {
 		$this->em = $em;
 		$this->usermanager = $usermanager;
 		$this->mailer = $mailer;
 		$this->translator = $translator;
 		$this->logger = $logger;
+		$this->ruleset = $ruleset;
 	}
 
 	public function getPaymentLevels(User $user = null, $system = false) {
-		if ($this->getParameter('ruleset') === 'maf') {
+		if ($this->ruleset === 'maf') {
 			return [
 				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
