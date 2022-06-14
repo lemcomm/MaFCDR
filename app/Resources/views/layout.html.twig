@@ -144,15 +144,15 @@
 			{# nothing #}
 		{% elseif character.insidePlace %}
 			{% if character.insideSettlement %}
-				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|capitalize }}
+				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|title|raw }}
 			{% else %}
-				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|capitalize }}
+				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|title|raw }}
 			{% endif %}
 		{% elseif character.insideSettlement %}
-			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|capitalize }}
+			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|title|raw }}
 		{% elseif character.location and app.session.get('nearest_settlement') %}
 			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
-			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))})|capitalize }}
+			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))})|title|raw }}
 		{% endif %}
 	</div>
 	{% endif %}
