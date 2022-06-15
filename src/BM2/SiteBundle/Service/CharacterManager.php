@@ -771,7 +771,7 @@ class CharacterManager {
 		if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
 			# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 			$inheritor = true;
-			$successor = $character->getHeadOfHouse->getSuccessor();
+			$successor = $house->getSuccessor();
 		} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
 			$character->getSuccessor()->getHouse() == $character->getHouse() OR (
 				$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
