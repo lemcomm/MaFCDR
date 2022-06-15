@@ -1,3 +1,6 @@
+{% if unread.count > 0 %}
+	<a href="{{ path('maf_conv_recent') }}">{{ 'index.allunread'|trans({}, "conversations") }}</a>
+{% endif %}
 <ul>
 {% for perm in unread %}
 	{% if perm.conversation.realm %}
