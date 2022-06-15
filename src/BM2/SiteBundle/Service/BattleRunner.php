@@ -30,6 +30,15 @@ class BattleRunner {
 	private $warman;
 	private $actman;
 
+	# Preset values.
+	private $defaultOffset = 135;
+	private $battleSeparation = 270;
+	/*
+	Going to talk about these abit as they determine things. Offset is the absolute value from zero for each of the two primary sides.
+	In the case of defenders this is also the positive value for where the "walls" are.
+
+	*/
+
 	# The following variables are used all over this class, in multiple functions, sometimes as far as 4 or 5 functions deep.
 	private $battle;
 	private $regionType;
@@ -601,6 +610,7 @@ class BattleRunner {
 		} else {
 			$this->log(20, "Ranged Penalty: ".$rangedPenalty."\n\n");
 		}
+		$this->prepareBattlefield();
 		$this->log(20, "...starting phases...\n");
 		while ($combat) {
 			$this->prepareRound();
@@ -651,6 +661,143 @@ class BattleRunner {
 		*/
 		$this->em->flush();
 
+	}
+
+	private function prepareBattlefield() {
+		$battle = $this->battle;
+		if ($battle->getType() === 'siegesortie') {
+			$siege = $battle->getSiege();
+		} elseif ($battle->getType() === 'siegeassault') {
+			$siege = $battle->getSiege();
+		} elseif ($battle->getType() === 'urban') {
+			$siege = false;
+		}
+		$posX = $this->defaultOffset;
+		$negX = 0 - $this->defaultOffset;
+		if ($siege) {
+			$inside = $battle->findInsideGroups();
+			$iCount = $inside->count();
+			$outside = $battle->findOutsideGroups();
+			$oCount = $outside->count();
+			$highY = 0;
+			$count = 1;
+			foreach ($inside as $group) {
+				list($highY, $count) = $this->deplyGroup($group, $posX, $highY, false, $count, $iCount);
+
+				/* Fancy logic follows for more than 2 sided battles.
+
+				These'll be fun for multiple reasons, largely because we'll ahve to rotate entire formations.
+
+				For now, none of these ;)
+				$highY = 0;
+				$lowY = 0;
+				if ($iCount == 1) {
+					$this->deployGroup($group, $posX, false); #We don't need the return.
+				} else {
+					if ($group === $siege->getPrimaryDefender()) {
+						$newHigh = $this->deployGroup($group, $posX, false);
+					} else {
+						$offsetX = $posX+$this->battleSeparation;
+						$newHigh = $this->deployGroup($group, $offsetX, false);
+					}
+					if ($newHigh > $highY) {
+						$highY = $newHigh;
+					}
+				} */
+			}
+			$count = 1; #Each side retains a separate count.
+			foreach ($outside as $group) {
+				list($highY, $count) = $this->deployGroup($group, $negX, $highY, true, $count, $oCount);
+			}
+		} else {
+			$groups = $battle->getGroups();
+			$tCount = $groups->count(); # Total count.
+			foreach ($groups as $group) {
+				list($highY, $count) = $this->deplyGroup($group, $posX, $highY, false, $count, $tCount);
+				$invet = !$invert;
+			}
+		}
+	}
+
+	private function deployGroup($group, $startX, $highY, $invert, $gCount, $tGCount, $angle = null) {
+		/*
+		group is the group we're depling.
+		startX is the initial x position we're working from.
+		highY lets us ensure separation on 3+ group battles.
+		invert tells it to increment or decrement X coordinates to space properly.
+		gCount is the total group number so far on this side.
+		tGCount is the total group count for this side.
+
+		Collectively, these let us keep all the deployment logic in here.
+		*/
+		$highY = 0;
+		$setup = [
+			1 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			2 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			3 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			4 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			5 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			6 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			7 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+		];
+		foreach ($group->getUnits() as $unit) {
+			$count = $setup[$line]['count'];
+			$line = $unit->getSettings()->getLine();
+			if ($invert) {
+				$xPos = $startX - ($line*20);
+			} else {
+				$xPos = $startX + ($line*20);
+			}
+			if ($count === 1) {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = $yPos + 20;
+			} elseif ($count % 2 === 0) {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = $yPos*-1;
+			} else {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = ($yPos*-1)+20;
+			}
+			$setup[$line]['count'] = $count+1;
+			if ($angle === null) {
+				$unit->setXPos($xPos);
+				$unit->setYPos($yPos);
+			}
+			if ($iCount > 2) {
+				# Handle vertical offsets for future deployment.
+				# We only need this if we have to work out angled deployments.
+				if ($yPos > 0 && $yPos > $highY) {
+					$highY = $yPos;
+				}
+			}
+		}
+		$gCount++;
+		return [$highY. $gCount];
+	}
+
+	private function rotateCoords($x, $y, $focus, $angle) {
+		# Do some math!
 	}
 
 	private function runStage($type, $rangedPenaltyStart, $phase, $doRanged) {
@@ -770,13 +917,6 @@ class BattleRunner {
 								// missed
 								$this->log(10, "missed\n");
 								$missed++;
-							}
-							if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
-								if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
-									// one-shot weapon, that only longbowmen will use by default in this phase
-									// TODO: Better logic that determines this, for when we add new weapons.
-									$soldier->dropEquipment();
-								}
 							}
 						} else {
 							$this->log(10, "no more targets\n");
