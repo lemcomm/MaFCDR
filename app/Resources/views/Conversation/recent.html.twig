@@ -6,6 +6,8 @@
 
         <h2>{{ 'conversation.recent'|trans({}, "conversations")|title }}</h2>
 
+	{% include 'Conversation/recent_menu.html.twig' %}
+
         <div class="cmsg_conversation">
         {% for message in messages %}
                 {% set convType = message.conversation.findType %}
@@ -53,16 +55,10 @@
                                 {% if message.type != 'system' and archive == false %}
                                         <div class="cmsg_message_meta_{{message.type}}">
                                                 <ul class="cmsg_actions">
-                                                        {% if not convType == 'local' %}
+                                                        {% if convType != 'local' %}
                                                                 <button class="recent_reply cmsg_button">{{ 'button.reply'|trans({}, "conversations") }}</button> |
-                                                                {# Disabled for now. --Andrew
-                                                                        <li><a href="{{ path('maf_conv_recent_reply', {"msg":message.id, "window":period}) }}"><button class="reply cmsg_button">{{ 'button.writereply'|trans({},"conversations") }}</button></a></li> |
-                                                                #}
                                                                 <li><a href="{{ path('maf_conv_read', {"conv":message.conversation.id}) }}#{{message.id}}"><button class="cmsg_button" id="view_conv">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li>
                                                         {% else %}
-                                                                {# Disabled for now. --Andrew
-                                                                        <li><button class="local_reply cmsg_button" disabled>{{ 'button.nolocalreply'|trans({},"conversations") }}</button></li> |
-                                                                #}
                                                                 <button class="recent_reply cmsg_button">{{ 'button.reply'|trans({}, "conversations") }}</button> |
                                                                 <li><a href="{{ path('maf_conv_local') }}#{{message.id}}"><button class="cmsg_button" id="view_local">{{ 'index.viewlocal'|trans({},"conversations") }}</button></a></li> |
                                                                 <li><a href="{{ path('maf_conv_local_remove', {"msg":message.id, "source":'2'}) }}"><button class="cmsg_button" id="remove_local">{{ 'button.remove'|trans({},"conversations") }}</button></a></li>
@@ -93,6 +89,8 @@
 		{% include "Conversation/syntax.html.twig" %}
 		{{ render(controller('BM2\\SiteBundle\\Controller\\ConversationController::replyRecentAction', {}, {'msg': null, 'window':period} )) }}
 	</div>
+
+	{% include 'Conversation/recent_menu.html.twig' %}
 
 {% endblock %}
 
