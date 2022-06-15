@@ -999,6 +999,12 @@ house:
    approved:    The disassociation request from %character% of %house% has been approved.
    deny:        Deny
    denied:      The disassociation request from %character% of %house% has been denied.
+  subcreate:
+   preamble:    You've received a request for the right to create a cadet house from %character%, on %date%, as follows:
+   approve:    Approve
+   approved:   The request to create a cadet house has been approved.
+   deny:       Deny
+   denied:     The request to create a cadet house has been denied.
   applicants:
    name:        Manage Applicants
    name2:       Manage Applicants to the %name%
