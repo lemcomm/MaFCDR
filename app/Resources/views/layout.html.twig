@@ -144,15 +144,15 @@
 			{# nothing #}
 		{% elseif character.insidePlace %}
 			{% if character.insideSettlement %}
-				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)} %}inside2{% endtrans %}
+				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|title|raw }}
 			{% else %}
-				{% trans with {'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)} %}inside3{% endtrans %}
+				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|title|raw }}
 			{% endif %}
 		{% elseif character.insideSettlement %}
-			{% trans with {'%settlement%':link(character.insidesettlement)} %}inside{% endtrans %}
+			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|title|raw }}
 		{% elseif character.location and app.session.get('nearest_settlement') %}
 			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
-			{% trans with {'%settlement%':link(app.session.get('nearest_settlement'))} %}near{% endtrans %}
+			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))})|title|raw }}
 		{% endif %}
 	</div>
 	{% endif %}
@@ -239,7 +239,7 @@
 		<div>
 			{{ gametime(false, 'current') }}<br />
 			{{ untilturn() }}<br />
-			server time: {{ "now"|date("H:i") }}
+			Server time: {{ "now"|date("H:i") }}
 		</div>
 		<hr />
 		{% endif %}

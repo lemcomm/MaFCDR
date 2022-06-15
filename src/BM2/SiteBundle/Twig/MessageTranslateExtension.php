@@ -48,6 +48,22 @@ class MessageTranslateExtension extends \Twig_Extension {
 			}
 			return implode("<br />", $strings);
 		} else {
+			if (array_key_exists('%subtrans%', $data)) {
+				if (array_key_exists('%transprefix%', $data)) {
+					if (array_key_exists('%transsuffix%', $data)) {
+						$data['%title%'] = $this->translator->trans($data['%transprefix%'].$data['%title%'].$data['%transsuffix%'], [], $data['%subtrans%']);
+					} else {
+						$data['%title%'] = $this->translator->trans($data['%transprefix%'].$data['%title%'], [], $data['%subtrans%']);
+					}
+				} else {
+					if (array_key_exists('%transsuffix%', $data)) {
+						$data['%title%'] = $this->translator->trans($data['%title%'].$data['%transsuffix%'], [], $data['%subtrans%']);
+					} else {
+						$data['%title%'] = $this->translator->trans($data['%title%'], [], $data['%subtrans%']);
+					}
+				}
+
+			}
 			return $this->translator->trans($event->getContent(), $data, "communication");
 		}
 	}
