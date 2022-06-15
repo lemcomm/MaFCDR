@@ -2086,24 +2086,18 @@ ul.cmsg_actions {
 
 
 .cmsg_message_wrapper_system {
-        border: 3px solid rgba(0,0,0,0.1)
+        border: 0px solid rgba(0,0,0,0.1)
 }
 .cmsg_message_header_system {
 	background-color: rgba(0,0,0,0.2);
-	padding: 0.25em;
 }
 .cmsg_content_system {
 	background-color: rgba(0,0,0,0.1);
-	padding: 0.25em;
 }
 .cmsg_message_meta_system {
 	background-color: rgba(0,0,0,0.2);
-	padding: 0.25em;
-	min-height: 1.8em;
 }
 .cmsg_message_meta_system ul {
-	margin: 0.1em;
-	padding: 0.1em;
 }
 .cmsg_message_meta_system li {
 	list-style: none;
