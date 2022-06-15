@@ -1,0 +1,14 @@
+<div id="recentMenu" class="cmsg_conversation">
+	<center>
+	{{ 'recent.options'|trans({},'conversations') }}<br>
+	<a href="{{ path('maf_conv_recent') }}">{{ 'recent.unread'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 1}) }}">{{ 'recent.prev12'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 2}) }}">{{ 'recent.prev24'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 3}) }}">{{ 'recent.prev3d'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 4}) }}">{{ 'recent.prev1w'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 5}) }}">{{ 'recent.prev2w'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 6}) }}">{{ 'recent.prev1m'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 7}) }}">{{ 'recent.prev2m'|trans({},'conversations')}}</a> |
+	<a href="{{ path('maf_conv_recent', {window: 8}) }}">{{ 'recent.prev3m'|trans({},'conversations')}}</a>
+	</center>
+</div>
