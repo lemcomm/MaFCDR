@@ -5,6 +5,7 @@ index:
  topic:     Topic
  messages:  Messages
  unread:    Unread
+ allunread: View All Unread Messages
  participants:  Participants
  first:     First message
  last:      Last message
@@ -222,6 +223,7 @@ reply:
  outro: Below, you can select your message type, formulate your response, and send it.
 
 recent:
+ options: If you'd like to view other messages, you can select any options from below to change the display.
  unread: Unread
  12h: 12 Hours
  24h: 1 Day
@@ -231,6 +233,14 @@ recent:
  1m: 1 Month
  2m: 2 Months
  3m: 3 Months
+ prev12: Previous 12 Hours
+ prev24: Previous Day
+ prev3d: Previous 3 Days
+ prev1w: Previous 1 Week
+ prev2w: Previous 2 Weeks
+ prev1m: Previous 1 Month
+ prev2m: Previous 2 Months
+ prev3m: Previous 3 Months
 
 local:
  title: Local Messages
