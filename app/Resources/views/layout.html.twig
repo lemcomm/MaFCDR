@@ -138,21 +138,21 @@
 	</div>
 	{% if character %}
 	<div id="identity">
-		{% trans with {'%name%': link(character)} %}menu.playing{% endtrans %}
+		{% trans with {'%name%': link(character)} %}menu.playing{% endtrans %},
 		<br />
 		{% if character.travelatsea %}
 			{# nothing #}
 		{% elseif character.insidePlace %}
 			{% if character.insideSettlement %}
-				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|title|raw }}
+				{{ 'inside2'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.insideSettlement)})|raw }}.
 			{% else %}
-				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|title|raw }}
+				{{ 'inside3'|trans({'%place%':link(character.insidePlace), '%settlement%':link(character.geoData.settlement)})|raw }}.
 			{% endif %}
 		{% elseif character.insideSettlement %}
-			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|title|raw }}
+			{{ 'inside'|trans({'%settlement%':link(character.insidesettlement)})|raw }}.
 		{% elseif character.location and app.session.get('nearest_settlement') %}
 			{# FIXME: instead of the if above, we should fetch it when its unknown... #}
-			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))})|title|raw }}
+			{{ 'near'|trans({'%settlement%':link(app.session.get('nearest_settlement'))})|raw }}.
 		{% endif %}
 	</div>
 	{% endif %}
