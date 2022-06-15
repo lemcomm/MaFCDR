@@ -689,6 +689,23 @@ class RealmController extends Controller {
 		]);
 	}
 
+
+	/**
+	  * @Route("/{realm}/accolades", requirements={"realm"="\d+"})
+	  */
+	public function triumphsAction(Realm $realm, Request $request) {
+		// FIXME: these should be visible to all realm members - seperate method or same?
+		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
+		if (!($character instanceof Character)) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Realm/positions.html.twig', [
+			'realm' => $realm,
+			'positions' => $realm->getPositions(),
+		]);
+	}
+
    /**
      * @Route("/{realm}/diplomacy", requirements={"realm"="\d+"})
      */
