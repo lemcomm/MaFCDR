@@ -229,7 +229,7 @@ class ConversationManager {
 		if ($local = $char->getLocalConversation()) {
 			foreach ($local->getMessages() as $msg) {
 				if (!$msg->getRead()) {
-					$allMsg->add($msg);
+					$unread->add($msg);
 					$msg->setRead(true);
 				}
 			}
