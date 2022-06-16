@@ -480,7 +480,6 @@ class WarManager {
 			// 30 attackers vs 155 defenders: 1 hours 35 minutes.
 			// 50 attackers vs 255 defenders: 3 hours 8 minutes.
 			// 100 attackers vs 505: 7 hours 31 minutes.
-			// Between 12 seconds (1 attacker, ) and 7 hours (180 attackers or over)
 			$time = max(0, min(72 * 60, ($num_attackers * log($num_attackers) * 25) / ($ratio * $ratio) ));
 		}
 		else {
