@@ -462,21 +462,33 @@ class WarManager {
 	}
 
 	public function calculatePreparationTime(Battle $battle) {
-		// prep time is based on the total number of soldiers, but only 20:1 (attackers) or 10:1 (defenders) actually get ready, i.e.
-		// if your 1000 men army attacks 10 men, it calculates battle time as if only 200 of your men get ready for battle.
-		// if your 1000 men are attacked by 10 men, it calculates battle time as if only 100 of them get ready for battle.
-		// this is to prevent blockade battles from being too effective for tiny sacrifical units
-		$smaller = max(1,min($battle->getActiveAttackersCount(), $battle->getActiveDefendersCount()));
-		$soldiers = min($battle->getActiveAttackersCount(), $smaller*20) + min($battle->getActiveDefendersCount(), $smaller*10);
-		// base time is 6 hours, less if the attacker is much smaller than the defender - FIXME: this and the one above overlap, maybe they could be unified?
-		$base_time = 6.0 * min(1.0, ($battle->getActiveAttackersCount()*2.0) / (1+$battle->getActiveDefendersCount()));
-		$time = $base_time + pow($soldiers, 1/1.666)/12;
-		if ($soldiers < 20 && $battle->getActiveAttackersCount()*5 < $battle->getActiveDefendersCount()) {
-			// another fix downwards for really tiny sacrifical battles
-			$time *= $soldiers/20;
+		$num_attackers = $battle->getActiveAttackersCount();
+		$num_defenders = $battle->getActiveDefendersCount();
+		if ($num_attackers == 0 || $num_defenders == 0) {
+			return 0;
 		}
-		$time = round($time * 3600); // convert to seconds
-		return $time;
+		$time = 0;
+		// Here we handle the exploit of tiny units locking large ones in battle.
+		// If the attackers are less than a fifth of the defenders, the battle will be quite fast.
+		// The more attackers, the slower the battle is, but the larger the ratio between defenders and attackers, the faster.
+		if ($num_attackers < ($num_defenders / 5)) {
+			$ratio = $num_defenders / $num_attackers;
+			// 5 or higher.
+			// 5 attackers vs 26 defenders: 7 minutes.
+			// 10 attackers vs 55 defenders: 19 minutes.
+			// 20 attackers vs 105 defenders: 54 minutes.
+			// 30 attackers vs 155 defenders: 1 hours 35 minutes.
+			// 50 attackers vs 255 defenders: 3 hours 8 minutes.
+			// 100 attackers vs 505: 7 hours 31 minutes.
+			// Between 12 seconds (1 attacker, ) and 7 hours (180 attackers or over)
+			$time = max(0, min(72 * 60, ($num_attackers * log($num_attackers) * 25) / ($ratio * $ratio) ));
+		}
+		else {
+			// Normal battles.
+			// Between 24 hours (720 total troops in the battlefield, or less) and 72 hours (2160 troops or more).
+			$time = max(24 * 60, min(72 * 60, $num_attackers + $num_defenders * 0.2));
+		}
+		return round($time * 60); // Return the value in seconds.
 	}
 
 	public function calculateDisengageTime(Character $character) {
