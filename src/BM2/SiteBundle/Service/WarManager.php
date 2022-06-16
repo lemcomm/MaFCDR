@@ -464,8 +464,8 @@ class WarManager {
 	public function calculatePreparationTime(Battle $battle) {
 		$num_attackers = $battle->getActiveAttackersCount();
 		$num_defenders = $battle->getActiveDefendersCount();
-		if ($num_attackers == 0 || $num_defenders == 0) {
-			return 0;
+		if ($num_attackers == 0) {
+			return 0; // Shouldn't happen, no attackers.
 		}
 		$time = 0;
 		// Here we handle the exploit of tiny units locking large ones in battle.
