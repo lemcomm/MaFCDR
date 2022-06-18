@@ -3109,7 +3109,7 @@ class Dispatcher {
 			$hasHouse = true;
 			foreach ($character->getRequests() as $req) {
 				if ($req->getType() == 'house.subcreate') {
-					if ($req->getApproved()) {
+					if ($req->getAccepted()) {
 						$approved = true;
 						break;
 					}
@@ -3297,7 +3297,7 @@ class Dispatcher {
 			array("%name%"=>$this->house->getName())
 		);
 		if (
-			($target->getHome() && $char->getInsidePlace() == $target->getInsidePlace()) ||
+			($target->getHome() && $char->getInsidePlace() == $target->getHome()) ||
 			($char->getInsideSettlement() == $target->getInsideSettlement())
 		) {
 			return $success;
