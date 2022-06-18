@@ -333,31 +333,40 @@ class UnitController extends Controller {
                 }
 
                 // return his equipment to the stockpile:
+                $check = false;
                 if ($recruit->getOldWeapon() && $recruit->getWeapon() != $recruit->getOldWeapon()) {
+                        $check = true;
                         $this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
                 }
                 if ($recruit->getOldArmour() && $recruit->getArmour() != $recruit->getOldArmour()) {
+                        $check = true;
                         $this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
                 }
                 if ($recruit->getOldEquipment() && $recruit->getEquipment() != $recruit->getOldEquipment()) {
+                        $check = true;
                         $this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
                 }
                 if ($recruit->getOldMount() && $recruit->getMount() != $recruit->getOldMount()) {
+                        $check = true;
                         $this->get('military_manager')->returnItem($settlement, $recruit->getMount());
                 }
 
-                if ($recruit->getOldWeapon() || $recruit->getOldArmour() || $recruit->getOldEquipment() || $recruit->getOldMount()) {
-                	// old soldier - return to militia with his old stuff
-                	$recruit->setWeapon($recruit->getOldWeapon());
-                	$recruit->setArmour($recruit->getOldArmour());
-                	$recruit->setEquipment($recruit->getOldEquipment());
-                	$recruit->setMount($recruit->getOldMount());
-                	$recruit->setTraining(0)->setTrainingRequired(0);
-                	$this->get('history')->addToSoldierLog($recruit, 'traincancel');
+                if ($check) {
+                        // old soldier - return to militia with his old stuff
+                        $recruit->setWeapon($recruit->getOldWeapon());
+                        $recruit->setArmour($recruit->getOldArmour());
+                        $recruit->setEquipment($recruit->getOldEquipment());
+                        $recruit->setMount($recruit->getOldMount());
+                        $recruit->setTraining(0)->setTrainingRequired(0);
+                        $this->get('history')->addToSoldierLog($recruit, 'traincancel');
                 } else {
-                	// fresh recruit - return to workforce
-                	$settlement->setPopulation($settlement->getPopulation()+1);
-                	$em->remove($recruit);
+                        // fresh recruit - return to workforce
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getWeapon());
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getArmour());
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getEquipment());
+                        $this->get('military_manager')->returnItem($settlement, $recruit->getMount());
+                        $settlement->setPopulation($settlement->getPopulation()+1);
+                        $em->remove($recruit);
                 }
                 $em->flush();
                 return new RedirectResponse($this->generateUrl('maf_unit_soldiers', ["unit"=>$unit->getId()]).'#recruits');
