@@ -29,6 +29,14 @@
 			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
 			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'house.manage.cadet.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'house.manage.cadet.deny'|trans({},"politics") }}</button></a>
 			</div>
+		{% elseif gamerequest.type == 'house.subcreate' %}
+			<hr>
+			{{ 'house.manage.subcreate.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
+			<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ gamerequest.subject|title }}</h4>
+			{{ gamerequest.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks}}
+			<a href="{{path('bm2_gamerequest_approve', {"id":gamerequest.id}) }}"><button id="approve">{{ 'house.manage.subcreate.approve'|trans({},"politics") }}</button></a> | <a href="{{path('bm2_gamerequest_deny', {"id":gamerequest.id}) }}"><button id="deny">{{ 'house.manage.subcreate.deny'|trans({},"politics") }}</button></a>
+			</div>
 		{% elseif gamerequest.type == 'house.join' %}
 			<hr>
 			{{ 'house.manage.applicant.preamble'|trans({"%link-character%":link(gamerequest.fromCharacter), "%date%":gamerequest.created|date("D, d M Y H:i:s")}, "politics")|raw }}
