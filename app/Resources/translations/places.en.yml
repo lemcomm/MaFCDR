@@ -114,6 +114,12 @@ place:
   intro: >
     If you've found the %name% to be troublesome, it's a fairly simple matter to evict them.
 
+house:
+ cadet:
+  name:    Offer Cadetship
+  description: Offer your house as a cadet to %house%
+  logdesc: This effectively makes your house their subordinate and may join the two inextricably forevermore.
+
 control:
  place:
   public: Place Allows Any Visitors?
