@@ -92,8 +92,8 @@ class House {
 			$all_cadets[] = $cadet;
 			$suball = $cadet->findAllCadets();
 			foreach ($suball as $sub) {
-				if (!$all->contains($sub)) {
-					$all->add($sub);
+				if (!$all_cadets->contains($sub)) {
+					$all_cadets->add($sub);
 				}
 			}
 		}
@@ -119,6 +119,5 @@ class House {
 		return $all_sups;
 
 	}
-	
 	
 }
