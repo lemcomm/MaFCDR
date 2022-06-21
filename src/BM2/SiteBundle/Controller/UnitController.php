@@ -328,7 +328,7 @@ class UnitController extends Controller {
                 }
 
                 $em = $this->getDoctrine()->getManager();
-                if (!$recruit->isRecruit() || $recruit->getHome()!=$settlement) {
+                if (!$recruit->isRecruit()) {
                 	throw $this->createNotFoundException('error.notfound.recruit');
                 }
 
