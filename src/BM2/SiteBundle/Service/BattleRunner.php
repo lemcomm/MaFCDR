@@ -445,6 +445,7 @@ class BattleRunner {
 					}
 				}
 
+				/*
 				if ($battle->getSiege() && !$this->siegeFinale && $group == $attGroup) {
 					$totalAttackers = $group->getActiveMeleeSoldiers()->count();
 					if ($group->getReinforcedBy()) {
@@ -455,6 +456,7 @@ class BattleRunner {
 					$this->attMinContacts = floor($totalAttackers/4);
 					$this->defMinContacts = floor(($totalAttackers/4*1.2));
 				}
+				*/
 				if ($battle->getSiege() && ($battle->getSiege()->getAttacker() != $group && !$battle->getSiege()->getAttacker()->getReinforcedBy()->contains($group))) {
 					// if we're on defense, we feel like we're more
 					$mysize *= 1 + ($this->defenseBonus/200);

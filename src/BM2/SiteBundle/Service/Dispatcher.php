@@ -477,10 +477,6 @@ class Dispatcher {
 				$actions['placeChangeOccupantTest'] = $this->placeChangeOccupantTest(true, $place);
 				$actions['placeChangeOccupierTest'] = $this->placeChangeOccupierTest(true, $place);
 			}
-			if ($type->getSpawnable()) {
-				$actions['placeNewPlayerInfoTest'] = $this->placeNewPlayerInfoTest(null, $place);
-				$actions['placeSpawnToggleTest'] = $this->placeSpawnToggleTest(null, $place);
-			}
 			$canManage = false;
 			if ($tName == 'embassy') {
 				$canManage = $this->placeManageEmbassyTest(null, $place);
@@ -489,15 +485,21 @@ class Dispatcher {
 			} else {
 				$canManage = $this->placeManageTest(null, $place);
 			}
-			if ($canManage !== false) {
+			if (array_key_exists('url', $canManage)) {
 				$actions['placeManageTest'] = $canManage;
-			}
-			$actions['placeTransferTest'] = $this->placeTransferTest(null, $place);
-			$actions['placePermissionsTest'] = $this->placePermissionsTest(null, $place);
-			$actions['placeDestroyTest'] = $this->placeDestroyTest(null, $place);
-			if ($type->getAssociations()) {
-				$actions['assocCreateTest'] = $this->assocCreateTest(true);
-				$actions['placeAddAssocTest'] = $this->placeAddAssocTest(null, $place);
+				$actions['placeTransferTest'] = $this->placeTransferTest(null, $place);
+				$actions['placePermissionsTest'] = $this->placePermissionsTest(null, $place);
+				$actions['placeDestroyTest'] = $this->placeDestroyTest(null, $place);
+				if ($type->getSpawnable()) {
+					$actions['placeNewPlayerInfoTest'] = $this->placeNewPlayerInfoTest(null, $place);
+					$actions['placeSpawnToggleTest'] = $this->placeSpawnToggleTest(null, $place);
+				}
+				if ($type->getAssociations()) {
+					$actions['assocCreateTest'] = $this->assocCreateTest(true);
+					$actions['placeAddAssocTest'] = $this->placeAddAssocTest(null, $place);
+				}
+			} else {
+				$actions['placeManageEmbassyTest'] = $canManage;
 			}
 
 			if ($pHouse = $place->getHouse()) {
@@ -3109,7 +3111,7 @@ class Dispatcher {
 			$hasHouse = true;
 			foreach ($character->getRequests() as $req) {
 				if ($req->getType() == 'house.subcreate') {
-					if ($req->getApproved()) {
+					if ($req->getAccepted()) {
 						$approved = true;
 						break;
 					}
@@ -3293,11 +3295,11 @@ class Dispatcher {
 		}
 
 		$success = $this->action("house.cadet", "maf_house_cadetship", true,
-			array('house'=>$this->house->getId()),
-			array("%name%"=>$this->house->getName())
+			array('house'=>$target->getId()),
+			array("%name%"=>$target->getName())
 		);
 		if (
-			($target->getHome() && $char->getInsidePlace() == $target->getInsidePlace()) ||
+			($target->getHome() && $char->getInsidePlace() == $target->getHome()) ||
 			($char->getInsideSettlement() == $target->getInsideSettlement())
 		) {
 			return $success;
