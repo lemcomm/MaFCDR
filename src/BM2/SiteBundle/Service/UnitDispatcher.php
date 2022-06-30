@@ -155,11 +155,9 @@ class UnitDispatcher extends Dispatcher {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.rebasing");
 		}
 		if (
-			$unit->getCharacter() == $character || (
-				$unit->getSettlement() && (
-					$unit->getSettlement()->getOwner() == $character || $unit->getSettlement()->getSteward() == $character
-				)
-			) || ($unit->getMarshal() == $character) || $this->pm->checkSettlementPermission($settlement, $character, 'recruit')) {
+			$unit->getCharacter() === $character
+			|| ($unit->getSettlement() && ($unit->getSettlement()->getOwner() === $character || $unit->getSettlement()->getSteward() === $character || $unit->getMarshal() === $character || $this->pm->checkSettlementPermission($unit->getSettlement(), $character, 'recruit')))
+		) {
 			return $this->action("unit.soldiers", "maf_unit_soldiers");
 		} else {
 			return array("name"=>"unit.soldiers.name", "description"=>"unavailable.notyourunit");
