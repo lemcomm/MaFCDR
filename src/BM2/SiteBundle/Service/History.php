@@ -10,7 +10,6 @@ use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\SoldierLog;
 use BM2\SiteBundle\EventListener\NotificationEvent;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 
 class History {
@@ -24,13 +23,13 @@ class History {
 
 	protected $em;
 	protected $appstate;
-	protected $dispatcher;
+	protected $noteman;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, EventDispatcherInterface $dispatcher) {
+	public function __construct(EntityManager $em, AppState $appstate, NotificationManager $noteman) {
 		$this->em = $em;
 		$this->appstate = $appstate;
-		$this->dispatcher = $dispatcher;
+		$this->noteman = $noteman;
 	}
 
 
@@ -53,11 +52,7 @@ class History {
 
 		// notify player by mail of important events
 		if ($priority >= History::NOTIFY) {
-			$ev = new NotificationEvent($event, $entity);
-			$this->dispatcher->dispatch('bm2.notification', $ev);
-			if ($ev->isPropagationStopped()) {
-				// TODO: how do we handle this?
-			}
+			$noteman->spoolEvent($event);
 		}
 
 		return $event;
