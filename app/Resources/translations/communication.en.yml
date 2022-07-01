@@ -559,12 +559,14 @@ siege:
   defender:     After the final %battle%, the siege has concluded in favor of the defenders.
 
 mail:
- sender:        Notification Service
- subject:       Might & Fealty Important Event Notice
- intro:         Important event for your character %name%:
- intro2:        Important event at the settlement %settlement%, owned by your character %character%:
- intro3:        Important event for the realm %realm%, ruled by your character %character%:
- footer:        <small>(if you do not want to receive these messages anymore, disable notifications in your settings)</small>
+ event:
+  sender:        Notification Service
+  subject:       Might & Fealty Important Event Notice
+  intro:         "As per your user settings in Might & Fealty, we're sending you this email to notify you of the following events:"
+  footer:        "We understand that you may get tired of receiving these emails, and if you would like to opt out entirely you can click <a href=\"%link%\">here</a>. Otherwise, they can be managed from in game as part of your account settings in your profile."
+ optout:
+  success:       You have successfully opted out of further event notification emails. This should take effect immediately, in most circumstances, but may take up to an hour in rare instances.
+  failure:       "We're sorry, the provided token doesn't match our record. This can happen in rare instances if your mail client has malformed the link or if you're clicking a link from a very old email (we do refresh the tokens occassionally)."
 
 
 news:
