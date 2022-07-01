@@ -76,5 +76,17 @@ class Association extends Faction {
 		}
 		return $all;
 	}
+
+        public function findOwners() {
+                $all = new ArrayCollection();
+                foreach ($this->ranks as $rank) {
+                        if ($rank->isOwner()) {
+                                foreach ($rank->getMembers() as $mbr) {
+                                        $all->add($mbr->getCharacter());
+                                }
+                        }
+                }
+                return $all;
+        }
 	
 }
