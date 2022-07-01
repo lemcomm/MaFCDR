@@ -53,7 +53,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@permission_manager', '@appstate']
     history:
         class:      BM2\SiteBundle\Service\History
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@notification_manager']
     house_manager:
         class:      BM2\SiteBundle\Service\HouseManager
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
@@ -65,7 +65,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     mail_manager:
         class:      BM2\SiteBundle\Service\MailManager
-        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %mail_from%, %mail_reply_to%, %mail_opt_out_url%]
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@mailer', '@appstate', %mail_from%, %mail_reply_to%, %mail_opt_out_url%]
     military_manager:
         class:      BM2\SiteBundle\Service\MilitaryManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
