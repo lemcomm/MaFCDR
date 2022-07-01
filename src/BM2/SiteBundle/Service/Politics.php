@@ -214,12 +214,14 @@ class Politics {
 				array('%link-place%'=>$character->getLiegePosition()->getId()),
 				History::MEDIUM, true
 			);
+			/* NOTE: This would return a realm position, which does not have an event log associated to it.
 			$this->history->logEvent(
 				$character->findAllegiance(),
 				'politics.oath.disowner',
 				array('%link-character%'=>$character->getId()),
 				History::MEDIUM, true
 			);
+			*/
 			$character->setLiegePosition(null);
 			return true;
 		}
@@ -849,32 +851,7 @@ class Politics {
 		}
 		foreach ($settlement->getUnits() as $unit) {
 			$unit->setMarshal(NULL);
-			if ($char) {
-				if ($unit->getCharacter() != $char) {
-					if ($realm) {
-						$this->history->logEvent(
-							$unit,
-							'event.unit.basetaken',
-							array("%link-realm%"=>$realm->getId(), "%link-settlement%"=>$settlement->getId()),
-							History::HIGH, false
-						);
-					} else {
-						$this->history->logEvent(
-							$unit,
-							'event.unit.basetaken2',
-							array("%link-settlement%"=>$settlement->getId()),
-							History::HIGH, false
-						);
-					}
-					$this->history->logEvent(
-						$unit->getCharacter(),
-						'event.character.isolated',
-						array("%link-settlement%"=>$settlement->getId(), "%link-unit%"=>$unit->getId()),
-						History::HIGH, false
-					);
-					$unit->setSettlement(NULL);
-				}
-			} else {
+			if ($unit->getCharacter() && $unit->getCharacter() != $char) {
 				if ($realm) {
 					$this->history->logEvent(
 						$unit,
@@ -900,6 +877,9 @@ class Politics {
 			}
 		}
 		foreach ($settlement->getDefendingUnits() as $unit) {
+			# This refers specificlaly to units defending this settlement as a relation.
+			# That is, those units left by troop leaders to defend that are not based out of this settlement NOR attached to a character.
+			# Literally just those left here to defend. As of v2.4, you can't actually set these.
 			if (!$char) {
 				$this->milman->returnUnitHome($unit, 'defenselost', $settlement);
 			} else {

@@ -827,6 +827,9 @@ class MilitaryManager {
 		$speed = $this->geo->getbaseSpeed() / exp(sqrt($count/200)); #This is the regular travel speed for M&F.
 		$days = $distance / $speed;
 		$final = $days*0.925*1.33; #Average travel speed of all region types mulitiplied by 1.33 so it deliberately moves slower than everything else.
+		if ($final < 0.16) {
+			$final = 0; #Less than an hour travel, just set to 0.
+		}
 
 		$unit->setTravelDays(ceil($final));
 		$unit->setCharacter(null);
