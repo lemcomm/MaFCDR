@@ -164,6 +164,24 @@ class AppState {
 		}
 	}
 
+	public function findEmailOptOutToken(User $user) {
+		return $user->getEmailOptOutToken()?$user->getEmailOptOutToken():$this->generateEmailOptOutToken($user);
+	}
+
+	public function generateEmailOptOutToken(User $user) {
+		$token = $this->generateToken();
+		$user->setEmailOptOutToken($token);
+		$this->em->flush();
+		return $token;
+	}
+
+	public function generateToken($length = 128, $method = 'trimbase64') {
+		if ($method = 'trimbase64') {
+			$token = rtrim(strtr(base64_encode(random_bytes($length)), '+/', '-_'), '=');
+		}
+		return $token;
+	}
+
 	// FIXME: this is duplicate code from Geography.php but I can't inject the geography service because it would create a circular injection (as it depends on appstate)
 	private function findNearestSettlement(Character $character) {
 		$query = $this->em->createQuery('SELECT s, ST_Distance(g.center, c.location) AS distance FROM BM2SiteBundle:Settlement s JOIN s.geo_data g, BM2SiteBundle:Character c WHERE c = :char ORDER BY distance ASC');
