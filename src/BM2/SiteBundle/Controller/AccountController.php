@@ -577,6 +577,7 @@ class AccountController extends Controller {
 
    			$user->setLanguage($data['language']);
    			$user->setNotifications($data['notifications']);
+			$user->setEmailDelay($data['emailDelay']);
    			$user->setNewsletter($data['newsletter']);
    			$this->get('bm2.usermanager')->updateUser($user);
 				$this->addFlash('notice', $this->get('translator')->trans('account.settings.saved'));
@@ -588,6 +589,21 @@ class AccountController extends Controller {
 			'form' => $form->createView(),
 			'user' => $user
 		]);
+	}
+
+	/**
+	  * @Route("/endemails/{user}/{token}", name="maf_end_emails")
+	  */
+	public function endEmailsAction(User $user, $token=null) {
+		if ($user && $user->getEmailOptOutToken() === $token) {
+			$user->setNotifications(false);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.success', [], "communication"));
+			return $this->redirectToRoute('bm2_index');
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.failure', [], "communication"));
+			return $this->redirectToRoute('bm2_index');
+		}
 	}
 
 	/**
