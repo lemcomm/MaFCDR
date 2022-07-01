@@ -1,17 +1,117 @@
 services:
+    action_manager:
+        class:      BM2\SiteBundle\Service\ActionManager
+        arguments:  ['@doctrine.orm.entity_manager']
+    action_resolution:
+        class:      BM2\SiteBundle\Service\ActionResolution
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager', '@activity_manager']
+    activity_manager:
+        class:      BM2\SiteBundle\Service\ActivityManager
+        arguments:  ['@doctrine.orm.entity_manager', '@geography']
+    activity_dispatcher:
+        class:      BM2\SiteBundle\Service\ActivityDispatcher
+        arguments:  ['@appstate']
     appstate:
         class:      BM2\SiteBundle\Service\AppState
         arguments:  ['@doctrine.orm.entity_manager', '@security.token_storage', '@security.authorization_checker', '@session']
+    association_manager:
+        class:      BM2\SiteBundle\Service\AssociationManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
+    battle_runner:
+        class:      BM2\SiteBundle\Service\BattleRunner
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager']
+        tags:
+            - { name: monolog.logger, channel: turn }
+    character_manager:
+        class:      BM2\SiteBundle\Service\CharacterManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager', '@association_manager']
+    conversation_manager:
+        class:      BM2\SiteBundle\Service\ConversationManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
+    description_manager:
+        class:      BM2\SiteBundle\Service\DescriptionManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
+    dispatcher:
+        class:      BM2\SiteBundle\Service\Dispatcher
+        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
+    economy:
+        class:      BM2\SiteBundle\Service\Economy
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@logger']
+    game_request_manager:
+        class:      BM2\SiteBundle\Service\GameRequestManager
+        arguments:  ['@doctrine.orm.entity_manager']
+    game_runner:
+        class:      BM2\SiteBundle\Service\GameRunner
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@conversation_manager', '@permission_manager', '@npc_manager', '@character_manager']
+        tags:
+            - { name: monolog.logger, channel: turn }
+    generator:
+        class:      BM2\SiteBundle\Service\Generator
+        arguments:  ['@doctrine.orm.entity_manager', '@military_manager']
+    geography:
+        class:      BM2\SiteBundle\Service\Geography
+        arguments:  ['@doctrine.orm.entity_manager', '@permission_manager', '@appstate']
+    history:
+        class:      BM2\SiteBundle\Service\History
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate']
+    house_manager:
+        class:      BM2\SiteBundle\Service\HouseManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
+    interactions:
+        class:      BM2\SiteBundle\Service\Interactions
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@politics', '@logger']
+    law_manager:
+        class:      BM2\SiteBundle\Service\LawManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
+    mail_manager:
+        class:      BM2\SiteBundle\Service\MailManager
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %mail_from%, %mail_reply_to%, %mail_opt_out_url%]
+    military_manager:
+        class:      BM2\SiteBundle\Service\MilitaryManager
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
+    news_manager:
+        class:      BM2\SiteBundle\Service\NewsManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@geography']
+    notification_manager:
+        class:      BM2\SiteBundle\Service\NotificationManager
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@mail_manager', '@twig.extension.messagetranslate']
+    npc_manager:
+        class:      BM2\SiteBundle\Service\NpcManager
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
     pagereader:
         class:      BM2\SiteBundle\Service\PageReader
-    twig.extension.geography:
-        class:      BM2\SiteBundle\Twig\GeographyExtension
-        arguments:  ['@translator']
+    payment_manager:
+        class:      BM2\SiteBundle\Service\PaymentManager
+        arguments:  ['@doctrine.orm.entity_manager', '@user_manager', '@mailer', '@translator', '@logger', %ruleset%]
+        tags:
+            - { name: monolog.logger, channel: payment }
+    permission_manager:
+        class:      BM2\SiteBundle\Service\PermissionManager
+        arguments:  ['@doctrine.orm.entity_manager', '@politics']
+    politics:
+        class:      BM2\SiteBundle\Service\Politics
+        arguments:  ['@doctrine.orm.entity_manager', '@history']
+    realm_manager:
+        class:      BM2\SiteBundle\Service\RealmManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager', '@law_manager']
+    twig.extension.appstate:
+        class:      BM2\SiteBundle\Twig\AppStateExtension
+        arguments:  ['@appstate']
+        tags:
+            - { name: twig.extension }
+    twig.extension.dispatcher:
+        class:      BM2\SiteBundle\Twig\DispatcherExtension
+        arguments:  ['@dispatcher']
         tags:
             - { name: twig.extension }
     twig.extension.gametime:
         class:      BM2\SiteBundle\Twig\GameTimeExtension
         arguments:  ['@appstate', '@translator']
+        tags:
+            - { name: twig.extension }
+    twig.extension.geography:
+        class:      BM2\SiteBundle\Twig\GeographyExtension
+        arguments:  ['@translator']
         tags:
             - { name: twig.extension }
     twig.extension.links:
@@ -24,107 +124,20 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@translator', '@twig.extension.links', '@twig.extension.geography']
         tags:
             - { name: twig.extension }
-    twig.extension.dispatcher:
-        class:      BM2\SiteBundle\Twig\DispatcherExtension
-        arguments:  ['@dispatcher']
-        tags:
-            - { name: twig.extension }
     twig.extension.unitDispatcher:
         class:      BM2\SiteBundle\Twig\UnitDispatcherExtension
         arguments:  ['@unit_dispatcher']
         tags:
             - { name: twig.extension }
-
-    geography:
-        class:      BM2\SiteBundle\Service\Geography
-        arguments:  ['@doctrine.orm.entity_manager', '@permission_manager', '@appstate']
-    history:
-        class:      BM2\SiteBundle\Service\History
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@event_dispatcher']
-    economy:
-        class:      BM2\SiteBundle\Service\Economy
-        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@logger']
-    politics:
-        class:      BM2\SiteBundle\Service\Politics
-        arguments:  ['@doctrine.orm.entity_manager', '@history']
-    permission_manager:
-        class:      BM2\SiteBundle\Service\PermissionManager
-        arguments:  ['@doctrine.orm.entity_manager', '@politics']
-    interactions:
-        class:      BM2\SiteBundle\Service\Interactions
-        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@permission_manager', '@politics', '@logger']
-    military_manager:
-        class:      BM2\SiteBundle\Service\MilitaryManager
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
-    war_manager:
-        class:      BM2\SiteBundle\Service\WarManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager', '@twig.extension.gametime', '@interactions', '@politics', '@logger']
-    generator:
-        class:      BM2\SiteBundle\Service\Generator
-        arguments:  ['@doctrine.orm.entity_manager', '@military_manager']
-    twig.extension.appstate:
-        class:      BM2\SiteBundle\Twig\AppStateExtension
-        arguments:  ['@appstate']
-        tags:
-            - { name: twig.extension }
-    dispatcher:
-        class:      BM2\SiteBundle\Service\Dispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
-    activity_dispatcher:
-        class:      BM2\SiteBundle\Service\ActivityDispatcher
-        arguments:  ['@appstate']
     unit_dispatcher:
         class:      BM2\SiteBundle\Service\UnitDispatcher
         arguments:  ['@appstate', '@permission_manager', '@military_manager']
-    conversation_manager:
-        class:      BM2\SiteBundle\Service\ConversationManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
-    character_manager:
-        class:      BM2\SiteBundle\Service\CharacterManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager', '@association_manager']
-    npc_manager:
-        class:      BM2\SiteBundle\Service\NpcManager
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
-    law_manager:
-        class:      BM2\SiteBundle\Service\LawManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
-    realm_manager:
-        class:      BM2\SiteBundle\Service\RealmManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@politics', '@conversation_manager', '@law_manager']
-    news_manager:
-        class:      BM2\SiteBundle\Service\NewsManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@geography']
-    description_manager:
-        class:      BM2\SiteBundle\Service\DescriptionManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
-    house_manager:
-        class:      BM2\SiteBundle\Service\HouseManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager']
-    association_manager:
-        class:      BM2\SiteBundle\Service\AssociationManager
-        arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
-    action_resolution:
-        class:      BM2\SiteBundle\Service\ActionResolution
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager', '@activity_manager']
-    action_manager:
-        class:      BM2\SiteBundle\Service\ActionManager
-        arguments:  ['@doctrine.orm.entity_manager']
-    activity_manager:
-        class:      BM2\SiteBundle\Service\ActivityManager
-        arguments:  ['@doctrine.orm.entity_manager', '@geography']
-    battle_runner:
-        class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager']
-        tags:
-            - { name: monolog.logger, channel: turn }
-    game_runner:
-        class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@conversation_manager', '@permission_manager', '@npc_manager', '@character_manager']
-        tags:
-            - { name: monolog.logger, channel: turn }
-    game_request_manager:
-        class:      BM2\SiteBundle\Service\GameRequestManager
-        arguments:  ['@doctrine.orm.entity_manager']
+    user_manager:
+        class:      BM2\SiteBundle\Service\UserManager
+        arguments:  ['@doctrine.orm.entity_manager', %fos_user.model.user.class%, '@fos_user.util.password_updater', '@fos_user.util.canonical_fields_updater']
+    war_manager:
+        class:      BM2\SiteBundle\Service\WarManager
+        arguments:  ['@doctrine.orm.entity_manager', '@history', '@military_manager', '@action_manager', '@twig.extension.gametime', '@interactions', '@politics', '@logger']
 
     bm2.registration.form.type:
         class:      BM2\SiteBundle\Form\RegistrationFormType
@@ -134,26 +147,11 @@ services:
         class:      BM2\SiteBundle\Form\HiddenEntityField
         arguments:  ['@doctrine.orm.entity_manager']
         tags:       [{ name: "form.type", alias: "hidden_entity" }]
-
-    bm2.user_manager:
-        class:      BM2\SiteBundle\Service\UserManager
-        arguments:  ['@doctrine.orm.entity_manager', %fos_user.model.user.class%, '@fos_user.util.password_updater', '@fos_user.util.canonical_fields_updater']
-    payment_manager:
-        class:      BM2\SiteBundle\Service\PaymentManager
-        arguments:  ['@doctrine.orm.entity_manager', '@bm2.user_manager', '@mailer', '@translator', '@logger', %ruleset%]
-        tags:
-            - { name: monolog.logger, channel: payment }
-
     bm2.authentication_success_listener:
         class:      BM2\SiteBundle\EventListener\AuthenticationEventListener
         arguments:  ['@doctrine.orm.entity_manager', '@fos_user.security.login_manager', %fos_user.firewall_name%]
         tags:
             - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess }
-    bm2.notification_event_listener:
-        class:      BM2\SiteBundle\EventListener\NotificationEventListener
-        arguments:  ['@translator', '@mailer', '@logger', '@twig.extension.messagetranslate']
-        tags:
-            - { name: kernel.event_listener, event: bm2.notification, method: onNotificationEvent }
     kernel.listener.bm2_exceptions:
         class:      BM2\SiteBundle\EventListener\ErrorExceptionListener
         arguments:  ['@templating', '@logger']
