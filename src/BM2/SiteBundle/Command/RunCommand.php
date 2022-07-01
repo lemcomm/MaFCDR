@@ -31,7 +31,7 @@ class RunCommand extends ContainerAwareCommand {
         $logger = $this->getContainer()->get('logger');
 
 		$which = $input->getArgument('which');
-		$game = $this->getContainer()->get('game_runner');      
+		$game = $this->getContainer()->get('game_runner');
 		$opt_time = $input->getOption('time');
 		$opt_debug = $input->getOption('debug');
 
@@ -68,20 +68,13 @@ class RunCommand extends ContainerAwareCommand {
 	private function sendNotification($text, $which, $code) {
 		$mailer = $this->getContainer()->get('mailer');
 		$spool = NULL;
-		if ($mailer->getTransport()->getSpool()) {
-			$spool = $mailer->getTransport()->getSpool();
-		}
-		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 
 		$message = \Swift_Message::newInstance()
 			 ->setSubject("[Might & Fealty] Error $code running $which")
 			 ->setFrom('mafserver@lemuriacommunity.org')
-			 ->setTo("mafteam@lemuriacommunity.org")
+			 ->setTo("andrew@lemuriacommunity.org")
 			 ->setBody($text);
-		$mailer->send($message, $failed);		
-		if ($spool) {
-			$spool->flushQueue($transport);
-		}
+		$mailer->send($message);
 	}
 
 }
