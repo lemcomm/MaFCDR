@@ -12,6 +12,8 @@
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
 		<field name="app_key" type="string"/>
+		<field name="email_opt_out_token" type="string" nullable="true"/>
+		<field name="email_delay" type="string" nullable="true"/>
 		<field name="language" type="string" nullable="true"/>
 		<field name="notifications" type="boolean"/>
 		<field name="newsletter" type="boolean"/>
@@ -52,6 +54,11 @@
 		<one-to-many field="patronizing" target-entity="Patron" mapped-by="user"/>
 		<one-to-many field="reports" target-entity="UserReport" mapped-by="user"/>
 		<one-to-many field="added_report_notes" target-entity="UserReportNote" mapped-by="from"/>
+		<one-to-many field="mail_entries" target-entity="MailEntry" mapped-by="user">
+			<order-by>
+				<order-by-field name="send_time" direction="ASC" />
+			</order-by>
+		</one-to-many>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />
