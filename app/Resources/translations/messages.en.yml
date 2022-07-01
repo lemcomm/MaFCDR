@@ -22,7 +22,9 @@ menu:
  profile:   Profile
  characters:  Characters
  homepage:  Homepage
- terms:     Terms
+ terms:     Terms of Use
+ privacy:   Privacy Policy
+ cookies:   Cookie Policy
  credits:   Credits
  contact:   Contact
  forum:     Forum
@@ -1703,6 +1705,9 @@ unavailable:
  haveleader:    Your side already has a leader.
  notbesieger:   Only the assaulting force's leader can cancel the siege.
  notimplemented: This feature has not yet been implemented.
+ notmanager:    You are not the manager of this Place of Interest.
+ cantxfercapitals: Capitals can't be transfered.
+ notspawnable:  This type of Place cannot be spawned in.
  conv:
   nopermission: You don't have permissions to this conversation.
   ismanaged:    This conversation is managed by the System.
