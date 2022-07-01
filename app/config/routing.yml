@@ -24,6 +24,11 @@ maf_patreon:
  defaults:
   _controller: BM2SiteBundle:Payment:patreon
 
+maf_end_emails:
+ pattern: /account/endemails/{user}/{token}
+ defaults:
+  _controller: BM2SiteBundle:Account:endEmails
+
 _catcher:
  path:	/{url}
  defaults:
