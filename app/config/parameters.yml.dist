@@ -15,11 +15,16 @@ parameters:
     mailer_password:   ~
     mailer_disable:    false
 
+    mail_from:         ~
+    mail_reply_to:     ~
+    mail_opt_out_url: "https://mightandfealty.com/account/endemails"
+
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     recaptcha_site_key: ~
     recaptcha_secret_key: ~
 
+    stripe_secret_key: ~
+
     ruleset: maf
-    
