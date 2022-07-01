@@ -124,7 +124,7 @@ fos_user:
     firewall_name: account
     user_class: BM2\SiteBundle\Entity\User
     service:
-        user_manager:   bm2.user_manager
+        user_manager:   user_manager
     registration:
         confirmation:
             enabled:    true
