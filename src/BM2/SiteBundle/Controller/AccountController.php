@@ -109,7 +109,7 @@ class AccountController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form['text']->getData();
-			$this->get('bm2.usermanager')->updateUser($user);
+			$this->get('user_manager')->updateUser($user);
 			if ($data && $text != $data) {
 				$desc = $this->get('description_manager')->newDescription($user, $data);
 			}
@@ -140,7 +140,7 @@ class AccountController extends Controller {
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, false);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, false);
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -402,7 +402,7 @@ class AccountController extends Controller {
 		if (!$make_more) {
 			throw new AccessDeniedHttpException('newcharacter.overlimit');
 		}
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, true);
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -579,7 +579,7 @@ class AccountController extends Controller {
    			$user->setNotifications($data['notifications']);
 			$user->setEmailDelay($data['emailDelay']);
    			$user->setNewsletter($data['newsletter']);
-   			$this->get('bm2.usermanager')->updateUser($user);
+   			$this->get('user_manager')->updateUser($user);
 				$this->addFlash('notice', $this->get('translator')->trans('account.settings.saved'));
 				return $this->redirectToRoute('bm2_account');
 			}
