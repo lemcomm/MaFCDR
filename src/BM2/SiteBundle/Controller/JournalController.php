@@ -59,6 +59,24 @@ class JournalController extends Controller {
 	  * @Route("/write/")
 	  */
 
+	private function newJournal(Character $char, $data) {
+		$journal = new Journal;
+		$journal->setCharacter($character);
+		$journal->setDate(new \DateTime('now'));
+		$journal->setCycle($this->get('appstate')->getCycle());
+		$journal->setLanguage('English');
+		$journal->setTopic($data['topic']);
+		$journal->setEntry($data['entry']);
+		$journal->setOoc($data['ooc']);
+		$journal->setPublic($data['public']);
+		$journal->setGraphic($data['graphic']);
+		$journal->setPendingReview(false);
+		$journal->setGMReviewed(false);
+		$journal->setGMPrivate(false);
+		$journal->setGMGraphic(false);
+		return $journal;
+	}
+
 	public function journalWriteAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('journalWriteTest');
 		if (! $character instanceof Character) {
@@ -70,20 +88,37 @@ class JournalController extends Controller {
 
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
-			$journal = new Journal;
-			$journal->setCharacter($character);
-			$journal->setDate(new \DateTime('now'));
-			$journal->setCycle($this->get('appstate')->getCycle());
-			$journal->setLanguage('English');
-			$journal->setTopic($data['topic']);
-			$journal->setEntry($data['entry']);
-			$journal->setOoc($data['ooc']);
-			$journal->setPublic($data['public']);
-			$journal->setGraphic($data['graphic']);
-			$journal->setPendingReview(false);
-			$journal->setGMReviewed(false);
-			$journal->setGMPrivate(false);
-			$journal->setGMGraphic(false);
+			$journal = $this->newJournal($character, $data);
+
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($journal);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('journal.write.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_journal_mine');
+		}
+
+		return $this->render('Journal/write.html.twig', [
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/write/battle/{report}", name="maf_journal_write_battle")
+	  */
+
+	public function journalWriteAboutBattleAction(Request $request, BattleReport $report) {
+		$character = $this->get('dispatcher')->gateway('journalWriteBattleTest', null, null, null, $report);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new JournalType());
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$journal = $this->newJournal($character, $data);
+			$journal->setBattleReport($report);
 
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
