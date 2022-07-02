@@ -18,5 +18,6 @@
 		<field name="language" type="string"/>
                 <many-to-one field="character" target-entity="Character" inversed-by="journals"/>
                 <one-to-many field="reports" target-entity="UserReport" mapped-by="journal"/>
+		<many-to-one field="battle_report" target-entity="BattleReport" inversed-by="journals"/>
 	</entity>
 </doctrine-mapping>
