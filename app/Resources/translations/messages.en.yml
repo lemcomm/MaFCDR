@@ -279,6 +279,21 @@ account:
   newsletter: Occasional newsletter
   submit: Update
   saved:  Your settings have been updated.
+  delay:
+   name:  Notification Timing
+   choose: (choose one)
+   now: Immediately
+   hourly: Every Hour
+   6h: Every 6 Hours
+   12h: Every 12 Hours
+   daily: Daily
+   sundays: Weekly on Sunday
+   mondays: Weekly on Monday
+   tuesdays: Weekly on Tuesday
+   wednesdays: Weekly on Wednesday
+   thursdays: Weekly on Thursday
+   fridays: Weekly on Friday
+   saturdays: Weekly on Saturday
  autologin:
   title:    Auto-Login
   intro: >
