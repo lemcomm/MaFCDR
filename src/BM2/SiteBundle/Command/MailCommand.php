@@ -20,17 +20,8 @@ class MailCommand extends ContainerAwareCommand {
 		;
 	}
 
-	private function getRecipients() {
-		$em = $this->getContainer()->get('doctrine')->getManager();
-
-		$query = $em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > :min');
-		$query->setParameter('min', 0);
-		return $query->getResult();
-	}
-
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$mailer = $this->getContainer()->get('mailer');
-		$mailer->sendEmails();
+		$this->getContainer()->get('mail_manager')->sendEventEmails();
 	}
 
 
