@@ -19,6 +19,10 @@ use Monolog\Logger;
 
 class BattleRunner {
 
+	/*
+	NOTE: There's a bunch of code in here that is "live" but not actually called relating to 2D battles.
+	*/
+
 	# Symfony Service variables.
 	private $em;
 	private $logger;
@@ -278,6 +282,8 @@ class BattleRunner {
 
 		$preparations = $this->prepare();
 		if ($preparations[0] === 'success') {
+			$this->addObservers($battle);
+			$this->em->flush();
 			// the main call to actually run the battle:
 			$this->log(15, "Resolving Battle...\n");
 			$this->resolveBattle($myStage, $maxStage);
@@ -365,6 +371,7 @@ class BattleRunner {
 		}
 		$this->em->flush();
 		$this->em->remove($battle);
+		$this->history->evaluateBattle($this->report);
 	}
 
 	private function prepare() {
@@ -384,6 +391,7 @@ class BattleRunner {
 			$attGroup = $battle->getPrimaryAttacker();
 			$defGroup = $battle->getPrimaryDefender();
 		}
+		$totalCount = 0;
 		foreach ($battle->getGroups() as $group) {
 			if ($siege && $defGroup == NULL) {
 				if ($group != $attGroup && !$group->getReinforcing()) {
@@ -401,7 +409,9 @@ class BattleRunner {
 			$this->addNobility($group);
 
 			$types=array();
+			$groupCount = 0;
 			foreach ($group->getSoldiers() as $soldier) {
+				$groupCount++;
 				if ($soldier->getExperience()<=5) {
 					$soldier->addXP(2);
 				} else {
@@ -414,6 +424,8 @@ class BattleRunner {
 					$types[$type] = 1;
 				}
 			}
+			$totalCount += $groupCount;
+			$groupReport->setCount($groupCount);
 			$combatworthy=false;
 			$troops = array();
 			$this->log(3, "Totals in this group:\n");
@@ -436,6 +448,7 @@ class BattleRunner {
 			}
 			$groupReport->setStart($troops);
 		}
+		$this->report->setCount($totalCount);
 		$this->em->flush();
 
 		// FIXME: in huge battles, this can potentially take, like, FOREVER :-(
@@ -543,6 +556,59 @@ class BattleRunner {
 		}
 	}
 
+	private function addObservers($battle) {
+		$added = new ArrayCollection;
+		$someone = null;
+		foreach ($battle->getGroups() as $group) {
+			foreach ($group->getCharacters() as $char) {
+				if (!$someone) {
+					$someone = $char;
+				}
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+		$dist = $this->geo->calculateInteractionDistance($someone);
+		$nearby = $this->geto->findCharactersNearMe($someone, $dist, false, false, false, true, false);
+		foreach ($nearby as $each) {
+			$char = $each['character'];
+			if (!$added->contains($char)) {
+				$obs = new BattleReportObserver;
+				$this->em->persist($obs);
+				$obs->setBattleReport($this->report);
+				$obs->setCharacter($char);
+				$added->add($char);
+			}
+		}
+		if ($battle->getPlace()) {
+			foreach ($battle->getPlace()->getCharactersPresent() as $char) {
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+		if ($battle->getSettlement()) {
+			foreach ($battle->getSettlement()->getCharactersPresent() as $char) {
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+	}
+
 	private function addNobility(BattleGroup $group) {
 		foreach ($group->getCharacters() as $char) {
 			// TODO: might make this actual buy options, instead of hardcoded
@@ -612,7 +678,7 @@ class BattleRunner {
 		} else {
 			$this->log(20, "Ranged Penalty: ".$rangedPenalty."\n\n");
 		}
-		$this->prepareBattlefield();
+		#$this->prepareBattlefield();
 		$this->log(20, "...starting phases...\n");
 		while ($combat) {
 			$this->prepareRound();
@@ -919,6 +985,14 @@ class BattleRunner {
 								// missed
 								$this->log(10, "missed\n");
 								$missed++;
+							}
+							# Remove this check after the Battle 2.0 update and 2D maps are added.
+							if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
+								if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
+									// one-shot weapon, that only longbowmen will use by default in this phase
+									// TODO: Better logic that determines this, for when we add new weapons.
+									$soldier->dropEquipment();
+								}
 							}
 						} else {
 							$this->log(10, "no more targets\n");
