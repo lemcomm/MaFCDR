@@ -559,9 +559,9 @@ siege:
   defender:     After the final %battle%, the siege has concluded in favor of the defenders.
 
 mail:
+ sender:        "Might & Fealty"
  event:
-  sender:        Notification Service
-  subject:       Might & Fealty Important Event Notice
+  subject:       In-Game Event Digest
   intro:         "As per your user settings in Might & Fealty, we're sending you this email to notify you of the following events:"
   footer:        "We understand that you may get tired of receiving these emails, and if you would like to opt out entirely you can click <a href=\"%link%\">here</a>. Otherwise, they can be managed from in game as part of your account settings in your profile."
  optout:
