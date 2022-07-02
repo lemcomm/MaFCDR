@@ -97,7 +97,7 @@ class Unit {
 	}
 
 	public function isLocal() {
-		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace() && !$this->getDefendingSettlement()) {
+		if ($this->getSettlement() && !$this->getCharacter() && !$this->getPlace() && !$this->getDefendingSettlement() && !$this->getTravelDays()) {
 			return true;
 		}
 		return false;
