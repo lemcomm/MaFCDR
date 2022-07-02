@@ -65,7 +65,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     mail_manager:
         class:      BM2\SiteBundle\Service\MailManager
-        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@mailer', '@appstate', %mail_from%, %mail_reply_to%, %mail_opt_out_url%]
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@mailer', '@appstate', %mail_from%, %mail_from_name%, %mail_reply_to%, %mail_opt_out_url%]
     military_manager:
         class:      BM2\SiteBundle\Service\MilitaryManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@permission_manager', '@appstate', '@geography']
