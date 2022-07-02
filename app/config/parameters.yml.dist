@@ -29,3 +29,6 @@ parameters:
     mail_from_name:    "Might & Fealty"
     mail_reply_to:     ~
     mail_opt_out_url: "https://mightandfealty.com/account/endemails"
+
+    discord_webhook_general: null
+    
