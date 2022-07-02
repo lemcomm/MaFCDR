@@ -31,6 +31,9 @@ services:
     description_manager:
         class:      BM2\SiteBundle\Service\DescriptionManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
+    discord_integrator:
+        class:      BM2\SiteBundle\Service\DiscordIntegrator
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
         arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
@@ -74,7 +77,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@geography']
     notification_manager:
         class:      BM2\SiteBundle\Service\NotificationManager
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@mail_manager', '@twig.extension.messagetranslate']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@mail_manager', '@twig.extension.messagetranslate', '@translator', '@discord_integrator']
     npc_manager:
         class:      BM2\SiteBundle\Service\NpcManager
         arguments:  ['@doctrine.orm.entity_manager', '@logger', '@generator', '@geography', '@history', '@character_manager']
