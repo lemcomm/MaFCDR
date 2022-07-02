@@ -1290,6 +1290,7 @@ battle:
   sortie:       The sortie from %location%
   near:         A battle near %location%
   around:       A battle in the vicinity of %location%
+  castle:       A battle at the castle of %location%
  defenses:      An assault against a defended position with
  initial:       initial troops
  combat:        combat
