@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Event;
 use BM2\SiteBundle\Entity\EventLog;
@@ -136,5 +137,38 @@ class History {
 			$this->em->flush($log); // need this here or later code accessing the log will fail because it doesn't have a database reference
 		}
 		return $log;
+	}
+
+	public function evaluateBattle(BattleReport $report) {
+		$size = $report->getCount();
+		if ($size <100) {
+			$epic = 0;
+		} elseif ($size <250) {
+			$epic = 1;
+		} elseif ($size <500) {
+			$epic = 2;
+		} elseif ($size <1000) {
+			$epic = 3;
+		} elseif ($size <1500) {
+			$epic = 4;
+		} elseif ($size <2000) {
+			$epic = 5;
+		} elseif ($size <3000) {
+			$epic = 6;
+		} elseif ($size <5000) {
+			$epic = 7;
+		} elseif ($size <10000) {
+			$epic = 8;
+		} else {
+			$epic = 9;
+		}
+		$report->setEpicness($epic);
+		if ($epic > 2) {
+			$aSize = $report->getGroups()->first()->getCount();
+			$ratio = $size / $aSize;
+			if ($ratio <= 5 && $ratio >= 1.25) {
+				$this->noteman->spoolBattle($report, $epic);
+			}
+		}
 	}
 }
