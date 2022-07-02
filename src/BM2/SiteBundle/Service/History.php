@@ -8,7 +8,6 @@ use BM2\SiteBundle\Entity\EventLog;
 use BM2\SiteBundle\Entity\EventMetadata;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\SoldierLog;
-use BM2\SiteBundle\EventListener\NotificationEvent;
 use Doctrine\ORM\EntityManager;
 
 
@@ -52,7 +51,7 @@ class History {
 
 		// notify player by mail of important events
 		if ($priority >= History::NOTIFY) {
-			$noteman->spoolEvent($event);
+			$this->noteman->spoolEvent($event);
 		}
 
 		return $event;
