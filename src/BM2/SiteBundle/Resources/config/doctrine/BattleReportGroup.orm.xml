@@ -15,6 +15,7 @@
 		<field name="hunt" type="array"/>
 		<field name="finish" type="array"/>
 		<field name="fates" type="array" nullable="true"/>
+		<field name="count" type="integer" nullable="true"/>
 
 		<one-to-many field="characters" target-entity="BattleReportCharacter" mapped-by="group_report"/>
 		<many-to-one field="battle_report" target-entity="BattleReport" inversed-by="groups"/>
