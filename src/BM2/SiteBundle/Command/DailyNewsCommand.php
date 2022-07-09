@@ -22,7 +22,6 @@ class DailyNewsCommand extends ContainerAwareCommand {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$mailer = $this->getContainer()->get('mailer');
 
-		$transport = $this->getContainer()->get('swiftmailer.transport.real');
 		$translator = $this->getContainer()->get('translator');
 		$em = $this->getContainer()->get('doctrine')->getManager();
 		$cycle = $this->getContainer()->get('appstate')->getCycle();
