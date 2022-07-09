@@ -13,24 +13,37 @@ class DiscordIntegrator {
 	protected $appstate;
 	protected $trans;
 	protected $generalHook;
+	protected $olympusHook;
+	protected $paymentsHook;
 
-	public function __construct(EntityManager $em, $translator, AppState $appstate, $discord_webhook_general) {
+	public function __construct(EntityManager $em, $translator, AppState $appstate, $discord_webhook_general, $discord_webhook_olympus, $paymentsHook) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->trans = $translator;
 		$this->generalHook = $discord_webhook_general;
+		$this->olympusHook = $discord_webhook_olympus;
+		$this->paymentsHook = $paymentsHook;
 	}
 
-	public function pushToGeneral($text) {
-		$webhook = $this->generalHook;
-		$data = ['content' => $text];
-		$jsonData = json_encode($data);
+	private function curlToDiscord($json, $webhook) {
 		$curl = curl_init($webhook);
 		curl_setopt($curl, CURLOPT_POST, true);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		$result = curl_exec($curl);
+	}
+
+	public function pushToGeneral($text) {
+		$this->curlToDiscord(json_encode(['content' => $text]), $this->generalHook);
+	}
+
+	public function pushToOlympus($text) {
+		$this->curlToDiscord(json_encode(['content' => $text]), $this->olympusHook);
+	}
+
+	public function pushToPayments($text) {
+		$this->curlToDiscord(json_encode(['content' => $text]), $this->paymentsHook);
 	}
 
 }
