@@ -84,7 +84,7 @@ class PaymentManager {
 	}
 
 	public function getCostOfHeraldry() {
-		return 500;
+		return 250;
 	}
 
 
@@ -122,20 +122,34 @@ class PaymentManager {
 			$this->logger->info("$bannedusername has been banned, and email notifications have been disabled.");
 			$this->em->flush();
 		}
-		$now = new \DateTime("now");
-		if (!$patronsOnly) {
-			$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
-			$query->setParameters(array('now'=>$now));
-		} else {
-			$query = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		$this->logger->info("Refreshing patreon pledges for users with connected accounts.");
+		$uCount = 0;
+		$pledges = 0;
+		$patronquery = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		foreach ($patronquery->getResult() as $user) {
+			foreach ($user->getPatronizing() as $patron) {
+				if ($patron->getExpires() < $now) {
+					$this->refreshPatreonTokens($patron);
+				}
+				$this->refreshPatreonPledge($patron);
+				$pledges++;
+			}
+			$uCount++;
 		}
+		$this->em->flush();
+		$this->logger->info("Refreshed ".$pledges." pledges for ".$uCount." users.");
+
+		$now = new \DateTime("now");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
+		$query->setParameters(array('now'=>$now));
+
 		$this->logger->info("  User Subscription Processing...");
 		foreach ($query->getResult() as $user) {
-			$this->logger->info("  --Calculating ".$user->getUsername()." (".$user->getId().")...");
+			#$this->logger->info("  --Calculating ".$user->getUsername()." (".$user->getId().")...");
 			$myfee = $this->calculateUserFee($user);
 			$levels = $this->getPaymentLevels();
 			if ($myfee > 0) {
-				#$this->logger->info("    --Fee of ".$myfee." detected...");
+				$this->logger->info("  --Calculating fee for ".$user->getUsername()." (".$user->getId().")...");
 				if ($this->spend($user, 'subscription', $myfee, true)) {
 					$this->logger->info("    --Credit spend successful...");
 					$active++;
@@ -158,13 +172,6 @@ class PaymentManager {
 					$status = null;
 					$entitlement = null;
 
-					if ($patron->getExpires() < $now) {
-						$this->logger->info("    --Access tokens expired. Refreshing...");
-						$this->refreshPatreonTokens($patron);
-					}
-
-					#$this->logger->info("    --Checking pledge status...");
-					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
 					$this->logger->info("    --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
 
 					if ($patreonLevel <= $entitlement) {
@@ -229,7 +236,18 @@ class PaymentManager {
 		$status = $member['included'][0]['attributes']['patron_status'];
 		$patron->setStatus($status);
 		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
+		$lifetime = $member['included'][0]['attributes']['lifetime_support_cents'];
 		$patron->setCurrentAmount($entitlement);
+		if ($patron->getCredited() != $lifetime) {
+			if ($patron->getCredited() === null) {
+				$dif = $lifetime;
+			} else {
+				$dif = $lifetime - $patron->getCredited();
+			}
+			$dif = $dif / 100; #Patreon provides in cents. We want full dollars!
+			$this->account($patron->getUser(), 'Patron Credit', 'USD', $dif);
+			$patron->setCredited($lifetime); #We do track it in cents though.
+		}
 		return [$status, $entitlement];
 	}
 
@@ -363,19 +381,24 @@ class PaymentManager {
 		}
 		$credits = ceil($credits);
 		$original = $credits;
-		if ($amount >= 100) {
-			$bonus = $credits * 0.5;
-		} elseif ($amount >= 50) {
-			$bonus = $credits * 0.4;
-		} elseif ($amount >= 20) {
-			$bonus = $credits * 0.3;
-		} elseif ($amount >= 10) {
-			$bonus = $credits * 0.2;
-		} elseif ($amount >= 5) {
-			$bonus = $credits * 0.1;
+		if ($type !== 'Patron Credit') {
+			if ($amount >= 100) {
+				$bonus = $credits * 0.5;
+			} elseif ($amount >= 50) {
+				$bonus = $credits * 0.4;
+			} elseif ($amount >= 20) {
+				$bonus = $credits * 0.3;
+			} elseif ($amount >= 10) {
+				$bonus = $credits * 0.2;
+			} elseif ($amount >= 5) {
+				$bonus = $credits * 0.1;
+			} else {
+				$bonus = 0;
+			}
 		} else {
-			$bonus = 0;
+			$bonus = $credits * 0.5;
 		}
+
 		$credits = $credits + $bonus;
 		$credits = ceil($credits); # Not that this should ever be a decimal but...
 
