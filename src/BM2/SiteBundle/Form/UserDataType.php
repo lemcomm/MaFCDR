@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -52,6 +53,14 @@ class UserDataType extends AbstractType {
 				'class'=>'tt_bot'
 			]
 		]);
+		$builder->add('show_patronage', CheckboxType::class, array(
+			'label' => 'form.patronage',
+			'required' => false,
+			'attr' => [
+				'title'=>'form.help.patronage',
+				'class'=>'tt_bot'
+			]
+		));
 		$builder->add('text', TextareaType::class, [
 			'label'=>'form.profile',
 			'data'=>$this->text,
