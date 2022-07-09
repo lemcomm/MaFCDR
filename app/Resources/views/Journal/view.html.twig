@@ -15,8 +15,7 @@
 	<hr>
 	{{ journal.entry|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
 	</div>
-	{#{% if not journal.GMReviewed and journal.character and journal.character.user != user %}#}
-	{% if not journal.GMReviewed %}
+	{% if not journal.GMReviewed and journal.character and journal.character.user != user %}
 		<p><a href="{{ path('maf_journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
 		{% if gm %}
 			<h4>{{ 'journal.gm.actions'|trans({}, "messages")}}<br>
