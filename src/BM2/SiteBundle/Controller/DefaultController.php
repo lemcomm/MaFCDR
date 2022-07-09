@@ -95,9 +95,13 @@ class DefaultController extends Controller {
 	  * @Route("/credits", name="bm2_credits")
 	  */
 	public function creditsAction() {
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT u FROM BM2SiteBundle:User u JOIN u.patronizing p WHERE u.show_patronage = :true ORDER BY u.display_name ASC');
+		$query->setParameters(['true'=>true]);
 
 		return $this->render('Default/credits.html.twig', [
-			"simple"=>true
+			"simple"=>true,
+			"patrons"=>$query->getResult()
 		]);
 	}
 
