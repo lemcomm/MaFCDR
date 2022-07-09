@@ -6,7 +6,7 @@
 		</id>
 		<field name="type" type="string"/>
 		<many-to-one field="user" target-entity="User" inversed-by="mail_entries"/>
-		<many-to-one field="event" target-entity="Event" inversed-bv="mail_entries"/>
+		<many-to-one field="event" target-entity="Event" inversed-by="mail_entries"/>
 		<field name="ts" type="datetime"/>
 		<field name="send_time" type="datetime"/>
 		<field name="content" type="text"/>
