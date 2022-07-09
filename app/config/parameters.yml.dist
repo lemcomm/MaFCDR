@@ -21,5 +21,9 @@ parameters:
     recaptcha_site_key: ~
     recaptcha_secret_key: ~
 
+    stripe_secret_key: ~
+    paypal-client-id: ~
+    paypal-secret: ~
+
     ruleset: maf
     

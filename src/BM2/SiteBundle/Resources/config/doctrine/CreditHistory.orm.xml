@@ -4,7 +4,8 @@
 		<id name="id" type="integer">
 			<generator strategy="IDENTITY"/>
 		</id>
-		<field name="credits" type="smallint"/>
+		<field name="credits" type="integer"/>
+		<field name="bonus" type="integer" nullable="true"/>
 		<field name="ts" type="datetime"/>
 		<field name="type" type="string"/>
 

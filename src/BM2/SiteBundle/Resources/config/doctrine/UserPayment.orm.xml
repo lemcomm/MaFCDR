@@ -7,7 +7,8 @@
 		<field name="transaction_code" type="string" nullable="true"/>
 		<field name="amount" type="float"/>
 		<field name="currency" type="string"/>
-		<field name="credits" type="smallint"/>
+		<field name="credits" type="integer"/>
+		<field name="bonus" type="integer" nullable="true"/>
 		<field name="ts" type="datetime"/>
 		<field name="type" type="string"/>
 
