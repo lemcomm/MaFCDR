@@ -52,8 +52,9 @@
 			</join-table>
 		</many-to-many>
 		<one-to-many field="patronizing" target-entity="Patron" mapped-by="user"/>
-		<one-to-many field="reports" target-entity="UserReport" mapped-by="user"/>
-		<one-to-many field="added_report_notes" target-entity="UserReportNote" mapped-by="from"/>
+		<one-to-many field="reports" target-entity="UserReport" mapped-by="user" fetch="EXTRA_LAZY"/>
+		<one-to-many field="reports_against" target-entity="UserReportAgainst" mapped-by="user" fetch="EXTRA_LAZY"/>
+		<one-to-many field="added_report_notes" target-entity="UserReportNote" mapped-by="from" fetch="EXTRA_LAZY"/>
 		<one-to-many field="mail_entries" target-entity="MailEntry" mapped-by="user">
 			<order-by>
 				<order-by-field name="send_time" direction="ASC" />
