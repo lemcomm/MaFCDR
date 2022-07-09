@@ -9,7 +9,15 @@ use BM2\SiteBundle\Form\GiftType;
 use BM2\SiteBundle\Form\SubscriptionType;
 use Patreon\API as PAPI;
 use Patreon\OAuth as POA;
-use PayPal;
+use PayPal\Api\Amount as PPAmt;
+use PayPal\Api\Details as PPDet;
+use PayPal\Api\Item as PPItem;
+use PayPal\Api\ItemList as PPIL;
+use PayPal\Api\Payer as PPPayer;
+use PayPal\Api\Payment as PPPayment;
+use PayPal\Api\PaymentExecution as PPExec;
+use PayPal\Api\RedirectUrls as PPRU;
+use PayPal\Api\Transaction as PPTrans;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -39,23 +47,6 @@ class PaymentController extends Controller {
 		}
 		return $result;
 	}
-
-	// FIXME: the secrets, etc. should probably not be in here, but in a safe place
-	// PayPal
-/*
-	private $paypal_config = array (
-			'mode' => 'sandbox' ,
-			'acct1.UserName' => 'jb-us-seller_api1.paypal.com',
-			'acct1.Password' => 'WX4WTU3S8MY44S7F',
-			'acct1.Signature' => 'AFcWxV21C7fd0v3bYYYRCpSSRl31A7yDhhsPUU2XhtMoZXsWHFxu-RWy'
-	);
-*/
-	private $paypal_config = array (
-			'mode' => 'live',
-			'acct1.UserName' => 'payment_api1.mightandfealty.com',
-			'acct1.Password' => 'YWJ22BG45Z63LBU4',
-			'acct1.Signature' => 'AuoUscunfGMRfST-cga6SnFHZjaMAhHW.dmiLV7HVrlT0SvatET9DLng'
-	);
 
 	/**
      * @Route("/", name="bm2_payment")
@@ -104,91 +95,84 @@ class PaymentController extends Controller {
 		}
 		$user = $this->getUser();
 
-		$paypalService = new PayPal\Service\PayPalAPIInterfaceServiceService($this->paypal_config);
-		$paymentDetails = $this->setup_payment_details($amount, $user->getId());
+		$payment = $this->generatePayPalPayment($user->getId(), $amount);
 
-		$setECReqDetails = new PayPal\EBLBaseComponents\SetExpressCheckoutRequestDetailsType();
-		$setECReqDetails->PaymentDetails[0] = $paymentDetails;
-		$setECReqDetails->CancelURL = $this->generateUrl('bm2_paypal_cancel', array(), true);
-		$setECReqDetails->ReturnURL = $this->generateUrl('bm2_paypal_success', array(), true);
+		$PPRequest = clone ($payment);
 
-		$setECReqType = new PayPal\PayPalAPI\SetExpressCheckoutRequestType();
-		$setECReqType->Version = '104.0';
-		$setECReqType->SetExpressCheckoutRequestDetails = $setECReqDetails;
-
-		$setECReq = new PayPal\PayPalAPI\SetExpressCheckoutReq();
-		$setECReq->SetExpressCheckoutRequest = $setECReqType;
-
-		$setECResponse = $paypalService->SetExpressCheckout($setECReq);
-
-		if (strtolower($setECResponse->Ack) == "success") {
-			$token = $setECResponse->Token;
-			return $this->redirect("https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=".$token);
-		} else {
-			throw new HttpException(402, "PayPal Checkout failed");
+		try {
+			$payment->create($this->get('payment_manager')->getPayPalAPIContext());
+		} catch (Exception $e) {
+			echo "Payment Failed!<br>";
+			var_dump($PPRequest);
+			echo "<br>";
+			echo $e;
 		}
+
+		$approvalUrl = $payment->getApprovalLink();
+		return $this->redirect($approvalUrl);
+	}
+
+
+	public function generatePayPalPayment($id, $amount) {
+		$amount = intval($amount);
+		$payer = new PPPayer();
+		$payer->setPaymentMethod("paypal");
+		$item = new PPItem();
+		$item->setName('M&F Game Credits')->setCurrency('USD')->setQuantity('1')->setPrice($amount)->setCategory('DIGITAL');
+		$list = new PPIL();
+		$list->setItems([$item]);
+		$details = new PPDet();
+		$details->setShipping(0)->setTax(0)->setSubtotal($amount);
+		$ppamt = new PPAmt();
+		$ppamt->setCurrency("USD")->setTotal($amount)->setDetails($details);
+		$trans = new PPTrans();
+		$trans->setAmount($ppamt)->setItemList($list)->setDescription("Might & Fealty Game Credits")->setInvoiceNumber($id.'--'.uniqid());
+		$success = $this->generateUrl('bm2_paypal_success', array(), true);
+		$cancel = $this->generateUrl('bm2_paypal_cancel', array(), true);
+		$redirects = new PPRU();
+		$redirects->setReturnUrl($success)->setCancelUrl($cancel);
+		$payment = new PPPayment();
+		$payment->setIntent("sale")->setPayer($payer)->setRedirectUrls($redirects)->setTransactions([$trans]);
+		return $payment;
 	}
 
 	/**
 	  * @Route("/paypal_success", name="bm2_paypal_success")
 	  */
 	public function paypalsuccessAction(Request $request) {
-		$token = $request->query->get('token');
-		$payer_id = $request->query->get('PayerID');
+		$user = $this->getUser();
+		$user_id = $user->getId();
+		$paymentId = $request->query->get("paymentId");
+		$apiContext = $this->get('payment_manager')->getPayPalAPIContext();
+		$payment = PPPayment::get($paymentId, $apiContext);
 
-		$paypalService = new PayPal\Service\PayPalAPIInterfaceServiceService($this->paypal_config);
-		$getExpressCheckoutDetailsRequest = new PayPal\PayPalAPI\GetExpressCheckoutDetailsRequestType($token);
-		$getExpressCheckoutDetailsRequest->Version = '104.0';
-		$getExpressCheckoutReq = new PayPal\PayPalAPI\GetExpressCheckoutDetailsReq();
-		$getExpressCheckoutReq->GetExpressCheckoutDetailsRequest = $getExpressCheckoutDetailsRequest;
+		$exec = new PPExec();
+		$exec->setPayerId($request->query->get('PayerID'));
 
-		$getECResponse = $paypalService->GetExpressCheckoutDetails($getExpressCheckoutReq);
-		$details = $getECResponse->GetExpressCheckoutDetailsResponseDetails;
-		$user_id = $details->Custom;
-		$em = $this->getDoctrine()->getManager();
-		$user = $em->getRepository('BM2SiteBundle:User')->find($user_id);
-		if ($user) {
-			$paymentDetails = $details->PaymentDetails;
-			$OrderTotal = $details->PaymentDetails[0]->OrderTotal;
-			if (strtolower($getECResponse->Ack) == "success") {
-				$paypalService = new PayPal\Service\PayPalAPIInterfaceServiceService($this->paypal_config);
-				$paymentDetails = $this->setup_payment_details($OrderTotal->value, $user_id);
+		try {
+			$result = $payment->execute($exec, $apiContext);
+		} catch (Exception $e) {
+			$this->addFlash('error', "PayPal Payment Failed. If you've received this it's because we weren't able to complete the transaction for some reason.");
+			return $this->redirectToRoute('bm2_payment');
+		}
 
-				$DoECRequestDetails = new PayPal\EBLBaseComponents\DoExpressCheckoutPaymentRequestDetailsType();
-				$DoECRequestDetails->PayerID = $payer_id;
-				$DoECRequestDetails->Token = $token;
-				$DoECRequestDetails->PaymentDetails[0] = $paymentDetails;
-
-				$DoECRequest = new PayPal\PayPalAPI\DoExpressCheckoutPaymentRequestType();
-				$DoECRequest->DoExpressCheckoutPaymentRequestDetails = $DoECRequestDetails;
-				$DoECRequest->Version = '104.0';
-
-				$DoECReq = new PayPal\PayPalAPI\DoExpressCheckoutPaymentReq();
-				$DoECReq->DoExpressCheckoutPaymentRequest = $DoECRequest;
-
-				$DoECResponse = $paypalService->DoExpressCheckoutPayment($DoECReq);
-
-				if (strtolower($DoECResponse->Ack) == "success") {
-					$info = $DoECResponse->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];
-					if (strtolower($info->PaymentStatus) == "completed") {
-						$tx_id = $info->TransactionID;
-						$amount = floatval($info->GrossAmount->value);
-						$currency = $info->GrossAmount->currencyID;
-
-						$this->get('payment_manager')->log_info("PayPal Payment callback: $amount $currency / for $user_id / tx_id: $tx_id");
-						$this->get('payment_manager')->account($user, "PayPal Payment", $currency, $amount, $tx_id);
-						return $this->redirectToRoute('bm2_payment');
-					}
-					throw new HttpException(402, "Payment not completed");
-				} else {
-					throw new HttpException(402, "Express Checkout response failed - ".$DoECResponse->Ack);
-				}
-			} else {
-				throw new HttpException(402, "Express Checkout failed");
+		if (strtolower($result->getState()) === 'approved') {
+			#Transaction successful, credit user.
+			$ID = $result->getId();
+			$trans = $result->getTransactions();
+			$amt = $trans[0]->getAmount();
+			$currency = $amt->getCurrency();
+			$total = $amt->getTotal();
+			if (strtolower($currency) !== 'usd') {
+				#TODO: Notify a GM because things have broke somehow!
 			}
+			$this->get('payment_manager')->log_info("PayPal Payment callback: $total $currency / for $user_id / tx_id: $ID");
+			$this->get('payment_manager')->account($user, "PayPal Payment", $currency, $total, $ID);
+			$this->addFlash('notice', 'Payment Successful! Thank you!');
+			return $this->redirectToRoute('bm2_payment');
 		} else {
-			$this->get('payment_manager')->log_error("Cannot find user for PayPal callback: $user_id");
-            throw new HttpException(402, "Cannot find user data");
+			$this->addFlash('error', "PayPal Payment Failed. If you believe you reached this incorrectly, please contact an Adminsitrator. Having both your M&F username and your PayPal transaction ID ready will hasten the lookup process.");
+			return $this->redirectToRoute('bm2_payment');
 		}
 	}
 
@@ -196,31 +180,8 @@ class PaymentController extends Controller {
 	  * @Route("/paypal_cancel", name="bm2_paypal_cancel")
 	  */
 	public function paypalcancelAction(Request $request) {
-		throw new HttpException(402, "PayPal Checkout cancelled");
-	}
-
-
-	private function setup_payment_details($amount, $custom) {
-		$paymentDetails= new PayPal\EBLBaseComponents\PaymentDetailsType();
-
-		$itemDetails = new PayPal\EBLBaseComponents\PaymentDetailsItemType();
-		$itemDetails->Name = 'Might & Fealty in-game credits';
-		$itemAmount = $amount;
-		$itemDetails->Amount = $itemAmount;
-		$itemQuantity = '1';
-		$itemDetails->Quantity = $itemQuantity;
-
-		$paymentDetails->PaymentDetailsItem[0] = $itemDetails;
-
-		$orderTotal = new PayPal\CoreComponentTypes\BasicAmountType();
-		$orderTotal->currencyID = 'EUR';
-		$orderTotal->value = $itemAmount * $itemQuantity;
-
-		$paymentDetails->OrderTotal = $orderTotal;
-		$paymentDetails->PaymentAction = 'Sale';
-		$paymentDetails->Custom = $custom;
-
-		return $paymentDetails;
+		$this->addFlash('warning', "You appear to have cancelled your payment. Transaction has ended.");
+		return $this->redirectToRoute('bm2_payment');
 	}
 
 	/**
