@@ -166,8 +166,10 @@ class PaymentController extends Controller {
 			if (strtolower($currency) !== 'usd') {
 				#TODO: Notify a GM because things have broke somehow!
 			}
-			$this->get('payment_manager')->log_info("PayPal Payment callback: $total $currency / for $user_id / tx_id: $ID");
+			$txt = "PayPal Payment callback: $total $currency / for $user_id / tx_id: $ID";
+			$this->get('payment_manager')->log_info($txt);
 			$this->get('payment_manager')->account($user, "PayPal Payment", $currency, $total, $ID);
+			$this->get('notification_manager')->spoolPayment('M&F '.$txt);
 			$this->addFlash('notice', 'Payment Successful! Thank you!');
 			return $this->redirectToRoute('bm2_payment');
 		} else {
