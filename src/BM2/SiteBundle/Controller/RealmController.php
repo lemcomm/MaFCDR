@@ -164,6 +164,8 @@ class RealmController extends Controller {
 				$topic = $realm->getName().' General Discussion';
 				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $realm, 'general');
 
+				$this->get('notification_manager')->spoolNewRealm($character, $realm);
+
 				$this->get('appstate')->setSessionData($character); // update, because we changed our realm count
 				return $this->redirectToRoute('bm2_site_realm_manage', array('realm'=>$realm->getId()));
 			}
