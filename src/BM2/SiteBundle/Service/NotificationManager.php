@@ -104,9 +104,11 @@ class NotificationManager {
 		if ($loc = $rep->getLocationName()) {
 			if ($rep->getPlace()) {
 				$entity = $em->getRepository("BM2SiteBundle:Place")->find($loc['id']);
+				$name = $entity->getName();
 				$url = 'https://mightandfealty.com/place/'.$loc['id'];
 			} else {
 				$entity = $em->getRepository("BM2SiteBundle:Settlement")->find($loc['id']);
+				$name = $entity->getName();
 				$url = 'https://mightandfealty.com/settlement/'.$loc['id'];
 			}
 		}
@@ -116,19 +118,19 @@ class NotificationManager {
 		if ($loc['key'] === 'battle.location.nowhere') {
 			$str = 'in lands unknown(!?)';
 		} elseif ($loc['key'] === 'battle.location.of') {
-			$str = 'at ['.$entity->getName().']('.$url.')';
+			$str = 'at ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.siege') {
-			$str = 'during the siege of ['.$entity->getName().']('.$url.')';
+			$str = 'during the siege of ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.sortie') {
-			$str = 'started by the defenders of ['.$entity->getName().']('.$url.')';
+			$str = 'started by the defenders of ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.assault') {
-			$str = 'during the assault of ['.$entity->getName().']('.$url.')';
+			$str = 'during the assault of ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.near') {
-			$str = 'near ['.$entity->getName().']('.$url.')';
+			$str = 'near ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.around') {
-			$str = 'in the vicinity of ['.$entity->getName().']('.$url.')';
+			$str = 'in the vicinity of ['.$name.']('.$url.')';
 		} elseif ($loc['key'] === 'battle.location.castle') {
-			$str = 'in the halls of ['.$entity->getName().']('.$url.')';
+			$str = 'in the halls of ['.$name.']('.$url.')';
 		}
 		if ($epic > 9) {
 			$txt = "Tales are spun and epics created about a legendary battle ".$str."!";
@@ -154,6 +156,32 @@ class NotificationManager {
 		} catch (Exception $e) {
 			# Nothing.
 		}
+	}
+
+	public function spoolNewRealm(Character $char, Realm $realm, $sub = false) {
+		if ($sub) {
+			$txt = $char->getName()." has created the new subrealm of ".$realm->getFormalName().". It includes the settlements of: ";
+		} else {
+			$txt = $char->getName()." has created the new realm of ".$realm->getFormalName().". It includes the settlements of: ";
+		}
+		$url = 'https://mightandfealty.com/settlement/';
+		$count = $realm->getSettlements()->count();
+		$i = 1;
+		foreach ($realm->getSettlements() as $each) {
+			if ($i > 1 && $i == $count) {
+				$txt .= ', and '.$this->dLink($each->getName(), $url.$each->getId()).'.';
+			} elseif ($i === 1) {
+				$txt .= $this->dLink($each->getName(), $url.$each->getId());
+			} else {
+				$txt .= ', '.$this->dLink($each->getName(), $url.$each->getId());
+			}
+			$i++;
+		}
+		$this->discord->pushToGeneral($txt);
+	}
+
+	private function dLink($name, $url) {
+		return "[".$name."](".$url.")";
 	}
 
 }
