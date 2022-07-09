@@ -33,7 +33,7 @@
 	<dl>
 		<dt>{{ 'user.profile.joined'|trans }}</dt>
 		<dd>{{ user.created|date('Y-m-d') }}</dd>
-		{% if user.patronizing.count > 0 %}
+		{% if user.showPatronage and user.patronizing.count > 0 %}
 			<dt>{{ 'user.profile.patron.patron'|trans }}</dt>
 			<dd>{% for patron in user.patronizing %}
 		{{ patron.creator.creator|title }} {% if patron.status == 'active_patron' %}{{ 'user.profile.patron.active'|trans }}, {% else %}{{ 'user.profile.patron.former'|trans }}{% endif %}
