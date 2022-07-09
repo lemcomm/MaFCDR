@@ -21,46 +21,35 @@ class PaymentManager {
 	protected $mailer;
 	protected $translator;
 	protected $logger;
+	private $mailman;
 	private $ruleset;
 	private $paypalClientId;
 	private $paypalSecret;
 	private $rootDir;
+	private $env;
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
-	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, $ruleset, $paypalClientId, $paypalSecret, $rootDir) {
+	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, MailManager $mailman, $ruleset, $paypalClientId, $paypalSecret, $rootDir, $env) {
 		$this->em = $em;
 		$this->usermanager = $usermanager;
 		$this->mailer = $mailer;
 		$this->translator = $translator;
 		$this->logger = $logger;
+		$this->mailman = $mailman;
 		$this->ruleset = $ruleset;
 		$this->paypalClientId = $paypalClientId;
 		$this->paypalSecret = $paypalSecret;
 		$this->rootDir = $rootDir;
+		$this->env = $env;
 	}
 
 	public function getPaymentLevels(User $user = null, $system = false) {
 		if ($this->ruleset === 'maf') {
 			return [
 				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>200,   'creator'=>'andrew'),
-				40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
-				50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
-			];
-		}
-		# And for when I change these tomorrow...
-		if ($this->ruleset === 'maf2') {
-			return [
-				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				10 =>	array('name' => 'trial',	'characters' =>   15, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				23 =>	array('name' => 'VIP',		'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
+				23 =>	array('name' => 'supporter',	'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
 				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
 				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => false,  'patreon'=>200,   'creator'=>'andrew'),
@@ -251,13 +240,24 @@ class PaymentManager {
 				$this->paypalSecret
 				)
 			);
-		$api->setConfig([
-			'mode' => 'live',
-			'log.LogEnabled' => true,
-			'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
-			'log.LogLevel' => 'INFO', // PLEASE USE `INFO` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
-			'cache.enabled' => false,
-		]);
+		if ($env === 'prod') {
+			$api->setConfig([
+				'mode' => 'live',
+				'log.LogEnabled' => true,
+				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.LogLevel' => 'INFO',
+				'cache.enabled' => false,
+			]);
+		} else {
+			$api->setConfig([
+				'mode' => 'sandbox',
+				'log.LogEnabled' => true,
+				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.LogLevel' => 'DEBUG',
+				'cache.enabled' => false,
+			]);
+		}
+
 		return $api;
 	}
 
@@ -434,15 +434,7 @@ class PaymentManager {
 				$this->usermanager->updateUser($sender, false);
 
 				$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
-				$message = \Swift_Message::newInstance()
-					->setSubject($this->translator->trans('account.invite.mail2.subject', array()))
-					->setFrom(array('mafserver@lemuriacommunity.org' => $this->translator->trans('mail.sender', array(), "communication")))
-					->setReplyTo('mafteam@lemuriacommunity.org')
-					->setTo($sender->getEmail())
-					->setBody(strip_tags($text))
-					->addPart($text, 'text/html')
-				;
-				$numSent = $this->mailer->send($message);
+				$numSent = $this->mailman->sendEmail($sender->getEmail(), $this->translator->trans('account.invite.mail2.subject'), $text);
 				$this->logger->info('sent friend subscriber email: ('.$numSent.') - '.$text);
 			}
 		}
