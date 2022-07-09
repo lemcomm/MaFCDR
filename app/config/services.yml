@@ -33,7 +33,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     discord_integrator:
         class:      BM2\SiteBundle\Service\DiscordIntegrator
-        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%]
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%, %discord_webhook_olympus%, %discord_webhook_payments%]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
         arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
@@ -85,7 +85,7 @@ services:
         class:      BM2\SiteBundle\Service\PageReader
     payment_manager:
         class:      BM2\SiteBundle\Service\PaymentManager
-        arguments:  ['@doctrine.orm.entity_manager', '@user_manager', '@mailer', '@translator', '@logger', %ruleset%]
+        arguments:  ['@doctrine.orm.entity_manager', '@user_manager', '@mailer', '@translator', '@logger', '@mail_manager', %ruleset%, %paypal-client-id%, %paypal-secret%, %kernel.root_dir%, %kernel.environment%]
         tags:
             - { name: monolog.logger, channel: payment }
     permission_manager:
