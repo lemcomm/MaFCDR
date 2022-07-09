@@ -61,6 +61,7 @@
 				<order-by-field name="send_time" direction="ASC" />
 			</order-by>
 		</one-to-many>
+		<one-to-one field="limits" target-entity="UserLimits" mapped-by="user"/>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />
