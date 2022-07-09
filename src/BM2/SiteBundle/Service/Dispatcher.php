@@ -2293,6 +2293,9 @@ class Dispatcher {
 		if ($check = $this->placeActionsGenericTests() !== true) {
 			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
 		}
+		if ($character->getUser()->getLimits() === null) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.nolimitscreated");
+		}
 		if ($character->getUser()->getFreePlaces() < 1) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
 		}
