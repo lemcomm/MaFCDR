@@ -254,6 +254,7 @@ account:
   20: Basic
   21: Volunteer
   22: Traveler (Andrew's Patron)
+  23: Supporter
   40: Intense
   41: Developer
   42: Explorer (Andrew's Patron)
@@ -317,9 +318,9 @@ account:
   link:     Get More Credits
   shop:     Buying Credits
   intro: >
-    Unfortunately, we can only offer PayPal payment at this time (Google Wallet has been discontinued).<br />
+    Unfortunately, we can only offer PayPal payment at this time but are looking into alternatives (like Stripe).<br />
     PayPal also handles <b>credit card payments</b>.<br />
-    Payments are handled through my company, <b>Calitarus GmbH</b>, so that is what you'll see on your order and receipt.
+    Payments are handled through <b>Iungard Systems, LLC</b>, so that is what you'll see on your order and receipt.
   history:  Payment History
   type:     Transaction type
   date:     Date
@@ -357,10 +358,15 @@ account:
  credits:
   name:     Credits
   sum:      %amount% credits
+  sum1:     %amount% credits + %per%%<br>(%total% Total)
   title:    Credits & Gifts
   link:     Credits and Gifts
   short:    Spend credits on additional content or make gifts to friends.
   shop:     Spend Credits
+  type:     Type
+  date:     Date
+  bonus:    Bonus
+
   shopdesc: >
     You can spend credits on various items that will change the appearance of your characters or estates.<br />
     None of these items give any advantages, except for prestige and recognition. We are strongly opposed to any "pay-2-win" game concepts.
@@ -1865,3 +1871,15 @@ journal:
   gamedate:    Game Date
   realdate:    Real World Date
   topic:       Topic
+
+olympus:
+ pending:
+  header:      Pending Reports
+  table:
+   type:
+    header:    Issue Type
+    journal:   Journal
+   name:       Object
+   reporter:   Reported By
+   ts:         Timestamp
+   actions:    Actions
