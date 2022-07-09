@@ -9,13 +9,15 @@
 <p>The equipment images were made by <a href="http://www.christophclasen.de/">Christoph Clasen</a>.</p>
 <p>Some of the map and other icons were made by <a href="http://nicubunu.ro/">Nicu Buculei</a> and released to the public domain.</p>
 <p>Might & Fealty itself was created by <a href="https://notveryprofessional.com/">Tom Vogt</a>.
-<p>Everything else is &copy;2013-2022 by Andrew Gwynn</p>
+<p>Everything else is &copy;2013-2022 by Iungard Systems, LLC.</p>
 
 <hr>
 
 <h2>Hosting & Continued Development Made Possible by...</h2>
-
-<p>People who I shall soon list once I find a fancier way of doing it! :D --Andrew
-
+<ul>
+{% for user in patrons %}
+        <li>{{ user.displayName }}</li>
+{% endfor %}
+</u>
 
 {% endblock %}
