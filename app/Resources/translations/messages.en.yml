@@ -1668,6 +1668,7 @@ unavailable:
  nooffers:      No soldiers or existing offers available.
  norealm:       This settlement must be part a realm if you wish to take on knights here.
  noassigned:    You have no soldiers assigned.
+ nolimitscreated: Missing updated user data. Please return to character list to correct this.
  nospies:       You don't have any spies in your employ.
  inbattle:      You are already involved in a battle.
  inbattle2:     This unit is currently involved in a battle.
