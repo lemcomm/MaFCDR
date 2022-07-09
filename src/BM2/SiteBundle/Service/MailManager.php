@@ -118,19 +118,25 @@ class MailManager {
 			$intro = "Hello ".$user->getUsername().",<br><br>\n\n";
 			$msg = $intro.$header.$text.$footer;
 
-			$message = \Swift_Message::newInstance()
-				->setSubject($this->trans->trans('mail.event.subject', array(), "communication"))
-				->setFrom([$this->mail_from => $this->mail_name])
-				->setReplyTo($this->mail_reply_to)
-				->setTo($user->getEmail())
-				->setBody(strip_tags($msg))
-				->addPart($msg, 'text/html');
-			$sent = $this->mailer->send($message);
+			$sent = $this->sendEmail($user->getEmail(), $this->trans->trans('mail.event.subject', array(), "communication"), $msg);
+			
 			foreach ($remove as $each) {
 				$em->remove($each);
 			}
 			$em->flush();
 		}
+	}
+
+	public function sendEmail($to, $subject, $text) {
+		$message = \Swift_Message::newInstance()
+			->setSubject($subject)
+			->setFrom([$this->mail_from => $this->mail_name])
+			->setReplyTo($this->mail_reply_to)
+			->setTo($to)
+			->setBody(strip_tags($text))
+			->addPart($text, 'text/html');
+		$sent = $this->mailer->send($message);
+		return $sent;
 	}
 
 }
