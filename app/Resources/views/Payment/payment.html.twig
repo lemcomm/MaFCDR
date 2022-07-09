@@ -18,7 +18,7 @@
 <h3>{{ 'account.code.title'|trans|title }}</h3>
 <p>{{ 'account.code.intro'|trans }}</p>
 {{ form(form) }}
-
+{#
 {% if app.environment != 'prod' %}
 
 <h3>{{ 'account.payment.shop'|trans|title }}</h3>
@@ -37,8 +37,8 @@ For testing purposes, you can simulate buying credits simply by clicking the but
 </form>
 
 {% endif %}
-
 {% if app.environment == 'prod' %}
+#}
 <h3>{{ 'account.payment.shop'|trans|title }}</h3>
 <p>{{ 'account.payment.intro'|trans|raw }}</p>
 
@@ -48,27 +48,29 @@ For testing purposes, you can simulate buying credits simply by clicking the but
 	<thead>
 		<tr class="big">
 			<th></th>
-			<th>{{ 'account.credits.sum'|trans({"%amount%":500}) }}</th>
-			<th>{{ 'account.credits.sum'|trans({"%amount%":1000}) }}</th>
-			<th>{{ 'account.credits.sum'|trans({"%amount%":2000}) }}</th>
-			<th>{{ 'account.credits.sum'|trans({"%amount%":3000}) }}</th>
-			<th>{{ 'account.credits.sum'|trans({"%amount%":5000}) }}</th>
+			<th>{{ 'account.credits.sum'|trans({"%amount%":200}) }}</th>
+			<th>{{ 'account.credits.sum1'|trans({"%amount%":500, "%per%": 10, "%total%": 550})|raw }}</th>
+			<th>{{ 'account.credits.sum1'|trans({"%amount%":1000, "%per%": 20, "%total%": 1200})|raw }}</th>
+			<th>{{ 'account.credits.sum1'|trans({"%amount%":2000, "%per%": 30, "%total%": 2600})|raw }}</th>
+			<th>{{ 'account.credits.sum1'|trans({"%amount%":5000, "%per%": 40, "%total%": 7000})|raw }}</th>
+			<th>{{ 'account.credits.sum1'|trans({"%amount%":10000, "%per%": 50, "%total%": 15000})|raw }}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr class="center">
 			<th><img src="https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-150px.png" alt="PayPal" /></th>
-			<td><a href="{{ path("bm2_paypal", {"amount":5}) }}"><button>5 €uro</button></a></td>
-			<td><a href="{{ path("bm2_paypal", {"amount":10}) }}"><button>10 €uro</button></a></td>
-			<td><a href="{{ path("bm2_paypal", {"amount":20}) }}"><button>20 €uro</button></a></td>
-			<td><a href="{{ path("bm2_paypal", {"amount":30}) }}"><button>30 €uro</button></a></td>
-			<td><a href="{{ path("bm2_paypal", {"amount":50}) }}"><button>50 €uro</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":2}) }}"><button>$2 (USD)</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":5}) }}"><button>$5 (USD)</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":10}) }}"><button>$10 (USD)</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":20}) }}"><button>$20 (USD)</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":50}) }}"><button>$50 (USD)</button></a></td>
+			<td><a href="{{ path("bm2_paypal", {"amount":100}) }}"><button>$100 (USD)</button></a></td>
 		</tr>
 	</tbody>
 </table>
-
+{#
 {% endif %}
-
+#}
 <hr class="spacer"/>
 
 <h3>{{ 'account.payment.history'|trans|title }}</h3>

@@ -10,6 +10,8 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Patreon\API as PAPI;
 use Patreon\OAuth as POA;
+use PayPal\Auth\OAuthTokenCredential as PPOATC;
+use PayPal\Rest\ApiContext as PPAC;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class PaymentManager {
@@ -20,16 +22,22 @@ class PaymentManager {
 	protected $translator;
 	protected $logger;
 	private $ruleset;
+	private $paypalClientId;
+	private $paypalSecret;
+	private $rootDir;
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
-	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, $ruleset) {
+	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, $ruleset, $paypalClientId, $paypalSecret, $rootDir) {
 		$this->em = $em;
 		$this->usermanager = $usermanager;
 		$this->mailer = $mailer;
 		$this->translator = $translator;
 		$this->logger = $logger;
 		$this->ruleset = $ruleset;
+		$this->paypalClientId = $paypalClientId;
+		$this->paypalSecret = $paypalSecret;
+		$this->rootDir = $rootDir;
 	}
 
 	public function getPaymentLevels(User $user = null, $system = false) {
@@ -45,6 +53,22 @@ class PaymentManager {
 				42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
 				50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
 				51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
+			];
+		}
+		# And for when I change these tomorrow...
+		if ($this->ruleset === 'maf2') {
+			return [
+				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+				10 =>	array('name' => 'trial',	'characters' =>   15, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
+				23 =>	array('name' => 'VIP',		'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
+				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
+				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => false,  'patreon'=>200,   'creator'=>'andrew'),
+				40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
+				41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
+				42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false,  'patreon'=>300,   'creator'=>'andrew'),
+				50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
+				51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => false,  'patreon'=>400,   'creator'=>'andrew'),
 			];
 		}
 	}
@@ -220,6 +244,23 @@ class PaymentManager {
 		return [$status, $entitlement];
 	}
 
+	public function getPayPalAPIContext() {
+		$api = new PPAC(
+			new PPOATC(
+				$this->paypalClientId,
+				$this->paypalSecret
+				)
+			);
+		$api->setConfig([
+			'mode' => 'live',
+			'log.LogEnabled' => true,
+			'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+			'log.LogLevel' => 'INFO', // PLEASE USE `INFO` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
+			'cache.enabled' => false,
+		]);
+		return $api;
+	}
+
 	/*
 	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
 		$papi = new PAPI($patron->getAccessToken());
@@ -315,13 +356,28 @@ class PaymentManager {
 	public function account(User $user, $type, $currency, $amount, $transaction=null) {
 		$credits = $amount*100; // if this ever changes, make sure to update texts mentioning it (e.g. description3)
 		switch ($currency) {
-			case 'EUR':		$credits *= 1.0; break;
-//			case 'USD':		$credits *= 0.7648; break; // FIXME: this shouldn't be hardcoded, I think...
+			case 'USD':		$credits *= 1.0; break;
 			default:
 				$this->logger->alert("unknown currency $currency in accounting for user #{$user->getId()}, transaction type $type, please add $amount manually.");
 				return false;
 		}
 		$credits = ceil($credits);
+		$original = $credits;
+		if ($amount >= 100) {
+			$bonus = $credits * 0.5;
+		} elseif ($amount >= 50) {
+			$bonus = $credits * 0.4;
+		} elseif ($amount >= 20) {
+			$bonus = $credits * 0.3;
+		} elseif ($amount >= 10) {
+			$bonus = $credits * 0.2;
+		} elseif ($amount >= 5) {
+			$bonus = $credits * 0.1;
+		} else {
+			$bonus = 0;
+		}
+		$credits = $credits + $bonus;
+		$credits = ceil($credits); # Not that this should ever be a decimal but...
 
 		if ($user->getPayments()->isEmpty()) {
 			$first = true;
@@ -335,14 +391,16 @@ class PaymentManager {
 		$payment->setAmount($amount);
 		$payment->setType($type);
 		$payment->setUser($user);
-		$payment->setCredits($credits);
+		$payment->setCredits($original);
+		$payment->setBonus($bonus);
 		$payment->setTransactionCode($transaction);
 		$this->em->persist($payment);
 		$user->addPayment($payment);
 
 		$history = new CreditHistory;
 		$history->setTs(new \DateTime("now"));
-		$history->setCredits($credits);
+		$history->setCredits($original);
+		$history->setBonus($bonus);
 		$history->setUser($user);
 		$history->setType($type);
 		$history->setPayment($payment);

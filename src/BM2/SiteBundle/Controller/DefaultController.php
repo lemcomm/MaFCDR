@@ -82,8 +82,8 @@ class DefaultController extends Controller {
 
 
 	/**
-     * @Route("/contact", name="bm2_contact")
-     */
+	  * @Route("/contact", name="bm2_contact")
+	  */
 	public function contactAction() {
 
 		return $this->render('Default/contact.html.twig', [
@@ -92,8 +92,8 @@ class DefaultController extends Controller {
 	}
 
 	/**
-     * @Route("/credits", name="bm2_credits")
-     */
+	  * @Route("/credits", name="bm2_credits")
+	  */
 	public function creditsAction() {
 
 		return $this->render('Default/credits.html.twig', [
@@ -102,13 +102,27 @@ class DefaultController extends Controller {
 	}
 
 	/**
-     * @Route("/terms", name="bm2_terms")
-     */
+	  * @Route("/terms", name="bm2_terms")
+	  */
 	public function termsAction() {
 
-		return $this->render('Default/terms.html.twig', [
-			"simple"=>true, "locale"=>$this->getRequest()->getLocale()
-		]);
+		return $this->render('Default/terms.html.twig');
+	}
+
+	/**
+	  * @Route("/privacy", name="maf_privacy")
+	  */
+	public function privacyAction() {
+
+		return $this->render('Default/privacy.html.twig');
+	}
+
+	/**
+	  * @Route("/cookies", name="maf_cookies")
+	  */
+	public function cookiesAction() {
+
+		return $this->render('Default/cookies.html.twig');
 	}
 
 	/**
@@ -126,8 +140,8 @@ class DefaultController extends Controller {
 	}
 
 	/**
-     * @Route("/paymentconcept")
-     */
+	  * @Route("/paymentconcept")
+	  */
 	public function paymentConceptAction() {
 		$pagecontent = $this->get('pagereader')->getPage('about', 'payment', $this->getRequest()->getLocale());
 
