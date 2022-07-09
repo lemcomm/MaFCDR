@@ -141,10 +141,14 @@ class AccountController extends Controller {
 		$user->setCurrentCharacter(null);
 
 		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, false);
+		if ($user->getLimits() === null) {
+			$this->get('user_manager')->createLimits($user);
+		}
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 		}
+
 
 		$characters = array();
 		$npcs = array();
@@ -705,8 +709,11 @@ class AccountController extends Controller {
 		// time-based action resolution
 		$this->get('action_resolution')->progress();
 
-		$this->get('appstate')->setSessionData($character);
+		if ($user->getLimits() === null) {
+			$this->get('user_manager')->createLimits($user);
+		}
 
+		$this->get('appstate')->setSessionData($character);
 		switch ($request->query->get('logic')) {
 			case 'play':
 				$character->setLastAccess(new \DateTime("now"));
