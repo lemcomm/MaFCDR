@@ -210,6 +210,25 @@ class PaymentManager {
 				}
 			}
 		}
+		$this->logger->info("  Updating Limits...");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u');
+		$now = new \DateTime("now");
+		$oneWeek = new \DateTime("+1 week");
+		$twoWeeks = new \DateTime("+2 weeks");
+		foreach ($query->getResult() as $user) {
+			$limits = $user->getLimits();
+			if (!$limits) {
+				$this->usermanager->createLimits($user);
+			} else {
+				if ($limits->getPlacesDate() <= $now)
+				$limits->setPlaces($limits->getPlaces()+1);
+				if($user->getAccountLevel() >= 20) {
+					$limits->setPlacesDate($oneWeek);
+				} else {
+					$limits->setPlacesDate($twoWeeks);
+				}
+			}
+		}
 		$this->logger->info("  Cycle ended. Flushing...");
 		$this->em->flush();
 		return array($free, $patronCount, $active, $credits, $expired, $storage, $bannedcount);
@@ -434,7 +453,15 @@ class PaymentManager {
 
 		if ($first) {
 			// give us our free vanity item
-			$user->setArtifactsLimit(max(1, $user->getArtifactsLimit()));
+			$limits = $user->getLimits();
+			if (!$limits) {
+				$limits = $this->usermanager->createLimits($user);
+			}
+			if ($limits->getArtifacts()) {
+				$limits->setArtifacts($limits->getArtifacts()+1);
+			} else {
+				$limits->setArtifacts(1);
+			}
 
 			// check if we had a friend code
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Code c WHERE c.used_by = :me AND c.sender IS NOT NULL AND c.sender != :me ORDER BY c.used_on ASC');
