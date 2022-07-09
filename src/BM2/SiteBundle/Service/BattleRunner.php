@@ -366,7 +366,7 @@ class BattleRunner {
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
 			$this->em->flush();
 			if ($victor) {
-				$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations[0], $this->report);
+				$this->progressSiege($battle, $victor, $preparations[0]);
 			}
 		}
 		$this->em->flush();
@@ -429,10 +429,15 @@ class BattleRunner {
 			$combatworthy=false;
 			$troops = array();
 			$this->log(3, "Totals in this group:\n");
+			$some = false;
 			foreach ($types as $type=>$number) {
 				$this->log(3, $type.": $number \n");
+				$some = true;
 				$troops[$type] = $number;
 				$combatworthy=true;
+			}
+			if (!$some) {
+				$this->log(3, "(none) \n");
 			}
 			if ($combatworthy && !$group->getReinforcing()) {
 				# Groups that are reinforcing don't represent a primary combatant, and if we don't have atleast 2 primary combatants, there's no point.
@@ -1893,6 +1898,212 @@ class BattleRunner {
 				$repot->setKilledBy($enemy);
 			}
 		}
+	}
+
+	private function progressSiege(Battle $battle, BattleGroup $victor = null, $flag) {
+		$siege = $battle->getSiege();
+		$report = $this->report;
+		$current = $siege->getStage();
+		$max = $siege->getMaxStage();
+		$assault = FALSE;
+		$sortie = FALSE;
+		$bypass = FALSE;
+		$completed = FALSE;
+		if ($battle->getType() === 'siegeassault') {
+			$assault = TRUE;
+			$this->log(1, "PS: Siege assualt\n");
+		} elseif ($battle->getType() === 'siegesortie') {
+			$sortie = TRUE;
+			$this->log(1, "PS: Siege sortie\n");
+		}
+		$attacker = $battle->getPrimaryAttacker();
+		if ($flag === 'haveAttacker') {
+			$victor = $siege->getAttacker();
+			$bypass = TRUE; #Defenders failed to muster any defenders.
+			$this->log(1, "PS: Bypass defenders. Default victory to attackers\n");
+		} elseif ($flag === 'haveDefender') {
+			$victor = $siege->getDefender();
+			$bypass = TRUE; #Attackers failed to muster any attackers.
+			$this->log(1, "PS: Bypass attackers. Default victory to defenders\n");
+		}
+		if ($siege->getSettlement()) {
+			$target = $siege->getSettlement();
+		} else {
+			$target = $siege->getPlace();
+		}
+		if ($assault) {
+			$this->log(1, "PS: Attacker matches victor and this is an assault.\n");
+			if ($current < $max && !$bypass) {
+				# Siege moves forward
+				$siege->setStage($current+1);
+				$this->log(1, "PS: Incrememnting stage.\n");
+				# "After the [link], the siege has advanced in favor of the attackers"
+				$this->history->logEvent(
+					$target,
+					'siege.advance.attacker',
+					array('%link-battle%'=>$report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+			if ($current == $max || $bypass) {
+				$this->log(1, "PS: Max stage reached or bypass flag set due to failed defense.\n");
+				$completed = TRUE;
+				# Siege is over, attackers win.
+				if (!$bypass) {
+					# "After the defenders failed to muster troops in [link], the siege concluded in attacker victory."
+					$this->history->logEvent(
+						$target,
+						'siege.victor.attacker',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					$this->log(1, "PS: Bypassed!\n");
+					# "After the [link], the siege concluded in an attacker victory."
+					$this->history->logEvent(
+						$target,
+						'siege.bypass.attacker',
+						array('%link-battle%'=>$report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+
+			}
+		} elseif ($sortie) {
+			$this->log(1, "PS: Attacker is not victor. This must be a sortie by the defenders.\n");
+			if ($current > 1 && !$bypass) {
+				# Siege moves backwards.
+				$siege->setStage($current-1);
+				$this->log(1, "PS: Decrementing stage.\n");
+				# "After the [link], the siege has advanced in favor of the defenders"
+				$this->history->logEvent(
+					$target,
+					'siege.advance.defender',
+					array('%link-battle%'=>$report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+			if ($current <= 1 || $bypass) {
+				$this->log(1, "PS: Minimum stage reached or bypass flag set due to failure by siege attackers to muster any force. Siege broken.\n");
+				$completed = TRUE;
+				# Siege is over, defender victory.
+				if ($bypass) {
+					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
+					$this->log(1, "PS: Bypassed!\n");
+					$this->history->logEvent(
+						$target,
+						'siege.victor.defender',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					# "After the [link], the siege concluded in a defender victory."
+					$this->history->logEvent(
+						$target,
+						'siege.bypass.defender',
+						array('%link-battle%'=>$report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+		}
+		# Yes, this means that if attackers lose an assault or defenders lose a sortie, nothing changes. This is intentional.
+		$battle->setPrimaryAttacker(NULL);
+		$battle->setPrimaryDefender(NULL);
+		$this->log(1, "PS: Unset primary flags!\n");
+		foreach ($siege->getGroups() as $group) {
+			$group->setBattle(NULL);
+		}
+		$this->log(1, "PS: Unset group battle associations!\n");
+
+		if ($completed) {
+			$this->log(1, "PS: Siege completed, running completion cycle.\n");
+			$realm = $siege->getRealm();
+			if ($assault) {
+				if ($target instanceof Settlement) {
+					$this->log(1, "PS: Target is settlement\n");
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the settlement.
+							$this->interactions->characterEnterSettlement($char, $target, true);
+							$this->log(1, "PS: ".$char->getName()." moved inside ".$target->getName().". \n");
+					}
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$this->log(1, "PS: No leader! Finding one at random!. \n");
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					$this->politics->changeSettlementOccupier($leader, $target, $realm);
+					$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+				} else {
+					$this->log(1, "PS: Target is place\n");
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the place.
+							$this->interactions->characterEnterPlace($char, $target, true);
+							$this->log(1, "PS: ".$char->getName()." moved inside ".$target->getName().". \n");
+					}
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$this->log(1, "PS: No leader! Finding one at random!. \n");
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					if ($leader) {
+						$this->politics->changePlaceOccupier($leader, $target, $realm);
+						$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+					}
+					foreach ($target->getUnits() as $unit) {
+						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
+						$this->log(1, "PS: ".$unit->getId()." sent home. \n");
+						$this->history->logEvent(
+							$unit,
+							'event.unit.defenselost2',
+							array("%link-place%"=>$target->getId()),
+							History::HIGH, true
+						);
+					}
+				}
+			}
+			$this->em->flush();
+			$this->log(1, "PS: Passing siege to disbandSiege function\n");
+			$this->warman->disbandSiege($siege, null, TRUE);
+		}
+		$this->em->flush();
+
 	}
 
 }
