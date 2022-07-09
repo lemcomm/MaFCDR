@@ -141,7 +141,19 @@ class NotificationManager {
 		} else {
 			$txt = "Tales are spun and epics created about a battle ".$str."!";
 		}
-		$this->discord->pushToGeneral($txt);
+		try {
+			$this->discord->pushToGeneral($txt);
+		} catch (Exception $e) {
+			# Nothing.
+		}
+	}
+
+	public function spoolPayment($text) {
+		try {
+			$this->discord->pushToPayments($text);
+		} catch (Exception $e) {
+			# Nothing.
+		}
 	}
 
 }
