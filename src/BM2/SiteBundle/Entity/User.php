@@ -112,7 +112,7 @@ class User extends BaseUser {
 	}
 
 	public function getFreePlaces() {
-		$months = floor($this->getCreated()->diff(new \DateTime("now"), true)->days/14);
+		$limit = $this->getLimits()->getPlaces();
 		$count = 0;
 		foreach ($this->getCharacters() as $character) {
 			foreach ($character->getCreatedPlaces() as $place) {
@@ -121,12 +121,16 @@ class User extends BaseUser {
 				}
 			}
 		}
-		if ($this->account_level >= 20) {
-			$mod = 2;
-		} else {
-			$mod = 1;
+		return $limit - $count;
+	}
+
+	public function getFreeArtifacts() {
+		$limit = $this->getLimits()->getArtifacts();
+		$count = 0;
+		foreach ($this->getArtifacts() as $art) {
+			$count++;
 		}
-		return ($months * $mod) - $count;
+		return $limit - $count;
 	}
 
 	public function isBanned() {
