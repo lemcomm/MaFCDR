@@ -43,9 +43,10 @@
 <h3>{{ 'account.credits.history'|trans|title }}</h3>
 <table>
 	<thead><tr>
-		<th>(type)</th>
-		<th>(date)</th>
-		<th>(credits)</th>
+		<th>{{ 'account.credits.type'|trans }}</th>
+		<th>{{ 'account.credits.date'|trans }}</th>
+		<th>{{ 'account.credits.name'|trans }}</th>
+		<th>{{ 'account.credits.bonus'|trans }}</th>
 	</tr></thead>
 	<tbody>
 	{% for credhist in app.user.credithistory %}
@@ -53,6 +54,7 @@
 			<td>{{ credhist.type }}</td>
 			<td>{{ credhist.ts|date }}</td>
 			<td align="right">{{ credhist.credits }}</td>
+			<td align="right">{% if credhist.bonus > 0 %}{{ credhist.bonus }}{% endif %}</td>
 		</tr>
 	{% endfor %}
 	</tbody>
