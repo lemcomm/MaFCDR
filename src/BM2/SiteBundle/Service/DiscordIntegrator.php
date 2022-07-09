@@ -35,15 +35,21 @@ class DiscordIntegrator {
 	}
 
 	public function pushToGeneral($text) {
-		$this->curlToDiscord(json_encode(['content' => $text]), $this->generalHook);
+		if ($this->generalHook) {
+			$this->curlToDiscord(json_encode(['content' => $text]), $this->generalHook);
+		}
 	}
 
 	public function pushToOlympus($text) {
-		$this->curlToDiscord(json_encode(['content' => $text]), $this->olympusHook);
+		if ($this->olympusHook) {
+			$this->curlToDiscord(json_encode(['content' => $text]), $this->olympusHook);
+		}
 	}
 
 	public function pushToPayments($text) {
-		$this->curlToDiscord(json_encode(['content' => $text]), $this->paymentsHook);
+		if ($this->paymentsHook) {
+			$this->curlToDiscord(json_encode(['content' => $text]), $this->paymentsHook);
+		}
 	}
 
 }
