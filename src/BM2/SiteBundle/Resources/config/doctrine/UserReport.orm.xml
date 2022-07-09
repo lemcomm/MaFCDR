@@ -5,10 +5,12 @@
 			<generator strategy="AUTO"/>
 		</id>
 		<field name="type" type="string"/>
+		<field name="text" type="text"/>
 		<field name="actioned" type="boolean"/>
 		<field name="date" type="datetime"/>
 		<many-to-one field="user" target-entity="User" inversed-by="reports"/>
 		<many-to-one field="journal" target-entity="Journal" inversed-by="reports"/>
 		<one-to-many field="notes" target-entity="UserReportNote" mapped-by="report"/>
+		<one-to-many field="against" target-entity="UserReportAgainst" mapped-by="report"/>
 	</entity>
 </doctrine-mapping>
