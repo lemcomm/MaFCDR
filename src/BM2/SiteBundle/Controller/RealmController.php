@@ -694,6 +694,8 @@ class RealmController extends Controller {
 	  * @Route("/{realm}/accolades", requirements={"realm"="\d+"})
 	  */
 	public function triumphsAction(Realm $realm, Request $request) {
+		$this->addFlash('notice', "This feature isn't quite ready yet, sorry!");
+		return $this->redirectToRoute('bm2_homepage');
 		// FIXME: these should be visible to all realm members - seperate method or same?
 		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
 		if (!($character instanceof Character)) {
