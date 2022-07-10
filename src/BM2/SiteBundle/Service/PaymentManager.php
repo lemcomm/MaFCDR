@@ -277,7 +277,7 @@ class PaymentManager {
 				$this->paypalSecret
 				)
 			);
-		if ($env === 'prod') {
+		if ($this->env === 'prod') {
 			$api->setConfig([
 				'mode' => 'live',
 				'log.LogEnabled' => true,
