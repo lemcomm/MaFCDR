@@ -49,7 +49,7 @@ class PaymentManager {
 			return [
 				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				10 =>	array('name' => 'trial',	'characters' =>   15, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				23 =>	array('name' => 'supporter',	'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
+				23 =>	array('name' => 'supporter',	'characters' =>	  15, 'fee' => 250, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
 				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
 				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => false,  'patreon'=>200,   'creator'=>'andrew'),
