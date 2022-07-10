@@ -12,3 +12,4 @@ APP="/var/www/maf/app/console"
 
 
 php $APP --env=prod maf:process:battles -t 5 2>&1 >> $LOGDIR/quarterhourly.log
+php $APP --env=prod maf:mail 2>&1 >> $LOGDIR/quarterhourly.log
