@@ -35,7 +35,7 @@ class ArtifactsController extends Controller {
 	public function createAction(Request $request) {
 		$user = $this->getUser();
 
-		if ($user->getArtifacts()->count() < $user->getArtifactsLimit()) {
+		if ($user->getArtifacts()->count() < $user->getFreeArtifacts()) {
 			$form = $this->createFormBuilder()
 				->add('name', 'text', array(
 					'required'=>true,

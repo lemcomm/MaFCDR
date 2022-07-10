@@ -164,6 +164,8 @@ class RealmController extends Controller {
 				$topic = $realm->getName().' General Discussion';
 				$this->get('conversation_manager')->newConversation(null, null, $topic, null, null, $realm, 'general');
 
+				$this->get('notification_manager')->spoolNewRealm($character, $realm);
+
 				$this->get('appstate')->setSessionData($character); // update, because we changed our realm count
 				return $this->redirectToRoute('bm2_site_realm_manage', array('realm'=>$realm->getId()));
 			}
@@ -686,6 +688,25 @@ class RealmController extends Controller {
 			'realm' => $realm,
 			'position' => $position,
 			'form' => $form->createView()
+		]);
+	}
+
+
+	/**
+	  * @Route("/{realm}/accolades", requirements={"realm"="\d+"})
+	  */
+	public function triumphsAction(Realm $realm, Request $request) {
+		$this->addFlash('notice', "This feature isn't quite ready yet, sorry!");
+		return $this->redirectToRoute('bm2_homepage');
+		// FIXME: these should be visible to all realm members - seperate method or same?
+		$character = $this->gateway($realm, 'hierarchyRealmPositionsTest');
+		if (!($character instanceof Character)) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Realm/positions.html.twig', [
+			'realm' => $realm,
+			'positions' => $realm->getPositions(),
 		]);
 	}
 

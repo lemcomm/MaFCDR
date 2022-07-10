@@ -33,11 +33,17 @@
 	<dl>
 		<dt>{{ 'user.profile.joined'|trans }}</dt>
 		<dd>{{ user.created|date('Y-m-d') }}</dd>
-		{% if user.patronizing.count > 0 %}
+		{% if user.showPatronage and user.patronizing.count > 0 %}
 			<dt>{{ 'user.profile.patron.patron'|trans }}</dt>
 			<dd>{% for patron in user.patronizing %}
 		{{ patron.creator.creator|title }} {% if patron.status == 'active_patron' %}{{ 'user.profile.patron.active'|trans }}, {% else %}{{ 'user.profile.patron.former'|trans }}{% endif %}
 			{% endfor %}</dd>
+		{% endif %}
+		{% if gm %}
+			<h3>Additional Details for GMs</h3>
+			<dt>Username: </dt><dd>{{ user.username }}</dd>
+			<dt>Subscription: </dt><dd>{{ user.accountLevel }}</dd>
+			<dt>Reports: </dt><dd><a href="{{ path('maf_gm_user_reports', {'id':user.id}) }}">View</a></dd>
 		{% endif %}
 	</dl><hr>
 

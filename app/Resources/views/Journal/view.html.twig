@@ -14,22 +14,19 @@
 	{{ 'journal.view.by'|trans({'%character%':link(journal.character), "%day%":journal.cycle|gametime("short"), "%ts%":journal.date|date}, "messages")|raw }}
 	<hr>
 	{{ journal.entry|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><h3><blockquote>')|wikilinks }}
-	<hr>
+	</div>
 	{% if not journal.GMReviewed and journal.character and journal.character.user != user %}
-		{# <p>{{ 'journal.view.report'|trans({}, "messages")|raw }}</p> #}
 		<p><a href="{{ path('maf_journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
-		{#
 		{% if gm %}
 			<h4>{{ 'journal.gm.actions'|trans({}, "messages")}}<br>
 			<p>Public or Private? {% if journal.public %}<b>Public</b>{% elseif jounal.GMPrivate %}<b>Forced Private</b>{% else %}<b>Private</b>{% endif %}.<br>
 			Graphic or Safe? {% if journal.graphic %}<b>Graphic</b>{% elseif journal.GMGraphic %}<b>Forced Graphic</b>{% else %}<b>Safe</b>{% endif %}.<br>
 			GM reviewed? {% if journal.pendingReview %}<b>Pending Review</b>{% elseif journal.GMReviewed %}<b>Yes</b>{% else %}<i>Not Requested</i>{% endif %}.<br></p>
 
-			<p><a href="{{ path('maf_journal_gmprivate', {"id":journal.id}) }}">{{ 'journal.gm.makeprivate'|trans({}, "messages") }}</a></p>
+			<p><a href="{{ path('maf_journal_gmprivate', {"id":journal.id}) }}">{{ 'journal.gm.private.link'|trans({}, "messages") }}</a> | <a href="{{ path('maf_journal_gmgraphic', {"id":journal.id}) }}">{{ 'journal.gm.graphic.link'|trans({}, "messages") }}</a></p>
 		{% endif %}
 		{% if admin %}
-			<p><a href="{{ path('maf_journal_remove', {"id":journal.id}) }}">{{ 'journal.gm.remove'|trans({}, "messages") }}</a></p>
+			<p><a href="{{ path('maf_journal_gmremove', {"id":journal.id}) }}">{{ 'journal.gm.remove'|trans({}, "messages") }}</a></p>
 		{% endif %}
-		#}
 	{% endif %}
 {% endblock %}

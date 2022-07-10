@@ -13,6 +13,7 @@
 		<field name="lifetime" type="smallint" nullable="true"/>
 
 		<many-to-one field="log" target-entity="EventLog" inversed-by="events"/>
+		<one-to-many field="mail_entries" target-entity="MailEntry" mapped-by="event"/>
 
 	</entity>
 </doctrine-mapping>

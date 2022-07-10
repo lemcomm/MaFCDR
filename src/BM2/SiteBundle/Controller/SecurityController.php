@@ -23,7 +23,7 @@ class SecurityController extends Controller {
 	}
 
 	protected function getUserManager() {
-		return $this->get('bm2.user_manager');
+		return $this->get('user_manager');
 	}
 
 
@@ -64,4 +64,3 @@ class SecurityController extends Controller {
 
 
 }
-

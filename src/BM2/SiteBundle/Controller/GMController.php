@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Journal;
+use BM2\SiteBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -26,6 +27,19 @@ class GMController extends Controller {
 
 		return $this->render('GM/pending.html.twig',  [
 			'reports'=>$reports,
+		]);
+	}
+
+	/**
+	  * @Route("/olympus/user/{id}", name="maf_gm_user_reports")
+	  */
+
+	public function userReportsAction(User $id) {
+		# Security is handled by Syfmony Firewall.
+
+		return $this->render('GM/userReports.html.twig',  [
+			'by'=>$id->getReports(),
+			'against'=>$id->getReportsAgainst()
 		]);
 	}
 

@@ -21,46 +21,35 @@ class PaymentManager {
 	protected $mailer;
 	protected $translator;
 	protected $logger;
+	private $mailman;
 	private $ruleset;
 	private $paypalClientId;
 	private $paypalSecret;
 	private $rootDir;
+	private $env;
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
-	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, $ruleset, $paypalClientId, $paypalSecret, $rootDir) {
+	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, MailManager $mailman, $ruleset, $paypalClientId, $paypalSecret, $rootDir, $env) {
 		$this->em = $em;
 		$this->usermanager = $usermanager;
 		$this->mailer = $mailer;
 		$this->translator = $translator;
 		$this->logger = $logger;
+		$this->mailman = $mailman;
 		$this->ruleset = $ruleset;
 		$this->paypalClientId = $paypalClientId;
 		$this->paypalSecret = $paypalSecret;
 		$this->rootDir = $rootDir;
+		$this->env = $env;
 	}
 
 	public function getPaymentLevels(User $user = null, $system = false) {
 		if ($this->ruleset === 'maf') {
 			return [
 				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				10 =>	array('name' => 'trial',	'characters' =>    4, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => true,  'patreon'=>200,   'creator'=>'andrew'),
-				40 =>	array('name' => 'intense',	'characters' =>   25, 'fee' => 300, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				41 =>	array('name' => 'developer',	'characters' =>   25, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
-				42 =>   array('name' => 'explorer',	'characters' =>   25, 'fee' =>   0, 'selectable' => true,  'patreon'=>300,   'creator'=>'andrew'),
-				50 =>	array('name' => 'ultimate',	'characters' =>   50, 'fee' => 400, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				51 =>   array('name' => 'explorer+',	'characters' =>   50, 'fee' =>   0, 'selectable' => true,  'patreon'=>400,   'creator'=>'andrew'),
-			];
-		}
-		# And for when I change these tomorrow...
-		if ($this->ruleset === 'maf2') {
-			return [
-				 0 =>	array('name' => 'storage',	'characters' =>    0, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				10 =>	array('name' => 'trial',	'characters' =>   15, 'fee' =>   0, 'selectable' => true,  'patreon'=>false, 'creator'=>false),
-				23 =>	array('name' => 'VIP',		'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
+				23 =>	array('name' => 'supporter',	'characters' =>	  15, 'fee' => 200, 'selectable' => true,  'patreon'=>false,	'creator'=>false),
 				20 =>	array('name' => 'basic',	'characters' =>   10, 'fee' => 200, 'selectable' => false,  'patreon'=>false, 'creator'=>false),
 				21 =>	array('name' => 'volunteer',	'characters' =>   10, 'fee' =>   0, 'selectable' => false, 'patreon'=>false, 'creator'=>false),
 				22 =>   array('name' => 'traveler',	'characters' =>   10, 'fee' =>   0, 'selectable' => false,  'patreon'=>200,   'creator'=>'andrew'),
@@ -95,7 +84,7 @@ class PaymentManager {
 	}
 
 	public function getCostOfHeraldry() {
-		return 500;
+		return 250;
 	}
 
 
@@ -133,20 +122,34 @@ class PaymentManager {
 			$this->logger->info("$bannedusername has been banned, and email notifications have been disabled.");
 			$this->em->flush();
 		}
-		$now = new \DateTime("now");
-		if (!$patronsOnly) {
-			$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
-			$query->setParameters(array('now'=>$now));
-		} else {
-			$query = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		$this->logger->info("Refreshing patreon pledges for users with connected accounts.");
+		$uCount = 0;
+		$pledges = 0;
+		$patronquery = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		foreach ($patronquery->getResult() as $user) {
+			foreach ($user->getPatronizing() as $patron) {
+				if ($patron->getExpires() < $now) {
+					$this->refreshPatreonTokens($patron);
+				}
+				$this->refreshPatreonPledge($patron);
+				$pledges++;
+			}
+			$uCount++;
 		}
+		$this->em->flush();
+		$this->logger->info("Refreshed ".$pledges." pledges for ".$uCount." users.");
+
+		$now = new \DateTime("now");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u WHERE u.account_level > 0 AND u.paid_until < :now');
+		$query->setParameters(array('now'=>$now));
+
 		$this->logger->info("  User Subscription Processing...");
 		foreach ($query->getResult() as $user) {
-			$this->logger->info("  --Calculating ".$user->getUsername()." (".$user->getId().")...");
+			#$this->logger->info("  --Calculating ".$user->getUsername()." (".$user->getId().")...");
 			$myfee = $this->calculateUserFee($user);
 			$levels = $this->getPaymentLevels();
 			if ($myfee > 0) {
-				#$this->logger->info("    --Fee of ".$myfee." detected...");
+				$this->logger->info("  --Calculating fee for ".$user->getUsername()." (".$user->getId().")...");
 				if ($this->spend($user, 'subscription', $myfee, true)) {
 					$this->logger->info("    --Credit spend successful...");
 					$active++;
@@ -169,13 +172,6 @@ class PaymentManager {
 					$status = null;
 					$entitlement = null;
 
-					if ($patron->getExpires() < $now) {
-						$this->logger->info("    --Access tokens expired. Refreshing...");
-						$this->refreshPatreonTokens($patron);
-					}
-
-					#$this->logger->info("    --Checking pledge status...");
-					list ($status, $entitlement) = $this->refreshPatreonPledge($patron);
 					$this->logger->info("    --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
 
 					if ($patreonLevel <= $entitlement) {
@@ -214,6 +210,25 @@ class PaymentManager {
 				}
 			}
 		}
+		$this->logger->info("  Updating Limits...");
+		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:User u');
+		$now = new \DateTime("now");
+		$oneWeek = new \DateTime("+1 week");
+		$twoWeeks = new \DateTime("+2 weeks");
+		foreach ($query->getResult() as $user) {
+			$limits = $user->getLimits();
+			if (!$limits) {
+				$this->usermanager->createLimits($user);
+			} else {
+				if ($limits->getPlacesDate() <= $now)
+				$limits->setPlaces($limits->getPlaces()+1);
+				if($user->getAccountLevel() >= 20) {
+					$limits->setPlacesDate($oneWeek);
+				} else {
+					$limits->setPlacesDate($twoWeeks);
+				}
+			}
+		}
 		$this->logger->info("  Cycle ended. Flushing...");
 		$this->em->flush();
 		return array($free, $patronCount, $active, $credits, $expired, $storage, $bannedcount);
@@ -240,7 +255,18 @@ class PaymentManager {
 		$status = $member['included'][0]['attributes']['patron_status'];
 		$patron->setStatus($status);
 		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
+		$lifetime = $member['included'][0]['attributes']['lifetime_support_cents'];
 		$patron->setCurrentAmount($entitlement);
+		if ($patron->getCredited() != $lifetime) {
+			if ($patron->getCredited() === null) {
+				$dif = $lifetime;
+			} else {
+				$dif = $lifetime - $patron->getCredited();
+			}
+			$dif = $dif / 100; #Patreon provides in cents. We want full dollars!
+			$this->account($patron->getUser(), 'Patron Credit', 'USD', $dif);
+			$patron->setCredited($lifetime); #We do track it in cents though.
+		}
 		return [$status, $entitlement];
 	}
 
@@ -251,13 +277,24 @@ class PaymentManager {
 				$this->paypalSecret
 				)
 			);
-		$api->setConfig([
-			'mode' => 'live',
-			'log.LogEnabled' => true,
-			'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
-			'log.LogLevel' => 'INFO', // PLEASE USE `INFO` LEVEL FOR LOGGING IN LIVE ENVIRONMENTS
-			'cache.enabled' => false,
-		]);
+		if ($this->env === 'prod') {
+			$api->setConfig([
+				'mode' => 'live',
+				'log.LogEnabled' => true,
+				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.LogLevel' => 'INFO',
+				'cache.enabled' => false,
+			]);
+		} else {
+			$api->setConfig([
+				'mode' => 'sandbox',
+				'log.LogEnabled' => true,
+				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.LogLevel' => 'DEBUG',
+				'cache.enabled' => false,
+			]);
+		}
+
 		return $api;
 	}
 
@@ -363,19 +400,24 @@ class PaymentManager {
 		}
 		$credits = ceil($credits);
 		$original = $credits;
-		if ($amount >= 100) {
-			$bonus = $credits * 0.5;
-		} elseif ($amount >= 50) {
-			$bonus = $credits * 0.4;
-		} elseif ($amount >= 20) {
-			$bonus = $credits * 0.3;
-		} elseif ($amount >= 10) {
-			$bonus = $credits * 0.2;
-		} elseif ($amount >= 5) {
-			$bonus = $credits * 0.1;
+		if ($type !== 'Patron Credit') {
+			if ($amount >= 100) {
+				$bonus = $credits * 0.5;
+			} elseif ($amount >= 50) {
+				$bonus = $credits * 0.4;
+			} elseif ($amount >= 20) {
+				$bonus = $credits * 0.3;
+			} elseif ($amount >= 10) {
+				$bonus = $credits * 0.2;
+			} elseif ($amount >= 5) {
+				$bonus = $credits * 0.1;
+			} else {
+				$bonus = 0;
+			}
 		} else {
-			$bonus = 0;
+			$bonus = $credits * 0.5;
 		}
+
 		$credits = $credits + $bonus;
 		$credits = ceil($credits); # Not that this should ever be a decimal but...
 
@@ -411,7 +453,15 @@ class PaymentManager {
 
 		if ($first) {
 			// give us our free vanity item
-			$user->setArtifactsLimit(max(1, $user->getArtifactsLimit()));
+			$limits = $user->getLimits();
+			if (!$limits) {
+				$limits = $this->usermanager->createLimits($user);
+			}
+			if ($limits->getArtifacts()) {
+				$limits->setArtifacts($limits->getArtifacts()+1);
+			} else {
+				$limits->setArtifacts(1);
+			}
 
 			// check if we had a friend code
 			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Code c WHERE c.used_by = :me AND c.sender IS NOT NULL AND c.sender != :me ORDER BY c.used_on ASC');
@@ -434,15 +484,7 @@ class PaymentManager {
 				$this->usermanager->updateUser($sender, false);
 
 				$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
-				$message = \Swift_Message::newInstance()
-					->setSubject($this->translator->trans('account.invite.mail2.subject', array()))
-					->setFrom(array('mafserver@lemuriacommunity.org' => $this->translator->trans('mail.sender', array(), "communication")))
-					->setReplyTo('mafteam@lemuriacommunity.org')
-					->setTo($sender->getEmail())
-					->setBody(strip_tags($text))
-					->addPart($text, 'text/html')
-				;
-				$numSent = $this->mailer->send($message);
+				$numSent = $this->mailman->sendEmail($sender->getEmail(), $this->translator->trans('account.invite.mail2.subject'), $text);
 				$this->logger->info('sent friend subscriber email: ('.$numSent.') - '.$text);
 			}
 		}

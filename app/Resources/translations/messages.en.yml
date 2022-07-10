@@ -22,7 +22,9 @@ menu:
  profile:   Profile
  characters:  Characters
  homepage:  Homepage
- terms:     Terms
+ terms:     Terms of Use
+ privacy:   Privacy Policy
+ cookies:   Cookie Policy
  credits:   Credits
  contact:   Contact
  forum:     Forum
@@ -252,6 +254,7 @@ account:
   20: Basic
   21: Volunteer
   22: Traveler (Andrew's Patron)
+  23: Supporter
   40: Intense
   41: Developer
   42: Explorer (Andrew's Patron)
@@ -277,6 +280,21 @@ account:
   newsletter: Occasional newsletter
   submit: Update
   saved:  Your settings have been updated.
+  delay:
+   name:  Notification Timing
+   choose: (choose one)
+   now: Immediately
+   hourly: Every Hour
+   6h: Every 6 Hours
+   12h: Every 12 Hours
+   daily: Daily
+   sundays: Weekly on Sunday
+   mondays: Weekly on Monday
+   tuesdays: Weekly on Tuesday
+   wednesdays: Weekly on Wednesday
+   thursdays: Weekly on Thursday
+   fridays: Weekly on Friday
+   saturdays: Weekly on Saturday
  autologin:
   title:    Auto-Login
   intro: >
@@ -300,9 +318,9 @@ account:
   link:     Get More Credits
   shop:     Buying Credits
   intro: >
-    Unfortunately, we can only offer PayPal payment at this time (Google Wallet has been discontinued).<br />
+    Unfortunately, we can only offer PayPal payment at this time but are looking into alternatives (like Stripe).<br />
     PayPal also handles <b>credit card payments</b>.<br />
-    Payments are handled through my company, <b>Calitarus GmbH</b>, so that is what you'll see on your order and receipt.
+    Payments are handled through <b>Iungard Systems, LLC</b>, so that is what you'll see on your order and receipt.
   history:  Payment History
   type:     Transaction type
   date:     Date
@@ -340,10 +358,15 @@ account:
  credits:
   name:     Credits
   sum:      %amount% credits
+  sum1:     %amount% credits + %per%%<br>(%total% Total)
   title:    Credits & Gifts
   link:     Credits and Gifts
   short:    Spend credits on additional content or make gifts to friends.
   shop:     Spend Credits
+  type:     Type
+  date:     Date
+  bonus:    Bonus
+
   shopdesc: >
     You can spend credits on various items that will change the appearance of your characters or estates.<br />
     None of these items give any advantages, except for prestige and recognition. We are strongly opposed to any "pay-2-win" game concepts.
@@ -485,7 +508,7 @@ account:
      <p>Thank you so much for helping the game become bigger and better.</p>
  patreon:
   title: Support Development via Patreon
-  info:  If you decide you'd rather forego a regular subscription and buying game credits through Calitarus GmbH, you can instead opt to become Andrew's Patron on Patreon for at least 2 US Dollars and get a free M&F subscription of an equivalent amount. In order to faciliate this, once you've become a Patron, you come back here and click the link below to let M&F authenticate with and request your user information and membership level from Patreon. We then apply that to your account here and unlock and display the Patreon-only subscription levels above.
+  info: If you'd like to take a more regular approach to supporting game development, you can opt to become one of Andrew's Patrons on Patreon. While you'll still need to opt-in to a subscription in game in order to get supporter benefits, you'll receive your entire patron pledge in equivalent game credits with a 50% bonus, regardless of how high your patron pledge is. In order to faciliate this, once you've become a Patron, you come back here and click the link below to let M&F authenticate with and request your user information and membership level from Patreon. This is updated daily, but if you'd like to request a specific update for your account, you can do it from your profile page's 'Update Your Patronage' link.
   andrew:
    name: Support Andrew through Patreon:
    connect: Login with Patreon.
@@ -1273,6 +1296,7 @@ battle:
   sortie:       The sortie from %location%
   near:         A battle near %location%
   around:       A battle in the vicinity of %location%
+  castle:       A battle at the castle of %location%
  defenses:      An assault against a defended position with
  initial:       initial troops
  combat:        combat
@@ -1644,6 +1668,7 @@ unavailable:
  nooffers:      No soldiers or existing offers available.
  norealm:       This settlement must be part a realm if you wish to take on knights here.
  noassigned:    You have no soldiers assigned.
+ nolimitscreated: Missing updated user data. Please return to character list to correct this.
  nospies:       You don't have any spies in your employ.
  inbattle:      You are already involved in a battle.
  inbattle2:     This unit is currently involved in a battle.
@@ -1847,3 +1872,15 @@ journal:
   gamedate:    Game Date
   realdate:    Real World Date
   topic:       Topic
+
+olympus:
+ pending:
+  header:      Pending Reports
+  table:
+   type:
+    header:    Issue Type
+    journal:   Journal
+   name:       Object
+   reporter:   Reported By
+   ts:         Timestamp
+   actions:    Actions

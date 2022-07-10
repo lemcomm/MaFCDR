@@ -4,7 +4,9 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Journal;
+use BM2\SiteBundle\Entity\UserReport;
 use BM2\SiteBundle\Form\JournalType;
+use BM2\SiteBundle\Form\UserReportType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -59,6 +61,24 @@ class JournalController extends Controller {
 	  * @Route("/write/")
 	  */
 
+	private function newJournal(Character $char, $data) {
+		$journal = new Journal;
+		$journal->setCharacter($character);
+		$journal->setDate(new \DateTime('now'));
+		$journal->setCycle($this->get('appstate')->getCycle());
+		$journal->setLanguage('English');
+		$journal->setTopic($data['topic']);
+		$journal->setEntry($data['entry']);
+		$journal->setOoc($data['ooc']);
+		$journal->setPublic($data['public']);
+		$journal->setGraphic($data['graphic']);
+		$journal->setPendingReview(false);
+		$journal->setGMReviewed(false);
+		$journal->setGMPrivate(false);
+		$journal->setGMGraphic(false);
+		return $journal;
+	}
+
 	public function journalWriteAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('journalWriteTest');
 		if (! $character instanceof Character) {
@@ -70,20 +90,37 @@ class JournalController extends Controller {
 
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
-			$journal = new Journal;
-			$journal->setCharacter($character);
-			$journal->setDate(new \DateTime('now'));
-			$journal->setCycle($this->get('appstate')->getCycle());
-			$journal->setLanguage('English');
-			$journal->setTopic($data['topic']);
-			$journal->setEntry($data['entry']);
-			$journal->setOoc($data['ooc']);
-			$journal->setPublic($data['public']);
-			$journal->setGraphic($data['graphic']);
-			$journal->setPendingReview(false);
-			$journal->setGMReviewed(false);
-			$journal->setGMPrivate(false);
-			$journal->setGMGraphic(false);
+			$journal = $this->newJournal($character, $data);
+
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($journal);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('journal.write.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_journal_mine');
+		}
+
+		return $this->render('Journal/write.html.twig', [
+			'form'=>$form->createView()
+		]);
+	}
+
+	/**
+	  * @Route("/write/battle/{report}", name="maf_journal_write_battle")
+	  */
+
+	public function journalWriteAboutBattleAction(Request $request, BattleReport $report) {
+		$character = $this->get('dispatcher')->gateway('journalWriteBattleTest', null, null, null, $report);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$form = $this->createForm(new JournalType());
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$data = $form->getData();
+			$journal = $this->newJournal($character, $data);
+			$journal->setBattleReport($report);
 
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
@@ -116,24 +153,84 @@ class JournalController extends Controller {
 	  * @Route("/report/{id}", name="maf_journal_report", requirements={"id"="\d+"})
 	  */
 
-	public function journalReportAction(Journal $id) {
+	public function journalReportAction(Request $request, Journal $id) {
 		if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-			$em = $this->getDoctrine()->getManager();
-			$report = new UserReport();
-			$report->setUser($this->getUser());
-			$report->setJournal($id);
-			$report->setType('Journal');
-			$report->setDate(new \DateTime('now'));
-			if ($id->getPendingReview()) {
-				$id->setPendingReview(true);
+			$form = $this->createForm(new UserReportType());
+			$form->handleRequest($request);
+			if ($form->isValid() && $form->isSubmitted()) {
+				$em = $this->getDoctrine()->getManager();
+				$user = $this->getUser();
+				$report = new UserReport();
+				$report->setUser($this->getUser());
+				$report->setJournal($id);
+				$report->setType('Journal');
+				$report->setDate(new \DateTime('now'));
+				if ($id->getPendingReview()) {
+					$id->setPendingReview(true);
+				}
+				$em->persist($report);
+				$em->flush();
+				$text = '['.$user->getUsername().'](https://mightandfealty.com/user/'.$user->getId().') has reported the journal: ['.$id->getTopic().'](https://mightandfealty.com/journal/'.$id->getId().').';
+				$this->get('discord_integrator')->pushToOlympus($text);
+				$this->addFlash('notice', $this->get('translator')->trans('journal.report.success', array(), 'messages'));
+				return $this->redirectToRoute('maf_journal', array('id'=>$id->getId()));
+			} else {
+				return $this->render('Journal/report.html.twig', [
+					'journal' => $id,
+					'form' => $form->createView()
+				]);
 			}
-			$em->persist($report);
-			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('journal.report.success', array(), 'messages'));
 		} else {
 			$this->addFlash('notice', $this->get('translator')->trans('journal.report.failure', array(), 'messages'));
+			return $this->redirectToRoute('maf_journal', array('id'=>$id->getId()));
+		}
+	}
+
+	/**
+	  * @Route("/gmprivate/{id}", name="maf_journal_gmprivate", requirements={"id"="\d+"})
+	  */
+
+	public function journalGMPrivateAction(Journal $id) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS')) {
+			$id->setGMPrivate(true);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.private.success', array(), 'messages'));
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.private.failure', array(), 'messages'));
 		}
 		return $this->redirectToRoute('maf_journal', array('id'=>$id->getId()));
+	}
+
+	/**
+	  * @Route("/gmgraphic/{id}", name="maf_journal_gmgraphic", requirements={"id"="\d+"})
+	  */
+
+	public function journalGMGraphicAction(Journal $id) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS')) {
+			$id->setGMGraphic(true);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.graphic.success', array(), 'messages'));
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.graphic.failure', array(), 'messages'));
+		}
+		return $this->redirectToRoute('maf_journal', array('id'=>$id->getId()));
+	}
+
+	/**
+	  * @Route("/gmremove/{id}", name="maf_journal_gmremove", requirements={"id"="\d+"})
+	  */
+
+	public function journalGMRemoveAction(Journal $id) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+			$em = $this->getDoctrine()->getManager();
+			$em->remove($id);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.remove.success', array(), 'messages'));
+			return $this->redirectToRoute('maf_gm_pending');
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('journal.gm.remove.failure', array(), 'messages'));
+			return $this->redirectToRoute('bm2_homepage');
+		}
 	}
 
 }

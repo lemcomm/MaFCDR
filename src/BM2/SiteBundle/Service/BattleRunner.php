@@ -19,6 +19,10 @@ use Monolog\Logger;
 
 class BattleRunner {
 
+	/*
+	NOTE: There's a bunch of code in here that is "live" but not actually called relating to 2D battles.
+	*/
+
 	# Symfony Service variables.
 	private $em;
 	private $logger;
@@ -29,6 +33,15 @@ class BattleRunner {
 	private $interactions;
 	private $warman;
 	private $actman;
+
+	# Preset values.
+	private $defaultOffset = 135;
+	private $battleSeparation = 270;
+	/*
+	Going to talk about these abit as they determine things. Offset is the absolute value from zero for each of the two primary sides.
+	In the case of defenders this is also the positive value for where the "walls" are.
+
+	*/
 
 	# The following variables are used all over this class, in multiple functions, sometimes as far as 4 or 5 functions deep.
 	private $battle;
@@ -269,6 +282,8 @@ class BattleRunner {
 
 		$preparations = $this->prepare();
 		if ($preparations[0] === 'success') {
+			$this->addObservers($battle);
+			$this->em->flush();
 			// the main call to actually run the battle:
 			$this->log(15, "Resolving Battle...\n");
 			$this->resolveBattle($myStage, $maxStage);
@@ -351,11 +366,12 @@ class BattleRunner {
 			# Pass the siege ID, which side won, and in the event of a battle failure, the preparation reesults (This lets us pass failures and prematurely end sieges.)
 			$this->em->flush();
 			if ($victor) {
-				$this->war_manager->progressSiege($battle->getSiege(), $battle, $victor, $preparations[0], $this->report);
+				$this->progressSiege($battle, $victor, $preparations[0]);
 			}
 		}
 		$this->em->flush();
 		$this->em->remove($battle);
+		$this->history->evaluateBattle($this->report);
 	}
 
 	private function prepare() {
@@ -375,6 +391,7 @@ class BattleRunner {
 			$attGroup = $battle->getPrimaryAttacker();
 			$defGroup = $battle->getPrimaryDefender();
 		}
+		$totalCount = 0;
 		foreach ($battle->getGroups() as $group) {
 			if ($siege && $defGroup == NULL) {
 				if ($group != $attGroup && !$group->getReinforcing()) {
@@ -392,7 +409,9 @@ class BattleRunner {
 			$this->addNobility($group);
 
 			$types=array();
+			$groupCount = 0;
 			foreach ($group->getSoldiers() as $soldier) {
+				$groupCount++;
 				if ($soldier->getExperience()<=5) {
 					$soldier->addXP(2);
 				} else {
@@ -405,13 +424,20 @@ class BattleRunner {
 					$types[$type] = 1;
 				}
 			}
+			$totalCount += $groupCount;
+			$groupReport->setCount($groupCount);
 			$combatworthy=false;
 			$troops = array();
 			$this->log(3, "Totals in this group:\n");
+			$some = false;
 			foreach ($types as $type=>$number) {
 				$this->log(3, $type.": $number \n");
+				$some = true;
 				$troops[$type] = $number;
 				$combatworthy=true;
+			}
+			if (!$some) {
+				$this->log(3, "(none) \n");
 			}
 			if ($combatworthy && !$group->getReinforcing()) {
 				# Groups that are reinforcing don't represent a primary combatant, and if we don't have atleast 2 primary combatants, there's no point.
@@ -427,6 +453,7 @@ class BattleRunner {
 			}
 			$groupReport->setStart($troops);
 		}
+		$this->report->setCount($totalCount);
 		$this->em->flush();
 
 		// FIXME: in huge battles, this can potentially take, like, FOREVER :-(
@@ -534,6 +561,59 @@ class BattleRunner {
 		}
 	}
 
+	private function addObservers($battle) {
+		$added = new ArrayCollection;
+		$someone = null;
+		foreach ($battle->getGroups() as $group) {
+			foreach ($group->getCharacters() as $char) {
+				if (!$someone) {
+					$someone = $char;
+				}
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+		$dist = $this->geo->calculateInteractionDistance($someone);
+		$nearby = $this->geto->findCharactersNearMe($someone, $dist, false, false, false, true, false);
+		foreach ($nearby as $each) {
+			$char = $each['character'];
+			if (!$added->contains($char)) {
+				$obs = new BattleReportObserver;
+				$this->em->persist($obs);
+				$obs->setBattleReport($this->report);
+				$obs->setCharacter($char);
+				$added->add($char);
+			}
+		}
+		if ($battle->getPlace()) {
+			foreach ($battle->getPlace()->getCharactersPresent() as $char) {
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+		if ($battle->getSettlement()) {
+			foreach ($battle->getSettlement()->getCharactersPresent() as $char) {
+				if (!$added->contains($char)) {
+					$obs = new BattleReportObserver;
+					$this->em->persist($obs);
+					$obs->setBattleReport($this->report);
+					$obs->setCharacter($char);
+					$added->add($char);
+				}
+			}
+		}
+	}
+
 	private function addNobility(BattleGroup $group) {
 		foreach ($group->getCharacters() as $char) {
 			// TODO: might make this actual buy options, instead of hardcoded
@@ -603,6 +683,7 @@ class BattleRunner {
 		} else {
 			$this->log(20, "Ranged Penalty: ".$rangedPenalty."\n\n");
 		}
+		#$this->prepareBattlefield();
 		$this->log(20, "...starting phases...\n");
 		while ($combat) {
 			$this->prepareRound();
@@ -653,6 +734,143 @@ class BattleRunner {
 		*/
 		$this->em->flush();
 
+	}
+
+	private function prepareBattlefield() {
+		$battle = $this->battle;
+		if ($battle->getType() === 'siegesortie') {
+			$siege = $battle->getSiege();
+		} elseif ($battle->getType() === 'siegeassault') {
+			$siege = $battle->getSiege();
+		} elseif ($battle->getType() === 'urban') {
+			$siege = false;
+		}
+		$posX = $this->defaultOffset;
+		$negX = 0 - $this->defaultOffset;
+		if ($siege) {
+			$inside = $battle->findInsideGroups();
+			$iCount = $inside->count();
+			$outside = $battle->findOutsideGroups();
+			$oCount = $outside->count();
+			$highY = 0;
+			$count = 1;
+			foreach ($inside as $group) {
+				list($highY, $count) = $this->deplyGroup($group, $posX, $highY, false, $count, $iCount);
+
+				/* Fancy logic follows for more than 2 sided battles.
+
+				These'll be fun for multiple reasons, largely because we'll ahve to rotate entire formations.
+
+				For now, none of these ;)
+				$highY = 0;
+				$lowY = 0;
+				if ($iCount == 1) {
+					$this->deployGroup($group, $posX, false); #We don't need the return.
+				} else {
+					if ($group === $siege->getPrimaryDefender()) {
+						$newHigh = $this->deployGroup($group, $posX, false);
+					} else {
+						$offsetX = $posX+$this->battleSeparation;
+						$newHigh = $this->deployGroup($group, $offsetX, false);
+					}
+					if ($newHigh > $highY) {
+						$highY = $newHigh;
+					}
+				} */
+			}
+			$count = 1; #Each side retains a separate count.
+			foreach ($outside as $group) {
+				list($highY, $count) = $this->deployGroup($group, $negX, $highY, true, $count, $oCount);
+			}
+		} else {
+			$groups = $battle->getGroups();
+			$tCount = $groups->count(); # Total count.
+			foreach ($groups as $group) {
+				list($highY, $count) = $this->deplyGroup($group, $posX, $highY, false, $count, $tCount);
+				$invet = !$invert;
+			}
+		}
+	}
+
+	private function deployGroup($group, $startX, $highY, $invert, $gCount, $tGCount, $angle = null) {
+		/*
+		group is the group we're depling.
+		startX is the initial x position we're working from.
+		highY lets us ensure separation on 3+ group battles.
+		invert tells it to increment or decrement X coordinates to space properly.
+		gCount is the total group number so far on this side.
+		tGCount is the total group count for this side.
+
+		Collectively, these let us keep all the deployment logic in here.
+		*/
+		$highY = 0;
+		$setup = [
+			1 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			2 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			3 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			4 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			5 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			6 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+			7 => [
+				'count' => 1,
+				'sep' => 0,
+			],
+		];
+		foreach ($group->getUnits() as $unit) {
+			$count = $setup[$line]['count'];
+			$line = $unit->getSettings()->getLine();
+			if ($invert) {
+				$xPos = $startX - ($line*20);
+			} else {
+				$xPos = $startX + ($line*20);
+			}
+			if ($count === 1) {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = $yPos + 20;
+			} elseif ($count % 2 === 0) {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = $yPos*-1;
+			} else {
+				$yPos = $setup[$line]['sep'];
+				$setup[$line]['sep'] = ($yPos*-1)+20;
+			}
+			$setup[$line]['count'] = $count+1;
+			if ($angle === null) {
+				$unit->setXPos($xPos);
+				$unit->setYPos($yPos);
+			}
+			if ($iCount > 2) {
+				# Handle vertical offsets for future deployment.
+				# We only need this if we have to work out angled deployments.
+				if ($yPos > 0 && $yPos > $highY) {
+					$highY = $yPos;
+				}
+			}
+		}
+		$gCount++;
+		return [$highY. $gCount];
+	}
+
+	private function rotateCoords($x, $y, $focus, $angle) {
+		# Do some math!
 	}
 
 	private function runStage($type, $rangedPenaltyStart, $phase, $doRanged) {
@@ -773,6 +991,7 @@ class BattleRunner {
 								$this->log(10, "missed\n");
 								$missed++;
 							}
+							# Remove this check after the Battle 2.0 update and 2D maps are added.
 							if ($soldier->getEquipment() && $soldier->getEquipment()->getName() == 'javelin') {
 								if ($soldier->getWeapon() && !$soldier->getWeapon()->getName() == 'longbow') {
 									// one-shot weapon, that only longbowmen will use by default in this phase
@@ -1679,6 +1898,212 @@ class BattleRunner {
 				$repot->setKilledBy($enemy);
 			}
 		}
+	}
+
+	private function progressSiege(Battle $battle, BattleGroup $victor = null, $flag) {
+		$siege = $battle->getSiege();
+		$report = $this->report;
+		$current = $siege->getStage();
+		$max = $siege->getMaxStage();
+		$assault = FALSE;
+		$sortie = FALSE;
+		$bypass = FALSE;
+		$completed = FALSE;
+		if ($battle->getType() === 'siegeassault') {
+			$assault = TRUE;
+			$this->log(1, "PS: Siege assualt\n");
+		} elseif ($battle->getType() === 'siegesortie') {
+			$sortie = TRUE;
+			$this->log(1, "PS: Siege sortie\n");
+		}
+		$attacker = $battle->getPrimaryAttacker();
+		if ($flag === 'haveAttacker') {
+			$victor = $siege->getAttacker();
+			$bypass = TRUE; #Defenders failed to muster any defenders.
+			$this->log(1, "PS: Bypass defenders. Default victory to attackers\n");
+		} elseif ($flag === 'haveDefender') {
+			$victor = $siege->getDefender();
+			$bypass = TRUE; #Attackers failed to muster any attackers.
+			$this->log(1, "PS: Bypass attackers. Default victory to defenders\n");
+		}
+		if ($siege->getSettlement()) {
+			$target = $siege->getSettlement();
+		} else {
+			$target = $siege->getPlace();
+		}
+		if ($assault) {
+			$this->log(1, "PS: Attacker matches victor and this is an assault.\n");
+			if ($current < $max && !$bypass) {
+				# Siege moves forward
+				$siege->setStage($current+1);
+				$this->log(1, "PS: Incrememnting stage.\n");
+				# "After the [link], the siege has advanced in favor of the attackers"
+				$this->history->logEvent(
+					$target,
+					'siege.advance.attacker',
+					array('%link-battle%'=>$report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+			if ($current == $max || $bypass) {
+				$this->log(1, "PS: Max stage reached or bypass flag set due to failed defense.\n");
+				$completed = TRUE;
+				# Siege is over, attackers win.
+				if (!$bypass) {
+					# "After the defenders failed to muster troops in [link], the siege concluded in attacker victory."
+					$this->history->logEvent(
+						$target,
+						'siege.victor.attacker',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					$this->log(1, "PS: Bypassed!\n");
+					# "After the [link], the siege concluded in an attacker victory."
+					$this->history->logEvent(
+						$target,
+						'siege.bypass.attacker',
+						array('%link-battle%'=>$report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+
+			}
+		} elseif ($sortie) {
+			$this->log(1, "PS: Attacker is not victor. This must be a sortie by the defenders.\n");
+			if ($current > 1 && !$bypass) {
+				# Siege moves backwards.
+				$siege->setStage($current-1);
+				$this->log(1, "PS: Decrementing stage.\n");
+				# "After the [link], the siege has advanced in favor of the defenders"
+				$this->history->logEvent(
+					$target,
+					'siege.advance.defender',
+					array('%link-battle%'=>$report->getId()),
+					History::MEDIUM, true, 20
+				);
+				foreach ($siege->getGroups() as $group) {
+					foreach ($group->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'siege.advance.defender',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+			if ($current <= 1 || $bypass) {
+				$this->log(1, "PS: Minimum stage reached or bypass flag set due to failure by siege attackers to muster any force. Siege broken.\n");
+				$completed = TRUE;
+				# Siege is over, defender victory.
+				if ($bypass) {
+					# "After the attackers failed to muster troops in [link], the siege concluded in defender victory."
+					$this->log(1, "PS: Bypassed!\n");
+					$this->history->logEvent(
+						$target,
+						'siege.victor.defender',
+						array(),
+						History::MEDIUM, false
+					);
+				} else {
+					# "After the [link], the siege concluded in a defender victory."
+					$this->history->logEvent(
+						$target,
+						'siege.bypass.defender',
+						array('%link-battle%'=>$report->getId()),
+						History::MEDIUM, false
+					);
+					foreach ($victor->getCharacters() as $char) {
+						$this->history->logEvent(
+							$char,
+							'battle.failed',
+							array(),
+							History::MEDIUM, false, 20
+						);
+					}
+				}
+			}
+		}
+		# Yes, this means that if attackers lose an assault or defenders lose a sortie, nothing changes. This is intentional.
+		$battle->setPrimaryAttacker(NULL);
+		$battle->setPrimaryDefender(NULL);
+		$this->log(1, "PS: Unset primary flags!\n");
+		foreach ($siege->getGroups() as $group) {
+			$group->setBattle(NULL);
+		}
+		$this->log(1, "PS: Unset group battle associations!\n");
+
+		if ($completed) {
+			$this->log(1, "PS: Siege completed, running completion cycle.\n");
+			$realm = $siege->getRealm();
+			if ($assault) {
+				if ($target instanceof Settlement) {
+					$this->log(1, "PS: Target is settlement\n");
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the settlement.
+							$this->interactions->characterEnterSettlement($char, $target, true);
+							$this->log(1, "PS: ".$char->getName()." moved inside ".$target->getName().". \n");
+					}
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$this->log(1, "PS: No leader! Finding one at random!. \n");
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					$this->politics->changeSettlementOccupier($leader, $target, $realm);
+					$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+				} else {
+					$this->log(1, "PS: Target is place\n");
+					foreach ($victor->getCharacters() as $char) {
+							# Force move victorious attackers inside the place.
+							$this->interactions->characterEnterPlace($char, $target, true);
+							$this->log(1, "PS: ".$char->getName()." moved inside ".$target->getName().". \n");
+					}
+					$leader = $victor->getLeader();
+					if (!$leader) {
+						$this->log(1, "PS: No leader! Finding one at random!. \n");
+						$leader = $victor->getCharacters()->first(); #Get one at random.
+					}
+					if ($leader) {
+						$this->politics->changePlaceOccupier($leader, $target, $realm);
+						$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+					}
+					foreach ($target->getUnits() as $unit) {
+						$this->milman->returnUnitHome($unit, 'defenselost', $victor->getLeader());
+						$this->log(1, "PS: ".$unit->getId()." sent home. \n");
+						$this->history->logEvent(
+							$unit,
+							'event.unit.defenselost2',
+							array("%link-place%"=>$target->getId()),
+							History::HIGH, true
+						);
+					}
+				}
+			}
+			$this->em->flush();
+			$this->log(1, "PS: Passing siege to disbandSiege function\n");
+			$this->warman->disbandSiege($siege, null, TRUE);
+		}
+		$this->em->flush();
+
 	}
 
 }

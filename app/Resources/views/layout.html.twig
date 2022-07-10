@@ -23,7 +23,7 @@
 	<link rel="apple-touch-icon" type="image/png" sizes="72x72" href="/apple-touch-icon-72.png">
 	<link rel="apple-touch-icon" type="image/png" sizes="57x57" href="/apple-touch-icon-57.png">
 	<link rel="apple-touch-icon" type="image/png" href="/apple-touch-icon.png">
-{#  non-mobile: #}
+{#  non-mobile: #}<script type="text/javascript" src="https://app.termly.io/embed.min.js" data-auto-block="on" data-website-uuid="66ba5197-b2e3-42ba-b41b-01f85ed493cf"></script>
 	{% block includes %}
 		{% if theme == 'office' %}
 			<link rel="stylesheet" href="{{ asset('bundles/bm2site/css/office.css') }}" title="Office Style"/>
@@ -248,9 +248,19 @@
 		{% endif %}
 		<div>&copy;2013-2022 by Andrew Gwynn<br>Originally created by <a href="https://notveryprofessional.com/">Tom Vogt</a></div>
 		<div><a href="{{ path('bm2_terms') }}">{{ 'menu.terms'|trans }}</a><br><a href="{{ path('bm2_credits') }}">{{ 'menu.credits'|trans }}</a></div>
+		<div><a href="{{ path('maf_privacy') }}">{{ 'menu.privacy'|trans }}</a><br><a href="{{ path('bm2_credits') }}">{{ 'menu.credits'|trans }}</a></div>
+		<div><a href="{{ path('maf_cookies') }}">{{ 'menu.cookies'|trans }}</a><br><a href="{{ path('bm2_credits') }}">{{ 'menu.credits'|trans }}</a></div>
 		<div><a href="{{ path('bm2_contact') }}">{{ 'menu.contact'|trans }}</a><br><a href="https://discord.gg/7YpAhEh">{{ 'menu.discord'|trans }}</a></div>
 {# TODO: social sharing buttons (from http://www.heise.de/extras/socialshareprivacy/) etc. #}
 		<div><a href="https://www.patreon.com/andrewdoesprogramming">{{ 'menu.patreon.andrew'|trans }}</a><br><a href="https://pbbg.com">{{ 'menu.pbbg'|trans }}</a></div>
+		<button
+			class="termly-cookie-preference-button"
+			type="button"
+			style="background: black; width: 165px; height: 30px; border-radius: 3px; border: 1px solid black; font-family: Roboto, Arial; font-size: 10px; color: white; font-weight: 600; box-sizing: border-box; cursor: pointer; padding: 0; outline: none;"
+			onclick="displayPreferenceModal()">
+			Manage Cookie Preferences
+		</button>
+
 	</div>
 </div>
 <script language="javascript" type="text/javascript">

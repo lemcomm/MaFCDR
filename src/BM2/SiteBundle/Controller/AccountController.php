@@ -109,7 +109,7 @@ class AccountController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form['text']->getData();
-			$this->get('bm2.usermanager')->updateUser($user);
+			$this->get('user_manager')->updateUser($user);
 			if ($data && $text != $data) {
 				$desc = $this->get('description_manager')->newDescription($user, $data);
 			}
@@ -140,11 +140,15 @@ class AccountController extends Controller {
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
 
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, false);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, false);
+		if ($user->getLimits() === null) {
+			$this->get('user_manager')->createLimits($user);
+		}
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
 		}
+
 
 		$characters = array();
 		$npcs = array();
@@ -402,7 +406,7 @@ class AccountController extends Controller {
 		if (!$make_more) {
 			throw new AccessDeniedHttpException('newcharacter.overlimit');
 		}
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, true);
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn2', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -577,8 +581,9 @@ class AccountController extends Controller {
 
    			$user->setLanguage($data['language']);
    			$user->setNotifications($data['notifications']);
+			$user->setEmailDelay($data['emailDelay']);
    			$user->setNewsletter($data['newsletter']);
-   			$this->get('bm2.usermanager')->updateUser($user);
+   			$this->get('user_manager')->updateUser($user);
 				$this->addFlash('notice', $this->get('translator')->trans('account.settings.saved'));
 				return $this->redirectToRoute('bm2_account');
 			}
@@ -588,6 +593,21 @@ class AccountController extends Controller {
 			'form' => $form->createView(),
 			'user' => $user
 		]);
+	}
+
+	/**
+	  * @Route("/endemails/{user}/{token}", name="maf_end_emails")
+	  */
+	public function endEmailsAction(User $user, $token=null) {
+		if ($user && $user->getEmailOptOutToken() === $token) {
+			$user->setNotifications(false);
+			$this->getDoctrine()->getManager()->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.success', [], "communication"));
+			return $this->redirectToRoute('bm2_index');
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.failure', [], "communication"));
+			return $this->redirectToRoute('bm2_index');
+		}
 	}
 
 	/**
@@ -689,8 +709,11 @@ class AccountController extends Controller {
 		// time-based action resolution
 		$this->get('action_resolution')->progress();
 
-		$this->get('appstate')->setSessionData($character);
+		if ($user->getLimits() === null) {
+			$this->get('user_manager')->createLimits($user);
+		}
 
+		$this->get('appstate')->setSessionData($character);
 		switch ($request->query->get('logic')) {
 			case 'play':
 				$character->setLastAccess(new \DateTime("now"));

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\MailEntry" table="mailentry">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="type" type="string"/>
+		<many-to-one field="user" target-entity="User" inversed-by="mail_entries"/>
+		<many-to-one field="event" target-entity="Event" inversed-by="mail_entries"/>
+		<field name="ts" type="datetime"/>
+		<field name="send_time" type="datetime"/>
+		<field name="content" type="text"/>
+
+	</entity>
+</doctrine-mapping>

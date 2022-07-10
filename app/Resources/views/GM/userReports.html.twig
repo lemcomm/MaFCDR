@@ -1,0 +1,58 @@
+{% extends "layout.html.twig" %}
+
+{% block includes %}
+	{{ parent() }}
+	<script src="{{ asset('bundles/bm2site/tablesorter/jquery.tablesorter.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<h2>{{ 'olympus.userReports.against.header'|trans({}, "messages")|raw }}</h2>
+<table id="by"><thead>
+	<tr>
+		<th>{{ 'olympus.pending.table.type.header'|trans }}</th>
+		<th>{{ 'olympus.pending.table.name'|trans }}</th>
+		<th>{{ 'olympus.pending.table.reporter'|trans }}</th>
+		<th>{{ 'olympus.pending.table.ts'|trans }}</th>
+		<th>{{ 'olympus.pending.table.actions'|trans }}</th>
+	</tr>
+</thead><tbody>
+{% for each in against %}
+	{% set report = each.report %}
+	<tr>
+		<td>{{ ('olympus.pending.table.type'~report.type)|trans }}</td>
+		<td>{{ link(report.getEntity) }}</td>
+		<td><a href="{{ path("maf_user", {"user": report.user.id}) }}">{{ report.user.username }}</a></td>
+		<td>{{ report.date|date }}</td>
+		<td><a href="{{ path("maf_gm_report", {'id':report.id}) }}">{{ 'olympus.report.view'|trans }}</a>
+	</tr>
+{% endfor %}
+</tbody></table>
+
+<h2>{{ 'olympus.userReports.by.header'|trans({}, "messages")|raw }}</h2>
+<table id="by"><thead>
+	<tr>
+		<th>{{ 'olympus.pending.table.type.header'|trans }}</th>
+		<th>{{ 'olympus.pending.table.name'|trans }}</th>
+		<th>{{ 'olympus.pending.table.reporter'|trans }}</th>
+		<th>{{ 'olympus.pending.table.ts'|trans }}</th>
+		<th>{{ 'olympus.pending.table.actions'|trans }}</th>
+	</tr>
+</thead><tbody>
+{% for report in by %}
+	<tr>
+		<td>{{ ('olympus.pending.table.type'~report.type)|trans }}</td>
+		<td>{{ link(report.getEntity) }}</td>
+		<td><a href="{{ path("maf_user", {"user": report.user.id}) }}">{{ report.user.username }}</a></td>
+		<td>{{ report.date|date }}</td>
+		<td><a href="{{ path("maf_gm_report", {'id':report.id}) }}">{{ 'olympus.report.view'|trans }}</a>
+	</tr>
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
+
+{% block jquery %}
+	$("#pending").tablesorter({
+		sortList: [[1,1]],
+	});
+{% endblock %}

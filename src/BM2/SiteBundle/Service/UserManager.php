@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\User;
+use BM2\SiteBundle\Entity\UserLimits;
 use Doctrine\Common\Persistence\ObjectManager;
 use FOS\UserBundle\Doctrine\UserManager as FosUserManager;
 use FOS\UserBundle\Util\CanonicalFieldsUpdater;
@@ -14,13 +15,14 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserManager extends FosUserManager {
 	private $genome_all = 'abcdefghijklmnopqrstuvwxyz';
 	private $genome_setsize = 15;
-
+	private $em;
 
 	/**
 	 * @param ObjectManager $om
 	 */
 	public function __construct(ObjectManager $om, $class, PasswordUpdaterInterface $passwordUpdater, CanonicalFieldsUpdater $canonicalFieldsUpdater) {
 		parent::__construct($passwordUpdater, $canonicalFieldsUpdater, $om, $class);
+		$this->em = $om;
 	}
 
 	/**
@@ -121,6 +123,22 @@ class UserManager extends FosUserManager {
 			return true;
 		}
 
+	}
+
+	public function createLimits(User $user) {
+		$limits = new UserLimits();
+		$limits->setUser($user);
+		if ($user->getAccountLevel() >= 20) {
+			$max = floor($user->getCreated()->diff(new \DateTime("now"), true)->days/7);
+			$limits->setPlacesDate(new \DateTime("+1 weeks"));
+		} else {
+			$max = floor($user->getCreated()->diff(new \DateTime("now"), true)->days/14);
+			$limits->setPlacesDate(new \DateTime("+2 week"));
+		}
+		$limits->setPlaces($max);
+		$limits->setArtifacts(max(0, $user->getArtifactsLimit()));
+		$this->em->persist($limits);
+		return $limits;
 	}
 
 }

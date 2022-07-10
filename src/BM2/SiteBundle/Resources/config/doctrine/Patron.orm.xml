@@ -9,6 +9,7 @@
 		<field name="refresh_token" type="string" nullable="true"/>
 		<field name="expires" type="datetime" nullable="true"/>
 		<field name="current_amount" type="integer" nullable="true"/>
+		<field name="credited" type="integer" nullable="true"/>
 		<field name="status" type="string" nullable="true"/>
 
 		<many-to-one field="creator" target-entity="Patreon" inversed-by="patrons"/>

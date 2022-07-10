@@ -17,6 +17,8 @@
 		<field name="hunt" type="array"/>
 		<field name="finish" type="array"/>
 		<field name="completed" type="boolean"/>
+		<field name="count" type="integer" nullable="true"/>
+		<field name="epicness" type="smallint" nullable="true"/>
 
 		<field name="debug" type="text"/>
 
@@ -35,6 +37,8 @@
 		<many-to-many field="defense_buildings" target-entity="BuildingType" />
 		<many-to-one field="war" target-entity="War" inversed-by="related_battle_reports"/>
 		<many-to-one field="siege" target-entity="Siege" inversed-by="related_battle_reports"/>
+		<one-to-many field="observers" target-entity="BattleReportObserver" mapped-by="battle_report"/>
+		<one-to-many field="journals" target-entity="Journal" mapped-by="battle_report"/>
 
 	</entity>
 </doctrine-mapping>

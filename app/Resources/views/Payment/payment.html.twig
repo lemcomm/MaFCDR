@@ -81,6 +81,7 @@ For testing purposes, you can simulate buying credits simply by clicking the but
 		<th>{{ 'account.payment.amount'|trans }}</th>
 		<th>{{ 'account.payment.currency'|trans }}</th>
 		<th>{{ 'account.credits.name'|trans }}</th>
+		<th>{{ 'account.credits.bonus'|trans }}</th>
 		<th>{{ 'account.payment.code'|trans }}</th>
 	</tr></thead>
 	<tbody>
@@ -91,6 +92,7 @@ For testing purposes, you can simulate buying credits simply by clicking the but
 			<td align="right">{{ payment.amount }}</td>
 			<td>{{ payment.currency }}</td>
 			<td align="right">{{ payment.credits }}</td>
+			<td align="right">{%if payment.bonus > 0 %}{{ payment.bonus }}{% endif %}</td>
 			<td>{{ payment.transactioncode }}</td>
 		</tr>
 	{% endfor %}

@@ -1474,15 +1474,17 @@ class CharacterController extends Controller {
 		}
 
 		if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-			$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
-			$query->setParameters(array('br'=>$report, 'me'=>$character));
-			$check = $query->getOneOrNullResult();
-			if (!$check) {
-				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleReportCharacter p JOIN p.group_report g WHERE p.character = :me AND g.battle_report = :br');
+			if (!$report->checkForObserver($character)) {
+				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
 				$query->setParameters(array('br'=>$report, 'me'=>$character));
 				$check = $query->getOneOrNullResult();
 				if (!$check) {
-					throw $this->createNotFoundException('error.noaccess.battlereport');
+					$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleReportCharacter p JOIN p.group_report g WHERE p.character = :me AND g.battle_report = :br');
+					$query->setParameters(array('br'=>$report, 'me'=>$character));
+					$check = $query->getOneOrNullResult();
+					if (!$check) {
+						throw $this->createNotFoundException('error.noaccess.battlereport');
+					}
 				}
 			}
 		}

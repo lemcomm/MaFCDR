@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Setting;
+use BM2\SiteBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -162,6 +163,24 @@ class AppState {
 			}
 			$this->session->set('realms', $realms);
 		}
+	}
+
+	public function findEmailOptOutToken(User $user) {
+		return $user->getEmailOptOutToken()?$user->getEmailOptOutToken():$this->generateEmailOptOutToken($user);
+	}
+
+	public function generateEmailOptOutToken(User $user) {
+		$token = $this->generateToken();
+		$user->setEmailOptOutToken($token);
+		$this->em->flush();
+		return $token;
+	}
+
+	public function generateToken($length = 128, $method = 'trimbase64') {
+		if ($method = 'trimbase64') {
+			$token = rtrim(strtr(base64_encode(random_bytes($length)), '+/', '-_'), '=');
+		}
+		return $token;
 	}
 
 	// FIXME: this is duplicate code from Geography.php but I can't inject the geography service because it would create a circular injection (as it depends on appstate)

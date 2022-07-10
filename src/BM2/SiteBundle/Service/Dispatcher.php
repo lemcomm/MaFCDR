@@ -2293,6 +2293,9 @@ class Dispatcher {
 		if ($check = $this->placeActionsGenericTests() !== true) {
 			return array("name"=>"place.new.name", "description"=>'unavailable.'.$check);
 		}
+		if ($character->getUser()->getLimits() === null) {
+			return array("name"=>"place.new.name", "description"=>"unavailable.nolimitscreated");
+		}
 		if ($character->getUser()->getFreePlaces() < 1) {
 			return array("name"=>"place.new.name", "description"=>"unavailable.nofreeplaces");
 		}
@@ -4049,6 +4052,18 @@ class Dispatcher {
 	public function journalWriteTest() {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
+		}
+
+		return array("name"=>"journal.write", "url"=>"maf_journal_write", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+	}
+
+	public function journalWriteBattleTest($ignored, BattleReport $report) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
+		}
+
+		if (!$report->checkForObserver($this->getCharacter())) {
+			return array("name"=>"journal.write.name", "description"=>"error.noaccess.battlereport");
 		}
 
 		return array("name"=>"journal.write", "url"=>"maf_journal_write", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");

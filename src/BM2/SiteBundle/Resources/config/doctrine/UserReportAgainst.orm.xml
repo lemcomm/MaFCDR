@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\UserReportAgainst">
+		<id name="id" type="bigint">
+			<generator strategy="AUTO"/>
+		</id>
+		<field name="date" type="datetime"/>
+		<many-to-one field="added_by" target-entity="User"/>
+		<many-to-one field="user" target-entity="User" inversed-by="reports_against"/>
+		<many-to-one field="report" target-entity="UserReport" inversed-by="against"/>
+	</entity>
+</doctrine-mapping>
