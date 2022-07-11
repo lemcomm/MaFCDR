@@ -274,7 +274,7 @@ class CharacterController extends Controller {
 		$now = new \DateTime('now');
 		$user = $character->getUser();
 		$em = $this->getDoctrine()->getManager();
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, true);
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -382,7 +382,7 @@ class CharacterController extends Controller {
 		}
 		$user = $character->getUser();
 		$em = $this->getDoctrine()->getManager();
-		$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+		$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, true);
 		$em->flush();
 		if (!$canSpawn) {
 			$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -428,7 +428,7 @@ class CharacterController extends Controller {
 		$supConv = null;
 		if (!$character->getLocation()) {
 			$user = $character->getUser();
-			$canSpawn = $this->get('bm2.user_manager')->checkIfUserCanSpawnCharacters($user, true);
+			$canSpawn = $this->get('user_manager')->checkIfUserCanSpawnCharacters($user, true);
 			$em->flush();
 			if (!$canSpawn) {
 				$this->addFlash('error', $this->get('translator')->trans('newcharacter.overspawn', array('%date%'=>$user->getNextSpawnTime()->format('Y-m-d H:i:s')), 'messages'));
@@ -511,7 +511,7 @@ class CharacterController extends Controller {
 				$this->get('history')->visitLog($settlement, $character);
 			}
 			$em->flush();
-			$this->get('bm2.user_manager')->calculateCharacterSpawnLimit($user, true); #This can return the date but we don't need it.
+			$this->get('user_manager')->calculateCharacterSpawnLimit($user, true); #This can return the date but we don't need it.
 			$em->flush();
 		} else {
 			$place = $spawn->getPlace();
