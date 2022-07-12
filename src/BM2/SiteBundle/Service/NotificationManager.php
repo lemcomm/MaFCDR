@@ -89,12 +89,14 @@ class NotificationManager {
 		$text = $this->msgtrans->eventTranslate($event, true);
 		$msg = $this->name.' ('.$this->type.') -- '.$text;
 
-		foreach ($users as $user) {
-			if (!$user || !$user->getNotifications()) {
-				return false; # No user to notify or user has disabled notifications.
+		if ($users) {
+			foreach ($users as $user) {
+				if (!$user || !$user->getNotifications()) {
+					return false; # No user to notify or user has disabled notifications.
+				}
+				#TODO: Expand this if we ever use other notification types. Like push notifications, or something to an app, etc.
+				$this->mailman->spoolEvent($event, $user, $msg);
 			}
-			#TODO: Expand this if we ever use other notification types. Like push notifications, or something to an app, etc.
-			$this->mailman->spoolEvent($event, $user, $msg);
 		}
 	}
 
