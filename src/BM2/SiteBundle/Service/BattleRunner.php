@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleGroup;
 use BM2\SiteBundle\Entity\BattleParticipant;
@@ -10,9 +12,9 @@ use BM2\SiteBundle\Entity\BattleReportGroup;
 use BM2\SiteBundle\Entity\BattleReportStage;
 use BM2\SiteBundle\Entity\BattleReportCharacter;
 use BM2\SiteBundle\Entity\BattleReportObserver;
+use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Soldier;
-use BM2\SiteBundle\Entity\Character;
-use BM2\SiteBundle\Entity\Action;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
@@ -580,7 +582,7 @@ class BattleRunner {
 			}
 		}
 		$dist = $this->geo->calculateInteractionDistance($someone);
-		$nearby = $this->geto->findCharactersNearMe($someone, $dist, false, false, false, true, false);
+		$nearby = $this->geo->findCharactersNearMe($someone, $dist, false, false, false, true, false);
 		foreach ($nearby as $each) {
 			$char = $each['character'];
 			if (!$added->contains($char)) {
