@@ -9,6 +9,7 @@ use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\BattleReportGroup;
 use BM2\SiteBundle\Entity\BattleReportStage;
 use BM2\SiteBundle\Entity\BattleReportCharacter;
+use BM2\SiteBundle\Entity\BattleReportObserver;
 use BM2\SiteBundle\Entity\Soldier;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Action;
