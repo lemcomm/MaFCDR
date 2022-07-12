@@ -30,9 +30,10 @@
         "creof/doctrine2-spatial": "dev-master",
         "knplabs/knp-markdown-bundle": "1.4.*@dev",
         "codeception/codeception": "*",
-        "paypal/merchant-sdk-php":"*",
         "kagurati/patreon": "^1.1.0",
-        "google/recaptcha": "^1.2"
+        "google/recaptcha": "^1.2",
+        "stripe/stripe-php": "^7.128",
+        "paypal/rest-api-sdk-php": "^1.14"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
