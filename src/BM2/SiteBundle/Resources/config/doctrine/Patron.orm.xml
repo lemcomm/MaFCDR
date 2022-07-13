@@ -11,6 +11,7 @@
 		<field name="current_amount" type="integer" nullable="true"/>
 		<field name="credited" type="integer" nullable="true"/>
 		<field name="status" type="string" nullable="true"/>
+		<field name="update_needed" type="boolean" nullable="true"/>
 
 		<many-to-one field="creator" target-entity="Patreon" inversed-by="patrons"/>
 		<many-to-one field="user" target-entity="User" inversed-by="patronizing"/>
