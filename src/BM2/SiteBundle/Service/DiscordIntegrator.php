@@ -15,14 +15,16 @@ class DiscordIntegrator {
 	protected $generalHook;
 	protected $olympusHook;
 	protected $paymentsHook;
+	protected $errorsHook;
 
-	public function __construct(EntityManager $em, $translator, AppState $appstate, $discord_webhook_general, $discord_webhook_olympus, $paymentsHook) {
+	public function __construct(EntityManager $em, $translator, AppState $appstate, $discord_webhook_general, $discord_webhook_olympus, $paymentsHook, $errorsHook) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->trans = $translator;
 		$this->generalHook = $discord_webhook_general;
 		$this->olympusHook = $discord_webhook_olympus;
 		$this->paymentsHook = $paymentsHook;
+		$this->errorsHook = $errorsHook;
 	}
 
 	private function curlToDiscord($json, $webhook) {
@@ -49,6 +51,12 @@ class DiscordIntegrator {
 	public function pushToPayments($text) {
 		if ($this->paymentsHook) {
 			$this->curlToDiscord(json_encode(['content' => $text]), $this->paymentsHook);
+		}
+	}
+
+	public function pushToErrors($text) {
+		if ($this->errorsHook) {
+			$this->curlToDiscord(json_encode(['content' => $text]), $this->errorsHook);
 		}
 	}
 
