@@ -2308,6 +2308,7 @@ class Dispatcher {
 			if (!$this->geography->checkPlacePlacement($character)) {
 				return array("name"=>"place.new.name", "description"=>"unavailable.toocrowded");
 			}
+			$occupied = null;
 		} elseif ($settlement->getOccupier() || $settlement->getOccupant()) {
 			$occupied = true;
 		} else {
