@@ -337,7 +337,7 @@ class PaymentManager {
 			$api->setConfig([
 				'mode' => 'live',
 				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
 				'log.LogLevel' => 'INFO',
 				'cache.enabled' => false,
 			]);
@@ -345,7 +345,7 @@ class PaymentManager {
 			$api->setConfig([
 				'mode' => 'sandbox',
 				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
 				'log.LogLevel' => 'DEBUG',
 				'cache.enabled' => false,
 			]);
