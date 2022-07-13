@@ -279,10 +279,15 @@ class PaymentController extends Controller {
 
 		$now = new \DateTime('now');
 		$amount = 0;
+		$wait = false;
+		if ($patreons->count() > 1) {
+			$wait = true;
+		}
 
 		foreach ($patreons as $patron) {
 			if ($patron->getExpires() < $now) {
 				$pm->refreshPatreonTokens($patron);
+				usleep(100000); #Wait a tenth a second, then continue, to avoid overloading the API.
 			}
 			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
 			# NOTE: Expand this later for other creators if we have any.
@@ -325,6 +330,11 @@ class PaymentController extends Controller {
 			$patron->setRefreshToken($tokens['refresh_token']);
 			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
 			list($status, $entitlement) = $pm->refreshPatreonPledge($patron);
+			if ($status === false) {
+				#This only returns false if the API spits garbage at us.
+				$this->addFlash('error', $this->get('translator')->trans('account.patreonapifailure'));
+				return $this->redirectToRoute('bm2_account');
+			}
 			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('account.patronizing', ['%entitlement%'=>$entitlement/100]));
 			return $this->redirectToRoute('bm2_account');

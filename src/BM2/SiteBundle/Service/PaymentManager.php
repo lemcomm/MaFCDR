@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Code;
 use BM2\SiteBundle\Entity\CreditHistory;
 use BM2\SiteBundle\Entity\User;
 use BM2\SiteBundle\Entity\UserPayment;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Patreon\API as PAPI;
@@ -125,16 +126,38 @@ class PaymentManager {
 		$this->logger->info("Refreshing patreon pledges for users with connected accounts.");
 		$uCount = 0;
 		$pledges = 0;
+		$break = false;
 		$patronquery = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
+		$users = new ArrayCollection();
+		$now = new \DateTime("now");
 		foreach ($patronquery->getResult() as $user) {
-			foreach ($user->getPatronizing() as $patron) {
-				if ($patron->getExpires() < $now) {
-					$this->refreshPatreonTokens($patron);
+			if (!$users->contains($user)) {
+				$patronizing = new ArrayCollection();
+				foreach ($user->getPatronizing() as $patron) {
+					if (!$patronizing->contains($patron)) {
+						$status = null;
+						$entitlement = null;
+						if ($patron->getExpires() < $now) {
+							$this->refreshPatreonTokens($patron);
+							usleep(100000); #Wait a tenth a second, then continue, to avoid overloading the API.
+						}
+						list($status, $entitlement) = $this->refreshPatreonPledge($patron);
+						if ($status === false) {
+							# API failure. Only wayt staus would be false.
+							$this->logger->info("Patreon API failed to return expected format. Expected JSON, got: ".$entitlement);
+							$break = true;
+							break;
+						}
+						$patronizing->add($patron);
+						$pledges++;
+					}
 				}
-				$this->refreshPatreonPledge($patron);
-				$pledges++;
+				if ($break) {
+					break;
+				}
+				$users->add($user);
+				$uCount++;
 			}
-			$uCount++;
 		}
 		$this->em->flush();
 		$this->logger->info("Refreshed ".$pledges." pledges for ".$uCount." users.");
@@ -248,10 +271,26 @@ class PaymentManager {
 
 	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
 		$papi = new PAPI($patron->getAccessToken());
-		$member = $papi->fetch_user($args);
+		$check = false;
+		$counter = 0;
+		while (!$check) {
+			$member = $papi->fetch_user($args);
+			$check = $this->checkPatreonFetch($member);
+			usleep(100000);
+			/*
+			Wait a tenth a second, then continue, to avoid overloading the API.
+			I realize that unless we're doing more than one there's no point, but the user isn't going to notice the difference here.
+			*/
+			$counter++;
+			if ($counter == 4 && !$check) {
+				#API might be down. Abort.
+				return [false, $member];
+			}
+		}
 		if (!$patron->getPatreonId()) {
 			$patron->setPatreonId($member['data']['id']);
 		}
+		#echo "<pre>".print_r($member,true)."</pre>";
 		$status = $member['included'][0]['attributes']['patron_status'];
 		$patron->setStatus($status);
 		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
@@ -268,6 +307,23 @@ class PaymentManager {
 			$patron->setCredited($lifetime); #We do track it in cents though.
 		}
 		return [$status, $entitlement];
+	}
+
+	public function checkPatreonFetch($member) {
+		# Validate that results are waht we expect them to be.
+		if (!is_int($member['data']['id'])) {
+			return false; #This shoudl ALWAYS return an integer.
+		}
+		if (!in_array($member['included'][0]['attributes']['patron_status'], ['active_patron', 'declined_patron', 'former_patron'])) {
+			return false; #This should always be active_patron, declined_patron, or former_patron.
+		}
+		if (!is_int($member['included'][0]['attributes']['currently_entitled_amount_cents'])) {
+			return false; #This should always be a cents count expressed as a full number, an int.
+		}
+		if (!is_int($member['included'][0]['attributes']['lifetime_support_cents'])) {
+			return false;
+		}
+		return true;
 	}
 
 	public function getPayPalAPIContext() {
@@ -297,22 +353,6 @@ class PaymentManager {
 
 		return $api;
 	}
-
-	/*
-	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
-		$papi = new PAPI($patron->getAccessToken());
-		$member = $papi->fetch_user($args);
-		if (!$patron->getPatreonId()) {
-			$patron->setPatreonId($member['data']['id']);
-		}
-		echo "<pre>".print_r($member,true)."</pre>";
-		$status = $member['included'][0]['attributes']['patron_status'];
-		$patron->setStatus($status);
-		$entitlement = $member['included'][0]['attributes']['currently_entitled_amount_cents'];
-		$patron->setCurrentAmount($entitlement);
-		return [$status, $entitlement];
-	}
-	*/
 
 	private function ChangeNotification(User $user, $subject, $text) {
 		$subject = $this->translator->trans("account.payment.mail.".$subject, array());
