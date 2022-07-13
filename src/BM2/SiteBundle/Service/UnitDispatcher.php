@@ -229,9 +229,6 @@ class UnitDispatcher extends Dispatcher {
 		if ($character->isInBattle()) {
 			return array("name"=>"unit.return.all", "description"=>"unavailable.inbattle2");
 		}
-		if (!$this->pm->checkSettlementPermission($unit->getSettlement(), $character, 'units')) {
-			return array("name"=>"unit.return.name", "description"=>"unavailable.notyourunit");
-		}
 		return $this->action("unit.return.name", "maf_unit_return");
 	}
 
