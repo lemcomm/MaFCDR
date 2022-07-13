@@ -28,6 +28,7 @@ class PaymentManager {
 	private $paypalSecret;
 	private $rootDir;
 	private $env;
+	private $patreonAlikes = ['patreon'];
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
@@ -135,6 +136,9 @@ class PaymentManager {
 			if (!$users->contains($user)) {
 				$userpatron = new ArrayCollection();
 				foreach ($user->getPatronizing() as $patron) {
+					if ($patron->getUpdateNeeded()) {
+						$skip = true;
+					}
 					if (!$userpatron->contains($patron)) {
 						$status = null;
 						$entitlement = null;
@@ -145,19 +149,26 @@ class PaymentManager {
 								$this->logger->info($patron->getId());
 								$updated = $this->refreshPatreonTokens($patron);
 							}
-							list($status, $entitlement) = $this->refreshPatreonPledge($patron);
-							if ($status === false) {
-								# API failure. Only wayt staus would be false.
-								$this->logger->info("Patreon API failed to return expected format. Expected JSON, got: ".$entitlement);
-								if (is_array($entitlement)) {
-									$this->logger->info("Array detected: ".implode(" || ", $entitlement));
+							if ($updated) {
+								list($status, $entitlement) = $this->refreshPatreonPledge($patron);
+								if ($status === false) {
+									# API failure. Only wayt staus would be false.
+									$this->logger->info("Patreon API failed to return expected format. Expected JSON, got: ".$entitlement);
+									if (is_array($entitlement)) {
+										$this->logger->info("Array detected: ".implode(" || ", $entitlement));
+									}
+									$this->logger->info("Errored on User ".$user->getUsername()." (".$user->getId().")");
+									$patron->setUpdateNeeded(true);
+
+									$skip = true;
+									continue;
+								} else {
+									$pledges++;
 								}
-								$this->logger->info("Errored on User ".$user->getUsername()." (".$user->getId().")");
-								$skip = true;
-								continue;
+								$userpatron->add($patron);
 							}
-							$userpatron->add($patron);
-							$pledges++;
+						} else {
+							$patron->setUpdateNeeded(true);
 						}
 					}
 				}
@@ -213,8 +224,11 @@ class PaymentManager {
 				}
 				if (!$sufficient) {
 					$this->logger->info("    --Pledge insufficient, reducing subscription...");
-			$this->logger->info($patron->getId());
+					$this->logger->info($patron->getId());
 					# insufficient pledge level
+					if (in_array($user->getAccountLevel(), ['22', '42', '51'])) {
+						$user->setOldAccountLevel($user->getAccountLevel());
+					}
 					$user->setAccountLevel(10);
 					$this->ChangeNotification($user, 'insufficient', 'insufficient2');
 					$expired++;
@@ -273,10 +287,17 @@ class PaymentManager {
 			$creator = $patron->getCreator();
 			$poa = new POA($creator->getClientId(), $creator->getClientSecret());
 			$tokens = $poa->refresh_token($patron->getRefreshToken());
-			$patron->setAccessToken($tokens['access_token']);
-			$patron->setRefreshToken($tokens['refresh_token']);
-			$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
+			if (array_key_exists('access_token')) {
+				$patron->setAccessToken($tokens['access_token']);
+				$patron->setRefreshToken($tokens['refresh_token']);
+				$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
+				return true;
+			} else {
+				$patron->setUpdateNeeded(true);
+				return false;
+			}
 		}
+		return true; # No update needed. Why did you call this?
 	}
 
 	public function refreshPatreonPledge($patron, $args = ['skip_read_from_cache'=>true, 'skip_add_to_cache'=>true]) {
@@ -314,8 +335,21 @@ class PaymentManager {
 				$dif = $lifetime - $patron->getCredited();
 			}
 			$dif = $dif / 100; #Patreon provides in cents. We want full dollars!
-			$this->account($patron->getUser(), 'Patron Credit', 'USD', $dif);
+			$this->account($patron->getUser(), 'Patron Credit', 'USD', $dif, null, 'patreon');
 			$patron->setCredited($lifetime); #We do track it in cents though.
+		}
+		if ($patron->getUpdateNeeded()) {
+			$levels = $this->getPaymentLevels();
+			$patron->setUpdateNeeded(false);
+			$user = $patron->getUser();
+			if (in_array($user->getOldAccountLevel(), ['22','42','51'])) {
+				#check for legacy patreon levels and restore them if they used to have one.
+				# Maybe some day we'll be able to remove this. That'd be nice.
+				if ($levels[$user->getAccountLevel()]['patreon'] <= $entitlement) {
+					$user->setAccountLevel($user->getOldAccountLevel());
+					$user->setOldAccountLevel(null);
+				}
+			}
 		}
 		return [$status, $entitlement];
 	}
@@ -442,7 +476,7 @@ class PaymentManager {
 	}
 
 
-	public function account(User $user, $type, $currency, $amount, $transaction=null) {
+	public function account(User $user, $type, $currency, $amount, $transaction=null, $src='paypal') {
 		$credits = $amount*100; // if this ever changes, make sure to update texts mentioning it (e.g. description3)
 		switch ($currency) {
 			case 'USD':		$credits *= 1.0; break;
@@ -516,29 +550,31 @@ class PaymentManager {
 				$limits->setArtifacts(1);
 			}
 
-			// check if we had a friend code
-			$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Code c WHERE c.used_by = :me AND c.sender IS NOT NULL AND c.sender != :me ORDER BY c.used_on ASC');
-			$query->setParameter('me', $user);
-			$query->setMaxResults(1);
-			$code = $query->getOneOrNullResult();
-			if ($code) {
-				$sender = $code->getSender();
-				$value = round(min($credits, $code->getCredits()) / 2);
+			if (!in_array($src, $this->patreonAlikes)) {
+				// check if we had a friend code
+				$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Code c WHERE c.used_by = :me AND c.sender IS NOT NULL AND c.sender != :me ORDER BY c.used_on ASC');
+				$query->setParameter('me', $user);
+				$query->setMaxResults(1);
+				$code = $query->getOneOrNullResult();
+				if ($code) {
+					$sender = $code->getSender();
+					$value = round(min($credits, $code->getCredits()) / 2);
 
-				$h = new CreditHistory;
-				$h->setTs(new \DateTime("now"));
-				$h->setCredits($value);
-				$h->setUser($sender);
-				$h->setType('friendinvite');
-				$this->em->persist($h);
-				$user->addCreditHistory($h);
+					$h = new CreditHistory;
+					$h->setTs(new \DateTime("now"));
+					$h->setCredits($value);
+					$h->setUser($sender);
+					$h->setType('friendinvite');
+					$this->em->persist($h);
+					$user->addCreditHistory($h);
 
-				$sender->setCredits($sender->getCredits()+$value);
-				$this->usermanager->updateUser($sender, false);
+					$sender->setCredits($sender->getCredits()+$value);
+					$this->usermanager->updateUser($sender, false);
 
-				$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
-				$numSent = $this->mailman->sendEmail($sender->getEmail(), $this->translator->trans('account.invite.mail2.subject'), $text);
-				$this->logger->info('sent friend subscriber email: ('.$numSent.') - '.$text);
+					$text = $this->translator->trans('account.invite.mail2.body', array("%mail%"=>$user->getEmail(), "%credits%"=>$value));
+					$numSent = $this->mailman->sendEmail($sender->getEmail(), $this->translator->trans('account.invite.mail2.subject'), $text);
+					$this->logger->info('sent friend subscriber email: ('.$numSent.') - '.$text);
+				}
 			}
 		}
 
