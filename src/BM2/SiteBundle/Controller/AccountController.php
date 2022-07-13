@@ -324,6 +324,12 @@ class AccountController extends Controller {
 			$em->flush();
 		}
 
+		foreach ($user->getPatronizing() as $patron) {
+			if ($patron->getUpdateNeeded()) {
+				$this->addFlash('warning', 'It appears we need a new access token for your patreon account in order to ensure you get your rewards. To corrected this, please click <a href="https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.$patron->getCreator()->getClientId().'&redirect_uri='.$patron->getCreator()->getReturnUri().'&scope=identity">here</a> and allow us to re-establish our connection to your patreon account.');
+			}
+		}
+
 		return $this->render('Account/characters.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices,
