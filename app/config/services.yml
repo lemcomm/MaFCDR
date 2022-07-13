@@ -19,7 +19,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager', '@politics', '@military_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     character_manager:
@@ -33,7 +33,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history']
     discord_integrator:
         class:      BM2\SiteBundle\Service\DiscordIntegrator
-        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%, %discord_webhook_olympus%, %discord_webhook_payments%]
+        arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%, %discord_webhook_olympus%, %discord_webhook_payments%, %discord_webhook_errors%]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
         arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
@@ -157,7 +157,7 @@ services:
             - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess }
     kernel.listener.bm2_exceptions:
         class:      BM2\SiteBundle\EventListener\ErrorExceptionListener
-        arguments:  ['@templating', '@logger']
+        arguments:  ['@templating', '@logger', '@discord_integrator']
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
             - { name: kernel.event_listener, event: console.exception, method: onConsoleException }

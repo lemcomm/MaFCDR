@@ -258,6 +258,7 @@ class UnitController extends Controller {
                                 }
                                 $canResupply = true;
 				$resupply = $this->get('military_manager')->findAvailableEquipment($settlement, false);
+                                $canReassign = true;
                         }
 
                         # If the unit has a settlement and either they are commanded by someone or not under anyones command (and thus in it).
@@ -286,10 +287,14 @@ class UnitController extends Controller {
                 foreach ($character->getUnits() as $mine) {
                         if (!$mine->getSettlement() || ($mine->getSettlement() && $this->get('permission_manager')->checkSettlementPermission($mine->getSettlement(), $character, 'units'))) {
                                 $units[] = $mine;
+                                if ($mine === $unit) {
+                                        $canReassign = true;
+                                }
                         }
+
                 }
 
-                if ($units) {
+                if (!$canReassign && count($units) > 0 && $units[0] !== $unit && $unit->getMarshal() === $character) {
                         $canReassign = true;
                 }
 
@@ -664,8 +669,8 @@ class UnitController extends Controller {
                                 return $this->render('Unit/recruit.html.twig', $renderArray);
      			}
                         if ($data['number'] > $data['unit']->getAvailable()) {
-                                $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
                                 $data['number'] = $remaining;
+                                $this->addFlash('notice', $this->get('translator')->trans('recruit.troops.unitmax', array('%only%'=> $remaining, '%planned%'=>$data['number']), 'actions'));
                         }
 
      			for ($i=0; $i<$data['number']; $i++) {

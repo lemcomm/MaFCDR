@@ -35,3 +35,4 @@ parameters:
     discord_webhook_general: null
     discord_webhook_olympus: null
     discord_webhook_payments: null
+    discord_webhook_errors: null

@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\EventListener;
 
+use BM2\SiteBundle\Service\DiscordIntegrator;
+
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedException;
@@ -19,10 +21,12 @@ class ErrorExceptionListener {
 
 	protected $templating;
 	protected $logger;
+	protected $discord;
 
-	public function __construct(EngineInterface $templating, LoggerInterface $logger) {
+	public function __construct(EngineInterface $templating, LoggerInterface $logger, DiscordIntegrator $discord) {
 		$this->templating = $templating;
 		$this->logger = $logger;
+		$this->discord = $discord;
 	}
 
 	public function onKernelException(GetResponseForExceptionEvent $event) {
@@ -54,6 +58,11 @@ class ErrorExceptionListener {
 			$exception->getLine(),
 			$command->getName()
 		);
+		try {
+			$this->discord->pushToErrors('Error encountered!'.$message);
+		} catch (Exception $e) {
+			# Nothing.
+		}
 
 		$this->logger->error($message);
 	}

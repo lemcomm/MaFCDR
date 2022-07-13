@@ -126,34 +126,43 @@ class PaymentManager {
 		$this->logger->info("Refreshing patreon pledges for users with connected accounts.");
 		$uCount = 0;
 		$pledges = 0;
-		$break = false;
+		$skip = false;
 		$patronquery = $this->em->createQuery('SELECT u, p FROM BM2SiteBundle:User u JOIN u.patronizing p');
 		$users = new ArrayCollection();
 		$now = new \DateTime("now");
+		$old = new \DateTime("-12 hours");
 		foreach ($patronquery->getResult() as $user) {
 			if (!$users->contains($user)) {
-				$patronizing = new ArrayCollection();
+				$userpatron = new ArrayCollection();
 				foreach ($user->getPatronizing() as $patron) {
-					if (!$patronizing->contains($patron)) {
+					if (!$userpatron->contains($patron)) {
 						$status = null;
 						$entitlement = null;
-						if ($patron->getExpires() < $now) {
-							$this->refreshPatreonTokens($patron);
-							usleep(100000); #Wait a tenth a second, then continue, to avoid overloading the API.
+						$updated = false;
+						$expires = $patron->getExpires();
+						if ($expires > $old) {
+							if ($expires < $now) {
+								$this->logger->info($patron->getId());
+								$updated = $this->refreshPatreonTokens($patron);
+							}
+							list($status, $entitlement) = $this->refreshPatreonPledge($patron);
+							if ($status === false) {
+								# API failure. Only wayt staus would be false.
+								$this->logger->info("Patreon API failed to return expected format. Expected JSON, got: ".$entitlement);
+								if (is_array($entitlement)) {
+									$this->logger->info("Array detected: ".implode(" || ", $entitlement));
+								}
+								$this->logger->info("Errored on User ".$user->getUsername()." (".$user->getId().")");
+								$skip = true;
+								continue;
+							}
+							$userpatron->add($patron);
+							$pledges++;
 						}
-						list($status, $entitlement) = $this->refreshPatreonPledge($patron);
-						if ($status === false) {
-							# API failure. Only wayt staus would be false.
-							$this->logger->info("Patreon API failed to return expected format. Expected JSON, got: ".$entitlement);
-							$break = true;
-							break;
-						}
-						$patronizing->add($patron);
-						$pledges++;
 					}
 				}
-				if ($break) {
-					break;
+				if ($skip) {
+					continue;
 				}
 				$users->add($user);
 				$uCount++;
@@ -186,14 +195,14 @@ class PaymentManager {
 					$expired++;
 				}
 			} elseif ($levels[$user->getAccountLevel()]['patreon'] != false) {
-				#$this->logger->info("    --Patron detected...");
+				$this->logger->info("  --Patron ".$user->getUsername()." (".$user->getId().")...");
 				$patreonLevel = $levels[$user->getAccountLevel()]['patreon'];
 				$sufficient = false;
 				#TODO: We'll need to expand this to support other creators, if we add any.
 				foreach ($user->getPatronizing() as $patron) {
 					$this->logger->info("    --Supporter of creator ".$patron->getCreator()->getCreator()."...");
-					$status = null;
-					$entitlement = null;
+					$status = $patron->getStatus();
+					$entitlement = $patron->getCurrentAmount();
 
 					$this->logger->info("    --Status of '".$status."'; entitlement of ".$entitlement."; versus need of ".$patreonLevel." for sub level ...");
 
@@ -204,6 +213,7 @@ class PaymentManager {
 				}
 				if (!$sufficient) {
 					$this->logger->info("    --Pledge insufficient, reducing subscription...");
+			$this->logger->info($patron->getId());
 					# insufficient pledge level
 					$user->setAccountLevel(10);
 					$this->ChangeNotification($user, 'insufficient', 'insufficient2');
@@ -281,11 +291,12 @@ class PaymentManager {
 			Wait a tenth a second, then continue, to avoid overloading the API.
 			I realize that unless we're doing more than one there's no point, but the user isn't going to notice the difference here.
 			*/
-			$counter++;
-			if ($counter == 4 && !$check) {
+			if ($counter == 1 && !$check) {
 				#API might be down. Abort.
+				#echo "<pre>".print_r($check,true)."</pre>";
 				return [false, $member];
 			}
+			$counter++;
 		}
 		if (!$patron->getPatreonId()) {
 			$patron->setPatreonId($member['data']['id']);
@@ -311,16 +322,17 @@ class PaymentManager {
 
 	public function checkPatreonFetch($member) {
 		# Validate that results are waht we expect them to be.
-		if (!is_int($member['data']['id'])) {
+		if (!is_numeric($member['data']['id'])) {
+			$this->logger->info($member);
 			return false; #This shoudl ALWAYS return an integer.
 		}
 		if (!in_array($member['included'][0]['attributes']['patron_status'], ['active_patron', 'declined_patron', 'former_patron'])) {
 			return false; #This should always be active_patron, declined_patron, or former_patron.
 		}
-		if (!is_int($member['included'][0]['attributes']['currently_entitled_amount_cents'])) {
+		if (!is_numeric($member['included'][0]['attributes']['currently_entitled_amount_cents'])) {
 			return false; #This should always be a cents count expressed as a full number, an int.
 		}
-		if (!is_int($member['included'][0]['attributes']['lifetime_support_cents'])) {
+		if (!is_numeric($member['included'][0]['attributes']['lifetime_support_cents'])) {
 			return false;
 		}
 		return true;
@@ -337,7 +349,7 @@ class PaymentManager {
 			$api->setConfig([
 				'mode' => 'live',
 				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
 				'log.LogLevel' => 'INFO',
 				'cache.enabled' => false,
 			]);
@@ -345,7 +357,7 @@ class PaymentManager {
 			$api->setConfig([
 				'mode' => 'sandbox',
 				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'app/logs/PayPal.log',
+				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
 				'log.LogLevel' => 'DEBUG',
 				'cache.enabled' => false,
 			]);
@@ -458,8 +470,9 @@ class PaymentManager {
 			$bonus = $credits * 0.5;
 		}
 
-		$credits = $credits + $bonus;
 		$credits = ceil($credits); # Not that this should ever be a decimal but...
+		$bonus = ceil($bonus);
+		$credits = $credits + $bonus;
 
 		if ($user->getPayments()->isEmpty()) {
 			$first = true;
@@ -474,7 +487,7 @@ class PaymentManager {
 		$payment->setType($type);
 		$payment->setUser($user);
 		$payment->setCredits($original);
-		$payment->setBonus($bonus);
+		$payment->setBonus(ceil($bonus));
 		$payment->setTransactionCode($transaction);
 		$this->em->persist($payment);
 		$user->addPayment($payment);
@@ -482,7 +495,7 @@ class PaymentManager {
 		$history = new CreditHistory;
 		$history->setTs(new \DateTime("now"));
 		$history->setCredits($original);
-		$history->setBonus($bonus);
+		$history->setBonus(ceil($bonus));
 		$history->setUser($user);
 		$history->setType($type);
 		$history->setPayment($payment);

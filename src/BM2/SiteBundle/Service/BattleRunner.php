@@ -36,6 +36,7 @@ class BattleRunner {
 	private $interactions;
 	private $warman;
 	private $actman;
+	private $politics;
 
 	# Preset values.
 	private $defaultOffset = 135;
@@ -68,7 +69,7 @@ class BattleRunner {
 	private $defenseBonus=0;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman, Politics $politics, MilitaryManager $milman) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
@@ -76,8 +77,10 @@ class BattleRunner {
 		$this->character_manager = $character_manager;
 		$this->npc_manager = $npc_manager;
 		$this->interactions = $interactions;
-		$this->war_manager = $war_manager;
+		$this->warman = $war_manager;
 		$this->actman = $actman;
+		$this->politics = $politics;
+		$this->milman = $milman;
 	}
 
 	public function enableLog($level=9999) {
@@ -354,7 +357,7 @@ class BattleRunner {
 						$char->setProgress(min(1.0, $char->getProgress() + $char->getSpeed() * 0.05));
 					}
 				}
-				$this->war_manager->disbandGroup($group, $this->battlesize);
+				$this->warman->disbandGroup($group, $this->battlesize);
 				# Battlesize is passed so we don't have to call addRegroupAction separately. Sieges don't have a regroup and are handled separately, so it doesn't matter for them.
 			}
 		} else {
