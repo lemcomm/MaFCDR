@@ -26,6 +26,7 @@
 		<one-to-one field="description" target-entity="Description" mapped-by="active_user"/>
 
 		<field name="account_level" type="smallint"/>
+		<field name="old_account_level" type="smallint" nullable="true"/>
 		<field name="vip_status" type="smallint"/>
 		<field name="paid_until" type="date"/>
 		<field name="credits" type="integer"/>
