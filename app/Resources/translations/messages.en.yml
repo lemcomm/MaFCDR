@@ -1288,6 +1288,8 @@ battle:
  title:         Battle Report
  upcoming:      Upcoming Battle
  participants:  participants
+ journal:       "%journal%, by %character%"
+ journals:      "It seems that people have shared stories about this battle. You could read one if you'd like."
  location:
   nowhere:      neverwhere battle
   of:           The battle of %location%
@@ -1851,6 +1853,7 @@ journal:
  write:
   header:      New Journal Entry
   intro:       Your journal is a place for you to write down your thoughts or record events from your view. It can also be used for other things, like as a repository of world information for your character's settings. Best of all, you can share these with others if you want, through the magic of the Lendan Stone network!<br><br>Be advsised that all content shared publicly MUST be safe for viewing for a teenager (13 years of age or older). Light swearing, is fine, but if you want to record your fantasies, make it private and/or graphic. Misuse of or failure to properly mark your journal entries may see all future entries forced to be marked private through GM action.
+  intro2:       Your journal is a place for you to write down your thoughts or record events from your view. It can also be used for other things, like as a repository of world information for your character's settings. Best of all, you can share these with others if you want, through the magic of the Lendan Stone network!<br><br>Be advsised that all content shared publicly MUST be safe for viewing for a teenager (13 years of age or older). Light swearing, is fine, but if you want to record your fantasies, make it private and/or graphic. Misuse of or failure to properly mark your journal entries may see all future entries forced to be marked private through GM action.<br><br>If this journal is public it'll also be visible for anyone looking at this %report%.
   success:     A new entry in your journal has been recorded.
  form:
   topic:
