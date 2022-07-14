@@ -212,8 +212,8 @@ class ActivityManager {
 				}
 			}
 			if ($theory) {
-				$newTheory = $training->getPractice() + $theory;
-				$training->setPractice($newTheory);
+				$newTheory = $training->getTheory() + $theory;
+				$training->getTheory($newTheory);
 				if ($newTheory > $training->getTheoryHigh()) {
 					$training->setTheoryHigh($newTheory);
 				}
