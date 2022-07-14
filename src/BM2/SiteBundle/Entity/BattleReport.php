@@ -17,4 +17,14 @@ class BattleReport {
 		return false;
 	}
 
+	public function countPublicJournals() {
+		$i = 0;
+		foreach ($this->journals as $each) {
+			if ($each->getPublic()) {
+				$i++;
+			}
+		}
+		return $i;
+	}
+
 }
