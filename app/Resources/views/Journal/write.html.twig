@@ -2,7 +2,11 @@
 
 {% block content %}
 	<h2>{{ 'journal.write.header'|trans({}, "messages")|raw }}</h2>
-	<p>{{ 'journal.write.intro'|trans({}, "messages")|raw }}</p>
+	{% if report is defined %}
+		<p>{{ 'journal.write.intro2'|trans({'%report%':link(report)}, "messages")|raw }}</p>
+	{% else %}
+		<p>{{ 'journal.write.intro'|trans({}, "messages")|raw }}</p>
+	{% endif %}
 	<p><div id="insertbox">
 		<input id="realmsearch" placeholder="insert realm" />
 		<input id="guildsearch" placeholder="insert association" />
