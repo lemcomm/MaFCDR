@@ -61,24 +61,6 @@ class JournalController extends Controller {
 	  * @Route("/write/")
 	  */
 
-	private function newJournal(Character $char, $data) {
-		$journal = new Journal;
-		$journal->setCharacter($character);
-		$journal->setDate(new \DateTime('now'));
-		$journal->setCycle($this->get('appstate')->getCycle());
-		$journal->setLanguage('English');
-		$journal->setTopic($data['topic']);
-		$journal->setEntry($data['entry']);
-		$journal->setOoc($data['ooc']);
-		$journal->setPublic($data['public']);
-		$journal->setGraphic($data['graphic']);
-		$journal->setPendingReview(false);
-		$journal->setGMReviewed(false);
-		$journal->setGMPrivate(false);
-		$journal->setGMGraphic(false);
-		return $journal;
-	}
-
 	public function journalWriteAction(Request $request) {
 		$character = $this->get('dispatcher')->gateway('journalWriteTest');
 		if (! $character instanceof Character) {
@@ -103,6 +85,24 @@ class JournalController extends Controller {
 			'form'=>$form->createView()
 		]);
 	}
+
+      private function newJournal(Character $char, $data) {
+	      $journal = new Journal;
+	      $journal->setCharacter($character);
+	      $journal->setDate(new \DateTime('now'));
+	      $journal->setCycle($this->get('appstate')->getCycle());
+	      $journal->setLanguage('English');
+	      $journal->setTopic($data['topic']);
+	      $journal->setEntry($data['entry']);
+	      $journal->setOoc($data['ooc']);
+	      $journal->setPublic($data['public']);
+	      $journal->setGraphic($data['graphic']);
+	      $journal->setPendingReview(false);
+	      $journal->setGMReviewed(false);
+	      $journal->setGMPrivate(false);
+	      $journal->setGMGraphic(false);
+	      return $journal;
+      }
 
 	/**
 	  * @Route("/write/battle/{report}", name="maf_journal_write_battle")
