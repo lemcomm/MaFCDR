@@ -609,10 +609,10 @@ class AccountController extends Controller {
 			$user->setNotifications(false);
 			$this->getDoctrine()->getManager()->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.success', [], "communication"));
-			return $this->redirectToRoute('bm2_index');
+			return $this->redirectToRoute('bm2_homepage');
 		} else {
 			$this->addFlash('notice', $this->get('translator')->trans('mail.optout.failure', [], "communication"));
-			return $this->redirectToRoute('bm2_index');
+			return $this->redirectToRoute('bm2_homepage');
 		}
 	}
 

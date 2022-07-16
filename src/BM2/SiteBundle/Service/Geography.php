@@ -512,7 +512,7 @@ class Geography {
 		if ($character->getInsideSettlement()) {
 			$query = $this->em->createQuery("SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance AND b.siege IS NULL AND b.type = 'urban'");
 		} else {
-			$query = $this->em->createQuery("SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance AND b.siege IS NULL AND b.type <> 'urban'");
+			$query = $this->em->createQuery("SELECT b as battle, ST_Distance(me.location, b.location) AS distance, ST_Azimuth(me.location, b.location) AS direction FROM BM2SiteBundle:Character me, BM2SiteBundle:Battle b WHERE me.id = :me AND ST_Distance(me.location, b.location) < :maxdistance AND b.siege IS NULL AND (b.type <> 'urban' OR b.type IS NULL)");
 		}
 		$query->setParameters(array('me'=>$character, 'maxdistance'=>$maxdistance));
 		return $query->getResult();
