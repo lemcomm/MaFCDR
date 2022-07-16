@@ -455,6 +455,7 @@ class PlaceController extends Controller {
 			$this->get('geography')->calculateInteractionDistance($character),
 			$character
 		));
+		$form->handleRequest($request);
 
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
