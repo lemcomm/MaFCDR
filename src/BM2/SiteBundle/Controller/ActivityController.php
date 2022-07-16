@@ -4,8 +4,10 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\EquipmentType;
 
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\InteractionType;
 
 use BM2\SiteBundle\Service\GameRequestManager;
 use BM2\SiteBundle\Service\History;
@@ -22,20 +24,108 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ActivityController extends Controller {
 
-        /**
-          * @Route("/duel/challenge", name="maf_activity_duel_challenge")
-          */
+	/**
+	  * @Route("/duel/challenge", name="maf_activity_duel_challenge")
+	  */
 
-        public function duelChallengeAction(Request $request) {
-                $character = $this->get('dispatcher')->gateway('activityDuelChallengeTest');
-                if (! $character instanceof Character) {
-                        return $this->redirectToRoute($character);
-                }
-                $em = $this->getDoctrine()->getManager();
+	public function duelChallengeAction(Request $request) {
+		$char = $this->get('dispatcher')->gateway('activityDuelChallengeTest');
+		if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+		}
+		$em = $this->getDoctrine()->getManager();
 
-                return $this->render('Activity/duelChallenge.html.twig', [
-                        'form' => $form,
-                ]);
+                $query = $em->createQuery('SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.skill IS NOT NULL AND e.type = :type');
+                $query->setParameters(['type'=>'weapon']);
+
+		$form = $this->createForm(new ActivitySelectType('duel', $this->get('geography')->calculateInteractionDistance($character), $character, $query->getResult()));
+		$form->handleRequest($request);
+		if ($form->isValid() && $form->isSubmitted()) {
+                        $type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
+                        $data = $form->getData();
+                        $duel = $this->get('activity_manager')->createDuel($char, $data['target'], $data['name'], $data['sameWeapon'], $data['weapon']);
+                        if ($duel instanceof Activity) {
+                                $this->addFlash('notice', $this->get('translator')->trans('duel.challenge.sent', ['%target%'=>$data['target']->getName()], 'activity'));
+                		return $this->redirectToRoute('bm2_actions');
+                        } else {
+                                $this->addFlash('error', $this->get('translator')->trans('duel.challenge.unsent', array(), 'activity'));
+                        }
+		}
+
+		return $this->render('Activity/duelChallenge.html.twig', [
+                      'form' => $form,
+		]);
+	}
+
+	/**
+	  * @Route("/duel/answer", name="maf_activity_duel_answer")
+	  */
+
+	public function duelAnswerAction(Request $request) {
+		$char = $this->get('dispatcher')->gateway('activityDuelAnswerTest');
+		if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+		}
+		$em = $this->getDoctrine()->getManager();
+
+                $query = $em->createQuery('SELECT a, p, b FROM BM2SiteBundle:Acitivity a JOIN a.participants p WHERE p.character = :char AND a.accepted = :acc');
+		$query->setParameters(['char'=>$char, 'acc'=>false]);
+		$duels = $query->getResult();
+
+		return $this->render('Activity/duelAnswer.html.twig', [
+                     'duels'=>$duels
+		]);
+	}
+
+	/**
+	  * @Route("/duel/accept/{act}", name="maf_activity_duel_accept")
+	  */
+
+	public function duelAcceptAction(Activity $act) {
+		$char = $this->get('dispatcher')->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+		}
+		foreach ($act->getParticipants() as $p) {
+			if ($p !== $char) {
+				$them = $p;
+				break;
+			}
+		}
+
+		$act->getBouts()->first()->setAccepted(true); #Duels only have one and the dispatcher has already validated.
+		$em = $this->getDoctrine()->getManager()->flush();
+		$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
+		return $this->redirectToRoute('maf_activity_duel_answer');
+	}
+
+	/**
+	  * @Route("/duel/refuse/{act}", name="maf_activity_duel_refuse")
+	  */
+
+	public function duelRefuseAction(Activity $act) {
+		$char = $this->get('dispatcher')->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		if (! $char instanceof Character) {
+                        return $this->redirectToRoute($char);
+		}
+		foreach ($act->getParticipants() as $p) {
+			if ($p !== $char) {
+				$them = $p;
+				break;
+			}
+		}
+
+		$this->get('activity_manager')->refuseDuel($act); # Delete the activity, basically. ActMan flushes.
+		$this->addFlash('notice', $this->get('translator')->trans('duel.answer.refused', ['%target%'=>$them->getName()]));
+		return $this->redirectToRoute('maf_activity_duel_answer');
+	}
+
+	/**
+	  * @Route("/duel/{report}", name="maf_duel_report", requirements={"report"="\d+"})
+	  */
+
+        public function activityReport(ActivityReport $report) {
+
         }
 
 	/**
@@ -43,8 +133,8 @@ class ActivityController extends Controller {
 	  */
 
 	public function trainSkillAction($skill) {
-                $character = $this->get('activity_dispatcher')->gateway('activityTrainTest', null, null, null, $skill);
-                if (! $character instanceof Character) {
+		$character = $this->get('activity_dispatcher')->gateway('activityTrainTest', null, null, null, $skill);
+		if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
                 if ($character->findActions('train.skill')->count() > 0) {
@@ -67,9 +157,9 @@ class ActivityController extends Controller {
                         $act->setHourly(false);
                         $result = $this->get('action_manager')->queue($act); #Includes a flush.
                         $this->addFlash('notice', $this->get('translator')->trans('train.'.$skill.'.success', array(), 'activity'));
-                } else {
-                        $this->addFlash('notice', $this->get('translator')->trans('train.'.$skill.'.notfound', array(), 'activity'));
-                }
+		} else {
+		$this->addFlash('notice', $this->get('translator')->trans('train.'.$skill.'.notfound', array(), 'activity'));
+		}
 
 		return $this->redirectToRoute('bm2_actions');
 	}
