@@ -373,6 +373,7 @@ class Dispatcher {
 
 	public function siegeActions() {
 		$actions=array();
+		$char = $this->getCharacter();
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.prisoner")));
 		}
@@ -384,14 +385,26 @@ class Dispatcher {
 				array("name"=>"military.all", "description"=>"unavailable.inbattle")
 			));
 		}
-		if ($this->getCharacter()->hasNoSoldiers()) {
-			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+		$settlement = $this->getActionableSettlement();
+		if ($settlement) {
+			$siege = $settlement->getSiege();
+			if (!$siege || !$siege->getCharacters()->contains($character)) {
+				# If we're already in a siege, we can access the menu. Otherwise deny.
+				if ($this->getCharacter()->hasNoSoldiers()) {
+					return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+				}
+			}
+		} else {
+			$siege = false;
+			if ($this->getCharacter()->hasNoSoldiers()) {
+				return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+			}
 		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.restricted")));
 		}
-		if ($settlement = $this->getActionableSettlement()) {
-			if (!$siege = $settlement->getSiege()) {
+		if ($settlement) {
+			if (!$siege) {
 				$actions[] = $this->militarySiegeSettlementTest();
 			} else {
 				$actions[] = $this->militarySiegeLeadershipTest(null, $siege);
