@@ -407,6 +407,7 @@ class Dispatcher {
 			if (!$siege) {
 				$actions[] = $this->militarySiegeSettlementTest();
 			} else {
+				$actions[] = $this->militarySiegeJoinSiegeTest();
 				$actions[] = $this->militarySiegeLeadershipTest(null, $siege);
 				$actions[] = $this->militarySiegeAssumeTest(null, $siege);
 				$actions[] = $this->militarySiegeBuildTest(null, $siege);
