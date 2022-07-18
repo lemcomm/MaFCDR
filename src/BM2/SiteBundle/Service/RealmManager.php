@@ -475,7 +475,7 @@ class RealmManager {
 			}
 		}
 		$this->em->flush();
-		foreach ($realm->getVassals() as $vassl) {
+		foreach ($realm->getVassals() as $vassal) {
 			if ($sovereign) {
 				$this->history->logEvent(
 					$vassal,

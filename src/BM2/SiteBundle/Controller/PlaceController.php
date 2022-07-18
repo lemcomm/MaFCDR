@@ -455,6 +455,7 @@ class PlaceController extends Controller {
 			$this->get('geography')->calculateInteractionDistance($character),
 			$character
 		));
+		$form->handleRequest($request);
 
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
@@ -467,12 +468,14 @@ class PlaceController extends Controller {
 					array('%link-character%'=>$data['target']->getId()),
 					History::MEDIUM, true, 20
 				);
-				$this->get('history')->logEvent(
-					$data['target'],
-					'event.character.recvdplace',
-					array('%link-settlement%'=>$settlement->getId()),
-					History::MEDIUM, true, 20
-				);
+				if ($place->getSettlement()) {
+					$this->get('history')->logEvent(
+						$data['target'],
+						'event.character.recvdplace',
+						array('%link-settlement%'=>$place->getSettlement()->getId()),
+						History::MEDIUM, true, 20
+					);
+				}
 				foreach ($place->getVassals() as $vassal) {
 					$vassal->setOathCurrent(false);
 					$this->history->logEvent(
