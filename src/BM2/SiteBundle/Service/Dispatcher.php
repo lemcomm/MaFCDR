@@ -374,12 +374,12 @@ class Dispatcher {
 	public function siegeActions() {
 		$actions=array();
 		$char = $this->getCharacter();
-		if ($this->getCharacter()->isPrisoner()) {
-			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.prisoner")));
+		if ($char->isPrisoner()) {
+			return array("name"=>"military.siege.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.prisoner")));
 		}
 
-		if ($this->getCharacter()->isInBattle()) {
-			return array("name"=>"military.name", "elements"=>array(
+		if ($char->isInBattle()) {
+			return array("name"=>"military.siege.name", "elements"=>array(
 				$this->militaryDisengageTest(true),
 				$this->militaryEvadeTest(true),
 				array("name"=>"military.all", "description"=>"unavailable.inbattle")
@@ -388,20 +388,20 @@ class Dispatcher {
 		$settlement = $this->getActionableSettlement();
 		if ($settlement) {
 			$siege = $settlement->getSiege();
-			if (!$siege || !$siege->getCharacters()->contains($character)) {
+			if (!$siege || !$siege->getCharacters()->contains($char)) {
 				# If we're already in a siege, we can access the menu. Otherwise deny.
 				if ($this->getCharacter()->hasNoSoldiers()) {
-					return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+					return array("name"=>"military.siege.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
 				}
 			}
 		} else {
 			$siege = false;
-			if ($this->getCharacter()->hasNoSoldiers()) {
-				return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
+			if ($char->hasNoSoldiers()) {
+				return array("name"=>"military.siege.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.nosoldiers")));
 			}
 		}
-		if ($this->getCharacter()->getUser()->getRestricted()) {
-			return array("name"=>"military.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.restricted")));
+		if ($char->getUser()->getRestricted()) {
+			return array("name"=>"military.siege.name", "elements"=>array(array("name"=>"military.all", "description"=>"unavailable.restricted")));
 		}
 		if ($settlement) {
 			if (!$siege) {
