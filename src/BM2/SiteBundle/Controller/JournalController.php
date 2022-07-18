@@ -88,7 +88,7 @@ class JournalController extends Controller {
 
       private function newJournal(Character $char, $data) {
 	      $journal = new Journal;
-	      $journal->setCharacter($character);
+	      $journal->setCharacter($char);
 	      $journal->setDate(new \DateTime('now'));
 	      $journal->setCycle($this->get('appstate')->getCycle());
 	      $journal->setLanguage('English');
