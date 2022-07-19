@@ -28,20 +28,31 @@
 	-
 	{{ report.cycle|gametime('long') }}
 </p>
-<p>
-{% if report.defensebuildings is not empty %}
-	<ul class="shortlist">
-		{# FIXME: Quick hack to get this into one line #}
-		<li>{{ 'battle.defenses'|trans }}</li>
-		{% for building in report.defensebuildings %}
-			<li>{{ link(building) }}</li>
-		{% endfor %}
-	</ul>
-	<br />
+{% if report.countPublicJournals > 0 %}
+<p>{{ 'battle.journals'|trans}}</p>
+<ul>
+	{% for journal in report.journals %}
+		{% if journal.public %}
+			<li>{{ 'battle.journal'|trans({'%journal%':link(journal), '%character%':link(journal.character)})|raw }}</li>
+		{% endif %}
+	{% endfor %}
+</ul>
 {% endif %}
-</p>
-<p>
-<table class="battlereport" >
+{% if access %}
+	<p>
+	{% if report.defensebuildings is not empty %}
+		<ul class="shortlist">
+			{# FIXME: Quick hack to get this into one line #}
+			<li>{{ 'battle.defenses'|trans }}</li>
+			{% for building in report.defensebuildings %}
+				<li>{{ link(building) }}</li>
+			{% endfor %}
+		</ul>
+		<br />
+	{% endif %}
+	</p>
+	<p>
+	<table class="battlereport" >
 	{% if version == 1 %}
 		<tr><td></td>
 			<th colspan="{{ start|length }}"><h3>{{ 'battle.participants'|trans|title }}</h3></th>
@@ -266,9 +277,9 @@
 		{% endfor %}
 		</tr>
 	{% endif %}
-
-</table>
-</p>
+	</table>
+	</p>
+{% endif %}
 
 <p>
 {% if is_granted('ROLE_ADMIN') %}

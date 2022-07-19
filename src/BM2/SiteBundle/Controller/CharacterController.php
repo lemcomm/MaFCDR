@@ -1483,10 +1483,18 @@ class CharacterController extends Controller {
 					$query->setParameters(array('br'=>$report, 'me'=>$character));
 					$check = $query->getOneOrNullResult();
 					if (!$check) {
-						throw $this->createNotFoundException('error.noaccess.battlereport');
+						$check = false;
+					} else {
+						$check = true; # standardize variable.
 					}
+				} else {
+					$check = true; # standardize variable.
 				}
+			} else {
+				$check = true;
 			}
+		} else {
+			$check = true;
 		}
 
 		if ($loc = $report->getLocationName()) {
@@ -1530,7 +1538,7 @@ class CharacterController extends Controller {
 			}
 
 			return $this->render('Character/viewBattleReport.html.twig', [
-				'version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location
+				'version'=>1, 'start'=>$start, 'survivors'=>$survivors, 'nobles'=>$nobles, 'report'=>$report, 'location'=>$location, 'access'=>$check
 			]);
 		} else {
 			$count = $report->getGroups()->count(); # These return in a specific order, low to high, ID ascending.
@@ -1540,7 +1548,7 @@ class CharacterController extends Controller {
 			}
 
 			return $this->render('Character/viewBattleReport.html.twig', [
-				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds
+				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds, 'access'=>$check
 			]);
 		}
 	}
