@@ -35,7 +35,8 @@ class ActivityManager {
 
         public function verify(ActivityType $act, Character $char) {
 		$valid = True;
-		if ($reqs = $act->getRequires()) {
+		$reqs = $act->getRequires();
+		if (!$reqs->isEmpty()) {
 			# ActivityRequirements will always have ither places or buildings or both, if the activity has requirements.
 			# Buildings require all to be present, so we set $hasBldgs to True, while Place only requires any to be owned, so we default to false.
 			$hasBldgs = True;
@@ -65,7 +66,7 @@ class ActivityManager {
 		return $valid;
 	}
 
-        public function create(ActivityType $type, ActivitySubType $subType=null, Character $char) {
+        public function create(ActivityType $type, ActivitySubType $subType=null, Character $char, Activity $mainAct = null) {
 		if (!$type->getEnabled()) {
 			return False;
 		}
@@ -85,17 +86,15 @@ class ActivityManager {
 				$act->setLocation($char->getLocation());
 				$act->setGeoData($this->geo->findMyRegion($char));
 			}
+			$act->setMainEvent($mainAct);
 			$act->setCreated($now);
-			$act->setStart($now);
-			$act->setFinish($now);
-			$this->em->flush();
 			return $act;
 		} else {
 			return False;
 		}
         }
 
-	public function createBout(Activity $act, ActivityType $type, $round=null) {
+	public function createBout(Activity $act, ActivityType $type, $same=true, $accepted = true, $round=null) {
 		$bout = new ActivityBout();
 		$this->em->persist($bout);
 		$bout->setActivity($act);
@@ -110,6 +109,7 @@ class ActivityManager {
 		$part->setActivity($act);
 		$part->setCharacter($char);
 		$part->setStyle($style);
+		$part->setWeapon($weapon);
 		return $part;
 	}
 
@@ -144,27 +144,42 @@ class ActivityManager {
 	ACTIVITY CREATE FUNCTIONS
 	*/
 
-	public function createDuel(ActivtyType $type, ActivitySubType $subType, Character $me, Character $them, Style $meStyle = null, Style $themStyle = null) {
-		if ($type->getName() == 'duel') {
-			if ($act = $this->create($type, $subType, $char)) {
+	public function createDuel(Character $me, Character $them, $name=null, $same, EquipmentType $weapon, Style $meStyle = null, Style $themStyle = null) {
+		$type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
+		if ($act = $this->create($type, null, $char)) {
+			if (!$name) {
 				$act->setName('Duel between '.$char->getName().' and '.$recip->getName());
-
-				$bout = $this->createBout($act, $subType);
-
-				$mePart = $this->createParticipant($act, $me, $meStyle);
-				$themPart = $this->createParticipant($act, $them, $themStyle);
-
-				$meBP = $this->createBoutParticipant($bout, $mePart);
-				$themBP = $this->createBoutParticipant($bout, $themPart);
-
-				$this->em->flush();
-				return $act;
 			} else {
-				return 'Verification check failed.';
+				$act->setName($name);
 			}
+			$act->setSame($same);
+			$act->setWeapon($weapon);
+
+			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon);
+			$themPart = $this->createParticipant($act, $them, $themStyle);
+
+			$this->em->flush();
+			return $act;
 		} else {
-			return 'Bad $type matchup.';
+			return 'Verification check failed.';
 		}
+	}
+
+	/*
+	ACTIVITY DELETE FUNCTIONS
+	*/
+
+	public function refuseDuel($act) {
+		if ($act->getType->getName() === 'duel') {
+			foreach ($act->getParticipants() as $p) {
+				$this->em->remove($p);
+			}
+			$this->em->remove($act->getBouts()->first());
+			$this->em->remove($act);
+			$this->em->flush();
+			return true;
+		}
+		return false;
 	}
 
 	/*
