@@ -10,6 +10,7 @@
                 <one-to-many field="bout_participation" target-entity="ActivityBoutParticipant" mapped-by="participant"/>
                 <many-to-one field="character" target-entity="Character" inversed-by="activity_participation"/>
 		<many-to-one field="style" target-entity="Style"/>
+		<many-to-one field="weapon" target-entity="EquipmentType"/>
 		<many-to-one field="group" target-entity="ActivityGroup" inversed-by="participants"/>
 	</entity>
 </doctrine-mapping>
