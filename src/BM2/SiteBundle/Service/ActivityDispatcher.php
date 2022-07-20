@@ -14,6 +14,13 @@ class ActivityDispatcher extends Dispatcher {
 
 	/* ========== Activity Dispatchers ========== */
 
+	public function activityDuelChallengeTest() {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"activity.train.name", "description"=>"unavailable.$check");
+		}
+		return $this->action("activity.duel.challenge", "maf_activity_duel_challenge");
+	}
+
 	public function activityTrainTest($ignored, $type) {
 		switch ($type) {
 			case 'shortbow':
