@@ -6,6 +6,7 @@ use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EquipmentType;
 
+use BM2\SiteBundle\Form\ActivitySelectType;
 use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\InteractionType;
 
@@ -24,12 +25,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ActivityController extends Controller {
 
+	private function gateway($test, $secondary = null) {
+		return $this->get('activity_dispatcher')->gateway($test, null, true, false, $secondary);
+	}
+
 	/**
 	  * @Route("/duel/challenge", name="maf_activity_duel_challenge")
 	  */
 
 	public function duelChallengeAction(Request $request) {
-		$char = $this->get('dispatcher')->gateway('activityDuelChallengeTest');
+		$char = $this->gateway('activityDuelChallengeTest');
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
@@ -38,7 +43,7 @@ class ActivityController extends Controller {
                 $query = $em->createQuery('SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.skill IS NOT NULL AND e.type = :type');
                 $query->setParameters(['type'=>'weapon']);
 
-		$form = $this->createForm(new ActivitySelectType('duel', $this->get('geography')->calculateInteractionDistance($character), $character, $query->getResult()));
+		$form = $this->createForm(new ActivitySelectType('duel', $this->get('geography')->calculateInteractionDistance($char), $char, $query->getResult()));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
                         $type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
@@ -53,7 +58,7 @@ class ActivityController extends Controller {
 		}
 
 		return $this->render('Activity/duelChallenge.html.twig', [
-                      'form' => $form,
+                      'form' => $form->createView(),
 		]);
 	}
 
@@ -62,7 +67,7 @@ class ActivityController extends Controller {
 	  */
 
 	public function duelAnswerAction(Request $request) {
-		$char = $this->get('dispatcher')->gateway('activityDuelAnswerTest');
+		$char = $this->gateway('activityDuelAnswerTest');
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
@@ -82,14 +87,14 @@ class ActivityController extends Controller {
 	  */
 
 	public function duelAcceptAction(Activity $act) {
-		$char = $this->get('dispatcher')->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		$char = $this->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
 		foreach ($act->getParticipants() as $p) {
 			if ($p !== $char) {
 				$them = $p;
-				break;
+				break; #For duels this is either us first or us second, so this can save us a worthless loop pass.
 			}
 		}
 
@@ -104,7 +109,7 @@ class ActivityController extends Controller {
 	  */
 
 	public function duelRefuseAction(Activity $act) {
-		$char = $this->get('dispatcher')->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		$char = $this->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
@@ -133,7 +138,7 @@ class ActivityController extends Controller {
 	  */
 
 	public function trainSkillAction($skill) {
-		$character = $this->get('activity_dispatcher')->gateway('activityTrainTest', null, null, null, $skill);
+		$character = $this->gateway('activityTrainTest', null, null, null, $skill);
 		if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
