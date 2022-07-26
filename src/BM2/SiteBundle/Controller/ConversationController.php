@@ -795,7 +795,7 @@ class ConversationController extends Controller {
 				if ($perm->getOwner()) {
 					$wasOwner = true;
 				}
-				if ($perm->getActive() && $perms->count() > 1) {
+				if ($perm->getActive()) {
 					$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
 				}
 				$em->remove($perm);
