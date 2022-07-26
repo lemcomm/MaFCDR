@@ -1507,15 +1507,16 @@ class Dispatcher {
 	public function militarySiegeSettlementTest() {
 		# Grants you access to the page in which you can start a siege.
 		$settlement = $this->getActionableSettlement();
-		if ($this->getCharacter()->isPrisoner()) {
+		$char = $this->getCharacter();
+		if ($char->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
 		}
-		if ($this->getCharacter()->isDoingAction('military.siege')) {
+		if ($char->isDoingAction('military.siege')) {
 			# Already doing.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->getInsideSettlement()) {
+		if ($char->getInsideSettlement()) {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inside");
 		}
@@ -1523,27 +1524,27 @@ class Dispatcher {
 			# Can't attack nothing or empty places.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosiegable");
 		}
-		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+		if ($char->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
 		}
-		if ($this->getCharacter()->isDoingAction('military.evade')) {
+		if ($char->isDoingAction('military.evade')) {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->hasNoSoldiers()) {
+		if ($char->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if ($settlement->getOwner() == $this->getCharacter() || $settlement->getOccupant() == $this->getCharacter()) {
+		if (($settlement->getOccupant() && $settlement->getOccupant() === $char) || (!$settlement->getOccupant() && $settlement->getOwner() === $char)) {
 			# No need to siege your own settlement.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
-		if ($this->getCharacter()->isInBattle()) {
+		if ($char->isInBattle()) {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");
 		}
-		if ($this->getCharacter()->DaysInGame()<2) {
+		if ($char->DaysInGame()<2) {
 			# Too new.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.fresh");
 		}
@@ -1552,15 +1553,16 @@ class Dispatcher {
 
 	public function militarySiegePlaceTest($ignored, $place) {
 		# Grants you access to the page in which you can start a siege.
-		if ($this->getCharacter()->isPrisoner()) {
+		$char = $this->getCharacter();
+		if ($char->isPrisoner()) {
 			# Prisoners can't attack.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.prisoner");
 		}
-		if ($this->getCharacter()->isDoingAction('military.siege')) {
+		if ($char->isDoingAction('military.siege')) {
 			# Already doing.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.already");
 		}
-		if ($this->getCharacter()->getInsidePlace()) {
+		if ($char->getInsidePlace()) {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.insideplace");
 		}
@@ -1568,27 +1570,27 @@ class Dispatcher {
 			# Can't attack nothing or empty places.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.notdefended");
 		}
-		if ($this->getCharacter()->isDoingAction('military.regroup')) {
+		if ($char->isDoingAction('military.regroup')) {
 			# Busy regrouping.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.regrouping");
 		}
-		if ($this->getCharacter()->isDoingAction('military.evade')) {
+		if ($char->isDoingAction('military.evade')) {
 			# Busy avoiding battle.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.evading");
 		}
-		if ($this->getCharacter()->hasNoSoldiers()) {
+		if ($char->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.nosoldiers");
 		}
-		if ($place->getOwner() == $this->getCharacter() || $place->getOccupant() == $this->getCharacter()) {
+		if (($place->getOccupant() && $place->getOccupant() === $char) || (!$place->getOccupant() && $place->getOwner() === $char)) {
 			# No need to siege your own settlement.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.location.yours");
 		}
-		if ($this->getCharacter()->isInBattle()) {
+		if ($char->isInBattle()) {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.inbattle");
 		}
-		if ($this->getCharacter()->DaysInGame()<2) {
+		if ($char->DaysInGame()<2) {
 			# Too new.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.fresh");
 		}
