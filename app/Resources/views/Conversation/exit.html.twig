@@ -1,0 +1,10 @@
+{% extends "Conversation/layout.html.twig" %}
+
+{% trans_default_domain 'conversations' %}
+{% block content %}
+<h2>{{ ('conversation.' ~ type ~ '.title')|trans({"%conv%":conv.topic})|title }}</h2>
+<p>{{ ('conversation.' ~ type ~ '.intro')|trans({"%conv%":conv.topic})|raw }}</p>
+
+{{ form(form) }}
+
+{% endblock %}
