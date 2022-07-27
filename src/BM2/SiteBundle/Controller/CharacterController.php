@@ -53,11 +53,13 @@ class CharacterController extends Controller {
 		$spottings = array();
 		foreach ($query->getResult() as $spotevent) {
 			$id = $spotevent->getTarget()->getId();
-			if (!isset($spottings[$id])) {
-				$spottings[$id] = array('target'=>$spotevent->getTarget(), 'details'=>false, 'events'=>array());
+			if ($id !== $character->getId()) {
+				if (!isset($spottings[$id])) {
+					$spottings[$id] = array('target'=>$spotevent->getTarget(), 'details'=>false, 'events'=>array());
+				}
+				// TODO: figure out if we can see details or not - by distance between spotter or watchtower?
+				$spottings[$id]['events'][] = $spotevent;
 			}
-			// TODO: figure out if we can see details or not - by distance between spotter or watchtower?
-			$spottings[$id]['events'][] = $spotevent;
 		}
 		return $spottings;
 	}
