@@ -12,13 +12,34 @@ class ActivityDispatcher extends Dispatcher {
 
 	}
 
+	public function activityActions() {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"activity.title", "elements"=>array(array("name"=>"activity.all", "description"=>"unavailable.$check")));
+		}
+		$actions = [];
+		$actions[] = $this->activityDuelChallengeTest();
+		$actions[] = $this->activityDuelAnswerTest();
+
+		return ["name"=>"activity.title", "elements"=>$actions];
+	}
+
 	/* ========== Activity Dispatchers ========== */
 
 	public function activityDuelChallengeTest() {
 		if (($check = $this->veryGenericTests()) !== true) {
-			return array("name"=>"activity.train.name", "description"=>"unavailable.$check");
+			return array("name"=>"duel.challenge.name", "description"=>"unavailable.$check");
 		}
-		return $this->action("activity.duel.challenge", "maf_activity_duel_challenge");
+		return $this->action("duel.challenge", "maf_activity_duel_challenge");
+	}
+
+	public function activityDuelAnswerTest() {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		if ($this->getCharacter()->findAnswerableDuels()->count() < 1) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_answer");
 	}
 
 	public function activityTrainTest($ignored, $type) {
