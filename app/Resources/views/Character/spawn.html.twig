@@ -21,7 +21,7 @@
         		{% for spawn in spawns %}
                                 {# DO THIS AREA #}
         			<h3><u>{{ spawn.place.name }}</u></h3>
-        			<p>{{ spawn.place.description.text }}</p>
+        			<p>{{ spawn.place.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
         			<a href="{{ path('maf_spawn_in', {"spawn":spawn.place.id}) }}">{{ 'character.spawn.join'|trans({"%name%":spawn.place.name})|raw }}</a></p>
                 		<hr>
         		{% endfor %}
@@ -29,7 +29,7 @@
                         {% for spawn in spawns %}
                                 {# DO THIS AREA #}
         			<h3><u>{{ spawn.place.name }}</u></h3>
-        			<p>{{ spawn.place.description.text }}</p>
+        			<p>{{ spawn.place.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}</p>
                                 <a href="{{ path('maf_spawn_in', {"spawn":spawn.place.id}) }}">{{ 'character.spawn.join'|trans({"%name%":spawn.place.name})|raw }}</a></p>
         			<hr>
                         {% endfor %}

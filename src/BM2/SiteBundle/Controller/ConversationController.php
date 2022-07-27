@@ -19,6 +19,7 @@ use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Message;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Form\AddParticipantType;
+use BM2\SiteBundle\Form\AreYouSureType;
 use BM2\SiteBundle\Form\MessageReplyType;
 use BM2\SiteBundle\Form\NewConversationType;
 use BM2\SiteBundle\Form\NewLocalMessageType;
@@ -747,32 +748,43 @@ class ConversationController extends Controller {
 	/**
 	  * @Route("/{conv}/leave", name="maf_conv_leave", requirements={"conv"="\d+"})
 	  */
-	public function leaveAction(Conversation $conv) {
+	public function leaveAction(Request $request, Conversation $conv) {
                 $char = $this->get('dispatcher')->gateway('conversationLeaveTest', false, true, false, $conv);
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
 
-		if ($perm = $conv->findActiveCharPermission($char)) {
-			$em = $this->getDoctrine()->getManager();
-			$perm->setActive(false);
-			$perm->setEndTime(new \DateTime("now"));
-			$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
-			if ($perm->getOwner()) {
-				$perm->setOwner(false);
-				$perm->setManager(false);
-				$this->get('conversation_manager')->findNewOwner($conv, $char, false);
-			} elseif ($perm->getManager()) {
-				$perm->setManager(false);
-			}
-			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('conversation.left', ["%name%"=>$perm->getConversation()->getTopic()], 'conversations'));
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
 
-			return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
+		if ($form->isValid() && $form->isSubmitted()) {
+			if ($form->getData()['sure']) {
+				$perm = $conv->findActiveCharPermission($char);
+				if ($perm) {
+					$em = $this->getDoctrine()->getManager();
+					$perm->setActive(false);
+					$perm->setEndTime(new \DateTime("now"));
+					$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
+					if ($perm->getOwner()) {
+						$perm->setOwner(false);
+						$perm->setManager(false);
+						$this->get('conversation_manager')->findNewOwner($conv, $char, false);
+					} elseif ($perm->getManager()) {
+						$perm->setManager(false);
+					}
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('conversation.left', ["%name%"=>$perm->getConversation()->getTopic()], 'conversations'));
+
+					return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]).'#'.$message->getId());
+				}
+			}
 		}
 
-		$this->addFlash('notice', $this->get('translator')->trans('conversation.left', ["%name%"=>$perm->getConversation()->getTopic()], 'conversations'));
-		return new RedirectResponse($this->generateUrl('maf_conv_read', ['conv' => $conv->getId()]));
+		return $this->render('Conversation/exit.html.twig', [
+			'form' => $form->createView(),
+			'conv' => $conv,
+			'type' => 'leave'
+		]);
 
 	}
 
@@ -781,42 +793,55 @@ class ConversationController extends Controller {
   	  * @Route("/{conv}/remove/", name="maf_conv_remove", requirements={"conv"="\d+"})
   	  * @Route("/{conv}/remove/{var}", name="maf_conv_remove", requirements={"conv"="\d+", "var"="\d+"})
 	  */
-	public function removeAction(Conversation $conv, $var = null) {
+	public function removeAction(Request $request, Conversation $conv, $var = null) {
                 $char = $this->get('dispatcher')->gateway('conversationRemoveTest', false, true, false, $conv);
                 if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
                 }
 
-		if ($perms = $conv->findCharPermissions($char)) {
-			$em = $this->getDoctrine()->getManager();
-			$wasOwner = false;
-			$topic = $conv->getTopic();
-			foreach ($perms as $perm) {
-				if ($perm->getOwner()) {
-					$wasOwner = true;
+		$form = $this->createForm(new AreYouSureType());
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			if ($form->getData()['sure']) {
+				$perms = $conv->findCharPermissions($char);
+				if ($perms) {
+					$em = $this->getDoctrine()->getManager();
+					$wasOwner = false;
+					$topic = $conv->getTopic();
+					foreach ($perms as $perm) {
+						if ($perm->getOwner()) {
+							$wasOwner = true;
+						}
+						if ($perm->getActive()) {
+							$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
+						}
+						$em->remove($perm);
+					}
+					$em->flush();
+					$prune = $this->get('conversation_manager')->pruneConversation($conv);
+					if ($prune == 'pruned') {
+						if ($wasOwner) {
+							$this->get('conversation_manager')->findNewOwner($conv, $char, true);
+						}
+					}
+					$this->addFlash('notice', $this->get('translator')->trans('conversation.removed', ["%name%"=>$topic], 'conversations'));
+				} else {
+					$this->addFlash('notice', $this->get('translator')->trans('conversation.badremoved', ["%id%"=>$conv->getId()], 'conversations'));
 				}
-				if ($perm->getActive()) {
-					$message = $this->get('conversation_manager')->newSystemMessage($conv, 'left', null, $char, false);
+				if ($var == 1) {
+					return new RedirectResponse($this->generateUrl('maf_convs'));
+				} else {
+					return new RedirectResponse($this->generateUrl('maf_conv_summary'));
 				}
-				$em->remove($perm);
 			}
-			$em->flush();
-			$prune = $this->get('conversation_manager')->pruneConversation($conv);
-			if ($prune == 'pruned') {
-				if ($wasOwner) {
-					$this->get('conversation_manager')->findNewOwner($conv, $char, true);
-				}
-			}
-			$this->addFlash('notice', $this->get('translator')->trans('conversation.removed', ["%name%"=>$topic], 'conversations'));
-		} else {
-			$this->addFlash('notice', $this->get('translator')->trans('conversation.badremoved', ["%id%"=>$conv->getId()], 'conversations'));
 		}
 
-		if ($var == 1) {
-			return new RedirectResponse($this->generateUrl('maf_convs'));
-		} else {
-			return new RedirectResponse($this->generateUrl('maf_conv_summary'));
-		}
+		return $this->render('Conversation/exit.html.twig', [
+			'form' => $form->createView(),
+			'conv' => $conv,
+			'type' => 'leave'
+		]);
 	}
 
 	/**
