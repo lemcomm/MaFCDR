@@ -589,5 +589,17 @@ class Character {
 		}
 		return $all;
 	}
+
+	public function findAnswerableDuels() {
+		$all = new ArrayCollection;
+		foreach ($this->getActivityParticipation() as $each) {
+			if ($each->getActivity()->getType()->getName() === 'duel') {
+				if (!$each->getAccepted()) {
+					$all->add($each->getActivity());
+				}
+			}
+		}
+		return $all;
+	}
 	
 }
