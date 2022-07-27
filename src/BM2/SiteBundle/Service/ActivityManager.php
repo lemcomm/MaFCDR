@@ -103,13 +103,16 @@ class ActivityManager {
 		return $bout;
 	}
 
-	public function createParticipant(Activity $act, Character $char, Style	$style=null) {
+	public function createParticipant(Activity $act, Character $char, Style	$style=null, $weapon=null, $same=false) {
 		$part = new ActivityParticipant();
 		$this->em->persist($part);
 		$part->setActivity($act);
 		$part->setCharacter($char);
 		$part->setStyle($style);
 		$part->setWeapon($weapon);
+		if ($same) {
+			$part->setAccepted(true);
+		}
 		return $part;
 	}
 
@@ -153,9 +156,8 @@ class ActivityManager {
 				$act->setName($name);
 			}
 			$act->setSame($same);
-			$act->setWeapon($weapon);
 
-			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon);
+			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon, $same);
 			$themPart = $this->createParticipant($act, $them, $themStyle);
 
 			$this->em->flush();
