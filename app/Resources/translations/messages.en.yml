@@ -852,6 +852,7 @@ settlement:
  resupply:  Equipment available for resupply
  retrain:   Equipment available for re-training
  train:     Equipment available for training
+ traintotal: (Numbers provided assume 100% usage of that facility's available equipment hours.<br>If you have 200 axes available and you train 100 infantry with axes, this will use half of your available machetes and halberds, since they are all supplied by the blacksmith.)
  militiacount:  %count% combat-ready local militia
  recruitscount: %count% recruits in training
  resources:
@@ -1758,6 +1759,7 @@ unavailable:
  cantxfercapital: This place type cannot be transferred to another owner.
  notcadetapproved: Not approved by the Head of the House.
  notlegislative: You do not hold a legislative position within this organisation.
+ noduels: You have no duels to answer.
 
 marker:
  name:      Marker name
