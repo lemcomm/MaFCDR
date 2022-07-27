@@ -5,6 +5,7 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="role" type="string" nullable="true"/>
+                <field name="accepted" type="boolean" nullable="true"/>
 
                 <many-to-one field="activity" target-entity="Activity" inversed-by="participants"/>
                 <one-to-many field="bout_participation" target-entity="ActivityBoutParticipant" mapped-by="participant"/>
