@@ -114,9 +114,13 @@ conversation:
  leave:
   label:    Leave Conversation
   help:     Leave this conversation, but retain your copies of it.
+  title:    "Leave conversation: %conv%"
+  intro:    Leaving a conversation will remove you from further messages from it, but retain your access to those you have already received. If you are added back later, you won't see any messages sent while you weren't actively part of the discussion.
  remove:
   label:    Remove Conversation
   help:     Delete your copies of this conversation, leaving it if you haven't already.
+  title:    "Remove conversation: %conv%"
+  intro:    Removing a conversation will both remove you from further messages but also destroy your own local copies of messages.
  old:
   show:     Show Older Messages
   hide:     Hide Old Messages
