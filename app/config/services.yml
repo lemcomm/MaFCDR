@@ -127,6 +127,11 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@translator', '@twig.extension.links', '@twig.extension.geography']
         tags:
             - { name: twig.extension }
+    twig.extension.activityDispatcher:
+        class:      BM2\SiteBundle\Twig\ActivityDispatcherExtension
+        arguments:  ['@activity_dispatcher']
+        tags:
+            - { name: twig.extension }
     twig.extension.unitDispatcher:
         class:      BM2\SiteBundle\Twig\UnitDispatcherExtension
         arguments:  ['@unit_dispatcher']
