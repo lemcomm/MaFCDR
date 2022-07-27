@@ -6,13 +6,17 @@
 activity:
  form:
   name:      "Name"
+ title:      Activities Menu
 
 duel:
  answer:
   accepted:  "You've accepted %target%'s request to duel!"
+  name:      "Answer a Duel"
   refused:   "You've refused %target%'s request to duel."
+  description: "You've challenges to answer."
  challenge:
   name:      "Challenge Someone to a Duel"
+  description: "Resolve things through individual, personal combat."
   intro:     "As a First One, there is a long tradition of resolving things through combat, but sometimes there is a need for a more personal resolution. For those situations, there exists a subset of ancient magics for not only refusing others the right to interfere but also ensuring the combatants themselves agree to the terms. You can use these ancient ways to challenge others to a specific type of personal combat, a duel, if you feel you have been wronged in some manner.<br><br>Note: If you opt to require the same weapon, you are choosing the weapon for both characters. If not, you're only choosing your own."
   sent:      "You've successfully challenged %target% to a duel!"
   unsent:    "We've encountered a problem creating the duel instance... If this fails after more than one attempt, please report it to an admin."
