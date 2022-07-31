@@ -1676,12 +1676,12 @@ class Dispatcher {
 				$inSiege = TRUE;
 				if ($group->isAttacker() && $isAttacker == FALSE) {
 					$isAttacker = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive(true)) {
 						$attLeader = TRUE; # Attackers already have leader
 					}
 				} else if ($isDefender == FALSE) {
 					$isDefender = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive(true)) {
 						$defLeader = TRUE; # Defenders already have leader
 					}
 				}
