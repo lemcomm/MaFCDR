@@ -155,7 +155,7 @@ class GameRunner {
 					# Get all character realms.
 					$myRealms = $char->findRealms();
 					$settlements = new ArrayCollection;
-					foreach ($char->getSettlements() as $settlement) {
+					foreach ($char->getOwnedSettlements() as $settlement) {
 						$settlements->add($settlement);
 					}
 					if ($char->getLiege()) {
