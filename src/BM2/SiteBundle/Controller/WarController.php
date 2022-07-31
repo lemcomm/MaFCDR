@@ -664,11 +664,11 @@ class WarController extends Controller {
 									if ($settlement->getOwner() == $character) {
 										$siege->setLeader('defenders', $character);
 										$em->flush();
-									} elseif (!$siege->getDefender()->getLeader()) {
+									} elseif (!$siege->getDefender()->getLeader() || $siege->getDefender()->getLeader()->isActive(true)) {
 										$siege->setLeader('defenders', $character);
 										$em->flush();
 									}
-								} elseif ($siege->getAttacker()->getCharacters()->contains($character) && !$siege->getAttacker()->getLeader()) {
+								} elseif ($siege->getAttacker()->getCharacters()->contains($character) && (!$siege->getAttacker()->getLeader() || !$siege->getAttacker()->getLeader()->isActive(true))) {
 									$siege->setLeader('attackers', $character);
 									$em->flush();
 								}
