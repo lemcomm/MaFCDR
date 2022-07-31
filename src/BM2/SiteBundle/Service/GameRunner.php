@@ -148,7 +148,7 @@ class GameRunner {
 			$allUnits = array();
 			foreach($row[0]->getFromCharacter()->getUnits() as $unit) {
 				if ($unit->getSupplier()==$row[0]->getToSettlement()) {
-					$char = $row->getFromCharacter();
+					$char = $row[0]->getFromCharacter();
 					$this->logger->info("  Character ".$char->getName()." (".$char->getId().") may be using request for food...");
 					# Character supplier matches target settlement, we need to see if this is still a valid food source.
 
@@ -175,7 +175,7 @@ class GameRunner {
 					if ($char->getRequests()->count() > 1) {
 						$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
 						foreach ($filtered as $req) {
-							if ($req != $row) {
+							if ($req != $row[0]) {
 								$settlements->add($req->getToSettlement());
 							}
 						}
