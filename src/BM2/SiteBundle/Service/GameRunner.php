@@ -166,16 +166,11 @@ class GameRunner {
 							}
 						}
 					}
-					$expr = new Comparison('type', '=', 'soldier.food');
-					$expr2 = new Comparison('accepted', '=', true);
-					$expr3 = new Comparison('expires', '<=', $now);
-					$criteria = new Critera();
-					$criteria->where($expr)->andWhere($expr2);
-					# Basically, we only care about accepted, non-expired requests about food.
-					if ($char->getRequests()->count() > 1) {
-						$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
-						foreach ($filtered as $req) {
-							if ($req != $row[0]) {
+
+					$reqs = $char->getRequests();
+					if ($reqs->count() > 1) {
+						foreach ($reqs as $req) {
+							if ($req->getType() === 'soldier.food' && $req->getAccepted()) {
 								$settlements->add($req->getToSettlement());
 							}
 						}
