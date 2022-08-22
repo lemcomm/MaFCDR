@@ -36,8 +36,19 @@ class ActivityDispatcher extends Dispatcher {
 		if (($check = $this->veryGenericTests()) !== true) {
 			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
 		}
-		if ($this->getCharacter()->findAnswerableDuels()->count() < 1) {
+		$duels = $this->getCharacter()->findAnswerableDuels();
+		if ($duels->count() < 1) {
 			return array("name"=>"duel.answer.name", "description"=>"unavailable.noduels");
+		}
+		$can = false;
+		foreach($duels as $each) {
+			if ($each->isAnswerable($this->getCharacter())) {
+				$can = true;
+				break;
+			}
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
 		}
 		return $this->action("duel.answer", "maf_activity_duel_answer");
 	}
