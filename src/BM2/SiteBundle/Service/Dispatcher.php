@@ -1632,6 +1632,10 @@ class Dispatcher {
 				}
 			}
 		}
+		if (!$inSiege) {
+			# Is not in the siege.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
+		}
 		if ($isLeader) {
 			# Is already leader.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
@@ -1689,6 +1693,10 @@ class Dispatcher {
 					$isLeader = TRUE; # We are a leader!
 				}
 			}
+		}
+		if (!$inSiege) {
+			# Is not in the siege.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
 		}
 		if ($isLeader) {
 			# Already leader.
