@@ -1760,6 +1760,7 @@ unavailable:
  notcadetapproved: Not approved by the Head of the House.
  notlegislative: You do not hold a legislative position within this organisation.
  noduels: You have no duels to answer.
+ noanswerableduels: All pending duels are awaiting others.
 
 marker:
  name:      Marker name
