@@ -9,6 +9,10 @@ activity:
  title:      Activities Menu
 
 duel:
+ accept:
+  name:      "Accept a Duel"
+  intro:     "%name% has challenged you to a duel under the terms of the ancient magics, but has granted you the option to choose your weapon. Once you've chosen they can then decline your selection.<br><br>Of course, you could always just refuse."
+  decline:   "Decline the Duel"
  answer:
   accepted:  "You've accepted %target%'s request to duel!"
   name:      "Answer a Duel"
@@ -17,7 +21,7 @@ duel:
  challenge:
   name:      "Challenge Someone to a Duel"
   description: "Resolve things through individual, personal combat."
-  intro:     "As a First One, there is a long tradition of resolving things through combat, but sometimes there is a need for a more personal resolution. For those situations, there exists a subset of ancient magics for not only refusing others the right to interfere but also ensuring the combatants themselves agree to the terms. You can use these ancient ways to challenge others to a specific type of personal combat, a duel, if you feel you have been wronged in some manner.<br><br>Note: If you opt to require the same weapon, you are choosing the weapon for both characters. If not, you're only choosing your own."
+  intro:     "As a First One, there is a long tradition of resolving things through combat, but sometimes there is a need for a more personal resolution. For those situations, there exists a subset of ancient magics for not only refusing others the right to interfere but also ensuring the combatants themselves agree to the terms. You can use these ancient ways to challenge others to a specific type of personal combat, a duel, if you feel you have been wronged in some manner.<br><br>Note: If you opt to require the same weapon, you are choosing the weapon for both characters. If not, you're only choosing your own. If you're only choosing your own, you'll be able to decline if they pick something you find unreasonable."
   sent:      "You've successfully challenged %target% to a duel!"
   unsent:    "We've encountered a problem creating the duel instance... If this fails after more than one attempt, please report it to an admin."
  form:
