@@ -1632,6 +1632,10 @@ class Dispatcher {
 				}
 			}
 		}
+		if (!$inSiege) {
+			# Is not in the siege.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
+		}
 		if ($isLeader) {
 			# Is already leader.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
@@ -1676,12 +1680,12 @@ class Dispatcher {
 				$inSiege = TRUE;
 				if ($group->isAttacker() && $isAttacker == FALSE) {
 					$isAttacker = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive(true)) {
 						$attLeader = TRUE; # Attackers already have leader
 					}
 				} else if ($isDefender == FALSE) {
 					$isDefender = TRUE;
-					if ($group->getLeader()) {
+					if ($group->getLeader() && $group->getLeader()->isActive(true)) {
 						$defLeader = TRUE; # Defenders already have leader
 					}
 				}
@@ -1689,6 +1693,10 @@ class Dispatcher {
 					$isLeader = TRUE; # We are a leader!
 				}
 			}
+		}
+		if (!$inSiege) {
+			# Is not in the siege.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
 		}
 		if ($isLeader) {
 			# Already leader.

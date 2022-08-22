@@ -148,14 +148,14 @@ class GameRunner {
 			$allUnits = array();
 			foreach($row[0]->getFromCharacter()->getUnits() as $unit) {
 				if ($unit->getSupplier()==$row[0]->getToSettlement()) {
-					$char = $row->getFromCharacter();
+					$char = $row[0]->getFromCharacter();
 					$this->logger->info("  Character ".$char->getName()." (".$char->getId().") may be using request for food...");
 					# Character supplier matches target settlement, we need to see if this is still a valid food source.
 
 					# Get all character realms.
 					$myRealms = $char->findRealms();
 					$settlements = new ArrayCollection;
-					foreach ($char->getSettlements() as $settlement) {
+					foreach ($char->getOwnedSettlements() as $settlement) {
 						$settlements->add($settlement);
 					}
 					if ($char->getLiege()) {
@@ -166,16 +166,11 @@ class GameRunner {
 							}
 						}
 					}
-					$expr = new Comparison('type', '=', 'soldier.food');
-					$expr2 = new Comparison('accepted', '=', true);
-					$expr3 = new Comparison('expires', '<=', $now);
-					$criteria = new Critera();
-					$criteria->where($expr)->andWhere($expr2);
-					# Basically, we only care about accepted, non-expired requests about food.
-					if ($char->getRequests()->count() > 1) {
-						$filtered = $char->getRequests()->matching($criteria); #Filter all sent requests to accepted, non-expired ones for food.
-						foreach ($filtered as $req) {
-							if ($req != $row) {
+
+					$reqs = $char->getRequests();
+					if ($reqs->count() > 1) {
+						foreach ($reqs as $req) {
+							if ($req->getType() === 'soldier.food' && $req->getAccepted()) {
 								$settlements->add($req->getToSettlement());
 							}
 						}
