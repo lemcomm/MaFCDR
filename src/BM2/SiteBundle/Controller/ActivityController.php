@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\EquipmentType;
 
 use BM2\SiteBundle\Form\ActivitySelectType;
 use BM2\SiteBundle\Form\AreYouSureType;
+use BM2\SiteBundle\Form\EquipmentLoadoutType;
 use BM2\SiteBundle\Form\InteractionType;
 
 use BM2\SiteBundle\Service\GameRequestManager;
@@ -40,10 +41,9 @@ class ActivityController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 
-                $query = $em->createQuery('SELECT e FROM BM2SiteBundle:EquipmentType e WHERE e.skill IS NOT NULL AND e.type = :type');
-                $query->setParameters(['type'=>'weapon']);
+		$opts = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
 
-		$form = $this->createForm(new ActivitySelectType('duel', $this->get('geography')->calculateInteractionDistance($char), $char, $query->getResult()));
+		$form = $this->createForm(new ActivitySelectType('duel', $this->get('geography')->calculateInteractionDistance($char), $char, $opts));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
                         $type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
@@ -83,10 +83,10 @@ class ActivityController extends Controller {
 	}
 
 	/**
-	  * @Route("/duel/accept/{act}", name="maf_activity_duel_accept")
+	  * @Route("/duel/accept/{act}", name="maf_activity_duel_accept", requirements={"act"="\d+"})
 	  */
 
-	public function duelAcceptAction(Activity $act) {
+	public function duelAcceptAction(Request $request, Activity $act) {
 		$char = $this->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
@@ -94,18 +94,46 @@ class ActivityController extends Controller {
 		foreach ($act->getParticipants() as $p) {
 			if ($p !== $char) {
 				$them = $p;
-				break; #For duels this is either us first or us second, so this can save us a worthless loop pass.
+			}
+			if ($p === $char) {
+				$me = $p;
 			}
 		}
+		$em = $this->getDoctrine()->getManager();
 
-		$act->getBouts()->first()->setAccepted(true); #Duels only have one and the dispatcher has already validated.
-		$em = $this->getDoctrine()->getManager()->flush();
-		$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
-		return $this->redirectToRoute('maf_activity_duel_answer');
+		if ($p === $act->getChallenged()) {
+			if ($act->getSame()) {
+				$me->setAccepted(true);
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
+				return $this->redirectToRoute('maf_activity_duel_answer');
+			} else {
+				$opts = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
+				$form = $this->createForm(new EquipmentLoadoutType($opts, 'loadout.weapon', 'settings'));
+				$form->handleRequest($request);
+				if ($form->isSubmitted() && $form->isValid()) {
+					$me->setWeapon($form->getData()['equipment']);
+					$me->setAccepted(true);
+					$em->flush();
+					$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
+					return $this->redirectToRoute('maf_activity_duel_answer');
+				}
+				return $this->render('Activity/duelAccept.html.twig', [
+					'form' => $form->createView(),
+					'them' => $them,
+					'duel' => $act
+				]);
+			}
+		} else {
+			$me->setAccepted(true);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted2', ['%target%'=>$them->getName()]));
+			return $this->redirectToRoute('maf_activity_duel_answer');
+		}
 	}
 
 	/**
-	  * @Route("/duel/refuse/{act}", name="maf_activity_duel_refuse")
+	  * @Route("/duel/refuse/{act}", name="maf_activity_duel_refuse", requirements={"act"="\d+"})
 	  */
 
 	public function duelRefuseAction(Activity $act) {
