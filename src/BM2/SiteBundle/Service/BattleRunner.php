@@ -38,6 +38,7 @@ class BattleRunner {
 	private $actman;
 	private $politics;
 	private $helper;
+	private $combat;
 
 	# Preset values.
 	private $defaultOffset = 135;
@@ -70,7 +71,7 @@ class BattleRunner {
 	private $defenseBonus=0;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman, Politics $politics, MilitaryManager $milman, HelperServer $helper) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman, Politics $politics, MilitaryManager $milman, HelperServer $helper, CombatManager $combat) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
@@ -83,6 +84,7 @@ class BattleRunner {
 		$this->politics = $politics;
 		$this->milman = $milman;
 		$this->helper = $helper;
+		$this->combat = $combat;
 	}
 
 	public function enableLog($level=9999) {
