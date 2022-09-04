@@ -601,5 +601,9 @@ class Character {
 		}
 		return $all;
 	}
+
+	public function getType() {
+		return 'first one';
+	}
 	
 }
