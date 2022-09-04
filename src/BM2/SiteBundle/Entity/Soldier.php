@@ -255,184 +255,40 @@ class Soldier extends NPC {
 		}
 	}
 
-	public function RangedPower() {
-//		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
-		if ($this->ranged!=-1) return $this->ranged;
-
-		$power = 0;
-		$hasW = false;
-		$hasE = false;
-		if ($this->getWeapon()) {
-			if ($rPower = $this->getWeapon()->getRanged()) {
-				$hasW = true;
-				$power += $rPower;
-			}
-		}
-		if ($this->getEquipment()) {
-			if ($this->getEquipment()->getRanged() > $power) {
-				$power = $this->getEquipment()->getRanged();
-				$hasE = true;
-			}
-		}
-
-		// all the below only adds if we have some ranged power to start with
-		if ($power<=0) return 0;
-
-		if ($this->isNoble) {
-			$power = 0;
-			if ($hasW) {
-				$power += 112;
-			} elseif ($hasE) {
-				$power += 81;
-			}
-			return $power;
-		}
-
-		$power += $this->ExperienceBonus($power);
-
-		// TODO: heavy armour should reduce this quite a bit
-
-		$fighters = $this->getAllInUnit()->count();
-		if ($fighters>1) {
-			$this->ranged = $power * pow($fighters, 0.96)/$fighters;
-		} else {
-			$this->ranged = $power;
-		}
-		return $this->ranged;
-	}
-
 	public function MeleePower() {
-//		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
-		if ($this->melee!=-1) return $this->melee;
-
-		$power = 0;
-		$hasW = false;
-		$hasM = false;
-		$hasE = false;
-		if ($this->getWeapon()) {
-			if ($mPower = $this->getWeapon()->getMelee() > 0) {
-				$hasW = true;
-				$power += $mPower;
-			}
-		} else {
-			// improvised weapons
-			$power += 5;
-		}
-		if ($this->getEquipment()) {
-			if ($this->getEquipment()->getName() != 'Lance') {
-				$power += $this->getEquipment()->getMelee();
-				$hasE = true;
-			}
-		}
-		if ($this->getMount()) {
-			$power += $this->getMount()->getMelee();
-			$hasM = false;
-		}
-		if ($this->isNoble) {
-			$power = 0;
-			if ($hasW) {
-				$power += 112;
-			}
-			if ($hasM) {
-				$power += 32;
-			}
-			if ($hasE) {
-				$power += 12;
-			}
-			return $power;
-		}
-		if ($power>0) {
-			$power += $this->ExperienceBonus($power);
-		}
-
-		// TODO: heavy armour should reduce this a little
-
-		$fighters = $this->getAllInUnit()->count();
-		if ($fighters>1) {
-			$this->melee = $power * pow($fighters, 0.96)/$fighters;
-		} else {
-			$this->melee = $power;
-		}
 		return $this->melee;
 	}
 
-	public function ChargePower() {
-//		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
-		if ($this->isNoble) {
-			$this->charge = 156;
-			return 156;
-		}
-		$power = 0;
-		if (!$this->getMount()) {
-			return 0;
-		} else {
-			$power += $this->getMount()->getMelee();
-		}
-		if ($this->getEquipment()) {
-			$power += $this->getEquipment()->getMelee();
-		}
-		$power += $this->ExperienceBonus($power);
-
-		$this->charge = $power;
-		return $this->charge;
+	public function updateMeleePower($val) {
+		$this->melee = $val;
+		return $this->melee;
 	}
 
-	public function DefensePower($melee = true) {
-//		if (!$this->getAlive() || $this->isWounded()) return 0;
-		if ($melee) {
-			if ($this->defense!=-1) return $this->defense;
-		} else {
-			if ($this->rDefense!=-1) return $this->rDefense;
-		}
-		$eqpt = $this->getEquipment();
-		if ($this->isNoble) {
-			$power = 100;
-			if ($this->getMount()) {
-				$power += 38;
-			}
-			if ($eqpt && $eqpt->getName() != 'Pavise') {
-				$power += 32;
-			} elseif ($this->getMount()) {
-				$power += 7;
-			}  elseif ($melee) {
-				$power += 13;
-			} else {
-				$power += 63;
-			}
-			if ($melee) {
-				$this->defense = $power;
-			} else {
-				$this->rDefense = $power;
-			}
-			return $power;
-		}
-
-		$power = 5; // basic defense power which represents luck, instinctive dodging, etc.
-		if ($this->getArmour()) {
-			$power += $this->getArmour()->getDefense();
-		}
-		if ($this->getEquipment()) {
-			if ($this->getEquipment()->getName() != 'Pavise') {
-				$power += $this->getEquipment()->getDefense();
-			} elseif ($this->getMount()) {
-				$power += $this->getEquipment()->getDefense()/10; #It isn't worthless, but it can't be used effectively.
-			} elseif ($melee) {
-				$power += $this->getEquipment()->getDefense()/5;
-			} else {
-				$power += $this->getEquipment()->getDefense();
-			}
-		}
-		if ($this->getMount()) {
-			$power += $this->getMount()->getDefense();
-		}
-
-		$power += $this->ExperienceBonus($power);
-		if ($melee) {
-			$this->defense = $power; // defense does NOT scale down with number of men in the unit
-		} else {
-			$this->rDefense = $power;
-		}
+	public function DefensePower() {
 		return $this->defense;
+	}
+
+	public function updateDefensePower($val) {
+		$this->defense = $val;
+		return $this->defense;
+	}
+
+	public function RDefensePower() {
+		return $this->rDefense;
+	}
+
+	public function updateRDefensePower($val) {
+		$this->rDefense = $val;
+		return $this->rDefense;
+	}
+
+	public function RangedPower() {
+		return $this->ranged;
+	}
+
+	public function updateRangedPower($val) {
+		$this->ranged = $val;
+		return $this->ranged;
 	}
 
 	private function ExperienceBonus($power) {
