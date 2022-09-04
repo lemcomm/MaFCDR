@@ -7,7 +7,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager', '@activity_manager']
     activity_manager:
         class:      BM2\SiteBundle\Service\ActivityManager
-        arguments:  ['@doctrine.orm.entity_manager', '@geography']
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@helper_service', '@logger', '@combat_manager']
     activity_dispatcher:
         class:      BM2\SiteBundle\Service\ActivityDispatcher
         arguments:  ['@appstate']
@@ -19,12 +19,15 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager', '@politics', '@military_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager', '@politics', '@military_manager', '@helper_service'. '@combat_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     character_manager:
         class:      BM2\SiteBundle\Service\CharacterManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@history', '@military_manager', '@politics', '@realm_manager', '@conversation_manager', '@dungeon_master', '@war_manager', '@association_manager']
+    combat_manager:
+        class:      BM2\SiteBundle\Service\CombatManager
+        arguments:  ['@doctrine.orm.entity_manager', '@helper_service', '@character_manager', '@history']
     conversation_manager:
         class:      BM2\SiteBundle\Service\ConversationManager
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger']
@@ -54,6 +57,9 @@ services:
     geography:
         class:      BM2\SiteBundle\Service\Geography
         arguments:  ['@doctrine.orm.entity_manager', '@permission_manager', '@appstate']
+    helper_service:
+        class:      BM2\SiteBundle\Service\HelperService
+        arguments:  []
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@notification_manager']
