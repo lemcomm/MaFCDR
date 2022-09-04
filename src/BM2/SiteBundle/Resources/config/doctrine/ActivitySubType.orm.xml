@@ -5,5 +5,6 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="name" type="string"/>
+		<many-to-one field="type" target-entity="ActivityType" inversed-by="subtypes"/>
 	</entity>
 </doctrine-mapping>
