@@ -9,11 +9,13 @@ use BM2\SiteBundle\Entity\ActivityBout;
 use BM2\SiteBundle\Entity\ActivityGroup;
 use BM2\SiteBundle\Entity\ActivityBoutGroup;
 use BM2\SiteBundle\Entity\ActivityBoutParticipant;
+use BM2\SiteBundle\Entity\ActivityReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Skill;
 use BM2\SiteBundle\Entity\SkillType;
 
 use Doctrine\ORM\EntityManager;
+use Monolog\Logger;
 
 /*
 As you might expect, ActivityManager handles Activities.
@@ -23,10 +25,18 @@ class ActivityManager {
 
 	private $em;
 	private $geo;
+	private $helper;
+	private $logger;
+	private $combat;
 
-	public function __construct(EntityManager $em, Geography $geo) {
+	private $debug=0;
+
+	public function __construct(EntityManager $em, Geography $geo, HelperService $helper, Logger $logger, CombatManager $combat) {
 		$this->em = $em;
 		$this->geo = $geo;
+		$this->helper = $helper;
+		$this->logger = $logger;
+		$this->combat = $combat;
 	}
 
 	/*
@@ -103,15 +113,18 @@ class ActivityManager {
 		return $bout;
 	}
 
-	public function createParticipant(Activity $act, Character $char, Style	$style=null, $weapon=null, $same=false) {
+	public function createParticipant(Activity $act, Character $char, Style	$style=null, $weapon=null, $same=false, $organizer) {
 		$part = new ActivityParticipant();
 		$this->em->persist($part);
 		$part->setActivity($act);
 		$part->setCharacter($char);
 		$part->setStyle($style);
 		$part->setWeapon($weapon);
+		$part->setOrganizer($organizer);
 		if ($same) {
 			$part->setAccepted(true);
+		} else {
+			$part->setAccepted(false);
 		}
 		return $part;
 	}
@@ -143,11 +156,20 @@ class ActivityManager {
 		return $boutGroup;
 	}
 
+	public function log($level, $text) {
+		if ($this->report) {
+			$this->report->setDebug($this->report->getDebug().$text);
+		}
+		if ($level <= $this->debug) {
+			$this->logger->info($text);
+		}
+	}
+
 	/*
 	ACTIVITY CREATE FUNCTIONS
 	*/
 
-	public function createDuel(Character $me, Character $them, $name=null, $same, EquipmentType $weapon, Style $meStyle = null, Style $themStyle = null) {
+	public function createDuel(Character $me, Character $them, $name=null, $level, $same, EquipmentType $weapon, Style $meStyle = null, Style $themStyle = null) {
 		$type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
 		if ($act = $this->create($type, null, $char)) {
 			if (!$name) {
@@ -156,9 +178,11 @@ class ActivityManager {
 				$act->setName($name);
 			}
 			$act->setSame($same);
+			$act->setWeaponOnly($weaponOnly);
+			$act->setSubType($em->getRepository('BM2SiteBundle:ActivitySubType')->findOneBy(['name'=>$level]));
 
-			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon, $same);
-			$themPart = $this->createParticipant($act, $them, $themStyle);
+			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon, $same, true);
+			$themPart = $this->createParticipant($act, $them, $themStyle, false);
 
 			$this->em->flush();
 			return $act;
@@ -185,59 +209,75 @@ class ActivityManager {
 	}
 
 	/*
-	SKILL FUNCTIONS
+	ACTIVITY RUNNING FUNCTIONS
 	*/
 
-	public function trainSkill(Character $char, SkillType $type=null, $pract = 0, $theory = 0) {
-		if (!$type) {
-			# Not all weapons have skills, this just catches those.
-			return false;
+	public function run(Activity $act) {
+		$type = $act->getType()->getName();
+		if ($type === 'duel') {
+			return $this->runDuel($act);
 		}
-		$training = false;
-		foreach ($char->getSkills() as $skill) {
-			if ($skill->getType() === $type) {
-				$training = $skill;
-				break;
-			}
-		}
-		if ($pract && $pract < 1) {
-			$pract = 1;
-		} elseif ($pract) {
-			$pract = round($pract);
-		}
-		if ($theory && $theory < 1) {
-			$theory = 1;
-		} elseif ($theory) {
-			$theory = round($theory);
-		}
-		if (!$training) {
-			$training = new Skill();
-			$this->em->persist($training);
-			$training->setCharacter($char);
-			$training->setType($type);
-			$training->setCategory($type->getCategory());
-			$training->setPractice($pract);
-			$training->setTheory($theory);
-			$training->setPracticeHigh($pract);
-			$training->setTheoryHigh($theory);
+		return 'typeNotFound';
+	}
+
+	private function runDuel(Activity $act) {
+		$em = $this->em;
+		$me = $act->findChallenger();
+		$meC = $me->getCharacter();
+		$them = $act->findChallenged();
+		$themC = $them->getCharacter();
+		$meRanged = $me->getWeapon()->getRangedPower();
+		$meMelee = $me->getWeapon()->getMeleePower();
+		$themRanged = $them->getWeapon()->getRangedPower();
+		$themMelee = $them->getWeapon()->getMeleePower();
+		if ($meRanged && !$themRanged) {
+			$meFreeAttack = true;
+		} elseif (!$meRanged && $themRanged) {
+			$themFreeAttack = true;
 		} else {
-			if ($pract) {
-				$newPract = $training->getPractice() + $pract;
-				$training->setPractice($newPract);
-				if ($newPract > $training->getPracticeHigh()) {
-					$training->setPracticeHigh($newPract);
+			$meFreeAttack = false;
+			$themFreeAttack = false;
+		}
+
+		$report = new ActivityReport;
+		$report->setPlace($act->getPlace());
+		$report->setSettlement($act->getSettlement());
+		$report->setType($act->getType());
+		$report->setSubType($act->getSubType());
+		$report->setLocation($act->getLocation());
+		$report->setGeoData($act->getGeoData());
+		$report->setDateTime(new \DateTime("now"));
+		$em->persist($report);
+		$this->report = $report;
+		$this->helper->addObservers($act, $report);
+		$em->flush();
+
+		# Special first round logic.
+		if ($meFreeAttack) {
+			$this->attack($me, $meC, $meRanged, $meMelee, $themChar, $act, true);
+		} elseif ($themFreeAttack) {
+			$this->attack($them, $themC, $themRanged, $themMelee, $meChar, $act, true);
+		}
+
+		/*
+		TODO: Finish this function. Link in reports. Expand duels to force no extra gear or not. Test. Test. Test.
+		*/
+	}
+
+	private function attack($me, $meChar, $meRanged, $meMelee, $themChar, $act, $ranged=false) {
+		if ($ranged) {
+			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
+			$this->log(10, $meChar->getName()." fires - ");
+			if ($this->combat->RangedRoll($meRanged)) {
+				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act);
+				foreach ($sublogs as $each) {
+					$this->log(10, $each);
 				}
-			}
-			if ($theory) {
-				$newTheory = $training->getTheory() + $theory;
-				$training->getTheory($newTheory);
-				if ($newTheory > $training->getTheoryHigh()) {
-					$training->setTheoryHigh($newTheory);
-				}
+			} else {
+				$result = 'miss';
 			}
 		}
-		$training->setUpdated(new \DateTime('now'));
-		$this->em->flush();
+		return $result;
 	}
 
 }
