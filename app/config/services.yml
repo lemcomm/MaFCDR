@@ -19,7 +19,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@history', '@description_manager', '@conversation_manager', '@law_manager']
     battle_runner:
         class:      BM2\SiteBundle\Service\BattleRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager', '@politics', '@military_manager', '@helper_service'. '@combat_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@logger', '@history', '@geography', '@character_manager', '@npc_manager', '@interactions', '@war_manager', '@activity_manager', '@politics', '@military_manager', '@helper_service', '@combat_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     character_manager:
