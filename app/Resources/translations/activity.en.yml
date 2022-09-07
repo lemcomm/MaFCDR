@@ -35,6 +35,7 @@ duel:
   submit: "Send Challenge"
   surrender: "Until Surrender"
   weapon: "Weapon to Use?"
+  weaponOnly: "Weapons Only? (No Armor Bonuses)"
   wound: "Until Wounding"
 
 
