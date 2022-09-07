@@ -110,6 +110,10 @@ class ActivitySelectType extends AbstractType {
                         'placeholder'=>'loadout.none',
 			'translation_domain'=>'settings'
 		]);
+		$builder->add('weaponOnly', CheckboxType::class, array(
+			'label'=>'duel.form.weaponOnly',
+			'required'=>false
+		));
 	}
 
 }
