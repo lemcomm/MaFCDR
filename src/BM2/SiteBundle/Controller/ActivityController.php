@@ -48,7 +48,7 @@ class ActivityController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
                         $type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
                         $data = $form->getData();
-                        $duel = $this->get('activity_manager')->createDuel($char, $data['target'], $data['name'], $data['context'], $data['sameWeapon'], $data['weapon']);
+                        $duel = $this->get('activity_manager')->createDuel($char, $data['target'], $data['name'], $data['context'], $data['sameWeapon'], $data['weapon'], $data['weaponOnly']);
                         if ($duel instanceof Activity) {
                                 $this->addFlash('notice', $this->get('translator')->trans('duel.challenge.sent', ['%target%'=>$data['target']->getName()], 'activity'));
                 		return $this->redirectToRoute('bm2_actions');
