@@ -913,7 +913,7 @@ class BattleRunner {
 						if ($target) {
 							$shots++;
 							$rPower = $this->combat->RangedPower($soldier, true);
-							if (rand(0,100+$defBonus)<min(95*$rangedPenalty,($rPower+$bonus)*$rangedPenalty)) {
+							if ($this->combat->RangedRoll($rPower, $defBonus, $rangedPenalty, $bonus, 95)) {
 								// target hit
 								$rangedHits++;
 								list($result, $logs) = $this->combat->RangedHit($soldier, $target, $rPower, false, true, $this->xpMod, $this->defenseBonus);
@@ -1044,7 +1044,7 @@ class BattleRunner {
 							$shots++;
 							$noTargets = 0;
 							$rPower = $this->combat->RangedPower($soldier, true);
-							if (rand(0,100+$defBonus)<min(75*$rangedPenalty,($rPower+$bonus)*$rangedPenalty)) {
+							if ($this->combat->RangedRoll($rPower, $defBonus, $rangedPenalty, $bonus)) {
 								$rangedHits++;
 								list($result, $logs) = $this->combat->RangedHit($soldier, $target, $rPower, false, true, $this->xpMod, $this->defenseBonus);
 								foreach ($logs as $each) {
