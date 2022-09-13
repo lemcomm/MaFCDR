@@ -15,44 +15,47 @@ Gameplay
 
 Entities
 --------
-* [Realms](realms)
 * [Associations](associations)
-* [Houses](houses)
-* [Settlements](settlements)
-* [Places](places)
 * [Characters](characters)
-* [Units](units)
-* [Soldiers](soldiers)
 * [Entourage](entourage)
+* [Houses](houses)
+* [Places](places)
+* [Realms](realms)
+* [Settlements](settlements)
 * [Siege](sieges)
+* [Soldiers](soldiers)
+* [Units](units)
 
 Interaction
 -----------
-* [Messages](messages)
-* [Publications](publications)
-* [Relations](relations)
-* [Fealty](fealty)
 * [Claims](claims)
-* [Prison](prison)
+* [Duels](duels)
+* [Fealty](fealty)
 * [History](history)
 * [Location](location)
+* [Messages](messages)
+* [Prison](prison)
+* [Publications](publications)
+* [Relations](relations)
 
 Concepts
 --------
-* [Battles](battles)
-* [Quests](quests)
+* [Activites](activities)
 * [Artifacts](artifacts)
-* [Looting](looting)
-* [Supply](supply)
-* [Economy](economy)
-* [Travel](travel)
-* [Spotting](spotting)
-* [Trade](trade)
+* [Battles](battles)
 * [Diplomacy](diplomacy)
+* [Economy](economy)
+* [Elections](elections)
+* [Looting](looting)
 * [Politics](politics)
 * [Positions](positions)
-* [Elections](elections)
 * [Permissions](permissions)
+* [Quests](quests)
+* [Skills](skills)
+* [Spotting](spotting)
+* [Supply](supply)
+* [Trade](trade)
+* [Travel](travel)
 
 Experimental
 ------------
