@@ -232,13 +232,37 @@ class ActivityManager {
 		$themMelee = $them->getWeapon()->getMeleePower();
 		if ($meRanged && !$themRanged) {
 			$meFreeAttack = true;
+			$themFreeAttack = false;
+			$stayRanged = false;
 		} elseif (!$meRanged && $themRanged) {
+			$meFreeAttack = false;
 			$themFreeAttack = true;
+			$stayRanged = false;
+		} elseif ($meRanged && $themRanged) {
+			$meFreeAttack = false;
+			$themFreeAttack = false;
+			$stayRanged = true;
 		} else {
 			$meFreeAttack = false;
 			$themFreeAttack = false;
+			$stayRanged = false;
+		}
+		switch ($act->getSubType()->getName()) {
+			case 'first blood':
+				$limit = 10;
+				break;
+			case 'wound':
+				$limit = 40;
+				break;
+			case 'surrender':
+				$limit = 70;
+				break;
+			case 'death':
+				$limit = 100;
+				break;
 		}
 
+		#Create Report
 		$report = new ActivityReport;
 		$report->setPlace($act->getPlace());
 		$report->setSettlement($act->getSettlement());
@@ -252,23 +276,87 @@ class ActivityManager {
 		$this->helper->addObservers($act, $report);
 		$em->flush();
 
+		$meReport = new ActivityCharacterReport;
+		$em->persist($meReport);
+		$this->report->addGroup($meReport);
+		$meReport->setActivityReport($this->report);
+
+		$themReport = new ActivityCharacterReport;
+		$em->persist($themReport);
+		$this->report->addGroup($themReport);
+		$themReport->setActivityReport($this->report);
+
+		$em->flush();
+
+		# Setup
+		$round = 1;
+		$continue = true;
+
 		# Special first round logic.
 		if ($meFreeAttack) {
-			$this->attack($me, $meC, $meRanged, $meMelee, $themChar, $act, true);
+			$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $themChar, $act, true);
+			$themWounds = $this->duelApplyResult($them, $themWounds, $result, $limit, $themReport, $round, $act);
+			if ($themWounds >= $limit) {
+				$continue = false;
+			}
+			$round++;
 		} elseif ($themFreeAttack) {
-			$this->attack($them, $themC, $themRanged, $themMelee, $meChar, $act, true);
+			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $meChar, $act, true);
+			$meWounds = $this->duelApplyResult($me, $meWounds, $result, $limit, $round, $act, false);
+			if ($meWounds >= $limit) {
+				$continue = false;
+			}
+			$round++;
 		}
+
+		if ($meRanged > $meMelee) {
+			$meUseRanged = true;
+		} else {
+			$meUseRanged = false;
+		}
+		if ($themRanged > $themMelee) {
+			$themUseRanged = true;
+		} else {
+			$themUseRanged = false;
+		}
+
+		if ($continue) {
+			while ($themWounds >= $limit && $meWounds >= $limit) {
+				# Challenger attacks.
+				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $themChar, $act, $meUseRanged);
+				$themWounds = $this->duelApplyResult($them, $themWounds, $result, $limit, $round, $act, true);
+
+				# Challenged attacks.
+				$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $meChar, $act, $themUseRanged);
+				$meWounds = $this->duelApplyResult($me, $meWounds, $result, $limit, $round, $act, false);
+
+				$round++;
+			}
+		}
+
+		$this->concludeDuel($me, $meWounds, $them, $themWounds, $act, $round);
 
 		/*
 		TODO: Finish this function. Link in reports. Expand duels to force no extra gear or not. Test. Test. Test.
 		*/
 	}
 
-	private function attack($me, $meChar, $meRanged, $meMelee, $themChar, $act, $ranged=false) {
+	private function duelAttack($me, $meChar, $meRanged, $meMelee, $themChar, $act, $ranged=false) {
 		if ($ranged) {
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." fires - ");
-			if ($this->combat->RangedRoll($meRanged)) {
+			if ($this->combat->RangedRoll()) {
+				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act);
+				foreach ($sublogs as $each) {
+					$this->log(10, $each);
+				}
+			} else {
+				$result = 'miss';
+			}
+		} else {
+			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
+			$this->log(10, $meChar->getName()." attacks - ");
+			if ($this->combat->MeleeRoll()) {
 				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act);
 				foreach ($sublogs as $each) {
 					$this->log(10, $each);
@@ -278,6 +366,21 @@ class ActivityManager {
 			}
 		}
 		return $result;
+	}
+
+	private function duelApplyResult($wounds, $result, $limit, $round, $act, $challenger=true) {
+		# Do nothing for misses.
+		if ($result === 'no damage') {
+			# Even taking no obvious damage still wears you down.
+			$wounds = $wounds + rand(0,3);
+		} elseif ($result === 'wound') {
+			# Sometimes you do more, sometimes less, but always something.
+			# Works out to between 1 and 20 wound points.
+			$wounds = $wounds + (rand(1,20)/10);
+		} elseif ($result === 'kill') {
+			$wounds = $wounds + (rand(20,100)/10);
+		}
+		return $wounds;
 	}
 
 }
