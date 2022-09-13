@@ -1467,52 +1467,55 @@ fiction:
 
 
 manual:
- title:       Game Manual
- intro:       Introduction
- background:  Background
- videos:      Videos
- basics:      Basic concepts
- knight:      Playing a knight
- lord:        Playing a lord
- ruler:       Playing a ruler
- others:      Other roles
- location:    Exploration
- characters:  Characters
- economy:     Economy
- battles:     Battles
- relations:   Marriage and relations
- fealty:      Oaths of fealty
- soldiers:    Soldiers
- entourage:   Entourage
- settlements: Settlements
- places:      Places of Interest
- claims:      Claims
- realms:      Realms
+ activities:  Activities
+ arrivals:      Arrivals System
+ artifacts:     Artifacts
  associations: Associations
- travel:      Travel
- trade:       Trade & tribute
- politics:    Politics
+ background:  Background
+ bandits:       Bandits
+ basics:      Basic concepts
+ battles:     Battles
+ battles2:      Battles (Upcoming Change)
+ characters:  Characters
+ claims:      Claims
  diplomacy:   Diplomacy
+ duels:       Duels
+ economy:     Economy
  elections:   Elections
- messages:    Messages
- publications:  Publications
+ entourage:   Entourage
+ fealty:      Oaths of fealty
  history:       History & events
+ houses:        Houses
+ intro:       Introduction
+ knight:      Playing a knight
+ location:    Exploration
+ lord:        Playing a lord
+ looting:       Looting
+ measurements:  Units of measurement
+ messages:    Messages
+ others:      Other roles
  permissions:   Permission system
  prison:        Captivity
- bandits:       Bandits
- looting:       Looting
- spotting:      Spotting
+ places:      Places of Interest
+ politics:    Politics
+ publications:  Publications
  quests:        Quests
- artifacts:     Artifacts
- supply:        Army supply
+ realms:      Realms
  reference:     Reference
- measurements:  Units of measurement
- test:          Test instance
- houses:        Houses
- units:         Units
- battles2:      Battles (Upcoming Change)
+ relations:   Marriage and relations
+ ruler:       Playing a ruler
+ settlements: Settlements
  sieges:        Sieges
- arrivals:      Arrivals System
+ skills:      Skills
+ soldiers:    Soldiers
+ spotting:      Spotting
+ supply:        Army supply
+ test:          Test instance
+ trade:       Trade & tribute
+ travel:      Travel
+ title:       Game Manual
+ units:         Units
+ videos:      Videos
 
 list:
  buildingtypes:   list of all building types
