@@ -14,7 +14,8 @@
 		<many-to-one field="settlement" target-entity="Settlement"/>
 		<many-to-one field="place" target-entity="Place"/>
 
-
+		<one-to-many field="characters" target-entity="ActivityReportCharacter" mapped-by="activity_report"/>
+		<one-to-many field="groups" target-entity="ActivityReportGroup" mapped-by="activity_report"/>
 		<one-to-many field="observers" target-entity="ActivityReportObserver" mapped-by="activity_report"/>
 		<one-to-many field="journals" target-entity="Journal" mapped-by="activity_report"/>
 
