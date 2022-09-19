@@ -1954,7 +1954,7 @@ class BattleRunner {
 					foreach ($group->getCharacters() as $char) {
 						$this->history->logEvent(
 							$char,
-							'siege.advance.defender',
+							'siege.advance.attacker',
 							array(),
 							History::MEDIUM, false, 20
 						);
