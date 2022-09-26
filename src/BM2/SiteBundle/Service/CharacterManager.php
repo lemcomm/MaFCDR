@@ -695,7 +695,7 @@ class CharacterManager {
 			$bequeath = 'bequeathEstate';
 			$fail = 'failInheritEstate';
 		} else {
-			if ($thing->getType()->getName() == 'home' && $thing->getHouse() && $thing->getOwner() === $thing->getHouse()->getHeadOfHouse()) {
+			if ($thing->getType()->getName() == 'home' && $thing->getHouse() && $thing->getOwner() === $thing->getHouse()->getHead()) {
 				return true; # Lineage is respected over law.
 			}
 			$type = 'place';
