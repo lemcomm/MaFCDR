@@ -522,7 +522,7 @@ class BattleRunner {
 				// defense bonuses:
 				if ($group == $battle->getPrimaryDefender() or $battle->getPrimaryDefender()->getReinforcedBy()->contains($group)) {
 					if ($battle->getType = 'siegeassault') {
-						$base_morale += $this->defenseBonus/2;
+						$base_morale += $this->defenseBonus;
 						$base_morale += 10;
 					}
 				}
