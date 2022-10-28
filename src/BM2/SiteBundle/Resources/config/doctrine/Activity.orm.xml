@@ -14,6 +14,8 @@
                 <field name="same" type="boolean" nullable="true"/>
                 <field name="weapon_only" type="boolean" nullable="true"/>
 
+		<one-to-one field="report" target-entity="ActivityReport" inversed-by="activity"/>
+
                 <one-to-many field="events" target-entity="Activity" mapped-by="main_event"/>
                 <many-to-one field="main_event" target-entity="Activity" inversed-by="events"/>
                 <one-to-many field="participants" target-entity="ActivityParticipant" mapped-by="activity"/>
