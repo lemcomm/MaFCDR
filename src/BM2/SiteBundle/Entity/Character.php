@@ -605,5 +605,14 @@ class Character {
 	public function getType() {
 		return 'first one';
 	}
+
+	public function findSkill($skill) {
+		foreach ($this->skills as $each) {
+			if ($each->getType()->getName() === $skill) {
+				return $each;
+			}
+		}
+		return false;
+	}
 	
 }
