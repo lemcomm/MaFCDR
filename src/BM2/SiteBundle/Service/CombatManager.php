@@ -263,8 +263,9 @@ class CombatManager {
 		return [$result, $logs];
 	}
 
-	public function MeleePower($me, $sol = false) {
+	public function MeleePower($me, $sol = false, EquipmentType $weapon = null) {
 		$noble = false;
+		$act = false;
 		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
 			if ($me->MeleePower() != -1) return $me->MeleePower();
@@ -272,6 +273,7 @@ class CombatManager {
 				$noble = true;
 			}
 		} elseif ($me instanceof ActivityParticipant) {
+			$act = $me->getActivity();
 			$me = $me->getCharacter();
 		}
 
@@ -279,8 +281,11 @@ class CombatManager {
 		$hasW = false;
 		$hasM = false;
 		$hasE = false;
-		if ($me->getWeapon()) {
-			if ($mPower = $me->getWeapon()->getMelee() > 0) {
+		if ($weapon === null) {
+			$weapon = $me->getWeapon();
+		}
+		if ($weapon !== null) {
+			if ($mPower = $weapon->getMelee() > 0) {
 				$hasW = true;
 				$power += $mPower;
 			}
@@ -288,17 +293,21 @@ class CombatManager {
 			// improvised weapons
 			$power += 5;
 		}
-		if ($me->getEquipment()) {
+		if ((!$act || !$act->getWeaponOnly()) && $me->getEquipment()) {
 			if ($me->getEquipment()->getName() != 'Lance') {
 				$power += $me->getEquipment()->getMelee();
 				$hasE = true;
 			}
 		}
-		if ($me->getMount()) {
+		if ((!$act || !$act->getWeaponOnly()) && $me->getMount()) {
 			$power += $me->getMount()->getMelee();
 			$hasM = false;
 		}
-		if ($noble) {
+		if ($act) {
+			$score = $me->findSkill($weapon->getName())->getScore();
+			$power += min(sqrt($score*5), $power/2); # Same as the soldier object's ExperienceBonus func.
+			return $power;
+		} elseif ($noble) {
 			# Only for battles.
 			$power = 0;
 			if ($hasW) {
@@ -312,6 +321,7 @@ class CombatManager {
 			}
 			return $power;
 		}
+		# If either above the above ifs compare as true we don't get here, so this is technically an else/if regardless.
 		if ($power>0) {
 			$power += $me->ExperienceBonus($power);
 		}
@@ -391,7 +401,7 @@ class CombatManager {
 		return [$result, $logs];
 	}
 
-	public function RangedPower($me, $sol = false) {
+	public function RangedPower($me, $sol = false, EquipmentType $weapon = null) {
 		$noble = false;
 		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
@@ -400,6 +410,7 @@ class CombatManager {
 				$noble = true;
 			}
 		} elseif ($me instanceof ActivityParticipant) {
+			$act = $me->getActivity();
 			$me = $me->getCharacter(); #for stndardizing the getEquipment type calls.
 		}
 //		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
@@ -407,8 +418,11 @@ class CombatManager {
 		$power = 0;
 		$hasW = false;
 		$hasE = false;
-		if ($me->getWeapon()) {
-			if ($rPower = $me->getWeapon()->getRanged()) {
+		if ($weapon === null) {
+			$weapon = $me->getWeapon();
+		}
+		if ($weapon !== null) {
+			if ($rPower = $weapon->getRanged()) {
 				$hasW = true;
 				$power += $rPower;
 			}
@@ -423,7 +437,11 @@ class CombatManager {
 		// all the below only adds if we have some ranged power to start with
 		if ($power<=0) return 0;
 
-		if ($noble) {
+		if ($act) {
+			$score = $me->findSkill($weapon->getName())->getScore();
+			$power += min(sqrt($score*5), $power/2); # Same as the soldier object's ExperienceBonus func.
+			return $power;
+		} elseif ($noble) {
 			# Only for battles.
 			$power = 0;
 			if ($hasW) {
@@ -433,8 +451,10 @@ class CombatManager {
 			}
 			return $power;
 		}
-
-		$power += $me->ExperienceBonus($power);
+		# If either above the above ifs compare as true we don't get here, so this is technically an else/if regardless.
+		if ($power>0) {
+			$power += $me->ExperienceBonus($power);
+		}
 
 		// TODO: heavy armour should reduce this quite a bit
 
