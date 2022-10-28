@@ -544,7 +544,7 @@ class Economy {
 		/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
 		$units = $this->FindFeedableUnits($settlement);
 		foreach ($units as $unit) {
-			$this->supplySoldiers($unit, $real_shortage);
+			$this->supplySoldiers($unit, $real_shortage, $settlement);
 		}
 		*/
 		$this->em->flush();
