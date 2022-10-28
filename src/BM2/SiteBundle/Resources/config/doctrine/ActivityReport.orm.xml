@@ -11,6 +11,8 @@
 		<field name="count" type="integer" nullable="true"/>
 		<field name="debug" type="text"/>
 
+		<one-to-one field="activity" target-entity="Activity" mapped-by="report"/>
+
 		<many-to-one field="settlement" target-entity="Settlement"/>
 		<many-to-one field="place" target-entity="Place"/>
 
