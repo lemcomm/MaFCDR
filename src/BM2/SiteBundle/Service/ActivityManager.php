@@ -226,10 +226,12 @@ class ActivityManager {
 		$meC = $me->getCharacter();
 		$them = $act->findChallenged();
 		$themC = $them->getCharacter();
-		$meRanged = $me->getWeapon()->getRangedPower();
-		$meMelee = $me->getWeapon()->getMeleePower();
-		$themRanged = $them->getWeapon()->getRangedPower();
-		$themMelee = $them->getWeapon()->getMeleePower();
+		$meRanged = $this->combat->RangedPower($me, false, $me->getWeapon());
+		$meScore = $me->findSkill($me->getWeapon()->getName())->getScore();
+		$meMelee = $this->combat->MeleePower($me, false, $me->getWeapon());
+		$themRanged = $this->combat->RangedPower($them, false, $them->getWeapon());
+		$themMelee = $this->combat->MeleePower($them, false, $them->getWeapon());
+		$themScore = $them->findSkill($them->getWeapon()->getName())->getScore();
 		if ($meRanged && !$themRanged) {
 			$meFreeAttack = true;
 			$themFreeAttack = false;
@@ -348,7 +350,7 @@ class ActivityManager {
 		# Special first round logic.
 		if ($meFreeAttack) {
 			$data = [];
-			$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $themC, $act, true);
+			$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $act, true);
 			$data['result'] = $result;
 			$newWounds = $this->duelApplyResult($result);
 			$data['new'] = $newWounds;
@@ -366,7 +368,7 @@ class ActivityManager {
 			$em->flush();
 		} elseif ($themFreeAttack) {
 			$data = [];
-			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $meC, $act, true);
+			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $act, true);
 			$data['result'] = $result;
 			$newWounds = $this->duelApplyResult($result);
 			$data['new'] = $newWounds;
@@ -399,7 +401,7 @@ class ActivityManager {
 			while ($themWounds >= $limit && $meWounds >= $limit) {
 				# Challenger attacks.
 				$data = [];
-				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $themC, $act, $meUseRanged);
+				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $act, $meUseRanged);
 				$data['result'] = $result;
 				$newWounds = $this->duelApplyResult($result);
 				$data['new'] = $newWounds;
@@ -412,7 +414,7 @@ class ActivityManager {
 
 				# Challenged attacks.
 				$data = [];
-				$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $meC, $act, $themUseRanged);
+				$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $act, $themUseRanged);
 				$data['result'] = $result;
 				$newWounds = $this->duelApplyResult($result);
 				$data['new'] = $newWounds;
@@ -436,11 +438,11 @@ class ActivityManager {
 		return true;
 	}
 
-	private function duelAttack($me, $meChar, $meRanged, $meMelee, $themChar, $act, $ranged=false) {
+	private function duelAttack($me, $meChar, $meRanged, $meMelee, $meScore, $themChar, $act, $ranged=false) {
 		if ($ranged) {
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." fires - ");
-			if ($this->combat->RangedRoll()) {
+			if ($this->combat->RangedRoll(0, 1, 0, $meScore)) {
 				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act);
 				foreach ($sublogs as $each) {
 					$this->log(10, $each);
@@ -451,8 +453,8 @@ class ActivityManager {
 		} else {
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." attacks - ");
-			if ($this->combat->MeleeRoll()) {
-				list($result, $sublogs) = $this->combat->MeleeAttack($me, $themChar, $meRanged, $act);
+			if ($this->combat->MeleeRoll(0, 1, 0, $meScore)) {
+				list($result, $sublogs) = $this->combat->MeleeAttack($me, $themChar, $meMelee, $act);
 				foreach ($sublogs as $each) {
 					$this->log(10, $each);
 				}
