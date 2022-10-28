@@ -100,6 +100,7 @@ class CombatManager {
 
 	public function DefensePower($me, $sol = false, $melee = true) {
 		$noble = false;
+		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
 			if ($melee) {
 				if ($me->defense!=-1) return $me->defense;
@@ -115,6 +116,7 @@ class CombatManager {
 
 		$eqpt = $me->getEquipment();
 		if ($noble) {
+			# Only for battles.
 			$power = 100;
 			if ($me->getMount()) {
 				$power += 38;
@@ -263,6 +265,7 @@ class CombatManager {
 
 	public function MeleePower($me, $sol = false) {
 		$noble = false;
+		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
 			if ($me->MeleePower() != -1) return $me->MeleePower();
 			if ($me->isNoble()) {
@@ -296,6 +299,7 @@ class CombatManager {
 			$hasM = false;
 		}
 		if ($noble) {
+			# Only for battles.
 			$power = 0;
 			if ($hasW) {
 				$power += 112;
@@ -389,6 +393,7 @@ class CombatManager {
 
 	public function RangedPower($me, $sol = false) {
 		$noble = false;
+		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
 			if ($me->RangedPower() != -1) return $me->RangedPower();
 			if ($me->isNoble()) {
@@ -419,6 +424,7 @@ class CombatManager {
 		if ($power<=0) return 0;
 
 		if ($noble) {
+			# Only for battles.
 			$power = 0;
 			if ($hasW) {
 				$power += 112;
