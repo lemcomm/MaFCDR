@@ -135,4 +135,19 @@ class ApiController extends Controller {
 		return $response;
 	}
 
+	/**
+	  * @Route("/active")
+	  */
+	public function activeUsersAction() {
+		$response = new JsonResponse;
+		$cycle = $this->get('appstate')->getCycle();
+
+		$em = $this->getDoctrine()->getManager();
+		$query = $em->createQuery('SELECT s.today_users as active_users FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
+		$query->setParameter('cycle', $cycle);
+		$response->setData($query->getArrayResult());
+
+		return $response;
+	}
+
 }
