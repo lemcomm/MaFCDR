@@ -526,7 +526,7 @@ class BattleRunner {
 				// defense bonuses:
 				if ($group == $battle->getPrimaryDefender() or $battle->getPrimaryDefender()->getReinforcedBy()->contains($group)) {
 					if ($battle->getType = 'siegeassault') {
-						$base_morale += $this->defenseBonus;
+						$base_morale += $this->defenseBonus/2;
 						$base_morale += 10;
 					}
 				}
@@ -1368,28 +1368,28 @@ class BattleRunner {
 							} else {
 								// no damage, check for dropping gear
 								$this->log(10, "no damage\n");
-								if ($soldier->isNoble()) continue; // noble characters don't throw away anything
+								if ($target->isNoble()) continue; // noble characters don't throw away anything
 								// throw away your shield - very likely
-								if ($soldier->getEquipment() && $soldier->getEquipment() == $shield) {
+								if ($target->getEquipment() && $target->getEquipment() == $shield) {
 									if (rand(0,100)<80) {
-										$soldier->dropEquipment();
-										$this->history->addToSoldierLog($soldier, 'dropped.shield');
-										$this->log(10, $soldier->getName()." (".$soldier->getType()."): drops shield\n");
+										$target->dropEquipment();
+										$this->history->addToSoldierLog($target, 'dropped.shield');
+										$this->log(10, $target->getName()." (".$target->getType()."): drops shield\n");
 										$huntReport['dropped']++;
 									}
 								}
 								// throw away your weapon - depends on weapon
-								if ($soldier->getWeapon()) {
-									switch ($soldier->getWeapon()->getName()) {
+								if ($target->getWeapon()) {
+									switch ($target->getWeapon()->getName()) {
 										case 'spear':		$chance = 40; break;
 										case 'pike':		$chance = 50; break;
 										case 'longbow':	$chance = 30; break;
 										default:				$chance = 20;
 									}
 									if (rand(0,100)<$chance) {
-										$soldier->dropWeapon();
-										$this->history->addToSoldierLog($soldier, 'dropped.weapon');
-										$this->log(10, $soldier->getName()." (".$soldier->getType()."): drops weapon\n");
+										$target->dropWeapon();
+										$this->history->addToSoldierLog($target, 'dropped.weapon');
+										$this->log(10, $target->getName()." (".$target->getType()."): drops weapon\n");
 										$huntReport['dropped']++;
 									}
 								}
