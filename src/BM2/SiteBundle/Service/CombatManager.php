@@ -225,7 +225,7 @@ class CombatManager {
 		$result='miss';
 
 		if ($act && $act->getWeaponOnly()) {
-			$defense = 0;
+			$defense += $defBonus;
 		} else {
 			$defense = $this->DefensePower($target, $battle);
 		}
@@ -245,7 +245,7 @@ class CombatManager {
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
 			$result = $this->resolveDamage($me, $target, $attack, $type, 'melee');
-			if ($me->isNoble() && $me->getWeapon()) {
+			if ((($type === 'battle' && $me->isNoble()) || $type === 'act') && $me->getWeapon()) {
 				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
 			} else {
 				$me->gainExperience(($result=='kill'?2:1)*$xpMod);
@@ -362,12 +362,15 @@ class CombatManager {
 			$type = 'battle';
 		} elseif ($act) {
 			$type = $me->getActivity()->getType()->getName();
+			if ($me->getWeapon()) {
+				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
+			}
 		}
 		$logs = [];
 		$result='miss';
 
 		if ($act && $act->getWeaponOnly()) {
-			$defense = 0;
+			$defense = $defBonus;
 		} else {
 			$defense = $this->DefensePower($target, $battle, false);
 		}
