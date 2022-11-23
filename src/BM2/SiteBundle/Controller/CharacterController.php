@@ -435,6 +435,10 @@ class CharacterController extends Controller {
 				return $this->redirectToRoute('bm2_characters');
 			}
 			if ($spawn) {
+				if (!$spawn->getActive()) {
+					$this->addFlash('error', $this->get('translator')->trans('newcharacter.spawnnotactive', [], 'messages'));
+					return $this->redirectToRoute('bm2_characters');
+				}
 				$place = $spawn->getPlace();
 				if ($spawn->getRealm()) {
 					$realm = $spawn->getRealm();
@@ -466,6 +470,11 @@ class CharacterController extends Controller {
 			} else {
 				$house = $character->getHouse();
 				$place = $house->getPlace();
+				$spawn = $place->getSpawn();
+				if (!$spawn->getActive()) {
+					$this->addFlash('error', $this->get('translator')->trans('newcharacter.spawnnotactive', [], 'messages'));
+					return $this->redirectToRoute('bm2_characters');
+				}
 			}
 			# new character spawn in.
 			if ($place->getLocation()) {
