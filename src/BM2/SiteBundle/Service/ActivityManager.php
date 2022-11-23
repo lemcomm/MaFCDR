@@ -11,8 +11,10 @@ use BM2\SiteBundle\Entity\ActivityBoutGroup;
 use BM2\SiteBundle\Entity\ActivityBoutParticipant;
 use BM2\SiteBundle\Entity\ActivityReport;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Skill;
 use BM2\SiteBundle\Entity\SkillType;
+use BM2\SiteBundle\Entity\Style;
 
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
@@ -113,7 +115,7 @@ class ActivityManager {
 		return $bout;
 	}
 
-	public function createParticipant(Activity $act, Character $char, Style	$style=null, $weapon=null, $same=false, $organizer) {
+	public function createParticipant(Activity $act, Character $char, Style	$style=null, $weapon=null, $same=false, $organizer=false) {
 		$part = new ActivityParticipant();
 		$this->em->persist($part);
 		$part->setActivity($act);
@@ -169,20 +171,21 @@ class ActivityManager {
 	ACTIVITY CREATE FUNCTIONS
 	*/
 
-	public function createDuel(Character $me, Character $them, $name=null, $level, $same, EquipmentType $weapon, Style $meStyle = null, Style $themStyle = null) {
-		$type = $em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
-		if ($act = $this->create($type, null, $char)) {
+	public function createDuel(Character $me, Character $them, $name=null, $level, $same, EquipmentType $weapon, $weaponOnly, Style $meStyle = null, Style $themStyle = null) {
+		$type = $this->em->getRepository('BM2SiteBundle:ActivityType')->findOneBy(['name'=>'duel']);
+		# TODO: Verify there isn't alreayd a duel between these individuals!
+		if ($act = $this->create($type, null, $me)) {
 			if (!$name) {
-				$act->setName('Duel between '.$char->getName().' and '.$recip->getName());
+				$act->setName('Duel between '.$me->getName().' and '.$them->getName());
 			} else {
 				$act->setName($name);
 			}
 			$act->setSame($same);
 			$act->setWeaponOnly($weaponOnly);
-			$act->setSubType($em->getRepository('BM2SiteBundle:ActivitySubType')->findOneBy(['name'=>$level]));
+			$act->setSubType($this->em->getRepository('BM2SiteBundle:ActivitySubType')->findOneBy(['name'=>$level]));
 
 			$mePart = $this->createParticipant($act, $me, $meStyle, $weapon, $same, true);
-			$themPart = $this->createParticipant($act, $them, $themStyle, false);
+			$themPart = $this->createParticipant($act, $them, $themStyle, $same?$weapon:null, false);
 
 			$this->em->flush();
 			return $act;
@@ -350,7 +353,7 @@ class ActivityManager {
 		# Special first round logic.
 		if ($meFreeAttack) {
 			$data = [];
-			$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $act, true);
+			$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $themScore, $act, true);
 			$data['result'] = $result;
 			$newWounds = $this->duelApplyResult($result);
 			$data['new'] = $newWounds;
@@ -368,7 +371,7 @@ class ActivityManager {
 			$em->flush();
 		} elseif ($themFreeAttack) {
 			$data = [];
-			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $act, true);
+			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $meScore, $act, true);
 			$data['result'] = $result;
 			$newWounds = $this->duelApplyResult($result);
 			$data['new'] = $newWounds;
@@ -401,7 +404,7 @@ class ActivityManager {
 			while ($themWounds >= $limit && $meWounds >= $limit) {
 				# Challenger attacks.
 				$data = [];
-				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $act, $meUseRanged);
+				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $themScore, $act, $meUseRanged);
 				$data['result'] = $result;
 				$newWounds = $this->duelApplyResult($result);
 				$data['new'] = $newWounds;
@@ -414,7 +417,7 @@ class ActivityManager {
 
 				# Challenged attacks.
 				$data = [];
-				$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $act, $themUseRanged);
+				$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $meScore, $act, $themUseRanged);
 				$data['result'] = $result;
 				$newWounds = $this->duelApplyResult($result);
 				$data['new'] = $newWounds;
@@ -430,20 +433,17 @@ class ActivityManager {
 			}
 		}
 
-		/*
-		TODO: Finish this function. Link in reports. Expand duels to force no extra gear or not. Test. Test. Test.
-		*/
 		$this->duelConclude($me, $meWounds, $meReport, $them, $themWounds, $themReport, $limit, $act, $round);
 
 		return true;
 	}
 
-	private function duelAttack($me, $meChar, $meRanged, $meMelee, $meScore, $themChar, $act, $ranged=false) {
+	private function duelAttack($me, $meChar, $meRanged, $meMelee, $meScore, $themChar, $themScore, $act, $ranged=false) {
 		if ($ranged) {
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." fires - ");
 			if ($this->combat->RangedRoll(0, 1, 0, $meScore)) {
-				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act);
+				list($result, $sublogs) = $this->combat->RangedHit($me, $themChar, $meRanged, $act, false, 1, $themScore);
 				foreach ($sublogs as $each) {
 					$this->log(10, $each);
 				}
@@ -454,7 +454,7 @@ class ActivityManager {
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." attacks - ");
 			if ($this->combat->MeleeRoll(0, 1, 0, $meScore)) {
-				list($result, $sublogs) = $this->combat->MeleeAttack($me, $themChar, $meMelee, $act);
+				list($result, $sublogs) = $this->combat->MeleeAttack($me, $themChar, $meMelee, $act, false, 1, $themScore);
 				foreach ($sublogs as $each) {
 					$this->log(10, $each);
 				}
@@ -500,7 +500,6 @@ class ActivityManager {
 	}
 
 	private function duelConclude($me, $meWounds, $meReport, $them, $themWounds, $themReport, $limit, $act, $round) {
-		# TODO: All of this stuff.
 		$meData = [];
 		$themData = [];
 		if ($themWounds >= $limit && $meWounds < $limit) {
@@ -539,7 +538,10 @@ class ActivityManager {
 	}
 
 	private function applyWounds(Character $me, $wounds) {
-
+		$me->setWounded($me->getWounded() + $wounds); # Character health is out of 100.
+		if ($me->healthValue() > 1) {
+			# TODO: Event for near death! :(
+		}
 	}
 
 	private function skillEval(Character $me, EquipmentType $meW, Character $them, EquipmentType $themW) {
