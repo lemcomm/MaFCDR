@@ -1484,8 +1484,10 @@ class CharacterController extends Controller {
 			throw $this->createNotFoundException('error.notfound.battlereport');
 		}
 
+		$check = false;
 		if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-			if (!$report->checkForObserver($character)) {
+			$check = $report->checkForObserver($character);
+			if (!$check) {
 				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
 				$query->setParameters(array('br'=>$report, 'me'=>$character));
 				$check = $query->getOneOrNullResult();
