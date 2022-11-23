@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
+use BM2\SiteBundle\Entity\Activity;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EquipmentType;
 
