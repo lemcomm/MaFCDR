@@ -11,13 +11,13 @@ A declaration that you wish to duel someone can be sent to anyone in the vicinit
 * To What Extent - In order of average length: first blood, wound, surrender, or death
 * Use the Same Weapon - Requires both participants to utilize the same weapon.
 * Weapon - The weapon you wish to use.
-* Weapons Only - Determines whether or not other gear is considered, like horses or armor. (See Note 1)
+* Weapons Only - Determines whether or not other gear is considered, like horses or armor.
 
-Note 1: This only really matters in a few situations. First Ones are always able to take full advantage of their armor or lack thereof, so the defense value armor provides is always the same regardless of what is worn or how heavy it is. Equipment can make this fluctuate quite a bit, as can mounts though. If you're unsure, or don't trust who you're challenging, force this to weapons only for the fight to have the least variability to it.
+A note on "Weapons Only": This only really matters in a few situations. First Ones are always able to take full advantage of their armor or lack thereof, so the defense value armor provides is always the same regardless of what is worn or how heavy it is. Equipment can make this fluctuate quite a bit, as can mounts though. If you're unsure, or don't trust who you're challenging, force this to weapons only for the fight to have the least variability to it. On the flip side of this, in duels, if a First One is not using armor or equipment to provide a defense value, they will focus exclusively on their weapon skill to provide that. Which probably makes duels a lot more interesting.
 
 Resolution
 ----------
-Similar to how [battles] work, duels resolve in stages where both sides always attack and always get a result, meaning a duel to the death in Might & Fealty can result in both participants dying of their wounds. There's also always a chance that a duel will be more severe than intended, particularly with uneven match-ups in skills. Finally, there is an exception to both sides attacking and getting a result for every round. If one side is using a ranged weapon and the other isn't, the ranged side will get a free attack of opportunity. If the attacked survives this round, the ranged user will suffer a penalty for no longer being able to maintain distance from the second round on.
+Similar to how [battles] work, duels resolve in stages where both sides always attack and always get a result, meaning a duel to the death in Might & Fealty can result in both participants dying of their wounds. There's also always a chance that a duel will be more severe than intended, particularly with uneven match-ups in skills. Finally, there is an exception to both sides attacking and getting a result for every round. If one side is using a ranged weapon and the other isn't, the ranged side will get a free attack of opportunity.
 
 Results
 -------
