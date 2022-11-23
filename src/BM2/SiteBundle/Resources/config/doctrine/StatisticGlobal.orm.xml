@@ -9,6 +9,7 @@
 		<field name="users" type="integer"/>
 		<field name="active_users" type="integer"/>
 		<field name="really_active_users" type="integer" nullable="true"/>
+		<field name="today_users" type="integer" nullable="true"/>
 		<field name="ever_paid_users" type="integer"/>
 		<field name="paying_users" type="integer"/>
 		<field name="active_patrons" type="integer" nullable="true"/>
@@ -34,6 +35,7 @@
 		<field name="entourage" type="integer"/>
 		<field name="peasants" type="integer"/>
 		<field name="thralls" type="integer"/>
+		<field name="ts" type="datetime" nullable="true"/>
 
 	</entity>
 </doctrine-mapping>
