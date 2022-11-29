@@ -140,7 +140,7 @@ class ApiController extends Controller {
 	  */
 	public function activeUsersAction() {
 		$response = new JsonResponse;
-		$cycle = $this->get('appstate')->getCycle();
+		$cycle = $this->get('appstate')->getCycle()-1;
 
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT s.today_users as active_users FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
