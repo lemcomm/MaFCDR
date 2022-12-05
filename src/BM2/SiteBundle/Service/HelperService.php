@@ -2,7 +2,9 @@
 
 namespace BM2\SiteBundle\Service;
 
+use BM2\SiteBundle\Entity\Activity;
 use BM2\SiteBundle\Entity\ActivityReportObserver;
+use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleReportObserver;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\SkillType;
@@ -18,8 +20,11 @@ class HelperService {
 	*/
 
 	protected $em;
+	protected $geo;
 
-	public function __construct() {
+	public function __construct(EntityManager $em, Geography $geo) {
+		$this->em = $em;
+		$this->geo = $geo;
 	}
 
 	private function newObserver($type) {
@@ -40,7 +45,7 @@ class HelperService {
 		$added = new ArrayCollection;
 		$someone = null;
 		if ($type === 'battle') {
-			foreach ($battle->getGroups() as $group) {
+			foreach ($thing->getGroups() as $group) {
 				foreach ($group->getCharacters() as $char) {
 					if (!$someone) {
 						$someone = $char;
@@ -55,7 +60,7 @@ class HelperService {
 				}
 			}
 		} elseif ($type === 'act') {
-			foreach ($act->getParticipants() as $part) {
+			foreach ($thing->getParticipants() as $part) {
 				$char = $part->getCharacter();
 				if (!$someone) {
 					$someone = $char;
@@ -81,8 +86,8 @@ class HelperService {
 				$added->add($char);
 			}
 		}
-		if ($act->getPlace()) {
-			foreach ($act->getPlace()->getCharactersPresent() as $char) {
+		if ($thing->getPlace()) {
+			foreach ($thing->getPlace()->getCharactersPresent() as $char) {
 				if (!$added->contains($char)) {
 					$obs = $this->newObserver($type);
 					$this->em->persist($obs);
@@ -92,8 +97,8 @@ class HelperService {
 				}
 			}
 		}
-		if ($act->getSettlement()) {
-			foreach ($act->getSettlement()->getCharactersPresent() as $char) {
+		if ($thing->getSettlement()) {
+			foreach ($thing->getSettlement()->getCharactersPresent() as $char) {
 				if (!$added->contains($char)) {
 					$obs = $this->newObserver($type);
 					$this->em->persist($obs);
