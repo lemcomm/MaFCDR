@@ -2,24 +2,26 @@
 
 {% trans_default_domain 'activity' %}
 {% block content %}
-	<h2>{{ 'duel.challenges.name'|trans }}</h2>
-	<p>{{ 'duel.challenges.intro'|trans|raw }}</p>
+	<h2>{{ 'duel.answer.name'|trans }}</h2>
+	<p>{{ 'duel.answer.intro'|trans|raw }}</p>
 
-	<h3> {{ 'duel.challenges.list'|trans|title }}</h3>
+	<h3> {{ 'duel.answer.list'|trans|title }}</h3>
 	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
 	{% for duel in duels %}
 		<hr>
 		<div class="subcontent inline_announcements" style="color:#460702">
 			<h4>{{ duel.name|title }}</h4>
+			<p>{{ link(duel.findChallenger.character) }} {{ 'duel.versus'|trans|raw}} {{ link(duel.findChallenged.character) }}<br />
+			{{ 'duel.answer.type'|trans|raw}} {{ ('duel.form.'~duel.subtype.name)|trans|raw}}<br />
 			{% if duel.same %}
-				{{ 'duel.challenges.same'|trans({"%link-character%":link(duel.getChallenger.character), "%link-equipment%":link(duel.getOrganizer.getWeapon)})|raw }}
+				{{ 'duel.answer.same'|trans({"%link-equipment%":link(duel.findOrganizer.getWeapon)})|raw }}
 			{% else %}
-				{{ 'duel.challenges.notsame'|trans({"%link-character%":link(duel.getChallenger.character)})|raw }}
-			{% endif %}
-			<a href="{{path('maf_activity_duel_accept', {"act":duel.id}) }}"><button id="approve">{{ 'duel.challenges.accept'|trans }}</button></a> | <a href="{{path('maf_activity_duel_refuse', {"act":duel.id}) }}"><button id="deny">{{ 'duel.challenges.reject'|trans }}</button></a>
+				
+			{% endif %}</p>
+			<p><a href="{{path('maf_activity_duel_accept', {"act":duel.id}) }}"><button id="approve">{{ 'duel.answer.accept'|trans }}</button></a> | <a href="{{path('maf_activity_duel_refuse', {"act":duel.id}) }}"><button id="deny">{{ 'duel.answer.refuse'|trans }}</button></a></p>
 		</div>
 	{% else %}
-		{{ 'duel.challenges.empty'|trans|raw }}<br />
+		{{ 'duel.answer.empty'|trans|raw }}<br />
 	{% endfor %}
 
 {% endblock %}
