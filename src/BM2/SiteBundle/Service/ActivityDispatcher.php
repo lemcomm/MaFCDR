@@ -53,6 +53,34 @@ class ActivityDispatcher extends Dispatcher {
 		return $this->action("duel.answer", "maf_activity_duel_answer");
 	}
 
+	public function activityDuelAcceptTest($ignored, $act) {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		$can = false;
+		if ($act->isAnswerable($this->getCharacter())) {
+			$can = true;
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_accept");
+	}
+
+	public function activityDuelRefuseTest($ignored, $act) {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		$can = false;
+		if ($act->isAnswerable($this->getCharacter())) {
+			$can = true;
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_refuse");
+	}
+
 	public function activityTrainTest($ignored, $type) {
 		switch ($type) {
 			case 'shortbow':
