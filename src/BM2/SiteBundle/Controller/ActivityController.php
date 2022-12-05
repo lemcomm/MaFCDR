@@ -74,7 +74,7 @@ class ActivityController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 
-                $query = $em->createQuery('SELECT a, p, b FROM BM2SiteBundle:Acitivity a JOIN a.participants p WHERE p.character = :char AND a.accepted = :acc');
+                $query = $em->createQuery('SELECT a, p FROM BM2SiteBundle:Activity a JOIN a.participants p WHERE p.character = :char AND p.accepted = :acc');
 		$query->setParameters(['char'=>$char, 'acc'=>false]);
 		$duels = $query->getResult();
 
@@ -88,27 +88,30 @@ class ActivityController extends Controller {
 	  */
 
 	public function duelAcceptAction(Request $request, Activity $act) {
-		$char = $this->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		$char = $this->gateway('activityDuelAcceptTest', $act);
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
 		foreach ($act->getParticipants() as $p) {
-			if ($p !== $char) {
+			if ($p->getCharacter() !== $char) {
 				$them = $p;
 			}
-			if ($p === $char) {
+			if ($p->getCharacter() === $char) {
 				$me = $p;
 			}
 		}
 		$em = $this->getDoctrine()->getManager();
 
-		if ($p === $act->getChallenged()) {
+		if ($me === $act->findChallenged()) {
 			if ($act->getSame()) {
+				# Same weapon, we accept. Standard duel. Set Ready and Accepted.
 				$me->setAccepted(true);
+				$act->setReady(true);
 				$em->flush();
-				$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
-				return $this->redirectToRoute('maf_activity_duel_answer');
+				$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getCharacter()->getName()]));
+				return $this->redirectToRoute('bm2_actions');
 			} else {
+				# Different weapons, we select ours, then they accept duel. No Act->setReady here.
 				$opts = $em->getRepository('BM2SiteBundle:EquipmentType')->findBy(['type'=>'weapon']);
 				$form = $this->createForm(new EquipmentLoadoutType($opts, 'loadout.weapon', 'settings'));
 				$form->handleRequest($request);
@@ -116,8 +119,8 @@ class ActivityController extends Controller {
 					$me->setWeapon($form->getData()['equipment']);
 					$me->setAccepted(true);
 					$em->flush();
-					$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getName()]));
-					return $this->redirectToRoute('maf_activity_duel_answer');
+					$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted', ['%target%'=>$them->getCharacter()->getName()]));
+					return $this->redirectToRoute('bm2_actions');
 				}
 				return $this->render('Activity/duelAccept.html.twig', [
 					'form' => $form->createView(),
@@ -126,10 +129,12 @@ class ActivityController extends Controller {
 				]);
 			}
 		} else {
+			# We're accepting their weapon choice. Set ready and accepted.
 			$me->setAccepted(true);
+			$act->setReady(true);
 			$em->flush();
-			$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted2', ['%target%'=>$them->getName()]));
-			return $this->redirectToRoute('maf_activity_duel_answer');
+			$this->addFlash('notice', $this->get('translator')->trans('duel.answer.accepted2', ['%target%'=>$them->getCharacter()->getName()]));
+			return $this->redirectToRoute('bm2_actions');
 		}
 	}
 
@@ -138,7 +143,7 @@ class ActivityController extends Controller {
 	  */
 
 	public function duelRefuseAction(Activity $act) {
-		$char = $this->gateway('activityDuelAcceptOrRefuseTest', null, null, null, $act);
+		$char = $this->gateway('activityDuelRefuseTest', $act);
 		if (! $char instanceof Character) {
                         return $this->redirectToRoute($char);
 		}
@@ -167,7 +172,7 @@ class ActivityController extends Controller {
 	  */
 
 	public function trainSkillAction($skill) {
-		$character = $this->gateway('activityTrainTest', null, null, null, $skill);
+		$character = $this->gateway('activityTrainTest', $skill);
 		if (! $character instanceof Character) {
                         return $this->redirectToRoute($character);
                 }
