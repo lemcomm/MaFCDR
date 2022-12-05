@@ -9,15 +9,24 @@ activity:
  title:      Activities Menu
 
 duel:
+ versus:     "<i>vs.</i>"
  accept:
   name:      "Accept a Duel"
   intro:     "%name% has challenged you to a duel under the terms of the ancient magics, but has granted you the option to choose your weapon. Once you've chosen they can then decline your selection.<br><br>Of course, you could always just refuse."
   decline:   "Decline the Duel"
  answer:
+  accept:    "Accept"
   accepted:  "You've accepted %target%'s request to duel!"
-  name:      "Answer a Duel"
-  refused:   "You've refused %target%'s request to duel."
   description: "You've challenges to answer."
+  intro:     "According to the rules of the ancient magics, you've been challenged to a duel it seems. Such as the magics decree, you need not agree if you do not desire such."
+  list:      "Duels to Answer"
+  name:      "Answer a Duel"
+  refuse:    "Refuse"
+  refused:   "You've refused %target%'s request to duel."
+  same:      "Both shall use the %link-equipment%"
+  weapon:    "Weapon:"
+  notsame:   "Your Choice"
+  type:      "Duel Limit:"
  challenge:
   name:      "Challenge Someone to a Duel"
   description: "Resolve things through individual, personal combat."
