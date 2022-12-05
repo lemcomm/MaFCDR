@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\ActivityParticipant;
+use BM2\SiteBundle\Entity\EquipmentType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
@@ -304,7 +305,12 @@ class CombatManager {
 			$hasM = false;
 		}
 		if ($act) {
-			$score = $me->findSkill($weapon->getName())->getScore();
+			$skill = $me->findSkill($weapon->getName());
+			if ($skill) {
+				$score = $skill->getScore();
+			} else {
+				$score = 0;
+			}
 			$power += min(sqrt($score*5), $power/2); # Same as the soldier object's ExperienceBonus func.
 			return $power;
 		} elseif ($noble) {
@@ -441,7 +447,12 @@ class CombatManager {
 		if ($power<=0) return 0;
 
 		if ($act) {
-			$score = $me->findSkill($weapon->getName())->getScore();
+			$skill = $me->findSkill($weapon->getName());
+			if ($skill) {
+				$score = $skill->getScore();
+			} else {
+				$score = 0;
+			}
 			$power += min(sqrt($score*5), $power/2); # Same as the soldier object's ExperienceBonus func.
 			return $power;
 		} elseif ($noble) {
