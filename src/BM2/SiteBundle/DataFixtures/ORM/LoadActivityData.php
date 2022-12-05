@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use BM2\SiteBundle\Entity\ActivityType;
+use BM2\SiteBundle\Entity\ActivitySubType;
 use BM2\SiteBundle\Entity\ActivityRequirement;
 use BM2\SiteBundle\Entity\BuildingType;
 use BM2\SiteBundle\Entity\PlaceType;
@@ -56,7 +57,7 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 			$type->setEnabled($data['enabled']);
 			$manager->flush();
 			$id = $type->getId();
-			if ($data['buildings']) {
+			if (isset($data['buildings'])) {
 				foreach ($data['buildings'] as $bldg) {
 					$bldgType = $manager->getRepository(BuildingType::class)->findOneBy(['name'=>$bldg]);
 					if ($bldgType) {
@@ -72,7 +73,7 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 					}
 				}
 			}
-			if ($data['places']) {
+			if (isset($data['places'])) {
 				foreach ($data['places'] as $place) {
 					$placeType = $manager->getRepository(PlaceType::class)->findOneBy(['name'=>$place]);
 					if ($placeType) {
@@ -88,13 +89,13 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 					}
 				}
 			}
-			if ($data['subtypes']) {
-				foreach ($data['subtypes'] as $subtype) {
-					$subType = $manager->getRepository(ActivitySubType::class)->findOneBy(['name'=>$subtype]);
+			if (isset($data['subtypes'])) {
+				foreach ($data['subtypes'] as $sub) {
+					$subType = $manager->getRepository(ActivitySubType::class)->findOneBy(['name'=>$sub]);
 					if (!$subType) {
 						$subType = new ActivitySubType;
 						$manager->persist($subType);
-						$subType->setName($subType);
+						$subType->setName($sub);
 					}
 				}
 			}
