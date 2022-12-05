@@ -22,10 +22,10 @@
 		<field name="surrender" type="boolean"/>
 		<field name="killed" type="boolean"/>
 
-		<field name="attacks" type="integer"/>
-		<field name="hits_taken" type="integer"/>
-		<field name="hits_made" type="integer"/>
-		<field name="wounds" type="integer"/>
+		<field name="attacks" type="integer" nullable="true"/>
+		<field name="hits_taken" type="integer" nullable="true"/>
+		<field name="hits_made" type="integer" nullable="true"/>
+		<field name="wounds" type="integer" nullable="true"/>
 
 		<many-to-one field="group_report" target-entity="ActivityReportGroup" inversed-by="characters"/>
 		<many-to-one field="character" target-entity="Character"/>
