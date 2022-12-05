@@ -7,7 +7,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager', '@activity_manager']
     activity_manager:
         class:      BM2\SiteBundle\Service\ActivityManager
-        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@helper_service', '@logger', '@combat_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@helper_service', '@logger', '@combat_manager', '@character_manager', '@appstate']
     activity_dispatcher:
         class:      BM2\SiteBundle\Service\ActivityDispatcher
         arguments:  ['@appstate']
@@ -59,7 +59,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@permission_manager', '@appstate']
     helper_service:
         class:      BM2\SiteBundle\Service\HelperService
-        arguments:  []
+        arguments:  ['@doctrine.orm.entity_manager', '@geography']
     history:
         class:      BM2\SiteBundle\Service\History
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@notification_manager']
