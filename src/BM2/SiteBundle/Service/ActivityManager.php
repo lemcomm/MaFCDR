@@ -10,6 +10,8 @@ use BM2\SiteBundle\Entity\ActivityGroup;
 use BM2\SiteBundle\Entity\ActivityBoutGroup;
 use BM2\SiteBundle\Entity\ActivityBoutParticipant;
 use BM2\SiteBundle\Entity\ActivityReport;
+use BM2\SiteBundle\Entity\ActivityReportCharacter;
+use BM2\SiteBundle\Entity\ActivityReportStage;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EquipmentType;
 use BM2\SiteBundle\Entity\Skill;
@@ -30,15 +32,19 @@ class ActivityManager {
 	private $helper;
 	private $logger;
 	private $combat;
+	private $charMan;
+	private $appState;
 
 	private $debug=0;
 
-	public function __construct(EntityManager $em, Geography $geo, HelperService $helper, Logger $logger, CombatManager $combat) {
+	public function __construct(EntityManager $em, Geography $geo, HelperService $helper, Logger $logger, CombatManager $combat, CharacterManager $charMan, AppState $appState) {
 		$this->em = $em;
 		$this->geo = $geo;
 		$this->helper = $helper;
 		$this->logger = $logger;
 		$this->combat = $combat;
+		$this->charMan = $charMan;
+		$this->appState = $appState;
 	}
 
 	/*
@@ -89,9 +95,11 @@ class ActivityManager {
 			$act->setType($type);
 			$act->setSubType($subType);
 			if ($place = $char->getInsidePlace()) {
+				$act->setLocation($char->getLocation());
 				$act->setPlace($place);
 				$act->setGeoData($place->getGeoData());
 			} elseif ($settlement = $char->getInsideSettlement()) {
+				$act->setLocation($char->getLocation());
 				$act->setSettlement($settlement);
 				$act->setGeoData($settlement->getGeoData());
 			} else {
@@ -100,6 +108,7 @@ class ActivityManager {
 			}
 			$act->setMainEvent($mainAct);
 			$act->setCreated($now);
+			$act->setReady(false);
 			return $act;
 		} else {
 			return False;
@@ -198,6 +207,28 @@ class ActivityManager {
 	ACTIVITY DELETE FUNCTIONS
 	*/
 
+	public function cleanupAct(Activity $act) {
+		$em = $this->em;
+		foreach ($act->getEvents() as $sub) {
+			$this->cleanupAct($sub);
+		}
+		foreach ($act->getParticipants() as $part) {
+			foreach($part->getBoutParticipation() as $bout) {
+				$em->remove($bout);
+			}
+			$em->remove($part);
+		}
+		foreach ($act->getGroups() as $group) {
+			$em->remove($group);
+		}
+		foreach ($act->getBouts() as $bout) {
+			$em->remove($bout);
+		}
+		$em->remove($act);
+		$em->flush();
+		return true;
+	}
+
 	public function refuseDuel($act) {
 		if ($act->getType->getName() === 'duel') {
 			foreach ($act->getParticipants() as $p) {
@@ -215,6 +246,22 @@ class ActivityManager {
 	ACTIVITY RUNNING FUNCTIONS
 	*/
 
+	public function runAll() {
+		$em = $this->em;
+                $now = new \DateTime("now");
+		$query = $em->createQuery('SELECT a FROM BM2SiteBundle:Activity a WHERE a.ready = true');
+		$all = $query->getResult();
+		foreach ($all as $act) {
+			$type = $act->getType()->getName();
+			if ($type === 'duel') {
+				$this->runDuel($act);
+			} else {
+				# Do nothing, for now.
+			}
+		}
+		return true;
+	}
+
 	public function run(Activity $act) {
 		$type = $act->getType()->getName();
 		if ($type === 'duel') {
@@ -230,11 +277,21 @@ class ActivityManager {
 		$them = $act->findChallenged();
 		$themC = $them->getCharacter();
 		$meRanged = $this->combat->RangedPower($me, false, $me->getWeapon());
-		$meScore = $me->findSkill($me->getWeapon()->getName())->getScore();
 		$meMelee = $this->combat->MeleePower($me, false, $me->getWeapon());
+		$meSkill = $meC->findSkill($me->getWeapon()->getName());
+		if ($meSkill) {
+			$meScore = $meSkill->getScore();
+		} else {
+			$meScore = 0;
+		}
 		$themRanged = $this->combat->RangedPower($them, false, $them->getWeapon());
 		$themMelee = $this->combat->MeleePower($them, false, $them->getWeapon());
-		$themScore = $them->findSkill($them->getWeapon()->getName())->getScore();
+		$themSkill = $themC->findSkill($them->getWeapon()->getName());
+		if ($themSkill) {
+			$themScore = $meSkill->getScore();
+		} else {
+			$themScore = 0;
+		}
 		if ($meRanged && !$themRanged) {
 			$meFreeAttack = true;
 			$themFreeAttack = false;
@@ -253,7 +310,7 @@ class ActivityManager {
 			$stayRanged = false;
 		}
 		$wpnOnly = $act->getWeaponOnly();
-		switch ($act->getSubType()->getName()) {
+		switch ($act->getSubtype()->getName()) {
 			case 'first blood':
 				$limit = 10;
 				break;
@@ -277,7 +334,8 @@ class ActivityManager {
 			$report->setSubType($act->getSubType());
 			$report->setLocation($act->getLocation());
 			$report->setGeoData($act->getGeoData());
-			$report->setDateTime(new \DateTime("now"));
+			$report->setTs(new \DateTime("now"));
+			$report->setCycle($this->appState->getCycle());
 			$em->persist($report);
 			$act->setReport($report);
 			$this->report = $report;
@@ -289,36 +347,38 @@ class ActivityManager {
 			$em->flush();
 		}
 
-		$charReports = $this->report->getCharacter();
-		$count = $charReports->count();
+		$charReports = $this->report->getCharacters();
 		$haveMe = false;
 		$haveThem = false;
-		if ($count === 2) {
-			foreach ($charReports as $each) {
-				if ($each->getCharacter() === $meC) {
-					$haveMe = true;
-					$meReport = $each;
-					continue;
+		if ($charReports) {
+			$count = $charReports->count();
+			if ($count === 2) {
+				foreach ($charReports as $each) {
+					if ($each->getCharacter() === $meC) {
+						$haveMe = true;
+						$meReport = $each;
+						continue;
+					}
+					if ($each->getCharacter() === $themC) {
+						$haveThem = true;
+						$themReport = $each;
+					}
 				}
-				if ($each->getCharacter() === $themC) {
-					$haveThem = true;
-					$themReport = $each;
-				}
-			}
-		} elseif ($count === 1) {
-			foreach ($this->report->getCharacters() as $each) {
-				if ($each->getCharacter() === $meC) {
-					$haveMe = true;
-					$meReport = $each;
-				}
-				if ($each->getCharacter() === $themC) {
-					$haveThem = true;
-					$themReport = $each;
+			} elseif ($count === 1) {
+				foreach ($this->report->getCharacters() as $each) {
+					if ($each->getCharacter() === $meC) {
+						$haveMe = true;
+						$meReport = $each;
+					}
+					if ($each->getCharacter() === $themC) {
+						$haveThem = true;
+						$themReport = $each;
+					}
 				}
 			}
 		}
 		if (!$haveMe) {
-			$meReport = new ActivityCharacterReport;
+			$meReport = new ActivityReportCharacter;
 			$em->persist($meReport);
 			$this->report->addCharacter($meReport);
 			$meReport->setCharacter($meC);
@@ -331,7 +391,7 @@ class ActivityManager {
 			$meReport->setActivityReport($this->report);
 		}
 		if (!$haveThem) {
-			$themReport = new ActivityCharacterReport;
+			$themReport = new ActivityReportCharacter;
 			$em->persist($themReport);
 			$this->report->addCharacter($themReport);
 			$themReport->setCharacter($themC);
@@ -349,6 +409,8 @@ class ActivityManager {
 		# Setup
 		$round = 1;
 		$continue = true;
+		$meWounds = 0;
+		$themWounds = 0;
 
 		# Special first round logic.
 		if ($meFreeAttack) {
@@ -365,10 +427,11 @@ class ActivityManager {
 			if ($themWounds >= $limit) {
 				$continue = false;
 			}
-			$this->createStageReport(null, $meReport, $round, $data);
-			$this->createStageReport(null, $themReport, $round, ['result'=>'freehit']);
+			$meSR = $this->createStageReport(null, $meReport, $round, $data);
+			$themSR = $this->createStageReport(null, $themReport, $round, ['result'=>'freehit']);
 			$round++;
 			$em->flush();
+			$meWounds = 0;
 		} elseif ($themFreeAttack) {
 			$data = [];
 			$result = $this->duelAttack($them, $themC, $themRanged, $themMelee, $themScore, $meC, $meScore, $act, true);
@@ -383,10 +446,11 @@ class ActivityManager {
 			if ($meWounds >= $limit) {
 				$continue = false;
 			}
-			$this->createStageReport(null, $themReport, $round, $data);
-			$this->createStageReport(null, $meReport, $round, ['result'=>'freehit']);
+			$themSR = $this->createStageReport(null, $themReport, $round, $data);
+			$meSR = $this->createStageReport(null, $meReport, $round, ['result'=>'freehit']);
 			$round++;
 			$em->flush();
+			$themWounds = 0;
 		}
 
 		if ($meRanged > $meMelee) {
@@ -413,7 +477,7 @@ class ActivityManager {
 				}
 				$themWounds = $themWounds + $newWounds;
 				$data['wounds'] = $themWounds;
-				$this->createStageReport(null, $meReport, $round, $data);
+				$meSR = $this->createStageReport(null, $meReport, $round, $data);
 
 				# Challenged attacks.
 				$data = [];
@@ -426,7 +490,7 @@ class ActivityManager {
 				}
 				$meWounds = $meWounds + $newWounds;
 				$data['wounds'] = $meWounds;
-				$this->createStageReport(null, $themReport, $round, $data);
+				$themSR = $this->createStageReport(null, $themReport, $round, $data);
 
 				$round++;
 				$em->flush();
@@ -501,27 +565,29 @@ class ActivityManager {
 
 	private function duelConclude($me, $meWounds, $meReport, $them, $themWounds, $themReport, $limit, $act, $round) {
 		$meData = [];
+		$meC = $me->getCharacter();
 		$themData = [];
+		$themC = $them->getCharacter();
 		if ($themWounds >= $limit && $meWounds < $limit) {
 			# My victory.
 			$meData['result'] = 'victory';
 			$themData['result'] = 'loss';
-			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($me, $meReport->getWeapon(), $them, $themReport->getWeapon());
+			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($meC, $meReport->getWeapon(), $themC, $themReport->getWeapon());
 		} elseif ($themWounds >= $limit && $meWounds >= $limit) {
 			# Draw.
 			$meData['result'] = 'draw';
 			$themData['result'] = 'draw';
-			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($me, $meReport->getWeapon(), $them, $themReport->getWeapon());
+			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($meC, $meReport->getWeapon(), $themC, $themReport->getWeapon());
 		} elseif ($meWounds >= $limit && $themWounds < $limit) {
 			# Their victory.
 			$meData['result'] = 'loss';
 			$themData['result'] = 'loss';
-			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($me, $meReport->getWeapon(), $them, $themReport->getWeapon());
+			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($meC, $meReport->getWeapon(), $themC, $themReport->getWeapon());
 		} else {
 			# Inconclusive. Shouldn't end up here. Process as draw, flag as error.
 			$meData['result'] = 'loss';
 			$themData['result'] = 'loss';
-			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($me, $meReport->getWeapon(), $them, $themReport->getWeapon());
+			list($meData['skillCheck'], $meData['skillAcc'], $themData['skillCheck'], $themData['skillAcc']) = $this->skillEval($meC, $meReport->getWeapon(), $themC, $themReport->getWeapon());
 			$this->log(10, "Duel ended inconclusively!\n");
 		}
 		# 32767 is the smallint max value, if you're curious.
@@ -529,12 +595,25 @@ class ActivityManager {
 		$this->createStageReport(null, $themReport, 32767, $themData);
 		$this->em->flush();
 		if ($limit == 100) {
+			if ($themWounds >= $limit && $meWounds >= $limit) {
+				# Special handling for both dieing, lol
+				#$this->charMan->kill($meC, $themC, null, 'deathduel2');
+				#$this->charMan->kill($themC, $meC, null, 'deathduel2');
+				$meC->setSystem('dueltestdead');
+				$themC->setSystem('dueltestedead');
+			} elseif ($themWounds >= $limit && $meWounds < $limit) {
+				#$this->charMan->kill($themC, $meC, null, 'deathduel');
+				$themC->setSystem('dueltestedead');
+			} elseif ($themWounds < $limit && $meWounds >= $limit) {
+				#$this->charMan->kill($meC, $themC, null, 'deathduel');
+				$meC->setSystem('dueltestdead');
+			}
 			# Duels to the death have separate handling.
 		} else {
-			$this->applyWounds($me->getCharacter(), $meWounds);
-			$this->applyWounds($them->getCharacter(), $themWounds);
+			$this->applyWounds($meC, $meWounds);
+			$this->applyWounds($themC, $themWounds);
 		}
-
+		$this->cleanupAct($act);
 	}
 
 	private function applyWounds(Character $me, $wounds) {
@@ -561,8 +640,18 @@ class ActivityManager {
 
 			}
 		}
-		$meS = $me->findSkill($meW->getName())->getScore();
-		$themS = $them->findSkill($themW->getName())->getScore();
+		$meSkill = $me->findSkill($meW->getName());
+		if ($meSkill) {
+			$meS = $meSkill->getScore();
+		} else {
+			$meS = 0;
+		}
+		$themSkill = $them->findSkill($themW->getName());
+		if ($meSkill) {
+			$themS = $themSkill->getScore();
+		} else {
+			$themS = 0;
+		}
 		# So this figures out which character has the higher skill, sets them as $a, sets the other as $b,
 		# and sets $flip so we can figure out who is who later.
 		if ($meS > $themS && $meS * $threshold > $themS) {
