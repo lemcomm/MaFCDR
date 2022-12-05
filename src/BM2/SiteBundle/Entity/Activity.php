@@ -12,7 +12,7 @@ class Activity {
 
         public function findChallenger() {
                 foreach ($this->participants as $p) {
-                        if ($p === $this->organizer) {
+                        if ($p->getOrganizer()) {
                                 return $p;
                         }
                 }
@@ -21,7 +21,16 @@ class Activity {
 
         public function findChallenged() {
                 foreach ($this->participants as $p) {
-                        if ($p !== $this->organizer) {
+                        if (!$p->getOrganizer()) {
+                                return $p;
+                        }
+                }
+                return false;
+        }
+
+        public function findOrganizer() {
+                foreach ($this->participants as $p) {
+                        if ($p->getOrganizer()) {
                                 return $p;
                         }
                 }
@@ -39,4 +48,5 @@ class Activity {
                 }
                 return false;
         }
+        
 }
