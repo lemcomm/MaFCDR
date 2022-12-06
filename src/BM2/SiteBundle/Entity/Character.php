@@ -593,10 +593,9 @@ class Character {
 	public function findAnswerableDuels() {
 		$all = new ArrayCollection;
 		foreach ($this->getActivityParticipation() as $each) {
-			if ($each->getActivity()->getType()->getName() === 'duel') {
-				if (!$each->getAccepted()) {
-					$all->add($each->getActivity());
-				}
+			$act = $each->getActivity();
+			if ($act->isAnswerable($this)) {
+				$all->add($act);
 			}
 		}
 		return $all;
