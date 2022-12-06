@@ -158,8 +158,8 @@ class CombatManager {
 			$power += $me->getMount()->getDefense();
 		}
 
-		$power += $me->ExperienceBonus($power);
 		if ($sol) {
+			$power += $me->ExperienceBonus($power);
 			if ($melee) {
 				$me->updateDefensePower($power); // defense does NOT scale down with number of men in the unit
 			} else {
@@ -211,7 +211,7 @@ class CombatManager {
 		return $logs;
 	}
 
-	public function MeleeAttack($me, $target, $mPower, $act=false, $battle=false, $xpMod = 1, $defBonus = null) {
+	public function MeleeAttack($me, $target, $mPower, $act=false, $battle=false, $xpMod = 1, $defBonus = 0) {
 		if ($battle) {
 			if ($me->isNoble() && $me->getWeapon()) {
 				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
@@ -226,7 +226,7 @@ class CombatManager {
 		$result='miss';
 
 		if ($act && $act->getWeaponOnly()) {
-			$defense += $defBonus;
+			$defense = $defBonus;
 		} else {
 			$defense = $this->DefensePower($target, $battle);
 		}
@@ -245,7 +245,10 @@ class CombatManager {
 		$logs[] = (round($attack*10)/10)." vs. ".(round($defense*10)/10)." - ";
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($me, $target, $attack, $type, 'melee');
+			list($result, $sublogs) = $this->resolveDamage($me, $target, $attack, $type, 'melee');
+			foreach ($sublogs as $each) {
+				$logs[] = $each;
+			}
 			if ((($type === 'battle' && $me->isNoble()) || $type === 'act') && $me->getWeapon()) {
 				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
 			} else {
@@ -352,7 +355,7 @@ class CombatManager {
 		}
 	}
 
-	public function RangedHit($me, $target, $rPower, $act=false, $battle=false, $xpMod = 1, $defBonus = null) {
+	public function RangedHit($me, $target, $rPower, $act=false, $battle=false, $xpMod = 1, $defBonus = 0) {
 		if ($battle) {
 			if ($me->isNoble() && $me->getWeapon()) {
 				if (in_array($me->getType(), ['armoured archer', 'archer'])) {
@@ -396,7 +399,10 @@ class CombatManager {
 
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($me, $target, $attack, $type, 'ranged');
+			list($result, $sublogs) = $this->resolveDamage($me, $target, $attack, $type, 'ranged');
+			foreach ($sublogs as $each) {
+				$logs[] = $each;
+			}
 		} else {
 			// armour saved our target
 			$logs[] = "no damage\n";
@@ -497,71 +503,82 @@ class CombatManager {
 		// TODO: attacks on mounted soldiers could kill the horse instead
 		$logs = [];
 		if ($type === 'battle') {
-			if (rand(0,$power) > rand(0,max(1,$this->DefensePower($target, true) - $target->getWounded(true)))) {
-				// penetrated again = kill
-				switch ($phase) {
-					case 'charge':  $surrender = 90; break;
-					case 'ranged':	$surrender = 60; break;
-					case 'hunt':	$surrender = 85; break;
-					case 'melee':
-					default:	$surrender = 75; break;
-				}
-				// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
-				if (($soldier->getMount() && $target->getMount() && rand(0,100) < 50) || $soldier->getMount() && !$target->getMount() && rand(0,100) < 70) {
+			$battle = true;
+		} else {
+			$battle = false;
+		}
+		if (rand(0,$power) > rand(0,max(1,$this->DefensePower($target, $battle) - $target->getWounded(true)))) {
+			// penetrated again = kill
+			switch ($phase) {
+				case 'charge':  $surrender = 90; break;
+				case 'ranged':	$surrender = 60; break;
+				case 'hunt':	$surrender = 85; break;
+				case 'melee':
+				default:	$surrender = 75; break;
+			}
+			// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
+			if ($battle && (($me->getMount() && $target->getMount() && rand(0,100) < 50) || $me->getMount() && !$target->getMount() && rand(0,100) < 70)) {
+				if ($battle) {
 					$logs[] = "killed mount & wounded\n";
 					$target->wound(rand(max(1, round($power/10)), $power));
 					$target->dropMount();
 					$this->history->addToSoldierLog($target, 'wounded.'.$phase);
-					$result='wound';
-				} else if ($target->isNoble() && !$target->getCharacter()->isNPC() && rand(0,100) < $surrender && $soldier->getCharacter()) {
-					$logs[] = "captured\n";
-					$this->charMan->imprison_prepare($target->getCharacter(), $soldier->getCharacter());
-					$this->history->logEvent($target->getCharacter(), 'event.character.capture', array('%link-character%'=>$soldier->getCharacter()->getId()), History::HIGH, true);
-					$result='capture';
-					$this->charMan->addAchievement($soldier->getCharacter(), 'captures');
-				} else {
-					if ($soldier->isNoble()) {
+				}
+				$result='wound';
+			} elseif ($battle && $target->isNoble() && !$target->getCharacter()->isNPC() && rand(0,100) < $surrender && $me->getCharacter()) {
+				$logs[] = "captured\n";
+				$this->charMan->imprison_prepare($target->getCharacter(), $me->getCharacter());
+				$this->history->logEvent($target->getCharacter(), 'event.character.capture', array('%link-character%'=>$me->getCharacter()->getId()), History::HIGH, true);
+				$result='capture';
+				$this->charMan->addAchievement($me->getCharacter(), 'captures');
+			} else {
+				if ($battle) {
+					if ($me->isNoble()) {
 						if ($target->isNoble()) {
-							$this->charMan->addAchievement($soldier->getCharacter(), 'kills.nobles');
+							$this->charMan->addAchievement($me->getCharacter(), 'kills.nobles');
 						} else {
-							$this->charMan->addAchievement($soldier->getCharacter(), 'kills.soldiers');
+							$this->charMan->addAchievement($me->getCharacter(), 'kills.soldiers');
 						}
 					}
 					$logs[] = "killed\n";
 					$target->kill();
 					$this->history->addToSoldierLog($target, 'killed');
-					$result='kill';
 				}
-			} else {
+				$result='kill';
+			}
+		} else {
+			if ($battle) {
 				$logs[] = "wounded\n";
 				$target->wound(rand(max(1, round($power/10)), $power));
 				$this->history->addToSoldierLog($target, 'wounded.'.$phase);
-				$result='wound';
 				$target->gainExperience(1*$this->xpMod); // it hurts, but it is a teaching experience...
 			}
-			if ($antiCav) {
-				$tPower = $this->MeleePower($target, true);
-				list($innerResult, $sublogs) = $this->MeleeAttack($target, $soldier, $tPower, false, true, $xpMod, $defBonus); // Basically, an attack of opportunity.
-				foreach ($sublogs as $each) {
-					$logs[] = $each;
-				}
-				$result = $result . " " . $innerResult;
-			} else {
-				$innerResult = null;
+			$result='wound';
+		}
+		if ($battle && $antiCav) {
+			$tPower = $this->MeleePower($target, true);
+			list($innerResult, $sublogs) = $this->MeleeAttack($target, $me, $tPower, false, true, $xpMod, $defBonus); // Basically, an attack of opportunity.
+			foreach ($sublogs as $each) {
+				$logs[] = $each;
 			}
-
-			$soldier->addCasualty();
+			$result = $result . " " . $innerResult;
+		} else {
+			$innerResult = null;
+		}
+		if ($battle) {
+			$me->addCasualty();
 
 			// FIXME: these need to take unit sizes into account!
 			// FIXME: maybe we can optimize this by counting morale damage per unit and looping over all soldiers only once?!?!
 			// every casualty reduces the morale of other soldiers in the same unit
 			foreach ($target->getAllInUnit() as $s) { $s->reduceMorale(1); }
 			// enemy casualties make us happy - +5 for the killer, +1 for everyone in his unit
-			foreach ($soldier->getAllInUnit() as $s) { $s->gainMorale(1); }
-			$soldier->gainMorale(4); // this is +5 because the above includes myself
+			foreach ($me->getAllInUnit() as $s) { $s->gainMorale(1); }
+			$me->gainMorale(4); // this is +5 because the above includes myself
 
 			// FIXME: since nobles can be wounded more than once, this can/will count them multiple times
 		}
+
 		return [$result, $logs];
 	}
 
