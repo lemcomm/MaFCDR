@@ -10,14 +10,14 @@ use Doctrine\ORM\Mapping as ORM;
 class ActivityParticipant {
 
         public function isChallenger() {
-                if ($this === $this->getActivity()->getOrganizer()) {
+                if ($this->getOrganizer()) {
                         return true;
                 }
                 return false;
         }
 
         public function isChallenged() {
-                if ($this !== $this->getActivity()->getOrganizer()) {
+                if (!$this->getOrganizer()) {
                         return true;
                 }
                 return false;
