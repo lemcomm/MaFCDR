@@ -230,13 +230,8 @@ class ActivityManager {
 	}
 
 	public function refuseDuel($act) {
-		if ($act->getType->getName() === 'duel') {
-			foreach ($act->getParticipants() as $p) {
-				$this->em->remove($p);
-			}
-			$this->em->remove($act->getBouts()->first());
-			$this->em->remove($act);
-			$this->em->flush();
+		if ($act->getType()->getName() === 'duel') {
+			$this->cleanupAct($act);
 			return true;
 		}
 		return false;
@@ -465,7 +460,7 @@ class ActivityManager {
 		}
 
 		if ($continue) {
-			while ($themWounds >= $limit && $meWounds >= $limit) {
+			while ($themWounds < $limit && $meWounds < $limit) {
 				# Challenger attacks.
 				$data = [];
 				$result = $this->duelAttack($me, $meC, $meRanged, $meMelee, $meScore, $themC, $themScore, $act, $meUseRanged);
@@ -504,6 +499,9 @@ class ActivityManager {
 
 	private function duelAttack($me, $meChar, $meRanged, $meMelee, $meScore, $themChar, $themScore, $act, $ranged=false) {
 		if ($ranged) {
+			if ($meScore < 25) {
+				$meScore = 25; # Basic to-hit chance.
+			}
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." fires - ");
 			if ($this->combat->RangedRoll(0, 1, 0, $meScore)) {
@@ -515,6 +513,9 @@ class ActivityManager {
 				$result = 'miss';
 			}
 		} else {
+			if ($meScore < 45) {
+				$meScore = 45; # Basic to-hit chance.
+			}
 			$this->helper->trainSkill($meChar, $me->getWeapon()->getSkill());
 			$this->log(10, $meChar->getName()." attacks - ");
 			if ($this->combat->MeleeRoll(0, 1, 0, $meScore)) {
@@ -532,7 +533,7 @@ class ActivityManager {
 	private function duelApplyResult($result) {
 		# Do nothing for misses.
 		$new = 0;
-		if ($result === 'no damage') {
+		if ($result === 'fail') {
 			# Even taking no obvious damage still wears you down.
 			$new = rand(0,3);
 		} elseif ($result === 'wound') {
@@ -647,7 +648,7 @@ class ActivityManager {
 			$meS = 0;
 		}
 		$themSkill = $them->findSkill($themW->getName());
-		if ($meSkill) {
+		if ($themSkill) {
 			$themS = $themSkill->getScore();
 		} else {
 			$themS = 0;
