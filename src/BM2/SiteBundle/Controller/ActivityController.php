@@ -155,8 +155,8 @@ class ActivityController extends Controller {
 		}
 
 		$this->get('activity_manager')->refuseDuel($act); # Delete the activity, basically. ActMan flushes.
-		$this->addFlash('notice', $this->get('translator')->trans('duel.answer.refused', ['%target%'=>$them->getName()]));
-		return $this->redirectToRoute('maf_activity_duel_answer');
+		$this->addFlash('notice', $this->get('translator')->trans('duel.answer.refused', ['%target%'=>$them->getCharacter()->getName()]));
+		return $this->redirectToRoute('bm2_actions');
 	}
 
 	/**
