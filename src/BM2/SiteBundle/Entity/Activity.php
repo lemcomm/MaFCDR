@@ -39,10 +39,20 @@ class Activity {
 
         public function isAnswerable(Character $char) {
                 foreach ($this->participants as $p) {
-                        if ($p->getCharacter() === $char && $p->isChallenged() && !$p->getAccepted()) {
+                        if ($p->getCharacter() !== $char) {
+                                # Not this character. Ignore.
+                                continue;
+                        }
+                        if ($p->getAccepted()) {
+                                # This character has already answered. End.
+                                break;
+                        }
+                        if ($p->isChallenged()) {
                                 return true;
                         }
-                        if ($p->getCharacter() === $char && $p->isChallenger() && $p->getActivity()->findChallenged()->getAccepted() && !$p->getAccepted()) {
+                        if ($p->isChallenger() && $p->getActivity()->findChallenged() && $p->getActivity()->findChallenged()->getAccepted()) {
+                                # We shouldn't *need* the middle check but just in case.
+                                # We are the challenger, the challenged has accepted. Now we can accept thier weapon choice.
                                 return true;
                         }
                 }
