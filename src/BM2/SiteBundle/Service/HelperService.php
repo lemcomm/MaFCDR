@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\ActivityReportObserver;
 use BM2\SiteBundle\Entity\Battle;
 use BM2\SiteBundle\Entity\BattleReportObserver;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Skill;
 use BM2\SiteBundle\Entity\SkillType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
