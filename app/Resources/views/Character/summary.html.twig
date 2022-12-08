@@ -73,7 +73,12 @@
 {% else %}
 	{{ 'personal.requests.summary.pending'|trans({}, "actions")|raw }} <a href="{{ path('bm2_gamerequest_manage') }}">{{ 'personal.requests.summary.some'|transchoice(requests|length, {"%i%":requests|length}, "actions")}}</a>
 {% endif %}
-
+<h3>{{ 'personal.activities.summary.title'|trans({}, "actions")|title }}</h3>
+{% if duels|length < 1 %}
+	{{ 'personal.activities.duels.none'|trans({}, "actions")|raw }}
+{% else %}
+	{{ 'personal.activities.duels.pending'|trans({}, "actions")|raw }} <a href="{{ path('maf_activity_duel_answer') }}">{{ 'personal.activities.duels.some'|transchoice(requests|length, {"%i%":duels|length}, "actions")}}</a>
+{% endif %}
 <h3>{{ 'unread.title'|trans({}, "conversations")|title }}</h3>
 {% include "Conversation/unread_template.html.twig" with {"unread":unread} only %}
 
