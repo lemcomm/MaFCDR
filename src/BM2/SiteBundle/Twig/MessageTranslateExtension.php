@@ -146,6 +146,10 @@ class MessageTranslateExtension extends \Twig_Extension {
 						$battle = $this->em->getRepository('BM2SiteBundle:BattleReport')->find($value);
 						$data['%battle'.$index.'%'] = $this->links->ObjectLink($battle, false, $this->absolute);
 						break;
+					case 'activityreport':
+						$report = $this->em->getRepository('BM2SiteBundle:ActivityReport')->find($value);
+						$data['%activityreport'.$index.'%'] = $this->links->ObjectLink($report, false, $this->absolute);
+						break;
 					case 'log':
 						$log = $this->em->getRepository('BM2SiteBundle:EventLog')->find($value);
 						$data['%log'.$index.'%'] = $this->links->ObjectLink($log, false, $this->absolute);
