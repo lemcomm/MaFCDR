@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Activity;
+use BM2\SiteBundle\Entity\ActivityReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\EquipmentType;
 
@@ -79,7 +80,8 @@ class ActivityController extends Controller {
 		$duels = $query->getResult();
 
 		return $this->render('Activity/duelAnswer.html.twig', [
-                     'duels'=>$duels
+                     'duels'=>$duels,
+		     'char'=>$char
 		]);
 	}
 
@@ -160,11 +162,43 @@ class ActivityController extends Controller {
 	}
 
 	/**
-	  * @Route("/duel/{report}", name="maf_duel_report", requirements={"report"="\d+"})
+	  * @Route("/activity/report/{report}", name="maf_activity_report", requirements={"report"="\d+"})
 	  */
 
         public function activityReport(ActivityReport $report) {
+		$char = $this->get('appstate')->getCharacter(true,true,true);
+		if (! $char instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
 
+		$check = false;
+		if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+			$check = $report->checkForObserver($char);
+			$admin = false;
+		} else {
+			$check = $report->checkForObserver($char);
+			$admin = true;
+		}
+
+		if ($report->getPlace()) {
+			$place = $report->getPlace();
+			$settlement = $place->getSettlement();
+			$inside = true;
+		} elseif ($report->getSettlement()) {
+			$place = false;
+			$settlement = $report->getSettlement();
+			$inside = true;
+		} else {
+			$place = false;
+			$settlement = $report->getGeoData()->getSettlement();
+			$inside = false;
+		}
+		foreach ($report->getCharacters() as $group) {
+			$totalRounds = $group->getStages()->count();
+			break;
+		}
+
+		return $this->render('Activity/viewReport.html.twig', ['report'=>$report, 'place'=>$place, 'settlement'=>$settlement, 'inside'=>$inside, 'access'=>$check, 'admin'=>$admin, 'roundcount'=>$totalRounds]);
         }
 
 	/**
