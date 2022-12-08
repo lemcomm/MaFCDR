@@ -117,12 +117,8 @@ class HelperService {
 			return false;
 		}
 		$training = false;
-		foreach ($char->getSkills() as $skill) {
-			if ($skill->getType() === $type) {
-				$training = $skill;
-				break;
-			}
-		}
+		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Skill s WHERE s.character = :me AND s.type = :type ORDER BY s.id ASC')->setParameters(['me'=>$char, 'type'=>$type])->setMaxResults(1);
+		$training = $query->getResult();
 		if ($pract && $pract < 1) {
 			$pract = 1;
 		} elseif ($pract) {
@@ -134,6 +130,7 @@ class HelperService {
 			$theory = round($theory);
 		}
 		if (!$training) {
+			echo 'making new skill - ';
 			$training = new Skill();
 			$this->em->persist($training);
 			$training->setCharacter($char);
@@ -144,6 +141,8 @@ class HelperService {
 			$training->setPracticeHigh($pract);
 			$training->setTheoryHigh($theory);
 		} else {
+			$training = $training[0];
+			echo 'updating skill '.$training->getId().' - ';
 			if ($pract) {
 				$newPract = $training->getPractice() + $pract;
 				$training->setPractice($newPract);
