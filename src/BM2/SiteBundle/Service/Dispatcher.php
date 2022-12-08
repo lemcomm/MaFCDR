@@ -1,11 +1,13 @@
 <?php
 
 namespace BM2\SiteBundle\Service;
-
+;
+use BM2\SiteBundle\Entity\ActivityReport;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationDeity;
 use BM2\SiteBundle\Entity\AssociationMember;
-use BM2\SiteBundle\Entity\AssociationRank;
+use BM2\SiteBundle\Entity\AssociationRank;;
+use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Deity;
@@ -4091,7 +4093,19 @@ class Dispatcher {
 			return array("name"=>"journal.write.name", "description"=>"error.noaccess.battlereport");
 		}
 
-		return array("name"=>"journal.write", "url"=>"maf_journal_write", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+		return array("name"=>"journal.write", "url"=>"maf_journal_write_battle", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+	}
+
+	public function journalWriteActivityTest($ignored, ActivityReport $report) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
+		}
+
+		if (!$report->checkForObserver($this->getCharacter())) {
+			return array("name"=>"journal.write.name", "description"=>"error.noaccess.activityreport");
+		}
+
+		return array("name"=>"journal.write", "url"=>"maf_journal_write_activity", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
 	}
 
 	/* ========== various tests and helpers ========== */
