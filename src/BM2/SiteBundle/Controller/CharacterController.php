@@ -129,7 +129,8 @@ class CharacterController extends Controller {
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
 			'actrange' => $this->get('geography')->calculateInteractionDistance($character),
-			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character)
+			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character),
+			'duels' => $character->findAnswerableDuels()
 		]);
 	}
 
