@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\ActivityReport;
+use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Journal;
 use BM2\SiteBundle\Entity\UserReport;
@@ -133,6 +135,36 @@ class JournalController extends Controller {
 			'report'=>$report
 		]);
 	}
+
+  	/**
+  	  * @Route("/write/activity/{report}", name="maf_journal_write_activity")
+  	  */
+  	public function journalWriteAboutActivityAction(Request $request, ActivityReport $report) {
+  		$character = $this->get('dispatcher')->gateway('journalWriteActivityTest', null, null, null, $report);
+  		if (! $character instanceof Character) {
+  			return $this->redirectToRoute($character);
+  		}
+
+  		$form = $this->createForm(new JournalType());
+  		$form->handleRequest($request);
+
+  		if ($form->isValid() && $form->isSubmitted()) {
+  			$data = $form->getData();
+  			$journal = $this->newJournal($character, $data);
+  			$journal->setActivityReport($report);
+
+  			$em = $this->getDoctrine()->getManager();
+  			$em->persist($journal);
+  			$em->flush();
+  			$this->addFlash('notice', $this->get('translator')->trans('journal.write.success', array(), 'messages'));
+  			return $this->redirectToRoute('maf_journal_mine');
+  		}
+
+  		return $this->render('Journal/write.html.twig', [
+  			'form'=>$form->createView(),
+  			'report'=>$report
+  		]);
+  	}
 
 	/**
 	  * @Route("/mine", name="maf_journal_mine")
