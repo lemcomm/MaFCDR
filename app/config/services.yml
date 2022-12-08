@@ -7,7 +7,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@character_manager', '@history', '@dispatcher', '@generator', '@geography', '@interactions', '@politics', '@permission_manager', '@twig.extension.gametime', '@war_manager', '@action_manager', '@activity_manager']
     activity_manager:
         class:      BM2\SiteBundle\Service\ActivityManager
-        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@helper_service', '@logger', '@combat_manager', '@character_manager', '@appstate']
+        arguments:  ['@doctrine.orm.entity_manager', '@geography', '@helper_service', '@logger', '@combat_manager', '@character_manager', '@appstate', '@history']
     activity_dispatcher:
         class:      BM2\SiteBundle\Service\ActivityDispatcher
         arguments:  ['@appstate']
