@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Place;
+use BM2\SiteBundle\Entity\SkillType;
 
 class Character {
 
@@ -605,9 +606,9 @@ class Character {
 		return 'first one';
 	}
 
-	public function findSkill($skill) {
+	public function findSkill(SkillType $skill) {
 		foreach ($this->skills as $each) {
-			if ($each->getType()->getName() === $skill) {
+			if ($each->getType() === $skill) {
 				return $each;
 			}
 		}
