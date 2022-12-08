@@ -209,6 +209,8 @@ class LinksExtension extends \Twig_Extension {
 
 	private function getLink($name) {
 		switch (strtolower($name)) {
+			case 'activity':    	return 'maf_activity';
+			case 'activityreport':  return 'maf_activity_report';
 			case 'character':       return 'bm2_site_character_view';
 			case 'settlement':      return 'bm2_settlement';
 			case 'battle':    	return 'bm2_battle';
@@ -266,6 +268,11 @@ class LinksExtension extends \Twig_Extension {
 				$id = $entity->getId();
 				$loc = $entity->getLocationName();
 				$name = $this->translator->trans($loc['key'], array('%location%'=>$loc['name']));
+				break;
+			case 'ActivityReport':
+				$id = $entity->getId();
+				$name = $this->translator->trans('activity.'.$entity->getType()->getName().'.'.$entity->getSubType()->getName());
+				$linktype = 'report';
 				break;
 			case 'Building':
 				$entity = $entity->getType();
@@ -393,10 +400,12 @@ class LinksExtension extends \Twig_Extension {
 		// FIXME: above still not working, so trying with all absolute paths now
 		$type = UrlGeneratorInterface::ABSOLUTE_URL;
 
-		if ($class != 'unit') {
-			$url = $this->generator->generate($path, array('id' => $id), $type);
-		} else {
+		if ($class === 'unit') {
 			$url = $this->generator->generate($path, array('unit' => $id), $type);
+		} elseif ($class === 'report') {
+			$url = $this->generator->generate($path, array($class => $id), $type);
+		} else {
+			$url = $this->generator->generate($path, array('id' => $id), $type);
 		}
 		if ($raw) return $url;
 		$link = '<a ';
