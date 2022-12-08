@@ -1183,6 +1183,13 @@ personal:
  dungeoncards:
   name:         Dungeon Actions
   description:  Review your available dungeon actions.
+ activities:
+  summary:
+   title:      Activities
+  duels:
+   none:       No duels to respond to.
+   some:       %i% duel |%i% duels.
+   pending:    Duels needing an answer:
  requests:
   name:        Manage Requests
   description: Handle any actional requests to you or your holdings.
