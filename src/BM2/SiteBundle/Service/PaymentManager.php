@@ -287,7 +287,7 @@ class PaymentManager {
 			$creator = $patron->getCreator();
 			$poa = new POA($creator->getClientId(), $creator->getClientSecret());
 			$tokens = $poa->refresh_token($patron->getRefreshToken());
-			if (array_key_exists('access_token')) {
+			if (array_key_exists('access_token', $tokens)) {
 				$patron->setAccessToken($tokens['access_token']);
 				$patron->setRefreshToken($tokens['refresh_token']);
 				$patron->setExpires(new \DateTime('+'.$tokens['expires_in'].' seconds'));
