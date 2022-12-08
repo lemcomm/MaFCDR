@@ -138,6 +138,8 @@ event:
   rerun:        Reaccounted for by the Heavens.
   death:        Died.
   death2:       Died in battle.
+  deathduel:    Died in a duel to the death.
+  deathduel2:   Died in a duel to the death, but took their opponent with them.
   lightningbolt: Killed by a Lightning Bolt from the Heavens.
   retired:      Has retired from war and politics.
   liegeretired: No longer has a liege after the retirement of %character%.
