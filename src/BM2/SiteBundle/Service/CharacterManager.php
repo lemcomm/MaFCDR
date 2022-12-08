@@ -1200,11 +1200,14 @@ class CharacterManager {
 
 	/* achievements */
 	public function getAchievement(Character $character, $key) {
-		return $character->getAchievements()->filter(
-			function($entry) use ($key) {
-				return ($entry->getType()==$key);
-			}
-		)->first();
+		# The below bypasses the doctrine cache, meaning it will always pull the current value from the database.
+		$query = $this->em->createQuery('SELECT a FROM BM2SiteBundle:Achievement a WHERE a.character = :me AND a.type = :type ORDER BY a.id ASC')->setParameters(['me'=>$character, 'type'=>$key])->setMaxResults(1);
+		$result = $query->getResult();
+		if ($result) {
+			return $result[0];
+		} else {
+			return false;
+		}
 	}
 
 	public function getAchievementValue(Character $character, $key) {
