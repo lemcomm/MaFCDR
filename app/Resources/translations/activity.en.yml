@@ -17,6 +17,7 @@ duel:
  answer:
   accept:    "Accept"
   accepted:  "You've accepted %target%'s request to duel!"
+  accepted2:  "You've agreed to %target%'s duel weapon."
   description: "You've challenges to answer."
   intro:     "According to the rules of the ancient magics, you've been challenged to a duel it seems. Such as the magics decree, you need not agree if you do not desire such."
   list:      "Duels to Answer"
@@ -25,7 +26,11 @@ duel:
   refused:   "You've refused %target%'s request to duel."
   same:      "Both shall use the %link-equipment%"
   weapon:    "Weapon:"
-  notsame:   "Your Choice"
+  gear:      "Gear Rule:"
+  gear1:     "Weapons Only"
+  gear2:     "All gear"
+  notsame:   "Challenger's weapon: %link-equipment%"
+  notsame2:  "Opponent's weapon: %link-equipment%"
   type:      "Duel Limit:"
  challenge:
   name:      "Challenge Someone to a Duel"
@@ -46,6 +51,41 @@ duel:
   weapon: "Weapon to Use?"
   weaponOnly: "Weapons Only? (No Armor Bonuses)"
   wound: "Until Wounding"
+
+report:
+ title: Activity Report
+ loc:
+  place: Inside %location%
+  near: Near %location%
+  settlement: Inside %location%
+ journals:  "It seems that people have shared stories about this. You could read one if you'd like."
+ journalwrite: "You're always welcome to write your own words about this, perhaps even publicly if you'd like."
+ duel:
+  participants: Participants
+  round:
+   title:    Round %i%
+  finish:    Duel Finish
+ combat:
+  miss:      %name% attacks with their %weapon% but misses.
+  fail:      %name% manages a glancing blow with their %weapon%.
+  wound:     %name% does signifcant damage with their %weapon%.
+  kill:      %name% delivers a major blow with their %weapon%.
+  victory:   Is Declared Victorious
+  loss:      Has Lost This Duel
+  draw:      Was Not Clearly The Winner
+ compare:
+  very high: Onlookers found their skill quite superior,
+  high:      Onlookers found their skill superior,
+  minor high: Onlookers found their skill a little superior,
+  similar:   Onlookers found their skill hard to compare,
+  minor low: Onlookers found their skill a little inferior,
+  low:       Onlookers found their skill inferior,
+  very low:  Onlookers found their skill quite inferior,
+
+ acc:
+  low:       but they were not confident in this opinion.
+  medium:    though they had mixed thoughts on it.
+  high:      and were nearly unanimous in this view.
 
 
 train:
