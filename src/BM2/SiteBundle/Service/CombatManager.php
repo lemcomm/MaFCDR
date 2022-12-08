@@ -145,7 +145,7 @@ class CombatManager {
 		}
 		if ($me->getEquipment()) {
 			if ($me->getEquipment()->getName() != 'Pavise') {
-				$power += $this->getEquipment()->getDefense();
+				$power += $me->getEquipment()->getDefense();
 			} elseif ($me->getMount()) {
 				$power += $me->getEquipment()->getDefense()/10; #It isn't worthless, but it can't be used effectively.
 			} elseif ($melee) {
@@ -308,7 +308,7 @@ class CombatManager {
 			$hasM = false;
 		}
 		if ($act) {
-			$skill = $me->findSkill($weapon->getName());
+			$skill = $me->findSkill($weapon->getSkill());
 			if ($skill) {
 				$score = $skill->getScore();
 			} else {
@@ -371,9 +371,6 @@ class CombatManager {
 			$type = 'battle';
 		} elseif ($act) {
 			$type = $me->getActivity()->getType()->getName();
-			if ($me->getWeapon()) {
-				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
-			}
 		}
 		$logs = [];
 		$result='miss';
@@ -453,7 +450,7 @@ class CombatManager {
 		if ($power<=0) return 0;
 
 		if ($act) {
-			$skill = $me->findSkill($weapon->getName());
+			$skill = $me->findSkill($weapon->getSkill());
 			if ($skill) {
 				$score = $skill->getScore();
 			} else {
