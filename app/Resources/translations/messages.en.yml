@@ -1285,12 +1285,20 @@ interaction:
   name:     New Owner
   submit:   Transfer
 
+activity:
+ duel:
+  first blood:  Duel til First Blood
+  wound:        Duel til Wound
+  surrender:    Duel til Surrender
+  death:        Duel to the Death
+
 battle:
  title:         Battle Report
  upcoming:      Upcoming Battle
  participants:  participants
  journal:       "%journal%, by %character%"
  journals:      "It seems that people have shared stories about this battle. You could read one if you'd like."
+ journalwrite:  "You're always welcome to write your own words about this, perhaps even publicly if you'd like."
  location:
   nowhere:      neverwhere battle
   of:           The battle of %location%
