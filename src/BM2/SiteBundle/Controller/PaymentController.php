@@ -87,101 +87,61 @@ class PaymentController extends Controller {
 	}
 
 	/**
-	  * @Route("/paypal/{amount}", name="bm2_paypal", requirements={"amount"="\d+"})
+	  * @Route("/stripe/{amount}", name="maf_stripe", requirements={"amount"="\d+"})
 	  */
-	public function paypalAction($amount, Request $request) {
+	public function stripeAction($amount, Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
 		$user = $this->getUser();
 
-		$payment = $this->generatePayPalPayment($user->getId(), $amount);
-
-		$PPRequest = clone ($payment);
-
-		try {
-			$payment->create($this->get('payment_manager')->getPayPalAPIContext());
-		} catch (Exception $e) {
-			echo "Payment Failed!<br>";
-			var_dump($PPRequest);
-			echo "<br>";
-			echo $e;
+		$success = $this->generateUrl('maf_stripe_success', [], true);
+		$cancel = $this->generateUrl('bm2_payment', [], true);
+		$checkout = $this->get('payment_manager')->buildStripeIntent($amount, $user, $success, $cancel);
+		if ($checkout === 'notfound') {
+			$this->addFlash('error', "Unable to locate the requested product.");
+			return $this->redirectToRoute('bm2_payment');
+		} else {
+			return $this->redirect($checkout->url);
 		}
-
-		$approvalUrl = $payment->getApprovalLink();
-		return $this->redirect($approvalUrl);
-	}
-
-
-	public function generatePayPalPayment($id, $amount) {
-		$amount = intval($amount);
-		$payer = new PPPayer();
-		$payer->setPaymentMethod("paypal");
-		$item = new PPItem();
-		$item->setName('M&F Game Credits')->setCurrency('USD')->setQuantity('1')->setPrice($amount)->setCategory('DIGITAL');
-		$list = new PPIL();
-		$list->setItems([$item]);
-		$details = new PPDet();
-		$details->setShipping(0)->setTax(0)->setSubtotal($amount);
-		$ppamt = new PPAmt();
-		$ppamt->setCurrency("USD")->setTotal($amount)->setDetails($details);
-		$trans = new PPTrans();
-		$trans->setAmount($ppamt)->setItemList($list)->setDescription("Might & Fealty Game Credits")->setInvoiceNumber($id.'--'.uniqid());
-		$success = $this->generateUrl('bm2_paypal_success', array(), true);
-		$cancel = $this->generateUrl('bm2_paypal_cancel', array(), true);
-		$redirects = new PPRU();
-		$redirects->setReturnUrl($success)->setCancelUrl($cancel);
-		$payment = new PPPayment();
-		$payment->setIntent("sale")->setPayer($payer)->setRedirectUrls($redirects)->setTransactions([$trans]);
-		return $payment;
 	}
 
 	/**
-	  * @Route("/paypal_success", name="bm2_paypal_success")
+	  * @Route("/stripe_success", name="maf_stripe_success")
 	  */
-	public function paypalsuccessAction(Request $request) {
+	public function stripeSuccessAction(Request $request) {
 		$user = $this->getUser();
 		$user_id = $user->getId();
-		$paymentId = $request->query->get("paymentId");
-		$apiContext = $this->get('payment_manager')->getPayPalAPIContext();
-		$payment = PPPayment::get($paymentId, $apiContext);
-
-		$exec = new PPExec();
-		$exec->setPayerId($request->query->get('PayerID'));
-
 		try {
-			$result = $payment->execute($exec, $apiContext);
+			list($result, $items) = $this->get('payment_manager')->retrieveStripe($request->query->get('session_id'));
 		} catch (Exception $e) {
-			$this->addFlash('error', "PayPal Payment Failed. If you've received this it's because we weren't able to complete the transaction for some reason.");
+			$this->addFlash('error', "Stripe Payment Failed. If you've received this it's because we weren't able to complete the transaction for some reason. Please let an administrator know about this in a direct message either on Discord or via email to andrew@iungard.com.");
 			return $this->redirectToRoute('bm2_payment');
 		}
 
-		if (strtolower($result->getState()) === 'approved') {
-			#Transaction successful, credit user.
-			$ID = $result->getId();
-			$trans = $result->getTransactions();
-			$amt = $trans[0]->getAmount();
-			$currency = $amt->getCurrency();
-			$total = $amt->getTotal();
-			if (strtolower($currency) !== 'usd') {
-				#TODO: Notify a GM because things have broke somehow!
-			}
-			$txt = "PayPal Payment callback: $total $currency / for $user_id / tx_id: $ID";
+		$total = $result->amount_subtotal/100;
+		$currency = strtoupper($result->currency);
+		$txid = $result->payment_intent;
+		$status = strtolower($result->payment_status);
+		$pid = $items->data[0]->price->id;
+
+		if ($status === 'paid' || $status == 'no_payment_required') {
+			$txt = "Stripe Payment calback: $total $currency // for user ID $user_id // tx id $txid";
 			$this->get('payment_manager')->log_info($txt);
-			$this->get('payment_manager')->account($user, "PayPal Payment", $currency, $total, $ID);
+			$this->get('payment_manager')->account($user, 'Stripe Payment', $pid, $txid);
 			$this->get('notification_manager')->spoolPayment('M&F '.$txt);
 			$this->addFlash('notice', 'Payment Successful! Thank you!');
 			return $this->redirectToRoute('bm2_payment');
 		} else {
-			$this->addFlash('error', "PayPal Payment Failed. If you believe you reached this incorrectly, please contact an Adminsitrator. Having both your M&F username and your PayPal transaction ID ready will hasten the lookup process.");
+			$this->addFlash('error', "Stripe Payment Incomplete. If you believe you reached this incorrectly, please contact an Adminsitrator. Having your M&F username and transaction time handy will make this easier to look into. Transactions that aren't immediate will require manual processing at this time.");
 			return $this->redirectToRoute('bm2_payment');
 		}
 	}
 
 	/**
-	  * @Route("/paypal_cancel", name="bm2_paypal_cancel")
+	  * @Route("/stripe_cancel", name="maf_stripe_cancel")
 	  */
-	public function paypalcancelAction(Request $request) {
+	public function stripeCancelAction(Request $request) {
 		$this->addFlash('warning', "You appear to have cancelled your payment. Transaction has ended.");
 		return $this->redirectToRoute('bm2_payment');
 	}
