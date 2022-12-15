@@ -23,7 +23,6 @@ class PaymentManager {
 	protected $logger;
 	private $mailman;
 	private $ruleset;
-	private $stripePublishable;
 	private $stripeSecret;
 	private $stripePrices;
 	private $env;
@@ -39,7 +38,6 @@ class PaymentManager {
 		$this->logger = $logger;
 		$this->mailman = $mailman;
 		$this->ruleset = $ruleset;
-		$this->stripePublishable = $stripePublishable;
 		$this->stripeSecret = $stripeSecret;
 		$this->stripePrices = $stripePrices;
 		$this->env = $env;
