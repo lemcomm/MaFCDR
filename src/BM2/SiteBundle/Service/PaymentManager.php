@@ -11,8 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Patreon\API as PAPI;
 use Patreon\OAuth as POA;
-use PayPal\Auth\OAuthTokenCredential as PPOATC;
-use PayPal\Rest\ApiContext as PPAC;
+
 use Symfony\Component\Translation\TranslatorInterface;
 
 class PaymentManager {
@@ -24,15 +23,15 @@ class PaymentManager {
 	protected $logger;
 	private $mailman;
 	private $ruleset;
-	private $paypalClientId;
-	private $paypalSecret;
-	private $rootDir;
+	private $stripePublishable;
+	private $stripeSecret;
+	private $stripePrices;
 	private $env;
 	private $patreonAlikes = ['patreon'];
 
 
 	// FIXME: type hinting for $translator removed because the addition of LoggingTranslator is breaking it
-	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, MailManager $mailman, $ruleset, $paypalClientId, $paypalSecret, $rootDir, $env) {
+	public function __construct(EntityManager $em, UserManager $usermanager, \Swift_Mailer $mailer, TranslatorInterface $translator, Logger $logger, MailManager $mailman, $ruleset, $stripeSecret, $stripePrices, $env) {
 		$this->em = $em;
 		$this->usermanager = $usermanager;
 		$this->mailer = $mailer;
@@ -40,9 +39,9 @@ class PaymentManager {
 		$this->logger = $logger;
 		$this->mailman = $mailman;
 		$this->ruleset = $ruleset;
-		$this->paypalClientId = $paypalClientId;
-		$this->paypalSecret = $paypalSecret;
-		$this->rootDir = $rootDir;
+		$this->stripePublishable = $stripePublishable;
+		$this->stripeSecret = $stripeSecret;
+		$this->stripePrices = $stripePrices;
 		$this->env = $env;
 	}
 
@@ -372,32 +371,47 @@ class PaymentManager {
 		return true;
 	}
 
-	public function getPayPalAPIContext() {
-		$api = new PPAC(
-			new PPOATC(
-				$this->paypalClientId,
-				$this->paypalSecret
-				)
-			);
-		if ($this->env === 'prod') {
-			$api->setConfig([
-				'mode' => 'live',
-				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
-				'log.LogLevel' => 'INFO',
-				'cache.enabled' => false,
-			]);
+	public function buildStripeIntent($amt, $user, $success, $cancel) {
+		$prices = $this->stripePrices;
+		if (array_key_exists($amt, $prices)) {
+			$pID = $prices[$amt];
 		} else {
-			$api->setConfig([
-				'mode' => 'sandbox',
-				'log.LogEnabled' => true,
-				'log.FileName' => $this->rootDir.'/logs/PayPal.log',
-				'log.LogLevel' => 'DEBUG',
-				'cache.enabled' => false,
-			]);
+			return 'notfound';
 		}
+		\Stripe\Stripe::setApiKey($this->stripeSecret);
+		$checkout = \Stripe\Checkout\Session::create([
+			'line_items' => [[
+				'price' => $pID,
+				'quantity' => 1,
+				'adjustable_quantity' => [
+					'enabled'=>false
+				],
+				]],
+			'mode' => 'payment',
+			'success_url' => $success.'?session_id={CHECKOUT_SESSION_ID}',
+			'cancel_url' => $cancel,
+			'client_reference_id' => $user->getId(),
+			'customer_email' => $user->getEmail(),
+			'allow_promotion_codes' => true,
+			'automatic_tax' => [
+				'enabled' => true,
+			],
 
-		return $api;
+		]);
+		return $checkout;
+	}
+
+	private function stripeAmtFromPid($pid) {
+		foreach ($this->stripePrices as $key=>$each) {
+			if ($each === $pid) {
+				return $key;
+			}
+		}
+	}
+
+	public function retrieveStripe($session) {
+		$stripe = new \Stripe\StripeClient($this->stripeSecret);
+		return [$stripe->checkout->sessions->retrieve($session), $stripe->checkout->sessions->allLineItems($session)];
 	}
 
 	private function ChangeNotification(User $user, $subject, $text) {
@@ -476,15 +490,11 @@ class PaymentManager {
 	}
 
 
-	public function account(User $user, $type, $currency, $amount, $transaction=null, $src='paypal') {
-		$credits = $amount*100; // if this ever changes, make sure to update texts mentioning it (e.g. description3)
-		switch ($currency) {
-			case 'USD':		$credits *= 1.0; break;
-			default:
-				$this->logger->alert("unknown currency $currency in accounting for user #{$user->getId()}, transaction type $type, please add $amount manually.");
-				return false;
+	public function account(User $user, $type, $amount, $transaction=null, $src='paypal') {
+		if ($type === 'Stripe Payment') {
+			$amount = $this->stripeAmtFromPid($amount);
 		}
-		$credits = ceil($credits);
+		$credits = ceil($amount*100);
 		$original = $credits;
 		if ($type !== 'Patron Credit') {
 			if ($amount >= 100) {
@@ -516,7 +526,7 @@ class PaymentManager {
 
 		$payment = new UserPayment;
 		$payment->setTs(new \DateTime("now"));
-		$payment->setCurrency($currency);
+		$payment->setCurrency('USD');
 		$payment->setAmount($amount);
 		$payment->setType($type);
 		$payment->setUser($user);
