@@ -53,6 +53,8 @@
 	{% if character %}
 		<link rel="alternate" type="application/rss+xml" title="New Events" href="http:{{ url('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}, true) }}">
 	{% endif %}
+	{% block header %}
+	{% endblock %}
 </head>
 <body>
 
