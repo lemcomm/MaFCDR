@@ -91,7 +91,7 @@ services:
         class:      BM2\SiteBundle\Service\PageReader
     payment_manager:
         class:      BM2\SiteBundle\Service\PaymentManager
-        arguments:  ['@doctrine.orm.entity_manager', '@user_manager', '@mailer', '@translator', '@logger', '@mail_manager', %ruleset%, %paypal-client-id%, %paypal-secret%, %kernel.root_dir%, %kernel.environment%]
+        arguments:  ['@doctrine.orm.entity_manager', '@user_manager', '@mailer', '@translator', '@logger', '@mail_manager', %ruleset%, %stripe-secret%, %stripe-prices%, %kernel.root_dir%, %kernel.environment%]
         tags:
             - { name: monolog.logger, channel: payment }
     permission_manager:
