@@ -318,9 +318,8 @@ account:
   link:     Get More Credits
   shop:     Buying Credits
   intro: >
-    Unfortunately, we can only offer PayPal payment at this time but are looking into alternatives (like Stripe).<br />
-    PayPal also handles <b>credit card payments</b>.<br />
-    Payments are handled through <b>Iungard Systems, LLC</b>, so that is what you'll see on your order and receipt.
+    Unfortunately, we can only accept payments through Stripe at this time but are open to exploring alternatives if you have suggestions.<br />
+    As this game is owned by <b>Iungard Systems LLC</b>, that is what you'll see on your transaction history.
   history:  Payment History
   type:     Transaction type
   date:     Date
