@@ -1771,6 +1771,7 @@ unavailable:
  notlegislative: You do not hold a legislative position within this organisation.
  noduels: You have no duels to answer.
  noanswerableduels: All pending duels are awaiting others.
+ unfinishedbusiness: "You have some unfinished business to attend to first. Perhaps it's a duel that requires your participation?"
 
 marker:
  name:      Marker name
