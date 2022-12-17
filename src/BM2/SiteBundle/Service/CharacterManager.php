@@ -45,6 +45,7 @@ class CharacterManager {
 		$this->dm = $dm;
 		$this->warman = $warman;
 		$this->assocman = $assocman;
+		$this->helper = $helper;
 	}
 
 
@@ -430,6 +431,27 @@ class CharacterManager {
 			$this->politics->endOccupation($each, 'death');
 		}
 
+		foreach ($character->getActivityParticipation() as $part) {
+			$act = $part->getActivity();
+			if ($act->getType()->getName() === 'duel') {
+				foreach ($act->getParticipants() as $each) {
+					if ($each !== $part) {
+						$this->history->logEvent(
+							$each->getCharacter(),
+							'event.character.duelfail',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, true
+						);
+					}
+				}
+			}
+			# TODO: De-duplicate this from ActivityManager.
+			foreach($part->getBoutParticipation() as $bout) {
+				$this->em->remove($bout);
+			}
+			$this->em->remove($part);
+		}
+
 		// TODO: permission lists - plus clear out those of old dead characters!
 
 		# Remove all allegiances -- as the dead have no loyalties.
@@ -634,6 +656,27 @@ class CharacterManager {
 
 		foreach ($character->getOccupiedPlaces() as $each) {
 			$this->politics->endOccupation($each, 'retire');
+		}
+
+		foreach ($character->getActivityParticipation() as $each) {
+			$act = $part->getActivity();
+			if ($act->getType()->getName() === 'duel') {
+				foreach ($act->getParticipants() as $each) {
+					if ($each !== $part) {
+						$this->history->logEvent(
+							$each->getCharacter(),
+							'event.character.duelfail2',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, true
+						);
+					}
+				}
+			}
+			# TODO: De-duplicate this from ActivityManager.
+			foreach($part->getBoutParticipation() as $bout) {
+				$this->em->remove($bout);
+			}
+			$this->em->remove($part);
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
