@@ -291,7 +291,7 @@ class Soldier extends NPC {
 		return $this->ranged;
 	}
 
-	private function ExperienceBonus($power) {
+	public function ExperienceBonus($power) {
 		$bonus = sqrt($this->getExperience()*5);
 		return min($power/2, $bonus);
 	}
