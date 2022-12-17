@@ -58,13 +58,21 @@ For testing purposes, you can simulate buying credits simply by clicking the but
 	</thead>
 	<tbody>
 		<tr class="center">
-			<th><img src="https://images.ctfassets.net/fzn2n1nzq965/6XFEUA9FzMBMphYdcUab19/37a1e07201366a351f7956560ccac09d/Stripe_wordmark_-_slate.svg" height="120" alt="Stripe" /></th>
-			<td><a href="{{ path("maf_stripe", {"amount":2}) }}"><button>$2 (USD)</button></a></td>
-			<td><a href="{{ path("maf_stripe", {"amount":5}) }}"><button>$5 (USD)</button></a></td>
-			<td><a href="{{ path("maf_stripe", {"amount":10}) }}"><button>$10 (USD)</button></a></td>
-			<td><a href="{{ path("maf_stripe", {"amount":20}) }}"><button>$20 (USD)</button></a></td>
-			<td><a href="{{ path("maf_stripe", {"amount":50}) }}"><button>$50 (USD)</button></a></td>
-			<td><a href="{{ path("maf_stripe", {"amount":100}) }}"><button>$100 (USD)</button></a></td>
+			<td rowspan="2"><img src="https://images.ctfassets.net/fzn2n1nzq965/6XFEUA9FzMBMphYdcUab19/37a1e07201366a351f7956560ccac09d/Stripe_wordmark_-_slate.svg" height="120" alt="Stripe" /></th>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":2}) }}"><button>$2 (USD)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":5}) }}"><button>$5 (USD)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":10}) }}"><button>$10 (USD)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":20}) }}"><button>$20 (USD)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":50}) }}"><button>$50 (USD)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"USD", "amount":100}) }}"><button>$100 (USD)</button></a></td>
+		</tr>
+		<tr class="center">
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":2}) }}"><button>€2 (EUR)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":5}) }}"><button>€5 (EUR)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":10}) }}"><button>€10 (EUR)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":20}) }}"><button>€20 (EUR)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":50}) }}"><button>€50 (EUR)</button></a></td>
+			<td><a href="{{ path("maf_stripe", {"currency":"EUR", "amount":100}) }}"><button>€100 (EUR)</button></a></td>
 		</tr>
 	</tbody>
 </table>
