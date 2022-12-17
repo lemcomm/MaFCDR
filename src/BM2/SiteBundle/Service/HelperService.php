@@ -22,10 +22,12 @@ class HelperService {
 
 	protected $em;
 	protected $geo;
+	protected $history;
 
-	public function __construct(EntityManager $em, Geography $geo) {
+	public function __construct(EntityManager $em, Geography $geo, History $history) {
 		$this->em = $em;
 		$this->geo = $geo;
+		$this->history = $history;
 	}
 
 	private function newObserver($type) {
