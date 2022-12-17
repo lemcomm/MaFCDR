@@ -104,9 +104,9 @@ class CombatManager {
 		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
 			if ($melee) {
-				if ($me->defense!=-1) return $me->defense;
+				if ($me->DefensePower()!=-1) return $me->DefensePower();
 			} else {
-				if ($me->rDefense!=-1) return $me->rDefense;
+				if ($me->RDefensePower()!=-1) return $me->RDefensePower();
 			}
 			if ($me->isNoble()) {
 				$noble = true;
@@ -132,9 +132,9 @@ class CombatManager {
 				$power += 63;
 			}
 			if ($melee) {
-				$me->defense = $power;
+				$me->updateDefensePower($power);
 			} else {
-				$me->rDefense = $power;
+				$me->updateRDefensePower($power);
 			}
 			return $power;
 		}
@@ -337,11 +337,11 @@ class CombatManager {
 
 		// TODO: heavy armour should reduce this a little
 		if ($sol) {
-			$fighters = $sol->getAllInUnit()->count();
+			$fighters = $me->getAllInUnit()->count();
 			if ($fighters>1) {
-				$sol->updateMeleePower($power * pow($fighters, 0.96)/$fighters);
+				$me->updateMeleePower($power * pow($fighters, 0.96)/$fighters);
 			} else {
-				$sol->updateMeleePower($power);
+				$me->updateMeleePower($power);
 			}
 		}
 		return $power;
@@ -421,6 +421,7 @@ class CombatManager {
 			if ($me->isNoble()) {
 				$noble = true;
 			}
+			$act = false;
 		} elseif ($me instanceof ActivityParticipant) {
 			$act = $me->getActivity();
 			$me = $me->getCharacter(); #for stndardizing the getEquipment type calls.
@@ -476,11 +477,11 @@ class CombatManager {
 		// TODO: heavy armour should reduce this quite a bit
 
 		if ($sol) {
-			$fighters = $sol->getAllInUnit()->count();
+			$fighters = $me->getAllInUnit()->count();
 			if ($fighters>1) {
-				$sol->updateRangedPower($power * pow($fighters, 0.96)/$fighters);
+				$me->updateRangedPower($power * pow($fighters, 0.96)/$fighters);
 			} else {
-				$sol->updateRangedPower($power);
+				$me->updateRangedPower($power);
 			}
 		}
 
@@ -548,7 +549,7 @@ class CombatManager {
 				$logs[] = "wounded\n";
 				$target->wound(rand(max(1, round($power/10)), $power));
 				$this->history->addToSoldierLog($target, 'wounded.'.$phase);
-				$target->gainExperience(1*$this->xpMod); // it hurts, but it is a teaching experience...
+				$target->gainExperience(1*$xpMod); // it hurts, but it is a teaching experience...
 			}
 			$result='wound';
 		}
