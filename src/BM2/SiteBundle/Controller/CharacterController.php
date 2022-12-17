@@ -995,12 +995,9 @@ class CharacterController extends Controller {
 	  * @Route("/kill")
 	  */
 	public function killAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('metaKillTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
-		}
-		if ($character->isPrisoner()) {
-			throw new AccessDeniedHttpException('unavailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
@@ -1064,12 +1061,9 @@ class CharacterController extends Controller {
      * @Route("/retire")
      */
 	public function retireAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('metaRetireTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
-		}
-		if ($character->isPrisoner()) {
-			throw new AccessDeniedHttpException('unvailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('retirement', 'textarea', array(
