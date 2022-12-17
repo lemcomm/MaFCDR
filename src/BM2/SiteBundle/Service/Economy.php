@@ -9,6 +9,10 @@ use BM2\SiteBundle\Entity\ResourceType;
 use BM2\SiteBundle\Entity\Road;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Character;
+use BM2\SiteBundle\Entity\Unit;
+use BM2\SiteBundle\Entity\Supply;
+use BM2\SiteBundle\Entity\Resupply;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 
@@ -518,14 +522,6 @@ class Economy {
 		//			we could code this by checking for the surplus storage
 		$growth = sqrt(1-exp(-pow($shortage,2)))*$sign;
 		$popchange = $sign*round(pow(abs($growth) * $settlement->getPopulation(),0.666));
-                /* Commenting this out to bring code in line with Tom's Server. It doesn't actually do anything. -- Andrew
-                if ($popchange > 0) {
-                        $goods = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('goods'));
-                        $wealth = $settlement->findResource($this->em->getRepository('BM2SiteBundle:ResourceType')->findOneByName('money'));
-                        $mod = min($goods->getSupply(), $wealth->getSupply());
-                        echo "growth of ".$settlement->getName()." limited by $mod\n";
-                }
-                */
 		$settlement->setPopulation($settlement->getPopulation() + $popchange);
 
 		// thralls drop faster and rise slower
@@ -541,12 +537,10 @@ class Economy {
 			$settlement->setThralls($settlement->getThralls() + $thrallschange);
 		}
 
-		/* TODO: Once people have had a moment to set soldier food sources, uncomment this.
 		$units = $this->FindFeedableUnits($settlement);
 		foreach ($units as $unit) {
 			$this->supplySoldiers($unit, $real_shortage, $settlement);
 		}
-		*/
 		$this->em->flush();
 	}
 
@@ -572,6 +566,8 @@ class Economy {
 		$count = $unit->getLivingSoldiers()->count();
 		if($shortage > 0) {
 			$deduct = $count*$shortage;
+		} else {
+			$deduct = 0;
 		}
 
 		$qty = $count - $deduct;
@@ -591,7 +587,7 @@ class Economy {
 			$found = false;
 			if ($unit->getSupplies()) {
 				foreach ($unit->getSupplies() as $supply) {
-					if ($supply->getType() == $resupply->getType()) {
+					if ($supply->getType() === 'food') {
 						$found = true;
 						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
 						break;
@@ -725,13 +721,14 @@ class Economy {
 		switch (strtolower($resource->getName())) {
 			case 'food':
 				$suppliedNPCs = 0;
-				/*TODO: When settlements feeding remote goes live, uncomment this.
 				$units = $this->FindFeedableUnits($settlement);
 				foreach ($units as $unit) {
 					$suppliedNPCs += $unit->getLivingSoldiers()->count();
 				}
-				$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
-				*/
+				if ($suppliedNPCs > 0) {
+					$suppliedNPCs = ceil($suppliedNPCs/10); #TODO: as funny as full effect would be :)
+				}
+				#$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
 				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs;
 				break;
 			case 'wood':
