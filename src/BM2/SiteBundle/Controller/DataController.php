@@ -21,6 +21,28 @@ class DataController extends Controller {
 	}
 
 	/**
+	  * @Route("/gsgp")
+	  */
+	public function gsgpAction(Request $request) {
+		$reqType = $this->validateRequest($request, 'gsgp');
+		if ($reqType instanceof Response) {
+			return $reqType;
+		}
+		$em = $this->getDoctrine()->getManager();
+		$cycle = $this->get('appstate')->getCycle()-1;
+		$query = $em->createQuery('SELECT s.today_users as active_users FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
+		$query->setParameter('cycle', $cycle);
+		$result['active_players'] = $query->getArrayResult()[0];
+		$result['name'] = "Might & Fealty";
+		$result['image_url'] = 'https://mightandfealty.com/bundles/bm2site/images/logo-transparent.png';
+		$result['description'] = 'An entirely player driven medieval sandbox game about politics and war set in a low-ish-fantasy world.';
+		$result['tags'] = ['RPG', 'medieval', 'fantasy', 'politics', 'sandbox', 'PvP', 'persistent', 'free', 'browser', 'custom'];
+		$result['last_updated'] = strtotime($this->get('appstate')->getGlobal('game-updated'));
+
+		return $this->outputHandler($reqType, $result, true);
+	}
+
+	/**
 	  * @Route("/data/characters/dead")
 	  */
 	public function charactersDeadAction(Request $request) {
