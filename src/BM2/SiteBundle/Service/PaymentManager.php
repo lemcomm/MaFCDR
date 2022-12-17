@@ -369,13 +369,19 @@ class PaymentManager {
 		return true;
 	}
 
-	public function buildStripeIntent($amt, $user, $success, $cancel) {
+	public function buildStripeIntent($currency, $amt, $user, $success, $cancel) {
 		$prices = $this->stripePrices;
-		if (array_key_exists($amt, $prices)) {
-			$pID = $prices[$amt];
+		if (array_key_exists($currency, $prices)) {
+			$iCurrency = $prices[$currency];
+			if (array_key_exists($amt, $iCurrency)) {
+				$pID = $iCurrency[$amt];
+			} else {
+				return 'notfound';
+			}
 		} else {
 			return 'notfound';
 		}
+
 		\Stripe\Stripe::setApiKey($this->stripeSecret);
 		$checkout = \Stripe\Checkout\Session::create([
 			'line_items' => [[
@@ -400,9 +406,11 @@ class PaymentManager {
 	}
 
 	private function stripeAmtFromPid($pid) {
-		foreach ($this->stripePrices as $key=>$each) {
-			if ($each === $pid) {
-				return $key;
+		foreach ($this->stripePrices as $aKey=>$aData) {
+			foreach ($aData as $bKey=>$each) {
+				if ($each === $pid) {
+					return [$aKey, $bKey];
+				}
 			}
 		}
 	}
@@ -490,7 +498,7 @@ class PaymentManager {
 
 	public function account(User $user, $type, $amount, $transaction=null, $src='paypal') {
 		if ($type === 'Stripe Payment') {
-			$amount = $this->stripeAmtFromPid($amount);
+			list($currency, $amount) = $this->stripeAmtFromPid($amount);
 		}
 		$credits = ceil($amount*100);
 		$original = $credits;
@@ -524,7 +532,7 @@ class PaymentManager {
 
 		$payment = new UserPayment;
 		$payment->setTs(new \DateTime("now"));
-		$payment->setCurrency('USD');
+		$payment->setCurrency(strtoupper($currency));
 		$payment->setAmount($amount);
 		$payment->setType($type);
 		$payment->setUser($user);
