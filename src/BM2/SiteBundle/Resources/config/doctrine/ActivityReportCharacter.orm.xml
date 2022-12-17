@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityReportCharacter">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<field name="start" type="array"/>
+
+		<many-to-one field="activity_report" target-entity="ActivityReport" inversed-by="characters"/>
+		<one-to-many field="stages" target-entity="ActivityReportStage" mapped-by="character">
+			<order-by>
+				<order-by-field name="round" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+
+		<field name="finish" type="array"/>
+
+		<field name="standing" type="boolean"/>
+		<field name="wounded" type="boolean"/>
+		<field name="surrender" type="boolean"/>
+		<field name="killed" type="boolean"/>
+
+		<field name="attacks" type="integer" nullable="true"/>
+		<field name="hits_taken" type="integer" nullable="true"/>
+		<field name="hits_made" type="integer" nullable="true"/>
+		<field name="wounds" type="integer" nullable="true"/>
+
+		<many-to-one field="group_report" target-entity="ActivityReportGroup" inversed-by="characters"/>
+		<many-to-one field="character" target-entity="Character"/>
+		<many-to-one field="weapon" target-entity="EquipmentType"/>
+		<many-to-one field="armour" target-entity="EquipmentType"/>
+		<many-to-one field="equipment" target-entity="EquipmentType"/>
+		<many-to-one field="mount" target-entity="EquipmentType"/>
+	</entity>
+</doctrine-mapping>

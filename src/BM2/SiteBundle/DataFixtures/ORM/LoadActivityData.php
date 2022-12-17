@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use BM2\SiteBundle\Entity\ActivityType;
+use BM2\SiteBundle\Entity\ActivitySubType;
 use BM2\SiteBundle\Entity\ActivityRequirement;
 use BM2\SiteBundle\Entity\BuildingType;
 use BM2\SiteBundle\Entity\PlaceType;
@@ -15,7 +16,17 @@ use BM2\SiteBundle\Entity\PlaceType;
 class LoadActivityData extends AbstractFixture implements OrderedFixtureInterface {
 
 	private $types = array(
-		'duel'			=> ['enabled' => True,  'buildings'=> null,                          'places'=>null],
+		'duel'			=> [
+			'enabled' => True,
+			'buildings'=> null,
+			'places'=>null,
+			'subtypes'=>[
+				'first blood',
+				'wound',
+				'surrender',
+				'death'
+				],
+		],
 		'arena'			=> ['enabled' => False, 'buildings' => ['Arena'],                    'places' => ['arena', 'tournament']],
 		'melee tournament'	=> ['enabled' => False, 'buildings' => ['Arena'],                    'places' => ['arena', 'tournament']],
 		'joust'			=> ['enabled' => False, 'buildings'=> null,                          'places' => ['tournament']],
@@ -45,42 +56,48 @@ class LoadActivityData extends AbstractFixture implements OrderedFixtureInterfac
 			}
 			$type->setEnabled($data['enabled']);
 			$manager->flush();
-			if ($type) {
-				$id = $type->getId();
-				if ($data['buildings']) {
-					foreach ($data['buildings'] as $bldg) {
-						$bldgType = $manager->getRepository(BuildingType::class)->findOneBy(['name'=>$bldg]);
-						if ($bldgType) {
-							$req = $manager->getRepository(ActivityRequirement::class)->findOneBy(['type'=>$id, 'building'=>$bldgType->getId()]);
-							if (!$req) {
-								$req = new ActivityRequirement();
-								$manager->persist($req);
-								$req->setType($type);
-								$req->setBuilding($bldgType);
-							}
-						} else {
-							echo 'No Building Type found matching string of '.$bldg.', loading skipped.';
+			$id = $type->getId();
+			if (isset($data['buildings'])) {
+				foreach ($data['buildings'] as $bldg) {
+					$bldgType = $manager->getRepository(BuildingType::class)->findOneBy(['name'=>$bldg]);
+					if ($bldgType) {
+						$req = $manager->getRepository(ActivityRequirement::class)->findOneBy(['type'=>$id, 'building'=>$bldgType->getId()]);
+						if (!$req) {
+							$req = new ActivityRequirement();
+							$manager->persist($req);
+							$req->setType($type);
+							$req->setBuilding($bldgType);
 						}
+					} else {
+						echo 'No Building Type found matching string of '.$bldg.', loading skipped.';
 					}
 				}
-				if ($data['places']) {
-					foreach ($data['places'] as $place) {
-						$placeType = $manager->getRepository(PlaceType::class)->findOneBy(['name'=>$place]);
-						if ($placeType) {
-							$req = $manager->getRepository(ActivityRequirement::class)->findOneBy(['type'=>$id, 'place'=>$placeType->getId()]);
-							if (!$req) {
-								$req = new ActivityRequirement();
-								$manager->persist($req);
-								$req->setType($type);
-								$req->setPlace($placeType);
-							}
-						} else {
-							echo 'No Place Type found matching string of '.$place.', loading skipped.';
+			}
+			if (isset($data['places'])) {
+				foreach ($data['places'] as $place) {
+					$placeType = $manager->getRepository(PlaceType::class)->findOneBy(['name'=>$place]);
+					if ($placeType) {
+						$req = $manager->getRepository(ActivityRequirement::class)->findOneBy(['type'=>$id, 'place'=>$placeType->getId()]);
+						if (!$req) {
+							$req = new ActivityRequirement();
+							$manager->persist($req);
+							$req->setType($type);
+							$req->setPlace($placeType);
 						}
+					} else {
+						echo 'No Place Type found matching string of '.$place.', loading skipped.';
 					}
 				}
-			} else {
-				echo 'No Activty Type found matching string of '.$name.', loading skipped.';
+			}
+			if (isset($data['subtypes'])) {
+				foreach ($data['subtypes'] as $sub) {
+					$subType = $manager->getRepository(ActivitySubType::class)->findOneBy(['name'=>$sub]);
+					if (!$subType) {
+						$subType = new ActivitySubType;
+						$manager->persist($subType);
+						$subType->setName($sub);
+					}
+				}
 			}
 		}
 		$manager->flush();

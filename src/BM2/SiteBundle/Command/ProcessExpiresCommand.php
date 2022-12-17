@@ -36,9 +36,14 @@ class ProcessExpiresCommand extends ContainerAwareCommand {
 
 	public function expireEvents() {
 		$this->output->writeln("expiring events...");
-		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:Event e WHERE e.lifetime IS NOT NULL AND e.cycle + e.lifetime < :cycle');
+		$query = $this->em->createQuery('SELECT e FROM BM2SiteBundle:Event e WHERE e.lifetime IS NOT NULL AND e.cycle + e.lifetime < :cycle');
 		$query->setParameter('cycle', $this->cycle);
-		$query->execute();
+		$all = $query->getResult();
+		foreach ($all as $each) {
+			if ($each->getMailEntries()->count() < 1) {
+				$this->em->remove($each);
+			}
+		}
 		$this->em->flush();
 
 		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:SoldierLog l WHERE l.soldier IS NULL');

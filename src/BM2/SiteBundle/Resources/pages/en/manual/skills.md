@@ -46,7 +46,7 @@ These skills reflect a character's ability to wield a particular weapon set and 
  * Spears
  * Staves
  * Swordstaves
-* Slings 
+* Slings
  * Slings
  * Staff Slings
 * Swords
@@ -58,3 +58,10 @@ These skills reflect a character's ability to wield a particular weapon set and 
  * Javelins
  * Throwing Axes
  * Throwing Knives
+
+
+ Related Articles
+ ----------------
+ * [activities]
+ * [characters]
+ * [duels]

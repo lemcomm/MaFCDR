@@ -1,11 +1,13 @@
 <?php
 
 namespace BM2\SiteBundle\Service;
-
+;
+use BM2\SiteBundle\Entity\ActivityReport;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\AssociationDeity;
 use BM2\SiteBundle\Entity\AssociationMember;
-use BM2\SiteBundle\Entity\AssociationRank;
+use BM2\SiteBundle\Entity\AssociationRank;;
+use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Conversation;
 use BM2\SiteBundle\Entity\Deity;
@@ -3906,12 +3908,16 @@ class Dispatcher {
 	}
 
 	public function metaRetireTest() {
-		if ($this->getCharacter()->isNPC()) {
+		$char = $this->getCharacter();
+		if ($char->isNPC()) {
 			// FIXME: respawn template doesn't exist.
 			return array("name"=>"meta.retire.name", "description"=>"unavailable.npc");
 		}
-		if ($this->getCharacter()->isPrisoner()) {
+		if ($char->isPrisoner()) {
 			return array("name"=>"meta.retire.name", "description"=>"unavailable.prisonershort");
+		}
+		if ($char->getActivityParticipation()->count() > 0) {
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.unfinishedbusiness");
 		}
 		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
 	}
@@ -4091,7 +4097,19 @@ class Dispatcher {
 			return array("name"=>"journal.write.name", "description"=>"error.noaccess.battlereport");
 		}
 
-		return array("name"=>"journal.write", "url"=>"maf_journal_write", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+		return array("name"=>"journal.write", "url"=>"maf_journal_write_battle", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
+	}
+
+	public function journalWriteActivityTest($ignored, ActivityReport $report) {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
+		}
+
+		if (!$report->checkForObserver($this->getCharacter())) {
+			return array("name"=>"journal.write.name", "description"=>"error.noaccess.activityreport");
+		}
+
+		return array("name"=>"journal.write", "url"=>"maf_journal_write_activity", "description"=>"journal.write.description", "long"=>"journal.write.longdesc");
 	}
 
 	/* ========== various tests and helpers ========== */

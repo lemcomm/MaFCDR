@@ -7,6 +7,7 @@ security:
         ROLE_OLYMPUS:     ROLE USER
         ROLE_ADMIN:       [ROLE_USER, ROLE_TESTER, ROLE_OLYMPUS]
         ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_BANNED:      [ROLE_BANNED_TOS, ROLE_BANNED_MULTI]
 
     providers:
         fos_userbundle:
@@ -39,7 +40,7 @@ security:
 
     access_control:
         - { path: ^/(../)?admin, roles: ROLE_ADMIN }
-        - { path: ^/(../)?GM, roles: ROLE_OLYMPUS }
+        - { path: ^/(../)?olympus, roles: ROLE_OLYMPUS }
         - { path: ^/(../)?gamerequest, roles: ROLE_USER } # Without this, users will be locked out of the gamerequest path by the line below. --Andrew
         - { path: ^/(../)?game, roles: ROLE_ADMIN }
         - { path: ^/(../)?world, roles: ROLE_ADMIN }

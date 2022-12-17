@@ -33,12 +33,13 @@
 <ul>
 	{% for journal in report.journals %}
 		{% if journal.public %}
-			<li>{{ 'battle.journal'|trans({'%journal%':link(journal), '%character%':link(journal.character)})|raw }}</li>
+			<li>{{link(journal)}} - {{link(journal.character)}} ({{journal.date|date}})</li>
 		{% endif %}
 	{% endfor %}
 </ul>
 {% endif %}
 {% if access %}
+	<a href="{{path('maf_journal_write_battle', {"report":report.id}) }}">{{ 'battle.journalwrite'|trans }}</a>
 	<p>
 	{% if report.defensebuildings is not empty %}
 		<ul class="shortlist">

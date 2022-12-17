@@ -47,7 +47,7 @@
 				<td align="right">{{ trade.amount }}</td>
 				<td>{{ trade.resourcetype.name|trans }}</td>
 				<td>{{ link(trade.source) }}</td>
-				{% if trade.source.owner == character %}
+				{% if trade.source.owner == character or trade.source.steward == character %}
 					<!-- <td>TODO: ? edit</td>-->
 					<td><button class="cancel" data-value="{{ trade.id }}">{{ "economy.trade.cancel"|trans({},"actions") }}</button></td>
 				{% endif %}

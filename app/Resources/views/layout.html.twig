@@ -53,6 +53,8 @@
 	{% if character %}
 		<link rel="alternate" type="application/rss+xml" title="New Events" href="http:{{ url('bm2_rss', {'appkey':app.user.appkey, 'user':app.user.id, 'char':character.id}, true) }}">
 	{% endif %}
+	{% block header %}
+	{% endblock %}
 </head>
 <body>
 
@@ -239,7 +241,8 @@
 		<div>
 			{{ gametime(false, 'current') }}<br />
 			{{ untilturn() }}<br />
-			Server time: {{ "now"|date("H:i") }}
+			Server time: {{ "now"|date("H:i") }}<br />
+			{{ 'game.version'|trans({"%version%":appstate.getGlobal('game-version'), "%updated%":appstate.getGlobal('game-updated')}) }}
 		</div>
 		<hr />
 		{% endif %}
@@ -254,7 +257,7 @@
 		<div><button
 			class="termly-cookie-preference-button"
 			type="button"
-			style="background: black; width: 165px; height: 30px; border-radius: 3px; border: 1px solid black; font-family: Roboto, Arial; font-size: 10px; color: white; font-weight: 600; box-sizing: border-box; cursor: pointer; padding: 0; outline: none;"
+			style="background: black; width: 150px; height: 20px; border-radius: 3px; border: 1px solid black; font-family: Roboto, Arial; font-size: 10px; color: white; font-weight: 600; box-sizing: border-box; cursor: pointer; padding: 0; outline: none;"
 			onclick="displayPreferenceModal()">
 			Manage Cookie Preferences
 		</button></div>

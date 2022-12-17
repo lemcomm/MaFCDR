@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\UpdateNote">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<field name="ts" type="datetime"/>
+		<field name="version" type="string"/>
+		<field name="title" type="string"/>
+		<field name="text" type="text"/>
+	</entity>
+</doctrine-mapping>

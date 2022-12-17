@@ -22,6 +22,7 @@
 	<div id="actionlist" class="boxlist">
 	{% include "element/linklist.html.twig" with {"list":dispatcher.personalActions, "domain":'actions'} only %}
 	{% include "element/linklist.html.twig" with {"list":dispatcher.interActions, "domain":'actions'} only %}
+	{% include "element/linklist.html.twig" with {"list":activityDispatcher.activityActions, "domain":'activity'} only %}
 	{% if character.insidePlace %}
 		{% include "element/linklist.html.twig" with {"list":dispatcher.placeActions(character.insidePlace), "domain":'places'} only %}
 	{% endif %}

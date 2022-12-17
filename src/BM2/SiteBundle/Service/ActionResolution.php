@@ -30,14 +30,14 @@ class ActionResolution {
 	private $gametime;
 	private $warman;
 	private $actman;
-	private $activity;
+	private $helper;
 
 	private $max_progress = 5; // maximum number of actions to resolve in each background progression call
 	private $debug=100;
 	private $speedmod = 1.0;
 
 
-	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman, ActivityManager $activity) {
+	public function __construct(EntityManager $em, AppState $appstate, CharacterManager $charman, History $history, Dispatcher $dispatcher, Generator $generator, Geography $geography, Interactions $interactions, Politics $politics, PermissionManager $permissions, GameTimeExtension $gametime, WarManager $warman, ActionManager $actman, HelperService $helper) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->charman = $charman;
@@ -51,7 +51,7 @@ class ActionResolution {
 		$this->gametime = $gametime;
 		$this->warman = $warman;
 		$this->actman = $actman;
-		$this->activity = $activity;
+		$this->helper = $helper;
 		$this->characters = new ArrayCollection();
 
 		$this->speedmod = (float)$this->appstate->getGlobal('travel.speedmod', 1.0);
@@ -741,7 +741,7 @@ class ActionResolution {
 	}
 
 	private function update_train_skill(Action $action) {
-		$this->activity->trainSkill($action->getcharacter(), $action->getTargetSkill(), 0, 1);
+		$this->helper->trainSkill($action->getcharacter(), $action->getTargetSkill(), 0, 1);
 	}
 
 	public function log($level, $text) {

@@ -53,11 +53,13 @@ class CharacterController extends Controller {
 		$spottings = array();
 		foreach ($query->getResult() as $spotevent) {
 			$id = $spotevent->getTarget()->getId();
-			if (!isset($spottings[$id])) {
-				$spottings[$id] = array('target'=>$spotevent->getTarget(), 'details'=>false, 'events'=>array());
+			if ($id !== $character->getId()) {
+				if (!isset($spottings[$id])) {
+					$spottings[$id] = array('target'=>$spotevent->getTarget(), 'details'=>false, 'events'=>array());
+				}
+				// TODO: figure out if we can see details or not - by distance between spotter or watchtower?
+				$spottings[$id]['events'][] = $spotevent;
 			}
-			// TODO: figure out if we can see details or not - by distance between spotter or watchtower?
-			$spottings[$id]['events'][] = $spotevent;
 		}
 		return $spottings;
 	}
@@ -127,7 +129,8 @@ class CharacterController extends Controller {
 			'dungeons' => $this->get('geography')->findDungeonsNearMe($character, Geography::DISTANCE_DUNGEON),
 			'spotrange' => $this->get('geography')->calculateSpottingDistance($character),
 			'actrange' => $this->get('geography')->calculateInteractionDistance($character),
-			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character)
+			'requests' => $this->get('game_request_manager')->findAllManageableRequests($character),
+			'duels' => $character->findAnswerableDuels()
 		]);
 	}
 
@@ -992,12 +995,9 @@ class CharacterController extends Controller {
 	  * @Route("/kill")
 	  */
 	public function killAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('metaKillTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
-		}
-		if ($character->isPrisoner()) {
-			throw new AccessDeniedHttpException('unavailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('death', 'textarea', array(
@@ -1061,12 +1061,9 @@ class CharacterController extends Controller {
      * @Route("/retire")
      */
 	public function retireAction(Request $request) {
-		$character = $this->get('appstate')->getCharacter();
+		$character = $this->get('dispatcher')->gateway('metaRetireTest');
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
-		}
-		if ($character->isPrisoner()) {
-			throw new AccessDeniedHttpException('unvailable.prisoner');
 		}
 		$form = $this->createFormBuilder()
 			->add('retirement', 'textarea', array(
@@ -1482,8 +1479,10 @@ class CharacterController extends Controller {
 			throw $this->createNotFoundException('error.notfound.battlereport');
 		}
 
+		$check = false;
 		if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
-			if (!$report->checkForObserver($character)) {
+			$check = $report->checkForObserver($character);
+			if (!$check) {
 				$query = $em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
 				$query->setParameters(array('br'=>$report, 'me'=>$character));
 				$check = $query->getOneOrNullResult();

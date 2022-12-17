@@ -1,0 +1,33 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'activity' %}
+{% block content %}
+	<h2>{{ 'duel.answer.name'|trans }}</h2>
+	<p>{{ 'duel.answer.intro'|trans|raw }}</p>
+
+	<h3> {{ 'duel.answer.list'|trans|title }}</h3>
+	{# For all that is sane, we do an individual if check for specific types or requests against every request. Ideally, we sort these in the order we expect them to happen. #}
+	{% for duel in duels %}
+		<hr>
+		<div class="subcontent inline_announcements" style="color:#460702">
+			<h4>{{ duel.name|title }}</h4>
+			<p>{{ link(duel.findChallenger.character) }} {{ 'duel.versus'|trans|raw}} {{ link(duel.findChallenged.character) }}<br />
+			{{ 'duel.answer.type'|trans|raw}} {{ ('duel.form.'~duel.subtype.name)|trans|raw}}<br />
+			{{ 'duel.answer.gear'|trans|raw}} {% if duel.weaponOnly %}{{ 'duel.answer.gear1'|trans|raw}}{% else %}{{ 'duel.answer.gear2'|trans|raw}}{% endif %}<br />
+			{% if duel.same %}
+				{{ 'duel.answer.same'|trans({"%link-equipment%":link(duel.findOrganizer.getWeapon)})|raw }}
+			{% else %}
+				{% if duel.findChallenger.character == char %}
+					{{ 'duel.answer.notsame'|trans({"%link-equipment%":link(duel.findChallenger.getWeapon)})|raw }}<br>
+					{{ 'duel.answer.notsame2'|trans({"%link-equipment%":link(duel.findChallenged.getWeapon)})|raw }}
+				{% else %}
+					{{ 'duel.answer.notsame'|trans({"%link-equipment%":link(duel.findChallenger.getWeapon)})|raw }}
+				{% endif %}
+			{% endif %}</p>
+			<p><a href="{{path('maf_activity_duel_accept', {"act":duel.id}) }}"><button id="approve">{{ 'duel.answer.accept'|trans }}</button></a> | <a href="{{path('maf_activity_duel_refuse', {"act":duel.id}) }}"><button id="deny">{{ 'duel.answer.refuse'|trans }}</button></a></p>
+		</div>
+	{% else %}
+		{{ 'duel.answer.empty'|trans|raw }}<br />
+	{% endfor %}
+
+{% endblock %}

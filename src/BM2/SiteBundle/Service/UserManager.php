@@ -80,7 +80,7 @@ class UserManager extends FosUserManager {
 	public function calculateCharacterSpawnLimit(User $user, $refresh = false) {
 		$newest = null;
 		$count = 0;
-		foreach ($user->getLivingCharacters() as $char) {
+		foreach ($user->getActiveCharacters() as $char) {
 			if ($char->getLocation() && $char->getCreated() > $newest) {
 				$newest = $char->getCreated();
 			}
@@ -113,7 +113,7 @@ class UserManager extends FosUserManager {
 			$next = $user->getNextSpawnTime();
 		}
 		if ($next) {
-			if ($user->getLivingCharacters()->count() > 3 && $next > $now) {
+			if ($user->getActiveCharacters()->count() > 3 && $next > $now) {
 				return false;
 			} else {
 				return true;

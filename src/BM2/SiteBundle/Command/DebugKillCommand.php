@@ -37,6 +37,10 @@ class DebugKillCommand extends ContainerAwareCommand {
 		}
 		$msg = $input->getArgument('m');
 
+		if ($msg === '') {
+			$msg = 'rerun';
+		}
+
 		$cm = $this->getContainer()->get('character_manager');
 
 		if ($cm->kill($char, $killer, false, $msg)) {

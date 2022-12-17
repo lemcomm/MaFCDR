@@ -3,6 +3,8 @@
 {% block content %}
 {% if announcements is defined %}
 <div class="subcontent_wrapper"><div class="subcontent">
+	<h2>M&F Version {{ update.version }} - {{ update.ts|date('Y-m-d')}}</h2>
+	{{ update.text|markdown|wikilinks }}
 	{{ announcements|markdown }}
 </div></div>
 {% endif %}

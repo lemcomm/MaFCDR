@@ -4,7 +4,9 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Journal;
+use BM2\SiteBundle\Entity\UpdateNote;
 use BM2\SiteBundle\Entity\User;
+use BM2\SiteBundle\Form\UpdateNoteType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -55,6 +57,47 @@ class GMController extends Controller {
 
 		return $this->render('GM/pending.html.twig',  [
 			'reports'=>$reports,
+		]);
+	}
+
+	/**
+	  * @Route("/admin/update/{id}", name="maf_admin_update")
+  	  * @Route("/admin/update")
+  	  * @Route("/admin/update/")
+	  */
+
+	public function updateNoteAction(Request $request, UpdateNote $id=null) {
+		# Security is handled by Syfmony Firewall.
+
+		$form = $this->createForm(new UpdateNoteType($id));
+		$form->handleRequest($request);
+
+		if ($form->isValid() && $form->isSubmitted()) {
+			$em = $this->getDoctrine()->getManager();
+			$data = $form->getData();
+			if (!$id) {
+				$note = new UpdateNote();
+				$now = new \DateTime('now');
+				$note->setTs($now);
+				$version = $data['version'];
+				$note->setVersion($version);
+				$em->persist($note);
+			} else {
+				$note = $id;
+			}
+			$note->setText($data['text']);
+			$note->setTitle($data['title']);
+			if (!$id) {
+				$this->get('appstate')->setGlobal('game-version', $version);
+				$this->get('appstate')->setGlobal('game-updated', $now->format('Y-m-d'));
+			}
+			$this->addFlash('notice', 'Update note created.');
+			return $this->redirectToRoute('bm2_characters');
+		}
+
+
+		return $this->render('GM/update.html.twig', [
+			'form'=>$form->createView()
 		]);
 	}
 }

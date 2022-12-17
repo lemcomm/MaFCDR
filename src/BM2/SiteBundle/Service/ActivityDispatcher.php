@@ -12,7 +12,82 @@ class ActivityDispatcher extends Dispatcher {
 
 	}
 
+	public function activityActions() {
+		if (($check = $this->interActionsGenericTests()) !== true) {
+			return array("name"=>"activity.title", "elements"=>array(array("name"=>"activity.all", "description"=>"unavailable.$check")));
+		}
+		$actions = [];
+		$actions[] = $this->activityDuelChallengeTest();
+		$actions[] = $this->activityDuelAnswerTest();
+
+		return ["name"=>"activity.title", "elements"=>$actions];
+	}
+
 	/* ========== Activity Dispatchers ========== */
+
+	public function activityDuelChallengeTest() {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.challenge.name", "description"=>"unavailable.$check");
+		}
+		return $this->action("duel.challenge", "maf_activity_duel_challenge");
+	}
+
+	public function activityDuelAnswerTest() {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		$duels = $char->findAnswerableDuels();
+		if ($duels->count() < 1) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noduels");
+		}
+		$can = false;
+		foreach($duels as $each) {
+			/*$me = $each->findChallenger();
+			$them = $each->findChallenged();
+			if ($me === $char && !$me->getAccepted()) {
+				$can = true;
+			} elseif ($them === $char && !$them->getAccepted()) {
+				$can = true;
+			}*/
+			if ($each->isAnswerable($char)) {
+				$can = true;
+				break; # We can answer one, no need to check more.
+			}
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_answer");
+	}
+
+	public function activityDuelAcceptTest($ignored, $act) {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		$can = false;
+		if ($act->isAnswerable($this->getCharacter())) {
+			$can = true;
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_accept");
+	}
+
+	public function activityDuelRefuseTest($ignored, $act) {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.$check");
+		}
+		$can = false;
+		if ($act->isAnswerable($this->getCharacter())) {
+			$can = true;
+		}
+		if (!$can) {
+			return array("name"=>"duel.answer.name", "description"=>"unavailable.noanswerableduels");
+		}
+		return $this->action("duel.answer", "maf_activity_duel_refuse");
+	}
 
 	public function activityTrainTest($ignored, $type) {
 		switch ($type) {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityReportGroup">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+
+		<field name="start" type="array"/>
+
+		<one-to-many field="stages" target-entity="ActivityReportStage" mapped-by="group">
+			<order-by>
+				<order-by-field name="round" direction="ASC"/>
+			</order-by>
+		</one-to-many>
+		<field name="finish" type="array"/>
+
+		<one-to-many field="characters" target-entity="ActivityReportCharacter" mapped-by="group_report"/>
+		<many-to-one field="activity_report" target-entity="ActivityReport" inversed-by="groups"/>
+
+	</entity>
+</doctrine-mapping>

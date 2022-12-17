@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityReport">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<field name="cycle" type="integer"/>
+		<field name="location" type="point"/>
+		<field name="location_name" type="array" nullable="true"/>
+		<field name="completed" type="boolean"/>
+		<field name="count" type="integer" nullable="true"/>
+		<field name="debug" type="text" nullable="true"/>
+		<field name="ts" type="datetime"/>
+
+		<one-to-one field="activity" target-entity="Activity" mapped-by="report"/>
+                <many-to-one field="type" target-entity="ActivityType"/>
+		<many-to-one field="subtype" target-entity="ActivitySubType"/>
+
+		<many-to-one field="settlement" target-entity="Settlement"/>
+		<many-to-one field="place" target-entity="Place"/>
+		<many-to-one field="geo_data" target-entity="GeoData"/>
+
+		<one-to-many field="characters" target-entity="ActivityReportCharacter" mapped-by="activity_report"/>
+		<one-to-many field="groups" target-entity="ActivityReportGroup" mapped-by="activity_report"/>
+		<one-to-many field="observers" target-entity="ActivityReportObserver" mapped-by="activity_report"/>
+		<one-to-many field="journals" target-entity="Journal" mapped-by="activity_report"/>
+
+	</entity>
+</doctrine-mapping>

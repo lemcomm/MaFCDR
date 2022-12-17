@@ -32,9 +32,9 @@ class CharacterManager {
 	protected $dm;
 	protected $warman;
 	protected $assocman;
+	protected $helper;
 
-
-	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman, AssociationManager $assocman) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman, AssociationManager $assocman, HelperService $helper) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
@@ -45,6 +45,7 @@ class CharacterManager {
 		$this->dm = $dm;
 		$this->warman = $warman;
 		$this->assocman = $assocman;
+		$this->helper = $helper;
 	}
 
 
@@ -430,6 +431,27 @@ class CharacterManager {
 			$this->politics->endOccupation($each, 'death');
 		}
 
+		foreach ($character->getActivityParticipation() as $part) {
+			$act = $part->getActivity();
+			if ($act->getType()->getName() === 'duel') {
+				foreach ($act->getParticipants() as $each) {
+					if ($each !== $part) {
+						$this->history->logEvent(
+							$each->getCharacter(),
+							'event.character.duelfail',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, true
+						);
+					}
+				}
+			}
+			# TODO: De-duplicate this from ActivityManager.
+			foreach($part->getBoutParticipation() as $bout) {
+				$this->em->remove($bout);
+			}
+			$this->em->remove($part);
+		}
+
 		// TODO: permission lists - plus clear out those of old dead characters!
 
 		# Remove all allegiances -- as the dead have no loyalties.
@@ -634,6 +656,27 @@ class CharacterManager {
 
 		foreach ($character->getOccupiedPlaces() as $each) {
 			$this->politics->endOccupation($each, 'retire');
+		}
+
+		foreach ($character->getActivityParticipation() as $each) {
+			$act = $part->getActivity();
+			if ($act->getType()->getName() === 'duel') {
+				foreach ($act->getParticipants() as $each) {
+					if ($each !== $part) {
+						$this->history->logEvent(
+							$each->getCharacter(),
+							'event.character.duelfail2',
+							array('%link-character%'=>$char->getId()),
+							History::MEDIUM, true
+						);
+					}
+				}
+			}
+			# TODO: De-duplicate this from ActivityManager.
+			foreach($part->getBoutParticipation() as $bout) {
+				$this->em->remove($bout);
+			}
+			$this->em->remove($part);
 		}
 
 		// TODO: permission lists - plus clear out those of old dead characters!
@@ -1200,11 +1243,14 @@ class CharacterManager {
 
 	/* achievements */
 	public function getAchievement(Character $character, $key) {
-		return $character->getAchievements()->filter(
-			function($entry) use ($key) {
-				return ($entry->getType()==$key);
-			}
-		)->first();
+		# The below bypasses the doctrine cache, meaning it will always pull the current value from the database.
+		$query = $this->em->createQuery('SELECT a FROM BM2SiteBundle:Achievement a WHERE a.character = :me AND a.type = :type ORDER BY a.id ASC')->setParameters(['me'=>$character, 'type'=>$key])->setMaxResults(1);
+		$result = $query->getResult();
+		if ($result) {
+			return $result[0];
+		} else {
+			return false;
+		}
 	}
 
 	public function getAchievementValue(Character $character, $key) {

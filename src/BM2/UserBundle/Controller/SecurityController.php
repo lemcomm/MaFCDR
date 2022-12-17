@@ -21,11 +21,6 @@ class SecurityController extends BaseController {
 	public function loginAction(Request $request) {
 		/** @var $session Session */
 		$session = $request->getSession();
-		if (file_exists(__DIR__."/../../SiteBundle/ShortAnnouncements.md")) {
-			$announcements = file_get_contents(__DIR__."/../../SiteBundle/ShortAnnouncements.md");
-		} else {
-			$announcements = NULL;
-		}
 
 		$authErrorKey = Security::AUTHENTICATION_ERROR;
 		$lastUsernameKey = Security::LAST_USERNAME;
@@ -54,7 +49,6 @@ class SecurityController extends BaseController {
 		return $this->renderLogin(array(
 		    'last_username' => $lastUsername,
 		    'error' => $error,
-		    'announcements' => $announcements,
 		    'csrf_token' => $csrfToken,
 		));
 	}

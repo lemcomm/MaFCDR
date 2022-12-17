@@ -2,6 +2,8 @@
 # Generic text strings for display, mostly on informational pages.
 # Authors: Tom Vogt, Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
+game:
+ version:     "Version %version% (Updated: %updated%)"
 dateformat:   Y-m-d
 gametime:
  current:     It is year %year%, week %week%, day %day% in the world of Might & Fealty
@@ -318,9 +320,8 @@ account:
   link:     Get More Credits
   shop:     Buying Credits
   intro: >
-    Unfortunately, we can only offer PayPal payment at this time but are looking into alternatives (like Stripe).<br />
-    PayPal also handles <b>credit card payments</b>.<br />
-    Payments are handled through <b>Iungard Systems, LLC</b>, so that is what you'll see on your order and receipt.
+    Unfortunately, we can only accept payments through Stripe at this time but are open to exploring alternatives if you have suggestions.<br />
+    As this game is owned by <b>Iungard Systems LLC</b>, that is what you'll see on your transaction history.
   history:  Payment History
   type:     Transaction type
   date:     Date
@@ -852,6 +853,7 @@ settlement:
  resupply:  Equipment available for resupply
  retrain:   Equipment available for re-training
  train:     Equipment available for training
+ traintotal: (Numbers provided assume 100% usage of that facility's available equipment hours.<br>If you have 200 axes available and you train 100 infantry with axes, this will use half of your available machetes and halberds, since they are all supplied by the blacksmith.)
  militiacount:  %count% combat-ready local militia
  recruitscount: %count% recruits in training
  resources:
@@ -1284,12 +1286,20 @@ interaction:
   name:     New Owner
   submit:   Transfer
 
+activity:
+ duel:
+  first blood:  Duel til First Blood
+  wound:        Duel til Wound
+  surrender:    Duel til Surrender
+  death:        Duel to the Death
+
 battle:
  title:         Battle Report
  upcoming:      Upcoming Battle
  participants:  participants
  journal:       "%journal%, by %character%"
  journals:      "It seems that people have shared stories about this battle. You could read one if you'd like."
+ journalwrite:  "You're always welcome to write your own words about this, perhaps even publicly if you'd like."
  location:
   nowhere:      neverwhere battle
   of:           The battle of %location%
@@ -1466,52 +1476,55 @@ fiction:
 
 
 manual:
- title:       Game Manual
- intro:       Introduction
- background:  Background
- videos:      Videos
- basics:      Basic concepts
- knight:      Playing a knight
- lord:        Playing a lord
- ruler:       Playing a ruler
- others:      Other roles
- location:    Exploration
- characters:  Characters
- economy:     Economy
- battles:     Battles
- relations:   Marriage and relations
- fealty:      Oaths of fealty
- soldiers:    Soldiers
- entourage:   Entourage
- settlements: Settlements
- places:      Places of Interest
- claims:      Claims
- realms:      Realms
+ activities:  Activities
+ arrivals:      Arrivals System
+ artifacts:     Artifacts
  associations: Associations
- travel:      Travel
- trade:       Trade & tribute
- politics:    Politics
+ background:  Background
+ bandits:       Bandits
+ basics:      Basic concepts
+ battles:     Battles
+ battles2:      Battles (Upcoming Change)
+ characters:  Characters
+ claims:      Claims
  diplomacy:   Diplomacy
+ duels:       Duels
+ economy:     Economy
  elections:   Elections
- messages:    Messages
- publications:  Publications
+ entourage:   Entourage
+ fealty:      Oaths of fealty
  history:       History & events
+ houses:        Houses
+ intro:       Introduction
+ knight:      Playing a knight
+ location:    Exploration
+ lord:        Playing a lord
+ looting:       Looting
+ measurements:  Units of measurement
+ messages:    Messages
+ others:      Other roles
  permissions:   Permission system
  prison:        Captivity
- bandits:       Bandits
- looting:       Looting
- spotting:      Spotting
+ places:      Places of Interest
+ politics:    Politics
+ publications:  Publications
  quests:        Quests
- artifacts:     Artifacts
- supply:        Army supply
+ realms:      Realms
  reference:     Reference
- measurements:  Units of measurement
- test:          Test instance
- houses:        Houses
- units:         Units
- battles2:      Battles (Upcoming Change)
+ relations:   Marriage and relations
+ ruler:       Playing a ruler
+ settlements: Settlements
  sieges:        Sieges
- arrivals:      Arrivals System
+ skills:      Skills
+ soldiers:    Soldiers
+ spotting:      Spotting
+ supply:        Army supply
+ test:          Test instance
+ trade:       Trade & tribute
+ travel:      Travel
+ title:       Game Manual
+ units:         Units
+ videos:      Videos
 
 list:
  buildingtypes:   list of all building types
@@ -1758,6 +1771,9 @@ unavailable:
  cantxfercapital: This place type cannot be transferred to another owner.
  notcadetapproved: Not approved by the Head of the House.
  notlegislative: You do not hold a legislative position within this organisation.
+ noduels: You have no duels to answer.
+ noanswerableduels: All pending duels are awaiting others.
+ unfinishedbusiness: "You have some unfinished business to attend to first. Perhaps it's a duel that requires your participation?"
 
 marker:
  name:      Marker name

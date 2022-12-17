@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\ActivityReportStage">
+		<id name="id" type="integer">
+			<generator strategy="IDENTITY"/>
+		</id>
+		<many-to-one field="group" target-entity="ActivityReportGroup" inversed-by="stages"/>
+		<many-to-one field="character" target-entity="ActivityReportCharacter" inversed-by="stages"/>
+		<field name="round" type="smallint"/>
+		<field name="data" type="array"/>
+		<field name="extra" type="array" nullable="true"/>
+
+	</entity>
+</doctrine-mapping>

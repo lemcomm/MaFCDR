@@ -1,0 +1,10 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'activity' %}
+{% block content %}
+	<h2>{{ 'duel.accept.name'|trans }}</h2>
+	<p>{{ 'duel.accept.intro'|trans({"%name%":link(duel.findChallenger.character)})|raw }}</p>
+	<p><a href="{{path('maf_activity_duel_refuse', {"act":duel.id}) }}"><button id="decline">{{ 'duel.accept.decline'|trans }}</button></a></p>
+	<hr>
+	{{ form(form, {'attr': {'class':'wide'}}) }}
+{% endblock %}

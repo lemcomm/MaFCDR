@@ -2,6 +2,92 @@
 # Text translation strings for activities and skills
 # Author: Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
+
+activity:
+ form:
+  name:      "Name"
+ title:      Activities Menu
+
+duel:
+ versus:     "<i>vs.</i>"
+ accept:
+  name:      "Accept a Duel"
+  intro:     "%name% has challenged you to a duel under the terms of the ancient magics, but has granted you the option to choose your weapon. Once you've chosen they can then decline your selection.<br><br>Of course, you could always just refuse."
+  decline:   "Decline the Duel"
+ answer:
+  accept:    "Accept"
+  accepted:  "You've accepted %target%'s request to duel!"
+  accepted2:  "You've agreed to %target%'s duel weapon."
+  description: "You've challenges to answer."
+  intro:     "According to the rules of the ancient magics, you've been challenged to a duel it seems. Such as the magics decree, you need not agree if you do not desire such."
+  list:      "Duels to Answer"
+  name:      "Answer a Duel"
+  refuse:    "Refuse"
+  refused:   "You've refused %target%'s request to duel."
+  same:      "Both shall use the %link-equipment%"
+  weapon:    "Weapon:"
+  gear:      "Gear Rule:"
+  gear1:     "Weapons Only"
+  gear2:     "All gear"
+  notsame:   "Challenger's weapon: %link-equipment%"
+  notsame2:  "Opponent's weapon: %link-equipment%"
+  type:      "Duel Limit:"
+ challenge:
+  name:      "Challenge Someone to a Duel"
+  description: "Resolve things through individual, personal combat."
+  intro:     "As a First One, there is a long tradition of resolving things through combat, but sometimes there is a need for a more personal resolution. For those situations, there exists a subset of ancient magics for not only refusing others the right to interfere but also ensuring the combatants themselves agree to the terms. You can use these ancient ways to challenge others to a specific type of personal combat, a duel, if you feel you have been wronged in some manner.<br><br>Note: If you opt to require the same weapon, you are choosing the weapon for both characters. If not, you're only choosing your own. If you're only choosing your own, you'll be able to decline if they pick something you find unreasonable."
+  sent:      "You've successfully challenged %target% to a duel!"
+  unsent:    "We've encountered a problem creating the duel instance... If this fails after more than one attempt, please report it to an admin."
+ form:
+  challenger: "Character to Duel?"
+  choose: "(choose)"
+  context: "To What Extent?"
+  death: "To the Death"
+  firstblood: "To First Blood"
+  name: "Duel Name"
+  sameWeapon: "Use the Same Weapon?"
+  submit: "Send Challenge"
+  surrender: "Until Surrender"
+  weapon: "Weapon to Use?"
+  weaponOnly: "Weapons Only? (No Armor Bonuses)"
+  wound: "Until Wounding"
+
+report:
+ title: Activity Report
+ loc:
+  place: Inside %location%
+  near: Near %location%
+  settlement: Inside %location%
+ journals:  "It seems that people have shared stories about this. You could read one if you'd like."
+ journalwrite: "You're always welcome to write your own words about this, perhaps even publicly if you'd like."
+ duel:
+  participants: Participants
+  round:
+   title:    Round %i%
+  finish:    Duel Finish
+ combat:
+  miss:      %name% attacks with their %weapon% but misses.
+  fail:      %name% manages a glancing blow with their %weapon%.
+  wound:     %name% does signifcant damage with their %weapon%.
+  kill:      %name% delivers a major blow with their %weapon%.
+  victory:   Is Declared Victorious
+  loss:      Has Lost This Duel
+  draw:      Was Not Clearly The Winner
+ compare:
+  very high: Onlookers found their skill quite superior,
+  high:      Onlookers found their skill superior,
+  minor high: Onlookers found their skill a little superior,
+  similar:   Onlookers found their skill hard to compare,
+  minor low: Onlookers found their skill a little inferior,
+  low:       Onlookers found their skill inferior,
+  very low:  Onlookers found their skill quite inferior,
+
+ acc:
+  low:       but they were not confident in this opinion.
+  medium:    though they had mixed thoughts on it.
+  high:      and were nearly unanimous in this view.
+
+
 train:
  noduplicate: Other training actions have been automatically removed. Sorry, you can only train one skill at a time.
  sling:

@@ -8,15 +8,25 @@
 		<many-to-one field="subtype" target-entity="ActivitySubType"/>
                 <field name="name" type="string"/>
 		<field name="created" type="datetime"/>
-		<field name="start" type="datetime"/>
-		<field name="finish" type="datetime"/>
+		<field name="start" type="datetime" nullable="true"/>
+		<field name="finish" type="datetime" nullable="true"/>
+                <field name="same" type="boolean" nullable="true"/>
+                <field name="weapon_only" type="boolean" nullable="true"/>
+		<field name="ready" type="boolean" nullable="true"/>
 
+		<one-to-one field="report" target-entity="ActivityReport" inversed-by="activity"/>
+
+                <one-to-many field="events" target-entity="Activity" mapped-by="main_event"/>
+                <many-to-one field="main_event" target-entity="Activity" inversed-by="events"/>
                 <one-to-many field="participants" target-entity="ActivityParticipant" mapped-by="activity"/>
+                <one-to-many field="groups" target-entity="ActivityGroup" mapped-by="activity"/>
+
+		<field name="location" type="point" nullable="true"/>
+		<many-to-one field="geo_data" target-entity="GeoData" inversed-by="activities"/>
                 <many-to-one field="settlement" target-entity="Settlement" inversed-by="activities"/>
                 <many-to-one field="place" target-entity="Place" inversed-by="activities"/>
-                <one-to-many field="bouts" target-entity="ActivityBout" mapped-by="activity"/>
 
-                <many-to-one field="organizer" target-entity="Character" inversed-by="organized_activities"/>
+                <one-to-many field="bouts" target-entity="ActivityBout" mapped-by="activity"/>
 
 	</entity>
 </doctrine-mapping>

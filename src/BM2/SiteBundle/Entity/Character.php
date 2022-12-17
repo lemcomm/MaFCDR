@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Place;
+use BM2\SiteBundle\Entity\SkillType;
 
 class Character {
 
@@ -588,6 +589,30 @@ class Character {
 			$all->add($each);
 		}
 		return $all;
+	}
+
+	public function findAnswerableDuels() {
+		$all = new ArrayCollection;
+		foreach ($this->getActivityParticipation() as $each) {
+			$act = $each->getActivity();
+			if ($act->isAnswerable($this)) {
+				$all->add($act);
+			}
+		}
+		return $all;
+	}
+
+	public function getType() {
+		return 'first one';
+	}
+
+	public function findSkill(SkillType $skill) {
+		foreach ($this->skills as $each) {
+			if ($each->getType() === $skill) {
+				return $each;
+			}
+		}
+		return false;
 	}
 	
 }

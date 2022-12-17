@@ -1,0 +1,96 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'activity' %}
+{% block content %}
+<h2>{{ 'report.title'|trans|title }}</h2>
+<p>
+	{% if place %}
+		{{ 'report.loc.place'|trans({'%location%':link(place)})|raw }}
+	{% elseif not inside %}
+		{{ 'report.loc.near'|trans({'%location%':link(settlement)})|raw }}
+	{% else %}
+		{{ 'report.loc.settlement'|trans({'%location%':link(settlement)})|raw }}
+	{% endif %}
+	-
+	{{ report.cycle|gametime('long') }}
+</p>
+{% if report.countPublicJournals > 0 %}
+<p>{{ 'report.journals'|trans}}</p>
+<ul>
+	{% for journal in report.journals %}
+		{% if journal.public %}
+			<li>{{link(journal)}} - {{link(journal.character)}} ({{journal.date|date}})</li>
+		{% endif %}
+	{% endfor %}
+</ul>
+{% endif %}
+{% if access %}
+	<a href="{{path('maf_journal_write_activity', {"report":report.id}) }}">{{ 'report.journalwrite'|trans }}</a>
+	<p>
+	<table class="battlereport" >
+	<tr>
+		<th colspan="2"><h3>{{ 'report.duel.participants'|trans|title }}</h3></th>
+	</tr>
+	{% if report.type.name is same as 'duel' %}
+		<tr>
+			{% for character in report.characters %}
+				<td class="reportcolumn"><ul class="shortlist">
+					{% if character.character.crest %}
+						{{ character_link(character.character.id, '<img src="'~path("bm2_site_heraldry_crest", {"id":character.character.crest.id})~'" width="60px" height="60px"/>') }}
+					{% else %}
+						{{ character_link(character.character.id, '<img src="'~asset("bundles/bm2site/heraldry-svg/empty.svg")~'" width="60px" height="60px"/>') }}
+					{% endif %}
+					{{ link(character.character) }}
+				</ul></td>
+			{% endfor %}
+		</tr>
+		{% for i in 1 .. roundcount %}
+			<tr>
+				<th colspan="2"><h4>{{ 'report.duel.round.title'|trans({'%i%':i})|title }}</h4></th></tr>
+			<tr>
+			{% for character in report.characters %}
+				<td>
+				{% set wpn = character.weapon.name %}
+				{% for stage in character.stages if stage.round == i %}
+					{% if stage.round != 32767 %}
+						<li>{{ ('report.combat.'~stage.data.result)|trans({'%name%':character.character.name, '%weapon%':wpn})|raw }}</li>
+					{% endif %}
+				{% endfor %}
+				</td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+		</tr>
+		<tr>
+			<th colspan="2"><h3>{{ 'report.duel.finish'|trans|title }}</h3></th>
+		</tr>
+		<tr>
+		{% for character in report.characters %}
+			<td valign="top">
+			<ul>
+				<li>{{ link(character.character) }}</li>
+				<li>{{ ('report.combat.'~character.finish.result)|trans|raw }}</li>
+				<li>{{ ('report.compare.'~character.finish.skillCheck)|trans|raw }}</li>
+				<li>{{ ('report.acc.'~character.finish.skillAcc)|trans|raw }}</li>
+			{#{% for result, skillCheck, skillAcc in character.finish %}
+				<li>{{ ('report.combat.'~result)|trans|raw }}</li>
+				<li>{{ ('report.compare.'~skillCheck)|trans|raw }}</li>
+				<li>{{ ('report.acc.'~skillAcc)|trans|raw }}</li>
+			{% endfor %}#}
+			</ul>
+			</td>
+		{% endfor %}
+		</tr>
+	{% endif %}
+	</table>
+	</p>
+{% endif %}
+
+<p>
+{% if admin %}
+<h2>Raw Debug Output</h2>
+<pre>{{ report.debug }}</pre>
+{% endif %}
+</p>
+
+{% endblock %}

@@ -21,12 +21,12 @@
 {% endif %}
 
 <div class="footnote">
-	{{ 'settlement.train'|trans }}:
 	<dl class="wide">
+		<dt>{{ 'settlement.train'|trans }}:</dt><dd>{{ 'settlement.traintotal'|trans|raw }}</dd>
 		{% set last = null %}
 		{% for data in training %}
 			{% set item = data.item %}
-			{% set type = item.trainer %}
+			{% set type = item.provider %}
 			{% set supply = data.resupply %}
 			{% if type != last %}
 				{% if last != null %}

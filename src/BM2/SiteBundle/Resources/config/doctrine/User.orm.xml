@@ -63,6 +63,7 @@
 			</order-by>
 		</one-to-many>
 		<one-to-one field="limits" target-entity="UserLimits" mapped-by="user"/>
+		<one-to-many field="keys" target-entity="AppKey" mapped-by="user"/>
 
 		<unique-constraints>
 			<unique-constraint columns="username" />

@@ -1,0 +1,9 @@
+{% extends "layout.html.twig" %}
+
+{% trans_default_domain 'activity' %}
+{% block content %}
+	<h2>{{ "duel.challenge.name"|trans|title }}</h2>
+	<p>{{ "duel.challenge.intro"|trans|raw}}</p>
+	{{ form(form, {'attr': {'class':'wide'}}) }}
+
+{% endblock %}
