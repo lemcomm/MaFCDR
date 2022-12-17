@@ -270,8 +270,13 @@ class ActivityManager {
 	private function runDuel(Activity $act) {
 		$em = $this->em;
 		$me = $act->findChallenger();
-		$meC = $me->getCharacter();
 		$them = $act->findChallenged();
+		if (!$me || !$them) {
+			# Duel failed. Someone probably died.
+			$this->cleanupAct($act);
+			return true;
+		}
+		$meC = $me->getCharacter();
 		$themC = $them->getCharacter();
 		$meRanged = $this->combat->RangedPower($me, false, $me->getWeapon());
 		$meMelee = $this->combat->MeleePower($me, false, $me->getWeapon());
