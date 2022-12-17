@@ -23,12 +23,20 @@ parameters:
 
     stripe-secret: ~
     stripe-prices:
-     2: ~
-     5: ~
-     10: ~
-     20: ~
-     50: ~
-     100: ~
+     USD:
+      2: ~
+      5: ~
+      10: ~
+      20: ~
+      50: ~
+      100: ~
+     EUR:
+      2: ~
+      5: ~
+      10: ~
+      20: ~
+      50: ~
+      100: ~
 
     ruleset: maf
 
