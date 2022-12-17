@@ -87,9 +87,9 @@ class PaymentController extends Controller {
 	}
 
 	/**
-	  * @Route("/stripe/{amount}", name="maf_stripe", requirements={"amount"="\d+"})
+	  * @Route("/stripe/{currency}/{amount}", name="maf_stripe", requirements={"currency"="[A-Z]+", "amount"="\d+"})
 	  */
-	public function stripeAction($amount, Request $request) {
+	public function stripeAction($currency, $amount, Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
 		}
@@ -97,7 +97,7 @@ class PaymentController extends Controller {
 
 		$success = $this->generateUrl('maf_stripe_success', [], true);
 		$cancel = $this->generateUrl('bm2_payment', [], true);
-		$checkout = $this->get('payment_manager')->buildStripeIntent($amount, $user, $success, $cancel);
+		$checkout = $this->get('payment_manager')->buildStripeIntent($currency, $amount, $user, $success, $cancel);
 		if ($checkout === 'notfound') {
 			$this->addFlash('error', "Unable to locate the requested product.");
 			return $this->redirectToRoute('bm2_payment');
@@ -225,9 +225,9 @@ class PaymentController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/patreon/update", name="maf_patreon_update")
-     */
+	/**
+	  * @Route("/patreon/update", name="maf_patreon_update")
+	  */
 	public function patreonUpdateAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -263,9 +263,9 @@ class PaymentController extends Controller {
 		return $this->redirectToRoute('bm2_account');
 	}
 
-   /**
-     * @Route("/patreon/{creator}", name="maf_patreon", requirements={"creator"="[A-Za-z]+"})
-     */
+	/**
+	  * @Route("/patreon/{creator}", name="maf_patreon", requirements={"creator"="[A-Za-z]+"})
+	  */
 	public function patreonAction(Request $request, $creator) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -304,9 +304,9 @@ class PaymentController extends Controller {
 		}
 	}
 
-   /**
-     * @Route("/culture")
-     */
+	/**
+	  * @Route("/culture")
+	  */
 	public function cultureAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -352,9 +352,9 @@ class PaymentController extends Controller {
 			'form'=>$form->createView()
 		]);
 	}
-   /**
-     * @Route("/gift")
-     */
+	/**
+	  * @Route("/gift")
+	  */
 	public function giftAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -404,9 +404,9 @@ class PaymentController extends Controller {
 			'form'=>$form->createView()
 		]);
 	}
-   /**
-     * @Route("/invite")
-     */
+	/**
+	  * @Route("/invite")
+	  */
 	public function inviteAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
