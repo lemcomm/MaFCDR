@@ -155,8 +155,7 @@
 		<field name="oath_time" type="datetime" nullable="true"/>
 
 		<one-to-many field="activity_participation" target-entity="ActivityParticipant" mapped-by="character"/>
-		<one-to-many field="organized_activities" target-entity="Activity" mapped-by="organizer"/>
-
+		
                 <one-to-many field="skills" target-entity="Skill" mapped-by="character"/>
 		<one-to-many field="styles" target-entity="CharacterStyle" mapped-by="character"/>
 		<one-to-many field="created_styles" target-entity="Style" mapped-by="creator"/>
