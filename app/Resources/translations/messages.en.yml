@@ -2,6 +2,8 @@
 # Generic text strings for display, mostly on informational pages.
 # Authors: Tom Vogt, Andrew Gwynn
 # Contact: mafteam@lemuriacommunity.org
+game:
+ version:     "Version %version% (Updated: %updated%)"
 dateformat:   Y-m-d
 gametime:
  current:     It is year %year%, week %week%, day %day% in the world of Might & Fealty
