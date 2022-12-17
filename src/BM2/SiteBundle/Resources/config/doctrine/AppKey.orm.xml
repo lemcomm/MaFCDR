@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping>
+	<entity name="BM2\SiteBundle\Entity\AppKey" table="user_key">
+                <id name="id" type="integer">
+                        <generator strategy="AUTO" />
+                </id>
+		<many-to-one field="user" target-entity="User" inversed-by="keys"/>
+
+		<field name="ts" type="datetime"/>
+		<field name="token" type="string"/>
+	</entity>
+</doctrine-mapping>
