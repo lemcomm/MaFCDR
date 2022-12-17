@@ -71,7 +71,7 @@ class BattleRunner {
 	private $defenseBonus=0;
 
 
-	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman, Politics $politics, MilitaryManager $milman, HelperServer $helper, CombatManager $combat) {
+	public function __construct(EntityManager $em, Logger $logger, History $history, Geography $geo, CharacterManager $character_manager, NpcManager $npc_manager, Interactions $interactions, WarManager $war_manager, ActivityManager $actman, Politics $politics, MilitaryManager $milman, HelperService $helper, CombatManager $combat) {
 		$this->em = $em;
 		$this->logger = $logger;
 		$this->history = $history;
