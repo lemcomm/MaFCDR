@@ -3,6 +3,7 @@
 namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\User;
+use BM2\SiteBundle\Entity\AppKey;
 
 use BM2\SiteBundle\Form\CharacterCreationType;
 use BM2\SiteBundle\Form\ListSelectType;
@@ -52,9 +53,9 @@ class AccountController extends Controller {
 		return array($announcements, $notices);
 	}
 
-   /**
-     * @Route("/", name="bm2_account")
-     */
+	/**
+	  * @Route("/", name="bm2_account")
+	  */
 	public function indexAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -66,20 +67,23 @@ class AccountController extends Controller {
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
-		$this->getDoctrine()->getManager()->flush();
+		$em = $this->getDoctrine()->getManager();
+		$em->flush();
 
 		list($announcements, $notices) = $this->notifications();
+		$update = $em->createQuery('SELECT u from BM2SiteBundle:UpdateNote u ORDER BY u.id DESC')->setMaxResults(1)->getResult()[0];
 
 		return $this->render('Account/account.html.twig', [
 			'announcements' => $announcements,
+			'update' => $update,
 			'notices' => $notices
 		]);
 	}
 
 
-   /**
-     * @Route("/data")
-     */
+	/**
+	  * @Route("/data")
+	  */
 	public function dataAction(Request $request) {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -124,9 +128,9 @@ class AccountController extends Controller {
 		]);
 	}
 
-   /**
-     * @Route("/characters", name="bm2_characters")
-     */
+	/**
+	  * @Route("/characters", name="bm2_characters")
+	  */
 	public function charactersAction() {
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
 			throw new AccessDeniedException('error.banned.multi');
@@ -330,9 +334,12 @@ class AccountController extends Controller {
 			}
 		}
 
+		$update = $em->createQuery('SELECT u from BM2SiteBundle:UpdateNote u ORDER BY u.id DESC')->setMaxResults(1)->getResult();
+
 		return $this->render('Account/characters.html.twig', [
 			'announcements' => $announcements,
 			'notices' => $notices,
+			'update' => $update[0],
 			'locked' => ($user->getAccountLevel()==0),
 			'list_form' => $list_form->createView(),
 			'characters' => $characters,
@@ -855,6 +862,134 @@ class AccountController extends Controller {
 			$index++;
 		}
 		return false;
+	}
+
+	/**
+	  * @Route("/keys", name="maf_keys")
+	  */
+	public function keysAction() {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
+		$user = $this->getUser();
+		if ($user->getKeys()->count() === 0) {
+			$em = $this->getDoctrine()->getManager();
+			$valid = false;
+			$i = 0;
+			while (!$valid && $i < 10) {
+                                $token = bin2hex(random_bytes($length));
+                                $result = $em->getRepository(User::class)->findOneBy(['user'=>$user->getId(), 'token' => $token]);
+                                if (!$result) {
+                                        $valid = true;
+                                } else {
+					$i++;
+				}
+                        }
+			$key = new AppKey;
+			$em->persist($key);
+			$key->setUser($user);
+			$key->setToken($token);
+			$em->flush();
+		}
+
+		return $this->render('Account/keys.html.twig', [
+			'keys' => $user->getKeys(),
+		]);
+	}
+
+	/**
+	  * @Route("/key/{key}/reset", name="maf_key_reset", requirements={"key"="\d+"})
+	  */
+	public function keyResetAction(AppKey $key) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
+		$user = $this->getUser();
+		if ($user->getKeys()->containes($key)) {
+			$em = $this->getDoctrine()->getManager();
+			$valid = false;
+			while (!$valid) {
+                                $token = bin2hex(random_bytes(32));
+                                $result = $em->getRepository(User::class)->findOneBy(['user'=>$user->getId(), 'token' => $token]);
+                                if (!$result) {
+                                        $valid = true;
+                                }
+			}
+			$key->setToken($token);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('account.key.reset.success', [], "communication"));
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('account.key.unauthorized', [], "communication"));
+		}
+		return $this->redirectToRoute('maf_keys');
+	}
+
+	/**
+	  * @Route("/key/{key}/delete", name="maf_key_reset", requirements={"key"="\d+"})
+	  */
+	public function keyDeleteAction(AppKey $key) {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
+		$user = $this->getUser();
+		if ($user->getKeys()->containes($key)) {
+			$em = $this->getDoctrine()->getManager();
+			$em->remove($key);
+			$em->flush();
+			$this->addFlash('notice', $this->get('translator')->trans('account.key.delete.success', [], "communication"));
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('account.key.unauthorized', [], "communication"));
+		}
+		return $this->redirectToRoute('maf_keys');
+	}
+
+	/**
+	  * @Route("/key/new", name="maf_key_reset", requirements={"key"="\d+"})
+	  */
+	public function keyNewAction() {
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_MULTI')) {
+			throw new AccessDeniedException('error.banned.multi');
+		}
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_BANNED_TOS')) {
+			throw new AccessDeniedException('error.banned.tos');
+		}
+		$user = $this->getUser();
+		$valid = false;
+		$i = 0;
+		if ($user->getKeys()->contains() > 10) {
+			$this->addFlash('notice', $this->get('translator')->trans('account.key.toomany', [], "communication"));
+		} else {
+			while (!$valid && $i < 10) {
+	                        $token = bin2hex(random_bytes(32));
+	                        $result = $em->getRepository(User::class)->findOneBy(['user'=>$user->getId(), 'token' => $token]);
+				if (!$result) {
+					$valid = true;
+				} else {
+					$i++;
+				}
+	                }
+			if ($valid) {
+				$em = $this->getDoctrine()->getManager();
+				$key = new AppKey;
+				$em->persist($key);
+				$key->setUser($user);
+				$key->setToken($token);
+				$em->flush();
+				$this->addFlash('notice', $this->get('translator')->trans('account.key.reset.success', [], "communication"));
+			} else {
+				$this->addFlash('notice', $this->get('translator')->trans('account.key.reset.fail', [], "communication"));
+			}
+		}
+		return $this->redirectToRoute('maf_keys');
 	}
 
 }
