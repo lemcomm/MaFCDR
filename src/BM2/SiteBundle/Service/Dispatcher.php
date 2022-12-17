@@ -3908,12 +3908,16 @@ class Dispatcher {
 	}
 
 	public function metaRetireTest() {
-		if ($this->getCharacter()->isNPC()) {
+		$char = $this->getCharacter();
+		if ($char->isNPC()) {
 			// FIXME: respawn template doesn't exist.
 			return array("name"=>"meta.retire.name", "description"=>"unavailable.npc");
 		}
-		if ($this->getCharacter()->isPrisoner()) {
+		if ($char->isPrisoner()) {
 			return array("name"=>"meta.retire.name", "description"=>"unavailable.prisonershort");
+		}
+		if ($char->getActivityParticipation()->count() > 0) {
+			return array("name"=>"meta.retire.name", "description"=>"unavailable.unfinishedbusiness");
 		}
 		return array("name"=>"meta.retire.name", "url"=>"bm2_site_character_retire", "description"=>"meta.retire.description");
 	}
