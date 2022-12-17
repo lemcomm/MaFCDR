@@ -140,6 +140,8 @@ event:
   death2:       Died in battle.
   deathduel:    Died in a duel to the death.
   deathduel2:   Died in a duel to the death, but took their opponent with them.
+  duelfail:     The duel against %character% is canceled due to their untimely demise.
+  duelfail2:    "The duel against %character% is canceled as they have retired (which shouldn't be possible)."  
   lightningbolt: Killed by a Lightning Bolt from the Heavens.
   retired:      Has retired from war and politics.
   liegeretired: No longer has a liege after the retirement of %character%.
