@@ -167,7 +167,9 @@ Table headers are handled as translation strings from the character.list databas
 		</ul>
 	</div>
 	<div class="subcontent inline_announcements">
-		{{ announcements|markdown }}
+		<h2>M&F Version {{ update.version }} - {{ update.ts|date('Y-m-d')}}</h2>
+		{{ update.text|markdown|wikilinks }}
+		{{ announcements|markdown|wikilinks }}
 	</div>
 </div>
 <div class="maincontent">
