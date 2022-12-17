@@ -32,9 +32,9 @@ class CharacterManager {
 	protected $dm;
 	protected $warman;
 	protected $assocman;
+	protected $helper;
 
-
-	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman, AssociationManager $assocman) {
+	public function __construct(EntityManager $em, AppState $appstate, History $history, MilitaryManager $milman, Politics $politics, RealmManager $realmmanager, ConversationManager $convman, DungeonMaster $dm, WarManager $warman, AssociationManager $assocman, HelperService $helper) {
 		$this->em = $em;
 		$this->appstate = $appstate;
 		$this->history = $history;
