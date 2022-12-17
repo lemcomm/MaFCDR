@@ -241,7 +241,8 @@
 		<div>
 			{{ gametime(false, 'current') }}<br />
 			{{ untilturn() }}<br />
-			Server time: {{ "now"|date("H:i") }}
+			Server time: {{ "now"|date("H:i") }}<br />
+			{{ 'game.version'|trans({"%version%":appstate.getGlobal('game-version'), "%updated%":appstate.getGlobal('game-updated')}) }}
 		</div>
 		<hr />
 		{% endif %}
