@@ -7,8 +7,7 @@
 
 		<field name="start" type="array"/>
 
-		<many-to-one field="group" target-entity="ActivityReportGroup" inversed-by="characters"/>
-		<many-to-one field="activity_report" target-entity="ActivityReport" inversed-by="groups"/>
+		<many-to-one field="activity_report" target-entity="ActivityReport" inversed-by="characters"/>
 		<one-to-many field="stages" target-entity="ActivityReportStage" mapped-by="character">
 			<order-by>
 				<order-by-field name="round" direction="ASC"/>
