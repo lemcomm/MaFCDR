@@ -581,7 +581,7 @@ class Economy {
 			$supply->setOrigin($settlement);
 			$supply->setUnit($unit);
 			$supply->setType('food');
-			$supply->setQuantity($qty);
+			$supply->setQuantity(ceil($qty));
 			$supply->setTravelDays($this->getSupplyTravelTime($settlement, $unit));
 		} elseif ($qty > 0 && $here) {
 			$found = false;
@@ -599,7 +599,7 @@ class Economy {
 				$this->em->persist($supply);
 				$supply->setUnit($unit);
 				$supply->setType('food');
-				$supply->setQuantity($qty);
+				$supply->setQuantity(ceil($qty));
 			}
 		}
 	}
