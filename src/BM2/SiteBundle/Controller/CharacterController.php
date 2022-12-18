@@ -396,7 +396,7 @@ class CharacterController extends Controller {
 		$myHouse = null;
 		if ($realm) {
 			foreach ($realm->getSpawns() as $spawn) {
-				if ($spawn->getPlace()->getSpawnDescription() && $spawn->getPlace()->getDescription()) {
+				if ($spawn->getActive() && $spawn->getPlace()->getSpawnDescription() && $spawn->getPlace()->getDescription()) {
 					$spawns->add($spawn);
 				}
 			}
