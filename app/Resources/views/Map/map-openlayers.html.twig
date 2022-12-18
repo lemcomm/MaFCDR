@@ -256,9 +256,9 @@ $("#search").autocomplete({
 			return;
 		}
 		$("#searchrunning").html("{{ 'map.searching'|trans }}");
-		$.getJSON("{{ path('bm2_site_data_settlements') }}", request, function( data, status, xhr ) {
-			settlement_cache[ term ] = data;
-			response( data );
+		$.getJSON("{{ path('maf_data_settlements') }}", request, function( data, status, xhr ) {
+			settlement_cache[ term ] = data['data'];
+			response( data['data'] );
 			$("#searchrunning").html("");
 		});
 	},
