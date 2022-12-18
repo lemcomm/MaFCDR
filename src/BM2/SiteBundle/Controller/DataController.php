@@ -30,9 +30,9 @@ class DataController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 		$cycle = $this->get('appstate')->getCycle()-1;
-		$query = $em->createQuery('SELECT s.today_users as active_users FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
-		$query->setParameter('cycle', $cycle);
-		$result['active_players'] = $query->getArrayResult()[0];
+                $query = $em->createQuery('SELECT s.today_users as active_players FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
+                $query->setParameter('cycle', $cycle);
+                $result = $query->getArrayResult()[0];
 		$result['name'] = "Might & Fealty";
 		$result['image_url'] = 'https://mightandfealty.com/bundles/bm2site/images/logo-transparent.png';
 		$result['description'] = 'An entirely player driven medieval sandbox game about politics and war set in a low-ish-fantasy world.';
