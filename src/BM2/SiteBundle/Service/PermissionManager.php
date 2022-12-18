@@ -142,17 +142,19 @@ class PermissionManager {
 			if (!$settlement->getOwner()->isActive() || $settlement->getOwner()->getUser()->isBanned()) {
 				if ($realm = $settlement->getRealm()) {
 					if ($law = $realm->findLaw('slumberingAccess')) {
-						$value = $law->getValue();
-						$members = false;
-						if ($value == 'any') {
-							return true;
-						} elseif ($value == 'direct') {
-							$members = $realm->findMembers(false);
-						} elseif ($value == 'realm') {
-							$members = $realm->findMembers();
-						}
-						if ($members && $members->contains($character)) {
-							return true;
+						if ($law->isActive()) {
+							$value = $law->getValue();
+							$members = false;
+							if ($value == 'any') {
+								return true;
+							} elseif ($value == 'direct') {
+								$members = $realm->findMembers(false);
+							} elseif ($value == 'realm') {
+								$members = $realm->findMembers();
+							}
+							if ($members && $members->contains($character)) {
+								return true;
+							}
 						}
 					}
 				}
