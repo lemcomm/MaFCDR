@@ -332,7 +332,7 @@ class PaymentManager {
 				$dif = $lifetime - $patron->getCredited();
 			}
 			$dif = $dif / 100; #Patreon provides in cents. We want full dollars!
-			$this->account($patron->getUser(), 'Patron Credit', 'USD', $dif, null, 'patreon');
+			$this->account($patron->getUser(), 'Patron Credit', $dif, null, 'patreon');
 			$patron->setCredited($lifetime); #We do track it in cents though.
 		}
 		if ($patron->getUpdateNeeded()) {
@@ -499,6 +499,8 @@ class PaymentManager {
 	public function account(User $user, $type, $amount, $transaction=null, $src='paypal') {
 		if ($type === 'Stripe Payment') {
 			list($currency, $amount) = $this->stripeAmtFromPid($amount);
+		} else {
+			$currency = 'USD';
 		}
 		$credits = ceil($amount*100);
 		$original = $credits;
