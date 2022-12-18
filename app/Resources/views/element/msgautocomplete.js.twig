@@ -21,9 +21,9 @@ function charselect(obj, callback) {
 				response( character_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_characters') }}", request, function( data, status, xhr ) {
-				character_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_characters_active') }}", request, function( data, status, xhr ) {
+				character_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
@@ -56,9 +56,9 @@ function settlementselect(obj, callback) {
 				response( settlement_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_settlements') }}", request, function( data, status, xhr ) {
-				settlement_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_settlements') }}", request, function( data, status, xhr ) {
+				settlement_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
@@ -96,9 +96,9 @@ function realmselect(obj, callback) {
 				response( realm_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_realms') }}", request, function( data, status, xhr ) {
-				realm_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_realms') }}", request, function( data, status, xhr ) {
+				realm_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
@@ -131,9 +131,9 @@ function placeselect(obj, callback) {
 				response( place_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_places') }}", request, function( data, status, xhr ) {
-				place_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_places') }}", request, function( data, status, xhr ) {
+				place_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
@@ -166,9 +166,9 @@ function guildselect(obj, callback) {
 				response( guild_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_assocs') }}", request, function( data, status, xhr ) {
-				guild_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_associations') }}", request, function( data, status, xhr ) {
+				guild_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
@@ -201,9 +201,9 @@ function houseselect(obj, callback) {
 				response( house_cache[ term ] );
 				return;
 			}
-			$.getJSON("{{ path('bm2_site_data_houses') }}", request, function( data, status, xhr ) {
-				house_cache[ term ] = data;
-				response( data );
+			$.getJSON("{{ path('maf_data_houses') }}", request, function( data, status, xhr ) {
+				house_cache[ term ] = data['data'];
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
