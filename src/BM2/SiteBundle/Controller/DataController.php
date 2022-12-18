@@ -21,7 +21,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/gsgp")
+	  * @Route("/gsgp", name="maf_data_gsgp")
 	  */
 	public function gsgpAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'gsgp');
@@ -43,7 +43,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/characters/dead")
+	  * @Route("/data/characters/dead", name="maf_data_characters_dead")
 	  */
 	public function charactersDeadAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'chars-dead');
@@ -61,7 +61,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/characters/active")
+	  * @Route("/data/characters/active", name="maf_data_characters_active")
 	  */
 	public function charactersActiveAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'chars-active');
@@ -79,7 +79,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/characters/living")
+	  * @Route("/data/characters/living", name="maf_data_characters_living")
 	  */
 	public function charactersLivingAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'chars-living');
@@ -97,7 +97,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/realms")
+	  * @Route("/data/realms", name="maf_data_realms")
 	  */
 	public function realmsAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'realms');
@@ -115,7 +115,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/settlements")
+	  * @Route("/data/settlements", name="maf_data_settlements")
 	  */
 	public function settlementsAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'settlements');
@@ -133,7 +133,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/assocs")
+	  * @Route("/data/assocs", name="maf_data_associations")
 	  */
 	public function assocsAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'assocs');
@@ -151,7 +151,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/deities")
+	  * @Route("/data/deities", name="maf_data_deities")
 	  */
 	public function deitiesAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'assocs');
@@ -169,7 +169,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/places")
+	  * @Route("/data/places", name="maf_data_places")
 	  */
 	public function placesAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'places');
@@ -187,7 +187,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/houses")
+	  * @Route("/data/houses", name="maf_data_houses")
 	  */
 	public function housesAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'houses');
@@ -205,7 +205,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/data/buildings")
+	  * @Route("/data/buildings", name="maf_data_buildings")
 	  */
 	public function buildingsAction(Request $request) {
 		$reqType = $this->validateRequest($request, 'houses');
@@ -223,7 +223,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/api/active")
+	  * @Route("/api/active", name="maf_data_active")
 	  * @Route("/data/active")
 	  */
 	public function activeUsersAction(Request $request) {
@@ -243,7 +243,7 @@ class DataController extends Controller {
 
 
 	/**
-	  * @Route("/api/manualdata")
+	  * @Route("/api/manualdata", name="maf_data_manual")
   	  * @Route("/data/manual")
 	  */
 	public function manualdataAction(Request $request) {
@@ -319,7 +319,7 @@ class DataController extends Controller {
 	}
 
 	/**
-	  * @Route("/api/mapdata")
+	  * @Route("/api/mapdata", name="maf_data_map")
   	  * @Route("/data/map")
 	  */
 	public function mapdataAction(Request $request) {
