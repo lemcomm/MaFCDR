@@ -87,6 +87,7 @@ class GMController extends Controller {
 			}
 			$note->setText($data['text']);
 			$note->setTitle($data['title']);
+			$em->flush();
 			if (!$id) {
 				$this->get('appstate')->setGlobal('game-version', $version);
 				$this->get('appstate')->setGlobal('game-updated', $now->format('Y-m-d'));
