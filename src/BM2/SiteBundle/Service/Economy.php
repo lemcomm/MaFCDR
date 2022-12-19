@@ -544,11 +544,11 @@ class Economy {
 		$this->em->flush();
 	}
 
-	public function getSupplyTravelTime(Settlement $start, Unit $end) {
+	public function getSupplyTravelTime(Settlement $start, Unit $unit) {
 		if ($unit->getDefendingSettlement()) {
 			$distance = $this->geo->calculateDistanceBetweenSettlements($start, $unit->getDefendingSettlement());
 		} elseif ($unit->getCharacter()) {
-			$distance = $this->geo->calculateDistanceToSettlement($end, $start);
+			$distance = $this->geo->calculateDistanceToSettlement($unit->getCharacter(), $start);
 		} elseif ($unit->getPlace()) {
 			$place = $unit->getPlace();
 			if ($place->getInsideSettlement()) {
@@ -589,7 +589,7 @@ class Economy {
 				foreach ($unit->getSupplies() as $supply) {
 					if ($supply->getType() === 'food') {
 						$found = true;
-						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
+						$supply->setQuantity($supply->getQuantity()+$supply->getQuantity());
 						break;
 					}
 				}
