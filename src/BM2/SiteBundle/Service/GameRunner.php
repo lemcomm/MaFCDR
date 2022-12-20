@@ -12,6 +12,7 @@ use BM2\SiteBundle\Entity\RealmPosition;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Entity\Ship;
+use BM2\SiteBundle\Entity\Supply;
 use CrEOF\Spatial\PHP\Types\Geometry\Point;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
