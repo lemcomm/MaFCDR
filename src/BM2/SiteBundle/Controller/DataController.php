@@ -30,9 +30,9 @@ class DataController extends Controller {
 		}
 		$em = $this->getDoctrine()->getManager();
 		$cycle = $this->get('appstate')->getCycle()-1;
-                $query = $em->createQuery('SELECT s.today_users as active_players FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
-                $query->setParameter('cycle', $cycle);
-                $result = $query->getArrayResult()[0];
+		$query = $em->createQuery('SELECT s.today_users as active_users FROM BM2SiteBundle:StatisticGlobal s WHERE s.cycle = :cycle');
+		$query->setParameter('cycle', $cycle);
+		$result['active_players'] = $query->getArrayResult()[0];
 		$result['name'] = "Might & Fealty";
 		$result['image_url'] = 'https://mightandfealty.com/bundles/bm2site/images/logo-transparent.png';
 		$result['description'] = 'An entirely player driven medieval sandbox game about politics and war set in a low-ish-fantasy world.';
@@ -50,7 +50,7 @@ class DataController extends Controller {
 		if ($reqType instanceof Response) {
 			return $reqType;
 		}
-		$term = $request->query->get("name");
+		$term = $request->query->get("term");
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT c.id, c.name as value FROM BM2SiteBundle:Character c WHERE c.alive=false AND LOWER(c.name) LIKE :term ORDER BY c.name ASC');
 		$query->setParameter('term', '%'.strtolower($term).'%');
@@ -68,9 +68,9 @@ class DataController extends Controller {
 		if ($reqType instanceof Response) {
 			return $reqType;
 		}
-		$term = $request->query->get("name");
+		$term = $request->query->get("term");
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT c.id, c.name as value FROM BM2SiteBundle:Character c WHERE c.alive=true AND c.retired = false AND c.slumbering=false AND LOWER(c.name) LIKE :term ORDER BY c.name ASC');
+		$query = $em->createQuery('SELECT c.id, c.name as value FROM BM2SiteBundle:Character c WHERE c.alive=true AND (c.retired = false OR c.retired IS NULL) AND c.slumbering=false AND LOWER(c.name) LIKE :term ORDER BY c.name ASC');
 		$query->setParameter('term', '%'.strtolower($term).'%');
 		$result = [];
 		$result['data'] = $query->getArrayResult();
@@ -86,7 +86,7 @@ class DataController extends Controller {
 		if ($reqType instanceof Response) {
 			return $reqType;
 		}
-		$term = $request->query->get("name");
+		$term = $request->query->get("term");
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT c.id, c.name as value FROM BM2SiteBundle:Character c WHERE c.alive=true AND LOWER(c.name) LIKE :term ORDER BY c.name ASC');
 		$query->setParameter('term', '%'.strtolower($term).'%');
@@ -358,6 +358,23 @@ class DataController extends Controller {
 		return $this->outputHandler($reqType, $result);
 	}
 
+	/**
+	  * @Route("/api/api_version", name="maf_data_api_version")
+  	  * @Route("/data/api_version")
+	  */
+	public function apiChangesAction(Request $request) {
+		$reqType = $this->validateRequest($request, 'houses');
+		if ($reqType instanceof Response) {
+			return $reqType;
+		}
+
+		$result['data']['1.0.0.0'] = 'Full API Rewrite in line with M&F version 2.6.0.0. -- 20221217';
+		$result['data']['1.0.1.0'] = 'Add /data/gsgp route. -- 20221218';
+		$result['data']['1.0.2.0'] = 'Fixed character data routes, fixed api-version field, added this route. -- 20221219';
+
+		return $this->outputHandler($reqType, $result);
+	}
+
 	#
 	# VALIDATOR FUNCTIONS
 	#
@@ -480,8 +497,7 @@ class DataController extends Controller {
 		$time = new \DateTime("now");
 		$data['metadata'] = [
 			'system' => 'Might & Fealty API',
-			'api-version' => '1.1.0.0',
-			'api-version' => '2022-12-17',
+			'api-version' => '1.1.0.1',
 			'game-version' => $this->get('appstate')->getGlobal('game-version'),
 			'game-updated' => $this->get('appstate')->getGlobal('game-updated'),
 			'timestamp' => $time->format('Y-m-d H:i:s'),
