@@ -1802,8 +1802,10 @@ class BattleRunner {
 						$this->log(1, "PS: No leader! Finding one at random!. \n");
 						$leader = $victor->getCharacters()->first(); #Get one at random.
 					}
-					$this->politics->changeSettlementOccupier($leader, $target, $realm);
-					$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+					if ($leader) {
+						$this->politics->changeSettlementOccupier($leader, $target, $realm);
+						$this->log(1, "PS: Occupant set to ".$leader->getName()." \n");
+					}
 				} else {
 					$this->log(1, "PS: Target is place\n");
 					foreach ($victor->getCharacters() as $char) {
