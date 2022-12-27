@@ -182,6 +182,18 @@ class JournalController extends Controller {
 	}
 
 	/**
+	  * @Route("/user/{id}", name="maf_journal_character", requirements={"id"="\d+"})
+	  */
+
+	public function journalCharacterAction(Character $id) {
+		$char = $this->get('appstate')->getCharacter(FALSE, TRUE, TRUE); #Not required, allow dead, allow not started.
+
+		return $this->render('Journal/user.html.twig', [
+			'char' => $id
+		]);
+	}
+
+	/**
 	  * @Route("/report/{id}", name="maf_journal_report", requirements={"id"="\d+"})
 	  */
 
