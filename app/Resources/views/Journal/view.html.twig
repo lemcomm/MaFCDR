@@ -17,7 +17,7 @@
 	</div>
 
 	{% if journal.character.journals.count > 0 %}
-		<a class="full" href="{{ path("maf_journal_user", {'id':journal.character.id}) }}">{{ 'journal.view.others'|trans|title }}</a>
+		<a class="full" href="{{ path("maf_journal_character", {'id':journal.character.id}) }}">{{ 'journal.view.others'|trans|title }}</a>
 	{% endif %}
 	{% if not journal.GMReviewed and journal.character and journal.character.user != user %}
 		<p><a href="{{ path('maf_journal_report', {"id":journal.id}) }}">{{ 'journal.report'|trans({}, "messages") }}</a><br><br>
