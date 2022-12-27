@@ -1890,6 +1890,7 @@ journal:
   failure:     You must be logged in to M&F to submit a report.
  mine:
   header:      Your Journal Entries
+  header2:     "%name%'s Journal Entries"
   gamedate:    Game Date
   realdate:    Real World Date
   topic:       Topic
