@@ -122,6 +122,9 @@
 		{% endfor %}
 	</ul>
 {% endif %}
+{% if char.journals.count > 0 %}
+	<i><a href="{{ path("maf_journal_character", {'id':char.id}) }}">{{ 'character.journals'|trans|title }}</a></i>
+{% endif %}
 
 {% if char.background.appearance is defined %}
 	{{ char.background.appearance|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
@@ -129,9 +132,6 @@
 {% if relationship %}
 	<h4>{{ 'character.personality'|trans|title }}</h4>
 	{{ char.background.personality|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
-{% endif %}
-{% if char.journals.count > 0 %}
-	<a class="full" href="{{ path("maf_journal_user", {'id':char.id}) }}">{{ 'character.journals'|trans|title }}</a>
 {% endif %}
 {% for parent in char.parents %}
 	{% if parent.male %}
