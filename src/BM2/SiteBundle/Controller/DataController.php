@@ -247,8 +247,9 @@ class DataController extends Controller {
 		$result['data']['cycle'] = $id->getCycle();
 		$result['data']['ooc'] = $id->getOoc();
 		if (!$id->isPrivate() && !$id->isGraphic()) {
+			$linker = $this->get('twig.extension.links');
 			$result['data']['topic'] = $id->getTopic();
-			$result['data']['entry'] = $id->getEntry();
+			$result['data']['entry'] = $linker->wikilinksFilter($id->getEntry());
 		}
 
 		return $this->outputHandler($reqType, $result);
