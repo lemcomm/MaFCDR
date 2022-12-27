@@ -152,6 +152,15 @@ class NotificationManager {
 		}
 	}
 
+	public function spoolJournal(Journal $journal) {
+		$text = '['.$journal->getCharacter()->getName().'](https://mightandfealty.com/character/view/'.$journal->getCharacter()->getId().') has written ['.$journal->getTopic().'](https://mightandfealty.com/journal/'.$journal->getId().').';
+		try {
+			$this->discord->pushToGeneral($text);
+		} catch (Exception $e) {
+			# Nothing
+		}
+	}
+
 	public function spoolPayment($text) {
 		try {
 			$this->discord->pushToPayments($text);

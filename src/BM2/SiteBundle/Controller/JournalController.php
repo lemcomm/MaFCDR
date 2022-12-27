@@ -75,6 +75,9 @@ class JournalController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 			$journal = $this->newJournal($character, $data);
+			if(!$journal->isPrivate() && !$journal->isGraphic()) {
+				$this->get('notification_manger')->spoolJournal($journal);
+			}
 
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
@@ -178,6 +181,16 @@ class JournalController extends Controller {
 
 		return $this->render('Journal/mine.html.twig', [
 			'char' => $character
+		]);
+	}
+
+	/**
+	  * @Route("/user/{id}", name="maf_journal_character", requirements={"id"="\d+"})
+	  */
+
+	public function journalCharacterAction(Character $id) {
+		return $this->render('Journal/user.html.twig', [
+			'char' => $id
 		]);
 	}
 

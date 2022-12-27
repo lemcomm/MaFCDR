@@ -122,6 +122,9 @@
 		{% endfor %}
 	</ul>
 {% endif %}
+{% if char.journals.count > 0 %}
+	<i><a href="{{ path("maf_journal_character", {'id':char.id}) }}">{{ 'character.journals'|trans|title }}</a></i>
+{% endif %}
 
 {% if char.background.appearance is defined %}
 	{{ char.background.appearance|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}

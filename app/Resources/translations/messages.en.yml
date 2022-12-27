@@ -627,6 +627,7 @@ character:
  prisoner2: You are currently a captive of %captor%.
  captorinactive: Your captor has not been seen in quite a while. You should <a href="%url%">try to escape</a>.
  full:    View full details
+ journals: "View journals they've written"
  list:
   select:   Move character to:
   submit:   Set new list
@@ -1861,6 +1862,7 @@ journal:
   intro:       Journals are player created messages about things in game. Most of the time these can be considered to be known things, as somethig your character heard via rumor, though they can also be flagged as out of character information that is really only meant for your enjoyment as a player rather than for use by your characters (unless they happen to know of it some other way.)
   by:          <i>Written by %character% on %day% (%ts%)</i>
   report:     If you feel this post shares content that is not safe for public viewing, you are encouraged to report it with the link below.
+  others:     If this was to your liking, perhaps there are other things they've written...
  ooc:         The author of this Journal has flagged it as "Out of Character Content", so it is meant for your enjoyment as a player rather than as something you can have your characters know about.
  gm:
   actions:     GM Action Menu...
@@ -1888,9 +1890,11 @@ journal:
   failure:     You must be logged in to M&F to submit a report.
  mine:
   header:      Your Journal Entries
+  header2:     "%name%'s Journal Entries"
   gamedate:    Game Date
   realdate:    Real World Date
   topic:       Topic
+  nothinghere: "Doesn't seem to be anything here... (they may be marked private or graphic)"
 
 olympus:
  pending:
