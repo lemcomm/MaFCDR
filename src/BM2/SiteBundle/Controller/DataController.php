@@ -2,6 +2,8 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Journal;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -223,6 +225,36 @@ class DataController extends Controller {
 	}
 
 	/**
+	  * @Route("/data/journal/{id}", name="maf_data_journal", requirements={"id"="\d+"})
+	  */
+	public function journalAction(Request $request, Journal $id) {
+		$reqType = $this->validateRequest($request, 'journal');
+		if ($reqType instanceof Response) {
+			return $reqType;
+		}
+		if ($id->isPrivate()) {
+			$result['data']['private'] = true;
+		} else {
+			$result['data']['private'] = false;
+		}
+		if ($id->isGraphic()) {
+			$result['data']['graphic'] = true;
+		} else {
+			$result['data']['graphic'] = false;
+		}
+		$result['data']['id'] = $id->getId();
+		$result['data']['date'] = $id->getDate();
+		$result['data']['cycle'] = $id->getCycle();
+		$result['data']['ooc'] = $id->getOoc();
+		if (!$id->isPrivate() && !$id->isGraphic()) {
+			$result['data']['topic'] = $id->getTopic();
+			$result['data']['entry'] = $id->getEntry();
+		}
+
+		return $this->outputHandler($reqType, $result);
+	}
+
+	/**
 	  * @Route("/api/active", name="maf_data_active")
 	  * @Route("/data/active")
 	  */
@@ -371,6 +403,7 @@ class DataController extends Controller {
 		$result['data']['1.0.0.0'] = 'Full API Rewrite in line with M&F version 2.6.0.0. -- 20221217';
 		$result['data']['1.0.1.0'] = 'Add /data/gsgp route. -- 20221218';
 		$result['data']['1.0.2.0'] = 'Fixed character data routes, fixed api-version field, added this route. -- 20221219';
+		$result['data']['1.0.3.0'] = 'Added journal route. -- 20221226';
 
 		return $this->outputHandler($reqType, $result);
 	}
@@ -497,7 +530,7 @@ class DataController extends Controller {
 		$time = new \DateTime("now");
 		$data['metadata'] = [
 			'system' => 'Might & Fealty API',
-			'api-version' => '1.1.0.1',
+			'api-version' => '1.0.3.0',
 			'game-version' => $this->get('appstate')->getGlobal('game-version'),
 			'game-updated' => $this->get('appstate')->getGlobal('game-updated'),
 			'timestamp' => $time->format('Y-m-d H:i:s'),
