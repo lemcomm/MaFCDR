@@ -8,6 +8,7 @@ use BM2\SiteBundle\Entity\BattleReport;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\House;
 use BM2\SiteBundle\Entity\Event;
+use BM2\SiteBundle\Entity\Journal;
 use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Twig\MessageTranslateExtension;
