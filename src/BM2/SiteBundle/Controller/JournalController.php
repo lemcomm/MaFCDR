@@ -189,8 +189,6 @@ class JournalController extends Controller {
 	  */
 
 	public function journalCharacterAction(Character $id) {
-		$char = $this->get('appstate')->getCharacter(FALSE, TRUE, TRUE); #Not required, allow dead, allow not started.
-
 		return $this->render('Journal/user.html.twig', [
 			'char' => $id
 		]);
