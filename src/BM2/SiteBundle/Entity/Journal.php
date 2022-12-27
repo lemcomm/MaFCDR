@@ -13,6 +13,13 @@ class Journal {
                 return false;
         }
 
+        public function isGraphic() {
+                if ($this->graphic || $this->GM_graphic) {
+                        return true;
+                }
+                return false;
+        }
+
         public function length() {
                 return strlen($this->entry);
         }
