@@ -75,6 +75,9 @@ class JournalController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 			$journal = $this->newJournal($character, $data);
+			if(!$journal->isPrivate() && !$journal->isGraphic()) {
+				$this->get('notification_manger')->spoolJournal($journal);
+			}
 
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
