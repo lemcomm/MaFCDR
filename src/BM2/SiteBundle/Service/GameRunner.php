@@ -680,11 +680,16 @@ class GameRunner {
 		foreach ($query->getResult() as $resupply) {
 			$unit = $resupply->getUnit();
 			$found = false;
+			$orig = 0;
+			$id = $unit->getId();
+			$add = $resupply->getQuantity();
 			if ($unit->getSupplies()) {
 				foreach ($unit->getSupplies() as $supply) {
-					if ($supply->getType() == $resupply->getType()) {
+					if ($supply->getType() === $resupply->getType()) {
 						$found = true;
-						$supply->setQuantity($supply->getQuantity()+$resupply->getQuantity());
+						$orig = $supply->getQuantity();
+						$this->logger->info("  -- Unit $id has $orig food and is getting $add.");
+						$supply->setQuantity($orig+$resupply->getQuantity());
 						break;
 					}
 				}
@@ -695,6 +700,7 @@ class GameRunner {
 				$supply->setUnit($unit);
 				$supply->setType($resupply->getType());
 				$supply->setQuantity($resupply->getQuantity());
+				$this->logger->info("  -- Unit $id has zero food and is getting $add.");
 			}
 			$this->em->remove($resupply);
 		}
