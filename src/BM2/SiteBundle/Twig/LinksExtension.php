@@ -409,7 +409,7 @@ class LinksExtension extends \Twig_Extension {
 		}
 		if ($raw) return $url;
 		$link = '<a ';
-		if ($class !== 'report') { $link .= 'class="link_'.$class.'" '; }
+		if (in_array($class, ['character', 'building', 'buildingtype', 'equipment', 'equipmenttype', 'weapon', 'armour', 'entouragetype', 'entourage'])) { $link .= 'class="link_'.$class.'" '; }
 		$link .= 'href="'.$url.'">'.$name.'</a>';
 		return $link;
 	}
