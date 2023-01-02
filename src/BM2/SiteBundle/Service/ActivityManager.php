@@ -684,14 +684,14 @@ class ActivityManager {
 			'event.character.duel',
 			['%link-activityreport%'=>$act->getId(), '%link-character%'=>$themC->getId()],
 			History::HIGH,
-			true
+			false
 		);
 		$this->history->logEvent(
 			$themC,
 			'event.character.duel',
 			['%link-activityreport%'=>$act->getReport()->getId(), '%link-character%'=>$meC->getId()],
 			History::HIGH,
-			true
+			false
 		);
 		$this->cleanupAct($act);
 	}
