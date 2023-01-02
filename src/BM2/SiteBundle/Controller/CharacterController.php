@@ -450,14 +450,14 @@ class CharacterController extends Controller {
 						$realm,
 						'event.realm.arrival',
 						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
-						History::MEDIUM, true, 15
+						History::MEDIUM, false, 15
 					);
 					if ($realm->getSuperior()) {
 						$this->get('history')->logEvent(
 							$realm->findUltimate(),
 							'event.subrealm.arrival',
 							array('%link-character%'=>$character->getId(), '%link-realm%'=>$realm->getId()),
-							History::MEDIUM, true, 15
+							History::MEDIUM, false, 15
 						);
 					}
 				} else {
@@ -467,7 +467,7 @@ class CharacterController extends Controller {
 						$house,
 						'event.house.arrival',
 						array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
-						History::MEDIUM, true, 15
+						History::MEDIUM, false, 15
 					);
 				}
 			} else {
@@ -510,7 +510,7 @@ class CharacterController extends Controller {
 				$place,
 				'event.place.start',
 				array('%link-character%'=>$character->getId()),
-				History::MEDIUM, true, 15
+				History::MEDIUM, false, 15
 			);
 			$this->get('history')->visitLog($place, $character);
 			if ($settlement) {
@@ -518,7 +518,7 @@ class CharacterController extends Controller {
 					$settlement,
 					'event.place.charstart',
 					array('%link-character%'=>$character->getId(), '%link-place%'=>$place->getId()),
-					History::MEDIUM, true, 15
+					History::MEDIUM, false, 15
 				);
 				$this->get('history')->visitLog($settlement, $character);
 			}
