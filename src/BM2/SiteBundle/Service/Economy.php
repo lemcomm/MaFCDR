@@ -564,10 +564,15 @@ class Economy {
 
 	public function supplySoldiers(Unit $unit, $shortage, Settlement $settlement) {
 		$count = $unit->getLivingSoldiers()->count();
-		if($shortage > 0) {
+		$this->logger('info', "Handling shortage of $shortage for ".$unit->getId());
+		$shortage = round($shortage, 2);
+		if ($shortage >= 1) {
+			# No food to send.
+			return true;
+		} elseif($shortage > 0) {
 			$deduct = $count*$shortage;
 		} else {
-			$deduct = 0;
+			$deduct = 0; #No negative shortages.
 		}
 
 		$qty = $count - $deduct;
@@ -582,7 +587,7 @@ class Economy {
 			$supply->setUnit($unit);
 			$supply->setType('food');
 			$supply->setQuantity(ceil($qty));
-			$supply->setTravelDays(ceil($this->getSupplyTravelTime($settlement, $unit)));
+			$supply->setTravelDays($this->getSupplyTravelTime($settlement, $unit));
 		} elseif ($qty > 0 && $here) {
 			$found = false;
 			if ($unit->getSupplies()) {
@@ -602,6 +607,7 @@ class Economy {
 				$supply->setQuantity(ceil($qty));
 			}
 		}
+		return true;
 	}
 
 	public function ResourceProduction(Settlement $settlement, ResourceType $resource, $ignore_buildings=false, $force_recalc=false) {
