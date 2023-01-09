@@ -587,7 +587,7 @@ class Economy {
 			$supply->setUnit($unit);
 			$supply->setType('food');
 			$supply->setQuantity(ceil($qty));
-			$supply->setTravelDays($this->getSupplyTravelTime($settlement, $unit));
+			$supply->setTravelDays(round($this->getSupplyTravelTime($settlement, $unit)));
 		} elseif ($qty > 0 && $here) {
 			$found = false;
 			if ($unit->getSupplies()) {
