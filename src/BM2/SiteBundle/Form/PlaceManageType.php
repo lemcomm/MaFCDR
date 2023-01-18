@@ -88,7 +88,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'realm.empty',
-					'label'=>'realm.label'
+					'label'=>'realm.label',
+					'data'=>$me->getRealm()
 				]);
 			}
 			if (!$me->getHostingRealm()) {
@@ -98,7 +99,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'realm.empty',
-					'label'=>'hosting.label'
+					'label'=>'hosting.label',
+					'data'=>$me->getHostingRealm()
 				]);
 				$builder->add('owning_realm', HiddenType::class, [
 					'data'=>null
@@ -122,7 +124,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'realm.empty',
-					'label'=>'owning.label'
+					'label'=>'owning.label',
+					'data'=>$me->getOwningRealm()
 				]);
 				$builder->add('ambassador', HiddenType::class, [
 					'data'=>null
@@ -143,8 +146,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'realm.empty',
-					'data'=>$me->getHostingRealm(),
-					'label'=>'owning.label'
+					'label'=>'owning.label',
+					'data'=>$me->getOwningRealm()
 				]);
 				$builder->add('ambassador', EntityType::class, [
 					'required'=>false,
@@ -152,7 +155,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Character',
 					'choice_label' => 'name',
 					'placeholder'=>'ambassador.empty',
-					'label'=>'ambassador.label'
+					'label'=>'ambassador.label',
+					'data'=>$me->getAmbassador()
 				]);
 			}
 		} else {
@@ -163,7 +167,8 @@ class PlaceManageType extends AbstractType {
 					'class'=>'BM2SiteBundle:Realm',
 					'choice_label' => 'name',
 					'placeholder'=>'realm.empty',
-					'label'=>'realm.label'
+					'label'=>'realm.label',
+					'data'=>$me->getRealm()
 				]);
 			}
 		}
