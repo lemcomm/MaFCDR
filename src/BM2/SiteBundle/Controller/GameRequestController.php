@@ -128,7 +128,7 @@ class GameRequestController extends Controller {
 							array('%link-character%'=>$settlement->getOwner()->getId(), '%link-settlement%'=>$settlement->getId()),
 							History::LOW, true
 						);
-					} else {
+					} elseif ($settlement->getSteward()) {
 						$this->get('history')->logEvent(
 							$id->getFromCharacter(),
 							'event.military.supplied.food.start',
