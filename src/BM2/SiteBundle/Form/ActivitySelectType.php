@@ -81,7 +81,7 @@ class ActivitySelectType extends AbstractType {
 				}
 				if (!$me->getInsideSettlement()) {
 					// if I am not inside a settlement, I can only attack others who are outside as well
-					$qb->andWhere('c.insidse_settlement IS NULL');
+					$qb->andWhere('c.inside_settlement IS NULL');
 				}
 				$qb->orderBy('c.name', 'ASC');
 				return $qb;
