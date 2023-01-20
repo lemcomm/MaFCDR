@@ -19,7 +19,7 @@
 			</options>
 		</field>
 		<field name="magic" type="integer" nullable="true"/>
-		<field name="list" type="smallint"/>
+		<field name="list" type="smallint" nullable="true"/>
 		<field name="created" type="datetime"/>
 		<field name="house_join_date" type="datetime" nullable="true"/>
 		<field name="last_access" type="datetime"/>
