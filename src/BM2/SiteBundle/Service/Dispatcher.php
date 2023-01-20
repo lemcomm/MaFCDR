@@ -1232,13 +1232,13 @@ class Dispatcher {
 		if (($check = $this->controlActionsGenericTests()) !== true) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.$check");
 		}
-		if (!$settlement = $this->getCharacter()->getInsideSettlement()) {
+		$char = $this->getCharacter();
+		if (!$char->getInsideSettlement()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.nosettlement");
 		}
 		if ($settlement->getOccupier() || $settlement->getOccupant()) {
 			return array("name"=>"control.description.settlement.name", "description"=>"unavailable.occupied");
 		}
-		$char = $this->getCharacter();
 		if ($settlement->getOwner() == $char || $settlement->getSteward() == $char) {
 			return $this->action("control.description.settlement", "bm2_site_settlement_description", false, array('id'=>$settlement->getId()));
 		} else {
