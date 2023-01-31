@@ -489,7 +489,7 @@ class CombatManager {
 	}
 
 	public function RangedRoll($defBonus = 0, $rangedPenalty = 1, $rangedBonus = 0, $base = 75) {
-		if (rand(0-$defBonus,100)<max($base*$rangedPenalty,$rangedBonus*$rangedPenalty)) {
+		if (rand(0,100+$defBonus)<max($base*$rangedPenalty,$rangedBonus*$rangedPenalty)) {
 			return true;
 		} else {
 			return false;
