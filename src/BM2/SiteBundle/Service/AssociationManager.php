@@ -276,9 +276,6 @@ class AssociationManager {
 			if ($assoc->getMembers()->count() == 0) {
 				# Collapsed.
 				$assoc->setActive(false);
-				foreach ($assoc->getRanks() as $rank) {
-					$this->em->remove($rank);
-				}
 				foreach ($assoc->getPlaces() as $place) {
 					$this->history->logEvent(
 						$place->getPlace(),

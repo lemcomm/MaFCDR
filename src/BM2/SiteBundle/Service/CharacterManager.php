@@ -756,7 +756,7 @@ class CharacterManager {
 			switch ($value) {
 				case 'steward':
 					$steward = $thing->getSteward();
-					if ($steward) {
+					if ($steward && $steward !== $char && $steward->isActive()) {
 						$this->$bequeath($thing, $steward, $char, null);
 						$thing->setSteward(null);
 						$this->history->logEvent(
@@ -769,7 +769,7 @@ class CharacterManager {
 					}
 				case 'liege':
 					$liege = $char->findLiege();
-					if ($liege) {
+					if ($liege && $liege !== $char && $liege->isActive()) {
 						if ($liege instanceof Collection) {
 							$liege = $liege->first();
 						}
@@ -778,19 +778,24 @@ class CharacterManager {
 					}
 				case 'ruler':
 					$rulers = $realm->findRulers();
-					if ($rulers && $rulers->count() > 0) {
-						$this->$bequeath($thing, $rulers->first(), $char, null);
-						break;
+					$count = $rulers->count();
+					if ($rulers && $count > 0) {
+						foreach ($rulers as $ruler) {
+							if ($ruler !== $char && $ruler->isActive()) {
+								$this->$bequeath($thing, $rulers->first(), $char, null);
+								break;
+							}
+						}
 					}
 				case 'characterInternal':
-					if ($heir && $heir->findRealms()->contains($realm)) {
+					if ($heir && $heir !== $char && $heir->isActive() && $heir->findRealms()->contains($realm)) {
 						$this->$bequeath($thing, $heir, $char, $via);
 					} else {
 						$this->$fail($char, $thing, 'lawnoinherit');
 					}
 					break;
 				case 'characterAny':
-					if ($heir) {
+					if ($heir && $heir !== $char && $heir->isActive()) {
 						$this->$bequeath($thing, $heir, $char, $via);
 					} else {
 						$this->$fail($char, $thing, 'lawnoinherit');
@@ -800,7 +805,7 @@ class CharacterManager {
 					$this->$fail($char, $thing, 'lawnoinherit');
 					break;
 			}
-		} elseif ($heir) {
+		} elseif ($heir && $heir !== $char && $heir->isActive()) {
 			$this->$bequeath($thing, $heir, $char, $via);
 		} else {
 			$this->$fail($char, $thing);
@@ -1119,7 +1124,7 @@ class CharacterManager {
 		}
 
 		if ($heir = $character->getSuccessor()) {
-			if ($heir->isAlive() && !$heir->getSlumbering()) {
+			if ($heir->isActive()) {
 				return array($heir, $from);
 			} else {
 				return $this->findHeir($heir, $from);
