@@ -289,7 +289,8 @@ class CombatManager {
 			$weapon = $me->getWeapon();
 		}
 		if ($weapon !== null) {
-			if ($mPower = $weapon->getMelee() > 0) {
+			$mPower = $weapon->getMelee();
+			if ($mPower > 0) {
 				$hasW = true;
 				$power += $mPower;
 			}
