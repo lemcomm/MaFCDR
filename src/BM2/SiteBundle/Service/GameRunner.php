@@ -221,8 +221,8 @@ class GameRunner {
 		$slumbercount = 0;
 		$knownslumber = 0;
 		$keeponslumbercount = 0;
-		$this->seen = new ArrayCollection;
 		foreach ($result as $character) {
+			$this->seen = new ArrayCollection;
 			list($heir, $via) = $this->findHeir($character);
 			if ($character->isAlive() == FALSE) {
 				$deadcount++;
@@ -683,12 +683,14 @@ class GameRunner {
 			$orig = 0;
 			$id = $unit->getId();
 			$add = $resupply->getQuantity();
+			$rid = $resupply->getId();
 			if ($unit->getSupplies()) {
 				foreach ($unit->getSupplies() as $supply) {
 					if ($supply->getType() === $resupply->getType()) {
 						$found = true;
 						$orig = $supply->getQuantity();
-						$this->logger->info("  -- Unit $id has $orig food and is getting $add.");
+						$sid = $supply->getId();
+						$this->logger->info("  -- Unit $id has $orig food in $sid and is getting $add from $rid.");
 						$supply->setQuantity($orig+$resupply->getQuantity());
 						break;
 					}
@@ -1502,7 +1504,7 @@ class GameRunner {
 			$from = $character;
 		}
 
-		if ($this->seen) {
+		if ($this->seen->contains($character)) {
 			// loops back to someone we've already checked
 			return array(false, false);
 		} else {
@@ -1510,7 +1512,7 @@ class GameRunner {
 		}
 
 		if ($heir = $character->getSuccessor()) {
-			if ($heir->isAlive() && !$heir->getSlumbering()) {
+			if ($heir->isActive()) {
 				return array($heir, $from);
 			} else {
 				return $this->findHeir($heir, $from);
