@@ -29,10 +29,10 @@ class CombatManager {
 
 	public function ChargeAttack($me, $target, $act=false, $battle=false, $xpMod = 1, $defBonus = null) {
 		if ($battle) {
-			if ($soldier->isNoble() && $soldier->getWeapon()) {
-				$this->helper->trainSkill($soldier->getCharacter(), $soldier->getEquipment()->getSkill(), $xpMod);
+			if ($me->isNoble() && $me->getWeapon()) {
+				$this->helper->trainSkill($me->getCharacter(), $me->getEquipment()->getSkill(), $xpMod);
 			} else {
-				$soldier->gainExperience(1*$xpMod);
+				$me->gainExperience(1*$xpMod);
 			}
 			$type = 'battle';
 		} elseif ($act) {
@@ -41,7 +41,7 @@ class CombatManager {
 		$logs = [];
 		$result='miss';
 
-		$attack = $this->ChargePower($soldier, true);
+		$attack = $this->ChargePower($me, true);
 		$defense = $this->DefensePower($target, $battle)*0.75;
 
 		$eWep = $target->getWeapon();
@@ -56,11 +56,11 @@ class CombatManager {
 		$logs[] = (round($attack*10)/10)." vs. ".(round($defense*10)/10)." - ";
 		if (rand(0,$attack) > rand(0,$defense)) {
 			// defense penetrated
-			$result = $this->resolveDamage($soldier, $target, $attack, $type, 'charge', $antiCav, $xpMod, $defBonus);
-			if ($soldier->isNoble() && $soldier->getWeapon()) {
-				$this->helper->trainSkill($soldier->getCharacter(), $soldier->getWeapon()->getSkill(), $xpMod);
+			$result = $this->resolveDamage($me, $target, $attack, $type, 'charge', $antiCav, $xpMod, $defBonus);
+			if ($me->isNoble() && $me->getWeapon()) {
+				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
 			} else {
-				$soldier->gainExperience(($result=='kill'?2:1)*$xpMod);
+				$me->gainExperience(($result=='kill'?2:1)*$xpMod);
 			}
 		} else {
 			// armour saved our target
@@ -68,7 +68,7 @@ class CombatManager {
 			$result='fail';
 		}
 		$target->addAttack(5);
-		$sublogs = $this->equipmentDamage($soldier, $target, 'charge', $antiCav);
+		$sublogs = $this->equipmentDamage($me, $target, 'charge', $antiCav);
 		foreach ($sublogs as $each) {
 			$logs[] = $each;
 		}
@@ -361,7 +361,7 @@ class CombatManager {
 				if (in_array($me->getType(), ['armoured archer', 'archer'])) {
 					$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
 				} else {
-					if ($soldier->getEquipment()) {
+					if ($me->getEquipment()) {
 						$this->helper->trainSkill($me->getCharacter(), $me->getEquipment()->getSkill(), $xpMod);
 					}
 				}
