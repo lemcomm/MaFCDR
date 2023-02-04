@@ -1512,7 +1512,7 @@ class GameRunner {
 		}
 
 		if ($heir = $character->getSuccessor()) {
-			if ($heir->isActive()) {
+			if ($heir->isActive(true)) {
 				return array($heir, $from);
 			} else {
 				return $this->findHeir($heir, $from);
