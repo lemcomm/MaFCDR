@@ -81,9 +81,12 @@ class CombatManager {
 		if ($sol) {
 			if ($me->isNoble()) {
 				return 156;
+			} else {
+				$mod = $me->hungerMod();
 			}
 		} elseif ($me instanceof ActivityParticipant) {
 			$me = $me->getCharacter();
+			$mod = 1;
 		}
 		$power = 0;
 		if (!$me->getMount()) {
@@ -96,7 +99,7 @@ class CombatManager {
 		}
 		$power += $me->ExperienceBonus($power);
 
-		return $power;
+		return $power*$mod;
 	}
 
 	public function DefensePower($me, $sol = false, $melee = true) {
@@ -110,9 +113,13 @@ class CombatManager {
 			}
 			if ($me->isNoble()) {
 				$noble = true;
+				$mod = 1;
+			} else {
+				$mod = $me->hungerMod();
 			}
 		} elseif ($me instanceof ActivityParticipant) {
 			$me = $me->getCharacter();
+			$mod = 1;
 		}
 
 		$eqpt = $me->getEquipment();
@@ -166,7 +173,7 @@ class CombatManager {
 				$me->updateRDefensePower($power);
 			}
 		}
-		return $power;
+		return $power*$mod;
 	}
 
 	public function equipmentDamage($attacker, $target) {
@@ -275,10 +282,14 @@ class CombatManager {
 			if ($me->MeleePower() != -1) return $me->MeleePower();
 			if ($me->isNoble()) {
 				$noble = true;
+				$mod = 1;
+			} else {
+				$mod = $me->hungerMod();
 			}
 		} elseif ($me instanceof ActivityParticipant) {
 			$act = $me->getActivity();
 			$me = $me->getCharacter();
+			$mod = 1;
 		}
 
 		$power = 0;
@@ -345,7 +356,7 @@ class CombatManager {
 				$me->updateMeleePower($power);
 			}
 		}
-		return $power;
+		return $power*$mod;
 	}
 
 	public function MeleeRoll($defBonus = 0, $rangedPenalty = 1, $rangedBonus = 0, $base = 95) {
@@ -421,11 +432,15 @@ class CombatManager {
 			if ($me->RangedPower() != -1) return $me->RangedPower();
 			if ($me->isNoble()) {
 				$noble = true;
+				$mod = 1;
+			} else {
+				$mod = $me->hungerMod();
 			}
 			$act = false;
 		} elseif ($me instanceof ActivityParticipant) {
 			$act = $me->getActivity();
 			$me = $me->getCharacter(); #for stndardizing the getEquipment type calls.
+			$mod = 1;
 		}
 //		if (!$this->isActive()) return 0; -- disabled - it prevents counter-attacks
 
@@ -486,7 +501,7 @@ class CombatManager {
 			}
 		}
 
-		return $power;
+		return $power*$mod;
 	}
 
 	public function RangedRoll($defBonus = 0, $rangedPenalty = 1, $rangedBonus = 0, $base = 75) {
