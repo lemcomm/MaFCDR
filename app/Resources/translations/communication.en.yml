@@ -141,7 +141,7 @@ event:
   deathduel:    Died in a duel to the death.
   deathduel2:   Died in a duel to the death, but took their opponent with them.
   duelfail:     The duel against %character% is canceled due to their untimely demise.
-  duelfail2:    "The duel against %character% is canceled as they have retired (which shouldn't be possible)."  
+  duelfail2:    "The duel against %character% is canceled as they have retired (which shouldn't be possible)."
   lightningbolt: Killed by a Lightning Bolt from the Heavens.
   retired:      Has retired from war and politics.
   liegeretired: No longer has a liege after the retirement of %character%.
@@ -288,6 +288,11 @@ event:
   returned2:    %unit% has been returned to %settlement%.
   rebased:      Unit has been rebased from %settlement-1% to %settlement-2%.
   disbanded:    Unit has been retired.
+  starvation:
+   light:       Light starvation is effecting %unit%.
+   medium:      Moderate starvation is effecting %unit%.
+   high:        Significant starvation is effecting %unit%.
+   death:       Due to starvation, %i% soldiers from %unit% have died.
  unit:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
@@ -297,6 +302,11 @@ event:
   defenselost:  The defense of %settlement% has failed, so the unit has returned home.
   defenselost2:  The defense of %place% has failed, so the unit has returned home.
   recalled:     %character% has recalled %unit% from your command.
+  starvation:
+   light:       Suffers from light starvation.
+   medium:      Suffers from moderate starvation.
+   high:        Suffers from significant starvation.
+   death:       Due to starvation, %i% soldiers have died.
  quest:
   created:      Quest created.
   started:      %character% has begun the quest.
