@@ -769,11 +769,16 @@ class GameRunner {
 				}
 			}
 			$available = $count-$short;
-			if ($count/$available > 0.1) {
+			if ($available > 0) {
+				$var = $count/$available;
+			} else {
+				$var = 1;
+			}
+			if ($var > 0.1) {
 				if ($unit->getCharacter()) {
-					$severity = min(ceil($count/$available)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
+					$severity = min(ceil($var)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
 				} else {
-					$severity = min(ceil($count/$available)*4, 4); # Militia starve slower, 4 per day. Starve in 22.5 days.
+					$severity = min(ceil($var)*4, 4); # Militia starve slower, 4 per day. Starve in 22.5 days.
 				}
 				if ($severity < 2) {
 					$this->history->logEvent(
@@ -782,7 +787,7 @@ class GameRunner {
 						array(),
 						History::MEDIUM, false, 30
 					);
-				} elseif ($seveirty < 4) {
+				} elseif ($severity < 4) {
 					$this->history->logEvent(
 						$unit,
 						'event.unit.starvation.medium',
@@ -798,6 +803,8 @@ class GameRunner {
 					);
 				}
 				$dead = 0;
+				$myfed = 0;
+				$mystarved = 0;
 				foreach ($living as $soldier) {
 					$soldier->makeHungry($severity);
 					// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
@@ -808,6 +815,7 @@ class GameRunner {
 						$dead++;
 					} else {
 						$starved++;
+						$mystarved++;
 					}
 				}
 				if ($dead > 0) {
@@ -830,9 +838,13 @@ class GameRunner {
 				foreach ($living as $soldier) {
 					$soldier->feed();
 					$fed++;
+					$myfed++;
 				}
 			}
 			$this->em->flush();
+			$date = date("Y-m-d H:i:s");
+			$id = $unit->getId();
+			$this->logger->info("$date --     Unit $id - Fed $myfed - Starved $mystarved - Killed $dead");
 		}
 		$date = date("Y-m-d H:i:s");
 		$this->logger->info("$date --     Fed $fed - Starved $starved - Killed $killed");
