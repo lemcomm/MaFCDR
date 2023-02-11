@@ -564,7 +564,7 @@ class Economy {
 
 	public function supplySoldiers(Unit $unit, $shortage, Settlement $settlement) {
 		$count = $unit->getLivingSoldiers()->count();
-		$this->logger('info', "Handling shortage of $shortage for ".$unit->getId());
+		$this->logger->info("Handling shortage of $shortage for ".$unit->getId());
 		$shortage = round($shortage, 2);
 		if ($shortage >= 1) {
 			# No food to send.
@@ -735,7 +735,7 @@ class Economy {
 					$suppliedNPCs = ceil($suppliedNPCs/5); #TODO: as funny as full effect would be :)
 				}
 				#$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
-				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs;
+				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs*0.8;
 				break;
 			case 'wood':
 				$base = sqrt($population) + exp(sqrt($population)/150) - 5;
