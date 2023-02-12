@@ -317,7 +317,7 @@ class CombatManager {
 		}
 		if ((!$act || !$act->getWeaponOnly()) && $me->getMount()) {
 			$power += $me->getMount()->getMelee();
-			$hasM = false;
+			$hasM = true;
 		}
 		if ($act) {
 			$skill = $me->findSkill($weapon->getSkill());
