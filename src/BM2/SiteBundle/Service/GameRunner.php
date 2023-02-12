@@ -685,8 +685,17 @@ class GameRunner {
 
 		$date = date("Y-m-d H:i:s");
 		$this->logger->info("$date --   Checking if units have gotten supplies...");
-		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
-		foreach ($query->getResult() as $resupply) {
+		$done = false;
+		$query = $ths->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
+		$iterableResult = $query->iterate();
+		while (!$done) {
+			$this->em->clear();
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				break;
+			}
+			$resupply = $row[0];
 			$unit = $resupply->getUnit();
 			$found = false;
 			$orig = 0;
@@ -712,8 +721,8 @@ class GameRunner {
 				$supply->setQuantity($resupply->getQuantity());
 			}
 			$this->em->remove($resupply);
+			$this->em->flush();
 		}
-		$this->em->flush();
 		$date = date("Y-m-d H:i:s");
 		$this->logger->info("$date --   Checking if units have food to eat...");
 		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.id > 0');
@@ -730,18 +739,21 @@ class GameRunner {
 				break;
 			}
 			$unit = $row[0];
+			$living = $unit->getLivingSoldiers();
+			$count = $living->count();
+			if ($count < 1) {
+				# No soldiers to feed. Skip!
+				continue;
+			}
+			$char = $unit->getCharacter();
 			$food = 0;
-			$fsupply = 0;
-			foreach ($unit->getSupplies() as $supply) {
+			$fsupply = null;
+			foreach ($unit->getSupplies() as $fsupply) {
 				if ($supply->getType() === 'food') {
-					$fsupply = $supply;
 					$food = $supply->getQuantity();
 					break;
 				}
 			}
-			$living = $unit->getLivingSoldiers();
-			$count = $living->count();
-			$char = $unit->getCharacter();
 			if ($count <= $food) {
 				$short = 0;
 			} else {
