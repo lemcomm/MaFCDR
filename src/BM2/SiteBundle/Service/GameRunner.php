@@ -856,8 +856,10 @@ class GameRunner {
 					$myfed++;
 				}
 			}
-			$left = $food-$count;
-			$fsupply->setQuantity($left);
+			if ($fsupply) {
+				$left = $food-$count;
+				$fsupply->setQuantity($left);
+			}
 			$this->em->flush();
 			$date = date("Y-m-d H:i:s");
 			$id = $unit->getId();
