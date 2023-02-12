@@ -745,8 +745,8 @@ class GameRunner {
 			if ($count <= $food) {
 				$short = 0;
 			} else {
-				$origNeed = $need;
 				$need = $count - $food;
+				$origNeed = $need;
 				if ($char) {
 					$food_followers = $char->getEntourage()->filter(function($entry) {
 						return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
@@ -777,6 +777,9 @@ class GameRunner {
 			} else {
 				$var = 1;
 			}
+			$dead = 0;
+			$myfed = 0;
+			$mystarved = 0;
 			if ($var > 0.1) {
 				if ($unit->getCharacter()) {
 					$severity = min(ceil($var)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
@@ -805,9 +808,6 @@ class GameRunner {
 						History::MEDIUM, false, 30
 					);
 				}
-				$dead = 0;
-				$myfed = 0;
-				$mystarved = 0;
 				foreach ($living as $soldier) {
 					$soldier->makeHungry($severity);
 					// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
