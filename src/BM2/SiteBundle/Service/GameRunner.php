@@ -731,6 +731,7 @@ class GameRunner {
 			}
 			$unit = $row[0];
 			$food = 0;
+			$fsupply = 0;
 			foreach ($unit->getSupplies() as $supply) {
 				if ($supply->getType() === 'food') {
 					$fsupply = $supply;
