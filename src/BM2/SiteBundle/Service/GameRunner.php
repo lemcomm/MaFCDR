@@ -686,7 +686,7 @@ class GameRunner {
 		$date = date("Y-m-d H:i:s");
 		$this->logger->info("$date --   Checking if units have gotten supplies...");
 		$done = false;
-		$query = $ths->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
+		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
 		$iterableResult = $query->iterate();
 		while (!$done) {
 			$this->em->clear();
