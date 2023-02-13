@@ -564,7 +564,7 @@ class Economy {
 
 	public function supplySoldiers(Unit $unit, $shortage, Settlement $settlement) {
 		$count = $unit->getLivingSoldiers()->count();
-		$this->logger('info', "Handling shortage of $shortage for ".$unit->getId());
+		$this->logger->info("Handling shortage of $shortage for ".$unit->getId());
 		$shortage = round($shortage, 2);
 		if ($shortage >= 1) {
 			# No food to send.
@@ -732,10 +732,10 @@ class Economy {
 					$suppliedNPCs += $unit->getLivingSoldiers()->count();
 				}
 				if ($suppliedNPCs > 0) {
-					$suppliedNPCs = ceil($suppliedNPCs/10); #TODO: as funny as full effect would be :)
+					$suppliedNPCs = ceil($suppliedNPCs/5); #TODO: as funny as full effect would be :)
 				}
 				#$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
-				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs;
+				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs*0.8;
 				break;
 			case 'wood':
 				$base = sqrt($population) + exp(sqrt($population)/150) - 5;
@@ -773,8 +773,12 @@ class Economy {
 		$amount = 0;
 		foreach ($query->getResult() as $result) {
 			$res = $result[0];
-			$focus = $result['focus'];
-			$amount += $res->getRequiresOperation() * pow(2, $focus);
+			if ($resource->getName() === 'food' && in_array(strtolower($res->getBuildingType()->getName()), ['stables', 'royal mews']) && in_array(strtolower($settlement->getGeoData()->getBiome()->getName()), ['scrub', 'thin scrub'])) {
+				return 0;
+			} else {
+				$focus = $result['focus'];
+				$amount += $res->getRequiresOperation() * pow(2, $focus);
+			}
 		}
 
 		// population size scaling

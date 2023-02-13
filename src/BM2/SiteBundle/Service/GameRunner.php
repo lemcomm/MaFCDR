@@ -483,7 +483,8 @@ class GameRunner {
 	public function runSoldierUpdatesCycle() {
 		$last = $this->appstate->getGlobal('cycle.soldiers', 0);
 		if ($last==='complete') return true;
-		$this->logger->info("Soldiers update...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date -- Soldiers update...");
 
 		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Soldier s SET s.locked=false');
 		$query->execute();
@@ -536,7 +537,8 @@ class GameRunner {
 		$this->em->clear();
 
 		// wounded troops: heal or die
-		$this->logger->info("  Heal or die...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Heal or die...");
 		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Soldier s WHERE s.wounded > 0');
 		$iterableResult = $query->iterate();
 		$i=1;
@@ -551,7 +553,8 @@ class GameRunner {
 		$this->em->flush();
 		$this->em->clear();
 
-		$this->logger->info("  Processing units of slumberers...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Processing units of slumberers...");
 		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u JOIN u.character c WHERE c.slumbering = true');
 		$result = $query->getResult();
 		foreach ($result as $unit) {
@@ -566,7 +569,8 @@ class GameRunner {
 		}
 		$this->em->flush();
 
-		$this->logger->info("  Checking for disbandable entourage.");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking for disbandable entourage.");
 		$disband_entourage = 0;
 		$query = $this->em->createQuery('SELECT e, c, DATE_DIFF(CURRENT_DATE(), c.last_access) as days FROM BM2SiteBundle:Entourage e JOIN e.character c WHERE c.slumbering = true');
 		$iterableResult = $query->iterate();
@@ -593,7 +597,8 @@ class GameRunner {
 		$this->em->flush();
 
 		if ($disband_entourage > 0) {
-			$this->logger->info("  Disbanded $disband_entourage entourage.");
+			$date = date("Y-m-d H:i:s");
+			$this->logger->info("$date --   Disbanded $disband_entourage entourage.");
 		}
 
 		// Update Soldier travel times.
@@ -602,14 +607,16 @@ class GameRunner {
 		$query->execute();
 
 		// Update soldier recruit training times. This will also set the training times for units, so this and the above affect whether travel starts same day or next (I'm going with next day).
-		$this->logger->info("  Checking on recruits...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking on recruits...");
 		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Settlement s WHERE s.id > 0');
 		foreach ($query->getResult() as $settlement) {
 			$this->milman->TrainingCycle($settlement);
 		}
 
 		// Update soldier arrivals to units based on travel times being at or below zero.
-		$this->logger->info("  Checking if soldiers have arrived...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking if soldiers have arrived...");
 		$count = 0;
 		$query = $this->em->createQuery('SELECT s FROM BM2SiteBundle:Soldier s WHERE s.travel_days <= 0');
 		$units = [];
@@ -647,7 +654,8 @@ class GameRunner {
 		$query->execute();
 
 		// Update Unit arrivals based on travel times being at or below zero.
-		$this->logger->info("  Checking if units have arrived...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking if units have arrived...");
 		$count = 0;
 		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.travel_days <= 0');
 		$units = [];
@@ -675,9 +683,19 @@ class GameRunner {
 		}
 		$this->em->flush();
 
-		$this->logger->info("  Checking if units have gotten supplies...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking if units have gotten supplies...");
+		$done = false;
 		$query = $this->em->createQuery('SELECT r FROM BM2SiteBundle:Resupply r WHERE r.travel_days <= 1');
-		foreach ($query->getResult() as $resupply) {
+		$iterableResult = $query->iterate();
+		while (!$done) {
+			$this->em->clear();
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				break;
+			}
+			$resupply = $row[0];
 			$unit = $resupply->getUnit();
 			$found = false;
 			$orig = 0;
@@ -690,7 +708,6 @@ class GameRunner {
 						$found = true;
 						$orig = $supply->getQuantity();
 						$sid = $supply->getId();
-						$this->logger->info("  -- Unit $id has $orig food in $sid and is getting $add from $rid.");
 						$supply->setQuantity($orig+$resupply->getQuantity());
 						break;
 					}
@@ -702,73 +719,158 @@ class GameRunner {
 				$supply->setUnit($unit);
 				$supply->setType($resupply->getType());
 				$supply->setQuantity($resupply->getQuantity());
-				$this->logger->info("  -- Unit $id has zero food and is getting $add.");
 			}
 			$this->em->remove($resupply);
+			$this->em->flush();
 		}
-		$this->em->flush();
-
-		/* TODO: Enable this once people have time to set up supplies.
-		$this->logger->info("checking if units have food to eat...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Checking if units have food to eat...");
 		$query = $this->em->createQuery('SELECT u FROM BM2SiteBundle:Unit u WHERE u.id > 0');
-		foreach ($query->getResult() as $unit) {
-			$food = null;
-			foreach ($unit->getSupplies() as $supply) {
-				if ($supply->getType() == 'food') {
-					$food = $supply;
+		$iterableResult = $query->iterate();
+		$fed = 0;
+		$starved = 0;
+		$killed = 0;
+		$done = false;
+		while (!$done) {
+			$this->em->clear();
+			$row = $iterableResult->next();
+			if ($row===false) {
+				$done=true;
+				break;
+			}
+			$unit = $row[0];
+			$living = $unit->getLivingSoldiers();
+			$count = $living->count();
+			if ($count < 1) {
+				# No soldiers to feed. Skip!
+				continue;
+			}
+			$char = $unit->getCharacter();
+			$food = 0;
+			$fsupply = null;
+			foreach ($unit->getSupplies() as $fsupply) {
+				if ($supply->getType() === 'food') {
+					$food = $supply->getQuantity();
 					break;
 				}
 			}
-			$living = $unit->getLivingSoldiers();
-			$count = $living->count();
-			$supply = $food->getQuantity();
-			if ($count < $supply) {
+			if ($count <= $food) {
 				$short = 0;
 			} else {
-				$short = floor($food->getQuantity()/$count*6);
-				if ($short < 1) {
-					$short = 0;
-				}
-			}
-			if ($short > 0) {
-				if ($unit->getCharacter()) {
-					$food_followers = $unit->getEntourage()->filter(function($entry) {
+				$need = $count - $food;
+				$origNeed = $need;
+				if ($char) {
+					$food_followers = $char->getEntourage()->filter(function($entry) {
 						return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
 					})->toArray();
 					if (!empty($food_followers)) {
 						foreach ($food_followers as $ent) {
-							if ($ent->getSupply() > ($count - $supply)) {
-								$supply2 = $count-$supply;
-								$supply += $count-$supply;
-								$ent->setSupply($ent->getSupply()-$count2);
+							if ($ent->getSupply() > $need) {
+								$supply2 = $ent->getSupply()-$need;
+								$need = 0;
+								$ent->setSupply($supply2);
+								break;
 							} else {
-								$supply += $ent->getSupply();
+								$need = $need - $food;
 								$ent->setSupply(0);
 							}
 						}
 					}
 				}
-			}
-			if ($count < $supply) {
-				$short = 0;
-			} else {
-				$short = floor($supply/$count*6);
-				if ($short < 1) {
+				if ($need > 0) {
+					$short = $need;
+				} else {
 					$short = 0;
 				}
 			}
-			foreach ($unit->getLivingSoldiers() as $soldier) {
-				$soldier->makeHungry($short);
-				// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
-				if ($soldier->getHungry() > 96 && rand(96, 192) < $soldier->getHungry()) {
-					$soldier->kill();
-					$this->history->addToSoldierLog($soldier, 'starved');
+			$available = $count-$short;
+			if ($available > 0) {
+				$var = $count/$available;
+			} else {
+				$var = 1;
+			}
+			$dead = 0;
+			$myfed = 0;
+			$mystarved = 0;
+			if ($var > 0.1) {
+				if ($unit->getCharacter()) {
+					$severity = min(ceil($var)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
+				} else {
+					$severity = min(ceil($var)*4, 4); # Militia starve slower, 4 per day. Starve in 22.5 days.
+				}
+				if ($severity < 2) {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.starvation.light',
+						array(),
+						History::MEDIUM, false, 30
+					);
+				} elseif ($severity < 4) {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.starvation.medium',
+						array(),
+						History::MEDIUM, false, 30
+					);
+				} else {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.starvation.high',
+						array(),
+						History::MEDIUM, false, 30
+					);
+				}
+				foreach ($living as $soldier) {
+					$soldier->makeHungry($severity);
+					// soldiers can take several days of starvation without danger of death, but slightly less than militia (because they move around, etc.)
+					if ($soldier->getHungry() > 90 && rand(90, 180) < $soldier->getHungry()) {
+						$soldier->kill();
+						$this->history->addToSoldierLog($soldier, 'starved');
+						$killed++;
+						$dead++;
+					} else {
+						$starved++;
+						$mystarved++;
+					}
+				}
+				if ($dead > 0) {
+					$this->history->logEvent(
+						$unit,
+						'event.unit.starvation.death',
+						array("%i%"=>$dead),
+						History::MEDIUM, false, 30
+					);
+					if ($unit->getCharacter()) {
+						$this->history->logEvent(
+							$unit->getCharacter(),
+							'event.unit.starvation.death',
+							array("%link-unit%"=>$unit->getId()),
+							History::HIGH, false, 30
+						);
+					}
+				}
+			} else {
+				foreach ($living as $soldier) {
+					$soldier->feed();
+					$fed++;
+					$myfed++;
 				}
 			}
-		}*/
+			if ($fsupply) {
+				$left = $food-$count;
+				$fsupply->setQuantity($left);
+			}
+			$this->em->flush();
+			$date = date("Y-m-d H:i:s");
+			$id = $unit->getId();
+			$this->logger->info("$date --     Unit $id - Soldiers $count - Var $var - Food $food - Fed $myfed - Starved $mystarved - Killed $dead");
+		}
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --     Fed $fed - Starved $starved - Killed $killed");
 
 		// Update Unit resupply travel times.
-		$this->logger->info("  Deducting a day from unit resupply times...");
+		$date = date("Y-m-d H:i:s");
+		$this->logger->info("$date --   Deducting a day from unit resupply times...");
 		$query = $this->em->createQuery('UPDATE BM2SiteBundle:Resupply r SET r.travel_days = (r.travel_days - 1) WHERE r.travel_days IS NOT NULL');
 		$query->execute();
 
