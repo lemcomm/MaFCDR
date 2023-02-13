@@ -1550,13 +1550,16 @@ class CharacterController extends Controller {
 			]);
 		} else {
 			$count = $report->getGroups()->count(); # These return in a specific order, low to high, ID ascending.
+			$fighters = new ArrayCollection();
 			foreach ($report->getGroups() as $group) {
 				$totalRounds = $group->getCombatStages()->count();
-				break;
+				foreach ($group->getCharacters() as $each) {
+					$fighters->add($each);
+				}
 			}
 
 			return $this->render('Character/viewBattleReport.html.twig', [
-				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds, 'access'=>$check
+				'version'=>2, 'report'=>$report, 'location'=>$location, 'count'=>$count, 'roundcount'=>$totalRounds, 'access'=>$check, 'fighters'=>$fighters
 			]);
 		}
 	}
