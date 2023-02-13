@@ -227,7 +227,19 @@
 					{% for result, amount in stage.data if amount > 0 %}
 						<li>{{ ('battle.round.'~result)|transchoice(amount, {'%i%':amount}) }}</li>
 					{% endfor %}
-					{{ macros.extras(stage.data, group) }}
+					{% for extra in stage.extra %}
+						{% set who = null %}
+						{% set by = null %}
+						{% for participant in fighters %}
+							{% if participant.character.id == extra.who %}
+								{% set who = participant.character %}
+							{% endif %}
+							{% if extra.by is defined and participant.character.id == extra.by %}
+								{% set by = participant.character %}
+							{% endif %}
+						{% endfor %}
+						<li>{{ ('battle.extras.'~extra.what)|trans({'%who%':who?link(who):'[nobody]', '%by%':by?link(by):'[nobody]'})|raw }}</li>
+					{% endfor %}
 				{% endfor %}
 				</td>
 			{% endfor %}
