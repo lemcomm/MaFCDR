@@ -396,7 +396,22 @@ class UnitController extends Controller {
                 if ($form->isValid()) {
                         $data = $form->getData();
                         $em = $this->getDoctrine()->getManager();
+                        if ($unit->getCharacter()) {
+                                $this->get('history')->closeLog($unit, $unit->getCharacter());
+                        }
+                        if ($here = $unit->getSettlement()) {
+                                if ($here->getOwner() && $here->getOwner() !== $data['target']) {
+                                        $this->get('history')->closeLog($unit, $here->getOwner());
+                                }
+                                if ($here->getSteward() && $here->getSteward() !== $data['target']) {
+                                        $this->get('history')->closeLog($unit, $here->getOwner());
+                                }
+                        }
+                        if ($unit->getMarshal() && $unit->getMarshal() !== $data['target']) {
+                                $this->get('history')->closeLog($unit, $unit->getMarshal());
+                        }
                         $unit->setCharacter($data['target']);
+                        $this->get('history')->openLog($unit, $data['target']);
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.assigned',
@@ -443,7 +458,11 @@ class UnitController extends Controller {
                 if ($form->isValid()) {
                         $data = $form->getData();
                         $em = $this->getDoctrine()->getManager();
+                        if ($unit->getMarshal() && $unit->getMarshal() !== $data['target']) {
+                                $this->get('history')->closeLog($unit, $unit->getMarshal());
+                        }
                         $unit->setMarshal($data['target']);
+                        $this->get('history')->openLog($unit, $data['target']);
                         $this->get('history')->logEvent(
 				$data['target'],
 				'event.unit.appointed',
@@ -561,6 +580,7 @@ class UnitController extends Controller {
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
                         $success = $this->get('military_manager')->returnUnitHome($unit, 'returned', $character, false);
+                        $this->getDoctrine()->getManager()->flush();
                         if ($success) {
                                 $this->addFlash('notice', $this->get('translator')->trans('unit.return.success', array(), 'actions'));
                                 return $this->redirectToRoute('maf_units');
@@ -589,10 +609,11 @@ class UnitController extends Controller {
 
                 $form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
-                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $unit->getCharacter(), false);
+                        $leader = $unit->getCharacter();
+                        $success = $this->get('military_manager')->returnUnitHome($unit, 'recalled', $leader, false);
                         if ($success) {
                                 $this->get('history')->logEvent(
-        				$data['target'],
+        				$leader,
         				'event.unit.recalled',
         				array('%unit%'=>$unit->getSettings()->getName(), '%link-character%'=>$character->getId()),
         				History::MEDIUM, false, 30
