@@ -1022,6 +1022,7 @@ class BattleRunner {
 						$this->log(10, $soldier->getName()." (Lancer) attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
+							$noTargets = 0;
 							$strikes++;
 							list($result, $logs) = $this->combat->ChargeAttack($soldier, $target, false, true, $this->xpMod, $this->defenseBonus);
 							foreach ($logs as $each) {
@@ -1039,6 +1040,7 @@ class BattleRunner {
 
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
+							$noTargets = 0;
 							$shots++;
 							$rPower = $this->combat->RangedPower($soldier, true);
 							if ($this->combat->RangedRoll($defBonus, $rangedPenalty, $bonus)) {
@@ -1053,7 +1055,7 @@ class BattleRunner {
 							}
 						} else {
 							// no more targets
-							$this->log(10, "no more targets\n");
+							$this->log(10, "but finds no target\n");
 							$noTargets++;
 						}
 					} else {
@@ -1061,6 +1063,7 @@ class BattleRunner {
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
+							$noTargets = 0;
 							$strikes++;
 							$mPower = $this->combat->MeleePower($soldier, true);
 							list($result, $logs) = $this->combat->MeleeAttack($soldier, $target, $mPower, false, true, $this->xpMod, $this->defenseBonus); // Basically, an attack of opportunity.
