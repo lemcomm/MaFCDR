@@ -808,10 +808,10 @@ class GameRunner {
 				$starve = 1 - $var;
 				$char = $unit->getCharacter();
 				if ($char) {
-					$severity = min(ceil($starve)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
+					$severity = round(min($starve*6, 6)); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
 					$this->history->openLog($unit, $char);
 				} else {
-					$severity = min(ceil($starve)*4, 4); # Militia starve slower, 4 per day. Starve in 22.5 days.
+					$severity = round(min($starve*4, 4)); # Militia starve slower, 4 per day. Starve in 22.5 days.
 					$where = $unit->getSettlement();
 					if ($where) {
 						$owner = $where->getOwner();
