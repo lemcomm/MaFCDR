@@ -569,6 +569,9 @@ class AccountController extends Controller {
 			$make_more = false;
 		} else {
 			$make_more = true;
+			if ($user->getRestricted()) {
+				$user->setRestricted(false);
+			}
 		}
 		return array($make_more, $characters_active, $characters_allowed);
 	}
