@@ -287,17 +287,17 @@ class Politics {
 		}
 
 		foreach ($settlement->getUnits() as $unit) {
-			if ($oldowner && $unit->getCharacter() !== $character) {
+			if ($oldowner && ($unit->getCharacter() !== $character || !$character)) {
 				$this->history->closeLog($unit, $oldowner);
 			}
-			if ($unit->getMarshal() && $unit->getMarshal() !== $character) {
+			if ($unit->getMarshal() && ($unit->getMarshal() !== $character || !$character)) {
 				$this->history->closeLog($unit, $unit->getMarsahl());
 			}
 			$unit->setMarshal(null);
-			if ($settlement->getSteward() && $settlement->getSteward() !== $character) {
+			if ($settlement->getSteward() && ($settlement->getSteward() !== $character || !$character)) {
 				$this->history->closeLog($unit, $settlement->getSteward());
 			}
-			if ($unit->isLocal()) {
+			if ($character && $unit->isLocal()) {
 				$this->history->openLog($unit, $character);
 			}
 		}
