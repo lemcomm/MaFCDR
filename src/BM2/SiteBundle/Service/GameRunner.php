@@ -888,7 +888,11 @@ class GameRunner {
 			}
 			if ($fsupply) {
 				$left = $food-$count;
-				$fsupply->setQuantity($left);
+				if ($left < 0) {
+					$fsupply->setQuantity(0);
+				} else {
+					$fsupply->setQuantity($left);
+				}
 			}
 			$this->em->flush();
 			$date = date("Y-m-d H:i:s");
