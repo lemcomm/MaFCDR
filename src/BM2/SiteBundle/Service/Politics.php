@@ -291,7 +291,7 @@ class Politics {
 				$this->history->closeLog($unit, $oldowner);
 			}
 			if ($unit->getMarshal() && ($unit->getMarshal() !== $character || !$character)) {
-				$this->history->closeLog($unit, $unit->getMarsahl());
+				$this->history->closeLog($unit, $unit->getMarshal());
 			}
 			$unit->setMarshal(null);
 			if ($settlement->getSteward() && ($settlement->getSteward() !== $character || !$character)) {
