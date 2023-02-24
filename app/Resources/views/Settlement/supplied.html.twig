@@ -1,0 +1,26 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ 'control.supplied.name'|trans({},"actions") }}</h2>
+	<p>{{ 'control.supplied.intro'|trans({},"actions")|raw }}</p>
+	<hr>
+        {% for unit in units %}
+                <h4>{{ unit.settings.name|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>') }}</h4><br>
+                {{ 'unit.list.soldiers'|trans({},"actions")|raw }}: {{ 'unit.list.count'|trans({"%soldiers%":unit.getActiveSoldiers.count}, "actions") }}<br />
+		{% if unit.character == character %}
+        		{{ 'unit.list.youcommand'|trans({}, "actions")|raw }}
+		{% elseif unit.character %}
+			{{ 'unit.list.commander'|trans({"%name%":link(unit.character)}, "actions")|raw }}
+		{% else %}
+			{{ 'unit.list.nocommander'|trans({}, "actions")|raw }}
+		{% endif %}<br />
+		{{ 'unit.list.supplied'|trans({},"actions")|raw }}: {% if unit.supplier %}{{ 'unit.list.source'|trans({"%settlement%":link(unit.supplier)}, "actions")|raw }}{% else %}{{'unit.list.nosupplier'|trans({}, "actions")|raw }}{% endif %}<br />
+		{{ 'unit.list.base'|trans({},"actions")|raw }}: {% if unit.settlement %}{{ 'unit.list.based'|trans({"%settlement%":link(unit.settlement)}, "actions")|raw }}{% else %}{{'unit.list.nobase'|trans({}, "actions")|raw }}{% endif %}
+		<br /><br />
+		{% if not unit.isLocal %}
+			<a href="{{ path('maf_settlement_supply_cancel', {"id":settlement.id, "unit":unit.id}) }}"><button id="soldiers">{{ 'control.supplied.cancel'|trans({},"actions") }}</button></a>
+		{% endif %}
+		<hr>
+        {% endfor %}
+
+{% endblock %}
