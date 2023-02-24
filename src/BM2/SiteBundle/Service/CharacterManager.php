@@ -769,12 +769,14 @@ class CharacterManager {
 					}
 				case 'liege':
 					$liege = $char->findLiege();
-					if ($liege && $liege !== $char && $liege->isActive()) {
+					if ($liege && $liege !== $char) {
 						if ($liege instanceof Collection) {
 							$liege = $liege->first();
 						}
-						$this->$bequeath($thing, $liege, $char, null);
-						break;
+						if ($liege->isActive()) {
+							$this->$bequeath($thing, $liege, $char, null);
+							break;
+						}
 					}
 				case 'ruler':
 					$rulers = $realm->findRulers();

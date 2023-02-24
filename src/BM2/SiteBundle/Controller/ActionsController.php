@@ -752,11 +752,13 @@ class ActionsController extends Controller {
 		$manageable = new ArrayCollection();
 		$sources = [];
 		foreach ($character->getOwnedSettlements() as $owned) {
-			$manageable->add($owned);
-			$sources[] = $owned->getId();
+			if (!$owned->getSiege()) {
+				$manageable->add($owned);
+				$sources[] = $owned->getId();
+			}
 		}
 		foreach ($character->getStewardingSettlements() as $stewarded) {
-			if (!$manageable->contains($stewarded)) {
+			if (!$manageable->contains($stewarded) && !$stewarded->getSiege()) {
 				$manageable->add($stewarded);
 			}
 			$sources[] = $stewarded->getId();

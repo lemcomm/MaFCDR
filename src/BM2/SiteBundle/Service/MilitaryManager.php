@@ -590,6 +590,17 @@ class MilitaryManager {
 			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
 		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
+		$this->em->flush();
+		if ($home) {
+			$owner = $home->getOwner();
+			if ($owner) {
+				$this->history->openLog($unit, $owner);
+			}
+			$steward = $home->getSteward();
+			if ($steward) {
+				$this->history->openLog($unit, $steward);
+			}
+		}
 		if ($character) {
 			$this->history->logEvent(
 				$data['assignto'],
@@ -850,6 +861,7 @@ class MilitaryManager {
 						array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
 						History::MEDIUM, false, 30
 					);
+					$this->history->closeLog($unit, $origin);
 				}
 			} elseif ($reason === 'returned') {
 				$this->history->logEvent(
@@ -865,6 +877,7 @@ class MilitaryManager {
 						array('%link-unit%'=>$unit->getId(), '%link-settlement%'=>$dest->getId()),
 						History::MEDIUM, false, 30
 					);
+					$this->history->closeLog($unit, $origin);
 				}
 			}
 		}

@@ -676,6 +676,18 @@ class GameRunner {
 						array('%link-unit%'=>$unit->getId()),
 						History::MEDIUM, false, 30
 					);
+					$owner = $settlement->getOwner();
+					if ($owner) {
+						$this->history->openLog($unit, $owner);
+					}
+					$steward = $settlement->getSteward();
+					if ($steward) {
+						$this->history->openLog($unit, $steward);
+					}
+					$marshal = $unit->getMarshal();
+					if ($marshal) {
+						$this->history->openLog($unit, $marshal);
+					}
 				} else {
 					# Somehow this unit is being returned to somewhere but doesn't have a settlement assigned????
 				}
@@ -749,8 +761,8 @@ class GameRunner {
 			$food = 0;
 			$fsupply = null;
 			foreach ($unit->getSupplies() as $fsupply) {
-				if ($supply->getType() === 'food') {
-					$food = $supply->getQuantity();
+				if ($fsupply->getType() === 'food') {
+					$food = $fsupply->getQuantity();
 					break;
 				}
 			}
@@ -785,18 +797,36 @@ class GameRunner {
 			}
 			$available = $count-$short;
 			if ($available > 0) {
-				$var = $count/$available;
+				$var = $available/$count;
 			} else {
-				$var = 1;
+				$var = 0;
 			}
 			$dead = 0;
 			$myfed = 0;
 			$mystarved = 0;
-			if ($var > 0.1) {
-				if ($unit->getCharacter()) {
-					$severity = min(ceil($var)*6, 6); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
+			if ($var <= 0.9) {
+				$starve = 1 - $var;
+				$char = $unit->getCharacter();
+				if ($char) {
+					$severity = round(min($starve*6, 6)); # Soldiers starve at a rate of 6 hunger per day max. No food? Starve in 15 days.
+					$this->history->openLog($unit, $char);
 				} else {
-					$severity = min(ceil($var)*4, 4); # Militia starve slower, 4 per day. Starve in 22.5 days.
+					$severity = round(min($starve*4, 4)); # Militia starve slower, 4 per day. Starve in 22.5 days.
+					$where = $unit->getSettlement();
+					if ($where) {
+						$owner = $where->getOwner();
+						if ($owner) {
+							$this->history->openLog($unit, $owner);
+						}
+						$steward = $where->getSteward();
+						if ($steward) {
+							$this->history->openLog($unit, $steward);
+						}
+						$marshal = $unit->getMarshal();
+						if ($marshal) {
+							$this->history->openLog($unit, $marshal);
+						}
+					}
 				}
 				if ($severity < 2) {
 					$this->history->logEvent(
@@ -858,7 +888,11 @@ class GameRunner {
 			}
 			if ($fsupply) {
 				$left = $food-$count;
-				$fsupply->setQuantity($left);
+				if ($left < 0) {
+					$fsupply->setQuantity(0);
+				} else {
+					$fsupply->setQuantity($left);
+				}
 			}
 			$this->em->flush();
 			$date = date("Y-m-d H:i:s");

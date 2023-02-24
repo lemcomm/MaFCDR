@@ -286,6 +286,22 @@ class Politics {
 			}
 		}
 
+		foreach ($settlement->getUnits() as $unit) {
+			if ($oldowner && ($unit->getCharacter() !== $character || !$character)) {
+				$this->history->closeLog($unit, $oldowner);
+			}
+			if ($unit->getMarshal() && ($unit->getMarshal() !== $character || !$character)) {
+				$this->history->closeLog($unit, $unit->getMarshal());
+			}
+			$unit->setMarshal(null);
+			if ($settlement->getSteward() && ($settlement->getSteward() !== $character || !$character)) {
+				$this->history->closeLog($unit, $settlement->getSteward());
+			}
+			if ($character && $unit->isLocal()) {
+				$this->history->openLog($unit, $character);
+			}
+		}
+
 		// TODO: probably need to clean out some actions, too
 
 		if ($reason) switch ($reason) {
