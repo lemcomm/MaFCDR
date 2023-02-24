@@ -316,6 +316,7 @@ class Dispatcher {
 			$actions[] = $this->controlRenameTest(true);
 			$actions[] = $this->controlCultureTest(true);
 			$actions[] = $this->controlStewardTest(true);
+			$actions[] = $this->controlSuppliedTest(true, $settlement);
 			$actions[] = $this->controlPermissionsTest(null, $settlement);
 			$actions[] = $this->controlQuestsTest(null, $settlement);
 		}
@@ -1185,6 +1186,21 @@ class Dispatcher {
 			return array("name"=>"control.abandon.name", "description"=>"unavailable.notyours2");
 		}
 		return $this->action("control.abandon", "bm2_site_settlement_abandon");
+	}
+
+	public function controlSuppliedTest($check_duplicate=false, $settlement) {
+		if (($check = $this->veryGenericTests()) !== true) {
+			return array("name"=>"control.supplied.name", "description"=>"unavailable.$check");
+		}
+		$char = $this->getCharacter();
+		if (
+			(
+				($settlement->getOccupier() || $settlement->getOccupant()) && $settlement->getOccupant() != $char
+			) || (
+				!$settlement->getOccupier() && !$settlement->getOccupant() && ($settlement->getOwner() !== $char && $settlement->getSteward() !== $char)))  {
+			return array("name"=>"control.supplied.name", "description"=>"unavailable.notyours2");
+		}
+		return $this->action("control.supplied", "maf_settlement_supplied", false, array('id'=>$settlement->getId()));
 	}
 
 	public function controlChangeOccupantTest($check_duplicate=false) {
