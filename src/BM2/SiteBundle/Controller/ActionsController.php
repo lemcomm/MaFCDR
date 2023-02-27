@@ -752,13 +752,13 @@ class ActionsController extends Controller {
 		$manageable = new ArrayCollection();
 		$sources = [];
 		foreach ($character->getOwnedSettlements() as $owned) {
-			if (!$owned->getSiege()) {
+			if (!$owned->getOccupier() && !$owned->getOccupant()) {
 				$manageable->add($owned);
 				$sources[] = $owned->getId();
 			}
 		}
 		foreach ($character->getStewardingSettlements() as $stewarded) {
-			if (!$manageable->contains($stewarded) && !$stewarded->getSiege()) {
+			if (!$manageable->contains($stewarded) && !$stewarded->getOccupier() && !$stewarded->getOccupant()) {
 				$manageable->add($stewarded);
 			}
 			$sources[] = $stewarded->getId();
@@ -823,29 +823,33 @@ class ActionsController extends Controller {
 		if ($request->isMethod('POST') && $request->request->has('trade')) {
 	                $form->handleRequest($request);
                 	if ($form->isValid()) {
-				if ($trade->getAmount()>0) {
-					if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
-						$form->addError(new FormError("trade.allremote"));
-					} elseif ($trade->getSource()==$trade->getDestination()) {
-						$form->addError(new FormError("trade.same"));
-					} else {
-						// TODO: check if we don't already have such a deal (same source, destination and resource)
-						// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
-						$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
-						if ($trade->getAmount() > $available) {
-							$form->addError(new FormError("trade.toomuch"));
+				if ($manageable->contains($trade->getSource())) {
+					if ($trade->getAmount()>0) {
+						if ($trade->getSource()!=$settlement && $trade->getDestination()!=$settlement) {
+							$form->addError(new FormError("trade.allremote"));
+						} elseif ($trade->getSource()==$trade->getDestination()) {
+							$form->addError(new FormError("trade.same"));
 						} else {
-							$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
-							if ($merchants->count() > 0 ) {
-								// remove a merchant!
-								$stay = $merchants->first();
-								$em->remove($stay);
+							// TODO: check if we don't already have such a deal (same source, destination and resource)
+							// FIXME: $trade->getResourceType() is NULL sometimes, causing an error here?
+							$available = $this->get('economy')->ResourceProduction($trade->getSource(), $trade->getResourceType()) + $this->get('economy')->TradeBalance($trade->getSource(), $trade->getResourceType());
+							if ($trade->getAmount() > $available) {
+								$form->addError(new FormError("trade.toomuch"));
+							} else {
+								$trade->setTradecost($this->get('economy')->TradeCostBetween($trade->getSource(), $trade->getDestination(), $merchants->count()>0));
+								if ($merchants->count() > 0 ) {
+									// remove a merchant!
+									$stay = $merchants->first();
+									$em->remove($stay);
+								}
+								$em->persist($trade);
+								$em->flush();
+								return $this->redirect($request->getUri());
 							}
-							$em->persist($trade);
-							$em->flush();
-							return $this->redirect($request->getUri());
 						}
 					}
+				} else {
+					$form->addError(new FormError("trade.notmanaged"));
 				}
 			}
 		} elseif ($request->isMethod('POST') && $request->request->has('tradecancel')) {

@@ -498,6 +498,19 @@ control:
   manage:
    start:       You have enabled spawning at %name%.
    stop:        You have disabled spawning at %name%.
+ supplied:
+  name:         Supplied Units
+  description:  Review the units supplied by this estate.
+  intro: >
+    Units in Might & Fealty are owned by the estate they are based from, but they're not necessarily supplied by the same.<br>
+    In certain situations it may be fortuitous to close that supply line though. This page allows you to do that.<br><br>
+    Of particular note is that if the unit is from here and is getting supplied from here, you'll be unable to cancel it--if you want the soldiers from their home settlement, you'll need to disband them instead.
+  cancel:       End Distribution
+ supply:
+  success:      Distribution to %name% canceled successfully.
+  failure:
+   local:       "The unit of %name% is local and would just eat from the stores directly--their family won't starve them even if you ask them to."
+   notyours:    "That unit doesn't appear to be yours to manage."
 
 military:
  name:          Military actions

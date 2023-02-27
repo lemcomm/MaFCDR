@@ -4,9 +4,11 @@ namespace BM2\SiteBundle\Controller;
 
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Settlement;
+use BM2\SiteBundle\Entity\Unit;
 use BM2\SiteBundle\Form\SettlementAbandonType;
 use BM2\SiteBundle\Form\SettlementPermissionsSetType;
 use BM2\SiteBundle\Form\DescriptionNewType;
+use BM2\SiteBundle\Service\History;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -302,6 +304,49 @@ class SettlementController extends Controller {
                         'form' => $form->createView(),
 			'settlement' => $id
                 ]);
+	}
+
+	/**
+	  * @Route("/{id}/supplied", name="maf_settlement_supplied", requirements={"id"="\d+"})
+	  */
+	public function suppliedAction(Settlement $id, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlSuppliedTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		return $this->render('Settlement/supplied.html.twig', [
+			'units' => $this->get('economy')->FindFeedableUnits($id),
+			'settlement' => $id
+		]);
+	}
+
+	/**
+	  * @Route("/{id}/supplyCancel/{unit}", name="maf_settlement_supply_cancel", requirements={"id"="\d+", "unit"="\d+"})
+	  */
+	public function supplyCancelAction(Settlement $id, Unit $unit, Request $request) {
+		$character = $this->get('dispatcher')->gateway('controlSuppliedTest', false, true, false, $id);
+		if (! $character instanceof Character) {
+			return $this->redirectToRoute($character);
+		}
+
+		$units = $this->get('economy')->FindFeedableUnits($id);
+		if ($units->contains($unit) && (!$unit->isLocal() || ($unit->isLocal() && $unit->getSettlement() !== $id))) {
+			$unit->setSupplier(null);
+			$this->getDoctrine()->getManager()->flush();
+			$this->get('history')->logEvent(
+				$unit,
+				'event.unit.supplies.food.cancel',
+				array('%link-settlement%'=>$id->getId()),
+				History::MEDIUM, false, 30
+			);
+			$this->addFlash('notice', $this->get('translator')->trans('control.supply.success', ['%name%'=>$unit->getSettings()->getName()], 'actions'));
+		} elseif ($unit->isLocal()) {
+			$this->addFlash('notice', $this->get('translator')->trans('control.supply.failure.local', ['%name%'=>$unit->getSettings()->getName()], 'actions'));
+		} else {
+			$this->addFlash('notice', $this->get('translator')->trans('control.supply.failure.notyours', [], 'actions'));
+		}
+		return $this->redirectToRoute('maf_settlement_supplied', ['id'=>$id->getId()]);
 	}
 
 }

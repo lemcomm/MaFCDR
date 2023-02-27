@@ -90,6 +90,7 @@
 			<br /><a href="{{ path('bm2_site_settlement_permissions', {'id':settlement.id}) }}">{{ 'control.permissions.name'|trans({},"actions") }}</a>
 			- <a href="{{ path('bm2_site_settlement_quests', {'id':settlement.id}) }}">{{ 'control.quests.name'|trans({},"actions") }}</a>
 			- <a href="{{ path('bm2_site_settlement_description', {'id':settlement.id}) }}">{{ 'control.description.settlement.name'|trans({},"actions") }}</a>
+			- <a href="{{ path('maf_settlement_supplied', {'id':settlement.id}) }}">{{ 'control.supplied.name'|trans({},"actions") }}</a>
 		{% endif %}
 		{% if isowner %}
 			- <a href="{{ path('bm2_site_settlement_abandon', {'id':settlement.id}) }}">{{ 'control.abandon.name'|trans({},"actions") }}</a>
