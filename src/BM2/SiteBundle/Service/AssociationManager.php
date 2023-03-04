@@ -348,6 +348,7 @@ class AssociationManager {
 			$this->descman->newDescription($deity, $data['description'], $char, TRUE); #Not new, but we pass it to save processing time.
 		}
 		$this->em->flush();
+		return $deity;
 	}
 
 	public function adoptDeity(Association $assoc, Deity $deity, Character $char) {
