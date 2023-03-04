@@ -70,7 +70,7 @@ class AssociationManager {
 
 		if ($superior) {
 			$assoc->setSuperior($superior);
-			$superior->addCadet($assoc);
+			$superior->addInferior($assoc);
 		}
 
 		$assoc->setFounder($founder);
@@ -121,10 +121,10 @@ class AssociationManager {
 
 		if ($assoc->getSuperior() !== $data['superior']) {
 			if ($assoc->getSuperior()) {
-				$assoc->getSuperior()->removeCadet($assoc);
+				$assoc->getSuperior()->removeInferior($assoc);
 			}
 			$assoc->setSuperior($data['superior']);
-			$data['superior']->addCadet($assoc);
+			$data['superior']->addInferior($assoc);
 		}
 		if ($assoc->getDescription()->getText() != $data['description']) {
 			$this->descman->newDescription($assoc, $data['description'], $char); #Descman includes a flush for the EM.
@@ -348,6 +348,7 @@ class AssociationManager {
 			$this->descman->newDescription($deity, $data['description'], $char, TRUE); #Not new, but we pass it to save processing time.
 		}
 		$this->em->flush();
+		return $deity;
 	}
 
 	public function adoptDeity(Association $assoc, Deity $deity, Character $char) {
