@@ -144,6 +144,9 @@ class Dispatcher {
 	}
 
 	protected function veryGenericTests() {
+		if (!$this->getCharacter()) {
+			return 'nocharacter';
+		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
@@ -226,6 +229,9 @@ class Dispatcher {
 	}
 
 	protected function interActionsGenericTests() {
+		if (!$this->getCharacter()) {
+			return 'nocharacter';
+		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
