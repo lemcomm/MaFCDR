@@ -57,10 +57,10 @@ class Siege {
 			}
 		}
 		if ($count >= $this->encirclement) {
-			$this->setEncirclement(true);
+			$this->setEncircled(true);
 			return $this;
 		} else {
-			$this->setEncirclement(false);
+			$this->setEncircled(false);
 			return $this;
 		}
 	}
