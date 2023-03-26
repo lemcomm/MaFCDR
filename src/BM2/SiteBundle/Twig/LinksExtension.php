@@ -250,7 +250,9 @@ class LinksExtension extends \Twig_Extension {
 		if (!is_object($entity)) {
 			$this->logger->error("link() called without object - $entity"); // fuck, it's impossible to get a backtrace! - out of memory
 			$this->logger->error("dump: ".\Doctrine\Common\Util\Debug::dump($entity, 1, true, false));
-			$this->logger->error("request: ".$this->request_stack->getCurrentRequest()->getRequestUri());
+			if ($this->request_stack->getCurrentRequest()) {
+				$this->logger->error("request: ".$this->request_stack->getCurrentRequest()->getRequestUri());
+			}
 			return "[invalid object]";
 		}
 		$classname = implode('', array_slice(explode('\\', get_class($entity)), -1));
