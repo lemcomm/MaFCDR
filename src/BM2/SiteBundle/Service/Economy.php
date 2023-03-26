@@ -876,12 +876,20 @@ class Economy {
 		$query->setParameters(array('resource'=>$resource, 'here'=>$settlement));
 
 		foreach ($query->getResult() as $trade) {
-			if ($trade->getDestination() == $settlement && ((!$trade->getSource()->getSiege() || ($trade->getSource()->getSiege() && !$trade->getSource()->getSiege()->getEncircled())) || ($settlement->getSiege() && $settlement->getSiege()->getEncircled()))) {
-				// incoming trade; only counts if source isn't encircled AND we're not encircled.
+			$source = $trade->getSource();
+			$dest = $trade->getDestination();
+			if ($dest === $settlement) {
+				if ($source->getSeige() && $source->getSiege()->getEncircled()) {
+					# Source is encirlced. No income.
+					continue;
+				}
 				$amount += $trade->getAmount();
-			} else if (!($settlement->getSiege() && $settlement->getSiege()->getEncircled())) {
-				// outgoing trade, only counts if we're not encircled.
-				$amount -= $trade->getAmount();
+			} else {
+				if ($dest->getSiege() && $dest->getSiege()->getEncircled()) {
+					continue;
+					# destination is encirlced. No income.
+				}
+				$amount += $trade->getAmount();
 			}
 		}
 		return $amount;
