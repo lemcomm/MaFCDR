@@ -879,7 +879,7 @@ class Economy {
 			$source = $trade->getSource();
 			$dest = $trade->getDestination();
 			if ($dest === $settlement) {
-				if ($source->getSeige() && $source->getSiege()->getEncircled()) {
+				if ($source->getSiege() && $source->getSiege()->getEncircled()) {
 					# Source is encirlced. No income.
 					continue;
 				}
