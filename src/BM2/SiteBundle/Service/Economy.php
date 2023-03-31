@@ -732,7 +732,7 @@ class Economy {
 					$suppliedNPCs += $unit->getLivingSoldiers()->count();
 				}
 				if ($suppliedNPCs > 0) {
-					$suppliedNPCs = ceil($suppliedNPCs/5); #TODO: as funny as full effect would be :)
+					$suppliedNPCs = ceil($suppliedNPCs/3); #TODO: as funny as full effect would be :)
 				}
 				#$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
 				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs*0.8;
@@ -872,6 +872,10 @@ class Economy {
 	public function TradeBalance(Settlement $settlement, ResourceType $resource) {
 		$amount = 0;
 
+		if ($settlement->getSiege() && $settlement->getSiege()->getEncirlced()) {
+			return $amount;
+		}
+
 		$query = $this->em->createQuery('SELECT t FROM BM2SiteBundle:Trade t WHERE t.resource_type = :resource AND (t.source = :here OR t.destination = :here)');
 		$query->setParameters(array('resource'=>$resource, 'here'=>$settlement));
 
@@ -889,7 +893,7 @@ class Economy {
 					continue;
 					# destination is encirlced. No income.
 				}
-				$amount += $trade->getAmount();
+				$amount -= $trade->getAmount();
 			}
 		}
 		return $amount;
