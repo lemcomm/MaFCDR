@@ -398,8 +398,13 @@ class ConversationController extends Controller {
 		$unread = $lastPerm->getUnread();
 		$total = $messages->count();
 
+		foreach ($perms as $each) {
+			if ($perm->getUnread()) {
+				$perm->setUnread(0);
+			}
+		}
+
 		if ($unread) {
-			$lastPerm->setUnread(0);
 			$last = $lastPerm->getLastAccess();
 		} else {
 			$unread = 0;
