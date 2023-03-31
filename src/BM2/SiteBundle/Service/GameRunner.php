@@ -719,7 +719,7 @@ class GameRunner {
 					}
 				}
 			}
-			if (!$encircled && $unit->getSupplier() !== $unit->getSettlement()) {
+			if (!$encircled && $unit->getSettlement() && $unit->getSupplier() !== $unit->getSettlement()) {
 				$here = $unit->getSettlement();
 				if ($here->getSiege() && $here->getSiege()->getEncircled()) {
 					$encircled = true;
