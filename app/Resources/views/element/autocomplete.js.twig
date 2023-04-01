@@ -91,7 +91,7 @@ function realmselect(obj, callback) {
 			}
 			$.getJSON("{{ path('maf_data_realms') }}", request, function( data, status, xhr ) {
 				realm_cache[ term ] = data['data'];
-				response( data );
+				response( data['data'] );
 			});
 		},
 		select: function(event, ui) {
