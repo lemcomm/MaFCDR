@@ -27,7 +27,7 @@ class CharacterTransformer implements DataTransformerInterface {
 			return null;
 		}
 		# First strip it of all non-numeric characters and see if we can find a character.
-		$id = preg_replace('/(?:[^123456790]*)/', '', $input);
+		$id = preg_replace('/(?:[^1234567890]*)/', '', $input);
 		if ($id) {
 			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('id'=>$id, 'alive' => TRUE));
 		} else {
