@@ -382,7 +382,7 @@ class UnitController extends Controller {
 	  */
 
         public function unitAssignAction(Request $request, Unit $unit) {
-                $character = $this->gateway('unitManageTest', $unit);
+                $character = $this->gateway('unitAssignTest', $unit);
                 # Distpatcher->getTest('test', default, default, default, UnitId)
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
