@@ -100,12 +100,29 @@ class UnitDispatcher extends Dispatcher {
 		return $this->action("unit.new", "maf_unit_new");
 	}
 
-	public function unitManageTest($ignored, Unit $unit) {
+	public function unitAssignTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $unit->getSettlement();
 		if ($unit->getTravelDays() > 0) {
-			return array("name"=>"unit.appoint.name", "description"=>"unavailable.rebasing");
+			return array("name"=>"unit.assign.name", "description"=>"unavailable.rebasing");
 		}
+		# TODO: Break this function into a separate unitAssignTest and unitSettingsTest. Combining them like this is going to be a problem eventually.
+		if (!$character->getUnits()->contains($unit)) {
+			if($settlement && (!$this->pm->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character)) {
+				if($unit->getSettlement() != $character->getInsideSettlement()) {
+					return array("name"=>"unit.assign.name", "description"=>"unavailable.notinside");
+				}
+				return array("name"=>"unit.assign.name", "description"=>"unavailable.notmarshal");
+			}
+		} elseif ($unit->getCharacter() != $character) {
+			return array("name"=>"unit.assign.name", "description"=>"unavailable.notyourunit");
+		}
+		return $this->action("unit.assign.name", "maf_unit_manage");
+	}
+
+	public function unitManageTest($ignored, Unit $unit) {
+		$character = $this->getCharacter();
+		$settlement = $unit->getSettlement();
 		# TODO: Break this function into a separate unitAssignTest and unitSettingsTest. Combining them like this is going to be a problem eventually.
 		if (!$character->getUnits()->contains($unit)) {
 			if($settlement && (!$this->pm->checkSettlementPermission($settlement, $character, 'units') && $unit->getMarshal() != $character)) {
@@ -115,7 +132,7 @@ class UnitDispatcher extends Dispatcher {
 				return array("name"=>"unit.manage.name", "description"=>"unavailable.notmarshal");
 			}
 		} elseif ($unit->getCharacter() != $character) {
-			return array("name"=>"unit.new.name", "description"=>"unavailable.notyourunit");
+			return array("name"=>"unit.manage.name", "description"=>"unavailable.notyourunit");
 		}
 		return $this->action("unit.manage.name", "maf_unit_manage");
 	}
