@@ -34,6 +34,10 @@ class CharacterTransformer implements DataTransformerInterface {
 			# Presumably, that wasn't an ID. Assume it's just a name. Strip out parantheses and numbers.
 			$name = trim(preg_replace('/(?:[123456790()]*)/', '', $input));
 			$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('name' => $name, 'alive' => TRUE), array('id' => 'ASC'));
+			if (!$character) {
+				$name = preg_replace('/(<\/i>)+/', '', preg_replace('/(<i>)+/', '', $name));
+				$character = $this->om->getRepository('BM2SiteBundle:Character')->findOneBy(array('known_as' => $name, 'alive' => TRUE), array('id' => 'ASC'));
+			}
 		}
 
 		if (!$character) {
