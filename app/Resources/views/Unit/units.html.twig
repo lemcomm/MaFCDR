@@ -28,16 +28,16 @@
 		{% elseif not unit.obj.settlement == null %}
 			<br />{{ 'unit.list.nomarshal'|trans({}, "actions")|raw }}
 		{% endif %}
-		{% if unit.obj.travelDays %}
+		{% if unit.obj.travelDays > 0 %}
 			<br />{{ 'unit.list.traveling'|trans({"%days%":unit.obj.travelDays}, "actions")|raw }}
 		{% endif %}
 		<br /><br />
         	<a href="{{ path('maf_unit_manage', {"unit":id}) }}"><button id="manage">{{ 'unit.list.manage'|trans({},"actions") }}</button></a>
 		 | <a href="{{ path('maf_unit_soldiers', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.review'|trans({},"actions") }}</button></a>
 		{% if unit.owner %}
-			{% if not unit.obj.character and not unit.obj.travelDays %}
+			{% if not unit.obj.character and unit.obj.travelDays < 1 %}
 				 | <a href="{{ path('maf_unit_assign', {"unit":id}) }}"><button id="assign">{{ 'unit.list.assign'|trans({},"actions") }}</button></a>
-			{% elseif unit.obj.character != character and unit.base and not unit.obj.travelDays %}
+			{% elseif unit.obj.character != character and unit.base and unit.obj.travelDays < 1 %}
 				 | <a href="{{ path('maf_unit_recall', {"unit":id}) }}"><button id="assign">{{ 'unit.list.recall'|trans({},"actions") }}</button></a>
 			{% endif %}
 			{% if unit.base %}
@@ -46,7 +46,7 @@
 			{% if unit.marshal %}
 				 | <a href="{{ path('maf_unit_revoke', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.revoke'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if character.insideSettlement != unit.obj.settlement and not unit.obj.travelDays %}
+			{% if character.insideSettlement != unit.obj.settlement and unit.obj.travelDays < 1 %}
 				 | <a href="{{ path('maf_unit_rebase', {"unit":id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
 			{% endif %}
 			{% if not unit.obj.travelDays %}
