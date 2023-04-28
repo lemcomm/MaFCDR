@@ -1408,6 +1408,9 @@ class GameRunner {
 				$added += $rtn['added']->count();
 			}
 		}
+		$this->logger->info("  Result: ".$total." assocs, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
 
 		if ($complete) {
 			$this->appstate->setGlobal('cycle.convs.assoc', 'complete');
