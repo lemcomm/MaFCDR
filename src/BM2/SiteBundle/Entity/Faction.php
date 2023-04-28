@@ -12,11 +12,14 @@ class Faction {
 		if ($this->ultimate!==false) {
 			return $this->ultimate;
 		}
-		if (!$superior=$this->getSuperior()) {
+		$superior = $this->getSuperior();
+		if (!$superior || $this === $superior) {
 			$this->ultimate=$this;
 		} else {
 			while ($superior->getSuperior()) {
-				$superior=$superior->getSuperior();
+				if ($superior->getSuperior() !== $superior) {
+					$superior=$superior->getSuperior();
+				}
 			}
 			$this->ultimate=$superior;
 		}
@@ -24,7 +27,7 @@ class Faction {
 	}
 
 	public function isUltimate() {
-		if ($this->findUltimate() == $this) return true;
+		if ($this->findUltimate() === $this) return true;
 		return false;
 	}
 
@@ -48,13 +51,15 @@ class Faction {
                         $all->add($this);
                 }
                 foreach ($this->getInferiors() as $inf) {
-                        $all->add($inf);
-                        $suball = $inf->findAllInferiors();
-                        foreach ($suball as $sub) {
-                                if (!$all->contains($sub)) {
-                                        $all->add($sub);
-                                }
-                        }
+			if ($inf !== $this) {
+	                        $all->add($inf);
+	                        $suball = $inf->findAllInferiors();
+	                        foreach ($suball as $sub) {
+	                                if (!$all->contains($sub)) {
+	                                        $all->add($sub);
+	                                }
+	                        }
+			}
                 }
                 return $all;
         }
@@ -62,8 +67,8 @@ class Faction {
 	public function findDeadInferiors() {
 		$all = new ArrayCollection;
 		foreach ($this->getInferiors() as $sub) {
-			if (!$sub->getActive()) {
-			$all->add($sub);
+			if (!$sub->getActive() && $sub !== $this) {
+				$all->add($sub);
 			}
 		}
 
@@ -76,11 +81,13 @@ class Faction {
 			$all->add($this);
 		}
 		if ($superior = $this->getSuperior()) {
-			$all->add($superior);
-			$supall = $superior->findAllSuperiors();
-			foreach ($supall as $sup) {
-				if (!$all->contains($sup)) {
-					$all->add($sup);
+			if ($superior !== $this) {
+				$all->add($superior);
+				$supall = $superior->findAllSuperiors();
+				foreach ($supall as $sup) {
+					if (!$all->contains($sup)) {
+						$all->add($sup);
+					}
 				}
 			}
 		}
