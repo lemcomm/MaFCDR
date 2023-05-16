@@ -872,7 +872,7 @@ class Economy {
 	public function TradeBalance(Settlement $settlement, ResourceType $resource) {
 		$amount = 0;
 
-		if ($settlement->getSiege() && $settlement->getSiege()->getEncirlced()) {
+		if ($settlement->getSiege() && $settlement->getSiege()->getEncircled()) {
 			return $amount;
 		}
 
