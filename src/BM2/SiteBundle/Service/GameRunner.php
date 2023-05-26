@@ -788,7 +788,12 @@ class GameRunner {
 					break;
 				}
 			}
-			$this->logger->info("Unit ".$unit->getId()." initial food quantity: ".$food." and soldier count of ".$count);
+			if ($fsupply) {
+				$this->logger->info("Unit ".$unit->getId()." initial food quantity: ".$food." from ".$fsupply->getId()." from unit ".$fsupply->getUnit()->getId()." and soldier count of ".$count);
+			} else {
+				$this->logger->info("Unit ".$unit->getId()." initial food quantity: ".$food." and soldier count of ".$count);
+			}
+
 			if ($count <= $food) {
 				$short = 0;
 			} else {
