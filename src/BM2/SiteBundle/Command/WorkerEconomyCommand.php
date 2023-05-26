@@ -32,7 +32,7 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 		$this->em = $container->get('doctrine')->getManager();
 		$this->generator = $container->get('generator');
 		$this->economy = $container->get('economy');
-		$history = $container->get('history');
+	        $logger = $this->getContainer()->get('logger');
 		$start = $input->getArgument('start');
 		$end = $input->getArgument('end');
 
@@ -74,9 +74,11 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 						} else {
 							$shortage = ($demand - $available) / $available;
 						}
-		//				$this->logger->debug("food in ".$settlement->getName()." (".$settlement->getId()."): $production + $tradebalance (+storage) = $available of $demand = ".(round($shortage*100)/100));
+						$logger->info("food in ".$settlement->getName()." (".$settlement->getId()."): $production + $tradebalance (+storage) = $available of $demand = ".(round($shortage*100)/100));
 						$this->economy->FoodSupply($settlement, $shortage);
 					}
+				} else {
+					$logger->info("skipping ".$settlement->getName()." (".$settlement->getId().") as it is encircled.");
 				}
 			}
 
@@ -84,7 +86,7 @@ class WorkerEconomyCommand extends ContainerAwareCommand {
 			if ($settlement->getOwner()) {
 				// no tax collection in free settlements
 				if (is_nan($WealthProduction)) {
-	//				$this->logger->warning("NAN for WealthProduction for ".$settlement->getId()."/".$resource->getType()->getName());
+	//				$logger->warning("NAN for WealthProduction for ".$settlement->getId()."/".$resource->getType()->getName());
 				} else {
 					$settlement->setGold(round($settlement->getGold() * 0.9 + $WealthProduction));
 				}
