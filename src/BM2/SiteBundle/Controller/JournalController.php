@@ -75,9 +75,6 @@ class JournalController extends Controller {
 		if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();
 			$journal = $this->newJournal($character, $data);
-			if(!$journal->isPrivate() && !$journal->isGraphic()) {
-				$this->get('notification_manger')->spoolJournal($journal);
-			}
 
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
@@ -132,6 +129,9 @@ class JournalController extends Controller {
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($journal);
 			$em->flush();
+                        if(!$journal->isPrivate() && !$journal->isGraphic()) {
+                                $this->get('notification_manager')->spoolJournal($journal);
+                        }
 			$this->addFlash('notice', $this->get('translator')->trans('journal.write.success', array(), 'messages'));
 			return $this->redirectToRoute('maf_journal_mine');
 		}
@@ -162,6 +162,9 @@ class JournalController extends Controller {
   			$em = $this->getDoctrine()->getManager();
   			$em->persist($journal);
   			$em->flush();
+                        if(!$journal->isPrivate() && !$journal->isGraphic()) {
+                                $this->get('notification_manager')->spoolJournal($journal);
+                        }
   			$this->addFlash('notice', $this->get('translator')->trans('journal.write.success', array(), 'messages'));
   			return $this->redirectToRoute('maf_journal_mine');
   		}
