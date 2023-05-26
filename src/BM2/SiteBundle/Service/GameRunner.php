@@ -670,7 +670,7 @@ class GameRunner {
 			$unit->setDestination(null);
 		}
 		if ($count) {
-			foreach ($units as $each) {
+			foreach ($units as $unit) {
 				if ($settlement = $unit->getSettlement()) {
 					$this->history->logEvent(
 						$settlement,
@@ -772,6 +772,7 @@ class GameRunner {
 				break;
 			}
 			$unit = $row[0];
+			$this->logger->info("Unit ".$unit->getId());
 			$living = $unit->getLivingSoldiers();
 			$count = $living->count();
 			if ($count < 1) {
@@ -787,16 +788,18 @@ class GameRunner {
 					break;
 				}
 			}
+			$this->logger->info("Unit ".$unit->getId()." initial food quantity: ".$food." and soldier count of ".$count);
 			if ($count <= $food) {
 				$short = 0;
 			} else {
 				$need = $count - $food;
-				$origNeed = $need;
+				$this->logger->info("Need ".$need." more food");
 				if ($char) {
 					$food_followers = $char->getEntourage()->filter(function($entry) {
 						return ($entry->getType()->getName()=='follower' && $entry->isAlive() && !$entry->getEquipment() && $entry->getSupply()>0);
 					})->toArray();
 					if (!empty($food_followers)) {
+						$this->logger->info("Checking followers...");
 						foreach ($food_followers as $ent) {
 							if ($ent->getSupply() > $need) {
 								$supply2 = $ent->getSupply()-$need;
@@ -815,6 +818,7 @@ class GameRunner {
 				} else {
 					$short = 0;
 				}
+				$this->logger->info("Final short of ".$short);
 			}
 			$available = $count-$short;
 			if ($available > 0) {
@@ -822,6 +826,7 @@ class GameRunner {
 			} else {
 				$var = 0;
 			}
+			$this->logger->info("Available food of ".$available." from a count of ".$count." less a short of ".$short);
 			$dead = 0;
 			$myfed = 0;
 			$mystarved = 0;
@@ -1408,6 +1413,9 @@ class GameRunner {
 				$added += $rtn['added']->count();
 			}
 		}
+		$this->logger->info("  Result: ".$total." assocs, ".$convs." conversations, ".$added." added permissions, ".$removed." removed permissions");
+		$this->em->flush();
+		$this->em->clear();
 
 		if ($complete) {
 			$this->appstate->setGlobal('cycle.convs.assoc', 'complete');
