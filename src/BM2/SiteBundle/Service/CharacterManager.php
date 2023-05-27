@@ -818,91 +818,109 @@ class CharacterManager {
 		$house = $character->getHeadOfHouse();
 		$successor = false;
 		$difhouse = false;
-		if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
+		$difhead = false;
+		$notheir = false;
+		$superior = false;
+		if ($house->getSuccessor() && $house->getSuccessor()->getHouse() === $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
 			# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
 			$successor = $house->getSuccessor();
-		} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
-			$character->getSuccessor()->getHouse() == $character->getHouse() OR (
-				$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
-			)
-		)) {
-			$successor = $character->getSuccessor();
-			if ($successor->getHouse() !== $character->getHouse()) {
+		} elseif ($character->getSuccessor() && $character->getSuccessor()->isActive(true)) {
+			$heir = $character->getSuccessor();
+			if ($heir->getHouse() === $character->getHouse()) {
+				# Successor is heir in this house.
+				$successor = $heir;
+			} elseif ($heir->getHouse() && $heir->getHouse() !== $character->getHouse()) {
+				# Successor is heir but in a different house.
 				$difhouse = true;
+				if ($heir->getHouse()->getHead() === $heir) {
+					# Heir is head of a house, we'll need a different one.
+					$difhead = true;
+					$superior = $heir->getHouse();
+				} else {
+					# Heir isn't head of a house, we can use them.
+					$successor = $heir;
+				}
 			}
 		}
-		if ($successor && $successor->getHouse() && $successor->getHouse()->getHead() !== $successor) {
-			$house->setHead($successor);
-			$successor->setHouse($house);
-			$house->setSuccessor(null);
-			if (!$difhouse) {
-				$this->history->logEvent(
-					$house,
-					'event.house.inherited.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-					History::ULTRA, true
-				);
-			} else {
-				$this->history->logEvent(
-					$house,
-					'event.house.merged.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
-					History::ULTRA, true
-				);
-				$this->history->logEvent(
-					$successor->getHouse(),
-					'event.house.merged.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$successor->getHouse()->getId()),
-					History::ULTRA, true
-				);
-				$house->setSuperior($successor->getHouse());
-			}
-			if ($home = $house->getHome()) {
-				$home->setOwner($successor);
-				$this->history->logEvent(
-					$house,
-					'event.place.inherited.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
-					History::ULTRA, true
-				);
-			}
-		} else {
-			$best = null;
+		if (!$successor || $difhead) {
+			# No valid inheritor, lets see if we can find someone in the house to run it.
 			foreach ($house->findAllActive() as $member) {
-				if ($best === null && $member != $character) {
-					$best = $member;
-				}
-				if ($member->getHouseJoinDate() < $best->getHouseJoinDate() && $member != $character) {
-					$best = $member;
-				}
-			}
-			$house->setHead($best);
-			$house->setSuccessor(null);
-			if ($best !== null) {
-				$this->history->logEvent(
-					$house,
-					'event.house.newhead.'.$why,
-					array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$best->getId()),
-					History::ULTRA, true
-				);
-			} else {
-				$house->setActive(false);
-				$this->history->logEvent(
-					$house,
-					'event.house.collapsed.'.$why,
-					array(),
-					History::ULTRA, true
-				);
-				if ($home = $house->getHome()) {
-					$home->setOwner(null);
-					$this->history->logEvent(
-						$home,
-						'event.place.abandoned.'.$why,
-						array('%link-house%'=>$house->getId(), '%link-character%'=>$character->getId()),
-						History::ULTRA, true
-					);
+				if ($member !== $character) {
+					if (!$successor) {
+						$successor = $member;
+					}
+					if ($member->getHouseJoinDate() < $successor->getHouseJoinDate()) {
+						$successor = $member;
+					}
 				}
 			}
+			$notheir = true;
+		}
+		if (!$successor) {
+			# No inheritor, house has collapsed.
+			$house->setActive(false);
+			$this->history->logEvent(
+				$house,
+				'event.house.collapsed.'.$why,
+				array(),
+				History::ULTRA, true
+			);
+			if ($home = $house->getHome()) {
+				$home->setOwner(null);
+				$this->history->logEvent(
+					$home,
+					'event.place.abandoned.'.$why,
+					array('%link-house%'=>$house->getId(), '%link-character%'=>$character->getId()),
+					History::ULTRA, true
+				);
+			}
+			return;
+		}
+		# Handle house realingments.
+		if ($difhouse) {
+			if ($superior->findAllSuperiors()->contains($house)) {
+				# This house is an inferior of the heir, time to flip things.
+				if ($house->getSuperior()) {
+					# House has a superior, we move the superior up.
+					$superior->setSuperior($house->getSuperior());
+				} else {
+					# No superior above the house, just remove superior's superior.
+					$superior->setSuperior();
+				}
+				# Set house's new superior.
+				$house->setSuperior($superior);
+			}
+			$this->history->logEvent(
+				$house,
+				'event.house.merged.'.$why,
+				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$superior->getId()),
+				History::ULTRA, true
+			);
+			$this->history->logEvent(
+				$superior,
+				'event.house.merged.'.$why,
+				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$superior->getId()),
+				History::ULTRA, true
+			);
+		}
+		# $successor must be a Character at this point or we'd have failed out. Make them Head.
+		$house->setHead($successor);
+		if ($notheir) {
+			# Not direct heir, we had to find a new one.
+			$this->history->logEvent(
+				$house,
+				'event.house.newhead.'.$why,
+				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+				History::ULTRA, true
+			);
+		} else {
+			# Direct heir.
+			$this->history->logEvent(
+				$house,
+				'event.house.inherited.'.$why,
+				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId()),
+				History::ULTRA, true
+			);
 		}
 	}
 
