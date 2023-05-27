@@ -816,25 +816,24 @@ class CharacterManager {
 
 	public function houseInheritance(Character $character, $why = 'death') {
 		$house = $character->getHeadOfHouse();
-		$inheritor = false;
+		$successor = false;
 		$difhouse = false;
 		if ($house->getSuccessor() && $house->getSuccessor()->getHouse() == $character->getHouse() && !$house->getSuccessor()->isActive(true)) {
 			# House has a successor, this takes priority, so long as they're also in the house and active (alive, not slumbering or retired)
-			$inheritor = true;
 			$successor = $house->getSuccessor();
 		} else if ($character->getSuccessor() && $character->getSuccessor()->isActive(true) && (
 			$character->getSuccessor()->getHouse() == $character->getHouse() OR (
 				$character->findImmediateRelatives()->contains($character->getSuccessor()) AND $character->getSuccessor()->getHouse()
 			)
 		)) {
-			$inheritor = true;
 			$successor = $character->getSuccessor();
-			if ($successor->getHouse() != $character->getHouse()) {
+			if ($successor->getHouse() !== $character->getHouse()) {
 				$difhouse = true;
 			}
 		}
-		if ($inheritor) {
+		if ($successor && $successor->getHouse() && $successor->getHouse()->getHead() !== $successor) {
 			$house->setHead($successor);
+			$successor->setHouse($house);
 			$house->setSuccessor(null);
 			if (!$difhouse) {
 				$this->history->logEvent(
@@ -857,7 +856,6 @@ class CharacterManager {
 					History::ULTRA, true
 				);
 				$house->setSuperior($successor->getHouse());
-				$successor->setHouse($house);
 			}
 			if ($home = $house->getHome()) {
 				$home->setOwner($successor);
