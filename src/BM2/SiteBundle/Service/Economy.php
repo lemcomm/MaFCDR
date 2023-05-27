@@ -577,8 +577,9 @@ class Economy {
 
 		$qty = $count - $deduct;
 		$here = false;
-		if (!$unit->getCharacter() || ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() == $settlement) || ($unit->getPlace() && $unit->getPlace()->getInsideSettlement() == $settlement)) {
+		if (!$unit->getCharacter() || ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() === $settlement) || ($unit->getPlace() && $unit->getPlace()->getSettlement() === $settlement)) {
 			$here = true;
+			$this->logger->info($unit->getId()." is inside it's settlement.");
 		}
 		if ($qty > 0 && !$here) {
 			$supply = new Resupply();
@@ -588,6 +589,7 @@ class Economy {
 			$supply->setType('food');
 			$supply->setQuantity(ceil($qty));
 			$supply->setTravelDays(round($this->getSupplyTravelTime($settlement, $unit)));
+			$this->logger->info("Sent ".$unit->getId()." ".ceil($qty)." food of $count requested.");
 		} elseif ($qty > 0 && $here) {
 			$found = false;
 			if ($unit->getSupplies()) {
@@ -606,6 +608,7 @@ class Economy {
 				$supply->setType('food');
 				$supply->setQuantity(ceil($qty));
 			}
+			$this->logger->info("Directly delivered ".$unit->getId()." ".ceil($qty)." food of $count requested.");
 		}
 		return true;
 	}
