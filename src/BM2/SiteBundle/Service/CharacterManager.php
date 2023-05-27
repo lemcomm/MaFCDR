@@ -903,7 +903,8 @@ class CharacterManager {
 				History::ULTRA, true
 			);
 		}
-		# $successor must be a Character at this point or we'd have failed out. Make them Head.
+		# $successor must be a Character at this point or we'd have failed out. Make them Head and make sure their house is correct.
+		$successor->setHouse($house);
 		$house->setHead($successor);
 		if ($notheir) {
 			# Not direct heir, we had to find a new one.
