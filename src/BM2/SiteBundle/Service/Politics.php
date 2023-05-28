@@ -334,6 +334,7 @@ class Politics {
 				if ($oldowner && $oldowner->isAlive() && !$oldowner->getSlumbering()) {
 					$this->addClaim($oldowner, $settlement, true, false);
 				}
+				$realm = null;
 				foreach ($settlement->getVassals() as $vassal) {
 					$vassal->setLiegeLand(null);
 					$vassal->setOathCurrent(false);
@@ -762,7 +763,7 @@ class Politics {
 			case 'change':	// settlement owner has decided to change
 				if ($newrealm) {
 					$this->history->logEvent(
-						$settlement,
+						$place,
 						'event.place.changed',
 						array('%link-realm%'=>$newrealm->getId()),
 						History::MEDIUM
@@ -801,7 +802,7 @@ class Politics {
 			case 'fail': // my realm has failed
 				if ($newrealm) {
 					$this->history->logEvent(
-						$settlement,
+						$place,
 						'event.place.realmfail2',
 						array("%link-realm-1%"=>$newrealm->getId(), "%link-realm-2%"=>$oldrealm->getId()),
 						History::HIGH, true
@@ -809,7 +810,7 @@ class Politics {
 					// TODO: message for new realm
 				} else {
 					$this->history->logEvent(
-						$settlement,
+						$place,
 						'event.place.realmfail',
 						array("%link-realm%"=>$oldrealm->getId()),
 						History::HIGH, true
@@ -820,7 +821,7 @@ class Politics {
 				$this->history->logEvent(
 					$oldrealm,
 					'event.place.lost',
-					array('%link-settlement%'=>$settlement->getId()),
+					array('%link-settlement%'=>$place->getId()),
 					History::MEDIUM
 				);
 				break;

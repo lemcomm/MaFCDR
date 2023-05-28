@@ -5,9 +5,14 @@
 			<generator strategy="IDENTITY"/>
 		</id>
 		<field name="ip" type="string" nullable="true"/>
+		<field name="agent" type="text" nullable="true"/>
+		<one-to-many field="logs" target-entity="UserLog" mapped-by="user"/>
+
+
 		<field name="display_name" type="string"/>
 		<field name="gm_name" type="string" nullable="true"/>
 		<field name="public_admin" type="boolean" nullable="true"/>
+		<field name="watched" type="boolean" nullable="true"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
