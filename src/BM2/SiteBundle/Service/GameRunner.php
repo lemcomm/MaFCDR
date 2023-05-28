@@ -78,6 +78,11 @@ class GameRunner {
 			$stopwatch = new Stopwatch();
 		}
 
+		$old = new \DateTime("-90 days");
+		$query = $this->em->createQuery('DELETE FROM BM2SiteBundle:UserLog u WHERE u.ts < :old');
+		$query->setParameter('old', $old);
+		$query->execute();
+
 		switch ($type) {
 			case 'update':		$pattern = '/^update(.+)$/';
 									$this->speedmod = 1/6; // since this happens every hour and not just every 6 hours
