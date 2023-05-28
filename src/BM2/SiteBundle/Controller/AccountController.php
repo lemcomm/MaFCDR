@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Controller;
 use BM2\SiteBundle\Entity\User;
 use BM2\SiteBundle\Entity\AppKey;
 
+use BM2\SiteBundle\Entity\UserLog;
 use BM2\SiteBundle\Form\CharacterCreationType;
 use BM2\SiteBundle\Form\ListSelectType;
 use BM2\SiteBundle\Form\NpcSelectType;
@@ -51,6 +52,36 @@ class AccountController extends Controller {
 		}
 
 		return array($announcements, $notices);
+	}
+
+	private function logUser($user, $route) {
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		$agent = $_SERVER['HTTP_USER_AGENT'];
+		if ($user->getIp() != $ip) {
+			$user->setIp($ip);
+		}
+		if ($user->getAgent() != $agent) {
+			$user->setAgent($agent);
+		}
+		$em = $this->getDoctrine()->getManager();
+		if ($user->getWatched()) {
+			$entry = new UserLog;
+			$em->persist($entry);
+			$entry->setTs(new \DateTime('now'));
+			$entry->setUser($user);
+			$entry->setIp($ip);
+			$entry->setAgent($agent);
+			$entry->setRoute($route);
+		}
+		$em->flush();
 	}
 
 	/**
@@ -313,20 +344,7 @@ class AccountController extends Controller {
 
 		$list_form = $this->createForm(new ListSelectType);
 
-		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-			//ip from share internet
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-			//ip pass from proxy
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}else{
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-
-		if ($user->getIp() != $ip) {
-			$user->setIp($ip);
-			$em->flush();
-		}
+		$this->logUser($user, 'characters');
 
 		foreach ($user->getPatronizing() as $patron) {
 			if ($patron->getUpdateNeeded()) {
@@ -704,6 +722,8 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
+		$logic = $request->query->get('logic');
+		$this->logUser($user, 'play_char_'.$id.'_'.$logic);
 		$this->checkCharacterLimit($user);
 
 		$em = $this->getDoctrine()->getManager();
@@ -730,7 +750,7 @@ class AccountController extends Controller {
 		}
 
 		$this->get('appstate')->setSessionData($character);
-		switch ($request->query->get('logic')) {
+		switch ($logic) {
 			case 'play':
 				$character->setLastAccess(new \DateTime("now"));
 				$character->setSlumbering(false);
