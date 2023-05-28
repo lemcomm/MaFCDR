@@ -845,7 +845,9 @@ class CharacterManager {
 		if (!$successor || $difhead) {
 			# No valid inheritor, lets see if we can find someone in the house to run it.
 			foreach ($house->findAllActive() as $member) {
-				if ($member !== $character) {
+				# Filter out the character who is passing things one.
+				# Also filter out subordinate house members. Inheritor *must* be from *this* house.
+				if ($member !== $character && $member->getHouse() === $house) {
 					if (!$successor) {
 						$successor = $member;
 					}
@@ -855,26 +857,6 @@ class CharacterManager {
 				}
 			}
 			$notheir = true;
-		}
-		if (!$successor) {
-			# No inheritor, house has collapsed.
-			$house->setActive(false);
-			$this->history->logEvent(
-				$house,
-				'event.house.collapsed.'.$why,
-				array(),
-				History::ULTRA, true
-			);
-			if ($home = $house->getHome()) {
-				$home->setOwner(null);
-				$this->history->logEvent(
-					$home,
-					'event.place.abandoned.'.$why,
-					array('%link-house%'=>$house->getId(), '%link-character%'=>$character->getId()),
-					History::ULTRA, true
-				);
-			}
-			return;
 		}
 		# Handle house realingments.
 		if ($difhouse) {
@@ -902,6 +884,28 @@ class CharacterManager {
 				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$superior->getId()),
 				History::ULTRA, true
 			);
+		}
+		# Handle the lack of inheritance (this is deliberately after changing house allegiances.
+		if (!$successor) {
+			# No inheritor, house has collapsed.
+			$house->setActive(false);
+			$this->history->logEvent(
+				$house,
+				'event.house.collapsed.'.$why,
+				array(),
+				History::ULTRA, true
+			);
+			if ($home = $house->getHome()) {
+				$home->setOwner(null);
+				$this->history->logEvent(
+					$home,
+					'event.place.abandoned.'.$why,
+					array('%link-house%'=>$house->getId(), '%link-character%'=>$character->getId()),
+					History::ULTRA, true
+				);
+			}
+			# No successor, terminate early, nothing to do for the rest of this code.
+			return;
 		}
 		# $successor must be a Character at this point or we'd have failed out. Make them Head and make sure their house is correct.
 		$successor->setHouse($house);
