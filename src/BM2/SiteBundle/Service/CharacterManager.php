@@ -875,13 +875,13 @@ class CharacterManager {
 			$this->history->logEvent(
 				$house,
 				'event.house.merged.'.$why,
-				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$superior->getId()),
+				array('%link-house%'=>$superior->getId()),
 				History::ULTRA, true
 			);
 			$this->history->logEvent(
 				$superior,
-				'event.house.merged.'.$why,
-				array('%link-character-1%'=>$character->getId(), '%link-character-2%'=>$successor->getId(), '%link-house-1%'=>$house->getId(), '%link-house-2%'=>$superior->getId()),
+				'event.house.merged2.'.$why,
+				array('%link-house%'=>$house->getId()),
 				History::ULTRA, true
 			);
 		}
