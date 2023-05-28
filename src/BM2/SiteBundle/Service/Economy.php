@@ -293,8 +293,11 @@ class Economy {
 						}
 					} else {
 						# If we only have one capital here, is it of one of our superior realms or our own realm?
-						if (in_array($settlement->getCapitalOf()->getId(), $realmids)) {
-							$matchedrealms = true;
+						foreach ($settlement->getCapitalOf() as $each) {
+							if (in_array($each->getId(), $realmids)) {
+								$matchedrealms = true;
+								break;
+							}
 						}
 					}
 				}
@@ -577,9 +580,12 @@ class Economy {
 
 		$qty = $count - $deduct;
 		$here = false;
-		if (!$unit->getCharacter() || ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() === $settlement) || ($unit->getPlace() && $unit->getPlace()->getSettlement() === $settlement)) {
+		if (!$unit->getCharacter() && $unit->getSettlement() === $settlement) {
 			$here = true;
 			$this->logger->info($unit->getId()." is inside it's settlement.");
+		} elseif ($unit->getCharacter() && $unit->getCharacter()->getInsideSettlement() === $settlement) {
+			$here = true;
+			$this->logger->info($unit->getId()." is inside it's settlement due to it's leader.");
 		}
 		if ($qty > 0 && !$here) {
 			$supply = new Resupply();
