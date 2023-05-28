@@ -397,6 +397,10 @@ event:
    death:       After the passing of its leader, due to another house taking leadership, became a cadet of %house%.
    retire:      After the retirement of its leader, due to another house taking leadership, became a cadet of %house%.
    slumber:     After the slumber of its leader, due to another house taking leadership, became a cadet of %house%.
+  merged2:
+   death:       After the passing of its leader, took over control of %house%.
+   retire:      After the retirement of its leader, took over control of %house%.
+   slumber:     After the slumber of its leader, took over control of %house%.
   inherited:
    death:       After the passing of its leader, %character% has inherited leadership.
    retire:      After the retirement of its leader, %character% has inherited leadership.
