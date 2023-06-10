@@ -7,6 +7,7 @@ use BM2\SiteBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use TorUtils\TorUtils;
 
 
 /**
@@ -21,9 +22,6 @@ class DefaultController extends Controller {
 		$em = $this->getDoctrine()->getManager();
 		$query = $em->createQuery('SELECT j from BM2SiteBundle:Journal j WHERE j.public = true AND j.graphic = false AND j.pending_review = false AND j.GM_private = false AND j.GM_graphic = false ORDER BY j.date DESC')->setMaxResults(3);
 		$journals = $query->getResult();
-		foreach ($journals as $journal) {
-
-		}
 		return $this->render('Default/index.html.twig', [
 			"simple"=>true,
 			"journals"=>$journals
@@ -141,6 +139,16 @@ class DefaultController extends Controller {
 			"user"=>$user,
 			"gm"=>$gm,
 		]);
+	}
+
+	/**
+	 * @Route("/needIP", name="maf_ip_req")
+	 */
+	public function ipReqAction() {
+		if ($this->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+			$this->get('appstate')->logUser($this->getUser(), 'ip_req', true);
+		}
+		return $this->render('Default/needip.html.twig');
 	}
 
 	/**
