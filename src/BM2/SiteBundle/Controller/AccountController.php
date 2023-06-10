@@ -22,6 +22,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,36 +55,6 @@ class AccountController extends Controller {
 		return array($announcements, $notices);
 	}
 
-	private function logUser($user, $route) {
-		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-			//ip from share internet
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-			//ip pass from proxy
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}else{
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		$agent = $_SERVER['HTTP_USER_AGENT'];
-		if ($user->getIp() != $ip) {
-			$user->setIp($ip);
-		}
-		if ($user->getAgent() != $agent) {
-			$user->setAgent($agent);
-		}
-		$em = $this->getDoctrine()->getManager();
-		if ($user->getWatched()) {
-			$entry = new UserLog;
-			$em->persist($entry);
-			$entry->setTs(new \DateTime('now'));
-			$entry->setUser($user);
-			$entry->setIp($ip);
-			$entry->setAgent($agent);
-			$entry->setRoute($route);
-		}
-		$em->flush();
-	}
-
 	/**
 	  * @Route("/", name="bm2_account")
 	  */
@@ -95,6 +66,10 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
+		$app = $this->get('appstate');
+		if ($app->exitsCheck($user)) {
+			return $this->redirectToRoute('maf_ip_req');
+		}
 
 		// clean out character id so we have a clear slate (especially for the template)
 		$user->setCurrentCharacter(null);
@@ -170,6 +145,10 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
+		$app = $this->get('appstate');
+		if ($app->exitsCheck($user)) {
+			return $this->redirectToRoute('maf_ip_req');
+		}
 		$em = $this->getDoctrine()->getManager();
 
 		// clean out character id so we have a clear slate (especially for the template)
@@ -344,7 +323,7 @@ class AccountController extends Controller {
 
 		$list_form = $this->createForm(new ListSelectType);
 
-		$this->logUser($user, 'characters');
+		$app->logUser($user, 'characters');
 
 		foreach ($user->getPatronizing() as $patron) {
 			if ($patron->getUpdateNeeded()) {
@@ -722,8 +701,12 @@ class AccountController extends Controller {
 			throw new AccessDeniedException('error.banned.tos');
 		}
 		$user = $this->getUser();
+		$app = $this->get('appstate');
+		if ($app->exitsCheck($user)) {
+			return $this->redirectToRoute('maf_ip_req');
+		}
 		$logic = $request->query->get('logic');
-		$this->logUser($user, 'play_char_'.$id.'_'.$logic);
+		$app->logUser($user, 'play_char_'.$id.'_'.$logic);
 		$this->checkCharacterLimit($user);
 
 		$em = $this->getDoctrine()->getManager();
