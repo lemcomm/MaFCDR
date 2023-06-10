@@ -13,6 +13,7 @@ pg_dump -C maf | gzip > $BACKUPDIR/maf-$DAY.sql.gz
 # sudo setfacl -R -m u:www-data:rwX -m u:maf:rwX /home/maf/symfony/app/cache /home/maf/symfony/app/logs /home/maf/symfony/app/spool
 # sudo setfacl -dR -m u:www-data:rwX -m u:maf:rwX /home/maf/symfony/app/cache /home/maf/symfony/app/logs /home/maf/symfony/app/spool
 
+php $APP maf:tor:update 2>&1 > $LOGDIR/exits-$DAY.log
 php $APP maf:process:expires --env=prod 2>&1 > $LOGDIR/turn-$DAY.log
 php $APP maf:process:economy --env=prod -t 2>&1 >> $LOGDIR/turn-$DAY.log
 php $APP maf:run -t -d turn --env=prod 2>&1 >> $LOGDIR/turn-$DAY.log
