@@ -13,6 +13,7 @@
 		<field name="gm_name" type="string" nullable="true"/>
 		<field name="public_admin" type="boolean" nullable="true"/>
 		<field name="watched" type="boolean" nullable="true"/>
+		<field name="bypass_exits" type="boolean" nullable="true"/>
 		<field name="created" type="datetime"/>
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
