@@ -5,6 +5,7 @@ namespace BM2\SiteBundle\Service;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Setting;
 use BM2\SiteBundle\Entity\User;
+use BM2\SiteBundle\Entity\UserLog;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -189,6 +190,56 @@ class AppState {
 		$query->setParameter('char', $character);
 		$query->setMaxResults(1);
 		return $query->getSingleResult();
+	}
+
+	public function findIp() {
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+			//ip from share internet
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			//ip pass from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip;
+	}
+
+	public function logUser($user, $route, $alwaysLog = false) {
+		$ip = $this->findIp();
+		$agent = $_SERVER['HTTP_USER_AGENT'];
+		if ($user) {
+			if ($user->getIp() != $ip) {
+				$user->setIp($ip);
+			}
+			if ($user->getAgent() != $agent) {
+				$user->setAgent($agent);
+			}
+		}
+		if ($user->getWatched() || $alwaysLog) {
+			$entry = new UserLog;
+			$this->em->persist($entry);
+			$entry->setTs(new \DateTime('now'));
+			$entry->setUser($user);
+			$entry->setIp($ip);
+			$entry->setAgent($agent);
+			$entry->setRoute($route);
+		}
+		$this->em->flush();
+	}
+
+	public function exitsCheck($user) {
+		if ($user->getBypassExits()) {
+			# Trusted user. Check bypassed.
+			return false;
+		}
+		$ip = $this->findIp();
+		if ($this->em->getRepository('BM2SiteBundle:NetExit')->findOneBy(['ip'=>$ip])) {
+			# Hit found, check failed.
+			return true;
+		}
+		# Nothing found, check passed.
+		return false;
 	}
 
 
