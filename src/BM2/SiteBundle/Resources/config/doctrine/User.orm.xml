@@ -15,6 +15,7 @@
 		<field name="watched" type="boolean" nullable="true"/>
 		<field name="bypass_exits" type="boolean" nullable="true"/>
 		<field name="created" type="datetime"/>
+		<field name="last_password" type="datetime" nullable="true"/>
 		<field name="new_chars_limit" type="smallint"/>
 		<field name="genome_set" type="string" length="26"/>
 		<field name="app_key" type="string"/>
