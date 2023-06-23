@@ -21,7 +21,7 @@ class Soldier extends NPC {
 		return "soldier #{$this->id} ({$this->getName()}, {$this->getType()}, base $base, char $char)";
 	}
 
-	public function isActive($include_routed=false) {
+	public function isActive($include_routed=false, $militia=false) {
 		if (!$this->isAlive() || $this->getTrainingRequired() > 0 || $this->getTravelDays() > 0) return false;
 		if ($this->getType()=='noble') {
 			// nobles have their own active check
@@ -32,6 +32,9 @@ class Soldier extends NPC {
 		if ($this->getExperience() > 10) $can_take++;
 		if ($this->getExperience() > 30) $can_take++;
 		if ($this->getExperience() > 100) $can_take++;
+		if ($militia) {
+			$can_take = $can_take * 10; # Militia are usually willing to fight, even wounded.
+		}
 		if (parent::getWounded() > $can_take) return false;
 		if (!$include_routed && $this->isRouted()) return false;
 		return true;

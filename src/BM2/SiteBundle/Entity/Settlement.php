@@ -79,11 +79,23 @@ class Settlement {
 	public function getTimeToTake(Character $taker, $supporters = null, $opposers = null) {
 		$supportCount = 1;
 		$opposeCount = 1;
+		$militia = 0;
 		if ($supporters) {
-			$supportCount = $supporters->count();
+			foreach ($supporters as $each) {
+				$supportCount += $each->countSoldiers();
+				$supportCount += 10; # Player Characters matter.
+			}
 		}
 		if ($opposers) {
-			$opposeCount = $opposers->count();
+			foreach ($opposers as $each) {
+				$opposeCount += $each->countSoldiers();
+				$opposeCount += 10; # Player characters matter.
+			}
+		}
+		foreach ($this->getUnits() as $unit) {
+			if ($unit->isLocal()) {
+				$militia += $unit->getActiveSoldiers()->count();
+			}
 		}
 		$enforce_claim = false;
 		foreach ($this->getClaims() as $claim) {
@@ -126,15 +138,22 @@ class Settlement {
 					$mod = 10;
 				}
 			}
+		} else {
+			$mod = 0.2;
 		}
 
 		// enforcing an enforceable claim makes things a lot faster
 		if ($enforce_claim) {
 			$time_to_take *= 0.2;
 		}
+		if ($this->getOccupant() && ($this->getOccupant() === $taker || $supporters->contains($this->getOccupant()))) {
+			$supportCount += $militia;
+		} else {
+			$opposeCount += $militia;
+		}
 		$time_to_take *= $mod;
 
-		$ratio = ($opposeCount/$supportCount);
+		$ratio = (($opposeCount*5)/$supportCount);
 
 		$time_to_take *= $ratio;
 
@@ -189,7 +208,7 @@ class Settlement {
 		}
 		foreach ($this->getUnits() as $unit) {
 			if ($unit->isLocal()) {
-				$militia += $unit->getActiveSoldiers()->count();
+				$militia += $unit->getMilitiaCount();
 			}
 		}
 		return $militia + $defenders;
@@ -238,7 +257,7 @@ class Settlement {
 		$walls = $this->getBuildings()->filter(
 			function($entry) {
 				if (!$entry->isActive() && abs($entry->getCondition())/$entry->getType()->getBuildHours() < 0.3) return false;
-				return in_array($entry->getType()->getName(), array('Palisade', 'Wood Wall', 'Stone Wall'));
+				return in_array($entry->getType()->getName(), array('Palisade', 'Wood Wall', 'Stone Wall', 'Fortress', 'Citadel'));
 			}
 		);
 		if (!$walls->isEmpty() && $this->isDefended()) return true;
