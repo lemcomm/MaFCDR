@@ -80,7 +80,6 @@ class Settlement {
 		$supportCount = 1;
 		$opposeCount = 1;
 		$militia = 0;
-		$mod = 1;
 		if ($supporters) {
 			foreach ($supporters as $each) {
 				$supportCount += $each->countSoldiers();
@@ -139,6 +138,8 @@ class Settlement {
 					$mod = 10;
 				}
 			}
+		} else {
+			$mod = 0.2;
 		}
 
 		// enforcing an enforceable claim makes things a lot faster
