@@ -20,12 +20,16 @@ class BattleGroup {
 			}
 		}
 
-		if ($this->battle->getSettlement() && $this->isDefender() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() == $this->battle->getSettlement()) {
-			foreach ($this->battle->getSettlement()->getUnits() as $unit) {
-				if ($unit->isLocal()) {
-					foreach ($unit->getActiveSoldiers() as $soldier) {
-						if ($soldier->isActive()) {
-							$this->soldiers->add($soldier);
+		if ($this->battle->getSettlement() && $this->battle->getSiege() && $this->battle->getSiege()->getSettlement() === $this->battle->getSettlement()) {
+			$type = $this->battle->getType();
+			if (($this->isDefender() && $type === 'siegeassault') || ($this->isAttacker() && $type === 'siegesortie')) {
+				foreach ($this->battle->getSettlement()->getUnits() as $unit) {
+					if ($unit->isLocal()) {
+						foreach ($unit->getSoldiers() as $soldier) {
+							if ($soldier->isActive(true, true)) {
+								$this->soldiers->add($soldier);
+								$soldier->setRouted(false);
+							}
 						}
 					}
 				}
