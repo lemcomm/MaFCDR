@@ -41,6 +41,16 @@ class SecurityController extends BaseController {
 
 		// last username entered by the user
 		$lastUsername = (null === $session) ? '' : $session->get($lastUsernameKey);
+		if ($error && $error->getMessageKey() === 'Account is disabled.') {
+			$em = $this->getDoctrine()->getManager();
+			$query = $em->createQuery('SELECT u from BM2SiteBundle:User u where LOWER(u.username) like :name and u.watched = true and u.enabled = false');
+			$query->setParameters(['name'=>$lastUsername]);
+			$query->setMaxResults(1);
+			$check = $query->getSingleResult();
+			if ($check) {
+				$this->addFlash('notice', 'This account was disabled for security reasons. To re-enable it, please reset your password using the link below.');
+			}
+		}
 
 		$csrfToken = $this->has('security.csrf.token_manager')
 		    ? $this->get('security.csrf.token_manager')->getToken('authenticate')->getValue()

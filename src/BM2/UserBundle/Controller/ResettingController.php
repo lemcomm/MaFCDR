@@ -188,6 +188,8 @@ class ResettingController extends BaseController
                         FOSUserEvents::RESETTING_RESET_COMPLETED,
                         new FilterUserResponseEvent($user, $request, $response)
                         );
+                        $user->setLastPassword(new \DateTime('now'));
+                        $this->getDoctrine()->getManager()->flush();
 
                         return $response;
                 }

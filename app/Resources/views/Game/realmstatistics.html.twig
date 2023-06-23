@@ -23,7 +23,7 @@
 	<tbody>
 	{% for data in realms %}
 		<tr>
-			<td><a href="{{ path('bm2_site_game_realmdata', {'realm':data.realm.id} ) }}">{{ data.realm.name }}</td>
+			<td><a href="{{ path('maf_game_stats_realm', {'realm':data.realm.id} ) }}">{{ data.realm.name }}</td>
 			<td align="right">{{ data.players }}</td>
 			<td align="right">{{ data.nobles }}</td>
 			<td align="right">{{ data.settlements }}</td>
