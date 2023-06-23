@@ -33,7 +33,7 @@
         "kagurati/patreon": "^1.1.0",
         "google/recaptcha": "^1.2",
         "stripe/stripe-php": "^7.128",
-        "kagurati/torutils": "^0.1.2"
+        "kagurati/torutils": "^0.2.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
