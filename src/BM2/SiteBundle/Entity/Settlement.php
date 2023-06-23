@@ -80,14 +80,21 @@ class Settlement {
 		$supportCount = 1;
 		$opposeCount = 1;
 		$militia = 0;
-		if ($supporters) {
-			foreach ($supporters as $each) {
+		if (!$supporters) {
+			$supporters = new ArrayCollection();
+			$supporters->add($taker);
+		}
+		foreach ($supporters as $each) {
+			if ($each instanceof Character) {
 				$supportCount += $each->countSoldiers();
 				$supportCount += 10; # Player Characters matter.
 			}
 		}
-		if ($opposers) {
-			foreach ($opposers as $each) {
+		if (!$opposers) {
+			$opposers = new ArrayCollection();
+		}
+		foreach ($opposers as $each) {
+			if ($each instanceof Character) {
 				$opposeCount += $each->countSoldiers();
 				$opposeCount += 10; # Player characters matter.
 			}
@@ -132,7 +139,7 @@ class Settlement {
 					}
 				}
 			} else {
-				if ($opposers && $opposers->contains($owner)) {
+				if ($opposers->contains($owner)) {
 					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
 				} else {
 					$mod = 10;
