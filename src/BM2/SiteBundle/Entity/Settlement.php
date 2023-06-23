@@ -77,8 +77,8 @@ class Settlement {
 	}
 
 	public function getTimeToTake(Character $taker, $supporters = null, $opposers = null) {
-		$supportCount = 0;
-		$opposeCount = 0;
+		$supportCount = 1;
+		$opposeCount = 1;
 		$militia = 0;
 		$mod = 1;
 		if ($supporters) {
@@ -206,7 +206,9 @@ class Settlement {
 			}
 		}
 		foreach ($this->getUnits() as $unit) {
-			$militia += $unit->getMilitiaCount();
+			if ($unit->isLocal()) {
+				$militia += $unit->getMilitiaCount();
+			}
 		}
 		return $militia + $defenders;
 	}
