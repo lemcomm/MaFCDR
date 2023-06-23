@@ -29,8 +29,8 @@ class UpdateTorExitsCommand extends ContainerAwareCommand {
 		$now = new DateTime("now", $utc);
 		$new = 0;
 		$changed = 0;
+		$skipped = 0;
 		foreach ($all as $each) {
-			$output->writeln($each['ip']);
 			$ip = $em->getRepository('BM2SiteBundle:NetExit')->findOneBy(['ip'=>$each['ip']]);
 			if (!$ip) {
 				$ip = new NetExit;
@@ -44,9 +44,11 @@ class UpdateTorExitsCommand extends ContainerAwareCommand {
 				$ip->setTs($now);
 				$ip->setLastSeen(new DateTime($each['last_seen'], $utc));
 				$changed++;
+			} else {
+				$skipped++;
 			}
 		}
-		$total = $new+$changed;
+		$total = $new+$changed+$skipped;
 		$em->flush();
 		$date = new DateTime('-30 days', $utc);
 		$query = $em->createQuery('DELETE FROM BM2SiteBundle:NetExit n WHERE n.last_seen < :when');
