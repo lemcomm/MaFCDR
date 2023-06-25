@@ -1339,6 +1339,7 @@ class GameRunner {
 				}
 			}
 		}
+		return true;
 	}
 
 	public function runConversationsCleanup() {
