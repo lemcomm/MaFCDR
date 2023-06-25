@@ -41,17 +41,21 @@ class WorkerTravelCommand extends ContainerAwareCommand {
 		$query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.id >= :start AND c.id <= :end AND c.travel IS NOT NULL AND c.travel_locked = false');
 		$query->setParameters(array('start'=>$start, 'end'=>$end));
 		foreach ($query->getResult() as $char) {
+			if ($char->getInsidePlace()) {
+				if (!$interactions->characterLeavePlace($char)) {
+					continue; #If you can't leave, you can't travel.
+				}
+			}
+			if ($char->getInsideSettlement()) {
+				if (!$interactions->characterLeaveSettlement($char)) {
+					continue; #If you can't leave, you can't travel.
+				}
+			}
 			if ($char->findActions('train.skill')->count() > 0) {
 				# Auto cancel any training actions.
 				foreach ($char->findActions('train.skill') as $each) {
 					$this->em->remove($each);
 				}
-			}
-			if ($char->getInsidePlace()) {
-				$interactions->characterLeavePlace($char);
-			}
-			if ($char->getInsideSettlement()) {
-				$interactions->characterLeaveSettlement($char);
 			}
 			$geography->updateTravelSpeed($char);
 			// TODO: check the return status, it should alert us to invalid travel settings!
