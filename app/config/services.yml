@@ -48,7 +48,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager']
     game_runner:
         class:      BM2\SiteBundle\Service\GameRunner
-        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@conversation_manager', '@permission_manager', '@npc_manager', '@character_manager']
+        arguments:  ['@doctrine.orm.entity_manager', '@appstate', '@logger', '@action_resolution', '@economy', '@politics', '@history', '@military_manager', '@battle_runner', '@interactions', '@geography', '@generator', '@realm_manager', '@conversation_manager', '@permission_manager', '@npc_manager', '@character_manager', '@war_manager']
         tags:
             - { name: monolog.logger, channel: turn }
     generator:

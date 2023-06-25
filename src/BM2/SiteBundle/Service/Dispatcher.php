@@ -1660,10 +1660,6 @@ class Dispatcher {
 			# Is not in the siege.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
 		}
-		if ($isLeader) {
-			# Is already leader.
-			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
-		}
 		if (($isDefender && $defLeader) || ($isAttacker && $attLeader)) {
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.alreadylead");
 		}

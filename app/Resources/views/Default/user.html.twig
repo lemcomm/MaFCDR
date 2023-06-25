@@ -40,9 +40,36 @@
 			{% endfor %}</dd>
 		{% endif %}
 		{% if gm %}
+			{% set acct = user.accountLevel %}
+			{% if acct == 0 %}
+				{% set level = 'Storage' %}
+			{% elseif acct == 10 %}
+				{% set level = 'Casual' %}
+			{% elseif acct == 20 %}
+				{% set level = 'Basic (Legacy)' %}
+			{% elseif acct == 21 %}
+				{% set level = 'Volunteer' %}
+			{% elseif acct == 22 %}
+				{% set level = 'Traveler (Legacy Patreon)' %}
+			{% elseif acct == 23 %}
+				{% set level = 'Supporter' %}
+			{% elseif acct == 40 %}
+				{% set level = 'Intense (Legacy)' %}
+			{% elseif acct == 41 %}
+				{% set level = 'Developer' %}
+			{% elseif acct == 42 %}
+				{% set level = 'Explorer (Legacy Patreon)' %}
+			{% elseif acct == 50 %}
+				{% set level = 'Ultimate (Legacy)' %}
+			{% elseif acct == 51 %}
+				{% set level = 'Explorer+ (Legacy)' %}
+			{% endif %}
 			<h3>Additional Details for GMs</h3>
 			<dt>Username: </dt><dd>{{ user.username }}</dd>
-			<dt>Subscription: </dt><dd>{{ user.accountLevel }}</dd>
+			<dt>Enabled: </dt><dd>{% if user.enabled %}Yes{% else %}No{% endif %}</dd>
+			<dt>Subscription: </dt><dd>{{ level }}</dd>
+			<dt>Last Login: </dt><dd>{{ user.last_login|date('Y-m-d H:i:s') }}</dd>
+			<dt>Activity Logging:</dt><dd>{% if user.watched %}Yes{% else %}No{% endif %}
 			<dt>Reports: </dt><dd><a href="{{ path('maf_gm_user_reports', {'id':user.id}) }}">View</a></dd>
 		{% endif %}
 	</dl><hr>

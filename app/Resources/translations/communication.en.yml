@@ -576,6 +576,9 @@ siege:
  victor:
   attacker:     After the final %battle%, the siege has concluded in favor of the attackers.
   defender:     After the final %battle%, the siege has concluded in favor of the defenders.
+ leaderinside:
+  settlement:   Since %character% is somehow inside %settlement%, the siege has been declared victorious and the siege forces have disbanded.
+  place:   Since %character% is somehow inside %place%, the siege has been declared victorious and the siege forces have disbanded.
 
 mail:
  sender:        "Might & Fealty"
