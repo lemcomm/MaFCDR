@@ -176,7 +176,7 @@ class ActivityController extends Controller {
 			$check = $report->checkForObserver($char);
 			$admin = false;
 		} else {
-			$check = $report->checkForObserver($char);
+			$check = true;
 			$admin = true;
 		}
 
