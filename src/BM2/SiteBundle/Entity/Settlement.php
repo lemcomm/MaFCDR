@@ -153,10 +153,12 @@ class Settlement {
 		if ($enforce_claim) {
 			$time_to_take *= 0.2;
 		}
-		if ($this->getOccupant() && ($this->getOccupant() === $taker || $supporters->contains($this->getOccupant()))) {
-			$supportCount += $militia;
-		} else {
-			$opposeCount += $militia;
+		if ($this->getOwner()) {
+			if ($this->getOccupant() && ($this->getOccupant() === $taker || $supporters->contains($this->getOccupant()))) {
+				$supportCount += $militia;
+			} else {
+				$opposeCount += $militia;
+			}
 		}
 		$time_to_take *= $mod;
 
