@@ -404,7 +404,7 @@ class UnitController extends Controller {
                                         $this->get('history')->closeLog($unit, $here->getOwner());
                                 }
                                 if ($here->getSteward() && $here->getSteward() !== $data['target']) {
-                                        $this->get('history')->closeLog($unit, $here->getOwner());
+                                        $this->get('history')->closeLog($unit, $here->getSteward());
                                 }
                         }
                         if ($unit->getMarshal() && $unit->getMarshal() !== $data['target']) {
