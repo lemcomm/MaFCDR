@@ -83,6 +83,8 @@ class Settlement {
 		if (!$supporters) {
 			$supporters = new ArrayCollection();
 			$supporters->add($taker);
+		} else {
+			$supporters->add($taker);
 		}
 		foreach ($supporters as $each) {
 			if ($each instanceof Character) {
