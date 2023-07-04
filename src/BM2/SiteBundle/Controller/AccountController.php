@@ -544,7 +544,7 @@ class AccountController extends Controller {
 
 	private function findSexPartners($char) {
 		$em = $this->getDoctrine()->getManager();
-		$query = $em->createQuery('SELECT p.id, p.name, u.id as user FROM BM2SiteBundle:Character p JOIN p.user u JOIN p.partnerships m WITH m.with_sex=true JOIN m.partners me WITH p!=me WHERE me=:me ORDER BY p.name');
+		$query = $em->createQuery('SELECT p.id, p.name, u.id as user FROM BM2SiteBundle:Character p JOIN p.user u JOIN p.partnerships m WITH m.with_sex=true JOIN m.partners me WITH p!=me WHERE me=:me AND me.male != p.male ORDER BY p.name');
 		if (is_object($char)) {
 			$query->setParameter('me', $char);
 		} else {
