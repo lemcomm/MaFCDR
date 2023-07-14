@@ -929,7 +929,7 @@ class CharacterManager {
 		}
 	}
 
-	public function assocInheritance(AssociationMember $mbr, Character $heir=null, Character $via=null) {
+	public function assocInheritance(AssociationMember $mbr, $heir=null) {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();
