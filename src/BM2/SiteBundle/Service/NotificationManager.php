@@ -13,6 +13,7 @@ use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Settlement;
 use BM2\SiteBundle\Twig\MessageTranslateExtension;
 use Doctrine\ORM\EntityManager;
+use Exception;
 
 class NotificationManager {
 
@@ -82,6 +83,17 @@ class NotificationManager {
 			return [$entity->getCreator()]; #NOTE: Creator is a User Entity.
 		}
 		return false;
+	}
+
+	public function spoolAchievement($type, Character $char) {
+		if ($type === 'dragon') {
+			$text = '['.$char->getName().'](https://mightandfealty.com/character/view/'.$char->getId().') has accomplished a feat few others have, and successfully slain a dragon!';
+			try {
+				$this->discord->pushToGeneral($text);
+			} catch (Exception $e) {
+				# Nothing
+			}
+		}
 	}
 
 	public function spoolEvent(Event $event) {
