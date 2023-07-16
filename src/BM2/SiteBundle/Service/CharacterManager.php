@@ -773,7 +773,7 @@ class CharacterManager {
 						if ($liege instanceof Collection) {
 							$liege = $liege->first();
 						}
-						if ($liege->isActive()) {
+						if ($liege && $liege->isActive()) {
 							$this->$bequeath($thing, $liege, $char, null);
 							break;
 						}
