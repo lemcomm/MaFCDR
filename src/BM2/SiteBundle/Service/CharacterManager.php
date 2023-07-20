@@ -773,7 +773,7 @@ class CharacterManager {
 						if ($liege instanceof Collection) {
 							$liege = $liege->first();
 						}
-						if ($liege->isActive()) {
+						if ($liege && $liege->isActive()) {
 							$this->$bequeath($thing, $liege, $char, null);
 							break;
 						}
@@ -929,7 +929,7 @@ class CharacterManager {
 		}
 	}
 
-	public function assocInheritance(AssociationMember $mbr, Character $heir=null, Character $via=null) {
+	public function assocInheritance(AssociationMember $mbr, $heir=null) {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();

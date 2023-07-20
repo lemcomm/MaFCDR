@@ -13,7 +13,7 @@ services:
             - { name: monolog.logger, channel: dungeons }
     dungeon_master:
         class:      BM2\DungeonBundle\Service\DungeonMaster
-        arguments:  ['@doctrine.orm.entity_manager', '@dungeon_creator', '@history', '@logger', '@router']
+        arguments:  ['@doctrine.orm.entity_manager', '@dungeon_creator', '@history', '@logger', '@router', '@notification_manager']
         tags:
             - { name: monolog.logger, channel: dungeons }
 

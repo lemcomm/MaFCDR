@@ -740,6 +740,7 @@ class AccountController extends Controller {
 				if ($character->getSystem() == 'procd_inactive') {
 					$character->setSystem(NULL);
 				}
+				$this->get('history')->openLog($character, $character); # Fix characters that can't access their own event logs.
 				$em->flush();
 				if ($character->getSpecial()) {
 					// special menu active - check for reasons
