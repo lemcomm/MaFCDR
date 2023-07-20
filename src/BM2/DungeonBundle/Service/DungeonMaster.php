@@ -2,6 +2,7 @@
 
 namespace BM2\DungeonBundle\Service;
 
+use BM2\SiteBundle\Service\NotificationManager;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Monolog\Logger;
@@ -30,7 +31,7 @@ class DungeonMaster {
 	private $history;
 	private $logger;
 	private $router;
-
+	private $noteman;
 
 	private $initial_random_cards = 3;
 	private $min_party_size = 2;
@@ -49,12 +50,13 @@ class DungeonMaster {
 		'basic.fight'		=> 5
 	);
 
-	public function __construct(EntityManager $em, DungeonCreator $creator, History $history, Logger $logger, Router $router) {
+	public function __construct(EntityManager $em, DungeonCreator $creator, History $history, Logger $logger, Router $router, NotificationManager $noteman) {
 		$this->em = $em;
 		$this->creator = $creator;
 		$this->history = $history;
 		$this->logger = $logger;
 		$this->router = $router;
+		$this->noteman = $noteman;
 	}
 
 
@@ -640,7 +642,10 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 				$target->setAmount(max(0,$target->getAmount()-1));
 				$wounds-=$target->getType()->getWounds();
 				if ($target->getType()->getName()=='dragon') {
-					$this->addAchievement($dungeoneer->getCharacter(), 'dragons', 1);
+					$char = $dungeoneer->getcharacter();
+					$char->getUser()->setArtifactsLimit($char->getUser()->getArtifactsLimit()+1);
+					$this->addAchievement($char, 'dragons', 1);
+					$this->noteman->spoolAchievement('dragon', $char);
 				}
 			}
 			if ($wounds>0) {
