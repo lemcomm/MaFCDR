@@ -944,36 +944,79 @@ class CharacterManager {
 				}
 				switch ($value) {
 					case 'character':
+						# If we don't have an heir, we won't get here, so we don't need to if-check this.
 						$this->assocman->updateMember($assoc, $rank, $heir, false);
 						$this->bequeathAssoc($assoc, $heir, $mbr->getCharacter());
 						break;
 					case 'senior':
 						$seniors = new ArrayCollection;
+						$searched = new ArrayCollection;
+						$last = new ArrayCollection;
+						$searched->add($rank);
+						/*
+						Simple foreach loop to get all the top level ranks (the owner rank, and all ranks subordinate to it or subordinate to none.
+						Then we get their members and add them to list.
+						*/
 						foreach($assoc->getRanks() as $aRank) {
-							if ($aRank->getSuperior() == null) {
+							if ($aRank->getSuperior() == null || $aRank->getSuperior() === $rank) {
 								foreach ($aRank->getMembers() as $each) {
 									$seniors->add($each);
 								}
+								$searched->add($aRank);
+								$last->add($aRank);
+							}
+						}
+						$allCount = $assoc->getRanks()->count();
+						while ($seniors->count() == 0) {
+							/* List is empty, beginning a much more arduous hunt for members.
+							This time in a while loop, every time checking if we're still at zero.
+							*/
+							$found = false;
+							$loop = new ArrayCollection;
+							foreach ($last as $aRank) {
+								foreach ($aRank->getSubordinates() as $each){
+									foreach ($each->getMembers() as $member) {
+										# Found someone! Yay! Add them to a list and set the found flag to true.
+										$seniors->add($member);
+										$found = true;
+									}
+								}
+								$searched->add($aRank);
+								$loop->add($aRank);
+							}
+							if (!$found) {
+								if ($searched->count() === $allCount) {
+									# No ranks left to search. Break out, declare this a failure.
+									break;
+								}
+								# Still have ranks. Set this loop to the last, and let it start again.
+								$last = $loop;
 							}
 						}
 						$mostSenior = null;
 						foreach ($seniors as $each) {
 							if (!$mostSenior) {
 								$mostSenior = $each;
+								continue;
 							}
-							if ($each->getRankDate() > $mostSenior->getRankDate()) {
+							if ($each->getRankDate() < $mostSenior->getRankDate()) {
 								$mostSenior = $each;
 							}
 						}
-						$this->assocman->updateMember($assoc, $rank, $mostSenior->getCharacter(), false);
-						$this->bequeathAssoc($assoc, $mostSenior->getCharacter(), $mbr->getCharacter());
+						if ($mostSenior) {
+							$this->assocman->updateMember($assoc, $rank, $mostSenior->getCharacter(), false);
+							$this->bequeathAssoc($assoc, $mostSenior->getCharacter(), $mbr->getCharacter());
+						}
 						break;
 					case 'oldest':
-						$query = $this->em->createQuery('SELECT m, c FROM BM2SiteBundle:AssociationMember m JOIN m.character c WHERE m.association = :assoc ORDER BY m.join_date ASC LIMIT 1');
-						$query->setParameters(['assoc'=>$assoc]);
-						$oldest = $query->getResult();
-						$this->assocman->updateMember($assoc, $rank, $oldest->getCharacter(), false);
-						$this->bequeathAssoc($assoc, $oldest->getCharacter(), $mbr->getCharacter());
+						$query = $this->em->createQuery('SELECT m FROM BM2SiteBundle:AssociationMember m WHERE m.association = :assoc and m.id != :rank ORDER BY m.join_date ASC')
+							->setParameters(['assoc'=>$assoc, 'rank'=>$mbr->getId()])
+							->setMaxResults(1);
+						$oldest = $query->getOneOrNullResult();
+						if ($oldest) {
+							$this->assocman->updateMember($assoc, $rank, $oldest->getCharacter(), false);
+							$this->bequeathAssoc($assoc, $oldest->getCharacter(), $mbr->getCharacter());
+						}
 						break;
 				}
 				$this->em->flush();
