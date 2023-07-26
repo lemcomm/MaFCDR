@@ -471,7 +471,7 @@ class RealmManager {
 				}
 				$realm->removePlace($place);
 				$place->setRealm($superior);
-				$superior->addSettlement($place);
+				$superior->addPlace($place);
 			}
 		}
 		$this->em->flush();
