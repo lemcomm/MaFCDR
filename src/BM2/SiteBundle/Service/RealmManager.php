@@ -483,7 +483,7 @@ class RealmManager {
 					array('%link-realm%'=>$realm->getId()),
 					History::MEDIUM
 				);
-				$vassal->setRealm($superior);
+				$vassal->setRealm(null);
 			} else {
 				$this->history->logEvent(
 					$vassal,
@@ -491,7 +491,7 @@ class RealmManager {
 					array('%link-realm%'=>$realm->getId(), '%link-realm-2%'=>$superior->getId()),
 					History::MEDIUM
 				);
-				$vassal->setRealm(null);
+				$vassal->setRealm($superior);
 			}
 		}
 		$this->em->flush();
