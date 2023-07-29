@@ -811,6 +811,28 @@ class RealmController extends Controller {
 				}
 			}
 		}
+		foreach ($character->findRealms() as $myrealm) {
+			if ($myrealm->getType() > $realm->getType()) {
+				if ($myrealm !== $realm->getSuperior()) {
+					if (isset($available[$id])) {
+						$available[$id]['via'][] = $char;
+					} else {
+						$available[$id] = array('realm'=>$myrealm, 'via'=>array($char));
+					}
+					if (!$realms->contains($myrealm)) {
+						$realms->add($myrealm);
+					}
+				} else {
+					if (!isset($unavailable[$id])) {
+						$unavailable[$id] = array('realm'=>$myrealm, 'reason'=>'current');
+					}
+				}
+			} else {
+				if (!isset($available[$id])) {
+					$unavailable[$id] = array('realm'=>$myrealm, 'reason'=>'type');
+				}
+			}
+		}
 
 		if ($realms->isEmpty()) {
 
