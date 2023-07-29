@@ -317,7 +317,7 @@ realm:
   description:  Tear down this realm.
   longdesc:     As the ruler of %formalname%, it's within your authority to order it's complete and utter dismantling, if you so wish.
   intro: >
-    Using your authority as ruler of this realm, you can forcibly dismantle this realm and remove it from existence.<br />
+    Using your authority as ruler of %name%, you can forcibly dismantle this realm and remove it from existence.<br />
     If you're not absolutely certain that you wish to do this, you shouldn't even be looking at this. That's how serious this action is.<br />
     It's also worth noting that you are only dismantling this realm, not it's subordinates, who will automatically gain independence.
   sure:         You Absolutely Certain?
