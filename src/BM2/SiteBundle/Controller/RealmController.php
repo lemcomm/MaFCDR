@@ -1007,6 +1007,7 @@ class RealmController extends Controller {
 
 		$this->get('realm_manager')->makeRuler($realm, $character);
 		$realm->setActive(TRUE);
+		$this->get('history')->openLog($realm, $character);
 		$this->get('history')->logEvent(
 			$realm,
 			'event.realm.restored',
