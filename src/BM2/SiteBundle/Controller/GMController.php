@@ -69,11 +69,15 @@ class GMController extends Controller {
 	public function updateNoteAction(Request $request, UpdateNote $id=null) {
 		# Security is handled by Syfmony Firewall.
 
+		$em = $this->getDoctrine()->getManager();
+		if ($request->query->get('last')) {
+			$id = $em->createQuery('SELECT n FROM BM2SiteBundle:UpdateNote n ORDER BY n.id DESC')->setMaxResults(1)->getSingleResult();
+		}
+
 		$form = $this->createForm(new UpdateNoteType($id));
 		$form->handleRequest($request);
 
 		if ($form->isValid() && $form->isSubmitted()) {
-			$em = $this->getDoctrine()->getManager();
 			$data = $form->getData();
 			if (!$id) {
 				$note = new UpdateNote();
