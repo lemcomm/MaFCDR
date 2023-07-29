@@ -524,11 +524,11 @@ class CombatManager {
 		if (rand(0,$power) > rand(0,max(1,$this->DefensePower($target, $battle) - $target->getWounded(true)))) {
 			// penetrated again = kill
 			switch ($phase) {
-				case 'charge':  $surrender = 90; break;
+				case 'charge':  $surrender = 85; break;
 				case 'ranged':	$surrender = 60; break;
-				case 'hunt':	$surrender = 85; break;
+				case 'hunt':	$surrender = 95; break;
 				case 'melee':
-				default:	$surrender = 75; break;
+				default:	$surrender = 90; break;
 			}
 			// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
 			if ($battle && (($me->getMount() && $target->getMount() && rand(0,100) < 50) || $me->getMount() && !$target->getMount() && rand(0,100) < 70)) {
