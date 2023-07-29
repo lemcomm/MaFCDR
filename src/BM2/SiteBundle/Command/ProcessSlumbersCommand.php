@@ -39,7 +39,7 @@ class ProcessSlumbersCommand extends ContainerAwareCommand {
 		$output->writeln("<info>Slumbers cleanup started!</info>");
 
 		$now = new \DateTime('now');
-		$twomos = $now->modify('-60 days');
+		$twomos = $now->modify('-42 days'); # Deliberately reduced from 60 days to 42 days --Andrew 20230728.
 		$query = $em->createQuery('SELECT c FROM BM2SiteBundle:Character c WHERE c.last_access <= :date AND c.alive = true AND c.location IS NOT NULL AND (c.retired = false OR c.retired IS NULL)');
 		$query->setParameters(['date'=>$twomos]);
 		$result = $query->getResult();
