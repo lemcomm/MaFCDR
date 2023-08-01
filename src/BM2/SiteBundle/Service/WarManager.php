@@ -639,7 +639,7 @@ class WarManager {
 				// If we're dealing with a battle, we have an empty group, we have 2 or less groups in this battle, we remove any actions relating to the battle and call the battle as failed..
 				foreach ($focus->getGroups() as $group) {
 					foreach ($group->getRelatedActions() as $act) {
-						if ($act->getType == 'military.battle') {
+						if ($act->getType() == 'military.battle') {
 							$this->em->remove($act);
 						}
 					}

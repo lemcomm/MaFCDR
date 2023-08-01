@@ -119,7 +119,7 @@ class AssociationController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$assoc = $this->get('association_manager')->update($assoc, $form->getData(), $char);
-			# No flush needed, AssocMan flushes.
+			$em->flush();
 			$this->addFlash('notice', $this->get('translator')->trans('assoc.route.updated.success', [], 'orgs'));
 			return $this->redirectToRoute('maf_politics_assocs');
 		}

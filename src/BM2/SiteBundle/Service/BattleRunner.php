@@ -202,6 +202,7 @@ class BattleRunner {
 							case 'stone towers': # 5 points
 							case 'stone castle': # 5 points
 								if ($myStage < 3) {
+									$this->log(10, "Debug: ".$building->getType()->getName()." for score of ".$building->getDefenseScore()."\n");
 									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
@@ -213,18 +214,21 @@ class BattleRunner {
 							case 'wood towers': # 5 points
 							case 'wood castle': # 5 points
 								if ($myStage < 2) {
+									$this->log(10, "Debug: ".$building->getType()->getName()." for score of ".$building->getDefenseScore()."\n");
 									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
 							case 'fortress': # 50 points
 								if ($myStage == 3) {
+									$this->log(10, "Debug: ".$building->getType()->getName()." for score of ".$building->getDefenseScore()."\n");
 									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
 								break;
 							case 'citadel': # 70 points
 								if ($myStage == 4) {
+									$this->log(10, "Debug: ".$building->getType()->getName()." for score of ".$building->getDefenseScore()."\n");
 									$this->report->addDefenseBuilding($building->getType());
 									$this->defenseBonus += $building->getDefenseScore();
 								}
@@ -233,6 +237,7 @@ class BattleRunner {
 								# Seats of power are all 5 pts each.
 								# Apothercary and alchemist are also 5.
 								# This grants up to 30 points.
+								$this->log(10, "Debug: ".$building->getType()->getName()." for score of ".$building->getDefenseScore()."\n");
 								$this->report->addDefenseBuilding($building->getType()); #Yes, this means Alchemists, and Seats of Governance ALWAYS give their bonus, if they exist.
 								$this->defenseBonus += $building->getDefenseScore();
 								break;
@@ -984,14 +989,16 @@ class BattleRunner {
 							$this->log(50, $soldier->getName()." (".$soldier->getType()."): morale ".round($soldier->getMorale()));
 							if ($soldier->getMorale()*2 < rand(0,100)) {
 								if ($soldier->isNoble()) {
-									$this->log(50, " - has no fear");
+									$this->log(50, " - has no fear\n");
 									$staredDeath++;
 								} else {
-									$this->log(50, " - panics");
+									$this->log(50, " - panics\n");
 									$soldier->setRouted(true);
 									$this->history->addToSoldierLog($soldier, 'routed.ranged');
 									$routed++;
 								}
+							} else {
+								$this->log(50, " - has resolve\n");
 							}
 							$this->log(50, "\n");
 						}
@@ -1144,8 +1151,8 @@ class BattleRunner {
 						}
 					}
 					if ($noTargets > 4) {
-						break;
 						$this->log(10, "Unable to locate viable targets -- skipping further calculations\n");
+						break;
 					}
 				}
 				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$noTargets, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'chargefail' => $chargeFail, 'chargewound'=>$chargeWound, 'chargecapture'=>$chargeCapture, 'chargekill'=>$chargeKill);
@@ -1220,17 +1227,6 @@ class BattleRunner {
 						$mod = min(0.99, $mod+0.1);
 					}
 					$soldier->setMorale($soldier->getMorale() * $mod);
-					if ($soldier->getMorale()*2 < rand(0,100)) {
-						if ($soldier->isNoble()) {
-							$this->log(50, " - has no fear");
-							$staredDeath++;
-						} else {
-							$this->log(50, " - panics");
-							$soldier->setRouted(true);
-							$this->history->addToSoldierLog($soldier, 'routed.ranged');
-							$routed++;
-						}
-					}
 					if ($soldier->getMorale() < rand(0,100)) {
 						if ($soldier->isNoble()) {
 							$this->log(10, $soldier->getName()." (".$soldier->getType()."): ($mod) morale ".round($soldier->getMorale())." - has no fear\n");
