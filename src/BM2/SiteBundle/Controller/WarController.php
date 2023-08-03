@@ -333,13 +333,47 @@ class WarController extends Controller {
 				}
 				$em->flush(); # We need this flushed in order to link to it below.
 
+				$hist = $this->get('history');
 				if ($settlement) {
-					$this->get('history')->logEvent(
+					$hist->logEvent(
 						$settlement,
 						'event.settlement.besieged',
 						array('%link-character%'=>$character->getId()),
 						History::MEDIUM, false, 60
 					);
+					if ($owner = $settlement->getOwner()) {
+						$hist->logEvent(
+							$owner,
+							'event.settlement.besieged2',
+							[
+								'%link-settlement%'=>$settlement->getId(),
+								'%link-character%'=>$character->getId()
+							],
+							History::MEDIUM, false, 60
+						);
+					}
+					if ($steward = $settlement->getSteward()) {
+						$hist->logEvent(
+							$steward,
+							'event.settlement.besieged2',
+							[
+								'%link-settlement%'=>$settlement->getId(),
+								'%link-character%'=>$character->getId()
+							],
+							History::MEDIUM, false, 60
+						);
+					}
+					if ($occupant = $settlement->getOccupant()) {
+						$hist->logEvent(
+							$occupant,
+							'event.settlement.besieged2',
+							[
+								'%link-settlement%'=>$settlement->getId(),
+								'%link-character%'=>$character->getId()
+							],
+							History::MEDIUM, false, 60
+						);
+					}
 				} elseif ($place) {
 					$this->get('history')->logEvent(
 						$place,
@@ -347,6 +381,17 @@ class WarController extends Controller {
 						array('%link-character%'=>$character->getId()),
 						History::MEDIUM, false, 60
 					);
+					if ($owner = $place->getOwner()) {
+						$hist->logEvent(
+							$owner,
+							'event.place.besieged2',
+							[
+								'%link-place%'=>$place->getId(),
+								'%link-character%'=>$character->getId()
+							],
+							History::MEDIUM, false, 60
+						);
+					}
 				}
 
 				# TODO: combine this code with the code in action resolution for battles so we have less code duplication.
