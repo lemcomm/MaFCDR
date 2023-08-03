@@ -87,7 +87,7 @@ class ConversationManager {
         }
 
         public function getLegacyContacts(Character $char) {
-                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (SELECT conv FROM BM2SiteBundle:Conversation conv JOIN conv.permissions perm WHERE perm.character = :me AND perm.active = TRUE)');
+                $query = $this->em->createQuery('SELECT c FROM BM2SiteBundle:Character c JOIN c.conv_permissions p JOIN p.conversation t WHERE t IN (SELECT conv FROM BM2SiteBundle:Conversation conv JOIN conv.permissions perm WHERE perm.character = :me AND perm.active = TRUE) and c.alive = true and (c.retired = false OR c.retired is NULL)');
                 $query->setParameter('me', $char);
                 return $query->getResult();
 	}
