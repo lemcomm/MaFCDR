@@ -15,4 +15,5 @@ php $APP --env=prod maf:process:familiarity -t 2>&1 >> $LOGDIR/hourly.log
 php $APP --env=prod maf:process:travel -t 2>&1 >> $LOGDIR/hourly.log
 php $APP --env=prod maf:process:spotting -t 2>&1 >> $LOGDIR/hourly.log
 php $APP --env=prod maf:run -t -d hourly 2>&1 >> $LOGDIR/hourly.log
+php $APP --env=prod dungeons:hourly -d 2>&1 >> $LOGDIR/hourly.log
 echo "----- hourly done -----" >> $LOGDIR/hourly.log

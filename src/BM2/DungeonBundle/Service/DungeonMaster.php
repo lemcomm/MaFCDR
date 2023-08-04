@@ -34,7 +34,7 @@ class DungeonMaster {
 	private $noteman;
 
 	private $initial_random_cards = 3;
-	private $min_party_size = 2;
+	private $min_party_size = 1;
 	private $max_party_size = 30;
 	private $max_cards_per_type = 8;
 	private $starting_wounds = 10;
@@ -566,7 +566,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 						break;
 					case 'fight.slime':
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
-							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
+							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $target->getType()->getClass())) {
 							$this->DungeoneerAttack($dungeoneer, $target, 6);
 							} else {
 							$this->DungeoneerAttack($dungeoneer, $target, 0.5);

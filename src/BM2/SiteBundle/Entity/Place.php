@@ -68,7 +68,7 @@ class Place {
                         if (
                                 $this->getAmbassador() === $char ||
         			(!$this->getAmbassador() && $this->getOwningRealm() && $this->getOwningRealm()->findRulers()->contains($char)) ||
-        			(!$this->getAmbassador() && !$this->getOwningRealm() && $this->getHostingRealm() && $this->getHostingRealm()->findRulers()->conntains($char)) ||
+        			(!$this->getAmbassador() && !$this->getOwningRealm() && $this->getHostingRealm() && $this->getHostingRealm()->findRulers()->contains($char)) ||
         			(!$this->getAmbassador() && !$this->getOwningRealm() && !$this->getHostingRealm() && $this->getOwner() == $char)
                         ) {
                                 return true;
