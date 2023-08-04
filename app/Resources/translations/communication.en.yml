@@ -117,6 +117,7 @@ event:
    forced:      The occupation by %realm% has been forcefully ended by %character%.
    forced2:      The occupation by %character-1% has been forcefully ended by %character-2%.
   besieged:     %character% has declared a siege of the Settlement.
+  besieged2:    %character% has declared a siege of %settlement%.
   newknight:    %character% has been accepted as a vassal of the settlement.
   rejectknight: %character% has been rejected as a potential vassal of the settlement.
   steward:      %character% has been appointed as the new steward.
@@ -124,6 +125,11 @@ event:
   stewarddeath: Is now steward-less due to the passing of %character%.
   stewardretire: Is now steward-less due to the retiring of %character%.
   stewardpromote: Is now steward-less due to the promotion of %character%.
+  siege:
+   assault:     %character% is leading an assault against the settlement.
+   assault2:    %character% is leading an assault against %settlement%.
+   sortie:      %character% is leading a sortie from the settlement.
+   sortie2:     %character% is leading a sortie from %settlement%.
  travel:
   disembark:    Your ships have arrived at their destination and you have disembarked.
   cantland:     The ships captain cannot find a suitable landing spot, please try a short distance further up or down the coast.
@@ -429,6 +435,7 @@ event:
   left:         %character% has been seen leaving.
   forceleft:    %character% has been forced outside the walls during the battle.
   besieged:     %character% has declared a siege of the location.
+  besieged2:    %character% has declared a siege of %place%.
   start:        A new First One named %character% has appeared here.
   charstart:    A new First One named %character% has appared at %place%.
   newknight:    %character% has been accepted as a vassal of the place.
@@ -439,6 +446,11 @@ event:
   realmfail:    Returned to independence with the failing of %realm%.
   realmfail2:   Became part of %realm-1% with the failing of %realm-2%.
   abandoned:    Abandoned after the collapse of %house% following the death of %character%.
+  siege:
+   assault:     %character% is leading an assault against the location.
+   assault2:    %character% is leading an assault against %place%.
+   sortie:      %character% is leading a sortie from the location.
+   sortie2:     %character% is leading a sortie from %place%.
  assoc:
   founded:      Formalized by %character%.
   deity:
