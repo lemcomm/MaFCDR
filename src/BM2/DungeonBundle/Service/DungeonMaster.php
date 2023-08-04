@@ -566,7 +566,7 @@ In short before a dungeon starts you get a bit longer, but when it's running you
 						break;
 					case 'fight.slime':
 						if ($target = $this->findMonsterTarget($dungeoneer)) {
-							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $monster->getType()->getClass())) {
+							if (in_array($dungeoneer->getCurrentAction()->getType()->getMonsterClass(), $target->getType()->getClass())) {
 							$this->DungeoneerAttack($dungeoneer, $target, 6);
 							} else {
 							$this->DungeoneerAttack($dungeoneer, $target, 0.5);
