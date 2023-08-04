@@ -34,7 +34,7 @@ class DungeonMaster {
 	private $noteman;
 
 	private $initial_random_cards = 3;
-	private $min_party_size = 2;
+	private $min_party_size = 1;
 	private $max_party_size = 30;
 	private $max_cards_per_type = 8;
 	private $starting_wounds = 10;
