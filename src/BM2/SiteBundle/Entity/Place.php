@@ -69,14 +69,16 @@ class Place {
                                 $this->getAmbassador() === $char ||
         			(!$this->getAmbassador() && $this->getOwningRealm() && $this->getOwningRealm()->findRulers()->contains($char)) ||
         			(!$this->getAmbassador() && !$this->getOwningRealm() && $this->getHostingRealm() && $this->getHostingRealm()->findRulers()->contains($char)) ||
-        			(!$this->getAmbassador() && !$this->getOwningRealm() && !$this->getHostingRealm() && $this->getOwner() == $char)
+        			(!$this->getAmbassador() && !$this->getOwningRealm() && !$this->getHostingRealm() && $this->getOwner() === $char)
                         ) {
                                 return true;
                         }
                 } elseif ($this->getOwner() === $char) {
                         return true;
-                } elseif (!$this->getOwner() && ($this->getGeoData()->getSettlement()->getOwner() === $char || $this->getGeoData()->getSettlement()->getSteward() === $char))
-                return false;
+                } elseif (!$this->getOwner() && ($this->getGeoData()->getSettlement()->getOwner() === $char || $this->getGeoData()->getSettlement()->getSteward() === $char)) {
+			return true;
+		}
+		return false;
         }
 
 }
