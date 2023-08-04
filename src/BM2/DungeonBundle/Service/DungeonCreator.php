@@ -132,7 +132,7 @@ class DungeonCreator {
 			$group->setNr(++$index);
 			$group->setType($monster);
 			$group->setAmount($amount)->setOriginalAmount($amount);
-			$group->setSize($size);
+			$group->setSize(ceil($size);
 			$group->setWounds(0)->setStunned(false);
 			$group->setLevel($level);
 			$level->addMonster($group);
