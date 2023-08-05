@@ -124,15 +124,15 @@ class CombatManager {
 		$eqpt = $me->getEquipment();
 		if ($noble) {
 			# Only for battles.
-			$power = 100;
+			$power = 120;
 			if ($me->getMount()) {
-				$power += 38;
+				$power += 48;
 			}
 			if ($eqpt && $eqpt->getName() != 'Pavise') {
 				$power += 32;
 			} elseif ($me->getMount()) {
 				$power += 7;
-			}  elseif ($melee) {
+			} elseif ($melee) {
 				$power += 13;
 			} else {
 				$power += 63;
@@ -225,7 +225,7 @@ class CombatManager {
 		return $logs;
 	}
 
-	public function MeleeAttack($me, $target, $mPower, $act=false, $battle=false, $xpMod = 1, $defBonus = 0) {
+	public function MeleeAttack($me, $target, $mPower, $act=false, $battle=false, $xpMod = 1, $defBonus = 0, $enableCounter = true) {
 		if ($battle) {
 			if ($me->isNoble() && $me->getWeapon()) {
 				$this->helper->trainSkill($me->getCharacter(), $me->getWeapon()->getSkill(), $xpMod);
@@ -277,9 +277,9 @@ class CombatManager {
 			$logs[] = "no damage\n";
 			$result='fail';
 			// out attack failed, do they get a counter?
-			if ($counterType) {
+			if ($enableCounter && $counterType) {
 				$tPower = $this->MeleePower($target, true);
-				list($innerResult, $sublogs) = $this->MeleeAttack($target, $me, $tPower, false, true, $xpMod, $defBonus);
+				list($innerResult, $sublogs) = $this->MeleeAttack($target, $me, $tPower, false, true, $xpMod, $defBonus, false);
 				foreach ($sublogs as $each) {
 					$logs[] = $each;
 				}
