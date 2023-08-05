@@ -1200,6 +1200,7 @@ item:
  improvised:       improvised
  javelin:          javelin
  lance:            lance
+ lamellar armour:  lamellar armor
  leather armour:   leather armor
  longbow:          longbow
  mace:             mace
@@ -1208,6 +1209,7 @@ item:
  pavise:           pavise
  pike:             pike
  plate armour:     plate armor
+ recurve bow:      recurve bow
  scale armour:     scale armor
  shield:           shield
  shortbow:         shortbow
@@ -1349,6 +1351,9 @@ battle:
   chargewound:  %i% was wounded by the enemy in the charge|%i% were wounded by the enemy in the charge
   chargecapture: %i% was captured by the enemy in the carge|%i% were captured by the enemy in the carge
   chargekill:   %i% was killed by the enemy in the charge|%i% were killed by the enemy in the charge
+  meleefail:    %i% was counter-attacked, but took no damage|%i% were counter-attacked but took no damage
+  meleewound:   %i% was wounded by an enemy counter-attack|%i% were wounded by enemy counter-attacks
+  meleecapture: %i% was captured by the enemy a counter-attack|%i% were captured by the enemy in counter-attacks
   stared:       %i% First One refused to reteat|%i% First Ones refused to retreat
  hunt:
   title:        hunt
@@ -1424,6 +1429,7 @@ description:
  horse:           Riding horse trained to suffer through the heat of battle without too much complaining.
  improvised:      Farm tools, other tools, big sticks - anything that was lying around and just might hurt someone.
  javelin:         A short spear, balanced for throwing. One-use weapon that gives melee troops a single, but powerful ranged attack. Use with camp followers to resupply in the field.
+ lamellar armour: A type of armor that served as inspiration for some modern armors in use today. Composed of metal plates, it doesn't offer the same protection as chainmail, but is significantly easier to make.
  lance:           A long polearm utilized to great effectivceness by mounted solders. Powerful, but only good for a single use.
  leather armour:  Hardened leather in multiple layers, slightly hindering movement but providing considerable protection.
  longbow:         The ultimate one-man ranged weapon, requiring long training and strong arms to use. Can pierce even solid metal armor at great distances.
@@ -1433,6 +1439,7 @@ description:
  pavise:          A shield large enough to cover the entire body, commonly carried by archers and crossbowmen, but sometimes utilized by other infantry. Makes for a good thing to hide behind when under attack by ranged enemies.
  pike:            A long pole-arm weapon with a blade and point, easy to learn and often the first serious weapon for conscripts to pick up.
  plate armour:    The ultimate in armor protection, consisting of solid metal plates covering every part of the body, interlocked and reinforced.
+ recurve bow:     More powerful than a longbow, but signficantly harder to make and train with (at least in Might & Fealty). We recommend using it on horseback.
  scale armour:    A mixture of metal and leather, the scale armor has a solid leather body with numerous metal plates overlayed, affording more freedom of movement than more solid metal armors.
  shield:          A primitive and yet highly efficient defensive choice, a shield protects against both melee and ranged attacks.
  shortbow:        A very common type of bow, used mainly for hunting but quite effective against lightly armored enemies, too.
