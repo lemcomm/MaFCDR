@@ -1023,11 +1023,13 @@ class BattleRunner {
 				foreach ($group->getFightingSoldiers() as $soldier) {
 					$result = false;
 					$target = false;
+					$counter = null;
 					if ($doRanged && $phase == 2 && $soldier->isLancer() && $this->battle->getType() == 'field') {
 						// Lancers will always perform a cavalry charge in the opening melee phase!
 						// A cavalry charge can only happen if there is a ranged phase (meaning, there is ground to fire/charge across)
 						$this->log(10, $soldier->getName()." (Lancer) attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
+						$counter = 'charge';
 						if ($target) {
 							$noTargets = 0;
 							$strikes++;
@@ -1069,6 +1071,7 @@ class BattleRunner {
 						// We are either in a siege assault and we have contact points left, OR we are not in a siege assault. We are a melee unit or ranged unit with melee capabilities in final siege battle.
 						$this->log(10, $soldier->getName()." (".$soldier->getType().") attacks ");
 						$target = $this->getRandomSoldier($enemyCollection);
+						$counter = 'melee';
 						if ($target) {
 							$noTargets = 0;
 							$strikes++;
@@ -1095,10 +1098,10 @@ class BattleRunner {
 							$noTargets++;
 						}
 					}
-					if (strpos($result, ' ') !== false) {
+					if ($counter && strpos($result, ' ') !== false) {
 						$results = explode(' ', $result);
 						$result = $results[0];
-						$result2 = 'charge' . $results[1];
+						$result2 = $counter . $results[1];
 					} else {
 						$result2 = false;
 					}
