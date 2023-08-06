@@ -109,7 +109,7 @@ class Soldier extends NPC {
 			if ($this->weapon && $this->weapon->getRanged() > 0) {
 				return 'mounted archer';
 			} else {
-				if ($def >= 80) {
+				if ($def >= 90) {
 					return 'heavy cavalry';
 				} else {
 					return 'light cavalry';
@@ -123,11 +123,11 @@ class Soldier extends NPC {
 				return 'archer';
 			}
 		}
-		if ($this->armour && $this->armour->getDefense() >= 60) {
+		if ($this->armour && $this->armour->getDefense() >= 70) {
 			return 'heavy infantry';
 		}
 
-		if ($def >= 40) {
+		if ($def >= 60) {
 			return 'medium infantry';
 		}
 		return 'light infantry';

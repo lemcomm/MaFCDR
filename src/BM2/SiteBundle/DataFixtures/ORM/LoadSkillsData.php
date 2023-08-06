@@ -84,6 +84,7 @@ class LoadSkillsData extends AbstractFixture implements OrderedFixtureInterface 
                 "staff sling" => array('cat' => 'slings'),
 
                 "shortbow" => array('cat' => 'bows'),
+		"recurve" => array('cat' => 'bows'),
                 "longbow" => array('cat' => 'bows'),
 
                 "crossbow" => array('cat' => 'crossbows'),
