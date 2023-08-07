@@ -205,7 +205,11 @@ class CombatManager {
 				}
 			}
 		}
-		$wpnSkill = $attacker->getWeapon()->getSkill()->getCategory()->getName();
+		if ($attacker->getWeapon()) {
+			$wpnSkill = $attacker->getWeapon()->getSkill()->getCategory()->getName();
+		} else {
+			$wpnSkill = false;
+		}
 		if ($target->getEquipment() && (rand(0,100)<25 || $wpnSkill === 'axes')) {
 			$eqpName = $target->getEquipment()->getName();
 			if ($eqpName === 'shield') {
