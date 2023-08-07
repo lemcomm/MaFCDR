@@ -206,7 +206,7 @@ class CombatManager {
 			}
 		}
 		$wpnSkill = $attacker->getWeapon()->getSkill()->getCategory()->getName();
-		if (rand(0,100)<25 || $wpnSkill === 'axes') {
+		if ($target->getEquipment() && (rand(0,100)<25 || $wpnSkill === 'axes')) {
 			$eqpName = $target->getEquipment()->getName();
 			if ($eqpName === 'shield') {
 				$target->dropEquipment();
