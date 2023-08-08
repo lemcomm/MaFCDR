@@ -258,7 +258,8 @@ class CombatManager {
 			if ($me->isFortified()) {
 				$attack += ($defBonus/2);
 			}
-			if (!$target->isMounted() && $target->getEquipment()->getType()->getName() === 'shield') {
+			$eqpt = $target->getEquipment();
+			if (!$target->getMount() && $eqpt && $eqpt->getName() === 'shield') {
 				$counterType = 'lightShield';
 			}
 		}
