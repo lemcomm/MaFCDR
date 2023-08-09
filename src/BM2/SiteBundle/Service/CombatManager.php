@@ -205,8 +205,12 @@ class CombatManager {
 				}
 			}
 		}
-		$wpnSkill = $attacker->getWeapon()->getSkill()->getCategory()->getName();
-		if (rand(0,100)<25 || $wpnSkill === 'axes') {
+		if ($attacker->getWeapon()) {
+			$wpnSkill = $attacker->getWeapon()->getSkill()->getCategory()->getName();
+		} else {
+			$wpnSkill = false;
+		}
+		if ($target->getEquipment() && (rand(0,100)<25 || $wpnSkill === 'axes')) {
 			$eqpName = $target->getEquipment()->getName();
 			if ($eqpName === 'shield') {
 				$target->dropEquipment();
@@ -254,7 +258,8 @@ class CombatManager {
 			if ($me->isFortified()) {
 				$attack += ($defBonus/2);
 			}
-			if (!$target->isMounted() && $target->getEquipment()->getType()->getName() === 'shield') {
+			$eqpt = $target->getEquipment();
+			if (!$target->getMount() && $eqpt && $eqpt->getName() === 'shield') {
 				$counterType = 'lightShield';
 			}
 		}
