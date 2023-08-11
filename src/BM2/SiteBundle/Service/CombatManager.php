@@ -288,7 +288,7 @@ class CombatManager {
 				foreach ($sublogs as $each) {
 					$logs[] = $each;
 				}
-				$result = $result . " " . $innerResult;
+				$result = $result . " " . $counterType . $innerResult;
 			}
 		}
 		if ($battle) {
