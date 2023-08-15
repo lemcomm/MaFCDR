@@ -962,17 +962,18 @@ yes:          yes
 no:           no
 techtree:     Technology Tree
 charstatus:
- inbattle:     battle
- travelling:   travel
- annexing:     annex
- supporting:   support
- opposing:     oppose
- looting:      loot
- blocking:     block
- granting:     grant
- renaming:     rename
- reclaiming:   reclaim
- sieging:     sieging
+ inbattle:    In a battle
+ travelling:  Travelling
+ annexing:    Annexing
+ supporting:  Supporting
+ opposing:    Opposing
+ looting:     Looting
+ blocking:    Blocking an area
+ granting:    Granting
+ renaming:    Renaming
+ reclaiming:  Reclaiming
+ sieging:     Sieging
+ prebattle:   Preparing for battle!
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 requests:     %number% request|%number% requests
