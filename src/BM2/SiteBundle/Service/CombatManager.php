@@ -374,12 +374,7 @@ class CombatManager {
 
 		// TODO: heavy armour should reduce this a little
 		if ($sol) {
-			$fighters = $me->getAllInUnit()->count();
-			if ($fighters>1) {
-				$me->updateMeleePower($power * pow($fighters, 0.96)/$fighters);
-			} else {
-				$me->updateMeleePower($power);
-			}
+			$me->updateMeleePower($power);
 		}
 		return $power*$mod;
 	}
@@ -527,12 +522,7 @@ class CombatManager {
 		// TODO: heavy armour should reduce this quite a bit
 
 		if ($sol) {
-			$fighters = $me->getAllInUnit()->count();
-			if ($fighters>1) {
-				$me->updateRangedPower($power * pow($fighters, 0.96)/$fighters);
-			} else {
-				$me->updateRangedPower($power);
-			}
+			$me->updateRangedPower($power);
 		}
 
 		return $power*$mod;
