@@ -1351,9 +1351,10 @@ battle:
   chargewound:  %i% was wounded by the enemy in the charge|%i% were wounded by the enemy in the charge
   chargecapture: %i% was captured by the enemy in the carge|%i% were captured by the enemy in the carge
   chargekill:   %i% was killed by the enemy in the charge|%i% were killed by the enemy in the charge
-  meleefail:    %i% was counter-attacked, but took no damage|%i% were counter-attacked but took no damage
-  meleewound:   %i% was wounded by an enemy counter-attack|%i% were wounded by enemy counter-attacks
-  meleecapture: %i% was captured by the enemy a counter-attack|%i% were captured by the enemy in counter-attacks
+  lightShieldfail:    %i% was counter-attacked, but took no damage|%i% were counter-attacked but took no damage
+  lightShieldwound:   %i% was wounded by an enemy counter-attack|%i% were wounded by enemy counter-attacks
+  lightShieldcapture: %i% was captured by the enemy a counter-attack|%i% were captured by the enemy in counter-attacks
+  lightShieldkill:   %i% was killed by the enemy in a counter-attack|%i% were killed by the enemy in counter-attacks
   stared:       %i% First One refused to reteat|%i% First Ones refused to retreat
  hunt:
   title:        hunt
