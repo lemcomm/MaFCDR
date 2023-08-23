@@ -787,6 +787,7 @@ class RealmController extends Controller {
 		$nearby = $this->get('dispatcher')->getActionableCharacters();
 		foreach ($nearby as $near) {
 			$char = $near['character'];
+			$myrealm = null;
 			foreach ($char->findRealms() as $myrealm) {
 				$id = $myrealm->getId();
 				if ($myrealm->getType() > $realm->getType()) {
@@ -811,13 +812,15 @@ class RealmController extends Controller {
 				}
 			}
 		}
+		$myrealm = null;
 		foreach ($character->findRealms() as $myrealm) {
+			$id = $myrealm->getId();
 			if ($myrealm->getType() > $realm->getType()) {
 				if ($myrealm !== $realm->getSuperior()) {
 					if (isset($available[$id])) {
-						$available[$id]['via'][] = $char;
+						$available[$id]['via'][] = $character;
 					} else {
-						$available[$id] = array('realm'=>$myrealm, 'via'=>array($char));
+						$available[$id] = array('realm'=>$myrealm, 'via'=>array($character));
 					}
 					if (!$realms->contains($myrealm)) {
 						$realms->add($myrealm);

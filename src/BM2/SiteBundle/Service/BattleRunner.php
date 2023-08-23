@@ -845,12 +845,16 @@ class BattleRunner {
 			$routed = 0;
 			$capture = 0;
 			$chargeCapture = 0;
+			$lightShieldCapture = 0;
 			$wound = 0;
 			$chargeWound = 0;
+			$lightShieldWound = 0;
 			$kill = 0;
 			$chargeKill = 0;
+			$lightShieldKill = 0;
 			$fail = 0;
 			$chargeFail =0;
+			$lightShieldFail = 0;
 			$missed = 0;
 			$crowded = 0;
 			$staredDeath = 0;
@@ -1145,12 +1149,22 @@ class BattleRunner {
 						*/
 					}
 					if ($result2) {
-						if ($result2=='chargewound') {
+						if($result2==='chargefail') {
+							$chargeFail++;
+						} elseif ($result2=='chargewound') {
 							$chargeWound++;
 						} elseif ($result2=='chargecapture') {
 							$chargeCapture++;
 						} elseif ($result2=='chargekill') {
 							$chargeKill++;
+						} elseif ($result2==='lightShieldfail') {
+							$lightShieldFail++;
+						} elseif ($result2==='lightShieldwound') {
+							$lightShieldWound++;
+						} elseif ($result2==='lightShieldcapture') {
+							$lightShieldCapture++;
+						} elseif ($result2==='lightShieldkill') {
+							$lightShieldKill++;
 						}
 					}
 					if ($noTargets > 4) {
@@ -1158,7 +1172,27 @@ class BattleRunner {
 						break;
 					}
 				}
-				$stageResult = array('alive'=>$attackers, 'shots'=>$shots, 'rangedHits'=>$rangedHits, 'strikes'=>$strikes, 'misses'=>$missed, 'notarget'=>$noTargets, 'crowded'=>$crowded, 'fail'=>$fail, 'wound'=>$wound, 'capture'=>$capture, 'kill'=>$kill, 'chargefail' => $chargeFail, 'chargewound'=>$chargeWound, 'chargecapture'=>$chargeCapture, 'chargekill'=>$chargeKill);
+				$stageResult = [
+					'alive'=>$attackers,
+					'shots'=>$shots,
+					'rangedHits'=>$rangedHits,
+					'strikes'=>$strikes,
+					'misses'=>$missed,
+					'notarget'=>$noTargets,
+					'crowded'=>$crowded,
+					'fail'=>$fail,
+					'wound'=>$wound,
+					'capture'=>$capture,
+					'kill'=>$kill,
+					'chargefail' => $chargeFail,
+					'chargewound'=>$chargeWound,
+					'chargecapture'=>$chargeCapture,
+					'chargekill'=>$chargeKill,
+					'lightShieldfail'=>$lightShieldFail,
+					'lightShieldwound'=>$lightShieldWound,
+					'lightShieldcapture'=>$lightShieldCapture,
+					'lightShieldkill'=>$lightShieldKill,
+				];
 			}
 			if ($type != 'hunt') { # Check that we're in either Ranged or Melee Phase
 				$stageReport->setData($stageResult); # Commit this stage's results to the combat report.
