@@ -208,15 +208,10 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'royal mews':
 			case 'stables':	// only in grass- or scrublands
 				$geo = $settlement->getGeoData()->getBiome()->getName();
 				if (!in_array($geo, array('grass', 'thin grass', 'scrub', 'thin scrub'))) {
-					return false;
-				}
-				break;
-			case 'royal mews':	// only in grasslands
-				$geo = $settlement->getGeoData()->getBiome()->getName();
-				if (!in_array($geo, array('grass', 'thin grass'))) {
 					return false;
 				}
 				break;

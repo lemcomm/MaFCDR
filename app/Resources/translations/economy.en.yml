@@ -338,9 +338,9 @@ condition:
  Quarry:             Not yet enabled/complete.
  Mine:               Can only be built in mountains and hills with metal ore in the ground.
  Regional Seat:      Can only be built in the capital of a realm.
- Royal Mews:         Can only be built in grasslands.
+ Royal Mews:         Can only be built in grasslands or scrublands.
  Royal Seat:         Can only be built in the capital of a realm.
- Stables:            Can only be built in grass- or scrublands.
+ Stables:            Can only be built in grasslands or scrublands.
  Imperial Seat:      Can only be built in the capital of a realm.
  Dockyard:           Not yet enabled/complete.
  Filled Moat: Region must be coastal or have a river.
