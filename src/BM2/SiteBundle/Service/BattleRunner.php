@@ -920,7 +920,7 @@ class BattleRunner {
 						$target = $this->getRandomSoldier($enemyCollection);
 						if ($target) {
 							$shots++;
-							$rPower = $this->combat->RangedPower($soldier, true);
+							$rPower = $this->combat->RangedPower($soldier, true, null, $attackers);
 							if ($this->combat->RangedRoll($defBonus, $rangedPenalty, $bonus, 95)) {
 								// target hit
 								$rangedHits++;
@@ -1055,7 +1055,7 @@ class BattleRunner {
 						if ($target) {
 							$noTargets = 0;
 							$shots++;
-							$rPower = $this->combat->RangedPower($soldier, true);
+							$rPower = $this->combat->RangedPower($soldier, true, null, $attackers);
 							if ($this->combat->RangedRoll($defBonus, $rangedPenalty, $bonus)) {
 								$rangedHits++;
 								list($result, $logs) = $this->combat->RangedHit($soldier, $target, $rPower, false, true, $this->xpMod, $defBonus);
@@ -1079,7 +1079,7 @@ class BattleRunner {
 						if ($target) {
 							$noTargets = 0;
 							$strikes++;
-							$mPower = $this->combat->MeleePower($soldier, true);
+							$mPower = $this->combat->MeleePower($soldier, true, null, $attackers);
 							list($result, $logs) = $this->combat->MeleeAttack($soldier, $target, $mPower, false, true, $this->xpMod, $this->defenseBonus); // Basically, an attack of opportunity.
 							foreach ($logs as $each) {
 								$this->log(10, $each);
