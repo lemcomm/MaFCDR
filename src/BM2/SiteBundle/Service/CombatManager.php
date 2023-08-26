@@ -299,7 +299,7 @@ class CombatManager {
 		return [$result, $logs];
 	}
 
-	public function MeleePower($me, $sol = false, EquipmentType $weapon = null) {
+	public function MeleePower($me, $sol = false, EquipmentType $weapon = null, $groupSize = 1) {
 		$noble = false;
 		$act = false;
 		# $sol is just a bypass for "Is this a soldier instance" or not.
@@ -374,7 +374,11 @@ class CombatManager {
 
 		// TODO: heavy armour should reduce this a little
 		if ($sol) {
-			$me->updateMeleePower($power);
+			if ($groupSize>1) {
+				$me->updateMeleePower($power * pow($groupSize, 0.96)/$groupSize);
+			} else {
+				$me->updateMeleePower($power);
+			}
 		}
 		return $power*$mod;
 	}
@@ -445,7 +449,7 @@ class CombatManager {
 		return [$result, $logs];
 	}
 
-	public function RangedPower($me, $sol = false, EquipmentType $weapon = null) {
+	public function RangedPower($me, $sol = false, EquipmentType $weapon = null, $groupSize = 1) {
 		$noble = false;
 		# $sol is just a bypass for "Is this a soldier instance" or not.
 		if ($sol) {
@@ -522,7 +526,11 @@ class CombatManager {
 		// TODO: heavy armour should reduce this quite a bit
 
 		if ($sol) {
-			$me->updateRangedPower($power);
+			if ($groupSize>1) {
+				$me->updateRangedPower($power * pow($groupSize, 0.96)/$groupSize);
+			} else {
+				$me->updateRangedPower($power);
+			}
 		}
 
 		return $power*$mod;
