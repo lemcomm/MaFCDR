@@ -232,7 +232,13 @@ class Economy {
 					return false;
 				}
 				$geo = $settlement->getGeoData()->getBiome()->getName();
-				if ($geo == 'rock') {
+				if (in_array($geo, array('rock', 'marsh'))) {
+					return false;
+				}
+				break;
+			case 'marsh drainage': // only in marshes
+			$geo = $settlement->getGeoData()->getBiome()->getName();
+				if ($geo != 'marsh') {
 					return false;
 				}
 				break;
