@@ -227,7 +227,7 @@ class Economy {
 					return false;
 				}
 				break;
-			case 'irrigation ditches': // only near rivers, not in mountains
+			case 'irrigation ditches': // only near rivers, not in mountains or marshes
 				if ($settlement->getGeoData()->getRiver() == false) {
 					return false;
 				}
