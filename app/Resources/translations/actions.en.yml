@@ -1127,7 +1127,8 @@ meta:
   intro: >
    Your can decide to make your character retire from active life at any time they are not captive.<br />
    This action will make your character lose all their titles, holdings, conversations, soldiers, and position on the map,
-   so it shouldn't be taken lightly. You will also have to wait, at a minimum, a few days to return them to activity.
+   so it shouldn't be taken lightly. You will also have to wait, at a minimum, a few days to return them to activity.<br><br>
+   Be advised, that if you are currently commanding units, and a battle is pending, your units will defect to the enemy.
   sure:         Are you certain?
   submit:       Leave the politics behind
   success:      Your character has entered their retirement, successfully.
@@ -1138,7 +1139,8 @@ meta:
     You can kill your character at any time.<br />
     This action will merely make your character dead without any reason given. You should roleplay an appropriate death
     so history and your fellow players know how %he% died.<br />
-    <div class="warning">This action cannot be undone or reversed.</div>
+    <div class="warning">This action cannot be undone or reversed.</div><br><br>
+    Be advised, that if you are currently commanding units, and a battle is pending, your units will defect to the enemy.
   sure:         Really, really sure?
   submit:       Welcome death's embrace.
   success:      Your character is now dead.
