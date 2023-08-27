@@ -197,10 +197,12 @@ class CharacterManager {
 		foreach ($character->getActions() as $act) {
 			$this->em->remove($act);
 		}
+		$enemies = false;
 		foreach ($character->getBattlegroups() as $bg) {
 			if ($bg->getLeader() === $character) {
 				$bg->setLeader(null);
 			}
+			$enemies = $bg->getEnemies()->first()->getCharacters();
 			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
@@ -210,9 +212,38 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'death', $character);
+		if ($enemies && $enemies->count() > 0) {
+			$enemy = $enemies->getCharacters()->first();
+			foreach ($character->getUnits() as $unit) {
+				if ($enemy instanceof Character) {
+					$unit->setCharacter($enemy);
+					$unit->setSettlement(null);
+					$unit->setSupplier(null);
+					$this->history->logEvent(
+						$unit,
+						'event.military.cowardice',
+						['%link-character-1%'=>$character->getId(), '%link-character-2%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$character,
+						'event.military.defection',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$enemy,
+						'event.military.defection2',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()]
+					);
+				} else {
+					$this->milman->returnUnitHome($unit, 'death', $character);
+				}
+			}
+		} else {
+			foreach ($character->getUnits() as $unit) {
+				$this->milman->returnUnitHome($unit, 'death', $character);
+			}
 		}
+
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
 		}
@@ -490,10 +521,12 @@ class CharacterManager {
 		foreach ($character->getActions() as $act) {
 			$this->em->remove($act);
 		}
+		$enemies = false;
 		foreach ($character->getBattlegroups() as $bg) {
 			if ($bg->getLeader() === $character) {
 				$bg->setLeader(null);
 			}
+			$enemies = $bg->getEnemies()->first()->getCharacters();
 			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
@@ -503,8 +536,36 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'retire', $character);
+		if ($enemies && $enemies->count() > 0) {
+			$enemy = $enemies->getCharacters()->first();
+			foreach ($character->getUnits() as $unit) {
+				if ($enemy instanceof Character) {
+					$unit->setCharacter($enemy);
+					$unit->setSettlement(null);
+					$unit->setSupplier(null);
+					$this->history->logEvent(
+						$unit,
+						'event.military.cowardice2',
+						['%link-character-1%'=>$character->getId(), '%link-character-2%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$character,
+						'event.military.defection',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$enemy,
+						'event.military.defection2',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()]
+					);
+				} else {
+					$this->milman->returnUnitHome($unit, 'retire', $character);
+				}
+			}
+		} else {
+			foreach ($character->getUnits() as $unit) {
+				$this->milman->returnUnitHome($unit, 'retire', $character);
+			}
 		}
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
