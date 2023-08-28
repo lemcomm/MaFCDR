@@ -89,7 +89,7 @@ class CharacterManager {
 		if ($father && $mother && $father->getHouse() && $mother->getHouse() && $father->getHouse() == $mother->getHouse()) {
 			$character->setHouse($father->getHouse);
 			$this->history->logEvent(
-				$house,
+				$father->getHouse(),
 				'event.house.newbirth2',
 				array('%link-character-1%'=>$father->getId(), '%link-character-2%'=>$mother->getId()),
 				History::ULTRA, true
@@ -97,7 +97,7 @@ class CharacterManager {
 		} else if ($father && !$mother && $father->getHouse()) {
 			$character->setHouse($father->getHouse);
 			$this->history->logEvent(
-				$house,
+				$father->getHouse(),
 				'event.house.newbirth1',
 				array('%link-character%'=>$father->getId()),
 				History::ULTRA, true
@@ -105,7 +105,7 @@ class CharacterManager {
 		} else if ($mother && !$father && $mother->getHouse()) {
 			$character->setHouse($mother->getHouse);
 			$this->history->logEvent(
-				$house,
+				$mother->getHouse(),
 				'event.house.newbirth1',
 				array('%link-character%'=>$mother->getId()),
 				History::MEDIUM, true
@@ -470,7 +470,7 @@ class CharacterManager {
 						$this->history->logEvent(
 							$each->getCharacter(),
 							'event.character.duelfail',
-							array('%link-character%'=>$char->getId()),
+							array('%link-character%'=>$character->getId()),
 							History::MEDIUM, true
 						);
 					}
@@ -719,7 +719,7 @@ class CharacterManager {
 			$this->politics->endOccupation($each, 'retire');
 		}
 
-		foreach ($character->getActivityParticipation() as $each) {
+		foreach ($character->getActivityParticipation() as $part) {
 			$act = $part->getActivity();
 			if ($act->getType()->getName() === 'duel') {
 				foreach ($act->getParticipants() as $each) {
@@ -727,7 +727,7 @@ class CharacterManager {
 						$this->history->logEvent(
 							$each->getCharacter(),
 							'event.character.duelfail2',
-							array('%link-character%'=>$char->getId()),
+							array('%link-character%'=>$character->getId()),
 							History::MEDIUM, true
 						);
 					}
@@ -821,7 +821,7 @@ class CharacterManager {
 						$this->$bequeath($thing, $steward, $char, null);
 						$thing->setSteward(null);
 						$this->history->logEvent(
-							$settlement,
+							$thing,
 							'event.settlement.stewardpromote',
 							array('%link-character%'=>$char->getId()),
 							History::MEDIUM, true
