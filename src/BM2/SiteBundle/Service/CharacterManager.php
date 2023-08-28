@@ -177,7 +177,7 @@ class CharacterManager {
 		return $selection[array_rand(str_split($selection))];
 	}
 
-	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
+	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death', $manual = false) {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		$character->setSystem(null);
@@ -212,7 +212,7 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		if ($enemies && $enemies->count() > 0) {
+		if ($manual && $enemies && $enemies->count() > 0) {
 			$enemy = $enemies->getCharacters()->first();
 			foreach ($character->getUnits() as $unit) {
 				if ($enemy instanceof Character) {
@@ -500,7 +500,7 @@ class CharacterManager {
 		return true;
 	}
 
-	public function retire(Character $character) {
+	public function retire(Character $character, $manual = false) {
 		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
 		// List is set to 90 as this sorts them to the retired listing on the account character list.
 		$character->setRetired(true)->setList(90)->setSlumbering(true);
@@ -536,7 +536,7 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		if ($enemies && $enemies->count() > 0) {
+		if ($manual && $enemies && $enemies->count() > 0) {
 			$enemy = $enemies->getCharacters()->first();
 			foreach ($character->getUnits() as $unit) {
 				if ($enemy instanceof Character) {
