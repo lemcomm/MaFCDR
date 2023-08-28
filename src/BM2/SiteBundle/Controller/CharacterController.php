@@ -1037,7 +1037,7 @@ class CharacterController extends Controller {
 					$character->getBackground()->setDeath($data['death']);
 					$em->flush();
 				}
-				$this->get('character_manager')->kill($character);
+				$this->get('character_manager')->kill($character, null, false, 'death', true);
 				foreach ($reclaimed as $rec) {
 					$this->get('history')->logEvent(
 						$rec['liege'],
@@ -1096,7 +1096,7 @@ class CharacterController extends Controller {
 					$character->getBackground()->setRetirement($data['retirement']);
 					$em->flush();
 				}
-				$this->get('character_manager')->retire($character);
+				$this->get('character_manager')->retire($character, true);
 				$this->addFlash('notice', $this->get('translator')->trans('meta.retire.success', array(), 'actions'));
 				return $this->redirectToRoute('bm2_characters');
 			}
