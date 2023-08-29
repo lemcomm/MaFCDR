@@ -2227,7 +2227,6 @@ class Dispatcher {
 
 
 	public function personalSurrenderTest() {
-		return array("name"=>"surrender.name", "description"=>"disabled because of abuse");
 		if ($this->getCharacter()->getPrisonerOf()) {
 			return array("name"=>"surrender.name", "description"=>"unavailable.prisoner");
 		}
