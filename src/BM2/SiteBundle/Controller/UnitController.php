@@ -511,6 +511,12 @@ class UnitController extends Controller {
                 foreach ($character->getOwnedSettlements() as $settlement) {
                         $options->add($settlement);
                 }
+                foreach ($character->getStewardingSettlements() as $settlement) {
+                        if ($options->contains($settlement)) {
+                                continue;
+                        }
+                        $options->add($settlement);
+                }
                 $inside = $character->getInsideSettlement();
                 if ($inside && $this->get('permission_manager')->checkSettlementPermission($inside, $character, 'units') && !$options->contains($inside)) {
                         $options->add($inside);

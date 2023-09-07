@@ -46,7 +46,7 @@
 			{% if unit.marshal %}
 				 | <a href="{{ path('maf_unit_revoke', {"unit":id}) }}"><button id="soldiers">{{ 'unit.list.revoke'|trans({},"actions") }}</button></a>
 			{% endif %}
-			{% if character.insideSettlement != unit.obj.settlement and unit.obj.travelDays < 1 %}
+			{% if unit.obj.travelDays < 1 %}
 				 | <a href="{{ path('maf_unit_rebase', {"unit":id}) }}"><button id="rebase">{{ 'unit.list.rebase'|trans({},"actions") }}</button></a>
 			{% endif %}
 			{% if not unit.obj.travelDays %}
