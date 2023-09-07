@@ -455,7 +455,7 @@ class AccountController extends Controller {
 					$form->addError(new FormError("character.burst"));
 					$works = false;
 				}
-				if (preg_match('/[01234567890\!\@\#\$\%\^\&\*\(\)_\+\-\=\[\]\{\}\:\;\<\>\.\?\/\\\|\~\"]/', $data['name'])) {
+				if (preg_match('/[0123456789!@#%^&*()_+\-=\[\]{}:;<>.?\/\\\|~\"]/', $data['name'])) {
 					$form->addError(new FormError("character.illegaltext"));
 					$works = false;
 				}
@@ -721,8 +721,10 @@ class AccountController extends Controller {
 		if ($character->getUser() != $user) {
 			throw $this->createAccessDeniedException('error.noaccess.character');
 		}
-		# Make sure this character can return from retirement. This function will throw an exception if the given character has not been retired for a week.
-		$this->get('character_manager')->checkReturnability($character);
+		# Make sure this character can return from retirement.
+		if ($character->isAlive() && !is_null($character->getRetiredOn()) && $character->getRetiredOn()->diff(new \DateTime("now"))->days <= 7) {
+			throw $this->createAccessDeniedException('error.noaccess.notreturnable');
+		}
 
 		$user->setCurrentCharacter($character);
 
