@@ -89,7 +89,7 @@ class CharacterManager {
 		if ($father && $mother && $father->getHouse() && $mother->getHouse() && $father->getHouse() == $mother->getHouse()) {
 			$character->setHouse($father->getHouse);
 			$this->history->logEvent(
-				$house,
+				$father->getHouse(),
 				'event.house.newbirth2',
 				array('%link-character-1%'=>$father->getId(), '%link-character-2%'=>$mother->getId()),
 				History::ULTRA, true
@@ -97,7 +97,7 @@ class CharacterManager {
 		} else if ($father && !$mother && $father->getHouse()) {
 			$character->setHouse($father->getHouse);
 			$this->history->logEvent(
-				$house,
+				$father->getHouse(),
 				'event.house.newbirth1',
 				array('%link-character%'=>$father->getId()),
 				History::ULTRA, true
@@ -105,7 +105,7 @@ class CharacterManager {
 		} else if ($mother && !$father && $mother->getHouse()) {
 			$character->setHouse($mother->getHouse);
 			$this->history->logEvent(
-				$house,
+				$mother->getHouse(),
 				'event.house.newbirth1',
 				array('%link-character%'=>$mother->getId()),
 				History::MEDIUM, true
@@ -177,7 +177,7 @@ class CharacterManager {
 		return $selection[array_rand(str_split($selection))];
 	}
 
-	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death') {
+	public function kill(Character $character, $killer=null, $forcekiller=false, $deathmsg='death', $manual = false) {
 		$character->setAlive(false)->setList(99)->setSlumbering(true);
 		// we used to remove characters from the map as part of this, but that's now handled by the GameRunner.
 		$character->setSystem(null);
@@ -197,10 +197,12 @@ class CharacterManager {
 		foreach ($character->getActions() as $act) {
 			$this->em->remove($act);
 		}
+		$enemies = false;
 		foreach ($character->getBattlegroups() as $bg) {
 			if ($bg->getLeader() === $character) {
 				$bg->setLeader(null);
 			}
+			$enemies = $bg->getEnemies()->first()->getCharacters();
 			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
@@ -210,9 +212,38 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'death', $character);
+		if ($manual && $enemies && $enemies->count() > 0) {
+			$enemy = $enemies->getCharacters()->first();
+			foreach ($character->getUnits() as $unit) {
+				if ($enemy instanceof Character) {
+					$unit->setCharacter($enemy);
+					$unit->setSettlement(null);
+					$unit->setSupplier(null);
+					$this->history->logEvent(
+						$unit,
+						'event.military.cowardice',
+						['%link-character-1%'=>$character->getId(), '%link-character-2%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$character,
+						'event.military.defection',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$enemy,
+						'event.military.defection2',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()]
+					);
+				} else {
+					$this->milman->returnUnitHome($unit, 'death', $character);
+				}
+			}
+		} else {
+			foreach ($character->getUnits() as $unit) {
+				$this->milman->returnUnitHome($unit, 'death', $character);
+			}
 		}
+
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
 		}
@@ -439,7 +470,7 @@ class CharacterManager {
 						$this->history->logEvent(
 							$each->getCharacter(),
 							'event.character.duelfail',
-							array('%link-character%'=>$char->getId()),
+							array('%link-character%'=>$character->getId()),
 							History::MEDIUM, true
 						);
 					}
@@ -469,7 +500,7 @@ class CharacterManager {
 		return true;
 	}
 
-	public function retire(Character $character) {
+	public function retire(Character $character, $manual = false) {
 		// This is very similar to the kill function above, but retirement is more restricted so we don't worry about certain things.
 		// List is set to 90 as this sorts them to the retired listing on the account character list.
 		$character->setRetired(true)->setList(90)->setSlumbering(true);
@@ -490,10 +521,12 @@ class CharacterManager {
 		foreach ($character->getActions() as $act) {
 			$this->em->remove($act);
 		}
+		$enemies = false;
 		foreach ($character->getBattlegroups() as $bg) {
 			if ($bg->getLeader() === $character) {
 				$bg->setLeader(null);
 			}
+			$enemies = $bg->getEnemies()->first()->getCharacters();
 			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 
@@ -503,8 +536,36 @@ class CharacterManager {
 		$query->execute();
 
 		// disband my troops
-		foreach ($character->getUnits() as $unit) {
-			$this->milman->returnUnitHome($unit, 'retire', $character);
+		if ($manual && $enemies && $enemies->count() > 0) {
+			$enemy = $enemies->getCharacters()->first();
+			foreach ($character->getUnits() as $unit) {
+				if ($enemy instanceof Character) {
+					$unit->setCharacter($enemy);
+					$unit->setSettlement(null);
+					$unit->setSupplier(null);
+					$this->history->logEvent(
+						$unit,
+						'event.military.cowardice2',
+						['%link-character-1%'=>$character->getId(), '%link-character-2%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$character,
+						'event.military.defection',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$enemy->getId()]
+					);
+					$this->history->logEvent(
+						$enemy,
+						'event.military.defection2',
+						['%link-unit%'=>$unit->getId(), '%link-character%'=>$character->getId()]
+					);
+				} else {
+					$this->milman->returnUnitHome($unit, 'retire', $character);
+				}
+			}
+		} else {
+			foreach ($character->getUnits() as $unit) {
+				$this->milman->returnUnitHome($unit, 'retire', $character);
+			}
 		}
 		foreach($character->getMarshallingUnits() as $unit) {
 			$unit->setMarshal(null);
@@ -658,7 +719,7 @@ class CharacterManager {
 			$this->politics->endOccupation($each, 'retire');
 		}
 
-		foreach ($character->getActivityParticipation() as $each) {
+		foreach ($character->getActivityParticipation() as $part) {
 			$act = $part->getActivity();
 			if ($act->getType()->getName() === 'duel') {
 				foreach ($act->getParticipants() as $each) {
@@ -666,7 +727,7 @@ class CharacterManager {
 						$this->history->logEvent(
 							$each->getCharacter(),
 							'event.character.duelfail2',
-							array('%link-character%'=>$char->getId()),
+							array('%link-character%'=>$character->getId()),
 							History::MEDIUM, true
 						);
 					}
@@ -760,7 +821,7 @@ class CharacterManager {
 						$this->$bequeath($thing, $steward, $char, null);
 						$thing->setSteward(null);
 						$this->history->logEvent(
-							$settlement,
+							$thing,
 							'event.settlement.stewardpromote',
 							array('%link-character%'=>$char->getId()),
 							History::MEDIUM, true

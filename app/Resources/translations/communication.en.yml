@@ -299,6 +299,9 @@ event:
    medium:      Moderate starvation is effecting %unit%.
    high:        Significant starvation is effecting %unit%.
    death:       Due to starvation, %i% soldiers from %unit% have died.
+  cowardice:    After the cowardice of %character-1%, the unit has sworn allegiance to %character-2%.
+  defection:    Seeing you unwilling to face your enemies, %unit% has defected to %character%.
+  defection2:   After seeing %character% being unwilling to fight you, %unit% has decided they'll fight for you instead.
  unit:
   assigned:     %character% has given you command of %unit%.
   appointed:    %character% has appointed you marshal of %unit%.
