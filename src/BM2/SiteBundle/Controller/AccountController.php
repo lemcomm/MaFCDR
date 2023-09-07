@@ -455,7 +455,7 @@ class AccountController extends Controller {
 					$form->addError(new FormError("character.burst"));
 					$works = false;
 				}
-				if (preg_match('/[0123456789!@#%^&*()_+\-=\[\]{}:;<>.?\/\\\|~\"]/', $data['name'])) {
+				if (preg_match('/[0123456789!@#%^&*()_+=\[\]{}:;<>.?\/\\\|~\"]/', $data['name'])) {
 					$form->addError(new FormError("character.illegaltext"));
 					$works = false;
 				}
