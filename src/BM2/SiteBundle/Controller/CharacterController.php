@@ -34,6 +34,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -842,51 +843,52 @@ class CharacterController extends Controller {
 			// TODO: validation ?
 			$data = $form->getData();
 			$newname=$data['name'];
-			$oldname = $character->getPureName();
+			if (preg_match('/[0123456789!@#%^&*()_+=\[\]{}:;<>.?\/\\\|~\"]/', $newname)) {
+				$form->addError(new FormError("character.illegaltext"));
+			} else {
+				$oldname = $character->getPureName();
 
-			if ($newname != $oldname) {
-				$character->setName($newname);
-				$this->get('history')->logEvent(
-					$character,
-					'event.character.renamed',
-					array('%oldname%'=>$oldname, '%newname%'=>$newname),
-					History::MEDIUM,
-					true
-				);
-			}
-
-			$new_knownas = $data['knownas'];
-			$old_knownas = $character->getKnownAs();
-			if ($new_knownas != $old_knownas) {
-				$character->setKnownAs($new_knownas);
-				if ($new_knownas) {
+				if ($newname != $oldname) {
+					$character->setName($newname);
 					$this->get('history')->logEvent(
 						$character,
-						'event.character.knownas1',
-						array('%newname%'=>$new_knownas),
-						History::MEDIUM,
-						true
-					);
-				} else {
-					$this->get('history')->logEvent(
-						$character,
-						'event.character.knownas2',
-						array('%oldname%'=>$old_knownas),
+						'event.character.renamed',
+						array('%oldname%' => $oldname, '%newname%' => $newname),
 						History::MEDIUM,
 						true
 					);
 				}
+
+				$new_knownas = $data['knownas'];
+				$old_knownas = $character->getKnownAs();
+				if ($new_knownas != $old_knownas) {
+					$character->setKnownAs($new_knownas);
+					if ($new_knownas) {
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.knownas1',
+							array('%newname%' => $new_knownas),
+							History::MEDIUM,
+							true
+						);
+					} else {
+						$this->get('history')->logEvent(
+							$character,
+							'event.character.knownas2',
+							array('%oldname%' => $old_knownas),
+							History::MEDIUM,
+							true
+						);
+					}
+				}
+
+				$this->getDoctrine()->getManager()->flush();
+
+				return $this->render('Character/rename.html.twig', [
+					'result' => array('success' => true),
+					'newname' => $newname
+				]);
 			}
-
-			$em = $this->getDoctrine()->getManager();
-			$em->flush();
-
-			return $this->render('Character/rename.html.twig', [
-				'result'=>array('success'=>true),
-				'newname'=>$newname
-			]);
-
-			return array();
 		}
 
 		return $this->render('Character/rename.html.twig', [
