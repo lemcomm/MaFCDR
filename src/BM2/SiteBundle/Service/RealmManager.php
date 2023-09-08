@@ -236,16 +236,23 @@ class RealmManager {
 	public function getVoteWeight(Election $election, Character $character) {
 		switch ($election->getMethod()) {
 			case 'spears':
-				return $character->getActiveSoldiers()->count();
+				$weight = 0;
+				foreach ($character->getUnits() as $unit) {
+					$weight += $unit->getActiveSoldiers()->count();
+				}
+				return $weight;
 			case 'swords':
 				return $character->getVisualSize();
 			case 'land':
 				return $character->getOwnedSettlements()->count();
 			case 'horses':
 				$weight = 0;
-				foreach ($character->getActiveSoldiers() as $soldier) {
-					if ($soldier->getEquipment()->getName()=='horse' || $soldier->getEquipment()->getName()=='war horse') {
-						$weight++;
+				foreach ($character->getUnits() as $unit) {
+					foreach ($unit->getActiveSoldiers() as $soldier) {
+						# While yes, I realize only mounts are horses, I'm leaving open the possibility of non-horse mounts.
+						if ($soldier->getMount()->getName() == 'horse' || $soldier->getMount()->getName() == 'war horse') {
+							$weight++;
+						}
 					}
 				}
 				return $weight;
