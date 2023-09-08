@@ -587,7 +587,8 @@ class MilitaryManager {
 		$unit->setSettlement($home);
 		if ($data) {
 			$unit->setSupplier($data['supplier']);
-			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
+		} else {
+			$unit->setSupplier($home);
 		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
 		$this->em->flush();
@@ -601,7 +602,7 @@ class MilitaryManager {
 				$this->history->openLog($unit, $steward);
 			}
 		}
-		if ($character) {
+		if ($character && $data) {
 			$this->history->logEvent(
 				$data['assignto'],
 				'event.military.newUnit',

@@ -96,6 +96,13 @@ class UnitSettingsType extends AbstractType {
 			));
 		}
 		if ($supply) {
+			$placeholder = 'unit.supplier.empty';
+			if($settings) {
+				$placeholder = $supplier;
+			} else if($char) {
+				$placeholder = $char->getInsideSettlement();
+			}
+			
 			# Find all settlements where we have permission to take food from.
 			$builder->add('supplier', EntityType::class, array(
 				'label' => 'unit.supplier.name',
@@ -110,7 +117,7 @@ class UnitSettingsType extends AbstractType {
 					$qb->orderBy('s.name');
 					return $qb;
 				},
-				'placeholder' => 'unit.supplier.empty',
+				'placeholder'=>$placeholder,
 				'data'=>$supplier,
 			));
 		}
