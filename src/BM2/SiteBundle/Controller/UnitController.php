@@ -507,16 +507,7 @@ class UnitController extends Controller {
 		if (! $character instanceof Character) {
 			return $this->redirectToRoute($character);
 		}
-                $options = new ArrayCollection();
-                foreach ($character->getOwnedSettlements() as $settlement) {
-                        $options->add($settlement);
-                }
-                foreach ($character->getStewardingSettlements() as $settlement) {
-                        if ($options->contains($settlement)) {
-                                continue;
-                        }
-                        $options->add($settlement);
-                }
+                $options = $character->findControlledSettlements();
                 $inside = $character->getInsideSettlement();
                 if ($inside && $this->get('permission_manager')->checkSettlementPermission($inside, $character, 'units') && !$options->contains($inside)) {
                         $options->add($inside);
