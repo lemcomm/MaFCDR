@@ -236,6 +236,12 @@ class Economy {
 					return false;
 				}
 				break;
+			case 'marsh drainage': // only in marshes
+			$geo = $settlement->getGeoData()->getBiome()->getName();
+				if ($geo != 'marsh') {
+					return false;
+				}
+				break;
 			case 'fortress': // not in marshes
 			case 'citadel': // not in marshes
 				$geo = $settlement->getGeoData()->getBiome()->getName();

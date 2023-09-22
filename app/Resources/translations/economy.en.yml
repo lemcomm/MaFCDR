@@ -57,6 +57,7 @@ building:
  Imperial Seat: Imperial Seat
  Inn: Inn
  Irrigation Ditches: Irrigation Ditches
+ Marsh Drainage: Marsh Drainage
  Leather Tanner: Leather Tanner
  Library: Library
  List Field: List Field
@@ -220,6 +221,8 @@ description:
    A series of small canals and ditches bringing water from a river deeper into the nearby farmland, which will improve
    fertility, but at the cost of constant management tying up manpower that could work the fields otherwise. Not very
    useful in already fertile regions, but very useful in less fertile ones.
+ Marsh Drainage: >
+   A system of drainage ditches and fillings to make the fertile marsh for suitable for agricultural activity.
  Leather Tanner: >
    A basic craftsman who turns animal hides into leather and simple leather products.
  Library: >
@@ -333,6 +336,7 @@ condition:
  Fishery:            Can only be built at the coast (both ocean and lakes).
  Fortress:           Cannot be built in marshland.
  Irrigation Ditches: Can only be built near rivers, can't be built in mountains or marshes.
+ Marsh Drainage:     Can only be built on marshes.
  Local Seat:         Can only be built in the capital of a realm.
  Lumber Yard:        Can only be built in forests.
  Quarry:             Not yet enabled/complete.
