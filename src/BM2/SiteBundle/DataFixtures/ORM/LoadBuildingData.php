@@ -147,7 +147,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'               => array('wood'=>array('construction'=>800), 'metal'=>array('construction'=>100), 'goods'=>array('construction'=>50), 'food'=>array('provides'=>50, 'bonus'=>5)),
 		'Lumber Yard'           => array('wood'=>array('construction'=>500, 'bonus'=>4), 'metal'=>array('construction'=>100, 'operation'=>1)),
 		'Irrigation Ditches'    => array('wood'=>array('construction'=>600), 'metal'=>array('construction'=>25), 'goods'=>array('construction'=>20), 'food'=>array('provides'=>100, 'bonus'=>1)),
-		'Marsh Drainage'    	=> array('wood'=>array('construction'=>1000), 'metal'=>array('construction'=>150), 'goods'=>array('construction'=>100), 'food'=>array('provides'=>40, 'bonus'=>5), 'wood'=>('provides'=>40, 'bonus'=>5)),
+		'Marsh Drainage'    	=> array('wood'=>array('construction'=>1000, 'provides'=>40, 'bonus'=>5), 'metal'=>array('construction'=>150), 'goods'=>array('construction'=>100), 'food'=>array('provides'=>40, 'bonus'=>5)),
 
 		'Local Seat'		=> array('wood'=>array('construction'=>2000, 'operation'=>10), 'metal'=>array('construction'=>300), 'money'=>array('construction'=>100, 'provides'=>2, 'bonus'=>1), 'food'=>array('bonus'=>3)),
 		'Regional Seat'		=> array('wood'=>array('construction'=>8000, 'operation'=>20), 'metal'=>array('construction'=>1000, 'bonus'=>5), 'money'=>array('construction'=>1000, 'provides'=>2, 'bonus'=>3), 'food'=>array('bonus'=>3)),
