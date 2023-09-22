@@ -140,6 +140,9 @@ class UnitDispatcher extends Dispatcher {
 	public function unitRebaseTest($ignored, Unit $unit) {
 		$character = $this->getCharacter();
 		$settlement = $this->getCharacter()->getInsideSettlement();
+		if($unit->disbanded) {
+			return array("name"=>"unit.rebase.name", "description"=>"unavailable.unitdisbanded");
+		}
 		if($unit->getSettlement() && !$this->pm->checkSettlementPermission($unit->getSettlement(), $character, 'units')) {
 			return array("name"=>"unit.rebase.name", "description"=>"unavailable.notowner");
 		}

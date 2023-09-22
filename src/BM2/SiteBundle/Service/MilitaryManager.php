@@ -602,7 +602,7 @@ class MilitaryManager {
 				$this->history->openLog($unit, $steward);
 			}
 		}
-		if ($character && $data) {
+		if ($character && $data && $data['assignto']) {
 			$this->history->logEvent(
 				$data['assignto'],
 				'event.military.newUnit',
@@ -889,28 +889,27 @@ class MilitaryManager {
 	}
 
 	public function rebaseUnit ($data, $options, Unit $unit) {
-		if ($options->contains($data['settlement']) && !$unit->getTravelDays()) {
-			$origin = $unit->getSettlement();
-
-			$unit->setSettlement($data['settlement']);
-			$unit->setSupplier($data['settlement']);
-
-			if (!$unit->getCharacter() && $origin) {
-				$this->returnUnitHome($unit, 'rebase', $origin);
-			}
-			if ($origin) {
-				$this->history->logEvent(
-					$unit,
-					'event.military.rebased',
-					array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
-					History::MEDIUM, false, 30
-				);
-			}
-
-			return true;
-		} else {
+		if (!($options->contains($data['settlement'])) || $unit->getTravelDays() > 0) {
 			return false;
 		}
+		$origin = $unit->getSettlement();
+
+		$unit->setSettlement($data['settlement']);
+		$unit->setSupplier($data['settlement']);
+
+		if (!$unit->getCharacter() && $origin) {
+			$this->returnUnitHome($unit, 'rebase', $origin);
+		}
+		if ($origin) {
+			$this->history->logEvent(
+				$unit,
+				'event.military.rebased',
+				array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
+				History::MEDIUM, false, 30
+			);
+		}
+
+		return true;
 	}
 
 	public function disbandUnit (Unit $unit, $bulk = false) {
