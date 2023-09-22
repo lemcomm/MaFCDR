@@ -1786,7 +1786,7 @@ unavailable:
  noduels: You have no duels to answer.
  noanswerableduels: All pending duels are awaiting others.
  unfinishedbusiness: "You have some unfinished business to attend to first. Perhaps it's a duel that requires your participation?"
- unitdisbanded: "This unit has been disbanded."
+ unitdisbanded: This unit has been disbanded.
 
 marker:
  name:      Marker name
