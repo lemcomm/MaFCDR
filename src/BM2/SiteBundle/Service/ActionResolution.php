@@ -552,26 +552,32 @@ class ActionResolution {
 		}
 
 		if (rand(0,100) < $chance) {
-			// add a short regroup timer to those who engaged me, to prevent immediate re-engages
-			foreach ($eChars as $enemy) {
-				$act = new Action;
-				$act->setType('military.regroup')->setCharacter($enemy);
-				$act->setBlockTravel(false);
-				$act->setCanCancel(false);
-				$complete = new \DateTime('now');
-				$complete->add(new \DateInterval('PT60M'));
-				$act->setComplete($complete);
-				$this->actman->queue($act, true);
+			if ($action->getTargetBattlegroup()->getCharacters()->count() === 1) {
+				# Just us, we can short-circuit this battle.
+				foreach ($action->getTargetBattlegroup()->getBattle()->getGroups() as $group) {
+					$this->warman->disbandGroup($group);
+				}
+			} else {
+				// add a short regroup timer to those who engaged me, to prevent immediate re-engages
+				foreach ($eChars as $enemy) {
+					$act = new Action;
+					$act->setType('military.regroup')->setCharacter($enemy);
+					$act->setBlockTravel(false);
+					$act->setCanCancel(false);
+					$complete = new \DateTime('now');
+					$complete->add(new \DateInterval('PT60M'));
+					$act->setComplete($complete);
+					$this->actman->queue($act, true);
+				}
+				$this->warman->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
+				$this->em->remove($action);
 			}
-			$this->warman->removeCharacterFromBattlegroup($char, $action->getTargetBattlegroup());
 			$this->history->logEvent(
 				$char,
 				'resolution.disengage.success',
 				array(),
 				History::MEDIUM, false, 10
 			);
-			$this->em->remove($action);
-
 			$get_away = 0.1;
 		} else {
 			$this->history->logEvent(
@@ -587,13 +593,6 @@ class ActionResolution {
 			$get_away = 0.05;
 		}
 		$this->em->flush();
-
-		// find the battle action and make it not blocking travel
-		foreach ($char->getActions() as $sub_action) {
-			if ($sub_action->getType()=='military.battle' && $sub_action->getTargetBattlegroup() == $action->getTargetBattlegroup()) {
-				$sub_action->setBlockTravel(false);
-			}
-		}
 
 		// to avoid people being trapped by overlapping engages - allow them to move a tiny bit along travel route
 		// 0.1 is 10% of a day's journey, or about 50% of an hourly journey - or about 1km base speed, modified for character speed
