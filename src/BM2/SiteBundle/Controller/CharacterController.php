@@ -1139,7 +1139,10 @@ class CharacterController extends Controller {
 				History::HIGH, true
 			);
 			$em->flush();
-			return array('success'=>true, 'target'=>$data['target']);
+			return $this->render('Character/surrender.html.twig', [
+				'success'=>true,
+				'target'=>$data['target']
+			]);
 		}
 
 		return $this->render('Character/surrender.html.twig', [
