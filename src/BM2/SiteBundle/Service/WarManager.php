@@ -665,9 +665,9 @@ class WarManager {
 	}
 
 	#TODO: Combine this with disbandSiege so we have less duplication of effort.
-	public function disbandGroup(BattleGroup $group, $battlesize = null) {
+	public function disbandGroup(BattleGroup $group, $battlesize = null, $skip = null) {
 		foreach ($group->getCharacters() as $character) {
-			$this->removeCharacterFromBattlegroup($character, $group);
+			$this->removeCharacterFromBattlegroup($character, $group, false, $skip);
 			$this->addRegroupAction($battlesize, $character);
 		}
 		if (!$group->getSiege()) {
@@ -677,10 +677,11 @@ class WarManager {
 		return true;
 	}
 
-	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg, $disbandSiege = false, $source = 'battlerunner') {
+	public function removeCharacterFromBattlegroup(Character $character, BattleGroup $bg, $disbandSiege = false, $skip = null) {
+		$total = $bg->getCharacters()->count();
 		$bg->removeCharacter($character);
-		if ($bg->getCharacters()->count()==0) {
-			// there are no more participants in this battlegroup
+		if ($total<=1) {
+			# I have no idea why it'd ever be less than 1, but *just in case*...
 			if ($bg->getBattle()) {
 				$focus = $bg->getBattle();
 				$type = 'battle';
@@ -700,15 +701,17 @@ class WarManager {
 						}
 					}
 					foreach ($group->getCharacters() as $char) {
-						$this->history->logEvent(
-							$char,
-							'battle.failed',
-							array(),
-							History::HIGH, false, 25
-						);
+						if ($char !== $skip) {
+							$this->history->logEvent(
+								$char,
+								'battle.failed',
+								array(),
+								History::HIGH, false, 25
+							);
+						}
 						if ($group->getLeader() == $char) {
 							$group->setLeader(null);
-							$char->removeLeadingBattlegroup($bg);
+							$char->removeLeadingBattlegroup($group);
 						}
 					}
 				}
