@@ -1686,7 +1686,7 @@ unavailable:
  notyours:      The settlement owner has not granted you permission to do this.
  notyours2:     You do not control this settlement.
  notoccupant:   You are not the occupant of this settlement.
- notowner:      You do not control this place of interest.
+ notowner:      You do not control this place.
  notrain:       No available training options.
  nobody:        No other First Ones within range.
  nosoldiers:    You do not have any soldiers.
@@ -1786,6 +1786,7 @@ unavailable:
  noduels: You have no duels to answer.
  noanswerableduels: All pending duels are awaiting others.
  unfinishedbusiness: "You have some unfinished business to attend to first. Perhaps it's a duel that requires your participation?"
+ unitdisbanded: This unit has been disbanded.
 
 marker:
  name:      Marker name
