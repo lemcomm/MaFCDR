@@ -552,7 +552,7 @@ class ActionResolution {
 		}
 
 		if (rand(0,100) < $chance) {
-			if ($action->getTargetBattlegroup()->getCharacters()->count() === 1) {
+			if ($action->getTargetBattlegroup()->getCharacters()->count() === 1 && $action->getTargetBattlegroup()->getBattle()->getGroups()->count() == 2) {
 				# Just us, we can short-circuit this battle.
 				foreach ($action->getTargetBattlegroup()->getBattle()->getGroups() as $group) {
 					$this->warman->disbandGroup($group);
