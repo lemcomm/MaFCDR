@@ -930,8 +930,8 @@ class CharacterManager {
 			}
 			$notheir = true;
 		}
-		# Handle house realingments.
-		if ($difhouse) {
+		# Handle house realignments.
+		if ($difhouse && $superior) {
 			if ($superior->findAllSuperiors()->contains($house)) {
 				# This house is an inferior of the heir, time to flip things.
 				if ($house->getSuperior()) {
