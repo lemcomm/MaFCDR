@@ -587,7 +587,8 @@ class MilitaryManager {
 		$unit->setSettlement($home);
 		if ($data) {
 			$unit->setSupplier($data['supplier']);
-			# Data can be passed as null, which works below because it's set as such, but not here because this doens't exist.
+		} else {
+			$unit->setSupplier($home);
 		}
 		$settings = $this->newUnitSettings($unit, $character, $data, true); #true to tell newUnitSettings not to flush so we can do it here.
 		$this->em->flush();
@@ -601,7 +602,7 @@ class MilitaryManager {
 				$this->history->openLog($unit, $steward);
 			}
 		}
-		if ($character) {
+		if ($character && $data && $data['assignto']) {
 			$this->history->logEvent(
 				$data['assignto'],
 				'event.military.newUnit',
@@ -888,52 +889,27 @@ class MilitaryManager {
 	}
 
 	public function rebaseUnit ($data, $options, Unit $unit) {
-		if ($options->contains($data['settlement']) && !$unit->getTravelDays()) {
-			$origin = $unit->getSettlement();
-			$senders = [];
-			if ($origin) {
-				if ($origin->getOwner()) {
-					$senders[] = $origin->getOwner()->getId();
-				}
-				if ($origin->getSteward()) {
-					$senders[] = $origin->getSteward()->getId();
-				}
-			}
-			$rcvs = [];
-			if ($data['settlement']->getOwner()) {
-				$rcvs[] = $data['settlement']->getOwner()->getId();
-			}
-			if ($data['settlement']->getSteward()) {
-				$rcvs[] = $data['settlement']->getSteward()->getId();
-			}
-			$unit->setSettlement($data['settlement']);
-			if (!$unit->getCharacter() && $origin) {
-				$this->returnUnitHome($unit, 'rebase', $origin);
-			}
-			if ((
-				$origin && $unit->getSupplier() == $data['settlement']
-			) OR (
-				$origin && in_array($senders, $rcvs)
-			) OR (
-				!$origin && $unit->getCharacter() && in_array($unit->getCharacter(), $rcvs)
-			)) {
-				# Nada. It's just easier to rule out the positives.
-			} else {
-				$unit->setSupplier(null);
-			}
-			if ($origin) {
-				$this->history->logEvent(
-					$unit,
-					'event.military.rebased',
-					array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
-					History::MEDIUM, false, 30
-				);
-			}
-
-			return true;
-		} else {
+		if (!($options->contains($data['settlement'])) || $unit->getTravelDays() > 0) {
 			return false;
 		}
+		$origin = $unit->getSettlement();
+
+		$unit->setSettlement($data['settlement']);
+		$unit->setSupplier($data['settlement']);
+
+		if (!$unit->getCharacter() && $origin) {
+			$this->returnUnitHome($unit, 'rebase', $origin);
+		}
+		if ($origin) {
+			$this->history->logEvent(
+				$unit,
+				'event.military.rebased',
+				array('%link-settlement-1%'=>$origin->getId(), '%link-settlement-2%'=>$data['settlement']->getId()),
+				History::MEDIUM, false, 30
+			);
+		}
+
+		return true;
 	}
 
 	public function disbandUnit (Unit $unit, $bulk = false) {

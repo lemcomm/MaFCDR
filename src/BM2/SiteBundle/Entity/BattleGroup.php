@@ -132,10 +132,10 @@ class BattleGroup {
 			}
 		} else if ($this->siege) {
 			# Sieges are a lot easier, as they're always 2 sided.
-			if ($this->siege->getAttackers()->contains($this)) {
-				$enemies = $this->siege->getDefenders();
-			} else {
-				$enemies = $this->siege->getAttackers();
+			foreach ($this->siege->getGroups() as $enemies) {
+				if ($enemies !== $this) {
+					break;
+				}
 			}
 		}
 		if (!empty($enemies)) {

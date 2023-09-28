@@ -68,6 +68,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'           	=> array('auto' =>   1800, 'min' =>    500, 'work' =>   6000, 'ratio' =>   800, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
 		'Lumber Yard'           => array('auto' =>      0, 'min' =>    600, 'work' =>   8000, 'ratio' =>  1400, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith','Dirt Streets'), 'conditions'=>true),
 		'Irrigation Ditches'    => array('auto' =>   3000, 'min' =>    200, 'work' =>  15000, 'ratio' =>   500, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith'), 'conditions'=>true),
+		'Marsh Drainage'    	=> array('auto' =>   0, 'min' =>    600, 'work' =>  20000, 'ratio' =>   50, 'builtin' => array('city'), 'requires' => array('Carpenter','Blacksmith'), 'conditions'=>true),
 
 		'Local Seat'		=> array('auto' =>	0, 'min' =>    100, 'work' =>   5000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Carpenter','Dirt Streets','Wood Wall'), 'conditions'=>true),
 		'Regional Seat'		=> array('auto' =>	0, 'min' =>   1000, 'work' => 500000, 'ratio' =>   500, 'builtin' => array('city'), 'defenses' => 5, 'requires' => array('Local Seat','Mason','Blacksmith','Paved Streets','Inn','School','Town Hall','Guardhouse','Wood Castle'), 'conditions'=>true),
@@ -146,6 +147,7 @@ class LoadBuildingData extends AbstractFixture implements OrderedFixtureInterfac
 		'Fishery'               => array('wood'=>array('construction'=>800), 'metal'=>array('construction'=>100), 'goods'=>array('construction'=>50), 'food'=>array('provides'=>50, 'bonus'=>5)),
 		'Lumber Yard'           => array('wood'=>array('construction'=>500, 'bonus'=>4), 'metal'=>array('construction'=>100, 'operation'=>1)),
 		'Irrigation Ditches'    => array('wood'=>array('construction'=>600), 'metal'=>array('construction'=>25), 'goods'=>array('construction'=>20), 'food'=>array('provides'=>100, 'bonus'=>1)),
+		'Marsh Drainage'    	=> array('wood'=>array('construction'=>1000, 'provides'=>40, 'bonus'=>5), 'metal'=>array('construction'=>150), 'goods'=>array('construction'=>100), 'food'=>array('provides'=>40, 'bonus'=>5)),
 
 		'Local Seat'		=> array('wood'=>array('construction'=>2000, 'operation'=>10), 'metal'=>array('construction'=>300), 'money'=>array('construction'=>100, 'provides'=>2, 'bonus'=>1), 'food'=>array('bonus'=>3)),
 		'Regional Seat'		=> array('wood'=>array('construction'=>8000, 'operation'=>20), 'metal'=>array('construction'=>1000, 'bonus'=>5), 'money'=>array('construction'=>1000, 'provides'=>2, 'bonus'=>3), 'food'=>array('bonus'=>3)),

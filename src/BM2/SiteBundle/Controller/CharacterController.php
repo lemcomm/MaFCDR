@@ -334,7 +334,7 @@ class CharacterController extends Controller {
 		}
 		if ($character->getHouse() && $character->getHouse()->getHome()) {
 			$myHouse = $character->getHouse();
-		} else {
+		} elseif (!$character->getHouse()) {
 			switch(rand(0,5)) {
 				case 0:
 					$query = $em->createQuery('SELECT s, h FROM BM2SiteBundle:Spawn s JOIN s.house h WHERE h.active = true AND s.active = true ORDER BY h.id DESC');
@@ -1139,7 +1139,10 @@ class CharacterController extends Controller {
 				History::HIGH, true
 			);
 			$em->flush();
-			return array('success'=>true, 'target'=>$data['target']);
+			return $this->render('Character/surrender.html.twig', [
+				'success'=>true,
+				'target'=>$data['target']
+			]);
 		}
 
 		return $this->render('Character/surrender.html.twig', [

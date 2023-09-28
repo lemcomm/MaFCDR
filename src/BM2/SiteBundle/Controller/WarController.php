@@ -1375,12 +1375,39 @@ class WarController extends Controller {
 			if (count($data['target']) == 0) {
 				$form->addError(new FormError("attack.nobody"));
 			} else {
-				$result = $this->get('war_manager')->createBattle($character, $character->getInsideSettlement(), null, $data['target']);
-				if ($result['outside'] && $character->getInsideSettlement()) {
-					// leave settlement if we attack targets outside
-					$character->setInsideSettlement(null);
+				$mine = 5;
+				foreach ($character->getUnits() as $unit) {
+					$mine += $unit->getVisualSize();
 				}
-
+				$force = 0;
+				foreach ($data['target'] as $target) {
+					$force += 5;
+					foreach ($target->getUnits() as $unit) {
+						$force += $unit->getVisualSize();
+					}
+				}
+				if ($mine*100<=$force) {
+					# The enemy force overwhelms you and immediately captures you.
+					$this->get('character_manager')->imprison($character, $target);
+					$this->get('history')->logEvent(
+						$character,
+						'event.character.overwhelmedby',
+						array('%link-character%'=>$data['target']->getId()),
+						History::HIGH, true
+					);
+					$this->get('history')->logEvent(
+						$data['target'],
+						'event.character.overwhelmed',
+						array('%link-character%'=>$character->getId()),
+						History::HIGH, true
+					);
+				} else {
+					$result = $this->get('war_manager')->createBattle($character, $character->getInsideSettlement(), null, $data['target']);
+					if ($result['outside'] && $character->getInsideSettlement()) {
+						// leave settlement if we attack targets outside
+						$character->setInsideSettlement(null);
+					}
+				}
 				$em->flush();
 			}
 		}
