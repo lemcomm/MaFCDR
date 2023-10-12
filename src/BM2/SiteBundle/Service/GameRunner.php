@@ -1606,7 +1606,7 @@ class GameRunner {
 						$electiontype = 'noruler';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
 
-						$msg = "Automatic election number ".$counter." has been triggered for the position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$msg = "Due to not having any rulers, an automatic election (number ".$counter.") has been triggered for the position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
 						$systemflag = 'announcements';
 						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
@@ -1614,7 +1614,7 @@ class GameRunner {
 					$disablefurtherelections = true;
 				}
 			}
-			if (!$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired() && !$disablefurtherelections) {
+			if (!$disablefurtherelections && !$position->getRuler() && $position->getHolders()->count() == 0 && $position->getElected() && !$position->getRetired()) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("  Empty realm position of ".$position->getName()." for realm ".$position->getRealm()->getName());
 					if ($position->getMinholders()) {
@@ -1626,7 +1626,7 @@ class GameRunner {
 						$electiontype = 'vacantelected';
 						$election = $this->setupElection($position, $electiontype, false, $counter);
 
-						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$msg = "Due to not having any position holders, an automatic election (number ".$counter.") has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
 						$systemflag = 'announcements';
 						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
@@ -1634,7 +1634,7 @@ class GameRunner {
 					$disablefurtherelections = true;
 				}
 			}
-			if ($position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired() && !$disablefurtherelections) {
+			if (!$disablefurtherelections && $position->getHolders()->count() < $position->getMinholders() && $position->getElected() && !$position->getRetired()) {
 				if (!$members->isEmpty()) {
 					$this->logger->notice("  Realm position of ".$position->getName()." for realm ".$position->getRealm()->getName()." needs more holders.");
 					if ($position->getMinholders()) {
@@ -1646,7 +1646,7 @@ class GameRunner {
 						$election = $this->setupElection($position, $electiontype, false, $counter);
 						$this->logger->notice("  -- election ".$counter." triggered.");
 
-						$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+						$msg = "Due to not having enough position holders, an automatic election (number ".$counter.") has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
 						$systemflag = 'announcements';
 						$this->postToRealm($position, $systemflag, $msg);
 						$electionsneeded--;
@@ -1684,11 +1684,9 @@ class GameRunner {
 					$position->setCycle(null);
 					break;
 			}
-			$members = $position->getRealm()->findMembers();
 			$this->logger->notice("  Calling election for ".$position->getName()." for realm ".$position->getRealm()->getName());
 			$electionsneeded = 1;
 			$counter = 0;
-			$firstelection = true;
 			if ($position->getMinholders()) {
 				$electionsneeded = $position->getMinholders();
 			}
@@ -1697,7 +1695,7 @@ class GameRunner {
 				$electiontype = 'routine';
 				$election = $this->setupElection($position, $electiontype, true, $counter);
 				$this->logger->notice("  -- election '.$counter.' triggered.");
-				$msg = "Automatic election number ".$counter." has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
+				$msg = "Due to it being time for regular elections, an automatic election (number ".$counter.") has been triggered for the elected position of ".$position->getName().". You are invited to vote - [vote:".$election->getId()."].";
 				$systemflag = 'announcements';
 				$this->postToRealm($position, $systemflag, $msg);
 				$electionsneeded--;
