@@ -321,7 +321,7 @@ class GameRunner {
 							$this->logger->info($position->getName().", ".$position->getId().", is detected as non-ruler, inherited position.");
 							if ($heir) {
 								$this->logger->info("    ".$heir->getName()." inherits ".$position->getName());
-								$this->cm->inheritPosition($position->getRealm(), $heir, $character, $via, 'slumber');
+								$this->cm->inheritPosition($position, $position->getRealm(), $heir, $character, $via, 'slumber');
 							} else {
 								$this->logger->info("    No one inherits ".$position->getName());
 								$this->cm->failInheritPosition($character, $position, 'slumber');
