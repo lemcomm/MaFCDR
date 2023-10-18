@@ -25,12 +25,14 @@ class LawEditType extends AbstractType {
 	private $law;
 	private $choices;
 	private $settlements;
+	private $faiths;
 
-	public function __construct(LawType $type, Law $law=null, $choices, $settlements) {
+	public function __construct(LawType $type, Law $law=null, $choices, $settlements, $faiths) {
 		$this->type = $type;
 		$this->law = $law;
 		$this->choices = $choices;
 		$this->settlements = $settlements;
+		$this->faiths = $faiths;
 	}
 
 	public function configureOptions(OptionsResolver $resolver) {
@@ -87,8 +89,8 @@ class LawEditType extends AbstractType {
 			'data'=>$law?$law->getCascades():false,
 			'required'=>false,
 		));
-		if ($type != 'freeform') {
-			if (!in_array($type, $taxes)) {
+		if ($type !== 'freeform') {
+			if ($type === 'realmFaith') {
 				$builder->add('value', ChoiceType::class, array(
 					'label'=>'law.form.edit.value',
 					'required'=>true,
@@ -101,6 +103,36 @@ class LawEditType extends AbstractType {
 					'data'=>$law?$law->getValue():null
 				));
 				$builder->add('settlement', HiddenType::class, array(
+					'data'=>null
+				));
+				$builder->add('faith', EntityType::class, array(
+					'label' => 'law.form.edit.faith',
+					'multiple'=>false,
+					'expanded'=>false,
+					'required'=>true,
+					'class'=>'BM2SiteBundle:Association',
+					'choice_label'=>function($choice, $key, $value) {
+						return $choice->getFaithName().' ('.$choice->getName().')';
+					},
+					'choices'=>$this->faiths,
+					'data'=>$law?$law->getFaith():null,
+				));
+			} elseif (!in_array($type, $taxes)) {
+				$builder->add('value', ChoiceType::class, array(
+					'label'=>'law.form.edit.value',
+					'required'=>true,
+					'choices'=>$choices[$type],
+					'placeholder'=>'law.form.type.empty',
+					'choice_translation_domain'=>'orgs',
+					'choice_label'=>function($choice, $key, $value) {
+						return 'law.info.'.$choice.'.desc';
+					},
+					'data'=>$law?$law->getValue():null
+				));
+				$builder->add('settlement', HiddenType::class, array(
+					'data'=>null
+				));
+				$builder->add('faith', HiddenType::class, array(
 					'data'=>null
 				));
 			} else {
@@ -118,6 +150,9 @@ class LawEditType extends AbstractType {
 					'choice_label'=>'name',
 					'choices'=>$this->settlements,
 					'data'=>$law?$law->getSettlement():null,
+				));
+				$builder->add('faith', HiddenType::class, array(
+					'data'=>null
 				));
 			}
 		} else {
