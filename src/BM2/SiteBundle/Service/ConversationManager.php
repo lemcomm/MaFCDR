@@ -651,6 +651,9 @@ class ConversationManager {
                 $now = new \DateTime("now");
                 foreach ($char->getConvPermissions() as $perm) {
                         if ($perm->getActive()) {
+				if ($perm->getOwner()) {
+					$this->findNewOwner($perm->getConversation(), $char, false);
+				}
                                 $perm->setActive(false);
                                 $perm->setEndTime($now);
                                 if (!$change) {
