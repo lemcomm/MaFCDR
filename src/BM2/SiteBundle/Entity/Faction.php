@@ -102,10 +102,13 @@ class Faction {
 		}
 		if ($climb) {
 			$superior = $this->getSuperior();
-			if ($law = $superior->findLaw($search, $climb)) {
-				# Climb the chain!
-				return $law;
+			if ($superior) {
+				if ($law = $superior->findLaw($search, $climb)) {
+					# Climb the chain!
+					return $law;
+				}
 			}
+
 		}
 		return false;
 	}
@@ -128,14 +131,16 @@ class Faction {
 		}
 		if ($climb) {
 			$superior = $this->getSuperior();
-			if ($law = $superior->findActiveLaw($search, $allowMultiple)) {
-				# Climb the chain!
-				if ($allowMultiple) {
-					foreach ($law as $each) {
-						$all->add($each);
+			if ($superior) {
+				if ($law = $superior->findActiveLaw($search, $allowMultiple)) {
+					# Climb the chain!
+					if ($allowMultiple) {
+						foreach ($law as $each) {
+							$all->add($each);
+						}
+					} else {
+						return $law;
 					}
-				} else {
-					return $law;
 				}
 			}
 			if ($allowMultiple && $all->count() > 0) {
