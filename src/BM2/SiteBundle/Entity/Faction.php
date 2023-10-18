@@ -94,23 +94,56 @@ class Faction {
 		return $all;
 	}
 
-	public function findLaw($search) {
+	public function findLaw($search, $climb = true) {
 		foreach ($this->getLaws() as $law) {
-			if ($law->getType()->getName() == $search) {
+			if ($law->getType()->getName() === $search) {
+				return $law;
+			}
+		}
+		if ($climb) {
+			$superior = $this->getSuperior();
+			if ($law = $superior->findLaw($search, $climb)) {
+				# Climb the chain!
 				return $law;
 			}
 		}
 		return false;
 	}
 
-	public function findMultipleLaws($haystack, $active = true) {
-		$needles = [];
+	public function findActiveLaw($search, $climb = true, $allowMultiple = false) {
+		# Search is what we want to find.
+		# Climb says do we check superiors.
+		# AllowMultiple determines if we want the first relative result or all possible results.
+		if ($allowMultiple) {
+			$all = new ArrayCollection();
+		}
 		foreach ($this->getLaws() as $law) {
-			if (in_array($law->getType()->getName(), $haystack) && $law->isActive() === $active) {
-				$needles[] = $law;
+			if ($law->isActive() && $law->getType()->getName() === $search) {
+				if ($allowMultiple) {
+					$all->add($law);
+				} else {
+					return $law;
+				}
 			}
 		}
-		return $needles;
+		if ($climb) {
+			$superior = $this->getSuperior();
+			if ($law = $superior->findActiveLaw($search, $allowMultiple)) {
+				# Climb the chain!
+				if ($allowMultiple) {
+					foreach ($law as $each) {
+						$all->add($each);
+					}
+				} else {
+					return $law;
+				}
+			}
+			if ($allowMultiple && $all->count() > 0) {
+				return $all;
+			}
+		}
+
+		return false;
 	}
 
 	public function findActiveLaws() {
