@@ -399,8 +399,8 @@ class ConversationController extends Controller {
 		$total = $messages->count();
 
 		foreach ($perms as $each) {
-			if ($perm->getUnread()) {
-				$perm->setUnread(0);
+			if ($each->getUnread()) {
+				$each->setUnread(0);
 			}
 		}
 
@@ -422,7 +422,7 @@ class ConversationController extends Controller {
 
 		if ($conv->findType() == 'org') {
 			if ($assoc = $conv->getAssociation()) {
-				if ($law = $assoc->findLaw('rankVisibility')) {
+				if ($law = $assoc->findActiveLaw('rankVisibility', false)) {
 					if ($law->getValue() == 'all') {
 						$known = null;
 						$privacy = false;
@@ -539,10 +539,7 @@ class ConversationController extends Controller {
 			$org = $conv->getHouse();
 		}
 
-		$total = $messages->count();
-
 		#Find the timestamp of the last read message.
-
 		$veryold = new \DateTime('now');
 		$veryold->sub(new \DateInterval("P30D")); // TODO: make this user-configurable
 
@@ -555,7 +552,7 @@ class ConversationController extends Controller {
 			]);
 		} elseif ($org) {
 			if ($assoc = $conv->getAssociation()) {
-				if ($law = $assoc->findLaw('rankVisibility')) {
+				if ($law = $assoc->findActiveLaw('rankVisibility', false)) {
 					if ($law->getValue() == 'all') {
 						$known = null;
 						$privacy = false;
