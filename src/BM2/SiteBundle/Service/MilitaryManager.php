@@ -60,6 +60,23 @@ class MilitaryManager {
 		// (not full, because you can't focus them)
 		foreach ($settlement->getUnits() as $unit) {
 			foreach ($unit->getRecruits() as $recruit) {
+				if (!$recruit->isAlive()) {
+					# Cleanup this recruit if they're dead for some reason (like starvation).
+					if ($weapon = $recruit->getWeapon()) {
+						$this->returnItem($settlement, $weapon);
+					}
+					if ($armor = $recruit->getArmour()) {
+						$this->returnItem($settlement, $armor);
+					}
+					if ($equipment = $recruit->getEquipment()) {
+						$this->returnItem($settlement, $equipment);
+					}
+					if ($mount = $recruit->getMount()) {
+						$this->returnItem($settlement, $mount);
+					}
+					$this->bury($recruit);
+					continue;
+				}
 				if ($recruit->getExperience()>0) {
 					$bonus = round(sqrt($recruit->getExperience())/5);
 				} else {
