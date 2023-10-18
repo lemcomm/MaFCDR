@@ -78,18 +78,31 @@ class Realm extends Faction {
 			}
 		}
 
-		foreach ($this->getPlaces() as $place) {
-			$owner = $place->getOwner();
-			if ($owner) {
-				$this->addRealmMember($owner);
-			}
-			foreach ($place->getVassals() as $knight) {
-				$this->addRealmMember($knight);
+		if ($law = $this->findActiveLaw('realmPlaceMembership')) {
+			foreach ($this->getPlaces() as $place) {
+				# These deliberately cascade into each other.
+				switch($law->getValue()) {
+					case 'all':
+						foreach ($place->getVassals() as $knight) {
+							$this->addRealmMember($knight);
+						}
+					case 'owner':
+						$owner = $place->getOwner();
+						if ($owner) {
+							$this->addRealmMember($owner);
+						}
+				}
 			}
 		}
 
 		foreach ($this->getVassals() as $knight) {
 			$this->addRealmMember($knight);
+		}
+
+		foreach ($this->getHostedEmbassies() as $embassy) {
+			if ($ambassador = $embassy->getAmbassador()) {
+				$this->addRealmMember($ambassador);
+			}
 		}
 
 		if ($with_subs) {
