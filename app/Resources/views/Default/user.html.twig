@@ -6,22 +6,22 @@
 {% endblock %}
 
 {% block content %}
-{% if (user and user.public) or gm %}
+{% if (viewedUser and viewedUser.public) or gm %}
 	{% if gm %}
-		{% if user and not user.public %}
+		{% if viewedUser and not viewedUser.public %}
 			<div class="warning">
-			<p>{{ 'user.profile.override'|trans }}</p>
+			<p>{{ 'override.user.profile'|trans }}</p>
 			</div>
-		{% elseif not user %}
+		{% elseif not viewedUser %}
 			This user ID either no longer or doesn't yet exist. Sorry!
 		{% endif %}
 	{% endif %}
 
-	{% if user.vipstatus > 0 %}
+	{% if viewedUser.vipstatus > 0 %}
 		<div class="vip">
-			{% if user.vipstatus == 30 %}
+			{% if viewedUser.vipstatus == 30 %}
 				<a href="{{ path("bm2_vips") }}"><img src="{{ asset('bundles/bm2site/images/vip-immortal.png') }}"/></a>
-			{% elseif user.vipstatus == 20 %}
+			{% elseif viewedUser.vipstatus == 20 %}
 				<a href="{{ path("bm2_vips") }}"><img src="{{ asset('bundles/bm2site/images/vip-legend.png') }}"/></a>
 			{% else %}
 				<a href="{{ path("bm2_vips") }}"><img src="{{ asset('bundles/bm2site/images/vip-hero.png') }}"/></a>
@@ -29,18 +29,18 @@
 		</div>
 	{% endif %}
 
-	<h2>{{ user.displayName }} {% if user.publicAdmin %}<small><i>{{ 'user.profile.isAdmin'|trans }}</i></small>{% endif %}</h2>
+	<h2>{{ viewedUser.displayName }} {% if viewedUser.publicAdmin %}<small><i>{{ 'user.profile.isAdmin'|trans }}</i></small>{% endif %}</h2>
 	<dl>
 		<dt>{{ 'user.profile.joined'|trans }}</dt>
-		<dd>{{ user.created|date('Y-m-d') }}</dd>
-		{% if user.showPatronage and user.patronizing.count > 0 %}
+		<dd>{{ viewedUser.created|date('Y-m-d') }}</dd>
+		{% if viewedUser.showPatronage and viewedUser.patronizing.count > 0 %}
 			<dt>{{ 'user.profile.patron.patron'|trans }}</dt>
-			<dd>{% for patron in user.patronizing %}
+			<dd>{% for patron in viewedUser.patronizing %}
 		{{ patron.creator.creator|title }} {% if patron.status == 'active_patron' %}{{ 'user.profile.patron.active'|trans }}, {% else %}{{ 'user.profile.patron.former'|trans }}{% endif %}
 			{% endfor %}</dd>
 		{% endif %}
 		{% if gm %}
-			{% set acct = user.accountLevel %}
+			{% set acct = viewedUser.accountLevel %}
 			{% if acct == 0 %}
 				{% set level = 'Storage' %}
 			{% elseif acct == 10 %}
@@ -65,18 +65,18 @@
 				{% set level = 'Explorer+ (Legacy)' %}
 			{% endif %}
 			<h3>Additional Details for GMs</h3>
-			<dt>Username: </dt><dd>{{ user.username }}</dd>
-			<dt>Enabled: </dt><dd>{% if user.enabled %}Yes{% else %}No{% endif %}</dd>
+			<dt>Username: </dt><dd>{{ viewedUser.username }}</dd>
+			<dt>Enabled: </dt><dd>{% if viewedUser.enabled %}Yes{% else %}No{% endif %}</dd>
 			<dt>Subscription: </dt><dd>{{ level }}</dd>
-			<dt>Last Login: </dt><dd>{{ user.last_login|date('Y-m-d H:i:s') }}</dd>
-			<dt>Activity Logging:</dt><dd>{% if user.watched %}Yes{% else %}No{% endif %}
+			<dt>Last Login: </dt><dd>{{ viewedUser.lastLogin|date('Y-m-d H:i:s') }}</dd>
+			<dt>Activity Logging:</dt><dd>{% if viewedUser.watched %}Yes{% else %}No{% endif %}
 			<dt>Reports: </dt><dd><a href="{{ path('maf_gm_user_reports', {'id':user.id}) }}">View</a></dd>
 		{% endif %}
 	</dl><hr>
 
 	<h3>{{ 'user.profile.profile'|trans }}</h3>
-	{% if user.description %}
-		{{ user.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
+	{% if viewedUser.description %}
+		{{ viewedUser.description.text|markdown|striptags('<strong><em><b><i><p><br><ul><ol><li><h1><h2><blockquote>')|wikilinks }}
 		<hr>
 	{% else %}
 		<i>{{ 'user.profile.empty'|trans }}</i>
@@ -90,7 +90,7 @@
 	<th>{{ 'user.profile.char.realms'|trans }}</th>
 	</thead>
 	<tbody>
-	{% for each in user.characters %}
+	{% for each in viewedUser.characters %}
 <tr><td><a href="{{ path('bm2_site_character_view', {'id':each.id})}}">{{ each.purename }}</a>{% if each.knownas %} {{ 'character.knownas'|trans({'%name%':each.knownas}) }}{% endif %}</td>
 		<td>{% if each.alive and each.location %}
 			{{ 'user.profile.char.active'|trans }}
