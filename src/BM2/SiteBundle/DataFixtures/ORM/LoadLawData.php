@@ -31,6 +31,8 @@ class LoadLawData extends AbstractFixture implements OrderedFixtureInterface {
 			'taxesWood'		=> ['allow_multiple'=>false],
 			'taxesMetal'		=> ['allow_multiple'=>false],
 			'taxesWealth'		=> ['allow_multiple'=>false],
+			'realmPlaceMembership'	=> ['allow_multiple'=>false],
+			'realmFaith'		=> ['allow_multiple'=>true],
 		]
 	];
 

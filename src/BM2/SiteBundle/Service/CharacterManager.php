@@ -818,7 +818,7 @@ class CharacterManager {
 			$fail = 'failInheritPlace';
 		}
 		if ($realm = $thing->getRealm()) {
-			$law = $realm->findLaw('settlementInheritance');
+			$law = $realm->findActiveLaw('settlementInheritance');
 			if ($law) {
 				$value = $law->getValue();
 			} else {
@@ -1005,7 +1005,7 @@ class CharacterManager {
 		if ($rank = $mbr->getRank()) {
 			if ($rank->isOwner() && $rank->getMembers()->count() == 1) {
 				$assoc = $rank->getAssociation();
-				$law = $assoc->findLaw('assocInheritance');
+				$law = $assoc->findActiveLaw('assocInheritance');
 				if ($law) {
 					$value = $law->getValue();
 				} else {

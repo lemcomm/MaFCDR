@@ -60,7 +60,7 @@ class Association extends Faction {
 	}
 
 	public function isPublic() {
-		$law = $this->findLaw('assocVisibility');
+		$law = $this->findActiveLaw('assocVisibility', false);
 		if ($law->getValue() === 'yes') {
 			return true;
 		} else {
@@ -69,7 +69,7 @@ class Association extends Faction {
 	}
 
 	public function findPubliclyVisibleRanks() {
-		if ($this->isPublic() && $this->findLaw('rankVisibility')->getValue() === 'all') {
+		if ($this->isPublic() && $this->findActiveLaw('rankVisibility', false)->getValue() === 'all') {
 			$all = $this->ranks;
 		} else {
 			$all = new ArrayCollection();

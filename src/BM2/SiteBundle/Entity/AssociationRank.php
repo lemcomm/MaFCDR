@@ -165,12 +165,12 @@ class AssociationRank {
 
         public function findRankDifference($rank) {
                 $diff = 0;
-                $assoc = $this->getAssocaition();
+                $assoc = $this->getAssociation();
                 if ($rank->getAssociation() === $assoc) {
                         if ($rank === $this) {
                                 return 0;
                         }
-                        $visLaw = $assoc->findLaw('rankVisibility');
+                        $visLaw = $assoc->findActiveLaw('rankVisibility', false);
                         if ($visLaw == 'direct') {
                                 # This takes advantage of the fact that superiors are returned in order. The first result of findAll is the immediate, the next is the one after, etc.
                                 foreach ($rank->findAllSuperiors() as $sup) {

@@ -23,6 +23,7 @@
 		<many-to-one field="settlement" target-entity="Settlement" inversed-by="laws" fetch="EAGER"/>
 		<many-to-one field="realm" target-entity="Realm" inversed-by="laws" fetch="EAGER"/>
 		<many-to-one field="type" target-entity="LawType" fetch="EAGER"/>
+		<many-to-one field="faith" target-entity="Association" inversed-by="followed_in" fetch="EAGER"/>
 
 	</entity>
 </doctrine-mapping>

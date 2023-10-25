@@ -124,7 +124,7 @@ class Settlement {
 				$mod = 0.5;
 				if (!$enforce_claim) {
 					if ($realm = $this->getRealm()) {
-						if ($law = $realm->findLaw('slumberingClaims')) {
+						if ($law = $realm->findActiveLaw('slumberingClaims')) {
 							$value = $law->getValue();
 							$members = false;
 							if ($value == 'all') {
@@ -144,7 +144,7 @@ class Settlement {
 				if ($opposers->contains($owner)) {
 					$mod = 25; # Very hard to take from current lord while he's around and actively opposing it.
 				} else {
-					$mod = 10;
+					$mod = 2.5;
 				}
 			}
 		} else {

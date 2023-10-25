@@ -803,8 +803,12 @@ class ActionsController extends Controller {
 
 			# Add law based destinations.
 			foreach ($character->findRealms() as $realm) {
-				foreach ($this->get('law_manager')->findTaxLaws($realm) as $law) {
-					if ($law->getSettlement()) {
+				$results = false;
+				foreach ($this->get('law_manager')->taxLaws as $type) {
+					$results = $realm->findActiveLaw($type, true, true);
+				}
+				if ($results) {
+					foreach ($results as $law) {
 						$dests[] = $law->getSettlement()->getId();
 					}
 				}

@@ -205,8 +205,23 @@ class LawController extends Controller {
 			$settlements = false;
 		}
 		$lawMan = $this->get('law_manager');
+		if ($type->getName() == 'realmFaith') {
+			$faiths = new ArrayCollection();
+			$query = $this->getDoctrine()->getManager()->createQuery('SELECT a FROM BM2SiteBundle:Association a WHERE a.faith_name is not null and a.follower_name is not null');
+			$all = $query->getResult();
+			foreach ($all as $each) {
+				if ($each->isPublic()) {
+					$faiths->add($each);
+				}
+			}
+			if ($char->getFaith() && !$faiths->contains($char->getFaith())) {
+				$faiths->add($char->getFaith());
+			}
+		} else {
+			$faiths = null;
+		}
 
-		$form = $this->createForm(new LawEditType($type, $law, $lawMan->choices, $settlements));
+		$form = $this->createForm(new LawEditType($type, $law, $lawMan->choices, $settlements, $faiths));
 		$form->handleRequest($request);
                 if ($form->isValid() && $form->isSubmitted()) {
 			$data = $form->getData();

@@ -242,6 +242,7 @@ law:
    value:    Law Intent
    amount:   Amount
    settlement: Settlement
+   faith:    Faith
    mandatory:
     label:   Law or Guideline
     yes:     Law
@@ -382,3 +383,28 @@ law:
   taxesWealth:
    label:    Realm Tax on Wealth
    desc:     Declares the amount of wealth to be taxed by the realm.
+  realmPlaceMembership:
+   label:    Realm Membership for Places
+   desc:     Determines whether the realm grants membership to Place owners and their vassals. (Ambassadors are exempt from this and always members).
+   all:
+    name:    Owners and Place Vassals
+    desc:    Owners and vassal of the Place are granted membership in the realm.
+   owners:
+    name:    Only Owners
+    desc:    Owners alone are granted membership in the realm.
+   none:
+    name:    No membership granted
+    desc:    No realm membership is granted by places.
+  realmFaith:
+   label:    Realm Recognition of Faiths
+   desc:     Declares the public position of the realm on one faith.
+   accepted:
+    name:    Accepted
+    desc:    This religion is accepted within the realm.
+   enforced:
+    name:    Enforced
+    desc:    This religion is mandatory within the realm.
+   outlawed:
+    name:    Outlawed
+    desc:    This religion is outlawed within the realm.
+
