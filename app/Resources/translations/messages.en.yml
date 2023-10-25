@@ -78,7 +78,6 @@ user:
   isAdmin: (Might & Fealty Administrator)
   joined: 'Date Joined:'
   profile: 'User Comment:'
-  override: Access to this private profile has been granted by your GM status!
   private: This user has not chosen to make their information public.
   empty: It seems nothing has been written here.
   patron:
@@ -98,6 +97,10 @@ user:
    knownas: (AKA %name%)
    realms: Realms
 
+override:
+  user:
+    profile: Access to this private profile has been granted by your GM status!
+  conversation: Access to this conversation may have been (at least in part) granted by your GM status! If you can send a message, you're in this conversation with this character. If you can't, you still might've been in this conversation, but no longer actively.
 
 contact:
  title:     Contact
@@ -962,18 +965,18 @@ yes:          yes
 no:           no
 techtree:     Technology Tree
 charstatus:
- inbattle:    In a battle
- travelling:  Travelling
- annexing:    Annexing
- supporting:  Supporting
- opposing:    Opposing
- looting:     Looting
- blocking:    Blocking an area
- granting:    Granting
- renaming:    Renaming
- reclaiming:  Reclaiming
- sieging:     Sieging
- prebattle:   Preparing for battle!
+  inbattle:    In a battle
+  travelling:  Travelling
+  annexing:    Annexing
+  supporting:  Supporting
+  opposing:    Opposing
+  looting:     Looting
+  blocking:    Blocking an area
+  granting:    Granting
+  renaming:    Renaming
+  reclaiming:  Reclaiming
+  sieging:     Sieging
+  prebattle:   Preparing for battle!
 newevents:    %number% event|%number% events
 newmessages:  %number% message|%number% messages
 requests:     %number% request|%number% requests
@@ -1867,7 +1870,6 @@ unit:
   link:        View Soldiers
 
 journal:
- report:       Report this Journal to the GMs for review.
  view:
   header:      Read a Journal Entry
   redirect:    This journal is private and you don't have access to read it.
@@ -1898,6 +1900,8 @@ journal:
    label:      Share as Out of Character Info Only?
   submit:      Record
  report:
+  header:      Report this journal for GM review
+  intro:       From here you can report this journal entry to the GMs for review and action.
   success:     A report has been generated and sent to the GMs for Review.
   failure:     You must be logged in to M&F to submit a report.
  mine:
@@ -1919,3 +1923,6 @@ olympus:
    reporter:   Reported By
    ts:         Timestamp
    actions:    Actions
+ report:
+   form:
+     help:     Why is this being reported?

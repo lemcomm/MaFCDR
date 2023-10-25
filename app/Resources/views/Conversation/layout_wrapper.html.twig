@@ -2,12 +2,18 @@
 
 {% block content %}
 
+	{% if gm %}
+		<div class="warning">
+			<p>{{ 'override.conversation'|trans }}</p>
+		</div>
+	{% endif %}
+
 {% if type == 'org' %}
-	{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive, "privacy": privacy, "known": known} %}
+	{% include "Conversation/org_conv.html.twig" with {"messages": messages, "conversation": conversation, "veryold": veryold, "active":active, "archive": archive, "privacy": privacy, "known": known} %}
 {% elseif type == 'local' %}
 	{% include "Conversation/local_conv.html.twig" with {"messages": messages, "conversation": conversation, "archive": archive} %}
 {% else %}
-	{% include "Conversation/priv_conv.html.twig" with {"messages": messages, "conversation": conversation, "last": last, "veryold": veryold, "active":active, "archive": archive} %}
+	{% include "Conversation/priv_conv.html.twig" with {"messages": messages, "conversation": conversation, "veryold": veryold, "active":active, "archive": archive} %}
 {% endif %}
 
 {% endblock %}

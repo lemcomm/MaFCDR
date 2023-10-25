@@ -136,7 +136,7 @@ assoc:
   newDeity:
    name:  Formalize a New Deity
    header: Formalize a New Deity
-   intro: <p>Deities are known things in Might & Fealty, for all First Ones trace their lineage back to the moment they were created by one deity or another. Whether or not you follow a deity is up to you, but the existence of deities beyond this realm is fact. How you interpret that is up to you.</p><p>Warning: No real world or clearly from popular fiction religions. This is a game. Make up something new or interesting.</p>
+   intro: "<p>Deities are known things in Might & Fealty, for all First Ones trace their lineage back to the moment they were created by one deity or another. Whether or not you follow a deity is up to you, but the existence of deities beyond this realm is fact. How you interpret that is up to you.</p><p>Warning: No real world or clearly from popular fiction religions. This is a game. Make up something new or interesting.</p>"
   removeDeity:
    name:  Remove this Deity from your Pantheon
   adoptDeity:
@@ -172,7 +172,7 @@ assoc:
 
  requests:
   join:
-   preamble: You've received a request to join the Association of %link-assoc% from %link-character%, on %date%, as follows:
+   preamble: "You've received a request to join the Association of %link-assoc% from %link-character%, on %date%, as follows:"
    approve:     Approve
    approved:    The applcation from %character% to join %assoc% has been approved.
    deny:        Deny
@@ -407,4 +407,7 @@ law:
    outlawed:
     name:    Outlawed
     desc:    This religion is outlawed within the realm.
+  realmVotingAge:
+   label:    Mininum Days Required in Realm to Vote
+   desc:     Sets (or unsets) the minimum required days in the realm to vote on elections or other matters. The default is everyone can vote.
 

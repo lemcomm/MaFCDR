@@ -234,19 +234,26 @@ class RealmManager {
 	}
 
 	public function getVoteWeight(Election $election, Character $character) {
+		$law = $election->getRealm()->findActiveLaw('realmVotingAge');
+		if (!$law || !$law->getValue()) {
+			$joinBy = new DateTime('2013-01-01');
+		} else {
+			$joinBy = new DateTime('-'.$law->getValue().' days');
+		}
+		$weight = 0;
 		switch ($election->getMethod()) {
 			case 'spears':
-				$weight = 0;
 				foreach ($character->getUnits() as $unit) {
 					$weight += $unit->getActiveSoldiers()->count();
 				}
-				return $weight;
+				break;
 			case 'swords':
-				return $character->getVisualSize();
+				$weight = $character->getVisualSize();
+				break;
 			case 'land':
-				return $character->getOwnedSettlements()->count();
+				$weight = $character->getOwnedSettlements()->count();
+				break;
 			case 'horses':
-				$weight = 0;
 				foreach ($character->getUnits() as $unit) {
 					foreach ($unit->getActiveSoldiers() as $soldier) {
 						# While yes, I realize only mounts are horses, I'm leaving open the possibility of non-horse mounts.
@@ -255,9 +262,8 @@ class RealmManager {
 						}
 					}
 				}
-				return $weight;
+				break;
 			case 'realmland':
-				$land = 0;
 				$realms = $election->getRealm()->findAllInferiors(true);
 				$realmids = [];
 				foreach ($realms as $realm) {
@@ -265,18 +271,16 @@ class RealmManager {
 					}
 				foreach ($character->getOwnedSettlements() as $e) {
 					if (in_array($e->getRealm()->getId(), $realmids)) {
-						$land++;
+						$weight++;
 					}
 				}
-				return $land;
+				break;
 			case 'heads':
-				$pop = 0;
 				foreach ($character->getOwnedSettlements() as $e) {
-					$pop += $e->getPopulation();
+					$weight += $e->getPopulation();
 				}
-				return $pop;
+				break;
 			case 'realmcastles':
-				$castles = 0;
 				$realms = [];
 				foreach ($election->getRealm()->findAllInferiors(true) as $realm) {
 					$realms[] = $realm->getId();
@@ -285,25 +289,28 @@ class RealmManager {
 					if (in_array($settlement->getRealm()->getId(), $realms)) {
 						foreach ($settlement->getBuildings() as $b) {
 							if ($b->getType()->getDefenses() > 0) {
-								$castles += $b->getType()->getDefenses()/10;
+								$weight += $b->getType()->getDefenses()/10;
 							}
 						}
 					}
 				}
-				return $castles;
+				break;
 			case 'castles':
-				$castles = 0;
 				foreach ($character->getOwnedSettlements() as $settlement) {
 					foreach ($settlement->getBuildings() as $b) {
 						if ($b->getType()->getDefenses() > 0) {
-							$castles += $b->getType()->getDefenses()/10;
+							$weight += $b->getType()->getDefenses()/10;
 						}
 					}
 				}
-				return $castles;
 			case 'banner':
 			default:
-				return 1;
+				$weight = 1;
+		}
+		if ($character->getCreated() >= $joinBy) {
+			return 0;
+		} else {
+			return $weight;
 		}
 	}
 

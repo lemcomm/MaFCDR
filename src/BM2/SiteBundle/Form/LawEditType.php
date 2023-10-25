@@ -117,6 +117,18 @@ class LawEditType extends AbstractType {
 					'choices'=>$this->faiths,
 					'data'=>$law?$law->getFaith():null,
 				));
+			} elseif ($type === 'realmVotingAge') {
+				$builder->add('value', TextType::class, array(
+					'label'=>'law.form.edit.amount',
+					'data'=>$law?$law->getValue():null,
+					'required'=>true
+				));
+				$builder->add('settlement', HiddenType::class, array(
+					'data'=>null
+				));
+				$builder->add('faith', HiddenType::class, array(
+					'data'=>null
+				));
 			} elseif (!in_array($type, $taxes)) {
 				$builder->add('value', ChoiceType::class, array(
 					'label'=>'law.form.edit.value',
