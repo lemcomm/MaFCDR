@@ -8,7 +8,6 @@ use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\RealmPosition;
 use Doctrine\ORM\EntityManager;
 
-
 class RealmManager {
 
 	protected $em;
@@ -236,9 +235,9 @@ class RealmManager {
 	public function getVoteWeight(Election $election, Character $character) {
 		$law = $election->getRealm()->findActiveLaw('realmVotingAge');
 		if (!$law || !$law->getValue()) {
-			$joinBy = new DateTime('2013-01-01');
+			$joinBy = new \DateTime('2013-01-01');
 		} else {
-			$joinBy = new DateTime('-'.$law->getValue().' days');
+			$joinBy = new \DateTime('-'.$law->getValue().' days');
 		}
 		$weight = 0;
 		switch ($election->getMethod()) {
@@ -303,11 +302,12 @@ class RealmManager {
 						}
 					}
 				}
+				break;
 			case 'banner':
 			default:
 				$weight = 1;
 		}
-		if ($character->getCreated() >= $joinBy) {
+		if ($character->getCreated() <= $joinBy) {
 			return 0;
 		} else {
 			return $weight;
