@@ -386,34 +386,44 @@ class ConversationController extends Controller {
 	  * @Route("/{conv}", name="maf_conv_read", requirements={"conv"="\d+"})
 	  */
 	public function readAction(Conversation $conv) {
-                $char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
-                if (! $char instanceof Character) {
-                        return $this->redirectToRoute($char);
-                }
+		$gm = $this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS');
+		if ($gm) {
+			try {
+				$char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
+			} catch (AccessDeniedHttpException $e) {
+				$char = false;
+			}
+		} else {
+			$char = $this->get('dispatcher')->gateway('conversationSingleTest', false, true, false, $conv);
+		}
 
-		$em = $this->getDoctrine()->getManager();
-		$messages = $conv->findMessages($char);
-		$perms = $conv->findCharPermissions($char);
-		$lastPerm = $perms->last();
-		$unread = $lastPerm->getUnread();
-		$total = $messages->count();
-
-		foreach ($perms as $each) {
-			if ($each->getUnread()) {
-				$each->setUnread(0);
+		$override = false;
+		if (! $char instanceof Character) {
+			if (!$gm) {
+				return $this->redirectToRoute($char);
+			} else {
+				$override = true;
 			}
 		}
-
-		if ($unread) {
-			$last = $lastPerm->getLastAccess();
+		$em = $this->getDoctrine()->getManager();
+		if ($gm) {
+			$messages = $conv->getMessages();
 		} else {
-			$unread = 0;
-			$last = NULL;
+			$messages = $conv->findMessages($char);
 		}
-		if ($lastPerm->getActive()) {
-			$lastPerm->setLastAccess(new \DateTime('now'));
+		if (!$override) {
+			$perms = $conv->findCharPermissions($char);
+			foreach ($perms as $each) {
+				if ($each->getUnread()) {
+					$each->setUnread(0);
+				}
+			}
+			$lastPerm = $perms->last();
+			if ($lastPerm->getActive()) {
+				$lastPerm->setLastAccess(new \DateTime('now'));
+			}
+			$em->flush();
 		}
-		$em->flush();
 
 		#Find the timestamp of the last read message.
 
@@ -422,7 +432,8 @@ class ConversationController extends Controller {
 
 		if ($conv->findType() == 'org') {
 			if ($assoc = $conv->getAssociation()) {
-				if ($law = $assoc->findActiveLaw('rankVisibility', false)) {
+				$law = $assoc->findActiveLaw('rankVisibility', false);
+				if (!$override && $law) {
 					if ($law->getValue() == 'all') {
 						$known = null;
 						$privacy = false;
@@ -435,6 +446,9 @@ class ConversationController extends Controller {
 							$known = new ArrayCollection;
 						}
 					}
+				} elseif ($override) {
+					$known = null;
+					$privacy = false;
 				}
 			} else {
 				$known = null;
@@ -445,22 +459,27 @@ class ConversationController extends Controller {
 				'conversation' => $conv,
 				'messages' => $messages,
 				'veryold' => $veryold,
-				'last' => $last,
-				'active'=> $lastPerm->getActive(),
+				'active'=> $override ? false : $lastPerm->getActive(),
 				'privacy' => $privacy,
 				'known' => $known,
-				'archive'=> false
+				'archive'=> false,
+				'gm' => $gm,
 			]);
 		} else {
+			if ($override) {
+				$manager = false;
+			} else {
+				$manager = $lastPerm->getManager()?true:$lastPerm->getOwner();
+			}
 			return $this->render('Conversation/layout_wrapper.html.twig', [
 				'type' => 'private',
 				'conversation' => $conv,
 				'messages' => $messages,
 				'veryold' => $veryold,
-				'last' => $last,
-				'manager' => $lastPerm->getManager() ? true : $lastPerm->getOwner(),
-				'active'=> $lastPerm->getActive(),
-				'archive'=> false
+				'manager' => $manager,
+				'active'=> $override ? false : $lastPerm->getActive(),
+				'archive'=> false,
+				'gm' => $gm,
 			]);
 		}
 	}
