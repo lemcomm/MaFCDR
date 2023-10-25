@@ -61,7 +61,7 @@ class Association extends Faction {
 
 	public function isPublic() {
 		$law = $this->findActiveLaw('assocVisibility', false);
-		if ($law->getValue() === 'yes') {
+		if ($law && $law->getValue() === 'yes') {
 			return true;
 		} else {
 			return false;
