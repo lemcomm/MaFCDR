@@ -68,6 +68,10 @@ class LawManager {
 			'realmFaith.accepted'=>'accepted',
 			'realmFaith.enforced'=>'enforced',
 		],
+		'realmVotingAge' => [
+			'realmVotingAge.none'=>'none',
+			'realmVotingAge.days'=>'days'
+		],
 	];
 
 	public $allowDuplicates = ['freeform', 'realmFaith', 'taxesFood', 'taxesWood', 'taxesMetal', 'taxesWealth'];
@@ -179,6 +183,7 @@ class LawManager {
 			'slumberingClaims',
 			'realmPlaceMembership',
 			'realmFaith',
+			'realmVotingAge'
 		];
 		if (in_array($type, $simpleLaws)) {
 			$old->setInvalidatedBy($law);
