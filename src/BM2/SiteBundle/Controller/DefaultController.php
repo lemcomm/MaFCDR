@@ -136,7 +136,7 @@ class DefaultController extends Controller {
 		$gm = $this->get('security.authorization_checker')->isGranted('ROLE_OLYMPUS');
 
 		return $this->render('Default/user.html.twig', [
-			"user"=>$user,
+			"viewedUser"=>$user,
 			"gm"=>$gm,
 		]);
 	}
