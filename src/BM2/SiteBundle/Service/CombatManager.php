@@ -4,6 +4,7 @@ namespace BM2\SiteBundle\Service;
 
 use BM2\SiteBundle\Entity\ActivityParticipant;
 use BM2\SiteBundle\Entity\EquipmentType;
+use BM2\SiteBundle\Entity\Settlement;
 use Doctrine\ORM\EntityManager;
 
 
@@ -556,41 +557,73 @@ class CombatManager {
 		if ($attScore > rand(0,max(1,$this->DefensePower($target, $battle) - $target->getWounded(true)))) {
 			// penetrated again = kill
 			switch ($phase) {
-				case 'charge':  $surrender = 85; break;
+				case 'charge':  $surrender = 50; break;
 				case 'ranged':	$surrender = 60; break;
 				case 'hunt':	$surrender = 95; break;
 				case 'melee':
-				default:	$surrender = 90; break;
+				default:	$surrender = 75; break;
 			}
 			// nobles can surrender and be captured instead of dying - if their attacker belongs to a noble
 			$random = rand(1,100);
-			if ($battle && $target->getMount() && (($me->getMount() && $random < 50) || (!$me->getMount() && $random < 70))) {
-				$logs[] = "killed mount & wounded\n";
-				#$target->wound($this->calculateWound($power));
-				$target->dropMount();
-				$this->history->addToSoldierLog($target, 'wounded.'.$phase);
-				$result='wound';
-			} elseif ($battle && $target->isNoble() && !$target->getCharacter()->isNPC() && $random < $surrender && $me->getCharacter()) {
-				$logs[] = "captured\n";
-				$this->charMan->imprison_prepare($target->getCharacter(), $me->getCharacter());
-				$this->history->logEvent($target->getCharacter(), 'event.character.capture', array('%link-character%'=>$me->getCharacter()->getId()), History::HIGH, true);
-				$result='capture';
-				$this->charMan->addAchievement($me->getCharacter(), 'captures');
-			} else {
-				if ($battle) {
-					if ($me->isNoble()) {
-						if ($target->isNoble()) {
-							$this->charMan->addAchievement($me->getCharacter(), 'kills.nobles');
-						} else {
-							$this->charMan->addAchievement($me->getCharacter(), 'kills.soldiers');
+			if ($battle) {
+				$resolved = false;
+				if ($target->getMount() && (($me->getMount() && $random < 50) || (!$me->getMount() && $random < 70))) {
+					$logs[] = "killed mount & wounded\n";
+					#$target->wound($this->calculateWound($power));
+					$target->dropMount();
+					$this->history->addToSoldierLog($target, 'wounded.' . $phase);
+					$result = 'wound';
+					$resolved = true;
+				}
+				if (!$resolved) {
+					$myNoble = false;
+					if ($me->getCharacter()) {
+						# We are our noble.
+						$myNoble = $me->getCharacter();
+					} elseif ($me->getUnit()) {
+						# If you're not a character you should have a unit but...
+						$unit = $me->getUnit();
+						if ($unit->getCharacter()) {
+							$myNoble = $unit->getCharacter();
+						} elseif ($unit->getSettlement()) {
+							/** @var Settlement $loc */
+							$loc = $unit->getSettlement();
+							if ($loc->getOccupant()) {
+								# Settlement is occupied.
+								$myNoble = $loc->getOccupant();
+							} elseif ($loc->getOwner()) {
+								# Settlement is not occupied, has owner.
+								$myNoble = $loc->getOwner();
+							} elseif ($loc->getSteward()) {
+								# Settlement is not occupied, no owner, has steward.
+								$myNoble = $loc->getSteward();
+							}
 						}
 					}
-					$logs[] = "killed\n";
-					$target->kill();
-					$this->history->addToSoldierLog($target, 'killed');
+					if ($target->isNoble() && $random < $surrender && $myNoble) {
+						$logs[] = "captured\n";
+						$this->charMan->imprison_prepare($target->getCharacter(), $myNoble);
+						$this->history->logEvent($target->getCharacter(), 'event.character.capture', ['%link-character%' => $myNoble->getId()], History::HIGH, true);
+						$result = 'capture';
+						$this->charMan->addAchievement($myNoble, 'captures');
+					} else {
+						if ($me->isNoble()) {
+							if ($target->isNoble()) {
+								$this->charMan->addAchievement($me->getCharacter(), 'kills.nobles');
+							} else {
+								$this->charMan->addAchievement($me->getCharacter(), 'kills.soldiers');
+							}
+						}
+						$logs[] = "killed\n";
+						$target->kill();
+						$this->history->addToSoldierLog($target, 'killed');
+						$result = 'kill';
+					}
 				}
+			} else {
 				$result='kill';
 			}
+
 		} else {
 			if ($battle) {
 				$logs[] = "wounded\n";
