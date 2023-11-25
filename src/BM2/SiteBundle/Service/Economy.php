@@ -742,7 +742,7 @@ class Economy {
 					$suppliedNPCs += $unit->getLivingSoldiers()->count();
 				}
 				if ($suppliedNPCs > 0) {
-					$suppliedNPCs = ceil($suppliedNPCs/3); #TODO: as funny as full effect would be :)
+					$suppliedNPCs = ceil($suppliedNPCs*0.75); #TODO: as funny as full effect would be :)
 				}
 				#$suppliedNPCs += $unit->getLivingEntourage()->count(); // TODO: Determine if we want to feed entourage or just pay them.
 				$need = $settlement->getPopulation() + $settlement->getThralls()*0.75 + $suppliedNPCs*0.8;
