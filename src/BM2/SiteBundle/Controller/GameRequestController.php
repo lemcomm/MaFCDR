@@ -71,9 +71,9 @@ class GameRequestController extends Controller {
 				if ($id->getToSettlement() && ($id->getToSettlement()->getOwner() != $char)) {
 					$result = false;
 				} elseif ($id->getToPlace()) {
-					if ($id->getToPlace()->getType() != 'embassy' && $id->getToPlace()->getOwner() != $char) {
-						$result = false;
-					} elseif ($id->getToPlace()->getType() == 'embassy' && $id->getToPlace()->getAmbassador() != $char) {
+					if ($id->getToPlace()->isOwner($char)) {
+						$result = true;
+					} else {
 						$result = false;
 					}
 				} elseif ($id->getToPosition() && !$id->getToPosition()->getHolders()->contains($char)) {
