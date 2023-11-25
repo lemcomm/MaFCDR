@@ -94,22 +94,45 @@ class Faction {
 		return $all;
 	}
 
-	public function findLaw($search, $climb = true) {
+	public function findLaw($search, $climb = true, $allowMultiple = false, $local = true) {
+		# Search is what we want to find.
+		# Climb says do we check superiors.
+		# AllowMultiple determines if we want the first relative result or all possible results.
+		# Local is only used to determine if we need to check cascading.
+		if ($allowMultiple) {
+			$all = new ArrayCollection();
+		}
 		foreach ($this->getLaws() as $law) {
-			if ($law->getType()->getName() === $search) {
-				return $law;
+			if ($local || $law->getCascades()) {
+				if ($law->isActive() && $law->getType()->getName() === $search) {
+					if ($allowMultiple) {
+						$all->add($law);
+					} else {
+						return $law;
+					}
+				}
 			}
 		}
 		if ($climb) {
 			$superior = $this->getSuperior();
 			if ($superior) {
-				if ($law = $superior->findLaw($search, $climb)) {
+				# We have a superior, but no law ourselves. Ask them if they do!
+				if ($law = $superior->findLaw($search, true, $allowMultiple, false)) {
 					# Climb the chain!
-					return $law;
+					if ($allowMultiple) {
+						foreach ($law as $each) {
+							$all->add($each);
+						}
+					} else {
+						return $law;
+					}
 				}
 			}
-
+			if ($allowMultiple && $all->count() > 0) {
+				return $all;
+			}
 		}
+
 		return false;
 	}
 

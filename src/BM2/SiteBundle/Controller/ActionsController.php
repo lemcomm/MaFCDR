@@ -805,7 +805,7 @@ class ActionsController extends Controller {
 			foreach ($character->findRealms() as $realm) {
 				$results = false;
 				foreach ($this->get('law_manager')->taxLaws as $type) {
-					$results = $realm->findActiveLaw($type, true, true);
+					$results = $realm->findLaw($type, true, true);
 				}
 				if ($results) {
 					foreach ($results as $law) {
