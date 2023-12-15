@@ -115,7 +115,7 @@ class AssociationController extends Controller {
 		$char = $this->gateway('assocUpdateTest', $assoc);
 
 		$em = $this->getDoctrine()->getManager();
-		$form = $this->createForm(new AssocUpdateType($em->getRepository('BM2SiteBundle:AssociationType')->findAll(), $char->findSubcreateableAssociations(), $assoc));
+		$form = $this->createForm(new AssocUpdateType($em->getRepository('BM2SiteBundle:AssociationType')->findAll(), $char->findSubcreateableAssociations($assoc), $assoc));
 		$form->handleRequest($request);
 		if ($form->isValid() && $form->isSubmitted()) {
 			$assoc = $this->get('association_manager')->update($assoc, $form->getData(), $char);
