@@ -386,13 +386,21 @@ class Character {
 		$this->my_assocs = $assocs;
 		return $assocs;
 	}
-
-	public function findSubcreateableAssociations() {
+	
+	public function findSubcreateableAssociations($except = null) {
+		$avoid = new ArrayCollection;
+		if ($except) {
+			$avoid->add($except);
+			foreach ($except->findAllInferoriors(false) as $minor) {
+				$avoid->add($minor);
+			}
+		}
 		$assocs = new ArrayCollection;
 		foreach ($this->getAssociationMemberships() as $mbr) {
 			if ($rank = $mbr->getRank()) {
-				if ($rank->getOwner() || $rank->getCreateAssocs()) {
-					$assocs->add($mbr->getAssociation());
+				$possible = $mbr->getAssociation();
+				if (($rank->getOwner() || $rank->getCreateAssocs()) && !$avoid->contains($possible)) {
+					$assocs->add($possible);
 				}
 			}
 		}
