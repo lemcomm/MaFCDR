@@ -119,13 +119,20 @@ class AssociationManager {
 			$assoc->setShortDescription($data['short_description']);
 		}
 
-		if ($assoc->getSuperior() !== $data['superior']) {
-			if ($assoc->getSuperior()) {
-				$assoc->getSuperior()->removeInferior($assoc);
+		if ($data['superior']) {
+			if ($data['superior'] === $assoc) {
+				$assoc->setSuperior(null);
+			} elseif ($assoc->findAllInferiors()->contains($data['superior'])) {
+				$assoc->setSuperior(null);
+			} elseif ($assoc->getSuperior() !== $data['superior']) {
+				if ($assoc->getSuperior()) {
+					$assoc->getSuperior()->removeInferior($assoc);
+				}
+				$assoc->setSuperior($data['superior']);
+				$data['superior']->addInferior($assoc);
 			}
-			$assoc->setSuperior($data['superior']);
-			$data['superior']->addInferior($assoc);
 		}
+		
 		if ($assoc->getDescription()->getText() != $data['description']) {
 			$this->descman->newDescription($assoc, $data['description'], $char); #Descman includes a flush for the EM.
 		}
