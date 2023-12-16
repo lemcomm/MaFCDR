@@ -391,7 +391,7 @@ class Character {
 		$avoid = new ArrayCollection;
 		if ($except) {
 			$avoid->add($except);
-			foreach ($except->findAllInferoriors(false) as $minor) {
+			foreach ($except->findAllInferiors(false) as $minor) {
 				$avoid->add($minor);
 			}
 		}
