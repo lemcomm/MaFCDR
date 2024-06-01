@@ -39,7 +39,7 @@ services:
         arguments:  ['@doctrine.orm.entity_manager', '@translator', '@appstate', %discord_webhook_general%, %discord_webhook_olympus%, %discord_webhook_payments%, %discord_webhook_errors%]
     dispatcher:
         class:      BM2\SiteBundle\Service\Dispatcher
-        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager']
+        arguments:  ['@appstate', '@permission_manager', '@geography', '@military_manager', '@interactions', '@association_manager', '@doctrine.orm.entity_manager']
     economy:
         class:      BM2\SiteBundle\Service\Economy
         arguments:  ['@doctrine.orm.entity_manager', '@geography', '@history', '@logger']

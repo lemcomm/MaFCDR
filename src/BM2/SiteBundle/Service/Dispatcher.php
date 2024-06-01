@@ -18,6 +18,7 @@ use BM2\SiteBundle\Entity\Place;
 use BM2\SiteBundle\Entity\Realm;
 use BM2\SiteBundle\Entity\Settlement;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 
@@ -40,6 +41,7 @@ class Dispatcher {
 	protected $milman;
 	protected $interactions;
 	protected $assocman;
+	protected $em;
 
 	// test results to store because they are expensive to calculate
 	private $actionableSettlement=false;
@@ -49,13 +51,14 @@ class Dispatcher {
 	private $actionableShip=false;
 	private $actionableHouses=false;
 
-	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions, AssociationManager $assocman) {
+	public function __construct(AppState $appstate, PermissionManager $pm, Geography $geo, MilitaryManager $milman, Interactions $interactions, AssociationManager $assocman, EntityManager $em) {
 		$this->appstate = $appstate;
 		$this->permission_manager = $pm;
 		$this->geography = $geo;
 		$this->milman = $milman;
 		$this->interactions = $interactions;
 		$this->assocman = $assocman;
+		$this->em = $em;
 	}
 
 	public function getCharacter() {
@@ -144,9 +147,6 @@ class Dispatcher {
 	}
 
 	protected function veryGenericTests() {
-		if (!$this->getCharacter()) {
-			return 'nocharacter';
-		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
@@ -229,9 +229,6 @@ class Dispatcher {
 	}
 
 	protected function interActionsGenericTests() {
-		if (!$this->getCharacter()) {
-			return 'nocharacter';
-		}
 		if ($this->getCharacter()->getUser()->getRestricted()) {
 			return 'restricted';
 		}
@@ -1660,8 +1657,9 @@ class Dispatcher {
 			# Is not in the siege.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.notinsiege");
 		}
-		if (($isDefender && $defLeader) || ($isAttacker && $attLeader)) {
-			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.alreadylead");
+		if ($isLeader) {
+			# Is already leader.
+			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.isleader");
 		}
 		if ($this->getCharacter()->hasNoSoldiers()) {
 			# The guards laugh at your "siege".
@@ -4109,8 +4107,22 @@ class Dispatcher {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"journal.write.name", "description"=>"unavailable.$check");
 		}
-
-		if (!$report->checkForObserver($this->getCharacter())) {
+		$char = $this->getCharacter();
+		$check = false;
+		if ($report->checkForObserver($char)) {
+			$check = true;
+		}
+		if (!$check) {
+			$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:BattleParticipant p WHERE p.battle_report = :br AND p.character = :me');
+			$query->setParameters(array('br'=>$report, 'me'=>$char));
+			$check = $query->getOneOrNullResult();
+		}
+		if (!$check) {
+			$query = $this->em->createQuery('SELECT p FROM BM2SiteBundle:BattleReportCharacter p JOIN p.group_report g WHERE p.character = :me AND g.battle_report = :br');
+			$query->setParameters(array('br'=>$report, 'me'=>$character));
+			$check = $query->getOneOrNullResult();
+		}
+		if (!$check) {
 			return array("name"=>"journal.write.name", "description"=>"error.noaccess.battlereport");
 		}
 
