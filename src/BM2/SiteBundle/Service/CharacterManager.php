@@ -793,7 +793,7 @@ class CharacterManager {
 			$this->em->remove($act);
 		}
 		foreach ($character->getBattlegroups() as $bg) {
-			$this->war_manager->removeCharacterFromBattlegroup($character, $bg);
+			$this->warman->removeCharacterFromBattlegroup($character, $bg);
 		}
 		foreach ($character->getUnits() as $unit) {
 			$this->milman->returnUnitHome($unit, 'surrender', $character);
