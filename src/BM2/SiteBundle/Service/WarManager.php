@@ -622,7 +622,7 @@ class WarManager {
 			$siege->setSettlement(NULL);
 		} else {
 			$siege->getPlace()->setSiege(NULL);
-			$siege->getPlace(NULL);
+			$siege->setPlace(NULL);
 		}
 		$this->em->flush();
 
