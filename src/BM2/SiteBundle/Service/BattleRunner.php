@@ -351,12 +351,9 @@ class BattleRunner {
 		# TODO: Adapt this for when sieges have reached their conclusion, and pass which side was victorious to a different function to closeout the siege properly.
 		if (!$battle->getSiege()) {
 			$this->log(15, "Regular battle detected, Nulling primary battle groups...\n");
-			if ($battle->getPrimaryDefender()) {
-				$battle->setPrimaryDefender(NULL);
-			}
-			if ($battle->getPrimaryAttacker()) {
-				$battle->setPrimaryAttacker(NULL);
-			}
+			$battle->setPrimaryDefender(NULL);
+			$battle->setPrimaryAttacker(NULL);
+			$this->em->flush(); #Commit the above two.
 			$this->log(15, "Jittering characters and disbanding groups...\n");
 			foreach ($battle->getGroups() as $group) {
 				// to avoid people being trapped by overlapping battles - we move a tiny bit after a battle if travel is set
@@ -943,10 +940,11 @@ class BattleRunner {
 								}
 								// special results for nobles
 								if ($target->isNoble() && in_array($result, array('kill','capture'))) {
+									$noble = $this->combat->findNobleFromSoldier($soldier);
 									if ($result=='capture') {
 										$extra = array(
 											'what' => 'ranged.'.$result,
-											'by' => $soldier->getCharacter()->getId()
+											'by' => $noble->getId()
 										);
 									} else {
 										$extra = array('what'=>'ranged.'.$result);
@@ -1126,10 +1124,11 @@ class BattleRunner {
 
 						// special results for nobles
 						if ($target->isNoble() && in_array($result, array('kill','capture'))) {
+							$noble = $this->combat->findNobleFromSoldier($soldier);
 							if ($result=='capture' || $soldier->isNoble()) {
 								$extra = array(
 									'what' => 'noble.'.$result,
-									'by' => $soldier->getCharacter()->getId()
+									'by' => $noble->getId()
 								);
 							} else {
 								$extra = array('what'=>'mortal.'.$result);
