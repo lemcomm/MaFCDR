@@ -1587,9 +1587,9 @@ class Dispatcher {
 			# Already inside.
 			return array("name"=>"military.siege.start.name", "description"=>"unavailable.insideplace");
 		}
-		if (!$place || ($place && !$place->isDefended())) {
+		if (!$place) {
 			# Can't attack nothing or empty places.
-			return array("name"=>"military.siege.start.name", "description"=>"unavailable.notdefended");
+			return array("name"=>"military.siege.start.name", "description"=>"unavailable.noplace");
 		}
 		if ($char->isDoingAction('military.regroup')) {
 			# Busy regrouping.
