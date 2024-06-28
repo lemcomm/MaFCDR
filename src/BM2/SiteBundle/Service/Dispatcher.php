@@ -2114,7 +2114,7 @@ class Dispatcher {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.inbattle");
 		}
-		if ($siege->getPlace()) {
+		if ($siege && $siege->getPlace()) {
 			return $this->action("military.siege.join", "maf_war_siege_place", false, array('action'=>'joinsiege', 'place'=>$siege->getPlace()->getId()));
 		} else {
 			return $this->action("military.siege.join", "bm2_site_war_siege", false, array('action'=>'joinsiege'));
