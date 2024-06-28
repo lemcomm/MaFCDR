@@ -1753,9 +1753,9 @@ class Dispatcher {
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.fresh");
 		}
 		if ($siege->getPlace()) {
-			return $this->action("military.siege.assault", "maf_war_siege_place", false, array('action'=>'assume', 'place'=>$siege->getPlace()->getId()));
+			return $this->action("military.siege.assume", "maf_war_siege_place", false, array('action'=>'assume', 'place'=>$siege->getPlace()->getId()));
 		} else {
-			return $this->action("military.siege.assault", "bm2_site_war_siege", false, array('action'=>'assume'));
+			return $this->action("military.siege.assume", "bm2_site_war_siege", false, array('action'=>'assume'));
 		}
 	}
 
