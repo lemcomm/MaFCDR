@@ -1660,7 +1660,7 @@ class BattleRunner {
 			}
 			if ($result == 'killed') {
 				$report->setKilled(true);
-				$repot->setKilledBy($enemy);
+				$report->setKilledBy($enemy);
 			}
 		}
 	}
@@ -1819,7 +1819,7 @@ class BattleRunner {
 
 		if ($completed) {
 			$this->log(1, "PS: Siege completed, running completion cycle.\n");
-			$realm = $siege->getRealm();
+			$realm = $siege->getRealm(); #Can be null!
 			if ($assault) {
 				if ($target instanceof Settlement) {
 					$this->log(1, "PS: Target is settlement\n");
