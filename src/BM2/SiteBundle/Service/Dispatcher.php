@@ -479,16 +479,26 @@ class Dispatcher {
 			return array("name"=>"place.name", "intro"=>"politics.intro", "elements"=>$actions);
 		}
 		$char = $this->getCharacter();
-		$settlement = $char->getInsideSettlement();
 		$inPlace = $char->getInsidePlace();
 		$actions=[];
 		$type = $place->getType();
 		$tName = $type->getName();
 
 		if ($place !== $inPlace) {
-			$actions['placeEnterTest'] = $this->placeEnterTest(true, $place);
-			if ($type->getDefensible()) {
-				$actions['militarySiegePlaceTest'] = $this->militarySiegePlaceTest(null, $place);
+			if (!$place->getSiege() && $type->getDefensible()) {
+				$actions['placeEnterTest'] = $this->placeEnterTest(true, $place);
+				if ($type->getDefensible()) {
+					$actions['militarySiegePlaceTest'] = $this->militarySiegePlaceTest(null, $place);
+				}
+			} else {
+				$siege = $place->getSiege();
+				$actions[] = $this->militarySiegeJoinSiegeTest(null, $siege);
+				$actions[] = $this->militarySiegeLeadershipTest(null, $siege);
+				$actions[] = $this->militarySiegeAssumeTest(null, $siege);
+				$actions[] = $this->militarySiegeBuildTest(null, $siege);
+				$actions[] = $this->militarySiegeAssaultTest(null, $siege);
+				$actions[] = $this->militarySiegeDisbandTest(null, $siege);
+				$actions[] = $this->militarySiegeLeaveTest(null, $siege);
 			}
 		} else {
 			$actions['placeLeaveTest'] = $this->placeLeaveTest(true);
@@ -1673,7 +1683,11 @@ class Dispatcher {
 			# Too new.
 			return array("name"=>"military.siege.leadership.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.siege.leadership", "bm2_site_war_siege", false, array('action'=>'leadership'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.assault", "maf_war_siege_place", false, array('action'=>'leadership', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.assault", "bm2_site_war_siege", false, array('action'=>'leadership'));
+		}
 	}
 
 	public function militarySiegeAssumeTest($check_duplicate=false, $siege) {
@@ -1738,7 +1752,11 @@ class Dispatcher {
 			# Too new.
 			return array("name"=>"military.siege.assume.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.siege.assume", "bm2_site_war_siege", false, array('action'=>'assume'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.assault", "maf_war_siege_place", false, array('action'=>'assume', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.assault", "bm2_site_war_siege", false, array('action'=>'assume'));
+		}
 	}
 
 	public function militarySiegeBuildTest($check_duplicate=false) {
@@ -1843,7 +1861,11 @@ class Dispatcher {
 			# Too new.
 			return array("name"=>"military.siege.assault.name", "description"=>"unavailable.fresh");
 		}
-		return $this->action("military.siege.assault", "bm2_site_war_siege", false, array('action'=>'assault'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.assault", "maf_war_siege_place", false, array('action'=>'assault', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.assault", "bm2_site_war_siege", false, array('action'=>'assault'));
+		}
 	}
 
 	public function militarySiegeDisbandTest($check_duplicate=false, $siege) {
@@ -1879,7 +1901,11 @@ class Dispatcher {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.disband.name", "description"=>"unavailable.inbattle");
 		}
-		return $this->action("military.siege.disband", "bm2_site_war_siege", false, array('action'=>'disband'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.disband", "maf_war_siege_place", false, array('action'=>'disband', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.disband", "bm2_site_war_siege", false, array('action'=>'disband'));
+		}
 	}
 
 	public function militarySiegeLeaveTest($check_duplicate=false, $siege) {
@@ -1905,7 +1931,11 @@ class Dispatcher {
 		if (!$inSiege) {
 			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.notinsiege");
 		}
-		return $this->action("military.siege.leave", "bm2_site_war_siege", false, array('action'=>'leave'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.leave", "maf_war_siege_place", false, array('action'=>'leave', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.leave", "bm2_site_war_siege", false, array('action'=>'leave'));
+		}
 	}
 
 	public function militarySiegeGeneralTest($check_duplicate=false, $siege) {
@@ -1926,9 +1956,13 @@ class Dispatcher {
 		}
 		if (!$inSiege) {
 			# Not in the siege.
-			return array("name"=>"military.siege.leave.name", "description"=>"unavailable.notinsiege");
+			return array("name"=>"military.siege.general.name", "description"=>"unavailable.notinsiege");
 		}
-		return $this->action("military.siege.leave", "bm2_site_war_siege", false, array('action'=>'leave'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.general", "maf_war_siege_place", false, array('action'=>'leave', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.general", "bm2_site_war_siege", false, array('action'=>'leave'));
+		}
 	}
 
 	/* TODO: Add suicide runs, maybe?
@@ -2080,7 +2114,11 @@ class Dispatcher {
 			# Busy fighting for life.
 			return array("name"=>"military.siege.join.name", "description"=>"unavailable.inbattle");
 		}
-		return $this->action("military.siege.join", "bm2_site_war_siege", false, array('action'=>'joinsiege'));
+		if ($siege->getPlace()) {
+			return $this->action("military.siege.join", "maf_war_siege_place", false, array('action'=>'joinsiege', 'place'=>$siege->getPlace()->getId()));
+		} else {
+			return $this->action("military.siege.join", "bm2_site_war_siege", false, array('action'=>'joinsiege'));
+		}
 	}
 
 	public function militaryDamageFeatureTest($check_duplicate=false) {
@@ -2597,9 +2635,9 @@ class Dispatcher {
 		}
 
 		return $this->action("place.manage", "maf_place_manage", true,
-				array('id'=>$place->getId()),
-				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-			);
+			array('id'=>$place->getId()),
+			array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+		);
 	}
 
 	public function placeManageEmbassyTest($ignored, Place $place) {
@@ -2621,9 +2659,9 @@ class Dispatcher {
 			(!$place->getAmbassador() && !$place->getOwningRealm() && !$place->getHostingRealm() && $place->getOwner() == $character)
 		) {
 			return $this->action("place.embassy", "maf_place_manage", true,
-					array('id'=>$place->getId()),
-					array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
-				);
+				array('id'=>$place->getId()),
+				array("%name%"=>$place->getName(), "%formalname%"=>$place->getFormalName())
+			);
 		} else {
 			return array("name"=>"place.embassy.name", "description"=>"unavailable.notowner");
 		}
@@ -2663,40 +2701,40 @@ class Dispatcher {
 	public function placeLeaveTest($check_duplicate=false) {
 		if (($check = $this->interActionsGenericTests()) !== true) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.$check"
-				    );
+				"description"=>"unavailable.$check"
+			);
 		}
 		if (!$this->getCharacter()->getInsidePlace()) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.outsideplace"
-				    );
+				"description"=>"unavailable.outsideplace"
+			);
 		}
 		if ($this->getCharacter()->getInsidePlace()->getSiege()) {
 			return array("name"=>"location.exit.name", "description"=>"unavailable.besieged");
 		}
 		if (!$place = $this->getActionablePlace()) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.noplace"
-				    );
+				"description"=>"unavailable.noplace"
+			);
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.exit')) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.already"
-				    );
+				"description"=>"unavailable.already"
+			);
 		}
 		if ($this->getCharacter()->isInBattle()) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.inbattle"
-				    );
+				"description"=>"unavailable.inbattle"
+			);
 		}
 		if ($this->getCharacter()->isPrisoner()) {
 			return array("name"=>"place.exit.name",
-				     "description"=>"unavailable.prisoner"
-				    );
+				"description"=>"unavailable.prisoner"
+			);
 		} else {
 			return $this->action("place.exit",
-					     "maf_place_exit"
-					    );
+				"maf_place_exit"
+			);
 		}
 	}
 
