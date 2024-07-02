@@ -485,13 +485,11 @@ class Dispatcher {
 		$tName = $type->getName();
 
 		if ($place !== $inPlace) {
-			if (!$place->getSiege() && $type->getDefensible()) {
+			$siege = $place->getSiege();
+			if (!$siege) {
 				$actions['placeEnterTest'] = $this->placeEnterTest(true, $place);
-				if ($type->getDefensible()) {
-					$actions['militarySiegePlaceTest'] = $this->militarySiegePlaceTest(null, $place);
-				}
+				$actions['militarySiegePlaceTest'] = $this->militarySiegePlaceTest(null, $place);
 			} else {
-				$siege = $place->getSiege();
 				$actions[] = $this->militarySiegeJoinSiegeTest(null, $siege);
 				$actions[] = $this->militarySiegeLeadershipTest(null, $siege);
 				$actions[] = $this->militarySiegeAssumeTest(null, $siege);
@@ -502,7 +500,7 @@ class Dispatcher {
 			}
 		} else {
 			$actions['placeLeaveTest'] = $this->placeLeaveTest(true);
-			if ($type->getDefensible() && $place->getOccupant() === $char) {
+			if ($place->getOccupant() === $char) {
 				$actions['placeOccupationEndTest'] = $this->placeOccupationEndTest(true, $place);
 				$actions['placeChangeOccupantTest'] = $this->placeChangeOccupantTest(true, $place);
 				$actions['placeChangeOccupierTest'] = $this->placeChangeOccupierTest(true, $place);
@@ -2677,7 +2675,8 @@ class Dispatcher {
 		if ($this->getCharacter()->isNPC()) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.npc");
 		}
-		if ($place != $this->getActionablePlace() && $this->getCharacter()->getInsideSettlement() != $place->getSettlement()) {
+		$nearby = $this->geography->findPlacesInActionRange($this->getCharacter());
+		if ($nearby && !in_array($place, $nearby)) {
 			return array("name"=>"place.enter.name", "description"=>"unavailable.noplace");
 		}
 		if ($check_duplicate && $this->getCharacter()->isDoingAction('place.enter')) {
