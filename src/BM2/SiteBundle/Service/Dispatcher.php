@@ -486,7 +486,7 @@ class Dispatcher {
 
 		if ($place !== $inPlace) {
 			$siege = $place->getSiege();
-			if ($siege) {
+			if (!$siege) {
 				$actions['placeEnterTest'] = $this->placeEnterTest(true, $place);
 				$actions['militarySiegePlaceTest'] = $this->militarySiegePlaceTest(null, $place);
 			} else {
