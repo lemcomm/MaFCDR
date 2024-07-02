@@ -268,21 +268,17 @@ class Interactions {
 			}
 		}
 
-                if (!$place->getPublic() && !$this->pm->checkPlacePermission($place, $character, 'visit')) {
-                                return false;
-                }
+		if (!$force) {
+			// check if we are allowed inside - but only for fortified settlements
+			if (!$place->getPublic() && $place->isFortified() && !$this->pm->checkPlacePermission($place, $character, 'visit')) {
+				return false;
+			}
 
-                if (!$force) {
-                        // check if we are allowed inside - but only for fortified settlements
-                        if (!$place->getPublic() && $place->isFortified() && !$this->pm->checkPlacePermission($place, $character, 'visit')) {
-                                return false;
-                        }
-
-                        // if we are currently engaged in battle, we can't enter
-                        if ($character->isInBattle()) {
-                                return false;
-                        }
-                }
+			// if we are currently engaged in battle, we can't enter
+			if ($character->isInBattle()) {
+				return false;
+			}
+		}
 
 		if ($place->getSettlement() != $character->getInsideSettlement()) {
 			// Not in the settlement the place is in.
