@@ -709,18 +709,17 @@ class Dispatcher {
 
 	public function PlacesActions() {
 		$actions=array();
-		if (($check = $this->placesActionsGenericTests()) !== true) {
+		if (($check = $this->placeActionsGenericTests()) !== true) {
 			$actions[] = array("name"=>"place.all", "description"=>"unavailable.$check");
 			return array("name"=>"place.name", "intro"=>"politics.intro", "elements"=>$actions);
 		}
 		$actions[] = $this->placeCreateTest();
 
 		foreach ($this->geo->findPlacesInActionRange($this->getCharacter()) as $place) {
-			$this->setPlace($place);
 			$actions[] = array("title"=>$place->getFormalName());
 			$actions[] = array("name"=>"place.view.name", "url"=>"bm2_site_place_view", "parameters"=>array("id"=>$place->getId()), "description"=>"place.view.description", "long"=>"place.view.longdesc");
-			$actions[] = $this->placeManageTest();
-			$actions[] = $this->placeEnterTest();
+			$actions[] = $this->placeManageTest(null, $place);
+			$actions[] = $this->placeEnterTest(false, $place);
 		}
 
 		return array("name"=>"place.name", "intro"=>"place.intro", "elements"=>$actions);
@@ -2784,7 +2783,7 @@ class Dispatcher {
 		if ($check_regroup && $this->getCharacter()->isDoingAction('military.regroup')) {
 			return array("name"=>"place.occupationend.name", "description"=>"unavailable.regrouping");
 		}
-		return $this->action("place.occupationend", "maf_settlement_occupation_end");
+		return $this->action("place.occupationend", "maf_place_occupation_end", false, array('id'=>$place->getId()));
 	}
 
 	public function placeChangeOccupierTest($check_duplicate=false, $place) {
@@ -2805,7 +2804,7 @@ class Dispatcher {
 		if ($myrealms->isEmpty()) {
 			return array("name"=>"place.changeoccupier.name", "description"=>"unavailable.norealms");
 		}
-		return $this->action("place.changeoccupier", "maf_settlement_occupier", false, array('id'=>$place->getId()));
+		return $this->action("place.changeoccupier", "maf_place_occupier", false, array('id'=>$place->getId()));
 	}
 
 	public function placeChangeOccupantTest($check_duplicate=false, $place) {
@@ -2821,7 +2820,7 @@ class Dispatcher {
 		if (!$this->getActionableCharacters()) {
 			return array("name"=>"place.changeoccupant.name", "description"=>"unavailable.nobody");
 		}
-		return $this->action("place.changeoccupant", "maf_settlement_occupant");
+		return $this->action("place.changeoccupant", "maf_place_occupant", false, array('id'=>$place->getId()));
 	}
 
 	/* ========== Unit Actions ========== */

@@ -2,6 +2,7 @@
 
 namespace BM2\SiteBundle\Controller;
 
+use BM2\SiteBundle\Entity\Action;
 use BM2\SiteBundle\Entity\Association;
 use BM2\SiteBundle\Entity\Character;
 use BM2\SiteBundle\Entity\Description;
@@ -14,6 +15,7 @@ use BM2\SiteBundle\Form\AssocSelectType;
 use BM2\SiteBundle\Form\DescriptionNewType;
 use BM2\SiteBundle\Form\InteractionType;
 use BM2\SiteBundle\Form\PlacePermissionsSetType;
+use BM2\SiteBundle\Form\RealmSelectType;
 use BM2\SiteBundle\Form\SoldiersManageType;
 use BM2\SiteBundle\Form\PlaceManageType;
 use BM2\SiteBundle\Form\PlaceNewType;
@@ -398,8 +400,8 @@ class PlaceController extends Controller {
 					$feat->setWorkers(0);
 					$feat->setCondition(0);
 					$feat->setType($em->getRepository('BM2SiteBundle:GeoFeatureType')->findOneByName('place'));
-					$em->flush(); #We need the above to set the below and do relations.
-					$place->setGeoFeature($feat);
+					$em->flush(); #We need the above to set the below and do relations
+					$place->setGeoMarker($feat);
 					$place->setLocation($loc);
 					#Arguably, we could just get location from the geofeature, but this leaves more possibilities open.
 					$place->setGeoData($geoData);
@@ -478,7 +480,7 @@ class PlaceController extends Controller {
 				}
 				foreach ($place->getVassals() as $vassal) {
 					$vassal->setOathCurrent(false);
-					$this->history->logEvent(
+					$this->get('history')->logEvent(
 						$vassal,
 						'politics.oath.notcurrent2',
 						array('%link-place%'=>$place->getId()),
@@ -492,7 +494,6 @@ class PlaceController extends Controller {
 		}
 
 		return $this->render('Place/transfer.html.twig', [
-			'settlement'=>$settlement,
 			'form'=>$form->createView()
 		]);
 	}
@@ -610,25 +611,21 @@ class PlaceController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
-			$result = array(
-				'success'=>true
-			);
 			if ($data['target']) {
 				$act = new Action;
 				$act->setType('place.occupant')->setCharacter($character);
-				$act->setTargetSettlement($settlement)->setTargetCharacter($data['target']);
+				$act->setTargetPlace($place)->setTargetCharacter($data['target']);
 				$act->setBlockTravel(true);
-				$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
 				$complete = new \DateTime("+1 hour");
 				$act->setComplete($complete);
-				$result = $this->get('action_manager')->queue($act);
-				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
+				$this->get('action_manager')->queue($act);
+				$this->addFlash('notice', $this->get('translator')->trans('event.place.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
 				return $this->redirectToRoute('bm2_actions');
 			}
 		}
 
 		return $this->render('Place/occupant.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
+			'place'=>$place, 'form'=>$form->createView()
 		]);
 	}
 
@@ -642,27 +639,24 @@ class PlaceController extends Controller {
 			return $this->redirectToRoute($character);
 		}
 
-		$em = $this->getDoctrine()->getManager();
-		$this->get('dispatcher')->setSettlement($settlement);
-
 		$form = $this->createForm(new RealmSelectType($character->findRealms(), 'changeoccupier'));
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
 			$targetrealm = $data['target'];
 
-			if ($settlement->getOccupier() == $targetrealm) {
+			if ($place->getOccupier() == $targetrealm) {
 				$result = 'same';
 			} else {
 				$result = 'success';
-				$this->get('politics')->changeSettlementOccupier($character, $settlement, $targetrealm);
+				$this->get('politics')->changePlaceOccupier($character, $place, $targetrealm);
 				$this->getDoctrine()->getManager()->flush();
 			}
 			$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupier.'.$result, [], 'communication'));
 			return $this->redirectToRoute('bm2_actions');
 		}
 		return $this->render('Place/occupier.html.twig', [
-			'settlement'=>$settlement, 'form'=>$form->createView()
+			'place'=>$place, 'form'=>$form->createView()
 		]);
 	}
 
