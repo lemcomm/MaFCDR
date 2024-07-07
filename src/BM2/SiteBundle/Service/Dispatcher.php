@@ -2805,7 +2805,7 @@ class Dispatcher {
 		if ($myrealms->isEmpty()) {
 			return array("name"=>"place.changeoccupier.name", "description"=>"unavailable.norealms");
 		}
-		return $this->action("place.changeoccupier", "maf_settlement_occupier", false, array('id'=>$settlement->getId()));
+		return $this->action("place.changeoccupier", "maf_settlement_occupier", false, array('id'=>$place->getId()));
 	}
 
 	public function placeChangeOccupantTest($check_duplicate=false, $place) {
