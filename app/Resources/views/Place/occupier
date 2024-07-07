@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+	<h2>{{ "control.changeoccupier.name"|trans({},"actions")|title }}</h2>
+
+	{% if place.occupier %}
+		<p>{{ "control.changeoccupier.intro3"|trans({"%place%":link(place), "%realm%":link(place.occupier)},"actions")|raw}}</p>
+	{% else %}
+		<p>{{ "control.changeoccupier.intro4"|trans({"%place%":link(place)},"actions")|raw}}</p>
+	{% endif %}
+
+	{{ form(form) }}
+
+{% endblock %}
