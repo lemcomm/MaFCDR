@@ -480,16 +480,22 @@ control:
   description:  Declare an end to the occupation?
   intro: >
     As either the occupant of %settlement%, or any first one in an undefended but occupied settlement, you are well within your capabilities to declare an end to the occupation of this settlement. If they aren't here to defend their claim, that's their problem.
+  intro2: >
+    As either the occupant of %place%, or any first one in an undefended but occupied place of interest, you are well within your capabilities to declare an end to the occupation of this location. If they aren't here to defend their claim, that's their problem.
  changeoccupant:
   name:         Change Occupant
   description:  Someone else can manage this
   intro: >
     As the occupant of %settlement% you can always pass off this responsibiity to someone else.
+  intro2: >
+    As the occupant of %place% you can always pass off this responsibiity to someone else.
  changeoccupier:
   name:         Change Occupying Realm
   description:  Replace the flag of the occupation
   intro:        As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by %realm%.
   intro2:       As the occupant of %settlement% you can always erect a different flag over this settlement. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by a first one without a realm's backing.
+  intro3:       As the occupant of %place% you can always erect a different flag over this place of interest. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by %realm%.
+  intro4:       As the occupant of %place% you can always erect a different flag over this place of interest. It is best if this matches the realm in charge of any ongoing wars against the previous controller of this settlement. It is currently occupied by a first one without a realm's backing.
 
  spawn:
   success:
