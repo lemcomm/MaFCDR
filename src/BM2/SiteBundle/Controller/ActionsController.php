@@ -1055,18 +1055,14 @@ class ActionsController extends Controller {
 		$form->handleRequest($request);
 		if ($form->isValid()) {
 			$data = $form->getData();
-			$result = array(
-				'success'=>true
-			);
 			if ($data['target']) {
 				$act = new Action;
 				$act->setType('settlement.occupant')->setCharacter($character);
 				$act->setTargetSettlement($settlement)->setTargetCharacter($data['target']);
 				$act->setBlockTravel(true);
-				$time_to_grant = round((sqrt($settlement->getPopulation()) + sqrt($soldiers))*3);
 				$complete = new \DateTime("+2 hours");
 				$act->setComplete($complete);
-				$result = $this->get('action_manager')->queue($act);
+				$this->get('action_manager')->queue($act);
 				$this->addFlash('notice', $this->get('translator')->trans('event.settlement.occupant.start', ["%time%"=>$complete->format('Y-M-d H:i:s')], 'communication'));
 				return $this->redirectToRoute('bm2_actions');
 			}
