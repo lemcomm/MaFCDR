@@ -647,7 +647,7 @@ class GameRunner {
 					}
 				}
 			} elseif ($here2 = $unit->getSettlement()) {
-				if ($here2->getSiege() && $here2->getSiege()->getEncirlced()) {
+				if ($here2->getSiege() && $here2->getSiege()->getEncircled()) {
 					$skippables[] = $unit->getId();
 					$soldier->setTravelDays(1); # Avoid negatives, just in case.
 					continue;
