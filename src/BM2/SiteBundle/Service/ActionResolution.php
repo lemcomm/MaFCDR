@@ -32,7 +32,7 @@ class ActionResolution {
 	private $actman;
 	private $helper;
 
-	private $max_progress = 5; // maximum number of actions to resolve in each background progression call
+	private $max_progress = 100; // maximum number of actions to resolve in each background progression call
 	private $debug=100;
 	private $speedmod = 1.0;
 
