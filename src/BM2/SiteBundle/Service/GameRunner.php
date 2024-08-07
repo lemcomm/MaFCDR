@@ -221,11 +221,8 @@ class GameRunner {
 		$slumbercount = 0;
 		$knownslumber = 0;
 		$keeponslumbercount = 0;
-		$via = null;
-		$heir = null;
 		foreach ($result as $character) {
 			$this->seen = new ArrayCollection;
-			list($heir, $via) = $this->findHeir($character);
 			if (!$character->isAlive()) {
 				$deadcount++;
 				$dead[] = $character;
@@ -238,6 +235,8 @@ class GameRunner {
 			$this->logger->info("  Sorting $deadcount dead and $slumbercount slumbering");
 		}
 		foreach ($dead as $character) {
+			$via = null;
+			$heir = null;
 			if ($character->getSystem() != 'procd_inactive') {
 				$this->logger->info("  ".$character->getName().", ".$character->getId()." is under review, as dead.");
 				$character->setLocation(NULL)->setInsideSettlement(null)->setTravel(null)->setProgress(null)->setSpeed(null);
@@ -248,6 +247,7 @@ class GameRunner {
 					$character->setPrisonerOf(null);
 					$captor->removePrisoner($character);
 				}
+				list($heir, $via) = $this->findHeir($character);
 				$this->logger->info("    Heir: ".($heir?$heir->getName():"(nobody)"));
 				if ($character->getPositions()) {
 					$this->logger->info("    Positions detected");
@@ -299,7 +299,10 @@ class GameRunner {
 			$this->em->flush();
 		}
 		foreach ($slumbered as $character) {
+			$via = null;
+			$heir = null;
 			if ($character->getSystem() != 'procd_inactive') {
+				list($heir, $via) = $this->findHeir($character);
 				$this->logger->info("  ".$character->getName().", ".$character->getId()." is under review, as slumbering.");
 				$this->logger->info("    Heir: ".($heir?$heir->getName():"(nobody)"));
 				if ($character->getPositions()) {
