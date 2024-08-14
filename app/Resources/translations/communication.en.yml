@@ -189,6 +189,8 @@ event:
   gotartifact:  You have received the %artifact% from %character%.
   surrender:    %character% has surrendered through the ancient geas of binding and is now at your mercy.
   surrenderto:  Has surrendered to %character% and become a prisoner.
+  overwhelmed:  %character% has been overwhelmed by your forces and forced to submit to the geas of binding.
+  overwhlemedby: Has been overwhelmed by %character% and forced to become a prisoner.
   proposed:
    marriage:    You have received a marriage proposal from %character%. Accept or decline it on the relations page.
    engagement:  You have received a proposal to become engaged to %character%. Accept or decline it on the relations page.
@@ -594,6 +596,8 @@ siege:
  leaderinside:
   settlement:   Since %character% is somehow inside %settlement%, the siege has been declared victorious and the siege forces have disbanded.
   place:   Since %character% is somehow inside %place%, the siege has been declared victorious and the siege forces have disbanded.
+ noattacker:    Somehow this siege has ended up with no attacking force, and has been automatically disbanded.
+ noattacker2:   The siege you were part of has disbanded due to the lack of any detected attacking force.
 
 mail:
  sender:        "Might & Fealty"
