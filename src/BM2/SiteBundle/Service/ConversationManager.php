@@ -230,7 +230,6 @@ class ConversationManager {
 			foreach ($local->getMessages() as $msg) {
 				if (!$msg->getRead()) {
 					$unread->add($msg);
-					$msg->setRead(true);
 				}
 			}
 		}
@@ -244,9 +243,11 @@ class ConversationManager {
         }
 
         public function removePlayerConversation(Character $char, Conversation $conv) {
-                $perms = $conv->getPermissions()->findBy(['char' => $char]);
-                foreach ($perms as $perm) {
-                        $this->em->remove($perm);
+		/** @var ConversationPermission $perm */
+		foreach ($conv->getPermissions() as $perm) {
+			if ($perm->getCharacter() === $char) {
+				$this->em->remove($perm);
+			}
                 }
         }
 
@@ -496,13 +497,11 @@ class ConversationManager {
                                 $recipients = $house->findAllLiving();
                         }
                 } elseif ($local) {
-                        $conv->setLocalFor($character);
+                        $conv->setLocalFor($char);
                 }
                 $this->em->flush();
-                $counter = 0;
                 foreach ($recipients as $recipient) {
                         if (!in_array($recipient, $added)) {
-                                $counter++;
                                 $perm = new ConversationPermission();
                                 $this->em->persist($perm);
                                 $perm->setStartTime($now);
@@ -517,8 +516,6 @@ class ConversationManager {
                                         $perm->setUnread(0);
                                 }
                                 $added[] = $recipient;
-                        } else {
-                                #Do nothing, duplicate recipient.
                         }
                 }
                 $this->em->flush();
