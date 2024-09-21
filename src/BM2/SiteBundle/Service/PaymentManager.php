@@ -265,12 +265,12 @@ class PaymentManager {
 				$this->usermanager->createLimits($user);
 			} else {
 				if ($limits->getPlacesDate() <= $now) {
-					$limits->setPlaces($limits->getPlaces()+1);
-				}
-				if($user->getAccountLevel() >= 20) {
-					$limits->setPlacesDate($oneWeek);
-				} else {
-					$limits->setPlacesDate($twoWeeks);
+					$limits->setPlaces($limits->getPlaces() + 1);
+					if($user->getAccountLevel() >= 20) {
+						$limits->setPlacesDate($oneWeek);
+					} else {
+						$limits->setPlacesDate($twoWeeks);
+					}
 				}
 			}
 		}
