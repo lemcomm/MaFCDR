@@ -1339,6 +1339,10 @@ class CharacterManager {
 	}
 
 	public function inheritPosition(RealmPosition $position, Realm $realm, Character $heir, Character $from, Character $via=null, $why='death') {
+		if ($position->getHolders()->contains($heir)) {
+			# Already held, skip.
+			return;
+		}
 		$position->addHolder($heir);
 		$heir->addPosition($position);
 		// NOTE: This can add characters to realms they weren't already in!
