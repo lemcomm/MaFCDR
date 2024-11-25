@@ -773,6 +773,7 @@ class PlaceController extends Controller {
 			if ($spawn = $place->getSpawn()) {
 				$em->remove($spawn);
 			}
+			$em->flush();
 			if ($siege = $place->getSiege()) {
 				$this->get('war_manager')->disbandSiege($siege, null, true);
 			}
