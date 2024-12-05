@@ -598,6 +598,7 @@ siege:
   place:   Since %character% is somehow inside %place%, the siege has been declared victorious and the siege forces have disbanded.
  noattacker:    Somehow this siege has ended up with no attacking force, and has been automatically disbanded.
  noattacker2:   The siege you were part of has disbanded due to the lack of any detected attacking force.
+ owningattacker: The siege has been disbanded as the siege leader is also the owner/occupant of the besieged location (as appropriate).
 
 mail:
  sender:        "Might & Fealty"
