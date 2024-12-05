@@ -1371,31 +1371,63 @@ class GameRunner {
 			if ($attacker) {
 				if ($attacker->getLeader()) {
 					$leader = $attacker->getLeader();
-					if ($settlement && ($leader->getInsideSettlement() === $settlement || ($leader->getInsidePlace() && $leader->getInsidePlace()->getSettlement() === $settlement))) {
-						# Attacking leader is somehow inside the settlement he is besieging, looks like siege should be over! :D
-						$this->logger->info("  Disbanding Siege ".$siege->getId()." for Settlement ".$settlement->getId());
-						foreach ($siege->getCharacters() as $char) {
-							$this->history->logEvent(
-								$char,
-								'siege.leaderinside.settlement',
-								['%link-character%'=>$leader->getId(), '%link-settlement%'=>$settlement->getId()]
-							);
-						}
-						$this->wm->disbandSiege($siege, $leader, true);
+					if ($settlement) {
+						if ($leader->getInsideSettlement() === $settlement || (
+								$leader->getInsidePlace() && $leader->getInsidePlace()->getSettlement() === $settlement
+							)) {
+							# Attacking leader is somehow inside the settlement he is besieging, looks like siege should be over! :D
+							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Settlement ".$settlement->getId());
+							foreach ($siege->getCharacters() as $char) {
+								$this->history->logEvent(
+									$char,
+									'siege.leaderinside.settlement',
+									['%link-character%'=>$leader->getId(), '%link-settlement%'=>$settlement->getId()]
+								);
+							}
+							$this->wm->disbandSiege($siege, $leader, true);
 
-					}
-					if ($place && $leader->getInsidePlace() === $place) {
-						# Attacking leader is somehow inside the place he is besieging, looks like siege should be over! :D
-						$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
-						foreach ($siege->getCharacters() as $char) {
-							$this->history->logEvent(
-								$char,
-								'siege.leaderinside.place',
-								['%link-character%'=>$leader->getId(), '%link-place%'=>$place->getId()]
-							);
 						}
-						$this->wm->disbandSiege($siege, $leader, true);
+						if (($settlement->getOwner() && (!$settlement->getOccupant() || $settlement->getOccupier()) && $attacker->getCharacters()->contains($settlement->getOwner())) || ($settlement->getOccupant() && $attacker->getCharacters()->contains($settlement->getOccupant()))) {
+							# Attacking force contains settlement lord of a non-occupied settlement. No need for siege! Also, why?
+							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Settlement ".$settlement->getId());
+							foreach ($siege->getCharacters() as $char) {
+								$this->history->logEvent(
+									$char,
+									'siege.owningattacker',
+									['%link-character%'=>$leader->getId(), '%link-settlement%'=>$settlement->getId()]
+								);
+							}
+							$this->wm->disbandSiege($siege, $leader, true);
+						}
 					}
+					if ($place) {
+						if ($leader->getInsidePlace() === $place) {
+							# Attacking leader is somehow inside the place he is besieging, looks like siege should be over! :D
+							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
+							foreach ($siege->getCharacters() as $char) {
+								$this->history->logEvent(
+									$char,
+									'siege.leaderinside.place',
+									['%link-character%'=>$leader->getId(), '%link-place%'=>$place->getId()]
+								);
+							}
+							$this->wm->disbandSiege($siege, $leader, true);
+						}
+						#TODO: Rework this to use some "findOwner" to sort through embassy stuff.
+						if (($place->getOwner() && (!$place->getOccupant() || !$place->getOccupier()) && $attacker->getCharacters()->contains($place->getOwner())) || ($place->getOccpant() && $attacker->getCharacters()->contains($place->getOccupant()))) {
+							# Attacking force contains place owner of a non-occupied place. No need for siege! Also, why?
+							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
+							foreach ($siege->getCharacters() as $char) {
+								$this->history->logEvent(
+									$char,
+									'siege.owningattacker',
+									['%link-character%'=>$leader->getId(), '%link-place%'=>$place->getId()]
+								);
+							}
+							$this->wm->disbandSiege($siege, $leader, true);
+						}
+					}
+
 				}
 			} else {
 				# No attackers? How???
