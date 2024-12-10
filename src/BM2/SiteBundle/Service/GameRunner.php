@@ -1365,6 +1365,7 @@ class GameRunner {
 		$all = $this->em->getRepository(Siege::class)->findAll();
 		/** @var Siege $siege */
 		foreach ($all as $siege) {
+			$this->logger->info("  Scanning Siege #".$siege->getId());
 			$settlement = $siege->getSettlement();
 			$place = $siege->getPlace();
 			$attacker = $siege->getAttacker();
@@ -1372,6 +1373,7 @@ class GameRunner {
 				if ($attacker->getLeader()) {
 					$leader = $attacker->getLeader();
 					if ($settlement) {
+						$this->logger->info("  Siege is in Settlement #".$settlement->getId());
 						if ($leader->getInsideSettlement() === $settlement || (
 								$leader->getInsidePlace() && $leader->getInsidePlace()->getSettlement() === $settlement
 							)) {
@@ -1387,7 +1389,10 @@ class GameRunner {
 							$this->wm->disbandSiege($siege, $leader, true);
 
 						}
-						if (($settlement->getOwner() && (!$settlement->getOccupant() || $settlement->getOccupier()) && $attacker->getCharacters()->contains($settlement->getOwner())) || ($settlement->getOccupant() && $attacker->getCharacters()->contains($settlement->getOccupant()))) {
+						if (
+							($settlement->getOwner() && (!$settlement->getOccupant() && !$settlement->getOccupier()) && $attacker->getCharacters()->contains($settlement->getOwner()))
+							|| ($settlement->getOccupant() && $attacker->getCharacters()->contains($settlement->getOccupant()))
+						) {
 							# Attacking force contains settlement lord of a non-occupied settlement. No need for siege! Also, why?
 							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Settlement ".$settlement->getId());
 							foreach ($siege->getCharacters() as $char) {
@@ -1401,6 +1406,7 @@ class GameRunner {
 						}
 					}
 					if ($place) {
+						$this->logger->info("  Siege is in Place #".$settlement->getId());
 						if ($leader->getInsidePlace() === $place) {
 							# Attacking leader is somehow inside the place he is besieging, looks like siege should be over! :D
 							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
@@ -1414,7 +1420,10 @@ class GameRunner {
 							$this->wm->disbandSiege($siege, $leader, true);
 						}
 						#TODO: Rework this to use some "findOwner" to sort through embassy stuff.
-						if (($place->getOwner() && (!$place->getOccupant() || !$place->getOccupier()) && $attacker->getCharacters()->contains($place->getOwner())) || ($place->getOccpant() && $attacker->getCharacters()->contains($place->getOccupant()))) {
+						if (
+							($place->getOwner() && (!$place->getOccupant() && !$place->getOccupier()) && $attacker->getCharacters()->contains($place->getOwner()))
+							|| ($place->getOccpant() && $attacker->getCharacters()->contains($place->getOccupant()))
+						) {
 							# Attacking force contains place owner of a non-occupied place. No need for siege! Also, why?
 							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
 							foreach ($siege->getCharacters() as $char) {
@@ -1427,8 +1436,10 @@ class GameRunner {
 							$this->wm->disbandSiege($siege, $leader, true);
 						}
 					}
-
 				}
+			} elseif ($attacker->getCharacters()->count() === 0) {
+				$this->logger->info("  Disbanding Siege ".$siege->getId()." -- No characters in attacking force.");
+				$this->wm->disbandSiege($siege, null, false);
 			} else {
 				# No attackers? How???
 				$this->history->logEvent(
