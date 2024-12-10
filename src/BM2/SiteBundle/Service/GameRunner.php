@@ -1437,9 +1437,6 @@ class GameRunner {
 						}
 					}
 				}
-			} elseif ($attacker->getCharacters()->count() === 0) {
-				$this->logger->info("  Disbanding Siege ".$siege->getId()." -- No characters in attacking force.");
-				$this->wm->disbandSiege($siege, null, false);
 			} else {
 				# No attackers? How???
 				$this->history->logEvent(
@@ -1454,7 +1451,10 @@ class GameRunner {
 				}
 				$this->wm->disbandSiege($siege, null, true);
 			}
-
+			if ($attacker->getCharacters()->count() === 0) {
+				$this->logger->info("  Disbanding Siege ".$siege->getId()." -- No characters in attacking force.");
+				$this->wm->disbandSiege($siege, null, false);
+			}
 		}
 		return true;
 	}
