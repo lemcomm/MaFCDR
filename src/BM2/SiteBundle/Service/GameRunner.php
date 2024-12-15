@@ -1422,7 +1422,7 @@ class GameRunner {
 						#TODO: Rework this to use some "findOwner" to sort through embassy stuff.
 						if (
 							($place->getOwner() && (!$place->getOccupant() && !$place->getOccupier()) && $attacker->getCharacters()->contains($place->getOwner()))
-							|| ($place->getOccpant() && $attacker->getCharacters()->contains($place->getOccupant()))
+							|| ($place->getOccupant() && $attacker->getCharacters()->contains($place->getOccupant()))
 						) {
 							# Attacking force contains place owner of a non-occupied place. No need for siege! Also, why?
 							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
