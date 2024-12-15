@@ -1406,7 +1406,7 @@ class GameRunner {
 						}
 					}
 					if ($place) {
-						$this->logger->info("  Siege is in Place #".$settlement->getId());
+						$this->logger->info("  Siege is in Place #".$place->getId());
 						if ($leader->getInsidePlace() === $place) {
 							# Attacking leader is somehow inside the place he is besieging, looks like siege should be over! :D
 							$this->logger->info("  Disbanding Siege ".$siege->getId()." for Place ".$place->getId());
