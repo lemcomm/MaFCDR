@@ -1,14 +1,13 @@
 Might & Fealty
 ==============
 
-This is the source code for the game [Might & Fealty](http://mightandfealty.com), a browser based, persistent, role playing game (RPG) with turn-based strategy elements written in PHP5 on the Symfony2 framework, using a PostgreSQL database for entity handling and QuantumGIS for map functionality.
+This is the old source code for the game [Might & Fealty](http://mightandfealty.com), a browser based, persistent, role playing game (RPG) with turn-based strategy elements written in PHP7.2 on the Symfony2.8 framework, using a PostgreSQL database for entity handling and QuantumGIS for map functionality.
+
+Starting in 2025, this source code was replaced with the [ReMaF](https://github.com/lemcomm/ReMaF) source code, which brings it up to Symfony 6.4 using PHP 8.4. This was considered a large enough project that doing it as a new repository was seen as the simplest method to keep things simple to work on. If you'd like to go back in time instead, you can view [The Original Source](https://github.com/tvogt/mightandfealty) which used Symfony 2.7 and PHP 5.6.
+
+All future development will be done as part of the [ReMaF](https://github.com/lemcomm/ReMaF) project, so this repository has been archived. The new project has better documentation as well as using new programming convetions.
 
 While the license doesn't forbid it, it's **strongly discouraged** to setup a separate game server, as it would split the player base and result in both servers failing to generate the dynamics needed to keep the game interesting to play. Instead, we'd encourage you to contribute your ideas and time to this project, which is the source code for the main Might & Fealty game, so we can make it a game that encompasses anything players want to do.
-
-Documentation
--------------
-
-At this time, documentation for this code is still being written, however some documentation can be found in the code itself.
 
 Completeness
 ------------
