@@ -7,8 +7,6 @@ Starting in 2025, this source code was replaced with the [ReMaF](https://github.
 
 All future development will be done as part of the [ReMaF](https://github.com/lemcomm/ReMaF) project, so this repository has been archived. The new project has better documentation as well as using new programming convetions.
 
-While the license doesn't forbid it, it's **strongly discouraged** to setup a separate game server, as it would split the player base and result in both servers failing to generate the dynamics needed to keep the game interesting to play. Instead, we'd encourage you to contribute your ideas and time to this project, which is the source code for the main Might & Fealty game, so we can make it a game that encompasses anything players want to do.
-
 Completeness
 ------------
 
